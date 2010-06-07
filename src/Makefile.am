@@ -69,4 +69,4 @@ CLEANFILES = \
 	$(NULL)
 
 datrie.txt: opencc_build_datrie datrie.in
-	./opencc_build_datrie
+	$(builddir)/opencc_build_datrie

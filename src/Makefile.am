@@ -16,8 +16,11 @@
 # limitations under the License.
 #
 
-lib_LTLIBRARIES = libopencc.la
+libopencc = libopencc.la
+
+lib_LTLIBRARIES = $(libopencc)
 bin_PROGRAMS = opencc_conv
+noinst_PROGRAMS = opencc_build_datrie
 
 libopencc_headers = \
 	opencc.h \
@@ -35,11 +38,10 @@ libopencc_la_SOURCES = \
 libopencc_la_DATA = \
 	datrie.txt \
 	$(NULL)
-
 libopencc_ladir = .
 
 opencc_conv_DEPENDENCIES = \
-	$(lib_LTLIBRARIES) \
+	$(libopencc) \
 	$(NULL)
 
 opencc_conv_SOURCES = \
@@ -48,14 +50,23 @@ opencc_conv_SOURCES = \
 	$(NULL)
 
 opencc_conv_LDADD = \
-	$(lib_LTLIBRARIES) \
+	$(libopencc) \
+	$(NULL)
+
+opencc_build_datrie_DEPENDENCIES = \
+	$(libopencc) \
+	$(NULL)
+
+opencc_build_datrie_SOURCES = \
+	opencc_build_datrie.c \
+	$(NULL)
+opencc_build_datrie_LDADD = \
+	$(libopencc) \
 	$(NULL)
 
 CLEANFILES = \
 	datrie.txt \
-	opencc_build_datrie \
 	$(NULL)
 
-datrie.txt: datrie.in opencc_build_datrie.c opencc_datrie.c
-	gcc opencc_build_datrie.c opencc_datrie.c -o opencc_build_datrie
+datrie.txt: opencc_build_datrie datrie.in
 	./opencc_build_datrie

@@ -17,6 +17,10 @@
 #
 
 libopencc = libopencc.la
+opencc_table = $(top_srcdir)/data/table.txt
+opencc_table_refined = $(builddir)/table.refined.txt
+opencc_datrie_table_h = $(builddir)/opencc_datrie_table.h
+refine_opencc_table_py = $(srcdir)/refine-opencc-table.py
 
 lib_LTLIBRARIES = $(libopencc)
 bin_PROGRAMS = opencc_conv
@@ -35,8 +39,11 @@ libopencc_la_SOURCES = \
 	$(libopencc_headers) \
 	$(NULL)
 
+libopencc_la_DEPENDENCIES = \
+	$(opencc_datrie_table_h) \
+	$(NULL)
+
 pkgdata_DATA = \
-	opencc_datrie_table.h \
 	$(NULL)
 
 opencc_conv_DEPENDENCIES = \
@@ -57,22 +64,18 @@ opencc_build_datrie_SOURCES = \
 	$(libopencc_headers) \
 	$(NULL)
 
-opencc_table = $(top_srcdir)/data/table.txt
-opencc_table_refined = $(builddir)/table.refined.txt
-opencc_table_h = $(builddir)/opencc_datrie_table.h
-
 EXTRA_DIST = \
 	$(opencc_table) \
-	$(opencc_table_refined) \
+	$(refine_opencc_table_py) \
 	$(NULL)
 
 CLEANFILES = \
-	$(opencc_table_h) \
 	$(opencc_table_refined) \
+	$(opencc_datrie_table_h) \
 	$(NULL)
 
-$(opencc_table_h): opencc_build_datrie $(opencc_table_refined)
-	$(builddir)/opencc_build_datrie < $(opencc_table_refined) > $@
+$(opencc_datrie_table_h): opencc_build_datrie table.refined.txt
+	$(builddir)/opencc_build_datrie < table.refined.txt > $@
 
-$(opencc_table_refined): refine-opencc-table.py $(opencc_table)
-	$(PYTHON) refine-opencc-table.py < $(opencc_table) > $@
+table.refined.txt: $(refine_opencc_table_py) $(opencc_table)
+	$(PYTHON) $(refine_opencc_table_py) < $(opencc_table) > $@

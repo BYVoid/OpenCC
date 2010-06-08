@@ -204,6 +204,8 @@ void make(void)
 	
 }
 
+const char * datrie_in = "datrie.in";
+
 void init(void)
 {
 	#define BUFFSIZE 1024
@@ -211,7 +213,7 @@ void init(void)
 	FILE * fp;
 	wchar_t buff[BUFFSIZE];
 	setlocale(LC_ALL, "zh_CN.UTF-8");
-	fp = fopen("datrie.in","r");
+	fp = fopen(datrie_in,"r");
 	fgetws(buff, BUFFSIZE,fp);
 	swscanf(buff,L"%d", &lexicon_count);
 	
@@ -274,8 +276,10 @@ void debug()
 	fclose(fp);
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
+    if (argc > 1)
+        datrie_in = argv[1];
 	init();
 	make();
 	writefile();

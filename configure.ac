@@ -58,10 +58,10 @@ AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION(0.16.1)
 
 # OUTPUT files
-AC_CONFIG_FILES(
+AC_CONFIG_FILES([po/Makefile.in
 Makefile
 src/Makefile
 m4/Makefile
-)
+])
 
 AC_OUTPUT

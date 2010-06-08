@@ -1,0 +1,56 @@
+Name:       @PACKAGE_NAME@
+Version:    @PACKAGE_VERSION@
+Release:    1%{?dist}
+Summary:    The Open Chinese Convert
+License:    Apache
+Group:      System Environment/Libraries
+URL:        http://code.google.com/p/ibus
+Source0:    http://ibus.googlecode.com/files/%{name}-%{version}.tar.gz
+
+BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
+%description
+The open Chinese convert.
+
+%package devel
+Summary:    Development tools for opencc
+Group:      Development/Libraries
+Requires:   %{name} = %{version}-%{release}
+
+%description devel
+Development tools for opencc.
+
+%prep
+%setup -q
+
+%build
+%configure --disable-static
+make %{?_smp_mflags}
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=${RPM_BUILD_ROOT} install
+rm -f $RPM_BUILD_ROOT%{_libdir}/libopencc.la
+
+# %find_lang %{name}
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%post
+
+%files
+# -f %{name}.lang
+%defattr(-,root,root,-)
+%doc AUTHORS COPYING README
+%{_bindir}/*
+%{_libdir}/libopencc.so.*
+
+%files devel
+%{_libdir}/libopencc.so
+%{_includedir}/opencc
+%{_libdir}/pkgconfig/opencc.pc
+
+%changelog
+* Fri Aug 08 2008 Peng Huang <shawn.p.huang@gmail.com> - @VERSION@-1
+- The first version.

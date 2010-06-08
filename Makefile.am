@@ -17,6 +17,7 @@
 #
 
 SUBDIRS = \
+	data \
 	src \
 	m4 \
 	po \

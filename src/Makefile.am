@@ -58,14 +58,21 @@ opencc_build_datrie_SOURCES = \
 	$(NULL)
 
 opencc_table = $(top_srcdir)/data/table.txt
+opencc_table_refined = $(builddir)/table.refined.txt
+opencc_table_h = $(builddir)/opencc_datrie_table.h
 
 EXTRA_DIST = \
 	$(opencc_table) \
+	$(opencc_table_refined) \
 	$(NULL)
 
 CLEANFILES = \
-	opencc_datrie_table.h \
+	$(opencc_table_h) \
+	$(opencc_table_refined) \
 	$(NULL)
 
-opencc_datrie_table.h: opencc_build_datrie $(opencc_table)
-	$(builddir)/opencc_build_datrie < $(opencc_table) > $@
+$(opencc_table_h): opencc_build_datrie $(opencc_table_refined)
+	$(builddir)/opencc_build_datrie < $(opencc_table_refined) > $@
+
+$(opencc_table_refined): refine-opencc-table.py $(opencc_table)
+	$(PYTHON) refine-opencc-table.py < $(opencc_table) > $@

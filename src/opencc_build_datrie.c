@@ -280,12 +280,18 @@ void output()
 			break;
 	item_max = i;
 	
+	int unused = 0;
 	for (i = 0; i <= item_max; i ++)
 	{
 		fprintf(fp, "\t{ %6d, %6d, %6d}, /* %6d */\n", dat[i].base, dat[i].parent, dat[i].word, i);
+		if (dat[i].parent == DATRIE_UNUSED)
+			unused ++;
 	}
 	
 	fprintf(fp, "};\n\n");
+	
+	//fprintf(fp, "/*\n* Total: %d\n* Unused: %d\n* Storage Efficiency: %.2lf percent\n*/\n\n", item_max + 1, unused, (item_max + 1 - unused) / (double)(item_max + 1) * 100);
+	
 	fprintf(fp, "#define DATRIE_SIZE (%d)\n", item_max + 1);
 	fprintf(fp, "#define DATRIE_WORD_MAX_LENGTH (%d)\n", word_max_length);
 	
@@ -341,4 +347,5 @@ int main(int argc, char **argv)
 	init();
 	make();
 	output();
+	//write_debug();
 }

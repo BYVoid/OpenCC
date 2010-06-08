@@ -64,6 +64,11 @@ const wchar_t * get_trad_in_datrie(const wchar_t * word, int * match_pos,int lim
 	int pos, item;
 	match_word(dat, word, &pos, &item, limit);
 	
+	while (dat[item].word == -1 && pos > 1)
+	{
+		match_word(dat, word, &pos, &item, pos - 1);
+	}
+	
 	if (match_pos)
 		*match_pos = pos;
 	

@@ -63,6 +63,7 @@ AM_GNU_GETTEXT_VERSION(0.16.1)
 # OUTPUT files
 AC_CONFIG_FILES([po/Makefile.in
 Makefile
+opencc.pc
 src/Makefile
 data/Makefile
 m4/Makefile

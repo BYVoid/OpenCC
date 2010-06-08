@@ -25,7 +25,11 @@ SUBDIRS = \
 
 ACLOCAL_AMFLAGS = -I m4
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = opencc.pc
+
 EXTRA_DIST = \
+	opencc.pc.in \
 	autogen.sh \
 	$(NULL)
 

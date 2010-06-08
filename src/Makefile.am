@@ -34,8 +34,11 @@ libopencc_built_headers = \
 libopencc_la_SOURCES = \
 	opencc_datrie.c \
 	opencc_convert.c \
+	$(NULL)
+libopencc_la_HEADERS = \
 	$(libopencc_headers) \
 	$(NULL)
+libopencc_ladir = $(pkgincludedir)
 nodist_libopencc_la_SOURCES = \
 	$(libopencc_built_headers) \
 	$(NULL)

@@ -21,6 +21,10 @@
 #include <stdlib.h>
 #include <locale.h>
 
+#define DATRIE_SIZE 300000
+#define DATRIE_WORD_MAX_COUNT 100000
+#define DATRIE_WORD_MAX_LENGTH 12
+
 typedef struct
 {
 	wchar_t simp[DATRIE_WORD_MAX_LENGTH];
@@ -32,12 +36,34 @@ Entry lexicon[DATRIE_WORD_MAX_COUNT];
 int lexicon_count;
 int words_set[DATRIE_WORD_MAX_COUNT],words_set_count;
 wchar_t words_set_char[DATRIE_WORD_MAX_COUNT];
-DoubleArrayTrie newdat;
+DoubleArrayTrieItem dat[DATRIE_SIZE];
+
+int encode_char(wchar_t ch)
+{
+	return (int)ch;
+}
+
+void match_word(const DoubleArrayTrieItem *dat, const wchar_t * word, int *match_pos, int *id, int limit)
+{
+	int i, j, p;
+	for (i = 0,p = 0; word[p] && (limit == 0 || p < limit) && dat[i].base != DATRIE_UNUSED; p ++)
+	{
+		int k = encode_char(word[p]);
+		j = dat[i].base + k;
+		if (j < 0 || j > DATRIE_SIZE || dat[j].parent != i)
+			break;
+		i = j;
+	}
+	if (match_pos)
+		*match_pos = p;
+	if (id)
+		*id = i;
+}
 
 int unused(int i)
 {
 	if (i >= 0 && i < DATRIE_SIZE)
-		return newdat.items[i].parent == DATRIE_UNUSED;
+		return dat[i].parent == DATRIE_UNUSED;
 	return FALSE;
 }
 
@@ -127,10 +153,10 @@ void insert_first_char(int id)
 {
 	Entry * word = &lexicon[id];
 	int k = encode_char(word->simp[0]);
-	newdat.items[k].base = DATRIE_UNUSED;
-	newdat.items[k].parent = 0;
+	dat[k].base = DATRIE_UNUSED;
+	dat[k].parent = 0;
 	if (word->length == 1)
-		newdat.items[k].word = id;
+		dat[k].word = id;
 }
 
 int insert_words(int delta, int parent,int word_len)
@@ -140,10 +166,10 @@ int insert_words(int delta, int parent,int word_len)
 	{
 		int j = words_set[i];
 		int k = encode_char(lexicon[j].simp[word_len]) + delta;
-		newdat.items[k].parent = parent;
+		dat[k].parent = parent;
 		if (lexicon[j].length == word_len + 1)
 		{
-			newdat.items[k].word = j;
+			dat[k].word = j;
 		}
 	}
 }
@@ -156,7 +182,7 @@ void insert(int id)
 	{
 		int p,i;
 		
-		match_word(&newdat, word->simp, &p, &i, 0);
+		match_word(dat, word->simp, &p, &i, 0);
 		if (p == word->length)
 			return;
 		
@@ -170,12 +196,13 @@ void insert(int id)
 		
 		if (delta == DATRIE_SIZE)
 		{
-			//error
+			fprintf(stderr,"DATRIE_SIZE Not Enough!\n");
+			exit(1);
 		}
 		
 		insert_words(delta, i, p);
 		
-		newdat.items[i].base = delta;
+		dat[i].base = delta;
 		while (!unused(space_min))
 			space_min++;
 	}
@@ -191,10 +218,10 @@ void make(void)
 	int i;
 	for (i = 1; i < DATRIE_SIZE; i ++)
 	{
-		newdat.items[i].parent = newdat.items[i].base = DATRIE_UNUSED;
-		newdat.items[i].word = -1;
+		dat[i].parent = dat[i].base = DATRIE_UNUSED;
+		dat[i].word = -1;
 	}
-	newdat.items[0].parent = newdat.items[0].base = 0;
+	dat[0].parent = dat[0].base = 0;
 	
 	qsort(lexicon, lexicon_count, sizeof(lexicon[0]), cmp);
 	for (i = 0; i < lexicon_count; i ++)
@@ -204,22 +231,17 @@ void make(void)
 	
 }
 
-const char * datrie_in = "datrie.in";
-
 void init(void)
 {
 	#define BUFFSIZE 1024
 	int i, tlen;
-	FILE * fp;
+	FILE * fp = stdin;
 	wchar_t buff[BUFFSIZE];
-	setlocale(LC_ALL, "zh_CN.UTF-8");
-	fp = fopen(datrie_in,"r");
-	fgetws(buff, BUFFSIZE,fp);
-	swscanf(buff,L"%d", &lexicon_count);
 	
-	for (i = 0; i < lexicon_count; i ++)
+	setlocale(LC_ALL, "zh_CN.UTF-8");
+	
+	for (i = 0; fgetws(buff, BUFFSIZE,fp); i ++)
 	{
-		fgetws(buff, BUFFSIZE,fp);
 		swscanf(buff,L"%ls%ls", lexicon[i].simp, lexicon[i].trad);
 		lexicon[i].length = wcslen(lexicon[i].simp);
 #if 0
@@ -229,10 +251,48 @@ void init(void)
 			lexicon[i].trad[tlen-1] = 0;
 #endif
 	}
+	
+	lexicon_count = i;
+	
 	fclose(fp);
 }
 
-void writefile()
+void output()
+{
+	FILE * fp = stdout;
+	int i, item_max, word_max_length = 0;
+	
+	fprintf(fp, "static const wchar_t * const words[] = {\n");
+
+	for (i = 0; i < lexicon_count; i ++)
+	{
+		fprintf(fp, "\tL\"%ls\", /* %6d */\n", lexicon[i].trad, i);
+		if (lexicon[i].length > word_max_length)
+			word_max_length = lexicon[i].length;
+	}
+	
+	fprintf(fp, "};\n\n");
+	fprintf(fp, "static const DoubleArrayTrieItem dat[] = {\n");
+	fprintf(fp, "\t/*  Base  Parent    Word          ID */\n");
+	
+	for (i = DATRIE_SIZE - 1; i > 0; i --)
+		if (dat[i].parent != DATRIE_UNUSED)
+			break;
+	item_max = i;
+	
+	for (i = 0; i <= item_max; i ++)
+	{
+		fprintf(fp, "\t{ %6d, %6d, %6d}, /* %6d */\n", dat[i].base, dat[i].parent, dat[i].word, i);
+	}
+	
+	fprintf(fp, "};\n\n");
+	fprintf(fp, "#define DATRIE_SIZE (%d)\n", item_max + 1);
+	fprintf(fp, "#define DATRIE_WORD_MAX_LENGTH (%d)\n", word_max_length);
+	
+	fclose(fp);
+}
+
+void write_text_file()
 {
 	FILE * fp;
 	int i;
@@ -246,16 +306,16 @@ void writefile()
 	
 	for (i = 0; i < DATRIE_SIZE; i ++)
 	{
-		if (newdat.items[i].parent != DATRIE_UNUSED)
+		if (dat[i].parent != DATRIE_UNUSED)
 		{
-			fprintf(fp,"%d %d %d %d\n", i, newdat.items[i].base, newdat.items[i].parent, newdat.items[i].word);
+			fprintf(fp,"%d %d %d %d\n", i, dat[i].base, dat[i].parent, dat[i].word);
 		}
 	}
 	
 	fclose(fp);
 }
 
-void debug()
+void write_debug()
 {
 	int i;
 	FILE * fp;
@@ -264,11 +324,11 @@ void debug()
 	
 	for (i = 0; i < DATRIE_SIZE; i ++)
 	{
-		if (newdat.items[i].parent != DATRIE_UNUSED)
+		if (dat[i].parent != DATRIE_UNUSED)
 		{
-			fprintf(fp,"[%6d] Base:%6d Parent:%6d",i,newdat.items[i].base,newdat.items[i].parent);
-			if (newdat.items[i].word != -1)
-				fprintf(fp," [%ls] [%ls]",lexicon[newdat.items[i].word].simp,lexicon[newdat.items[i].word].trad);
+			fprintf(fp,"[%6d] Base:%6d Parent:%6d",i,dat[i].base,dat[i].parent);
+			if (dat[i].word != -1)
+				fprintf(fp," [%ls] [%ls]",lexicon[dat[i].word].simp,lexicon[dat[i].word].trad);
 			fprintf(fp,"\n");
 		}
 	}
@@ -278,10 +338,7 @@ void debug()
 
 int main(int argc, char **argv)
 {
-    if (argc > 1)
-        datrie_in = argv[1];
 	init();
 	make();
-	writefile();
-	//debug();
+	output();
 }

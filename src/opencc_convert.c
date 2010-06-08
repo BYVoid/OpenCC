@@ -22,7 +22,7 @@
 wchar_t * segment_sp(wchar_t * pdest, const wchar_t * text, int start, int end)
 {
 	/* 最短路徑分詞 */
-	static int match_length[DATRIE_WORD_MAX_LENGTH];
+	static int match_length[SEGMENT_BUFF_SIZE + 1];
 	static int min_len[SEGMENT_BUFF_SIZE], parent[SEGMENT_BUFF_SIZE], path[SEGMENT_BUFF_SIZE];
 	
 	int i, j, k;

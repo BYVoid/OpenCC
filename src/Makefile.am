@@ -36,7 +36,7 @@ libopencc_la_SOURCES = \
 	$(NULL)
 
 pkgdata_DATA = \
-	datrie.txt \
+	opencc_datrie_table.h \
 	$(NULL)
 
 opencc_conv_DEPENDENCIES = \
@@ -52,24 +52,20 @@ opencc_conv_LDADD = \
 	$(libopencc) \
 	$(NULL)
 
-opencc_build_datrie_DEPENDENCIES = \
-	$(libopencc) \
-	$(NULL)
-
 opencc_build_datrie_SOURCES = \
 	opencc_build_datrie.c \
-	$(NULL)
-opencc_build_datrie_LDADD = \
-	$(libopencc) \
+	$(libopencc_headers) \
 	$(NULL)
 
+opencc_table = $(top_srcdir)/data/table.txt
+
 EXTRA_DIST = \
-	datrie.in \
+	$(opencc_table) \
 	$(NULL)
 
 CLEANFILES = \
-	datrie.txt \
+	opencc_datrie_table.h \
 	$(NULL)
 
-datrie.txt: opencc_build_datrie $(srcdir)/datrie.in
-	$(builddir)/opencc_build_datrie $(srcdir)/datrie.in
+opencc_datrie_table.h: opencc_build_datrie $(opencc_table)
+	$(builddir)/opencc_build_datrie < $(opencc_table) > $@

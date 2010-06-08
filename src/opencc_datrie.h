@@ -21,9 +21,6 @@
 
 #include "opencc_utils.h"
 
-#define DATRIE_SIZE 300000
-#define DATRIE_WORD_MAX_COUNT 100000
-#define DATRIE_WORD_MAX_LENGTH 12
 #define DATRIE_UNUSED -1
 
 typedef struct
@@ -33,15 +30,7 @@ typedef struct
 	int word;
 } DoubleArrayTrieItem;
 
-typedef struct
-{
-	DoubleArrayTrieItem items[DATRIE_SIZE];
-} DoubleArrayTrie;
-
 const wchar_t * get_trad_in_datrie(const wchar_t *, int *, int);
 void get_match_lengths(const wchar_t *, int *);
-
-int encode_char(wchar_t);
-void match_word(const DoubleArrayTrie *, const wchar_t *, int *, int *, int);
 
 #endif /* __OPENCC_DATRIE_H_ */

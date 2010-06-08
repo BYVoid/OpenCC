@@ -75,7 +75,10 @@ CLEANFILES = \
 	table.refined.txt \
 	$(NULL)
 
-opencc_datrie_table.h: $(opencc_table) opencc_build_datrie
+opencc_datrie_table.h: table.refined.txt opencc_build_datrie
 	$(AM_V_GEN) \
-	$(PYTHON) $(srcdir)/refine-opencc-table.py < $(opencc_table) > table.refined.txt && \
 	./opencc_build_datrie < table.refined.txt > $@
+
+table.refined.txt: $(opencc_table)
+	$(AM_V_GEN) \
+	$(PYTHON) $(srcdir)/refine-opencc-table.py < $(opencc_table) > table.refined.txt

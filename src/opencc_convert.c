@@ -22,6 +22,12 @@
 
 #define DEFAULT_SEGMENT_BUFF_SIZE 10240
 
+typedef struct
+{
+	opencc_convert_direction_t convert_direction;
+	opencc_convert_errno_t errno;
+} opencc_description;
+
 int segment_buff_size = DEFAULT_SEGMENT_BUFF_SIZE;
 int * sp_seg_match_length = NULL;
 int * sp_seg_min_len = NULL;
@@ -122,62 +128,73 @@ wchar_t * sp_seg(wchar_t * pdest, const wchar_t * text, int start, int end)
 	return pdest;
 }
 
-wchar_t * mmsp_seg(wchar_t * dest, const wchar_t * text)
+void mmsp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
+		wchar_t ** outbuf, size_t * outbuf_left)
 {
 	/* 正向最大分詞 */
-	static wchar_t buff_single[2] = {0, 0};
-	int i, match_len, start, bound;
-	wchar_t * pdest = dest;
+	int i, start, bound;
+	int length_limit = *inbuf_left;
 	
 	bound = -1;
 	
-	for (i = start = 0; text[i]; i ++)
+	for (i = start = 0; i < length_limit && (*inbuf)[i]; i ++)
 	{
 		if (i == bound)
 		{
 			/* 對歧義部分進行最短路徑分詞 */
-			pdest = sp_seg(pdest, text, start, bound);
+			//sp_seg(od, inbuf, inbuf_left, outbuf, outbuf_left, start, bound);
 			start = i;
 		}
 	
-		const wchar_t * rs = get_trad_in_datrie(text + i, &match_len, 0);
+		int match_len;
+		get_trad_in_datrie((*inbuf) + i, &match_len, 0);
 		
-		if (rs == NULL)
+		//if (rs == NULL)
 			match_len = 1;
 		
 		if (i + match_len > bound)
 			bound = i + match_len;
 	}
 	
-	pdest = sp_seg(pdest, text, start, i);
-	*pdest = 0;
-	
-	return dest;
+	//pdest = sp_seg(pdest, text, start, i);
 }
 
-wchar_t * mm_seg(wchar_t * dest, const wchar_t * text)
+size_t mm_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
+		wchar_t ** outbuf, size_t * outbuf_left)
 {
-	const wchar_t * ptext;
-	wchar_t * pdest;
-	int match_pos;
-	
-	for (ptext = text, pdest = dest; *ptext;)
+	size_t inbuf_left_start = *inbuf_left;
+
+	for (; **inbuf && *inbuf_left > 0 && *outbuf_left > 0;)
 	{
-		const wchar_t * match_rs = get_trad_in_datrie(ptext, &match_pos, 0);
+		int match_len;
+		const wchar_t * match_rs = get_trad_in_datrie(*inbuf, &match_len, *inbuf_left);
+
+		if (match_len > *outbuf_left) /* 輸出緩衝區剩餘空間小於分詞長度 */
+		{
+			if (inbuf_left_start - *inbuf_left > 0)
+				break;
+			od->errno = OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH;
+			return (size_t) -1;
+		}
+
 		if (match_rs == NULL)
-			*pdest ++ = *ptext ++;
+		{
+			**outbuf = **inbuf;
+			(*outbuf) ++, (*outbuf_left) --;
+			(*inbuf) ++, (*inbuf_left) --;
+		}
 		else
 		{
-			const wchar_t * pmrs;
-			for (pmrs = match_rs; *pmrs; pmrs ++)
-				*pdest ++ = *pmrs;
-			ptext += match_pos;
+			for (; *match_rs; match_rs ++)
+			{
+				**outbuf = *match_rs;
+				(*outbuf) ++,(*outbuf_left) --;
+				(*inbuf) ++,(*inbuf_left) --;
+			}
 		}
 	}
-	
-	*pdest = 0;
-	
-	return dest;
+
+	return inbuf_left_start - *inbuf_left;
 }
 
 int opencc_set_segment_buff_size(int size)
@@ -191,7 +208,51 @@ int opencc_get_segment_buff_size(void)
 	return segment_buff_size;
 }
 
-wchar_t * opencc_simp_to_trad(wchar_t * dest, const wchar_t * text)
+size_t opencc_convert(opencc_t odt, wchar_t ** inbuf, size_t * inbuf_left,
+		wchar_t ** outbuf, size_t * outbuf_left)
 {
-	return mmsp_seg(dest, text);
+	opencc_description * od = (opencc_description *) odt;
+
+	if (od->convert_direction == OPENCC_CONVERT_SIMP_TO_TRAD)
+	{
+		return mm_seg(od, inbuf, inbuf_left, outbuf, outbuf_left);
+		//return mmsp_seg(od, inbuf, inbuf_left, outbuf, outbuf_left);
+	}
+}
+
+opencc_t opencc_open(opencc_convert_direction_t convert_direction)
+{
+	opencc_description * od;
+	od = (opencc_description *) malloc(sizeof(opencc_description));
+
+	od->convert_direction = convert_direction;
+	od->errno = OPENCC_CONVERT_ERROR_VOID;
+
+	return (opencc_t) od;
+}
+
+void opencc_close(opencc_t odt)
+{
+	opencc_description * od;
+	od = (opencc_description *) odt;
+	free(od);
+}
+
+opencc_convert_errno_t opencc_errno(opencc_t odt)
+{
+	opencc_description * od;
+	od = (opencc_description *) odt;
+	return od->errno;
+}
+
+void opencc_perror(opencc_t odt)
+{
+	switch (opencc_errno(odt))
+	{
+	case OPENCC_CONVERT_ERROR_VOID:
+		break;
+	case OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH:
+		fprintf(stderr, "Output buffer is not enough for one segment.\n");
+		break;
+	}
 }

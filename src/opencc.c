@@ -20,24 +20,48 @@
 #include <locale.h>
 #include <stdio.h>
 
-#define BUFF_SIZE 1048576
+#define INPUT_BUFFER_SIZE 1048576
+#define OUTPUT_BUFFER_SIZE 4
 
-wchar_t buff[BUFF_SIZE],rs[BUFF_SIZE];
+wchar_t inbuf[INPUT_BUFFER_SIZE + 1],outbuf[OUTPUT_BUFFER_SIZE + 1];
 
 int main()
 {
 	setlocale(LC_ALL, "zh_CN.utf8");
 	
 	FILE * fp = stdin;
+	//fp = fopen("test.txt","r");
 	
-	opencc_set_segment_buff_size(BUFF_SIZE);
+	opencc_t od = opencc_open(OPENCC_CONVERT_SIMP_TO_TRAD);
 	
-	while (fgetws(buff, BUFF_SIZE, fp) != NULL)
+	while (fgetws(inbuf, INPUT_BUFFER_SIZE, fp) != NULL)
 	{
-		opencc_simp_to_trad(rs,buff);
+		wchar_t * pinbuf = inbuf, * poutbuf = outbuf;
+		size_t inbuf_left, outbuf_left;
+		size_t ccnt;
+
+		inbuf_left = wcslen(inbuf);
+		outbuf_left = OUTPUT_BUFFER_SIZE;
+
+		while ((ccnt = opencc_convert(od, &pinbuf, &inbuf_left, &poutbuf, &outbuf_left)) > 0)
+		{
+			if (ccnt == OPENCC_CONVERT_ERROR)
+			{
+				opencc_perror(od);
+				break;
+			}
+
+			*poutbuf = 0;
+
+			printf("%ls %d %d\n", outbuf, inbuf_left, outbuf_left);
+
+			outbuf_left = OUTPUT_BUFFER_SIZE;
+			poutbuf = outbuf;
+		}
 		
-		printf("%ls",rs);
 	}
 	
+	opencc_close(od);
+
 	return 0;
 }

@@ -19,15 +19,32 @@
 #ifndef __OPENCC_CONVERT_H_
 #define __OPENCC_CONVERT_H_
 
-#include <wchar.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-wchar_t * opencc_simp_to_trad(wchar_t *, const wchar_t *);
-int opencc_set_segment_buff_size(int);
-int opencc_get_segment_buff_size(void);
+#include <wchar.h>
+
+#define OPENCC_CONVERT_ERROR ((size_t) -1)
+
+typedef void * opencc_t;
+
+typedef enum
+{
+	OPENCC_CONVERT_SIMP_TO_TRAD,
+} opencc_convert_direction_t;
+
+typedef enum
+{
+	OPENCC_CONVERT_ERROR_VOID,
+	OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH,
+} opencc_convert_errno_t;
+
+opencc_t opencc_open(opencc_convert_direction_t);
+void opencc_close(opencc_t);
+size_t opencc_convert(opencc_t, wchar_t **, size_t *, wchar_t **, size_t *);
+opencc_convert_errno_t opencc_errno(opencc_t);
+void opencc_perror(opencc_t);
 
 #ifdef __cplusplus
 };

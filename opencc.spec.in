@@ -4,8 +4,8 @@ Release:    1%{?dist}
 Summary:    The Open Chinese Convert
 License:    Apache
 Group:      System Environment/Libraries
-URL:        http://code.google.com/p/ibus
-Source0:    http://ibus.googlecode.com/files/%{name}-%{version}.tar.gz
+URL:        http://code.google.com/p/open-chinese-convert/
+Source0:    http://open-chinese-convert.googlecode.com/files/%{name}-%{version}.tar.gz
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 

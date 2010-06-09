@@ -20,7 +20,5 @@
 #define __OPENCC_H_
 
 #include "opencc_convert.h"
-#include "opencc_datrie.h"
-#include "opencc_utils.h"
 
 #endif /* __OPENCC_H_ */

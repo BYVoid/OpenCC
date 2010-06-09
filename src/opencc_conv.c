@@ -20,19 +20,22 @@
 #include <locale.h>
 #include <stdio.h>
 
-wchar_t buff[SEGMENT_BUFF_SIZE],rs[SEGMENT_BUFF_SIZE];
+#define BUFF_SIZE 1048576
+
+wchar_t buff[BUFF_SIZE],rs[BUFF_SIZE];
 
 int main()
 {
-	setlocale(LC_ALL, "zh_CN.UTF-8");
+	setlocale(LC_ALL, "zh_CN.utf8");
 	
 	FILE * fp = stdin;
-	//fp = fopen("testsimp.txt","r");
 	
-	while (fgetws(buff, SEGMENT_BUFF_SIZE, fp) != NULL)
+	opencc_set_segment_buff_size(BUFF_SIZE);
+	
+	while (fgetws(buff, BUFF_SIZE, fp) != NULL)
 	{
-		//simp_to_trad(rs,buff);
-		words_segmention(rs,buff);
+		opencc_simp_to_trad(rs,buff);
+		
 		printf("%ls",rs);
 	}
 	

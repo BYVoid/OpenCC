@@ -19,16 +19,15 @@
 #ifndef __OPENCC_CONVERT_H_
 #define __OPENCC_CONVERT_H_
 
-#include "opencc_utils.h"
-
-#define SEGMENT_BUFF_SIZE 1048576
+#include <wchar.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-wchar_t * words_segmention(wchar_t * dest, const wchar_t * text);
-wchar_t * simp_to_trad(wchar_t * dest, const wchar_t * text);
+wchar_t * opencc_simp_to_trad(wchar_t *, const wchar_t *);
+int opencc_set_segment_buff_size(int);
+int opencc_get_segment_buff_size(void);
 
 #ifdef __cplusplus
 };

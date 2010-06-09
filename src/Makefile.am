@@ -19,14 +19,12 @@
 libopencc = libopencc.la
 
 lib_LTLIBRARIES = $(libopencc)
-bin_PROGRAMS = opencc_conv
+bin_PROGRAMS = opencc_s2t
 noinst_PROGRAMS = opencc_build_datrie
 
 libopencc_headers = \
 	opencc.h \
-	opencc_datrie.h \
 	opencc_convert.h \
-	opencc_utils.h \
 	$(NULL)
 libopencc_built_headers = \
 	opencc_datrie_table.h \
@@ -40,6 +38,8 @@ libopencc_la_HEADERS = \
 	$(NULL)
 libopencc_ladir = $(pkgincludedir)
 nodist_libopencc_la_SOURCES = \
+	opencc_datrie.h \
+	opencc_utils.h \
 	$(libopencc_built_headers) \
 	$(NULL)
 BUILT_SOURCES = \
@@ -49,16 +49,16 @@ BUILT_SOURCES = \
 pkgdata_DATA = \
 	$(NULL)
 
-opencc_conv_DEPENDENCIES = \
+opencc_s2t_DEPENDENCIES = \
 	$(libopencc) \
 	$(NULL)
 
-opencc_conv_SOURCES = \
+opencc_s2t_SOURCES = \
 	opencc_conv.c \
 	$(libopencc_headers) \
 	$(NULL)
 
-opencc_conv_LDADD = \
+opencc_s2t_LDADD = \
 	$(libopencc) \
 	$(NULL)
 

@@ -20,6 +20,9 @@
 #define __OPENCC_UTILS_H_
 
 #include <wchar.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #define FALSE (0)
 #define TRUE (!(0))

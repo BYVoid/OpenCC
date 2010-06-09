@@ -18,52 +18,92 @@
 
 #include "opencc_convert.h"
 #include "opencc_datrie.h"
+#include "opencc_utils.h"
 
-wchar_t * segment_sp(wchar_t * pdest, const wchar_t * text, int start, int end)
+#define DEFAULT_SEGMENT_BUFF_SIZE 10240
+
+int segment_buff_size = DEFAULT_SEGMENT_BUFF_SIZE;
+int * sp_seg_match_length = NULL;
+int * sp_seg_min_len = NULL;
+int * sp_seg_parent = NULL;
+int * sp_seg_path = NULL;
+int sp_seg_initialized = FALSE;
+
+void sp_seg_set_buff_size()
+{
+	if (sp_seg_initialized == TRUE)
+	{
+		free(sp_seg_match_length);
+		free(sp_seg_min_len);
+		free(sp_seg_parent);
+		free(sp_seg_path);
+	}
+	
+	sp_seg_match_length = (int *) malloc((segment_buff_size + 1) * sizeof(int));
+	sp_seg_min_len = (int *) malloc(segment_buff_size * sizeof(int));
+	sp_seg_parent = (int *) malloc(segment_buff_size * sizeof(int));
+	sp_seg_path = (int *) malloc(segment_buff_size * sizeof(int));
+	
+	sp_seg_initialized = TRUE;
+}
+
+wchar_t * sp_seg(wchar_t * pdest, const wchar_t * text, int start, int end)
 {
 	/* 最短路徑分詞 */
-	static int match_length[SEGMENT_BUFF_SIZE + 1];
-	static int min_len[SEGMENT_BUFF_SIZE], parent[SEGMENT_BUFF_SIZE], path[SEGMENT_BUFF_SIZE];
-	
 	int i, j, k;
 	
-	for (i = start; i <= end; i ++)
-		min_len[i - start] = parent[i - start] = INFINITY_INT;
+	if (end - start == 1) /* 對長度爲1時特殊優化 */
+	{
+		const wchar_t * match_rs = get_trad_in_datrie(text + start, NULL, 1);
+		
+		if (match_rs == NULL)
+			*pdest ++ = *(text + start);
+		else
+			*pdest ++ = *match_rs;
+		
+		return pdest;
+	}
 	
-	min_len[0] = parent[0] = 0;
+	if (sp_seg_initialized == FALSE)
+		sp_seg_set_buff_size();
+	
+	for (i = start; i <= end; i ++)
+		sp_seg_min_len[i - start] = sp_seg_parent[i - start] = INFINITY_INT;
+	
+	sp_seg_min_len[0] = sp_seg_parent[0] = 0;
 	
 	for (i = start; i < end; i ++)
 	{
-		get_match_lengths(text + i, match_length); /* 獲取所有匹配長度 */
+		get_match_lengths(text + i, sp_seg_match_length); /* 獲取所有匹配長度 */
 		
-		if (match_length[1] != 1)
-			match_length[++ match_length[0]] = 1;
+		if (sp_seg_match_length[1] != 1)
+			sp_seg_match_length[++ sp_seg_match_length[0]] = 1;
 		
-		for (j = 1; j <= match_length[0]; j ++) /* 動態規劃求最短分割路徑 */
+		for (j = 1; j <= sp_seg_match_length[0]; j ++) /* 動態規劃求最短分割路徑 */
 		{
-			k = match_length[j];
-			match_length[j] = 0;
+			k = sp_seg_match_length[j];
+			sp_seg_match_length[j] = 0;
 			
-			if (min_len[i - start] + 1 <= min_len[i - start + k])
+			if (sp_seg_min_len[i - start] + 1 <= sp_seg_min_len[i - start + k])
 			{
-				min_len[i - start + k] = min_len[i - start] + 1;
-				parent[i - start + k] = i - start;
+				sp_seg_min_len[i - start + k] = sp_seg_min_len[i - start] + 1;
+				sp_seg_parent[i - start + k] = i - start;
 			}
 		}
 	}
 	
 	i = end - start; /* 取得最短分割路徑 */
-	j = min_len[i];
+	j = sp_seg_min_len[i];
 	while (i != 0)
 	{
-		path[--j] = i;
-		i = parent[i];
+		sp_seg_path[--j] = i;
+		i = sp_seg_parent[i];
 	}
 	
 	j = 0;
-	for (i = 0; i < min_len[end - start]; i ++) /* 根據最短分割路徑轉換 */
+	for (i = 0; i < sp_seg_min_len[end - start]; i ++) /* 根據最短分割路徑轉換 */
 	{
-		k = path[i];
+		k = sp_seg_path[i];
 		
 		const wchar_t * match_rs = get_trad_in_datrie(text + start + j, NULL, k - j);
 		
@@ -82,7 +122,7 @@ wchar_t * segment_sp(wchar_t * pdest, const wchar_t * text, int start, int end)
 	return pdest;
 }
 
-wchar_t * words_segmention(wchar_t * dest, const wchar_t * text)
+wchar_t * mmsp_seg(wchar_t * dest, const wchar_t * text)
 {
 	/* 正向最大分詞 */
 	static wchar_t buff_single[2] = {0, 0};
@@ -96,7 +136,7 @@ wchar_t * words_segmention(wchar_t * dest, const wchar_t * text)
 		if (i == bound)
 		{
 			/* 對歧義部分進行最短路徑分詞 */
-			pdest = segment_sp(pdest, text, start, bound);
+			pdest = sp_seg(pdest, text, start, bound);
 			start = i;
 		}
 	
@@ -109,13 +149,13 @@ wchar_t * words_segmention(wchar_t * dest, const wchar_t * text)
 			bound = i + match_len;
 	}
 	
-	pdest = segment_sp(pdest, text, start, i);
+	pdest = sp_seg(pdest, text, start, i);
 	*pdest = 0;
 	
 	return dest;
 }
 
-wchar_t * simp_to_trad(wchar_t * dest, const wchar_t * text)
+wchar_t * mm_seg(wchar_t * dest, const wchar_t * text)
 {
 	const wchar_t * ptext;
 	wchar_t * pdest;
@@ -133,10 +173,25 @@ wchar_t * simp_to_trad(wchar_t * dest, const wchar_t * text)
 				*pdest ++ = *pmrs;
 			ptext += match_pos;
 		}
-		//*pdest ++ = ' ';
 	}
 	
 	*pdest = 0;
 	
 	return dest;
+}
+
+int opencc_set_segment_buff_size(int size)
+{
+	segment_buff_size = size;
+	sp_seg_set_buff_size();
+}
+
+int opencc_get_segment_buff_size(void)
+{
+	return segment_buff_size;
+}
+
+wchar_t * opencc_simp_to_trad(wchar_t * dest, const wchar_t * text)
+{
+	return mmsp_seg(dest, text);
 }

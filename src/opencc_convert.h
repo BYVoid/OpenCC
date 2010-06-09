@@ -23,7 +23,15 @@
 
 #define SEGMENT_BUFF_SIZE 1048576
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 wchar_t * words_segmention(wchar_t * dest, const wchar_t * text);
 wchar_t * simp_to_trad(wchar_t * dest, const wchar_t * text);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif /* __OPENCC_CONVERT_H_ */

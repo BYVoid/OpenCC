@@ -19,7 +19,7 @@
 libopencc = libopencc.la
 
 lib_LTLIBRARIES = $(libopencc)
-bin_PROGRAMS = opencc_s2t
+bin_PROGRAMS = opencc
 noinst_PROGRAMS = opencc_build_datrie
 
 libopencc_headers = \
@@ -32,14 +32,14 @@ libopencc_built_headers = \
 libopencc_la_SOURCES = \
 	opencc_datrie.c \
 	opencc_convert.c \
+	opencc_datrie.h \
+	opencc_utils.h \
 	$(NULL)
 libopencc_la_HEADERS = \
 	$(libopencc_headers) \
 	$(NULL)
 libopencc_ladir = $(pkgincludedir)
 nodist_libopencc_la_SOURCES = \
-	opencc_datrie.h \
-	opencc_utils.h \
 	$(libopencc_built_headers) \
 	$(NULL)
 BUILT_SOURCES = \
@@ -49,16 +49,16 @@ BUILT_SOURCES = \
 pkgdata_DATA = \
 	$(NULL)
 
-opencc_s2t_DEPENDENCIES = \
+opencc_DEPENDENCIES = \
 	$(libopencc) \
 	$(NULL)
 
-opencc_s2t_SOURCES = \
-	opencc_conv.c \
+opencc_SOURCES = \
+	opencc.c \
 	$(libopencc_headers) \
 	$(NULL)
 
-opencc_s2t_LDADD = \
+opencc_LDADD = \
 	$(libopencc) \
 	$(NULL)
 
@@ -85,3 +85,4 @@ opencc_datrie_table.h: table.refined.txt opencc_build_datrie
 table.refined.txt: $(opencc_table)
 	$(AM_V_GEN) \
 	$(PYTHON) $(srcdir)/refine-opencc-table.py < $(opencc_table) > table.refined.txt
+

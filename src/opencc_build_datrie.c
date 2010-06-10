@@ -159,7 +159,7 @@ void insert_first_char(int id)
 		dat[k].word = id;
 }
 
-int insert_words(int delta, int parent,int word_len)
+void insert_words(int delta, int parent,int word_len)
 {
 	int i;
 	for (i = 0; i < words_set_count; i ++)
@@ -234,7 +234,7 @@ void make(void)
 void init(void)
 {
 	#define BUFFSIZE 1024
-	int i, tlen;
+	int i;
 	FILE * fp = stdin;
 	wchar_t buff[BUFFSIZE];
 	
@@ -246,7 +246,7 @@ void init(void)
 		lexicon[i].length = wcslen(lexicon[i].simp);
 #if 0
 		wcscpy(lexicon[i].trad,buff + lexicon[i].length + 1);
-		tlen = wcslen(lexicon[i].trad);
+		int tlen = wcslen(lexicon[i].trad);
 		if (lexicon[i].trad[tlen-1] == L'\n' || lexicon[i].trad[tlen-1] == WEOF)
 			lexicon[i].trad[tlen-1] = 0;
 #endif
@@ -348,4 +348,5 @@ int main(int argc, char **argv)
 	make();
 	output();
 	//write_debug();
+	return 0;
 }

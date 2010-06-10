@@ -24,7 +24,6 @@ noinst_PROGRAMS = opencc_build_datrie
 
 libopencc_headers = \
 	opencc.h \
-	opencc_convert.h \
 	$(NULL)
 libopencc_built_headers = \
 	opencc_datrie_table.h \

@@ -16,7 +16,7 @@
 * limitations under the License.
 */
 
-#include "opencc_convert.h"
+#include "opencc.h"
 #include "opencc_datrie.h"
 #include "opencc_utils.h"
 

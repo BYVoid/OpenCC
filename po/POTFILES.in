@@ -1,7 +1,6 @@
 src/opencc_build_datrie.c
 src/opencc.c
 src/opencc_convert.c
-src/opencc_convert.h
 src/opencc_datrie.c
 src/opencc_datrie.h
 src/opencc.h

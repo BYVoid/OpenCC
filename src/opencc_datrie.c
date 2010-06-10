@@ -24,13 +24,13 @@ int encode_char(wchar_t ch)
 	return (int)ch;
 }
 
-void match_word(const DoubleArrayTrieItem *dat, const wchar_t * word, int *match_pos, int *id, int limit)
+void match_word(const DoubleArrayTrieItem *dat, const wchar_t * word, size_t *match_pos, size_t *id, size_t limit)
 {
-	int i, j, p;
+	size_t i, p;
 	for (i = 0,p = 0; word[p] && (limit == 0 || p < limit) && dat[i].base != DATRIE_UNUSED; p ++)
 	{
 		int k = encode_char(word[p]);
-		j = dat[i].base + k;
+		int j = dat[i].base + k;
 		if (j < 0 || j > DATRIE_SIZE || dat[j].parent != i)
 			break;
 		i = j;
@@ -41,15 +41,15 @@ void match_word(const DoubleArrayTrieItem *dat, const wchar_t * word, int *match
 		*id = i;
 }
 
-void get_match_lengths(const wchar_t * word, int * match_length)
+void datrie_get_match_lengths(const wchar_t * word, size_t * match_length)
 {
 	match_length[0] = 0;
 	
-	int i, j, p;
+	size_t i, p;
 	for (i = 0,p = 0; word[p] && dat[i].base != DATRIE_UNUSED; p ++)
 	{
 		int k = encode_char(word[p]);
-		j = dat[i].base + k;
+		int j = dat[i].base + k;
 		if (j < 0 || j > DATRIE_SIZE || dat[j].parent != i)
 			break;
 		i = j;
@@ -59,18 +59,16 @@ void get_match_lengths(const wchar_t * word, int * match_length)
 	}
 }
 
-const wchar_t * get_trad_in_datrie(const wchar_t * word, int * match_pos,int limit)
+const wchar_t * datrie_match(const wchar_t * word, size_t * match_length, size_t length_limit)
 {
-	int pos, item;
-	match_word(dat, word, &pos, &item, limit);
+	size_t pos, item;
+	match_word(dat, word, &pos, &item, length_limit);
 	
 	while (dat[item].word == -1 && pos > 1)
-	{
 		match_word(dat, word, &pos, &item, pos - 1);
-	}
 	
-	if (match_pos)
-		*match_pos = pos;
+	if (match_length)
+		*match_length = pos;
 	
 	if (pos == 0 || dat[item].word == -1)
 		return NULL;

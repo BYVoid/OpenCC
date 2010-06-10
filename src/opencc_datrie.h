@@ -30,7 +30,7 @@ typedef struct
 	int word;
 } DoubleArrayTrieItem;
 
-const wchar_t * get_trad_in_datrie(const wchar_t *, int *, int);
-void get_match_lengths(const wchar_t *, int *);
+const wchar_t * datrie_match(const wchar_t *, size_t *, size_t);
+void datrie_get_match_lengths(const wchar_t *, size_t *);
 
 #endif /* __OPENCC_DATRIE_H_ */

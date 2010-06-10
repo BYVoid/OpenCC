@@ -264,6 +264,7 @@ size_t opencc_convert(opencc_t odt, wchar_t ** inbuf, size_t * inbuf_left,
 	{
 		return mm_seg(od, inbuf, inbuf_left, outbuf, outbuf_left);
 	}
+    return 0;
 }
 
 opencc_t opencc_open(opencc_convert_direction_t convert_direction)

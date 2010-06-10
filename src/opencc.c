@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 #define INPUT_BUFFER_SIZE 1048576
-#define OUTPUT_BUFFER_SIZE 4
+#define OUTPUT_BUFFER_SIZE 64
 
 wchar_t inbuf[INPUT_BUFFER_SIZE + 1],outbuf[OUTPUT_BUFFER_SIZE + 1];
 
@@ -30,7 +30,7 @@ int main()
 	setlocale(LC_ALL, "zh_CN.utf8");
 	
 	FILE * fp = stdin;
-	//fp = fopen("test.txt","r");
+	//fp = fopen("testsimp.txt","r");
 	
 	opencc_t od = opencc_open(OPENCC_CONVERT_SIMP_TO_TRAD);
 	
@@ -53,7 +53,8 @@ int main()
 
 			*poutbuf = 0;
 
-			printf("%ls %d %d\n", outbuf, inbuf_left, outbuf_left);
+			//printf("%ls %d %d\n", outbuf, inbuf_left, outbuf_left);
+			printf("%ls",outbuf);
 
 			outbuf_left = OUTPUT_BUFFER_SIZE;
 			poutbuf = outbuf;

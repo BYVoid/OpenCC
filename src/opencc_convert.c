@@ -20,161 +20,219 @@
 #include "opencc_datrie.h"
 #include "opencc_utils.h"
 
-#define DEFAULT_SEGMENT_BUFF_SIZE 10240
+#define OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE 1024
+
+typedef struct
+{
+	int initialized;
+	size_t buffer_size;
+	size_t * match_length;
+	size_t * min_len;
+	size_t * parent;
+	size_t * path;
+} opencc_sp_seg_buffer;
 
 typedef struct
 {
 	opencc_convert_direction_t convert_direction;
 	opencc_convert_errno_t errno;
+	opencc_sp_seg_buffer sp_seg_buffer;
 } opencc_description;
 
-int segment_buff_size = DEFAULT_SEGMENT_BUFF_SIZE;
-int * sp_seg_match_length = NULL;
-int * sp_seg_min_len = NULL;
-int * sp_seg_parent = NULL;
-int * sp_seg_path = NULL;
-int sp_seg_initialized = FALSE;
-
-void sp_seg_set_buff_size()
+void sp_seg_buffer_free(opencc_sp_seg_buffer * ossb)
 {
-	if (sp_seg_initialized == TRUE)
-	{
-		free(sp_seg_match_length);
-		free(sp_seg_min_len);
-		free(sp_seg_parent);
-		free(sp_seg_path);
-	}
-	
-	sp_seg_match_length = (int *) malloc((segment_buff_size + 1) * sizeof(int));
-	sp_seg_min_len = (int *) malloc(segment_buff_size * sizeof(int));
-	sp_seg_parent = (int *) malloc(segment_buff_size * sizeof(int));
-	sp_seg_path = (int *) malloc(segment_buff_size * sizeof(int));
-	
-	sp_seg_initialized = TRUE;
+	free(ossb->match_length);
+	free(ossb->min_len);
+	free(ossb->parent);
+	free(ossb->path);
 }
 
-wchar_t * sp_seg(wchar_t * pdest, const wchar_t * text, int start, int end)
+void sp_seg_set_buffer_size(opencc_sp_seg_buffer * ossb, size_t buffer_size)
+{
+	if (ossb->initialized == TRUE)
+		sp_seg_buffer_free(ossb);
+	
+	ossb->buffer_size = buffer_size;
+	ossb->match_length = (size_t *) malloc((buffer_size + 1) * sizeof(size_t));
+	ossb->min_len = (size_t *) malloc(buffer_size * sizeof(size_t));
+	ossb->parent = (size_t *) malloc(buffer_size * sizeof(size_t));
+	ossb->path = (size_t *) malloc(buffer_size * sizeof(size_t));
+	
+	ossb->initialized = TRUE;
+}
+
+size_t sp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
+		wchar_t ** outbuf, size_t * outbuf_left, size_t length)
 {
 	/* 最短路徑分詞 */
-	int i, j, k;
 	
-	if (end - start == 1) /* 對長度爲1時特殊優化 */
+	/* 對長度爲1時特殊優化 */
+	if (length == 1)
 	{
-		const wchar_t * match_rs = get_trad_in_datrie(text + start, NULL, 1);
+		const wchar_t * match_rs = datrie_match(*inbuf, NULL, 1);
 		
 		if (match_rs == NULL)
-			*pdest ++ = *(text + start);
+			**outbuf = **inbuf;
 		else
-			*pdest ++ = *match_rs;
+			**outbuf = *match_rs;
 		
-		return pdest;
+		(*outbuf) ++,(*outbuf_left) --;
+		(*inbuf) ++,(*inbuf_left) --;
+
+		/* 必須保證有一個字符空間 */
+		return 1;
 	}
 	
-	if (sp_seg_initialized == FALSE)
-		sp_seg_set_buff_size();
+	/* 設置緩衝區空間 */
+	opencc_sp_seg_buffer * ossb = &(od->sp_seg_buffer);
+	size_t buffer_size_need = length + 1;
+	if (ossb->initialized == FALSE || ossb->buffer_size < buffer_size_need)
+		sp_seg_set_buffer_size(&(od->sp_seg_buffer), buffer_size_need);
 	
-	for (i = start; i <= end; i ++)
-		sp_seg_min_len[i - start] = sp_seg_parent[i - start] = INFINITY_INT;
+	size_t i, j;
+
+	for (i = 0; i <= length; i ++)
+		ossb->min_len[i] = INFINITY_INT;
 	
-	sp_seg_min_len[0] = sp_seg_parent[0] = 0;
+	ossb->min_len[0] = ossb->parent[0] = 0;
 	
-	for (i = start; i < end; i ++)
+	for (i = 0; i < length; i ++)
 	{
-		get_match_lengths(text + i, sp_seg_match_length); /* 獲取所有匹配長度 */
+		/* 獲取所有匹配長度 */
+		datrie_get_match_lengths((*inbuf) + i, ossb->match_length);
 		
-		if (sp_seg_match_length[1] != 1)
-			sp_seg_match_length[++ sp_seg_match_length[0]] = 1;
+		if (ossb->match_length[1] != 1)
+			ossb->match_length[++ ossb->match_length[0]] = 1;
 		
-		for (j = 1; j <= sp_seg_match_length[0]; j ++) /* 動態規劃求最短分割路徑 */
+		/* 動態規劃求最短分割路徑 */
+		for (j = 1; j <= ossb->match_length[0]; j ++)
 		{
-			k = sp_seg_match_length[j];
-			sp_seg_match_length[j] = 0;
+			size_t k = ossb->match_length[j];
+			ossb->match_length[j] = 0;
 			
-			if (sp_seg_min_len[i - start] + 1 <= sp_seg_min_len[i - start + k])
+			if (ossb->min_len[i] + 1 <= ossb->min_len[i + k])
 			{
-				sp_seg_min_len[i - start + k] = sp_seg_min_len[i - start] + 1;
-				sp_seg_parent[i - start + k] = i - start;
+				ossb->min_len[i + k] = ossb->min_len[i] + 1;
+				ossb->parent[i + k] = i;
 			}
 		}
 	}
 	
-	i = end - start; /* 取得最短分割路徑 */
-	j = sp_seg_min_len[i];
-	while (i != 0)
-	{
-		sp_seg_path[--j] = i;
-		i = sp_seg_parent[i];
-	}
+	/* 取得最短分割路徑 */
+	for (i = length, j = ossb->min_len[length]; i != 0; i = ossb->parent[i])
+		ossb->path[--j] = i;
 	
-	j = 0;
-	for (i = 0; i < sp_seg_min_len[end - start]; i ++) /* 根據最短分割路徑轉換 */
+	size_t inbuf_left_start = *inbuf_left;
+	size_t begin, end;
+
+	/* 根據最短分割路徑轉換 */
+	for (i = begin = 0; i < ossb->min_len[length]; i ++)
 	{
-		k = sp_seg_path[i];
+		end = ossb->path[i];
 		
-		const wchar_t * match_rs = get_trad_in_datrie(text + start + j, NULL, k - j);
+		size_t match_len;
+		const wchar_t * match_rs = datrie_match(*inbuf, &match_len, end - begin);
 		
+		/* 輸出緩衝區剩餘空間小於分詞長度 */
+		if (match_len > *outbuf_left)
+			break;
+
 		if (match_rs == NULL)
-			*pdest ++ = *(text + start + j);
+		{
+			**outbuf = **inbuf;
+			(*outbuf) ++, (*outbuf_left) --;
+			(*inbuf) ++, (*inbuf_left) --;
+		}
 		else
 		{
-			const wchar_t * pmrs;
-			for (pmrs = match_rs; *pmrs; pmrs ++)
-				*pdest ++ = *pmrs;
+			for (; *match_rs; match_rs ++)
+			{
+				**outbuf = *match_rs;
+				(*outbuf) ++,(*outbuf_left) --;
+				(*inbuf) ++,(*inbuf_left) --;
+			}
 		}
 		
-		j = k;
+		begin = end;
 	}
 	
-	return pdest;
+	return inbuf_left_start - *inbuf_left;
 }
 
-void mmsp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
+size_t mmsp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 		wchar_t ** outbuf, size_t * outbuf_left)
 {
-	/* 正向最大分詞 */
-	int i, start, bound;
-	int length_limit = *inbuf_left;
+	/* 歧義分割最短路徑分詞 */
+	size_t i, start, bound;
+	const wchar_t * inbuf_start = *inbuf;
+	size_t inbuf_left_start = *inbuf_left;
+	size_t sp_seg_length;
 	
-	bound = -1;
+	bound = 0;
 	
-	for (i = start = 0; i < length_limit && (*inbuf)[i]; i ++)
+	for (i = start = 0; inbuf_start[i] && *inbuf_left > 0 && *outbuf_left > 0; i ++)
 	{
-		if (i == bound)
+		if (i != 0 && i == bound)
 		{
 			/* 對歧義部分進行最短路徑分詞 */
-			//sp_seg(od, inbuf, inbuf_left, outbuf, outbuf_left, start, bound);
+			sp_seg_length = sp_seg(od, inbuf, inbuf_left, outbuf, outbuf_left, bound - start);
+			if (sp_seg_length ==  OPENCC_CONVERT_ERROR)
+				return OPENCC_CONVERT_ERROR;
+			if (sp_seg_length == 0)
+			{
+				if (inbuf_left_start - *inbuf_left > 0)
+					return inbuf_left_start - *inbuf_left;
+				od->errno = OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH;
+				return OPENCC_CONVERT_ERROR;
+			}
 			start = i;
 		}
 	
-		int match_len;
-		get_trad_in_datrie((*inbuf) + i, &match_len, 0);
+		size_t match_len;
+		const wchar_t * match_rs = datrie_match(inbuf_start + i, &match_len, 0);
 		
-		//if (rs == NULL)
+		if (match_rs == NULL)
 			match_len = 1;
 		
 		if (i + match_len > bound)
 			bound = i + match_len;
 	}
 	
-	//pdest = sp_seg(pdest, text, start, i);
+	if (*inbuf_left > 0 && *outbuf_left > 0)
+	{
+		sp_seg_length = sp_seg(od, inbuf, inbuf_left, outbuf, outbuf_left, bound - start);
+		if (sp_seg_length ==  OPENCC_CONVERT_ERROR)
+			return OPENCC_CONVERT_ERROR;
+		if (sp_seg_length == 0)
+		{
+			if (inbuf_left_start - *inbuf_left > 0)
+				return inbuf_left_start - *inbuf_left;
+			od->errno = OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH;
+			return OPENCC_CONVERT_ERROR;
+		}
+	}
+
+	return inbuf_left_start - *inbuf_left;
 }
 
 size_t mm_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 		wchar_t ** outbuf, size_t * outbuf_left)
 {
+	/* 正向最大分詞 */
 	size_t inbuf_left_start = *inbuf_left;
 
 	for (; **inbuf && *inbuf_left > 0 && *outbuf_left > 0;)
 	{
-		int match_len;
-		const wchar_t * match_rs = get_trad_in_datrie(*inbuf, &match_len, *inbuf_left);
+		size_t match_len;
+		const wchar_t * match_rs = datrie_match(*inbuf, &match_len, *inbuf_left);
 
-		if (match_len > *outbuf_left) /* 輸出緩衝區剩餘空間小於分詞長度 */
+		/* 輸出緩衝區剩餘空間小於分詞長度 */
+		if (match_len > *outbuf_left)
 		{
 			if (inbuf_left_start - *inbuf_left > 0)
 				break;
 			od->errno = OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH;
-			return (size_t) -1;
+			return OPENCC_CONVERT_ERROR;
 		}
 
 		if (match_rs == NULL)
@@ -197,17 +255,6 @@ size_t mm_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 	return inbuf_left_start - *inbuf_left;
 }
 
-int opencc_set_segment_buff_size(int size)
-{
-	segment_buff_size = size;
-	sp_seg_set_buff_size();
-}
-
-int opencc_get_segment_buff_size(void)
-{
-	return segment_buff_size;
-}
-
 size_t opencc_convert(opencc_t odt, wchar_t ** inbuf, size_t * inbuf_left,
 		wchar_t ** outbuf, size_t * outbuf_left)
 {
@@ -216,7 +263,6 @@ size_t opencc_convert(opencc_t odt, wchar_t ** inbuf, size_t * inbuf_left,
 	if (od->convert_direction == OPENCC_CONVERT_SIMP_TO_TRAD)
 	{
 		return mm_seg(od, inbuf, inbuf_left, outbuf, outbuf_left);
-		//return mmsp_seg(od, inbuf, inbuf_left, outbuf, outbuf_left);
 	}
 }
 
@@ -227,6 +273,10 @@ opencc_t opencc_open(opencc_convert_direction_t convert_direction)
 
 	od->convert_direction = convert_direction;
 	od->errno = OPENCC_CONVERT_ERROR_VOID;
+	od->sp_seg_buffer.initialized = FALSE;
+	od->sp_seg_buffer.buffer_size = OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE;
+	od->sp_seg_buffer.match_length = od->sp_seg_buffer.min_len
+			= od->sp_seg_buffer.parent = od->sp_seg_buffer.path = NULL;
 
 	return (opencc_t) od;
 }
@@ -235,6 +285,7 @@ void opencc_close(opencc_t odt)
 {
 	opencc_description * od;
 	od = (opencc_description *) odt;
+	sp_seg_buffer_free(&(od->sp_seg_buffer));
 	free(od);
 }
 

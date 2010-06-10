@@ -107,23 +107,61 @@ void opencc_perror(opencc_t od);
 #ifdef __cplusplus
 };
 
-class OpenCC
+#include <string>
+
+namespace opencc
+{
+
+class converter
 {
 public:
-	OpenCC(opencc_convert_direction_t convert_direction) :
+	converter(opencc_convert_direction_t convert_direction) :
 		od (opencc_open(convert_direction))
 	{
 	}
 
-	virtual ~OpenCC()
+	virtual ~converter()
 	{
 		opencc_close(od);
 	}
 
-	size_t convert(wchar_t *& inbuf, size_t & inbufleft,
-			wchar_t *& outbuf, size_t & outbufleft)
+	size_t convert(const std::wstring &in, std::wstring &out,
+			ssize_t length = -1)
 	{
-		return opencc_convert(od, &inbuf, &inbufleft, &outbuf, outbufleft);
+		size_t in_length = in.length();
+		if (length == -1 || length > in_length)
+			length = in_length;
+		size_t buffer_size = length;
+
+		wchar_t * outbuf = new wchar_t[buffer_size + 1];
+		wchar_t * poutbuf = outbuf;
+		const wchar_t * pinbuf = in.c_str();
+
+		size_t inbuf_left = length;
+		size_t outbuf_left = buffer_size;
+
+		size_t convert_cnt;
+		size_t total_convert_cnt = 0;
+
+		out.clear();
+
+		while ((convert_cnt = opencc_convert(od, (wchar_t **)&pinbuf,
+				&inbuf_left, &poutbuf, &outbuf_left)) > 0)
+		{
+			if (convert_cnt == OPENCC_CONVERT_ERROR)
+				return OPENCC_CONVERT_ERROR;
+
+			total_convert_cnt += convert_cnt;
+			*poutbuf = 0;
+			out += outbuf;
+
+			outbuf_left = buffer_size;
+			poutbuf = outbuf;
+		}
+
+		delete [] outbuf;
+
+		return total_convert_cnt;
 	}
 
 	opencc_convert_errno_t errno()
@@ -139,6 +177,9 @@ public:
 private:
 	opencc_t od;
 };
+
+};
+
 #endif
 
 #endif /* __OPENCC_H_ */

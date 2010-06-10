@@ -106,6 +106,39 @@ void opencc_perror(opencc_t od);
 
 #ifdef __cplusplus
 };
+
+class OpenCC
+{
+public:
+	OpenCC(opencc_convert_direction_t convert_direction) :
+		od (opencc_open(convert_direction))
+	{
+	}
+
+	virtual ~OpenCC()
+	{
+		opencc_close(od);
+	}
+
+	size_t convert(wchar_t *& inbuf, size_t & inbufleft,
+			wchar_t *& outbuf, size_t & outbufleft)
+	{
+		return opencc_convert(od, &inbuf, &inbufleft, &outbuf, outbufleft);
+	}
+
+	opencc_convert_errno_t errno()
+	{
+		return opencc_errno(od);
+	}
+
+	void perror()
+	{
+		opencc_perror(od);
+	}
+
+private:
+	opencc_t od;
+};
 #endif
 
 #endif /* __OPENCC_H_ */

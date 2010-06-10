@@ -23,8 +23,14 @@
 extern "C" {
 #endif
 
+/*
+ * Headers from C standard library
+ */
 #include <wchar.h>
 
+/*
+ * Macros
+ */
 #define OPENCC_CONVERT_ERROR ((size_t) -1)
 
 typedef void * opencc_t;
@@ -40,11 +46,63 @@ typedef enum
 	OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH,
 } opencc_convert_errno_t;
 
-opencc_t opencc_open(opencc_convert_direction_t);
-void opencc_close(opencc_t);
-size_t opencc_convert(opencc_t, wchar_t **, size_t *, wchar_t **, size_t *);
-opencc_convert_errno_t opencc_errno(opencc_t);
-void opencc_perror(opencc_t);
+/**
+ * opencc_open:
+ * @convert_direction: Direction of convert.
+ * @returns: A description pointer of the newly allocated instance of opencc.
+ *
+ * Make an instance of opencc.
+ *
+ */
+opencc_t opencc_open(opencc_convert_direction_t convert_direction);
+
+/**
+ * opencc_close:
+ * @od: The description pointer.
+ *
+ * Destroy an instance of opencc.
+ *
+ */
+void opencc_close(opencc_t od);
+
+/**
+ * opencc_convert:
+ * @od: The description pointer.
+ * @inbuf: The pointer to the wide character string of the input buffer.
+ * @inbufleft: The maximum number of characters in *inbuf to convert.
+ * @outbuf: The pointer to the wide character string of the output buffer.
+ * @outbufleft: The size of output buffer.
+ *
+ * @returns: The number of characters of the input buffer that converted.
+ *
+ * Convert string from *inbuf to *outbuf.
+ *
+ * (Note: Don't forget to assign **outbuf to L'\0' after this method called.)
+ *
+ */
+size_t opencc_convert(opencc_t od, wchar_t ** inbuf, size_t * inbufleft,
+		wchar_t ** outbuf, size_t * inbufleft);
+
+/**
+ * opencc_errno:
+ * @od: The description pointer.
+ *
+ * @returns: The error number.
+ *
+ * Return an opencc_convert_errno_t which describes the last error that occured or
+ * OPENCC_CONVERT_ERROR_VOID
+ *
+ */
+opencc_convert_errno_t opencc_errno(opencc_t od);
+
+/**
+ * opencc_perror:
+ * @od: The description pointer.
+ *
+ * Print the error message to stderr when errno is set.
+ *
+ */
+void opencc_perror(opencc_t od);
 
 #ifdef __cplusplus
 };

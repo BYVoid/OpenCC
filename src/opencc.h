@@ -149,7 +149,10 @@ public:
 				&inbuf_left, &poutbuf, &outbuf_left)) > 0)
 		{
 			if (convert_cnt == OPENCC_CONVERT_ERROR)
+			{
+				delete [] outbuf;
 				return OPENCC_CONVERT_ERROR;
+			}
 
 			total_convert_cnt += convert_cnt;
 			*poutbuf = 0;

@@ -37,6 +37,9 @@ libopencc_la_SOURCES = \
 libopencc_la_HEADERS = \
 	$(libopencc_headers) \
 	$(NULL)
+libopencc_la_LDFLAGS = \
+	-export-symbols-regex "opencc_.*" \
+	$(NULL)
 libopencc_ladir = $(pkgincludedir)
 nodist_libopencc_la_SOURCES = \
 	$(libopencc_built_headers) \

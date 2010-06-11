@@ -19,11 +19,12 @@
 #include "opencc_datrie.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <locale.h>
+#include <iconv.h>
 
 #define DATRIE_SIZE 300000
 #define DATRIE_WORD_MAX_COUNT 100000
 #define DATRIE_WORD_MAX_LENGTH 12
+#define BUFFSIZE 1024
 
 typedef struct
 {
@@ -231,25 +232,80 @@ void make(void)
 	
 }
 
+int utf82wcs(const char * inbuf, wchar_t * outbuf, size_t outbuf_size)
+{
+	iconv_t cd = iconv_open("WCHAR_T", "UTF8");
+	
+	if (cd == (iconv_t) -1)
+	{
+		*outbuf = L'\0';
+		return -1;
+	}
+	
+	char * pinbuf = (char *) inbuf;
+	char * poutbuf = (char *) outbuf;
+	size_t insize = strlen(inbuf);
+	size_t outsize = outbuf_size;
+
+	size_t retval = iconv(cd, &pinbuf, &insize, &poutbuf, &outsize);
+	
+	if (retval == (size_t) -1)
+		return -1;
+	
+	if (outsize >= sizeof (wchar_t))
+		*((wchar_t *) poutbuf) = L'\0';
+	else
+		return -1;
+	
+	iconv_close(cd);
+	
+	return 0;
+}
+
+int wcs2utf8(const wchar_t * inbuf, char * outbuf, size_t outbuf_size)
+{
+	iconv_t cd = iconv_open("UTF8", "WCHAR_T");
+	
+	if (cd == (iconv_t) -1)
+	{
+		*outbuf = '\0';
+		return -1;
+	}
+	
+	char * pinbuf = (char *) inbuf;
+	char * poutbuf = outbuf;
+	size_t insize = wcslen(inbuf) * sizeof(wchar_t);
+	size_t outsize = outbuf_size;
+
+	size_t retval = iconv(cd, &pinbuf, &insize, &poutbuf, &outsize);
+	
+	if (retval == (size_t) -1)
+		return -1;
+	
+	if (outsize >= sizeof (char))
+		*poutbuf = '\0';
+	else
+		return -1;
+	
+	iconv_close(cd);
+	
+	return 0;
+}
+
 void init(void)
 {
-	#define BUFFSIZE 1024
 	int i;
 	FILE * fp = stdin;
-	wchar_t buff[BUFFSIZE];
+	fp = fopen("table.refined.txt","r");
+	char buff[BUFFSIZE];
+	wchar_t wbuff[BUFFSIZE];
 	
-	setlocale(LC_ALL, "zh_CN.UTF-8");
-	
-	for (i = 0; fgetws(buff, BUFFSIZE,fp); i ++)
+	for (i = 0; fgets(buff, BUFFSIZE, fp); i ++)
 	{
-		swscanf(buff,L"%ls%ls", lexicon[i].simp, lexicon[i].trad);
+		if (utf82wcs(buff, wbuff, BUFFSIZE) == -1)
+			exit(1);
+		swscanf(wbuff,L"%ls%ls", lexicon[i].simp, lexicon[i].trad);
 		lexicon[i].length = wcslen(lexicon[i].simp);
-#if 0
-		wcscpy(lexicon[i].trad,buff + lexicon[i].length + 1);
-		int tlen = wcslen(lexicon[i].trad);
-		if (lexicon[i].trad[tlen-1] == L'\n' || lexicon[i].trad[tlen-1] == WEOF)
-			lexicon[i].trad[tlen-1] = 0;
-#endif
 	}
 	
 	lexicon_count = i;
@@ -261,12 +317,15 @@ void output()
 {
 	FILE * fp = stdout;
 	int i, item_max, word_max_length = 0;
+	char buff[BUFFSIZE];
 	
 	fprintf(fp, "static const wchar_t * const words[] = {\n");
 
 	for (i = 0; i < lexicon_count; i ++)
 	{
-		fprintf(fp, "\tL\"%ls\", /* %6d */\n", lexicon[i].trad, i);
+		if (wcs2utf8(lexicon[i].trad, buff, BUFFSIZE) == -1)
+			exit(1);
+		fprintf(fp, "\tL\"%s\", /* %6d */\n", buff, i);
 		if (lexicon[i].length > word_max_length)
 			word_max_length = lexicon[i].length;
 	}

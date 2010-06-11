@@ -7,7 +7,7 @@
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 *
-*      http://www.apache.org/licenses/LICENSE-2.0
+*	  http://www.apache.org/licenses/LICENSE-2.0
 *
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
@@ -121,41 +121,47 @@ namespace opencc
 class converter
 {
 public:
-	converter(opencc_convert_direction_t convert_direction = OPENCC_CONVERT_SIMP_TO_TRAD,
-			size_t buffer_size = 1024) :
-		od (opencc_open(convert_direction)),
-		m_buffer_size (buffer_size),
-		m_output_buffer (new wchar_t[m_buffer_size + 1])
+	converter(opencc_convert_direction_t convert_direction = OPENCC_CONVERT_SIMP_TO_TRAD)
+		: od (opencc_open(convert_direction))
 	{
 	}
 
 	virtual ~converter()
 	{
-		delete [] m_output_buffer;
 		opencc_close(od);
 	}
 
-	size_t convert(const std::wstring &in, std::wstring &out,
-			ssize_t length = -1)
+	long convert(const std::wstring &in, std::wstring &out, long length = -1)
 	{
 		size_t inbuf_left = in.length ();
-		if (length >= 0 && length < inbuf_left)
+		if (length >= 0 && length < (long)inbuf_left)
 			inbuf_left = length;
 
-		size_t outbuf_left = inbuf_left + 1;
+		const wchar_t * inbuf = in.c_str();
+		long count = 0;
 
-		/* occupy space */
-		out.resize (outbuf_left);
+		while (inbuf_left != 0) {
+			size_t retval;
+			size_t outbuf_left;
+			wchar_t * outbuf;
 
-		const wchar_t * pinbuf = in.c_str();
-		wchar_t * poutbuf = (wchar_t *)out.c_str();
+			/* occupy space */
+			outbuf_left = inbuf_left + 64;
+			out.resize (count + outbuf_left);
+			outbuf = (wchar_t *)out.c_str () + count;
 
-		size_t retval = opencc_convert(od, (wchar_t **)&pinbuf,
-							&inbuf_left, &poutbuf, &outbuf_left);
+			retval = opencc_convert (od, (wchar_t **)&inbuf,
+						&inbuf_left, &outbuf, &outbuf_left);
+			if (retval == OPENCC_CONVERT_ERROR)
+				return -1;
+			count += retval;
+		}
 
-		if (retval != OPENCC_CONVERT_ERROR)
-			*poutbuf = 0;
-		return retval;
+		/* set the zero termination and shrink the size */
+		out.resize (count + 1);
+		out[count] = L'\0';
+
+		return count;
 	}
 
 	opencc_convert_errno_t errno()
@@ -170,8 +176,6 @@ public:
 
 private:
 	opencc_t od;
-	size_t m_buffer_size;
-	wchar_t * m_output_buffer;
 };
 
 };

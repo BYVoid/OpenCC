@@ -17,7 +17,8 @@
 */
 
 #include "opencc.h"
-#include "opencc_datrie.h"
+#include "opencc_encoding.h"
+#include "opencc_dictionary.h"
 #include "opencc_utils.h"
 
 #define OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE 1024
@@ -34,6 +35,7 @@ typedef struct
 
 typedef struct
 {
+	opencc_dictionary_t dicts;
 	opencc_convert_direction_t convert_direction;
 	opencc_convert_errno_t errno;
 	opencc_sp_seg_buffer sp_seg_buffer;
@@ -69,7 +71,7 @@ size_t sp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 	/* 對長度爲1時特殊優化 */
 	if (length == 1)
 	{
-		const wchar_t * match_rs = datrie_match(*inbuf, NULL, 1);
+		const wchar_t * match_rs = dict_match_longest(od->dicts, *inbuf, 1);
 		
 		if (match_rs == NULL)
 			**outbuf = **inbuf;
@@ -99,7 +101,7 @@ size_t sp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 	for (i = 0; i < length; i ++)
 	{
 		/* 獲取所有匹配長度 */
-		datrie_get_match_lengths((*inbuf) + i, ossb->match_length);
+		dict_get_all_match_lengths(od->dicts, (*inbuf) + i, ossb->match_length);
 		
 		if (ossb->match_length[1] != 1)
 			ossb->match_length[++ ossb->match_length[0]] = 1;
@@ -130,12 +132,7 @@ size_t sp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 	{
 		end = ossb->path[i];
 		
-		size_t match_len;
-		const wchar_t * match_rs = datrie_match(*inbuf, &match_len, end - begin);
-		
-		/* 輸出緩衝區剩餘空間小於分詞長度 */
-		if (match_len > *outbuf_left)
-			break;
+		const wchar_t * match_rs = dict_match_longest(od->dicts, *inbuf, end - begin);
 
 		if (match_rs == NULL)
 		{
@@ -145,6 +142,10 @@ size_t sp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 		}
 		else
 		{
+			/* 輸出緩衝區剩餘空間小於分詞長度 */
+			size_t match_len = wcslen(match_rs);
+			if (match_len > *outbuf_left)
+				break;
 			for (; *match_rs; match_rs ++)
 			{
 				**outbuf = *match_rs;
@@ -188,8 +189,8 @@ size_t mmsp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 			start = i;
 		}
 	
-		size_t match_len;
-		const wchar_t * match_rs = datrie_match(inbuf_start + i, &match_len, 0);
+		const wchar_t * match_rs = dict_match_longest(od->dicts, inbuf_start + i, 0);
+		size_t match_len = wcslen(match_rs);
 		
 		if (match_rs == NULL)
 			match_len = 1;
@@ -220,20 +221,11 @@ size_t mm_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 {
 	/* 正向最大分詞 */
 	size_t inbuf_left_start = *inbuf_left;
+	wchar_t * ous = *outbuf;
 
 	for (; **inbuf && *inbuf_left > 0 && *outbuf_left > 0;)
 	{
-		size_t match_len;
-		const wchar_t * match_rs = datrie_match(*inbuf, &match_len, *inbuf_left);
-
-		/* 輸出緩衝區剩餘空間小於分詞長度 */
-		if (match_len > *outbuf_left)
-		{
-			if (inbuf_left_start - *inbuf_left > 0)
-				break;
-			od->errno = OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH;
-			return OPENCC_CONVERT_ERROR;
-		}
+		const wchar_t * match_rs = dict_match_longest(od->dicts, *inbuf, *inbuf_left);
 
 		if (match_rs == NULL)
 		{
@@ -243,6 +235,16 @@ size_t mm_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 		}
 		else
 		{
+			/* 輸出緩衝區剩餘空間小於分詞長度 */
+			size_t match_len = wcslen(match_rs);
+			if (match_len > *outbuf_left)
+			{
+				if (inbuf_left_start - *inbuf_left > 0)
+					break;
+				od->errno = OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH;
+				return OPENCC_CONVERT_ERROR;
+			}
+
 			for (; *match_rs; match_rs ++)
 			{
 				**outbuf = *match_rs;
@@ -272,6 +274,8 @@ opencc_t opencc_open(opencc_convert_direction_t convert_direction)
 	opencc_description * od;
 	od = (opencc_description *) malloc(sizeof(opencc_description));
 
+	/* TODO: read dictionary */
+	od->dicts = dict_open("table.txt", OPENCC_DICTIONARY_TYPE_TEXT);
 	od->convert_direction = convert_direction;
 	od->errno = OPENCC_CONVERT_ERROR_VOID;
 	od->sp_seg_buffer.initialized = FALSE;
@@ -282,12 +286,15 @@ opencc_t opencc_open(opencc_convert_direction_t convert_direction)
 	return (opencc_t) od;
 }
 
-void opencc_close(opencc_t odt)
+int opencc_close(opencc_t odt)
 {
 	opencc_description * od;
 	od = (opencc_description *) odt;
 	sp_seg_buffer_free(&(od->sp_seg_buffer));
+	dict_close(od->dicts);
 	free(od);
+
+	return 0;
 }
 
 opencc_convert_errno_t opencc_errno(opencc_t odt)

@@ -59,11 +59,12 @@ opencc_t opencc_open(opencc_convert_direction_t convert_direction);
 /**
  * opencc_close:
  * @od: The description pointer.
+ * @returns: 0 on success or non-zero number on failure.
  *
  * Destroy an instance of opencc.
  *
  */
-void opencc_close(opencc_t od);
+int opencc_close(opencc_t od);
 
 /**
  * opencc_convert:

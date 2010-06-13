@@ -20,33 +20,52 @@ libopencc = libopencc.la
 
 lib_LTLIBRARIES = $(libopencc)
 bin_PROGRAMS = opencc
-noinst_PROGRAMS = opencc_build_datrie
+#noinst_PROGRAMS = opencc_build_datrie
 
 libopencc_headers = \
 	opencc.h \
+	openccxx.h \
 	$(NULL)
-libopencc_built_headers = \
-	opencc_datrie_table.h \
+
+libopencc_dictionary_sources = \
+	dictionary/opencc_dictionary_abstract.c \
+	dictionary/opencc_dictionary_text.c \
+	dictionary/opencc_dictionary_abstract.h \
+	dictionary/opencc_dictionary_text.h \
 	$(NULL)
+
+#libopencc_built_headers = \
+#	opencc_datrie_table.h \
+#	$(NULL)
+
 libopencc_la_SOURCES = \
-	opencc_datrie.c \
 	opencc_convert.c \
-	opencc_datrie.h \
+	opencc_dictionary.c \
+	opencc_encoding.c \
+	opencc_utils.c \
+	opencc_dictionary.h\
+	opencc_encoding.h \
 	opencc_utils.h \
+	$(libopencc_dictionary_sources) \
 	$(NULL)
+
 libopencc_la_HEADERS = \
 	$(libopencc_headers) \
 	$(NULL)
+
 libopencc_la_LDFLAGS = \
 	-export-symbols-regex "opencc_.*" \
 	$(NULL)
+
 libopencc_ladir = $(pkgincludedir)
-nodist_libopencc_la_SOURCES = \
-	$(libopencc_built_headers) \
-	$(NULL)
-BUILT_SOURCES = \
-	$(libopencc_built_headers) \
-	$(NULL)
+
+#nodist_libopencc_la_SOURCES = \
+#	$(libopencc_built_headers) \
+#	$(NULL)
+
+#BUILT_SOURCES = \
+#	$(libopencc_built_headers) \
+#	$(NULL)
 
 pkgdata_DATA = \
 	$(NULL)

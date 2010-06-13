@@ -16,21 +16,20 @@
 * limitations under the License.
 */
 
-#ifndef __OPENCC_DATRIE_H_
-#define __OPENCC_DATRIE_H_
+#ifndef __OPENCC_DICTIONARY_TEXT_H_
+#define __OPENCC_DICTIONARY_TEXT_H_
 
-#include "opencc_utils.h"
+#include "../opencc_utils.h"
+#include "opencc_dictionary_abstract.h"
 
-#define DATRIE_UNUSED -1
+dict_ptr dict_text_open(const char * filename);
 
-typedef struct
-{
-	int base;
-	int parent;
-	int word;
-} DoubleArrayTrieItem;
+void dict_text_close(dict_ptr dp);
 
-const wchar_t * datrie_match(const wchar_t *, size_t *, size_t);
-void datrie_get_match_lengths(const wchar_t *, size_t *);
+const wchar_t * dict_text_match_longest(dict_ptr dp, const wchar_t * word,
+		size_t length);
 
-#endif /* __OPENCC_DATRIE_H_ */
+void dict_text_get_all_match_lengths(dict_ptr dp, const wchar_t * word,
+		size_t * match_length);
+
+#endif /* __OPENCC_DICTIONARY_TEXT_H_ */

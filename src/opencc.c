@@ -29,9 +29,6 @@
 #define VERSION "Unknown"
 #endif
 
-#define INPUT_BUFFER_SIZE 32768
-#define OUTPUT_BUFFER_SIZE 256
-
 int utf82wcs(const char * inbuf, wchar_t * outbuf, size_t outbuf_size)
 {
 	iconv_t cd = iconv_open("WCHAR_T", "UTF8");
@@ -45,7 +42,7 @@ int utf82wcs(const char * inbuf, wchar_t * outbuf, size_t outbuf_size)
 	char * pinbuf = (char *) inbuf;
 	char * poutbuf = (char *) outbuf;
 	size_t insize = strlen(inbuf);
-	size_t outsize = outbuf_size;
+	size_t outsize = outbuf_size * sizeof(wchar_t);
 
 	size_t retval = iconv(cd, &pinbuf, &insize, &poutbuf, &outsize);
 	
@@ -94,10 +91,15 @@ int wcs2utf8(const wchar_t * inbuf, char * outbuf, size_t outbuf_size)
 
 void convert(const char * input_file, const char * output_file)
 {
+#define INPUT_BUFFER_SIZE 32768
+#define OUTPUT_BUFFER_SIZE 256
+#define INPUT_WBUFFER_SIZE INPUT_BUFFER_SIZE / sizeof(wchar_t)
+#define OUTPUT_WBUFFER_SIZE OUTPUT_BUFFER_SIZE / sizeof(wchar_t)
+
 	static char inbuf[INPUT_BUFFER_SIZE + 1];
 	static char outbuf[OUTPUT_BUFFER_SIZE + 1];
-	static wchar_t winbuf[INPUT_BUFFER_SIZE + 1];
-	static wchar_t woutbuf[OUTPUT_BUFFER_SIZE + 1];
+	static wchar_t winbuf[INPUT_WBUFFER_SIZE + 1];
+	static wchar_t woutbuf[OUTPUT_WBUFFER_SIZE + 1];
 	
 	FILE * fp = stdin;
 	FILE * fpo = stdout;
@@ -126,18 +128,18 @@ void convert(const char * input_file, const char * output_file)
 	
 	while (fgets(inbuf, INPUT_BUFFER_SIZE, fp) != NULL)
 	{
-		utf82wcs(inbuf, winbuf, INPUT_BUFFER_SIZE);
+		utf82wcs(inbuf, winbuf, INPUT_WBUFFER_SIZE);
 	
 		wchar_t * pinbuf = winbuf, * poutbuf = woutbuf;
 		size_t inbuf_left, outbuf_left;
-		size_t ccnt;
 
 		inbuf_left = wcslen(winbuf);
-		outbuf_left = OUTPUT_BUFFER_SIZE;
+		outbuf_left = OUTPUT_WBUFFER_SIZE;
 
-		while ((ccnt = opencc_convert(od, &pinbuf, &inbuf_left, &poutbuf, &outbuf_left)) > 0)
+		while (inbuf_left > 0)
 		{
-			if (ccnt == OPENCC_CONVERT_ERROR)
+			size_t retval = opencc_convert(od, &pinbuf, &inbuf_left, &poutbuf, &outbuf_left);
+			if (retval == OPENCC_CONVERT_ERROR)
 			{
 				opencc_perror(od);
 				break;
@@ -148,7 +150,7 @@ void convert(const char * input_file, const char * output_file)
 			wcs2utf8(woutbuf, outbuf, OUTPUT_BUFFER_SIZE);
 			fprintf(fpo,"%s",outbuf);
 
-			outbuf_left = OUTPUT_BUFFER_SIZE;
+			outbuf_left = OUTPUT_WBUFFER_SIZE;
 			poutbuf = woutbuf;
 		}
 		

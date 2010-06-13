@@ -16,24 +16,9 @@
 * limitations under the License.
 */
 
-#ifndef __OPENCC_UTILS_H_
-#define __OPENCC_UTILS_H_
+#include "opencc_utils.h"
 
-#include <wchar.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-
-#define FALSE (0)
-#define TRUE (!(0))
-#define INFINITY_INT ((~0U)>>1)
-
-#define debug_should_not_be_here() \
-	do { \
-	fprintf(stderr, "Should not be here: %d %s\n", __LINE__, __FILE__); \
-	exit(1); \
-	} while(0)\
-
-int qsort_int_cmp(const void * a, const void * b);
-
-#endif /* __OPENCC_UTILS_H_ */
+int qsort_int_cmp(const void * a, const void * b)
+{
+	return *((int *) a) - *((int *) b);
+}

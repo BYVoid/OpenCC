@@ -269,6 +269,51 @@ size_t opencc_convert(opencc_t odt, wchar_t ** inbuf, size_t * inbuf_left,
     return 0;
 }
 
+size_t opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length,
+		char * outbuf)
+{
+	const char * original_outbuf = outbuf;
+
+	if (length == (size_t) -1)
+		length = strlen(inbuf);
+
+	size_t wbufsize = length;
+	wchar_t * winbuf = (wchar_t *) malloc(sizeof(wchar_t) * (wbufsize + 1));
+	wchar_t * woutbuf = (wchar_t *) malloc(sizeof(wchar_t) * (wbufsize + 1));
+
+	utf8_to_wcs(inbuf, length, winbuf, wbufsize + 1);
+
+	wchar_t * pinbuf = winbuf, * poutbuf = woutbuf;
+	size_t inbuf_left, outbuf_left;
+
+	inbuf_left = wcslen(winbuf);
+	outbuf_left = wbufsize;
+
+	while (inbuf_left > 0)
+	{
+		size_t retval = opencc_convert(odt, &pinbuf, &inbuf_left, &poutbuf, &outbuf_left);
+		if (retval == OPENCC_CONVERT_ERROR)
+		{
+			free(winbuf);
+			free(woutbuf);
+			return OPENCC_CONVERT_ERROR;
+		}
+
+		*poutbuf = L'\0';
+
+		wcs_to_utf8(woutbuf, (size_t) -1, outbuf, wbufsize * sizeof(size_t));
+		outbuf += strlen(outbuf);
+
+		outbuf_left = wbufsize;
+		poutbuf = woutbuf;
+	}
+	*outbuf = '\0';
+
+	free(winbuf);
+	free(woutbuf);
+	return outbuf - original_outbuf;
+}
+
 opencc_t opencc_open(opencc_convert_direction_t convert_direction)
 {
 	opencc_description * od;

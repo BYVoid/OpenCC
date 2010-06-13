@@ -281,7 +281,12 @@ size_t opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length,
 	wchar_t * winbuf = (wchar_t *) malloc(sizeof(wchar_t) * (wbufsize + 1));
 	wchar_t * woutbuf = (wchar_t *) malloc(sizeof(wchar_t) * (wbufsize + 1));
 
-	utf8_to_wcs(inbuf, length, winbuf, wbufsize + 1);
+	if (utf8_to_wcs(inbuf, length, winbuf, wbufsize + 1) == OPENCC_CONVERT_ERROR)
+	{
+		free(winbuf);
+		free(woutbuf);
+		return OPENCC_CONVERT_ERROR;
+	}
 
 	wchar_t * pinbuf = winbuf, * poutbuf = woutbuf;
 	size_t inbuf_left, outbuf_left;
@@ -301,7 +306,13 @@ size_t opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length,
 
 		*poutbuf = L'\0';
 
-		wcs_to_utf8(woutbuf, (size_t) -1, outbuf, wbufsize * sizeof(size_t));
+		if (wcs_to_utf8(woutbuf, (size_t) -1, outbuf, wbufsize * sizeof(size_t)) == OPENCC_CONVERT_ERROR)
+		{
+			free(winbuf);
+			free(woutbuf);
+			return OPENCC_CONVERT_ERROR;
+		}
+
 		outbuf += strlen(outbuf);
 
 		outbuf_left = wbufsize;

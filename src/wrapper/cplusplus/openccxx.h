@@ -42,6 +42,24 @@ public:
 		opencc_close(od);
 	}
 
+	long convert(const std::string &in, std::string out, long length = -1)
+	{
+		if (length == -1)
+			length = in.length();
+
+		out.resize(length);
+
+		size_t retval;
+		retval = opencc_convert_utf8(od, in.c_str(), length, (char *) out.c_str());
+
+		if (retval == OPENCC_CONVERT_ERROR)
+			return -1;
+
+		out.resize(retval);
+
+		return retval;
+	}
+
 	long convert(const std::wstring &in, std::wstring &out, long length = -1)
 	{
 		size_t inbuf_left = in.length ();

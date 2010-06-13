@@ -24,7 +24,7 @@ bin_PROGRAMS = opencc
 
 libopencc_headers = \
 	opencc.h \
-	openccxx.h \
+	wrapper/cplusplus/openccxx.h \
 	$(NULL)
 
 libopencc_dictionary_sources = \

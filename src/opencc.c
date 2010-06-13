@@ -164,24 +164,24 @@ void convert(const char * input_file, const char * output_file)
 
 void show_version()
 {
-	fprintf(stderr, "\nOpen Chinese Convert (OpenCC) Command Line Tool\nVersion %s\n\n",VERSION);
+	printf("\nOpen Chinese Convert (OpenCC) Command Line Tool\nVersion %s\n\n",VERSION);
 }
 
 void show_usage()
 {
 	show_version();
-	fprintf(stderr, "Usage:\n");
-	fprintf(stderr, "  opencc [-i input_file] [-o output_file]\n\n");
-	fprintf(stderr, "    -i\n");
-	fprintf(stderr, "      Read original text from input_file.\n");
-	fprintf(stderr, "    -o\n");
-	fprintf(stderr, "      Write converted text to output_file.\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "  Note:\n");
-	fprintf(stderr, "    Text from standard input will be read if input_file is not set\n");
-	fprintf(stderr, "    and will be written to standard output if output_file is not set.\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "\n");
+	printf("Usage:\n");
+	printf("  opencc [-i input_file] [-o output_file]\n\n");
+	printf("    -i\n");
+	printf("      Read original text from input_file.\n");
+	printf("    -o\n");
+	printf("      Write converted text to output_file.\n");
+	printf("\n");
+	printf("  Note:\n");
+	printf("    Text from standard input will be read if input_file is not set\n");
+	printf("    and will be written to standard output if output_file is not set.\n");
+	printf("\n");
+	printf("\n");
 }
 
 int main(int argc, char ** argv)

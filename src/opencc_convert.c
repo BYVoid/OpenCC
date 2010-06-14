@@ -262,11 +262,13 @@ size_t opencc_convert(opencc_t odt, wchar_t ** inbuf, size_t * inbuf_left,
 {
 	opencc_description * od = (opencc_description *) odt;
 
-	if (od->convert_direction == OPENCC_CONVERT_SIMP_TO_TRAD)
+	if (od->dicts == NULL)
 	{
-		return mm_seg(od, inbuf, inbuf_left, outbuf, outbuf_left);
+		/* TODO:沒有加載辭典 */
+		return OPENCC_CONVERT_ERROR;
 	}
-    return 0;
+
+	return mm_seg(od, inbuf, inbuf_left, outbuf, outbuf_left);
 }
 
 char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
@@ -346,9 +348,33 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 	free(winbuf);
 	free(woutbuf);
 
-	original_outbuf = (char *) realloc(original_outbuf, sizeof(char) * (strlen(original_outbuf) + 1));
+	original_outbuf = (char *) realloc(original_outbuf,
+			sizeof(char) * (strlen(original_outbuf) + 1));
 
 	return original_outbuf;
+}
+
+int opencc_dict_load(opencc_t odt, const char * dict_filename,
+		opencc_dictionary_type dict_type)
+{
+	opencc_description * od;
+	od = (opencc_description *) odt;
+
+	if (od->dicts == NULL)
+	{
+		od->dicts = dict_open(dict_filename, dict_type);
+		if (od->dicts == (opencc_dictionary_t) -1)
+		{
+			od->dicts = NULL;
+			return -1;
+		}
+	}
+	else
+	{
+		return dict_load(od->dicts, dict_filename, dict_type);
+	}
+
+	return 0;
 }
 
 opencc_t opencc_open(opencc_convert_direction_t convert_direction)
@@ -356,14 +382,30 @@ opencc_t opencc_open(opencc_convert_direction_t convert_direction)
 	opencc_description * od;
 	od = (opencc_description *) malloc(sizeof(opencc_description));
 
-	/* TODO: read dictionary */
-	od->dicts = dict_open("table.txt", OPENCC_DICTIONARY_TYPE_TEXT);
 	od->convert_direction = convert_direction;
 	od->errno = OPENCC_CONVERT_ERROR_VOID;
 	od->sp_seg_buffer.initialized = FALSE;
 	od->sp_seg_buffer.buffer_size = OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE;
 	od->sp_seg_buffer.match_length = od->sp_seg_buffer.min_len
 			= od->sp_seg_buffer.parent = od->sp_seg_buffer.path = NULL;
+	od->dicts = NULL;
+
+	/* 加載默認辭典 */
+	int retval;
+	if (convert_direction == OPENCC_CONVERT_SIMP_TO_TRAD)
+		retval = opencc_dict_load((opencc_t) od, "simp_to_trad.ocd", OPENCC_DICTIONARY_TYPE_DATRIE);
+	else if (convert_direction == OPENCC_CONVERT_TRAD_TO_SIMP)
+		retval = opencc_dict_load((opencc_t) od, "trad_to_simp.ocd", OPENCC_DICTIONARY_TYPE_DATRIE);
+	else if (convert_direction == OPENCC_CONVERT_CUSTOM)
+		;
+	else
+		debug_should_not_be_here();
+
+	if (retval == -1)
+	{
+		opencc_close((opencc_t) od);
+		return (opencc_t) -1;
+	}
 
 	return (opencc_t) od;
 }
@@ -373,7 +415,8 @@ int opencc_close(opencc_t odt)
 	opencc_description * od;
 	od = (opencc_description *) odt;
 	sp_seg_buffer_free(&(od->sp_seg_buffer));
-	dict_close(od->dicts);
+	if (od->dicts)
+		dict_close(od->dicts);
 	free(od);
 
 	return 0;

@@ -38,6 +38,8 @@ typedef void * opencc_t;
 typedef enum
 {
 	OPENCC_CONVERT_SIMP_TO_TRAD,
+	OPENCC_CONVERT_TRAD_TO_SIMP,
+	OPENCC_CONVERT_CUSTOM,
 } opencc_convert_direction_t;
 
 typedef enum
@@ -45,6 +47,18 @@ typedef enum
 	OPENCC_CONVERT_ERROR_VOID,
 	OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH,
 } opencc_convert_errno_t;
+
+typedef enum
+{
+	OPENCC_DICTIONARY_TYPE_TEXT,
+	OPENCC_DICTIONARY_TYPE_DATRIE,
+} opencc_dictionary_type;
+
+typedef struct
+{
+	wchar_t * key;
+	wchar_t * value;
+} opencc_entry;
 
 /**
  * opencc_open:
@@ -85,6 +99,9 @@ size_t opencc_convert(opencc_t od, wchar_t ** inbuf, size_t * inbufleft,
 		wchar_t ** outbuf, size_t * outbufleft);
 
 char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length);
+
+int opencc_dict_load(opencc_t odt, const char * dict_filename,
+		opencc_dictionary_type dict_type);
 
 /**
  * opencc_errno:

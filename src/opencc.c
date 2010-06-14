@@ -35,6 +35,13 @@ void convert(const char * input_file, const char * output_file)
 {
 	static char inbuf[BUFFER_SIZE + 1];
 	
+	opencc_t od = opencc_open(OPENCC_CONVERT_SIMP_TO_TRAD);
+	if (od == (opencc_t) -1)
+	{
+		fprintf(stderr, "Can not create OpenCC.\n");
+		exit(1);
+	}
+
 	FILE * fp = stdin;
 	FILE * fpo = stdout;
 	
@@ -57,8 +64,6 @@ void convert(const char * input_file, const char * output_file)
 			exit(1);
 		}
 	}
-	
-	opencc_t od = opencc_open(OPENCC_CONVERT_SIMP_TO_TRAD);
 	
 	while (fgets(inbuf, BUFFER_SIZE, fp) != NULL)
 	{

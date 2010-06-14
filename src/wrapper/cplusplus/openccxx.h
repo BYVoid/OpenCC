@@ -47,17 +47,15 @@ public:
 		if (length == -1)
 			length = in.length();
 
-		out.resize(length);
+		char * outbuf = opencc_convert_utf8(od, in.c_str(), length);
 
-		size_t retval;
-		retval = opencc_convert_utf8(od, in.c_str(), length, (char *) out.c_str());
-
-		if (retval == OPENCC_CONVERT_ERROR)
+		if (outbuf == NULL)
 			return -1;
 
-		out.resize(retval);
+		out = outbuf;
+		free(outbuf);
 
-		return retval;
+		return length;
 	}
 
 	long convert(const std::wstring &in, std::wstring &out, long length = -1)

@@ -84,8 +84,7 @@ int opencc_close(opencc_t od);
 size_t opencc_convert(opencc_t od, wchar_t ** inbuf, size_t * inbufleft,
 		wchar_t ** outbuf, size_t * outbufleft);
 
-size_t opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length,
-		char * outbuf);
+char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length);
 
 /**
  * opencc_errno:

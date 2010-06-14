@@ -28,8 +28,10 @@ libopencc_headers = \
 	$(NULL)
 
 libopencc_dictionary_sources = \
+	dictionary/opencc_dictionary.c \
 	dictionary/opencc_dictionary_abstract.c \
 	dictionary/opencc_dictionary_text.c \
+	dictionary/opencc_dictionary.h \
 	dictionary/opencc_dictionary_abstract.h \
 	dictionary/opencc_dictionary_text.h \
 	$(NULL)
@@ -40,10 +42,8 @@ libopencc_dictionary_sources = \
 
 libopencc_la_SOURCES = \
 	opencc_convert.c \
-	opencc_dictionary.c \
 	opencc_encoding.c \
 	opencc_utils.c \
-	opencc_dictionary.h\
 	opencc_encoding.h \
 	opencc_utils.h \
 	$(libopencc_dictionary_sources) \
@@ -83,10 +83,10 @@ opencc_LDADD = \
 	$(libopencc) \
 	$(NULL)
 
-opencc_build_datrie_SOURCES = \
-	opencc_build_datrie.c \
-	$(libopencc_headers) \
-	$(NULL)
+#opencc_build_datrie_SOURCES = \
+#	opencc_build_datrie.c \
+#	$(libopencc_headers) \
+#	$(NULL)
 
 opencc_table = $(top_srcdir)/data/table.txt
 

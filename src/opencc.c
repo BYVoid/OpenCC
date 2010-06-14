@@ -34,7 +34,6 @@
 void convert(const char * input_file, const char * output_file)
 {
 	static char inbuf[BUFFER_SIZE + 1];
-	static char outbuf[BUFFER_SIZE + 1];
 	
 	FILE * fp = stdin;
 	FILE * fpo = stdout;
@@ -63,8 +62,9 @@ void convert(const char * input_file, const char * output_file)
 	
 	while (fgets(inbuf, BUFFER_SIZE, fp) != NULL)
 	{
-		size_t retval = opencc_convert_utf8(od, inbuf, (size_t) -1, outbuf);
-		if (retval == OPENCC_CONVERT_ERROR)
+		char * outbuf;
+		outbuf = opencc_convert_utf8(od, inbuf, (size_t) -1);
+		if (outbuf == NULL)
 		{
 			opencc_perror(od);
 			break;

@@ -18,7 +18,7 @@
 
 #include "opencc.h"
 #include "opencc_encoding.h"
-#include "opencc_dictionary.h"
+#include "dictionary/opencc_dictionary.h"
 #include "opencc_utils.h"
 
 #define OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE 1024
@@ -269,26 +269,31 @@ size_t opencc_convert(opencc_t odt, wchar_t ** inbuf, size_t * inbuf_left,
     return 0;
 }
 
-size_t opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length,
-		char * outbuf)
+char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 {
-	const char * original_outbuf = outbuf;
-
-	if (length == (size_t) -1)
+	if (length == (size_t) -1 || length > strlen(inbuf))
 		length = strlen(inbuf);
 
-	size_t wbufsize = length;
-	wchar_t * winbuf = (wchar_t *) malloc(sizeof(wchar_t) * (wbufsize + 1));
-	wchar_t * woutbuf = (wchar_t *) malloc(sizeof(wchar_t) * (wbufsize + 1));
-
-	if (utf8_to_wcs(inbuf, length, winbuf, wbufsize + 1) == OPENCC_CONVERT_ERROR)
+	/* 將輸入數據轉換爲wchar_t字符串 */
+	wchar_t * winbuf = utf8_to_wcs(inbuf, length);
+	if (winbuf == NULL)
 	{
-		free(winbuf);
-		free(woutbuf);
-		return OPENCC_CONVERT_ERROR;
+		/* 輸入數據轉換失敗 */
+		return NULL;
 	}
 
-	wchar_t * pinbuf = winbuf, * poutbuf = woutbuf;
+	/* 設置輸出UTF8文本緩衝區空間 */
+	size_t outbuf_len = length;
+	size_t outsize = outbuf_len;
+	char * original_outbuf = (char *) malloc(sizeof(char) * (outbuf_len + 1));
+	char * outbuf = original_outbuf;
+
+	/* 設置轉換緩衝區空間 */
+	size_t wbufsize = length;
+	wchar_t * woutbuf = (wchar_t *) malloc(sizeof(wchar_t) * (wbufsize + 1));
+
+	wchar_t * pinbuf = winbuf;
+	wchar_t * poutbuf = woutbuf;
 	size_t inbuf_left, outbuf_left;
 
 	inbuf_left = wcslen(winbuf);
@@ -299,30 +304,51 @@ size_t opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length,
 		size_t retval = opencc_convert(odt, &pinbuf, &inbuf_left, &poutbuf, &outbuf_left);
 		if (retval == OPENCC_CONVERT_ERROR)
 		{
+			free(outbuf);
 			free(winbuf);
 			free(woutbuf);
-			return OPENCC_CONVERT_ERROR;
+			return NULL;
 		}
 
 		*poutbuf = L'\0';
 
-		if (wcs_to_utf8(woutbuf, (size_t) -1, outbuf, wbufsize * sizeof(size_t)) == OPENCC_CONVERT_ERROR)
+		char * ubuff = wcs_to_utf8(woutbuf, (size_t) -1);
+
+		if (ubuff == NULL)
 		{
+			free(outbuf);
 			free(winbuf);
 			free(woutbuf);
-			return OPENCC_CONVERT_ERROR;
+			return NULL;
 		}
 
-		outbuf += strlen(outbuf);
+		size_t ubuff_len = strlen(ubuff);
+
+		while (ubuff_len > outsize)
+		{
+			size_t outbuf_offset = outbuf - original_outbuf;
+			outsize += outbuf_len;
+			outbuf_len += outbuf_len;
+			original_outbuf = (char *) realloc(original_outbuf, sizeof(char) * outbuf_len);
+			outbuf = original_outbuf + outbuf_offset;
+		}
+
+		strncpy(outbuf, ubuff, ubuff_len);
+		free(ubuff);
+
+		outbuf += ubuff_len;
+		*outbuf = '\0';
 
 		outbuf_left = wbufsize;
 		poutbuf = woutbuf;
 	}
-	*outbuf = '\0';
 
 	free(winbuf);
 	free(woutbuf);
-	return outbuf - original_outbuf;
+
+	original_outbuf = (char *) realloc(original_outbuf, sizeof(char) * (strlen(original_outbuf) + 1));
+
+	return original_outbuf;
 }
 
 opencc_t opencc_open(opencc_convert_direction_t convert_direction)

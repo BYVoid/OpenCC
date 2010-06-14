@@ -21,6 +21,7 @@
 
 #define INITIAL_DICTIONARY_SIZE 1024
 #define ENTRY_BUFF_SIZE 128
+#define ENTRY_WBUFF_SIZE ENTRY_BUFF_SIZE / sizeof(size_t)
 
 typedef struct
 {
@@ -52,7 +53,7 @@ dict_ptr dict_text_open(const char * filename)
 	static char buff[ENTRY_BUFF_SIZE];
 	static char key_buff[ENTRY_BUFF_SIZE];
 	static char value_buff[ENTRY_BUFF_SIZE];
-	static wchar_t wbuff[ENTRY_BUFF_SIZE];
+	wchar_t * wbuff;
 
 	FILE * fp = fopen(filename,"r");
 	if (fp == NULL)
@@ -69,18 +70,19 @@ dict_ptr dict_text_open(const char * filename)
 
 		sscanf(buff, "%s %s", key_buff, value_buff);
 
-		utf8_to_wcs(key_buff, wbuff, ENTRY_BUFF_SIZE);
-
+		wbuff = utf8_to_wcs(key_buff,(size_t) -1);
 		size_t length = wcslen(wbuff);
 		if (length > td->max_length)
 			td->max_length = length;
 
 		td->lexicon[i].key = (wchar_t *) malloc((length + 1) * sizeof(wchar_t));
 		wcscpy(td->lexicon[i].key, wbuff);
+		free(wbuff);
 
-		utf8_to_wcs(value_buff, wbuff, ENTRY_BUFF_SIZE);
+		wbuff = utf8_to_wcs(value_buff,(size_t) -1);
 		td->lexicon[i].value = (wchar_t *) malloc((wcslen(wbuff) + 1) * sizeof(wchar_t));
 		wcscpy(td->lexicon[i].value, wbuff);
+		free(wbuff);
 
 		i ++;
 	}

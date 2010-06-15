@@ -28,20 +28,22 @@ libopencc_headers = \
 	$(NULL)
 
 libopencc_dictionary_sources = \
-	opencc_dictionary.c \
 	dictionary/opencc_dictionary_abstract.c \
+	dictionary/opencc_dictionary_datrie.c \
 	dictionary/opencc_dictionary_text.c \
-	opencc_dictionary.h \
 	dictionary/opencc_dictionary_abstract.h \
+	dictionary/opencc_dictionary_datrie.h \
 	dictionary/opencc_dictionary_text.h \
 	$(NULL)
 
 libopencc_la_SOURCES = \
 	opencc_converter.c \
+	opencc_dictionary.c \
 	opencc_encoding.c \
 	opencc_utils.c \
 	opencc.c \
 	opencc_converter.h \
+	opencc_dictionary.h \
 	opencc_encoding.h \
 	opencc_utils.h \
 	$(libopencc_dictionary_sources) \

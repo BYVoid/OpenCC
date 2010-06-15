@@ -18,20 +18,12 @@
 
 #include "../opencc.h"
 #include "../opencc_utils.h"
+#include "../dictionary/opencc_dictionary_datrie.h"
 
 #define DATRIE_SIZE 300000
 #define DATRIE_WORD_MAX_COUNT 100000
 #define DATRIE_WORD_MAX_LENGTH 32
 #define BUFFSIZE 1024
-
-#define DATRIE_UNUSED -1
-
-typedef struct
-{
-	int base;
-	int parent;
-	int word;
-} DoubleArrayTrieItem;
 
 typedef struct
 {
@@ -46,11 +38,6 @@ size_t lexicon_count, words_set_count;
 int words_set[DATRIE_WORD_MAX_COUNT];
 wchar_t words_set_char[DATRIE_WORD_MAX_COUNT];
 DoubleArrayTrieItem dat[DATRIE_SIZE];
-
-int encode_char(wchar_t ch)
-{
-	return (int)ch;
-}
 
 void match_word(const DoubleArrayTrieItem *dat, const wchar_t * word, int *match_pos, int *id, int limit)
 {
@@ -217,11 +204,6 @@ void insert(int id)
 	}
 }
 
-int cmp(const void *a, const void *b)
-{
-	return wcscmp(((const Entry *)a)->key, ((const Entry *)b)->key);
-}
-
 void make(void)
 {
 	int i;
@@ -232,12 +214,15 @@ void make(void)
 	}
 	dat[0].parent = dat[0].base = 0;
 	
-	qsort(lexicon, lexicon_count, sizeof(lexicon[0]), cmp);
 	for (i = 0; i < lexicon_count; i ++)
 		insert_first_char(i);
 	for (i = 0; i < lexicon_count; i ++)
 		insert(i);
-	
+}
+
+int cmp(const void *a, const void *b)
+{
+	return wcscmp(((const opencc_entry *)a)->key, ((const opencc_entry *)b)->key);
 }
 
 void init(void)
@@ -254,14 +239,19 @@ void init(void)
 	static opencc_entry tlexicon[DATRIE_WORD_MAX_COUNT];
 
 	lexicon_count = opencc_dict_get_lexicon(od, tlexicon);
+	qsort(tlexicon, lexicon_count, sizeof(tlexicon[0]), cmp);
 
+	lexicon[0].pos = 0;
 	size_t i;
 	for (i = 0; i < lexicon_count; i ++)
 	{
 		lexicon[i].key = tlexicon[i].key;
 		lexicon[i].value = tlexicon[i].value;
 		lexicon[i].length = wcslen(lexicon[i].key);
-		lexicon[i].pos = lexicon[i-1].pos + lexicon[i-1].length + 1;
+		if (i > 0)
+			lexicon[i].pos = lexicon[i-1].pos + wcslen(lexicon[i-1].value) + 1;
+		//if (lexicon[i].length != wcslen(lexicon[i].value))
+		//	printf("%d\n",i);
 	}
 }
 
@@ -275,8 +265,11 @@ void output()
 			break;
 	item_count = i + 1;
 
+	size_t lexicon_length = lexicon[lexicon_count - 1].pos +
+			wcslen(lexicon[lexicon_count - 1].value) + 1;
+
 	fwrite(OPENCC_DICHEADER, sizeof(char), strlen(OPENCC_DICHEADER), fp);
-	fwrite(&lexicon_count, sizeof(size_t), 1, fp);
+	fwrite(&lexicon_length, sizeof(size_t), 1, fp);
 	fwrite(&item_count, sizeof(size_t), 1, fp);
 
 	for (i = 0; i < lexicon_count; i ++)

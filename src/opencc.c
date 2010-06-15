@@ -21,6 +21,12 @@
 #include "opencc_encoding.h"
 #include "opencc_utils.h"
 
+/* 默認辭典 */
+#define DEFAULT_DICT_SIMP_TO_TRAD "simp_to_trad.ocd"
+#define DEFAULT_DICT_SIMP_TO_TRAD_TYPE OPENCC_DICTIONARY_TYPE_DATRIE
+#define DEFAULT_DICT_TRAD_TO_SIMP "trad_to_simp.ocd"
+#define DEFAULT_DICT_TRAD_TO_SIMP_TYPE OPENCC_DICTIONARY_TYPE_DATRIE
+
 typedef struct
 {
 	opencc_dictionary_t dicts;
@@ -139,11 +145,13 @@ opencc_t opencc_open(opencc_convert_direction_t convert_direction)
 	/* 加載默認辭典 */
 	int retval;
 	if (convert_direction == OPENCC_CONVERT_SIMP_TO_TRAD)
-		retval = opencc_dict_load((opencc_t) od, "simp_to_trad.ocd", OPENCC_DICTIONARY_TYPE_DATRIE);
+		retval = opencc_dict_load((opencc_t) od, DEFAULT_DICT_SIMP_TO_TRAD,
+				DEFAULT_DICT_SIMP_TO_TRAD_TYPE);
 	else if (convert_direction == OPENCC_CONVERT_TRAD_TO_SIMP)
-		retval = opencc_dict_load((opencc_t) od, "trad_to_simp.ocd", OPENCC_DICTIONARY_TYPE_DATRIE);
+		retval = opencc_dict_load((opencc_t) od, DEFAULT_DICT_TRAD_TO_SIMP,
+				DEFAULT_DICT_TRAD_TO_SIMP_TYPE);
 	else if (convert_direction == OPENCC_CONVERT_CUSTOM)
-		;
+		retval = 0;
 	else
 		debug_should_not_be_here();
 
@@ -213,6 +221,8 @@ int opencc_dict_load(opencc_t odt, const char * dict_filename,
 			od->dicts = NULL;
 			return -1;
 		}
+		converter_assign_dicts(od->converter, od->dicts);
+		return 0;
 	}
 	else
 	{

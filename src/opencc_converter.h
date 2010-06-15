@@ -19,24 +19,17 @@
 #ifndef __OPENCC_CONVERT_H_
 #define __OPENCC_CONVERT_H_
 
-#include "dictionary/opencc_dictionary.h"
+#include "opencc_dictionary.h"
 
-typedef struct
-{
-	int initialized;
-	size_t buffer_size;
-	size_t * match_length;
-	size_t * min_len;
-	size_t * parent;
-	size_t * path;
-} opencc_sp_seg_buffer;
+typedef void * opencc_converter_t;
 
-typedef struct
-{
-	opencc_dictionary_t dicts;
-	opencc_convert_direction_t convert_direction;
-	opencc_convert_errno_t errno;
-	opencc_sp_seg_buffer sp_seg_buffer;
-} opencc_description;
+void converter_assign_dicts(opencc_converter_t cdt, opencc_dictionary_t dicts);
+
+opencc_converter_t converter_open();
+
+void converter_close(opencc_converter_t cdt);
+
+size_t converter_convert(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbuf_left,
+		wchar_t ** outbuf, size_t * outbuf_left);
 
 #endif /* __OPENCC_CONVERT_H_ */

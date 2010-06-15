@@ -19,8 +19,7 @@
 #ifndef __OPENCC_DICTIONARY_H_
 #define __OPENCC_DICTIONARY_H_
 
-#include "../opencc.h"
-#include "../opencc_utils.h"
+#include "opencc.h"
 
 typedef void * opencc_dictionary_t;
 

@@ -16,12 +16,27 @@
 * limitations under the License.
 */
 
-#include "opencc.h"
-#include "opencc_convert.h"
-#include "opencc_encoding.h"
 #include "opencc_utils.h"
+#include "opencc_converter.h"
+#include "opencc_dictionary.h"
 
 #define OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE 1024
+
+typedef struct
+{
+	int initialized;
+	size_t buffer_size;
+	size_t * match_length;
+	size_t * min_len;
+	size_t * parent;
+	size_t * path;
+} opencc_sp_seg_buffer;
+
+typedef struct
+{
+	opencc_sp_seg_buffer sp_seg_buffer;
+	opencc_dictionary_t dicts;
+} opencc_converter_description;
 
 void sp_seg_buffer_free(opencc_sp_seg_buffer * ossb)
 {
@@ -45,7 +60,7 @@ void sp_seg_set_buffer_size(opencc_sp_seg_buffer * ossb, size_t buffer_size)
 	ossb->initialized = TRUE;
 }
 
-size_t sp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
+size_t sp_seg(opencc_converter_description * cd, wchar_t ** inbuf, size_t * inbuf_left,
 		wchar_t ** outbuf, size_t * outbuf_left, size_t length)
 {
 	/* 最短路徑分詞 */
@@ -53,7 +68,7 @@ size_t sp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 	/* 對長度爲1時特殊優化 */
 	if (length == 1)
 	{
-		const wchar_t * match_rs = dict_match_longest(od->dicts, *inbuf, 1);
+		const wchar_t * match_rs = dict_match_longest(cd->dicts, *inbuf, 1);
 		
 		if (match_rs == NULL)
 			**outbuf = **inbuf;
@@ -68,10 +83,10 @@ size_t sp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 	}
 	
 	/* 設置緩衝區空間 */
-	opencc_sp_seg_buffer * ossb = &(od->sp_seg_buffer);
+	opencc_sp_seg_buffer * ossb = &(cd->sp_seg_buffer);
 	size_t buffer_size_need = length + 1;
 	if (ossb->initialized == FALSE || ossb->buffer_size < buffer_size_need)
-		sp_seg_set_buffer_size(&(od->sp_seg_buffer), buffer_size_need);
+		sp_seg_set_buffer_size(&(cd->sp_seg_buffer), buffer_size_need);
 	
 	size_t i, j;
 
@@ -83,7 +98,7 @@ size_t sp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 	for (i = 0; i < length; i ++)
 	{
 		/* 獲取所有匹配長度 */
-		dict_get_all_match_lengths(od->dicts, (*inbuf) + i, ossb->match_length);
+		dict_get_all_match_lengths(cd->dicts, (*inbuf) + i, ossb->match_length);
 		
 		if (ossb->match_length[1] != 1)
 			ossb->match_length[++ ossb->match_length[0]] = 1;
@@ -114,7 +129,7 @@ size_t sp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 	{
 		end = ossb->path[i];
 		
-		const wchar_t * match_rs = dict_match_longest(od->dicts, *inbuf, end - begin);
+		const wchar_t * match_rs = dict_match_longest(cd->dicts, *inbuf, end - begin);
 
 		if (match_rs == NULL)
 		{
@@ -142,9 +157,10 @@ size_t sp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 	return inbuf_left_start - *inbuf_left;
 }
 
-size_t mmsp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
+size_t mmsp_seg(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbuf_left,
 		wchar_t ** outbuf, size_t * outbuf_left)
 {
+	opencc_converter_description * cd = (opencc_converter_description *) cdt;
 	/* 歧義分割最短路徑分詞 */
 	size_t i, start, bound;
 	const wchar_t * inbuf_start = *inbuf;
@@ -158,20 +174,20 @@ size_t mmsp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 		if (i != 0 && i == bound)
 		{
 			/* 對歧義部分進行最短路徑分詞 */
-			sp_seg_length = sp_seg(od, inbuf, inbuf_left, outbuf, outbuf_left, bound - start);
+			sp_seg_length = sp_seg(cd, inbuf, inbuf_left, outbuf, outbuf_left, bound - start);
 			if (sp_seg_length ==  OPENCC_CONVERT_ERROR)
 				return OPENCC_CONVERT_ERROR;
 			if (sp_seg_length == 0)
 			{
 				if (inbuf_left_start - *inbuf_left > 0)
 					return inbuf_left_start - *inbuf_left;
-				od->errno = OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH;
+				/* 空間不足 */
 				return OPENCC_CONVERT_ERROR;
 			}
 			start = i;
 		}
 	
-		const wchar_t * match_rs = dict_match_longest(od->dicts, inbuf_start + i, 0);
+		const wchar_t * match_rs = dict_match_longest(cd->dicts, inbuf_start + i, 0);
 		size_t match_len = wcslen(match_rs);
 		
 		if (match_rs == NULL)
@@ -183,14 +199,14 @@ size_t mmsp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 	
 	if (*inbuf_left > 0 && *outbuf_left > 0)
 	{
-		sp_seg_length = sp_seg(od, inbuf, inbuf_left, outbuf, outbuf_left, bound - start);
+		sp_seg_length = sp_seg(cd, inbuf, inbuf_left, outbuf, outbuf_left, bound - start);
 		if (sp_seg_length ==  OPENCC_CONVERT_ERROR)
 			return OPENCC_CONVERT_ERROR;
 		if (sp_seg_length == 0)
 		{
 			if (inbuf_left_start - *inbuf_left > 0)
 				return inbuf_left_start - *inbuf_left;
-			od->errno = OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH;
+			/* 空間不足 */
 			return OPENCC_CONVERT_ERROR;
 		}
 	}
@@ -198,16 +214,18 @@ size_t mmsp_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 	return inbuf_left_start - *inbuf_left;
 }
 
-size_t mm_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
+size_t converter_convert(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbuf_left,
 		wchar_t ** outbuf, size_t * outbuf_left)
 {
+	opencc_converter_description * cd = (opencc_converter_description *) cdt;
+
 	/* 正向最大分詞 */
 	size_t inbuf_left_start = *inbuf_left;
 	wchar_t * ous = *outbuf;
 
 	for (; **inbuf && *inbuf_left > 0 && *outbuf_left > 0;)
 	{
-		const wchar_t * match_rs = dict_match_longest(od->dicts, *inbuf, *inbuf_left);
+		const wchar_t * match_rs = dict_match_longest(cd->dicts, *inbuf, *inbuf_left);
 
 		if (match_rs == NULL)
 		{
@@ -223,7 +241,6 @@ size_t mm_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 			{
 				if (inbuf_left_start - *inbuf_left > 0)
 					break;
-				od->errno = OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH;
 				return OPENCC_CONVERT_ERROR;
 			}
 
@@ -239,163 +256,32 @@ size_t mm_seg(opencc_description * od, wchar_t ** inbuf, size_t * inbuf_left,
 	return inbuf_left_start - *inbuf_left;
 }
 
-size_t opencc_convert(opencc_t odt, wchar_t ** inbuf, size_t * inbuf_left,
-		wchar_t ** outbuf, size_t * outbuf_left)
+void converter_assign_dicts(opencc_converter_t cdt, opencc_dictionary_t dicts)
 {
-	opencc_description * od = (opencc_description *) odt;
-
-	if (od->dicts == NULL)
-	{
-		/* TODO:沒有加載辭典 */
-		return OPENCC_CONVERT_ERROR;
-	}
-
-	return mm_seg(od, inbuf, inbuf_left, outbuf, outbuf_left);
+	opencc_converter_description * cd = (opencc_converter_description *) cdt;
+	cd->dicts = dicts;
 }
 
-char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
+opencc_converter_t converter_open()
 {
-	if (length == (size_t) -1 || length > strlen(inbuf))
-		length = strlen(inbuf);
+	opencc_converter_description * cd = (opencc_converter_description *)
+			malloc(sizeof(opencc_converter_description));
 
-	/* 將輸入數據轉換爲wchar_t字符串 */
-	wchar_t * winbuf = utf8_to_wcs(inbuf, length);
-	if (winbuf == NULL)
-	{
-		/* 輸入數據轉換失敗 */
-		return NULL;
-	}
+	cd->sp_seg_buffer.initialized = FALSE;
+	cd->sp_seg_buffer.buffer_size = OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE;
+	cd->sp_seg_buffer.match_length = cd->sp_seg_buffer.min_len
+			= cd->sp_seg_buffer.parent = cd->sp_seg_buffer.path = NULL;
 
-	/* 設置輸出UTF8文本緩衝區空間 */
-	size_t outbuf_len = length;
-	size_t outsize = outbuf_len;
-	char * original_outbuf = (char *) malloc(sizeof(char) * (outbuf_len + 1));
-	char * outbuf = original_outbuf;
+	cd->dicts = NULL;
 
-	/* 設置轉換緩衝區空間 */
-	size_t wbufsize = length;
-	wchar_t * woutbuf = (wchar_t *) malloc(sizeof(wchar_t) * (wbufsize + 1));
-
-	wchar_t * pinbuf = winbuf;
-	wchar_t * poutbuf = woutbuf;
-	size_t inbuf_left, outbuf_left;
-
-	inbuf_left = wcslen(winbuf);
-	outbuf_left = wbufsize;
-
-	while (inbuf_left > 0)
-	{
-		size_t retval = opencc_convert(odt, &pinbuf, &inbuf_left, &poutbuf, &outbuf_left);
-		if (retval == OPENCC_CONVERT_ERROR)
-		{
-			free(outbuf);
-			free(winbuf);
-			free(woutbuf);
-			return NULL;
-		}
-
-		*poutbuf = L'\0';
-
-		char * ubuff = wcs_to_utf8(woutbuf, (size_t) -1);
-
-		if (ubuff == NULL)
-		{
-			free(outbuf);
-			free(winbuf);
-			free(woutbuf);
-			return NULL;
-		}
-
-		size_t ubuff_len = strlen(ubuff);
-
-		while (ubuff_len > outsize)
-		{
-			size_t outbuf_offset = outbuf - original_outbuf;
-			outsize += outbuf_len;
-			outbuf_len += outbuf_len;
-			original_outbuf = (char *) realloc(original_outbuf, sizeof(char) * outbuf_len);
-			outbuf = original_outbuf + outbuf_offset;
-		}
-
-		strncpy(outbuf, ubuff, ubuff_len);
-		free(ubuff);
-
-		outbuf += ubuff_len;
-		*outbuf = '\0';
-
-		outbuf_left = wbufsize;
-		poutbuf = woutbuf;
-	}
-
-	free(winbuf);
-	free(woutbuf);
-
-	original_outbuf = (char *) realloc(original_outbuf,
-			sizeof(char) * (strlen(original_outbuf) + 1));
-
-	return original_outbuf;
+	return (opencc_converter_t) cd;
 }
 
-opencc_t opencc_open(opencc_convert_direction_t convert_direction)
+void converter_close(opencc_converter_t cdt)
 {
-	opencc_description * od;
-	od = (opencc_description *) malloc(sizeof(opencc_description));
+	opencc_converter_description * cd = (opencc_converter_description *) cdt;
 
-	od->convert_direction = convert_direction;
-	od->errno = OPENCC_CONVERT_ERROR_VOID;
-	od->sp_seg_buffer.initialized = FALSE;
-	od->sp_seg_buffer.buffer_size = OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE;
-	od->sp_seg_buffer.match_length = od->sp_seg_buffer.min_len
-			= od->sp_seg_buffer.parent = od->sp_seg_buffer.path = NULL;
-	od->dicts = NULL;
+	sp_seg_buffer_free(&(cd->sp_seg_buffer));
 
-	/* 加載默認辭典 */
-	int retval;
-	if (convert_direction == OPENCC_CONVERT_SIMP_TO_TRAD)
-		retval = opencc_dict_load((opencc_t) od, "simp_to_trad.ocd", OPENCC_DICTIONARY_TYPE_DATRIE);
-	else if (convert_direction == OPENCC_CONVERT_TRAD_TO_SIMP)
-		retval = opencc_dict_load((opencc_t) od, "trad_to_simp.ocd", OPENCC_DICTIONARY_TYPE_DATRIE);
-	else if (convert_direction == OPENCC_CONVERT_CUSTOM)
-		;
-	else
-		debug_should_not_be_here();
-
-	if (retval == -1)
-	{
-		opencc_close((opencc_t) od);
-		return (opencc_t) -1;
-	}
-
-	return (opencc_t) od;
-}
-
-int opencc_close(opencc_t odt)
-{
-	opencc_description * od;
-	od = (opencc_description *) odt;
-	sp_seg_buffer_free(&(od->sp_seg_buffer));
-	if (od->dicts)
-		dict_close(od->dicts);
-	free(od);
-
-	return 0;
-}
-
-opencc_convert_errno_t opencc_errno(opencc_t odt)
-{
-	opencc_description * od;
-	od = (opencc_description *) odt;
-	return od->errno;
-}
-
-void opencc_perror(opencc_t odt)
-{
-	switch (opencc_errno(odt))
-	{
-	case OPENCC_CONVERT_ERROR_VOID:
-		break;
-	case OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH:
-		fprintf(stderr, "Output buffer is not enough for one segment.\n");
-		break;
-	}
+	free(cd);
 }

@@ -28,18 +28,20 @@ libopencc_headers = \
 	$(NULL)
 
 libopencc_dictionary_sources = \
-	dictionary/opencc_dictionary.c \
+	opencc_dictionary.c \
 	dictionary/opencc_dictionary_abstract.c \
 	dictionary/opencc_dictionary_text.c \
-	dictionary/opencc_dictionary.h \
+	opencc_dictionary.h \
 	dictionary/opencc_dictionary_abstract.h \
 	dictionary/opencc_dictionary_text.h \
 	$(NULL)
 
 libopencc_la_SOURCES = \
-	opencc_convert.c \
+	opencc_converter.c \
 	opencc_encoding.c \
 	opencc_utils.c \
+	opencc.c \
+	opencc_converter.h \
 	opencc_encoding.h \
 	opencc_utils.h \
 	$(libopencc_dictionary_sources) \
@@ -103,13 +105,11 @@ opencc_dict_LDADD = \
 
 opencc_table = $(top_srcdir)/data/table.txt
 
-EXTRA_DIST = \
-	refine-opencc-table.py \
-	$(NULL)
+#EXTRA_DIST = \
+#	refine-opencc-table.py \
+#	$(NULL)
 
 CLEANFILES = \
-	opencc_datrie_table.h \
-	table.refined.txt \
 	$(NULL)
 
 opencc_datrie_table.h: table.refined.txt opencc_build_datrie

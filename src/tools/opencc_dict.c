@@ -16,26 +16,34 @@
 * limitations under the License.
 */
 
-#include "opencc_datrie.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <iconv.h>
+#include "../opencc.h"
+#include "../opencc_utils.h"
 
 #define DATRIE_SIZE 300000
 #define DATRIE_WORD_MAX_COUNT 100000
-#define DATRIE_WORD_MAX_LENGTH 12
+#define DATRIE_WORD_MAX_LENGTH 32
 #define BUFFSIZE 1024
+
+#define DATRIE_UNUSED -1
 
 typedef struct
 {
-	wchar_t simp[DATRIE_WORD_MAX_LENGTH];
-	wchar_t trad[DATRIE_WORD_MAX_LENGTH];
+	int base;
+	int parent;
+	int word;
+} DoubleArrayTrieItem;
+
+typedef struct
+{
+	wchar_t * key;
+	wchar_t * value;
 	int length;
+	int pos;
 } Entry;
 
 Entry lexicon[DATRIE_WORD_MAX_COUNT];
-int lexicon_count;
-int words_set[DATRIE_WORD_MAX_COUNT],words_set_count;
+size_t lexicon_count, words_set_count;
+int words_set[DATRIE_WORD_MAX_COUNT];
 wchar_t words_set_char[DATRIE_WORD_MAX_COUNT];
 DoubleArrayTrieItem dat[DATRIE_SIZE];
 
@@ -89,14 +97,14 @@ int binary_search(const wchar_t *str)
 	while (a + 1 < b)
 	{
 		c = (a + b) / 2;
-		if (wcscmp(str,lexicon[c].simp) <= 0)
+		if (wcscmp(str,lexicon[c].key) <= 0)
 			b = c;
 		else
 			a = c+1;
 	}
-	if (is_prefix(str,lexicon[a].simp) && (a == 0 || !is_prefix(str,lexicon[a-1].simp)))
+	if (is_prefix(str,lexicon[a].key) && (a == 0 || !is_prefix(str,lexicon[a-1].key)))
 		return a;
-	if (is_prefix(str,lexicon[b].simp) && !is_prefix(str,lexicon[b-1].simp))
+	if (is_prefix(str,lexicon[b].key) && !is_prefix(str,lexicon[b-1].key))
 		return b;
 	return -1;
 }
@@ -117,11 +125,11 @@ void get_words_with_prefix(wchar_t * word, int p)
 	buff[p] = 0;
 	
 	words_set_count = 0;
-	for (i = binary_search(buff); i < lexicon_count && is_prefix(buff,lexicon[i].simp); i ++)
+	for (i = binary_search(buff); i < lexicon_count && is_prefix(buff,lexicon[i].key); i ++)
 	{
-		if (wcscmp(buff,lexicon[i].simp) == 0)
+		if (wcscmp(buff,lexicon[i].key) == 0)
 			continue;
-		words_set_char_buff[words_set_count] = lexicon[i].simp[p];
+		words_set_char_buff[words_set_count] = lexicon[i].key[p];
 		words_set[words_set_count ++] = i;
 	}
 	words_set_char_buff[words_set_count] = 0;
@@ -153,11 +161,11 @@ int words_space_available(int delta)
 void insert_first_char(int id)
 {
 	Entry * word = &lexicon[id];
-	int k = encode_char(word->simp[0]);
+	int k = encode_char(word->key[0]);
 	dat[k].base = DATRIE_UNUSED;
 	dat[k].parent = 0;
 	if (word->length == 1)
-		dat[k].word = id;
+		dat[k].word = lexicon[id].pos;
 }
 
 void insert_words(int delta, int parent,int word_len)
@@ -166,11 +174,11 @@ void insert_words(int delta, int parent,int word_len)
 	for (i = 0; i < words_set_count; i ++)
 	{
 		int j = words_set[i];
-		int k = encode_char(lexicon[j].simp[word_len]) + delta;
+		int k = encode_char(lexicon[j].key[word_len]) + delta;
 		dat[k].parent = parent;
 		if (lexicon[j].length == word_len + 1)
 		{
-			dat[k].word = j;
+			dat[k].word = lexicon[j].pos;
 		}
 	}
 }
@@ -183,11 +191,11 @@ void insert(int id)
 	{
 		int p,i;
 		
-		match_word(dat, word->simp, &p, &i, 0);
+		match_word(dat, word->key, &p, &i, 0);
 		if (p == word->length)
 			return;
 		
-		get_words_with_prefix(word->simp, p);
+		get_words_with_prefix(word->key, p);
 		
 		int delta;
 		delta = space_min - words_set_char[0];
@@ -211,7 +219,7 @@ void insert(int id)
 
 int cmp(const void *a, const void *b)
 {
-	return wcscmp((const wchar_t *)a, (const wchar_t *)b);
+	return wcscmp(((const Entry *)a)->key, ((const Entry *)b)->key);
 }
 
 void make(void)
@@ -232,127 +240,51 @@ void make(void)
 	
 }
 
-int utf82wcs(const char * inbuf, wchar_t * outbuf, size_t outbuf_size)
-{
-	iconv_t cd = iconv_open("WCHAR_T", "UTF8");
-	
-	if (cd == (iconv_t) -1)
-	{
-		*outbuf = L'\0';
-		return -1;
-	}
-	
-	char * pinbuf = (char *) inbuf;
-	char * poutbuf = (char *) outbuf;
-	size_t insize = strlen(inbuf);
-	size_t outsize = outbuf_size;
-
-	size_t retval = iconv(cd, &pinbuf, &insize, &poutbuf, &outsize);
-	
-	if (retval == (size_t) -1)
-		return -1;
-	
-	if (outsize >= sizeof (wchar_t))
-		*((wchar_t *) poutbuf) = L'\0';
-	else
-		return -1;
-	
-	iconv_close(cd);
-	
-	return 0;
-}
-
-int wcs2utf8(const wchar_t * inbuf, char * outbuf, size_t outbuf_size)
-{
-	iconv_t cd = iconv_open("UTF8", "WCHAR_T");
-	
-	if (cd == (iconv_t) -1)
-	{
-		*outbuf = '\0';
-		return -1;
-	}
-	
-	char * pinbuf = (char *) inbuf;
-	char * poutbuf = outbuf;
-	size_t insize = wcslen(inbuf) * sizeof(wchar_t);
-	size_t outsize = outbuf_size;
-
-	size_t retval = iconv(cd, &pinbuf, &insize, &poutbuf, &outsize);
-	
-	if (retval == (size_t) -1)
-		return -1;
-	
-	if (outsize >= sizeof (char))
-		*poutbuf = '\0';
-	else
-		return -1;
-	
-	iconv_close(cd);
-	
-	return 0;
-}
-
 void init(void)
 {
-	int i;
-	FILE * fp = stdin;
-	fp = fopen("table.refined.txt","r");
-	char buff[BUFFSIZE];
-	wchar_t wbuff[BUFFSIZE];
-	
-	for (i = 0; fgets(buff, BUFFSIZE, fp); i ++)
+	opencc_t od = opencc_open(OPENCC_CONVERT_CUSTOM);
+	if (od == (opencc_t) -1)
 	{
-		if (utf82wcs(buff, wbuff, BUFFSIZE) == -1)
-			exit(1);
-		swscanf(wbuff,L"%ls%ls", lexicon[i].simp, lexicon[i].trad);
-		lexicon[i].length = wcslen(lexicon[i].simp);
+		fprintf(stderr, "Can not create OpenCC.\n");
+		exit(1);
 	}
-	
-	lexicon_count = i;
-	
-	fclose(fp);
+
+	opencc_dict_load(od, "table.txt", OPENCC_DICTIONARY_TYPE_TEXT);
+
+	static opencc_entry tlexicon[DATRIE_WORD_MAX_COUNT];
+
+	lexicon_count = opencc_dict_get_lexicon(od, tlexicon);
+
+	size_t i;
+	for (i = 0; i < lexicon_count; i ++)
+	{
+		lexicon[i].key = tlexicon[i].key;
+		lexicon[i].value = tlexicon[i].value;
+		lexicon[i].length = wcslen(lexicon[i].key);
+		lexicon[i].pos = lexicon[i-1].pos + lexicon[i-1].length + 1;
+	}
 }
 
 void output()
 {
-	FILE * fp = stdout;
-	int i, item_max, word_max_length = 0;
-	char buff[BUFFSIZE];
-	
-	fprintf(fp, "static const wchar_t * const words[] = {\n");
-
-	for (i = 0; i < lexicon_count; i ++)
-	{
-		if (wcs2utf8(lexicon[i].trad, buff, BUFFSIZE) == -1)
-			exit(1);
-		fprintf(fp, "\tL\"%s\", /* %6d */\n", buff, i);
-		if (lexicon[i].length > word_max_length)
-			word_max_length = lexicon[i].length;
-	}
-	
-	fprintf(fp, "};\n\n");
-	fprintf(fp, "static const DoubleArrayTrieItem dat[] = {\n");
-	fprintf(fp, "\t/*  Base  Parent    Word          ID */\n");
+	FILE * fp = fopen("a.ocd", "wb");
+	size_t i, item_count;
 	
 	for (i = DATRIE_SIZE - 1; i > 0; i --)
 		if (dat[i].parent != DATRIE_UNUSED)
 			break;
-	item_max = i;
-	
-	int unused = 0;
-	for (i = 0; i <= item_max; i ++)
+	item_count = i + 1;
+
+	fwrite(OPENCC_DICHEADER, sizeof(char), strlen(OPENCC_DICHEADER), fp);
+	fwrite(&lexicon_count, sizeof(size_t), 1, fp);
+	fwrite(&item_count, sizeof(size_t), 1, fp);
+
+	for (i = 0; i < lexicon_count; i ++)
 	{
-		fprintf(fp, "\t{ %6d, %6d, %6d}, /* %6d */\n", dat[i].base, dat[i].parent, dat[i].word, i);
-		if (dat[i].parent == DATRIE_UNUSED)
-			unused ++;
+		fwrite(lexicon[i].value, sizeof(wchar_t), wcslen(lexicon[i].value) + 1, fp);
 	}
 	
-	fprintf(fp, "};\n\n");
-	
-	//fprintf(fp, "/*\n* Total: %d\n* Unused: %d\n* Storage Efficiency: %.2lf percent\n*/\n\n", item_max + 1, unused, (item_max + 1 - unused) / (double)(item_max + 1) * 100);
-	
-	fprintf(fp, "#define DATRIE_SIZE (%d)\n", item_max + 1);
-	fprintf(fp, "#define DATRIE_WORD_MAX_LENGTH (%d)\n", word_max_length);
+	fwrite(dat, sizeof(dat[0]), item_count, fp);
 	
 	fclose(fp);
 }
@@ -363,10 +295,10 @@ void write_text_file()
 	int i;
 	fp = fopen("datrie.txt","w");
 	fprintf(fp, "%d\n", lexicon_count);
-	
+
 	for (i = 0; i < lexicon_count; i ++)
 	{
-		fprintf(fp, "%ls\n", lexicon[i].trad);
+		fprintf(fp, "%ls\n", lexicon[i].value);
 	}
 	
 	for (i = 0; i < DATRIE_SIZE; i ++)
@@ -380,32 +312,11 @@ void write_text_file()
 	fclose(fp);
 }
 
-void write_debug()
-{
-	int i;
-	FILE * fp;
-	
-	fp = fopen("datrie.txt","w");
-	
-	for (i = 0; i < DATRIE_SIZE; i ++)
-	{
-		if (dat[i].parent != DATRIE_UNUSED)
-		{
-			fprintf(fp,"[%6d] Base:%6d Parent:%6d",i,dat[i].base,dat[i].parent);
-			if (dat[i].word != -1)
-				fprintf(fp," [%ls] [%ls]",lexicon[dat[i].word].simp,lexicon[dat[i].word].trad);
-			fprintf(fp,"\n");
-		}
-	}
-	
-	fclose(fp);
-}
-
 int main(int argc, char **argv)
 {
 	init();
 	make();
 	output();
-	//write_debug();
+	write_text_file();
 	return 0;
 }

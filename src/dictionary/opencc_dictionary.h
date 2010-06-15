@@ -19,15 +19,10 @@
 #ifndef __OPENCC_DICTIONARY_H_
 #define __OPENCC_DICTIONARY_H_
 
+#include "../opencc.h"
 #include "../opencc_utils.h"
 
 typedef void * opencc_dictionary_t;
-
-typedef enum
-{
-	OPENCC_DICTIONARY_TYPE_TEXT,
-	OPENCC_DICTIONARY_TYPE_OCD
-} opencc_dictionary_type;
 
 opencc_dictionary_t dict_open(const char * dict_filename, opencc_dictionary_type dict_type);
 

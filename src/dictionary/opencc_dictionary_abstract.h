@@ -49,4 +49,6 @@ const wchar_t * dict_abstract_match_longest(opencc_dictionary * dict, const wcha
 void dict_abstract_get_all_match_lengths(opencc_dictionary * dict, const wchar_t * word,
 		size_t * match_length);
 
+size_t dict_abstract_get_lexicon(opencc_dictionary * dict, opencc_entry * lexicon);
+
 #endif /* __OPENCC_DICTIONARY_ABSTRACT_H_ */

@@ -80,3 +80,18 @@ void dict_abstract_get_all_match_lengths(opencc_dictionary * dict, const wchar_t
 		debug_should_not_be_here();
 	}
 }
+
+size_t dict_abstract_get_lexicon(opencc_dictionary * dict, opencc_entry * lexicon)
+{
+	switch (dict->type)
+	{
+	case OPENCC_DICTIONARY_TYPE_TEXT:
+		return dict_text_get_lexicon(dict->dict, lexicon);
+		break;
+//	case OPENCC_DICTIONARY_TYPE_OCD:
+//		return dict_datrie_get_all_match_lengths(dict->dict, word, match_length);
+		break;
+	default:
+		debug_should_not_be_here();
+	}
+}

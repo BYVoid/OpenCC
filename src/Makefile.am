@@ -19,7 +19,7 @@
 libopencc = libopencc.la
 
 lib_LTLIBRARIES = $(libopencc)
-bin_PROGRAMS = opencc
+bin_PROGRAMS = opencc opencc_dict
 #noinst_PROGRAMS = opencc_build_datrie
 
 libopencc_headers = \
@@ -36,10 +36,6 @@ libopencc_dictionary_sources = \
 	dictionary/opencc_dictionary_text.h \
 	$(NULL)
 
-#libopencc_built_headers = \
-#	opencc_datrie_table.h \
-#	$(NULL)
-
 libopencc_la_SOURCES = \
 	opencc_convert.c \
 	opencc_encoding.c \
@@ -51,6 +47,10 @@ libopencc_la_SOURCES = \
 
 libopencc_la_HEADERS = \
 	$(libopencc_headers) \
+	$(NULL)
+
+libopencc_la_CFLAGS = \
+	-DPKGDATADIR=\"$(pkgdatadir)\" \
 	$(NULL)
 
 libopencc_la_LDFLAGS = \
@@ -75,11 +75,24 @@ opencc_DEPENDENCIES = \
 	$(NULL)
 
 opencc_SOURCES = \
-	opencc.c \
+	tools/opencc.c \
 	$(libopencc_headers) \
 	$(NULL)
 
 opencc_LDADD = \
+	$(libopencc) \
+	$(NULL)
+
+opencc_dict_DEPENDENCIES = \
+	$(libopencc) \
+	$(NULL)
+
+opencc_dict_SOURCES = \
+	tools/opencc_dict.c \
+	$(libopencc_headers) \
+	$(NULL)
+
+opencc_dict_LDADD = \
 	$(libopencc) \
 	$(NULL)
 

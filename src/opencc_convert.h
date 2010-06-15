@@ -16,22 +16,27 @@
 * limitations under the License.
 */
 
-#ifndef __OPENCC_DICTIONARY_TEXT_H_
-#define __OPENCC_DICTIONARY_TEXT_H_
+#ifndef __OPENCC_CONVERT_H_
+#define __OPENCC_CONVERT_H_
 
-#include "../opencc_utils.h"
-#include "opencc_dictionary_abstract.h"
+#include "dictionary/opencc_dictionary.h"
 
-dict_ptr dict_text_open(const char * filename);
+typedef struct
+{
+	int initialized;
+	size_t buffer_size;
+	size_t * match_length;
+	size_t * min_len;
+	size_t * parent;
+	size_t * path;
+} opencc_sp_seg_buffer;
 
-void dict_text_close(dict_ptr dp);
+typedef struct
+{
+	opencc_dictionary_t dicts;
+	opencc_convert_direction_t convert_direction;
+	opencc_convert_errno_t errno;
+	opencc_sp_seg_buffer sp_seg_buffer;
+} opencc_description;
 
-const wchar_t * dict_text_match_longest(dict_ptr dp, const wchar_t * word,
-		size_t length);
-
-void dict_text_get_all_match_lengths(dict_ptr dp, const wchar_t * word,
-		size_t * match_length);
-
-size_t dict_text_get_lexicon(dict_ptr dp, opencc_entry * lexicon);
-
-#endif /* __OPENCC_DICTIONARY_TEXT_H_ */
+#endif /* __OPENCC_CONVERT_H_ */

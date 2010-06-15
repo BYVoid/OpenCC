@@ -25,21 +25,15 @@
 
 typedef struct
 {
-	wchar_t * key;
-	wchar_t * value;
-} entry;
-
-typedef struct
-{
 	size_t entry_count;
 	size_t max_length;
-	entry * lexicon;
+	opencc_entry * lexicon;
 	wchar_t * word_buff;
 } text_dictionary;
 
 int qsort_entry_cmp(const void *a, const void *b)
 {
-	return wcscmp(((entry *)a)->key, ((entry *)b)->key);
+	return wcscmp(((opencc_entry *)a)->key, ((opencc_entry *)b)->key);
 }
 
 dict_ptr dict_text_open(const char * filename)
@@ -48,7 +42,7 @@ dict_ptr dict_text_open(const char * filename)
 	td = (text_dictionary *) malloc(sizeof(text_dictionary));
 	td->entry_count = INITIAL_DICTIONARY_SIZE;
 	td->max_length = 0;
-	td->lexicon = (entry *) malloc(sizeof(entry) * td->entry_count);
+	td->lexicon = (opencc_entry *) malloc(sizeof(opencc_entry) * td->entry_count);
 
 	static char buff[ENTRY_BUFF_SIZE];
 	static char key_buff[ENTRY_BUFF_SIZE];
@@ -65,7 +59,7 @@ dict_ptr dict_text_open(const char * filename)
 		if (i >= td->entry_count)
 		{
 			td->entry_count += td->entry_count;
-			td->lexicon = (entry *) realloc(td->lexicon, sizeof(entry) * td->entry_count);
+			td->lexicon = (opencc_entry *) realloc(td->lexicon, sizeof(opencc_entry) * td->entry_count);
 		}
 
 		sscanf(buff, "%s %s", key_buff, value_buff);
@@ -90,7 +84,7 @@ dict_ptr dict_text_open(const char * filename)
 	fclose(fp);
 
 	td->entry_count = i;
-	td->lexicon = (entry *) realloc(td->lexicon, sizeof(entry) * td->entry_count);
+	td->lexicon = (opencc_entry *) realloc(td->lexicon, sizeof(opencc_entry) * td->entry_count);
 	td->word_buff = (wchar_t *) malloc(sizeof(wchar_t) * (td->max_length + 1));
 
 	qsort(td->lexicon, td->entry_count, sizeof(td->lexicon[0]), qsort_entry_cmp);
@@ -131,13 +125,13 @@ const wchar_t * dict_text_match_longest(dict_ptr dp, const wchar_t * word,
 	wcsncpy(td->word_buff, word, len);
 	td->word_buff[len] = L'\0';
 
-	entry buff;
+	opencc_entry buff;
 	buff.key = td->word_buff;
 
 	for (; len > 0; len --)
 	{
 		td->word_buff[len] = L'\0';
-		entry * brs = (entry *) bsearch(&buff, td->lexicon, td->entry_count,
+		opencc_entry * brs = (opencc_entry *) bsearch(&buff, td->lexicon, td->entry_count,
 				sizeof(td->lexicon[0]), qsort_entry_cmp);
 
 		if (brs != NULL)
@@ -150,5 +144,19 @@ const wchar_t * dict_text_match_longest(dict_ptr dp, const wchar_t * word,
 void dict_text_get_all_match_lengths(dict_ptr dp, const wchar_t * word,
 		size_t * match_length)
 {
+	text_dictionary * td = (text_dictionary *) dp;
+}
 
+size_t dict_text_get_lexicon(dict_ptr dp, opencc_entry * lexicon)
+{
+	text_dictionary * td = (text_dictionary *) dp;
+
+	size_t i;
+	for (i = 0; i < td->entry_count; i ++)
+	{
+		lexicon[i].key = td->lexicon[i].key;
+		lexicon[i].value = td->lexicon[i].value;
+	}
+
+	return td->entry_count;
 }

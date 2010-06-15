@@ -17,29 +17,11 @@
 */
 
 #include "opencc.h"
+#include "opencc_convert.h"
 #include "opencc_encoding.h"
-#include "dictionary/opencc_dictionary.h"
 #include "opencc_utils.h"
 
 #define OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE 1024
-
-typedef struct
-{
-	int initialized;
-	size_t buffer_size;
-	size_t * match_length;
-	size_t * min_len;
-	size_t * parent;
-	size_t * path;
-} opencc_sp_seg_buffer;
-
-typedef struct
-{
-	opencc_dictionary_t dicts;
-	opencc_convert_direction_t convert_direction;
-	opencc_convert_errno_t errno;
-	opencc_sp_seg_buffer sp_seg_buffer;
-} opencc_description;
 
 void sp_seg_buffer_free(opencc_sp_seg_buffer * ossb)
 {
@@ -352,29 +334,6 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 			sizeof(char) * (strlen(original_outbuf) + 1));
 
 	return original_outbuf;
-}
-
-int opencc_dict_load(opencc_t odt, const char * dict_filename,
-		opencc_dictionary_type dict_type)
-{
-	opencc_description * od;
-	od = (opencc_description *) odt;
-
-	if (od->dicts == NULL)
-	{
-		od->dicts = dict_open(dict_filename, dict_type);
-		if (od->dicts == (opencc_dictionary_t) -1)
-		{
-			od->dicts = NULL;
-			return -1;
-		}
-	}
-	else
-	{
-		return dict_load(od->dicts, dict_filename, dict_type);
-	}
-
-	return 0;
 }
 
 opencc_t opencc_open(opencc_convert_direction_t convert_direction)

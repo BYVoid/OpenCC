@@ -32,6 +32,7 @@ extern "C" {
  * Macros
  */
 #define OPENCC_CONVERT_ERROR ((size_t) -1)
+#define OPENCC_DICHEADER "OPENCCDATRIE"
 
 typedef void * opencc_t;
 
@@ -102,6 +103,8 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length);
 
 int opencc_dict_load(opencc_t odt, const char * dict_filename,
 		opencc_dictionary_type dict_type);
+
+size_t opencc_dict_get_lexicon(opencc_t odt, opencc_entry * lexicon);
 
 /**
  * opencc_errno:

@@ -16,6 +16,7 @@
 * limitations under the License.
 */
 
+#include "../opencc_convert.h"
 #include "opencc_dictionary.h"
 #include "opencc_dictionary_abstract.h"
 
@@ -54,7 +55,6 @@ void dict_get_all_match_lengths(opencc_dictionary_t ddt, const wchar_t * word,
 	opencc_dictionary_description * dd = (opencc_dictionary_description *) ddt;
 
 	int i;
-	/* 依次查找每個辭典，取得最長匹配長度 */
 	for (i = 0; i < dd->dict_count; i --)
 	{
 		dict_abstract_get_all_match_lengths(dd->dict + i, word, match_length);
@@ -73,23 +73,50 @@ void dict_get_all_match_lengths(opencc_dictionary_t ddt, const wchar_t * word,
 	}
 }
 
+size_t dict_get_lexicon(opencc_dictionary_t ddt, opencc_entry * lexicon)
+{
+	opencc_dictionary_description * dd = (opencc_dictionary_description *) ddt;
+
+	size_t count = 0;
+	int i;
+	for (i = dd->dict_count - 1; i >= 0; i --)
+	{
+		count += dict_abstract_get_lexicon(dd->dict + i, lexicon + count);
+	}
+
+	return count;
+}
+
 int dict_load(opencc_dictionary_t ddt, const char * dict_filename,
 		opencc_dictionary_type dict_type)
 {
 	opencc_dictionary_description * dd = (opencc_dictionary_description *) ddt;
 	opencc_dictionary dict;
-	dict.filename = (char *) dict_filename;
+
+	dict.filename = (char *) malloc(sizeof(char) * (strlen(dict_filename) + 1));
+	strcpy(dict.filename, dict_filename);
 	dict.type = dict_type;
 
-	FILE * fp = fopen(dict.filename,"rb");
+	FILE * fp = fopen(dict.filename, "rb");
 	if (!fp)
 	{
-		fclose(fp);
-		return -1; /* 辭典文件無法訪問 */
+		/* 使用 PKGDATADIR 路徑 */
+		dict.filename = (char *) realloc(dict.filename,
+				sizeof(char) * (strlen(dict_filename) + strlen(PKGDATADIR) + 1));
+		sprintf(dict.filename, "%s/%s", PKGDATADIR, dict_filename);
+
+		fp = fopen(dict.filename, "rb");
+		if (!fp)
+		{
+			free(dict.filename);
+			return -1; /* 辭典文件無法訪問 */
+		}
 	}
 	fclose(fp);
 
 	dict_ptr dp = dict_abstract_open(&dict);
+
+	free(dict.filename);
 
 	if (dp == (dict_ptr) -1)
 		return -1; /* 辭典讀取錯誤 */
@@ -129,4 +156,42 @@ opencc_dictionary_t dict_open(const char * dict_filename, opencc_dictionary_type
 	}
 
 	return (opencc_dictionary_t) dd;
+}
+
+
+size_t opencc_dict_get_lexicon(opencc_t odt, opencc_entry * lexicon)
+{
+	opencc_description * od;
+	od = (opencc_description *) odt;
+	if (od->dicts == NULL)
+	{
+		return (size_t) -1;
+	}
+	else
+	{
+		return dict_get_lexicon(od->dicts, lexicon);
+	}
+}
+
+int opencc_dict_load(opencc_t odt, const char * dict_filename,
+		opencc_dictionary_type dict_type)
+{
+	opencc_description * od;
+	od = (opencc_description *) odt;
+
+	if (od->dicts == NULL)
+	{
+		od->dicts = dict_open(dict_filename, dict_type);
+		if (od->dicts == (opencc_dictionary_t) -1)
+		{
+			od->dicts = NULL;
+			return -1;
+		}
+	}
+	else
+	{
+		return dict_load(od->dicts, dict_filename, dict_type);
+	}
+
+	return 0;
 }

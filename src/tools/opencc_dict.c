@@ -19,10 +19,18 @@
 #include "opencc.h"
 #include "opencc_utils.h"
 #include "dictionary/opencc_dictionary_datrie.h"
+#include <unistd.h>
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#else
+#define VERSION "Unknown"
+#endif
 
 #define DATRIE_SIZE 1000000
 #define DATRIE_WORD_MAX_COUNT 500000
 #define DATRIE_WORD_MAX_LENGTH 32
+#define BUFFER_SIZE 1024
 
 typedef struct
 {
@@ -224,7 +232,7 @@ int cmp(const void *a, const void *b)
 	return wcscmp(((const opencc_entry *)a)->key, ((const opencc_entry *)b)->key);
 }
 
-void init(void)
+void init(const char * file_name)
 {
 	opencc_t od = opencc_open(OPENCC_CONVERT_CUSTOM);
 	if (od == (opencc_t) -1)
@@ -233,7 +241,13 @@ void init(void)
 		exit(1);
 	}
 
-	opencc_dict_load(od, "table.txt", OPENCC_DICTIONARY_TYPE_TEXT);
+	int retval = opencc_dict_load(od, file_name, OPENCC_DICTIONARY_TYPE_TEXT);
+
+	if (retval == -1)
+	{
+		fprintf(stderr, "Can not read data from %s\n", file_name);
+		exit(1);
+	}
 
 	static opencc_entry tlexicon[DATRIE_WORD_MAX_COUNT];
 
@@ -254,9 +268,16 @@ void init(void)
 	}
 }
 
-void output()
+void output(const char * file_name)
 {
-	FILE * fp = fopen("a.ocd", "wb");
+	FILE * fp = fopen(file_name, "wb");
+
+	if (!fp)
+	{
+		fprintf(stderr, "Can not write file: %s\n", file_name);
+		exit(1);
+	}
+
 	size_t i, item_count;
 	
 	for (i = DATRIE_SIZE - 1; i > 0; i --)
@@ -306,10 +327,77 @@ void write_text_file()
 }
 #endif
 
-int main(int argc, char **argv)
+void show_version()
 {
-	init();
+	printf("\nOpen Chinese Convert (OpenCC) Dictionary Tool\nVersion %s\n\n",VERSION);
+}
+
+void show_usage()
+{
+	show_version();
+	printf("Usage:\n");
+	printf("  opencc_dict -i input_file -o output_file\n\n");
+	printf("    -i\n");
+	printf("      Read data from input_file.\n");
+	printf("    -o\n");
+	printf("      Write converted data to output_file.\n");
+	printf("\n");
+	printf("\n");
+}
+
+int main(int argc, char ** argv)
+{
+	static int oc;
+	static char input_file[BUFFER_SIZE], output_file[BUFFER_SIZE];
+	int input_file_specified = FALSE, output_file_specified = FALSE;
+
+	while((oc = getopt(argc, argv, "vh-:i:o:")) != -1)
+	{
+		switch (oc)
+		{
+		case 'v':
+			show_version();
+			return;
+		case 'h':
+		case '?':
+			show_usage();
+			return;
+		case '-':
+			if (strcmp(optarg, "version") == 0)
+				show_version();
+			else if (strcmp(optarg, "help") == 0)
+				show_usage();
+			else
+				show_usage();
+			return;
+		case 'i':
+			strcpy(input_file, optarg);
+			input_file_specified = TRUE;
+			break;
+		case 'o':
+			strcpy(output_file, optarg);
+			output_file_specified = TRUE;
+			break;
+		}
+	}
+
+	if (!input_file_specified)
+	{
+		fprintf(stderr, "Please specify input file using -i.\n");
+		show_usage();
+		return 1;
+	}
+
+	if (!output_file_specified)
+	{
+		fprintf(stderr, "Please specify output file using -o.\n");
+		show_usage();
+		return 1;
+	}
+
+	init(input_file);
 	make();
-	output();
+	output(output_file);
+
 	return 0;
 }

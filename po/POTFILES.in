@@ -1,6 +1,7 @@
 src/opencc.c
 src/opencc.h
-src/opencc_convert.c
+src/opencc_converter.c
+src/opencc_converter.h
 src/opencc_dictionary.c
 src/opencc_dictionary.h
 src/opencc_encoding.c
@@ -10,5 +11,9 @@ src/opencc_utils.h
 src/wrapper/cplusplus/openccxx.h
 src/dictionary/opencc_dictionary_abstract.c
 src/dictionary/opencc_dictionary_abstract.h
+src/dictionary/opencc_dictionary_datrie.c
+src/dictionary/opencc_dictionary_datrie.h
 src/dictionary/opencc_dictionary_text.c
 src/dictionary/opencc_dictionary_text.h
+src/tools/opencc.c
+src/tools/opencc_dict.c

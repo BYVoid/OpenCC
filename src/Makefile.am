@@ -93,6 +93,10 @@ opencc_dict_DEPENDENCIES = \
 
 opencc_dict_SOURCES = \
 	tools/opencc_dict.c \
+	opencc_utils.c \
+	opencc_utils.h \
+	dictionary/opencc_dictionary_datrie.c \
+	dictionary/opencc_dictionary_datrie.h \
 	$(libopencc_headers) \
 	$(NULL)
 

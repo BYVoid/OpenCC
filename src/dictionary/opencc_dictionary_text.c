@@ -141,10 +141,38 @@ const wchar_t * dict_text_match_longest(dict_ptr dp, const wchar_t * word,
 	return NULL;
 }
 
-void dict_text_get_all_match_lengths(dict_ptr dp, const wchar_t * word,
+size_t dict_text_get_all_match_lengths(dict_ptr dp, const wchar_t * word,
 		size_t * match_length)
 {
 	text_dictionary * td = (text_dictionary *) dp;
+
+	size_t rscnt = 0;
+
+	if (td->entry_count == 0)
+		return rscnt;
+
+	size_t length = wcslen(word);
+	size_t len = td->max_length;
+	if (length < len)
+		len = length;
+
+	wcsncpy(td->word_buff, word, len);
+	td->word_buff[len] = L'\0';
+
+	opencc_entry buff;
+	buff.key = td->word_buff;
+
+	for (; len > 0; len --)
+	{
+		td->word_buff[len] = L'\0';
+		opencc_entry * brs = (opencc_entry *) bsearch(&buff, td->lexicon, td->entry_count,
+				sizeof(td->lexicon[0]), qsort_entry_cmp);
+
+		if (brs != NULL)
+			match_length[rscnt ++] = len;
+	}
+
+	return rscnt;
 }
 
 size_t dict_text_get_lexicon(dict_ptr dp, opencc_entry * lexicon)

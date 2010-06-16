@@ -33,7 +33,7 @@ int dict_load(opencc_dictionary_t ddt, const char * dict_filename,
 const wchar_t * dict_match_longest(opencc_dictionary_t ddt, const wchar_t * word,
 		size_t length);
 
-void dict_get_all_match_lengths(opencc_dictionary_t ddt, const wchar_t * word,
+size_t dict_get_all_match_lengths(opencc_dictionary_t ddt, const wchar_t * word,
 		size_t * match_length);
 
 #endif /* __OPENCC_DICTIONARY_H_ */

@@ -48,28 +48,33 @@ const wchar_t * dict_match_longest(opencc_dictionary_t ddt, const wchar_t * word
 	return retvel;
 }
 
-void dict_get_all_match_lengths(opencc_dictionary_t ddt, const wchar_t * word,
+size_t dict_get_all_match_lengths(opencc_dictionary_t ddt, const wchar_t * word,
 		size_t * match_length)
 {
 	opencc_dictionary_description * dd = (opencc_dictionary_description *) ddt;
+	size_t rscnt = 0;
 
 	int i;
 	for (i = 0; i < dd->dict_count; i --)
 	{
-		dict_abstract_get_all_match_lengths(dd->dict + i, word, match_length);
+		size_t retval;
+		retval = dict_abstract_get_all_match_lengths(dd->dict + i, word, match_length + rscnt);
+		rscnt += retval;
 		/* 去除重複長度 */
-		if (i > 0 && match_length[0] > 1)
+		if (i > 0 && rscnt > 1)
 		{
-			qsort(match_length + 1, match_length[0], sizeof(match_length[0]), qsort_int_cmp);
+			qsort(match_length, rscnt, sizeof(match_length[0]), qsort_int_cmp);
 			int j, k;
-			for (j = 1, k = 2; k < match_length[0]; k ++)
+			for (j = 0, k = 1; k < rscnt; k ++)
 			{
 				if (match_length[k] != match_length[j])
 					match_length[++ j] = match_length[k];
 			}
-			match_length[0] = j;
+			rscnt = j;
 		}
 	}
+
+	return rscnt;
 }
 
 size_t dict_get_lexicon(opencc_dictionary_t ddt, opencc_entry * lexicon)

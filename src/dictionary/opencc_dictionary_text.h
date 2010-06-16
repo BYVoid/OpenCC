@@ -28,7 +28,7 @@ void dict_text_close(dict_ptr dp);
 const wchar_t * dict_text_match_longest(dict_ptr dp, const wchar_t * word,
 		size_t length);
 
-void dict_text_get_all_match_lengths(dict_ptr dp, const wchar_t * word,
+size_t dict_text_get_all_match_lengths(dict_ptr dp, const wchar_t * word,
 		size_t * match_length);
 
 size_t dict_text_get_lexicon(dict_ptr dp, opencc_entry * lexicon);

@@ -158,12 +158,12 @@ const wchar_t * dict_datrie_match_longest(dict_ptr dp, const wchar_t * word,
 	return dd->lexicon + dd->dat[item].word;
 }
 
-void dict_datrie_get_all_match_lengths(dict_ptr dp, const wchar_t * word,
+size_t dict_datrie_get_all_match_lengths(dict_ptr dp, const wchar_t * word,
 		size_t * match_length)
 {
 	datrie_dictionary * dd = (datrie_dictionary *) dp;
 
-	match_length[0] = 0;
+	size_t rscnt = 0;
 
 	size_t i, p;
 	for (i = 0,p = 0; word[p] && dd->dat[i].base != DATRIE_UNUSED; p ++)
@@ -175,11 +175,14 @@ void dict_datrie_get_all_match_lengths(dict_ptr dp, const wchar_t * word,
 		i = j;
 
 		if (dd->dat[i].word != -1)
-			match_length[++ match_length[0]] = p + 1;
+			match_length[rscnt ++] = p + 1;
 	}
+
+	return rscnt;
 }
 
 size_t dict_datrie_get_lexicon(dict_ptr dp, opencc_entry * lexicon)
 {
+	/* TODO 從datrie中讀取詞條 */
 	return 0;
 }

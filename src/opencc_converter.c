@@ -157,7 +157,7 @@ size_t sp_seg(opencc_converter_description * cd, wchar_t ** inbuf, size_t * inbu
 	return inbuf_left_start - *inbuf_left;
 }
 
-size_t mmsp_seg(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbuf_left,
+size_t converter_convert(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbuf_left,
 		wchar_t ** outbuf, size_t * outbuf_left)
 {
 	opencc_converter_description * cd = (opencc_converter_description *) cdt;
@@ -188,10 +188,10 @@ size_t mmsp_seg(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbuf_left,
 		}
 	
 		const wchar_t * match_rs = dict_match_longest(cd->dicts, inbuf_start + i, 0);
-		size_t match_len = wcslen(match_rs);
 		
-		if (match_rs == NULL)
-			match_len = 1;
+		size_t match_len = 1;
+		if (match_rs != NULL)
+			match_len = wcslen(match_rs);
 		
 		if (i + match_len > bound)
 			bound = i + match_len;
@@ -214,7 +214,7 @@ size_t mmsp_seg(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbuf_left,
 	return inbuf_left_start - *inbuf_left;
 }
 
-size_t converter_convert(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbuf_left,
+size_t converter_convert1(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbuf_left,
 		wchar_t ** outbuf, size_t * outbuf_left)
 {
 	opencc_converter_description * cd = (opencc_converter_description *) cdt;

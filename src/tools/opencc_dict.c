@@ -20,10 +20,9 @@
 #include "../opencc_utils.h"
 #include "../dictionary/opencc_dictionary_datrie.h"
 
-#define DATRIE_SIZE 300000
-#define DATRIE_WORD_MAX_COUNT 100000
+#define DATRIE_SIZE 1000000
+#define DATRIE_WORD_MAX_COUNT 500000
 #define DATRIE_WORD_MAX_LENGTH 32
-#define BUFFSIZE 1024
 
 typedef struct
 {
@@ -282,6 +281,7 @@ void output()
 	fclose(fp);
 }
 
+#if 0
 void write_text_file()
 {
 	FILE * fp;
@@ -304,12 +304,12 @@ void write_text_file()
 	
 	fclose(fp);
 }
+#endif
 
 int main(int argc, char **argv)
 {
 	init();
 	make();
 	output();
-	write_text_file();
 	return 0;
 }

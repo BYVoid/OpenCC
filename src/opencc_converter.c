@@ -98,13 +98,14 @@ size_t sp_seg(opencc_converter_description * cd, wchar_t ** inbuf, size_t * inbu
 	for (i = 0; i < length; i ++)
 	{
 		/* 獲取所有匹配長度 */
-		dict_get_all_match_lengths(cd->dicts, (*inbuf) + i, ossb->match_length);
+		size_t match_count
+			= dict_get_all_match_lengths(cd->dicts, (*inbuf) + i, ossb->match_length);
 		
-		if (ossb->match_length[1] != 1)
-			ossb->match_length[++ ossb->match_length[0]] = 1;
+		if (ossb->match_length[0] != 1)
+			ossb->match_length[match_count ++] = 1;
 		
 		/* 動態規劃求最短分割路徑 */
-		for (j = 1; j <= ossb->match_length[0]; j ++)
+		for (j = 0; j < match_count; j ++)
 		{
 			size_t k = ossb->match_length[j];
 			ossb->match_length[j] = 0;
@@ -268,9 +269,10 @@ opencc_converter_t converter_open()
 			malloc(sizeof(opencc_converter_description));
 
 	cd->sp_seg_buffer.initialized = FALSE;
-	cd->sp_seg_buffer.buffer_size = OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE;
 	cd->sp_seg_buffer.match_length = cd->sp_seg_buffer.min_len
 			= cd->sp_seg_buffer.parent = cd->sp_seg_buffer.path = NULL;
+
+	sp_seg_set_buffer_size(&cd->sp_seg_buffer, OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE);
 
 	cd->dicts = NULL;
 

@@ -20,7 +20,6 @@ libopencc = libopencc.la
 
 lib_LTLIBRARIES = $(libopencc)
 bin_PROGRAMS = opencc opencc_dict
-#noinst_PROGRAMS = opencc_build_datrie
 
 libopencc_headers = \
 	opencc.h \
@@ -49,6 +48,7 @@ libopencc_la_SOURCES = \
 	$(libopencc_dictionary_sources) \
 	$(NULL)
 
+libopencc_ladir = $(pkgincludedir)
 libopencc_la_HEADERS = \
 	$(libopencc_headers) \
 	$(NULL)
@@ -59,19 +59,6 @@ libopencc_la_CFLAGS = \
 
 libopencc_la_LDFLAGS = \
 	-export-symbols-regex "opencc_.*" \
-	$(NULL)
-
-libopencc_ladir = $(pkgincludedir)
-
-#nodist_libopencc_la_SOURCES = \
-#	$(libopencc_built_headers) \
-#	$(NULL)
-
-#BUILT_SOURCES = \
-#	$(libopencc_built_headers) \
-#	$(NULL)
-
-pkgdata_DATA = \
 	$(NULL)
 
 opencc_DEPENDENCIES = \
@@ -104,25 +91,20 @@ opencc_dict_LDADD = \
 	$(libopencc) \
 	$(NULL)
 
-#opencc_build_datrie_SOURCES = \
-#	opencc_build_datrie.c \
-#	$(libopencc_headers) \
-#	$(NULL)
-
-opencc_table = $(top_srcdir)/data/table.txt
-
-#EXTRA_DIST = \
-#	refine-opencc-table.py \
-#	$(NULL)
-
-CLEANFILES = \
+pkgdata_DATA = \
+	simp_to_trad.ocd \
 	$(NULL)
 
-opencc_datrie_table.h: table.refined.txt opencc_build_datrie
-	$(AM_V_GEN) \
-	./opencc_build_datrie < table.refined.txt > $@
+EXTRA_DIST = \
+	$(NULL)
 
-table.refined.txt: $(opencc_table)
+CLEANFILES = \
+	simp_to_trad.ocd \
+	$(NULL)
+
+simp_to_trad_txt = $(top_srcdir)/data/simp_to_trad.txt
+
+simp_to_trad.ocd: $(simp_to_trad_txt) opencc_dict
 	$(AM_V_GEN) \
-	$(PYTHON) $(srcdir)/refine-opencc-table.py < $(opencc_table) > table.refined.txt
+	./opencc_dict -i $(simp_to_trad_txt) -o $@
 

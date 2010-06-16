@@ -1,3 +1,3 @@
 EXTRA_DIST = \
-	table.txt \
+	simp_to_trad.txt \
 	$(NULL)

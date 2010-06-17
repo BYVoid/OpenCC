@@ -18,6 +18,7 @@
 
 SUBDIRS = \
 	data \
+	doc \
 	src \
 	m4 \
 	po \

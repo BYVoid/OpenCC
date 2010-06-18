@@ -16,7 +16,7 @@
 * limitations under the License.
 */
 
-#include "opencc.h"
+#include "opencc_dictionary.h"
 #include "opencc_utils.h"
 #include "dictionary/opencc_dictionary_datrie.h"
 #include <unistd.h>
@@ -234,16 +234,9 @@ int cmp(const void *a, const void *b)
 
 void init(const char * file_name)
 {
-	opencc_t od = opencc_open(OPENCC_CONVERT_CUSTOM);
-	if (od == (opencc_t) -1)
-	{
-		fprintf(stderr, "Can not create OpenCC.\n");
-		exit(1);
-	}
+	opencc_dictionary_t dt = dict_open(file_name, OPENCC_DICTIONARY_TYPE_TEXT);
 
-	int retval = opencc_dict_load(od, file_name, OPENCC_DICTIONARY_TYPE_TEXT);
-
-	if (retval == -1)
+	if (dt == (opencc_dictionary_t) -1)
 	{
 		fprintf(stderr, "Can not read data from %s\n", file_name);
 		exit(1);
@@ -251,20 +244,20 @@ void init(const char * file_name)
 
 	static opencc_entry tlexicon[DATRIE_WORD_MAX_COUNT];
 
-	lexicon_count = opencc_dict_get_lexicon(od, tlexicon);
+	lexicon_count = dict_get_lexicon(dt, tlexicon);
 	qsort(tlexicon, lexicon_count, sizeof(tlexicon[0]), cmp);
 
-	lexicon[0].pos = 0;
 	size_t i;
+	lexicon[0].pos = 0;
 	for (i = 0; i < lexicon_count; i ++)
 	{
 		lexicon[i].key = tlexicon[i].key;
 		lexicon[i].value = tlexicon[i].value;
 		lexicon[i].length = wcslen(lexicon[i].key);
 		if (i > 0)
+		{
 			lexicon[i].pos = lexicon[i-1].pos + wcslen(lexicon[i-1].value) + 1;
-		//if (lexicon[i].length != wcslen(lexicon[i].value))
-		//	printf("%d\n",i);
+		}
 	}
 }
 

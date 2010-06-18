@@ -80,11 +80,18 @@ opencc_dict_DEPENDENCIES = \
 
 opencc_dict_SOURCES = \
 	tools/opencc_dict.c \
+	opencc_dictionary.c \
+	opencc_dictionary.h \
+	opencc_encoding.c \
+	opencc_encoding.h \
 	opencc_utils.c \
 	opencc_utils.h \
-	dictionary/opencc_dictionary_datrie.c \
-	dictionary/opencc_dictionary_datrie.h \
+	$(libopencc_dictionary_sources) \
 	$(libopencc_headers) \
+	$(NULL)
+	
+opencc_dict_CFLAGS = \
+	-DPKGDATADIR=\"$(pkgdatadir)\" \
 	$(NULL)
 
 opencc_dict_LDADD = \

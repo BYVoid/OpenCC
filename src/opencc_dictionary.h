@@ -23,6 +23,12 @@
 
 typedef void * opencc_dictionary_t;
 
+typedef struct
+{
+	wchar_t * key;
+	wchar_t * value;
+} opencc_entry;
+
 opencc_dictionary_t dict_open(const char * dict_filename, opencc_dictionary_type dict_type);
 
 int dict_close(opencc_dictionary_t ddt);
@@ -35,5 +41,7 @@ const wchar_t * dict_match_longest(opencc_dictionary_t ddt, const wchar_t * word
 
 size_t dict_get_all_match_lengths(opencc_dictionary_t ddt, const wchar_t * word,
 		size_t * match_length);
+
+size_t dict_get_lexicon(opencc_dictionary_t ddt, opencc_entry * lexicon);
 
 #endif /* __OPENCC_DICTIONARY_H_ */

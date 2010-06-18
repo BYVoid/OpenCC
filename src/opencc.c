@@ -195,19 +195,6 @@ void opencc_perror(opencc_t odt)
 	}
 }
 
-size_t opencc_dict_get_lexicon(opencc_t odt, opencc_entry * lexicon)
-{
-	opencc_description * od = (opencc_description *) odt;
-	if (od->dicts == NULL)
-	{
-		return (size_t) -1;
-	}
-	else
-	{
-		return dict_get_lexicon(od->dicts, lexicon);
-	}
-}
-
 int opencc_dict_load(opencc_t odt, const char * dict_filename,
 		opencc_dictionary_type dict_type)
 {

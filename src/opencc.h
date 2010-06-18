@@ -55,12 +55,6 @@ typedef enum
 	OPENCC_DICTIONARY_TYPE_DATRIE,
 } opencc_dictionary_type;
 
-typedef struct
-{
-	wchar_t * key;
-	wchar_t * value;
-} opencc_entry;
-
 /**
  * opencc_open:
  * @convert_direction: Direction of convert.
@@ -103,8 +97,6 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length);
 
 int opencc_dict_load(opencc_t odt, const char * dict_filename,
 		opencc_dictionary_type dict_type);
-
-size_t opencc_dict_get_lexicon(opencc_t odt, opencc_entry * lexicon);
 
 /**
  * opencc_errno:

@@ -20,7 +20,7 @@
 #define __OPENCC_DICTIONARY_ABSTRACT_H_
 
 #include "../opencc_utils.h"
-#include "../opencc.h"
+#include "../opencc_dictionary.h"
 
 #define DICTIONARY_MAX_COUNT 128
 

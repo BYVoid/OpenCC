@@ -25,6 +25,7 @@
 #ifdef __cplusplus
 
 #include <string>
+#include <cstdlib>
 
 namespace opencc
 {
@@ -42,7 +43,7 @@ public:
 		opencc_close(od);
 	}
 
-	long convert(const std::string &in, std::string out, long length = -1)
+	long convert(const std::string &in, std::string &out, long length = -1)
 	{
 		if (length == -1)
 			length = in.length();

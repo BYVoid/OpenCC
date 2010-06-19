@@ -22,10 +22,10 @@ m4_define([opencc_major_version], [0])
 m4_define([opencc_minor_version], [0])
 m4_define([opencc_micro_version], [2])
 m4_define(opencc_maybe_datestamp,
-    m4_esyscmd([if test x]opencc_released[ != x1; then date +.%Y%m%d | tr -d '\n\r'; fi]))
+	m4_esyscmd([if test x]opencc_released[ != x1; then date +.%Y%m%d | tr -d '\n\r'; fi]))
 
 m4_define([opencc_version],
-    opencc_major_version.opencc_minor_version.opencc_micro_version[]opencc_maybe_datestamp)
+	opencc_major_version.opencc_minor_version.opencc_micro_version[]opencc_maybe_datestamp)
 
 AC_INIT([package_name], [opencc_version], [http://code.google.com/p/open-chinese-convert/issues/entry], [package_name])
 AM_INIT_AUTOMAKE([1.10])
@@ -49,8 +49,6 @@ AC_HEADER_STDC
 AM_PROG_LIBTOOL
 # IT_PROG_INTLTOOL([0.35.0])
 
-#check python
-AM_PATH_PYTHON([2.5])
 
 # define GETTEXT_* variables
 GETTEXT_PACKAGE="$PACKAGE_NAME"
@@ -72,3 +70,13 @@ src/Makefile
 ])
 
 AC_OUTPUT
+
+AC_MSG_RESULT([
+Open Chinese Convert (OpenCC)
+    Version                     $VERSION
+
+Build options:
+    Install prefix              $prefix
+
+Use make && make install to install.
+])

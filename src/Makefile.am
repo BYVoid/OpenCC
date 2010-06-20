@@ -100,18 +100,23 @@ opencc_dict_LDADD = \
 
 pkgdata_DATA = \
 	simp_to_trad.ocd \
+	trad_to_simp.ocd \
 	$(NULL)
 
 EXTRA_DIST = \
 	$(NULL)
 
 CLEANFILES = \
-	simp_to_trad.ocd \
+	$(pkgdata_DATA) \
 	$(NULL)
 
 simp_to_trad_txt = $(top_srcdir)/data/simp_to_trad.txt
+trad_to_simp_txt = $(top_srcdir)/data/trad_to_simp.txt
 
 simp_to_trad.ocd: $(simp_to_trad_txt) opencc_dict
 	$(AM_V_GEN) \
 	./opencc_dict -i $(simp_to_trad_txt) -o $@
 
+trad_to_simp.ocd: $(trad_to_simp_txt) opencc_dict
+	$(AM_V_GEN) \
+	./opencc_dict -i $(trad_to_simp_txt) -o $@

@@ -1,5 +1,8 @@
 src/opencc.c
 src/opencc.h
+src/opencc_types.h
+src/opencc_config.c
+src/opencc_config.h
 src/opencc_converter.c
 src/opencc_converter.h
 src/opencc_dictionary.c

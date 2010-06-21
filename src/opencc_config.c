@@ -220,19 +220,19 @@ void config_perror(const char * spec)
 	case CONFIG_ERROR_VOID:
 		break;
 	case CONFIG_ERROR_CANNOT_ACCESS_CONFIG_FILE:
-		perror("Can not access configureation file");
+		perror(_("Can not access configureation file"));
 		break;
 	case CONFIG_ERROR_PARSE:
-		perr("Configureation file parse error");
+		perr(_("Configuration file parse error"));
 		break;
 	case CONFIG_ERROR_NO_PROPERTY:
-		perr("Invalid property");
+		perr(_("Invalid property"));
 		break;
 	case CONFIG_ERROR_INVALID_DICT_TYPE:
-		perr("Invalid dictionary type");
+		perr(_("Invalid dictionary type"));
 		break;
 	default:
-		perr("Unknown error");
+		perr(_("Unknown"));
 	}
 }
 

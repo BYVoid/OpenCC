@@ -70,6 +70,8 @@ opencc_DEPENDENCIES = \
 
 opencc_SOURCES = \
 	tools/opencc.c \
+	opencc_utils.c \
+	opencc_utils.h \
 	$(libopencc_headers) \
 	$(NULL)
 

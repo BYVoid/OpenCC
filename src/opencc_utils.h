@@ -25,9 +25,14 @@
 #include <stdio.h>
 #include <assert.h>
 
+#include <libintl.h>
+#include <locale.h>
+
 #define FALSE (0)
 #define TRUE (!(0))
 #define INFINITY_INT ((~0U)>>1)
+
+#define _(STR) gettext(STR)
 
 #define debug_should_not_be_here() \
 	do { \

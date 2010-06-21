@@ -46,7 +46,8 @@ int words_set[DATRIE_WORD_MAX_COUNT];
 wchar_t words_set_char[DATRIE_WORD_MAX_COUNT];
 DoubleArrayTrieItem dat[DATRIE_SIZE];
 
-void match_word(const DoubleArrayTrieItem *dat, const wchar_t * word, int *match_pos, int *id, int limit)
+void match_word(const DoubleArrayTrieItem *dat, const wchar_t * word,
+		int *match_pos, int *id, int limit)
 {
 	int i, j, p;
 	for (i = 0,p = 0; word[p] && (limit == 0 || p < limit) && dat[i].base != DATRIE_UNUSED; p ++)
@@ -238,7 +239,8 @@ void init(const char * file_name)
 
 	if (dt == (opencc_dictionary_t) -1)
 	{
-		fprintf(stderr, "Can not read data from %s\n", file_name);
+		dict_perror(_("Dictionary loading error"));
+		fprintf(stderr, _("\n"));
 		exit(1);
 	}
 
@@ -267,7 +269,7 @@ void output(const char * file_name)
 
 	if (!fp)
 	{
-		fprintf(stderr, "Can not write file: %s\n", file_name);
+		fprintf(stderr, _("Can not write file: %s\n"), file_name);
 		exit(1);
 	}
 
@@ -322,20 +324,20 @@ void write_text_file()
 
 void show_version()
 {
-	printf("\nOpen Chinese Convert (OpenCC) Dictionary Tool\nVersion %s\n\n",VERSION);
+	printf(_("\nOpen Chinese Convert (OpenCC) Dictionary Tool\nVersion %s\n\n"), VERSION);
 }
 
 void show_usage()
 {
 	show_version();
-	printf("Usage:\n");
-	printf("  opencc_dict -i input_file -o output_file\n\n");
-	printf("    -i\n");
-	printf("      Read data from input_file.\n");
-	printf("    -o\n");
-	printf("      Write converted data to output_file.\n");
-	printf("\n");
-	printf("\n");
+	printf(_("Usage:\n"));
+	printf(_("  opencc_dict -i input_file -o output_file\n\n"));
+	printf(_("    -i input_file\n"));
+	printf(_("      Read data from input_file.\n"));
+	printf(_("    -o output_file\n"));
+	printf(_("      Write converted data to output_file.\n"));
+	printf(_("\n"));
+	printf(_("\n"));
 }
 
 int main(int argc, char ** argv)
@@ -376,14 +378,14 @@ int main(int argc, char ** argv)
 
 	if (!input_file_specified)
 	{
-		fprintf(stderr, "Please specify input file using -i.\n");
+		fprintf(stderr, _("Please specify input file using -i.\n"));
 		show_usage();
 		return 1;
 	}
 
 	if (!output_file_specified)
 	{
-		fprintf(stderr, "Please specify output file using -o.\n");
+		fprintf(stderr, _("Please specify output file using -o.\n"));
 		show_usage();
 		return 1;
 	}

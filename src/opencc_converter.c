@@ -327,12 +327,12 @@ void converter_perror(const char * spec)
 	case CONVERTER_ERROR_VOID:
 		break;
 	case CONVERTER_ERROR_NODICT:
-		perr("No dictionary loaded");
+		perr(_("No dictionary loaded"));
 		break;
 	case CONVERTER_ERROR_OUTBUF:
-		perr("Output buffer not enough for one segment");
+		perr(_("Output buffer not enough for one segment"));
 		break;
 	default:
-		perr("Unknown");
+		perr(_("Unknown"));
 	}
 }

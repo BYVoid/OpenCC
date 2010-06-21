@@ -225,14 +225,16 @@ void opencc_perror(const char * spec)
 	case OPENCC_ERROR_VOID:
 		break;
 	case OPENCC_ERROR_DICTLOAD:
-		dict_perror("Dictionary loading error");
+		dict_perror(_("Dictionary loading error"));
 		break;
 	case OPENCC_ERROR_CONFIG:
-		config_perror("Config error");
+		config_perror(_("Configuration error"));
 		break;
 	case OPENCC_ERROR_CONVERTER:
-		converter_perror("Converter error");
+		converter_perror(_("Converter error"));
 		break;
+	default:
+		perr(_("Unknown"));
 	}
 	perr("\n");
 }

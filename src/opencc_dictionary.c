@@ -200,15 +200,15 @@ void dict_perror(const char * spec)
 	case DICTIONARY_ERROR_VOID:
 		break;
 	case DICTIONARY_ERROR_NODICT:
-		perr("No dictionary loaded");
+		perr(_("No dictionary loaded"));
 		break;
 	case DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE:
-		perror("Can not open dictionary file");
+		perror(_("Can not open dictionary file"));
 		break;
 	case DICTIONARY_ERROR_INVALID_DICT:
-		perror("Invalid dictionary file");
+		perror(_("Invalid dictionary file"));
 		break;
 	default:
-		perr("Unknown");
+		perr(_("Unknown"));
 	}
 }

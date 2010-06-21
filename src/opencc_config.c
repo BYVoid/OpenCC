@@ -220,7 +220,7 @@ void config_perror(const char * spec)
 	case CONFIG_ERROR_VOID:
 		break;
 	case CONFIG_ERROR_CANNOT_ACCESS_CONFIG_FILE:
-		perr("Can not access configureation file");
+		perror("Can not access configureation file");
 		break;
 	case CONFIG_ERROR_PARSE:
 		perr("Configureation file parse error");

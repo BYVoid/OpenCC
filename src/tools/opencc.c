@@ -107,7 +107,7 @@ void show_usage()
 	printf("\n");
 }
 
-char * mstrcpy(const char * str)
+static char * mstrcpy(const char * str)
 {
 	char * strbuf = (char *) malloc(sizeof(char) * (strlen(str) + 1));
 	strcpy(strbuf, str);
@@ -150,8 +150,11 @@ int main(int argc, char ** argv)
 		}
 	}
 	
+	if (config_file == NULL)
+		config_file = mstrcpy("zhs2zht.ini");
+
 	convert(input_file, output_file, config_file);
-	
+
 	free(input_file);
 	free(output_file);
 	free(config_file);

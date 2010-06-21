@@ -38,7 +38,7 @@ size_t opencc_convert(opencc_t odt, wchar_t ** inbuf, size_t * inbuf_left,
 	if (od->dicts == NULL)
 	{
 		/* TODO:沒有加載辭典 */
-		return OPENCC_CONVERT_ERROR;
+		return (size_t) -1;
 	}
 
 	return converter_convert(od->converter, inbuf, inbuf_left, outbuf, outbuf_left);
@@ -77,7 +77,7 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 	while (inbuf_left > 0)
 	{
 		size_t retval = opencc_convert(odt, &pinbuf, &inbuf_left, &poutbuf, &outbuf_left);
-		if (retval == OPENCC_CONVERT_ERROR)
+		if (retval == (size_t) -1)
 		{
 			free(outbuf);
 			free(winbuf);

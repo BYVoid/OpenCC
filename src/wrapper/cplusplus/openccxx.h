@@ -33,24 +33,46 @@ namespace opencc
 class converter
 {
 public:
-	converter(opencc_convert_direction_t convert_direction = OPENCC_CONVERT_SIMP_TO_TRAD)
-		: od (opencc_open(convert_direction))
+	static const char * CONFIG_SIMP_TO_TRAD;
+	static const char * CONFIG_TRAD_TO_SIMP;
+	static const char * CONFIG_NULL;
+
+	converter(const char * config_file = CONFIG_NULL)
+		: od((opencc_t) -1)
 	{
+		open(config_file);
 	}
 
 	virtual ~converter()
 	{
-		opencc_close(od);
+		if (od != (opencc_t) -1)
+			opencc_close(od);
+	}
+
+	operator int() const
+	{
+		return (int) od;
+	}
+
+	int open(const char * config_file)
+	{
+		if (od != (opencc_t) -1)
+			opencc_close(od);
+		od = opencc_open(config_file);
+		return (od == (opencc_t) -1) ? (-1) : (0);
 	}
 
 	long convert(const std::string &in, std::string &out, long length = -1)
 	{
+		if (od == (opencc_t) -1)
+			return -1;
+
 		if (length == -1)
 			length = in.length();
 
 		char * outbuf = opencc_convert_utf8(od, in.c_str(), length);
 
-		if (outbuf == NULL)
+		if (outbuf == (char *) -1)
 			return -1;
 
 		out = outbuf;
@@ -61,6 +83,9 @@ public:
 
 	long convert(const std::wstring &in, std::wstring &out, long length = -1)
 	{
+		if (od == (opencc_t) -1)
+			return -1;
+
 		size_t inbuf_left = in.length ();
 		if (length >= 0 && length < (long)inbuf_left)
 			inbuf_left = length;
@@ -81,7 +106,7 @@ public:
 
 			retval = opencc_convert (od, (wchar_t **)&inbuf,
 						&inbuf_left, &outbuf, &outbuf_left);
-			if (retval == OPENCC_CONVERT_ERROR)
+			if (retval == -1)
 				return -1;
 			count += retval;
 		}
@@ -93,19 +118,23 @@ public:
 		return count;
 	}
 
-	opencc_convert_errno_t errno()
+	opencc_error errno() const
 	{
-		return opencc_errno(od);
+		return opencc_errno();
 	}
 
-	void perror()
+	void perror(const char * spec = "OpenCC") const
 	{
-		opencc_perror(od);
+		opencc_perror(spec);
 	}
 
 private:
 	opencc_t od;
 };
+
+const char * converter::CONFIG_SIMP_TO_TRAD = OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD;
+const char * converter::CONFIG_TRAD_TO_SIMP = OPENCC_DEFAULT_CONFIG_TRAD_TO_SIMP;
+const char * converter::CONFIG_NULL = NULL;
 
 };
 

@@ -31,8 +31,10 @@ extern "C" {
 #include <wchar.h>
 
 /* Macros */
-#define OPENCC_CONVERT_ERROR ((size_t) -1)
 #define OPENCC_DICHEADER "OPENCCDATRIE"
+
+#define OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD "zhs2zht.ini"
+#define OPENCC_DEFAULT_CONFIG_TRAD_TO_SIMP "zht2zhs.ini"
 
 /**
  * opencc_open:
@@ -96,7 +98,7 @@ opencc_error opencc_errno(void);
  * Print the error message to stderr when errno is set.
  *
  */
-const char * opencc_strerror(void);
+void opencc_perror(const char * spec);
 
 #ifdef __cplusplus
 };

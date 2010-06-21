@@ -176,14 +176,14 @@ size_t converter_convert(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbu
 		{
 			/* 對歧義部分進行最短路徑分詞 */
 			sp_seg_length = sp_seg(cd, inbuf, inbuf_left, outbuf, outbuf_left, bound - start);
-			if (sp_seg_length ==  OPENCC_CONVERT_ERROR)
-				return OPENCC_CONVERT_ERROR;
+			if (sp_seg_length ==  (size_t) -1)
+				return (size_t) -1;
 			if (sp_seg_length == 0)
 			{
 				if (inbuf_left_start - *inbuf_left > 0)
 					return inbuf_left_start - *inbuf_left;
 				/* 空間不足 */
-				return OPENCC_CONVERT_ERROR;
+				return (size_t) -1;
 			}
 			start = i;
 		}
@@ -201,14 +201,14 @@ size_t converter_convert(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbu
 	if (*inbuf_left > 0 && *outbuf_left > 0)
 	{
 		sp_seg_length = sp_seg(cd, inbuf, inbuf_left, outbuf, outbuf_left, bound - start);
-		if (sp_seg_length ==  OPENCC_CONVERT_ERROR)
-			return OPENCC_CONVERT_ERROR;
+		if (sp_seg_length ==  (size_t) -1)
+			return (size_t) -1;
 		if (sp_seg_length == 0)
 		{
 			if (inbuf_left_start - *inbuf_left > 0)
 				return inbuf_left_start - *inbuf_left;
 			/* 空間不足 */
-			return OPENCC_CONVERT_ERROR;
+			return (size_t) -1;
 		}
 	}
 
@@ -242,7 +242,7 @@ size_t converter_convert1(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inb
 			{
 				if (inbuf_left_start - *inbuf_left > 0)
 					break;
-				return OPENCC_CONVERT_ERROR;
+				return (size_t) -1;
 			}
 
 			for (; *match_rs; match_rs ++)

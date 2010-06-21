@@ -347,7 +347,7 @@ int main(int argc, char ** argv)
 	int input_file_specified = FALSE, output_file_specified = FALSE;
 
 	setlocale(LC_ALL, "");
-	bindtextdomain(GETTEXT_PACKAGE, "/usr/share/locale");
+	bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
 	textdomain(GETTEXT_PACKAGE);
 
 	while((oc = getopt(argc, argv, "vh-:i:o:")) != -1)

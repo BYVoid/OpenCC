@@ -21,6 +21,11 @@ libopencc = libopencc.la
 lib_LTLIBRARIES = $(libopencc)
 bin_PROGRAMS = opencc opencc_dict
 
+macro_cflags = \
+	-DPKGDATADIR=\"$(pkgdatadir)\" \
+	-DLOCALEDIR=\"$(localedir)\" \
+	$(NULL)
+
 libopencc_headers = \
 	opencc.h \
 	opencc_types.h \
@@ -57,7 +62,7 @@ libopencc_la_HEADERS = \
 	$(NULL)
 
 libopencc_la_CFLAGS = \
-	-DPKGDATADIR=\"$(pkgdatadir)\" \
+	$(macro_cflags) \
 	$(NULL)
 
 libopencc_la_LDFLAGS = \
@@ -73,6 +78,10 @@ opencc_SOURCES = \
 	opencc_utils.c \
 	opencc_utils.h \
 	$(libopencc_headers) \
+	$(NULL)
+
+opencc_CFLAGS = \
+	$(macro_cflags) \
 	$(NULL)
 
 opencc_LDADD = \
@@ -96,7 +105,7 @@ opencc_dict_SOURCES = \
 	$(NULL)
 	
 opencc_dict_CFLAGS = \
-	-DPKGDATADIR=\"$(pkgdatadir)\" \
+	$(macro_cflags) \
 	$(NULL)
 
 opencc_dict_LDADD = \

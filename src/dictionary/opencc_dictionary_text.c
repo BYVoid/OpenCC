@@ -43,6 +43,7 @@ dict_ptr dict_text_open(const char * filename)
 	td->entry_count = INITIAL_DICTIONARY_SIZE;
 	td->max_length = 0;
 	td->lexicon = (opencc_entry *) malloc(sizeof(opencc_entry) * td->entry_count);
+	td->word_buff = NULL;
 
 	static char buff[ENTRY_BUFF_SIZE];
 	static char key_buff[ENTRY_BUFF_SIZE];
@@ -51,7 +52,10 @@ dict_ptr dict_text_open(const char * filename)
 
 	FILE * fp = fopen(filename,"r");
 	if (fp == NULL)
+	{
+		dict_text_close((dict_ptr) td);
 		return (dict_ptr) -1;
+	}
 
 	size_t i = 0;
 	while (fgets(buff, ENTRY_BUFF_SIZE, fp))
@@ -65,6 +69,14 @@ dict_ptr dict_text_open(const char * filename)
 		sscanf(buff, "%s %s", key_buff, value_buff);
 
 		wbuff = utf8_to_wcs(key_buff,(size_t) -1);
+
+		if (wbuff == (wchar_t *) -1)
+		{
+			td->entry_count = i + 1;
+			dict_text_close((dict_ptr) td);
+			return (dict_ptr) -1;
+		}
+
 		size_t length = wcslen(wbuff);
 		if (length > td->max_length)
 			td->max_length = length;
@@ -74,6 +86,14 @@ dict_ptr dict_text_open(const char * filename)
 		free(wbuff);
 
 		wbuff = utf8_to_wcs(value_buff,(size_t) -1);
+
+		if (wbuff == (wchar_t *) -1)
+		{
+			td->entry_count = i + 1;
+			dict_text_close((dict_ptr) td);
+			return (dict_ptr) -1;
+		}
+
 		td->lexicon[i].value = (wchar_t *) malloc((wcslen(wbuff) + 1) * sizeof(wchar_t));
 		wcscpy(td->lexicon[i].value, wbuff);
 		free(wbuff);

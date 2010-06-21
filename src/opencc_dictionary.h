@@ -23,6 +23,14 @@
 
 typedef void * opencc_dictionary_t;
 
+typedef enum
+{
+	DICTIONARY_ERROR_VOID,
+	DICTIONARY_ERROR_NODICT,
+	DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE,
+	DICTIONARY_ERROR_INVALID_DICT,
+} dictionary_error;
+
 typedef struct
 {
 	wchar_t * key;
@@ -43,5 +51,9 @@ size_t dict_get_all_match_lengths(opencc_dictionary_t ddt, const wchar_t * word,
 		size_t * match_length);
 
 size_t dict_get_lexicon(opencc_dictionary_t ddt, opencc_entry * lexicon);
+
+dictionary_error dict_errno(void);
+
+void dict_perror(const char * spec);
 
 #endif /* __OPENCC_DICTIONARY_H_ */

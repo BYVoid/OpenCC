@@ -35,6 +35,8 @@
 	exit(1); \
 	} while(0)\
 
+void perr(const char * str);
+
 int qsort_int_cmp(const void * a, const void * b);
 
 char * mstrcpy(const char * str);

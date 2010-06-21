@@ -29,7 +29,7 @@ wchar_t * utf8_to_wcs(const char * inbuf, size_t inbuf_len)
 	
 	if (cd == (iconv_t) -1)
 	{
-		return NULL;
+		return (wchar_t *) -1;
 	}
 	
 	char * pinbuf = (char *) inbuf;
@@ -47,9 +47,8 @@ wchar_t * utf8_to_wcs(const char * inbuf, size_t inbuf_len)
 		size_t retval = iconv(cd, &pinbuf, &insize, &poutbuf, &outsize);
 		if (retval == (size_t) -1 && errno != E2BIG)
 		{
-			perror("iconv");
 			free(outbuf);
-			return NULL;
+			return (wchar_t *) -1;
 		}
 
 		if (insize == 0)
@@ -76,7 +75,7 @@ char * wcs_to_utf8(const wchar_t * inbuf, size_t inbuf_len)
 
 	if (cd == (iconv_t) -1)
 	{
-		return NULL;
+		return (char *) -1;
 	}
 	
 	char * pinbuf = (char *) inbuf;
@@ -95,9 +94,8 @@ char * wcs_to_utf8(const wchar_t * inbuf, size_t inbuf_len)
 		size_t retval = iconv(cd, &pinbuf, &insize, &poutbuf, &outsize);
 		if (retval == (size_t) -1 && errno != E2BIG)
 		{
-			perror("iconv");
 			free(outbuf);
-			return NULL;
+			return (char *) -1;
 		}
 
 		if (insize == 0)

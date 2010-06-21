@@ -27,16 +27,11 @@ typedef void * opencc_t;
 
 typedef enum
 {
-	OPENCC_CONVERT_SIMP_TO_TRAD,
-	OPENCC_CONVERT_TRAD_TO_SIMP,
-	OPENCC_CONVERT_CUSTOM,
-} opencc_convert_direction_t;
-
-typedef enum
-{
-	OPENCC_CONVERT_ERROR_VOID,
+	OPENCC_ERROR_VOID,
+	OPENCC_ERROR_DICTLOAD,
+	OPENCC_ERROR_CONFIG,
 	OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH,
-} opencc_convert_errno_t;
+} opencc_error;
 
 typedef enum
 {

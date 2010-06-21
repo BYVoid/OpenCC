@@ -22,11 +22,11 @@
 #include "opencc_encoding.h"
 #include "opencc_utils.h"
 
+static opencc_error errno = OPENCC_ERROR_VOID;
+
 typedef struct
 {
 	opencc_dictionary_t dicts;
-	opencc_convert_direction_t convert_direction;
-	opencc_convert_errno_t errno;
 	opencc_converter_t converter;
 } opencc_description;
 
@@ -132,7 +132,6 @@ opencc_t opencc_open(const char * config_file)
 	opencc_description * od;
 	od = (opencc_description *) malloc(sizeof(opencc_description));
 
-	od->errno = OPENCC_CONVERT_ERROR_VOID;
 	od->dicts = NULL;
 	od->converter = converter_open();
 
@@ -147,7 +146,7 @@ opencc_t opencc_open(const char * config_file)
 
 		if (ct == (config_t) -1)
 		{
-			fprintf(stderr, "Config Error: %s\n", config_strerror());
+			errno = OPENCC_ERROR_CONFIG;
 			return (opencc_t) -1;
 		}
 
@@ -162,7 +161,7 @@ opencc_t opencc_open(const char * config_file)
 			{
 				opencc_close((opencc_t) od);
 				config_close(ct);
-				/* todo */
+				errno = OPENCC_ERROR_DICTLOAD;
 				return (opencc_t) -1;
 			}
 		}
@@ -185,30 +184,12 @@ int opencc_close(opencc_t odt)
 	return 0;
 }
 
-opencc_convert_errno_t opencc_errno(opencc_t odt)
-{
-	opencc_description * od;
-	od = (opencc_description *) odt;
-	return od->errno;
-}
-
-void opencc_perror(opencc_t odt)
-{
-	switch (opencc_errno(odt))
-	{
-	case OPENCC_CONVERT_ERROR_VOID:
-		break;
-	case OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH:
-		fprintf(stderr, "Output buffer is not enough for one segment.\n");
-		break;
-	}
-}
-
 int opencc_dict_load(opencc_t odt, const char * dict_filename,
 		opencc_dictionary_type dict_type)
 {
 	opencc_description * od = (opencc_description *) odt;
 
+	int retval;
 	if (od->dicts == NULL)
 	{
 		od->dicts = dict_open(dict_filename, dict_type);
@@ -217,13 +198,39 @@ int opencc_dict_load(opencc_t odt, const char * dict_filename,
 			od->dicts = NULL;
 			return -1;
 		}
-		converter_assign_dicts(od->converter, od->dicts);
-		return 0;
+		retval = 0;
 	}
 	else
 	{
-		int retval = dict_load(od->dicts, dict_filename, dict_type);
-		converter_assign_dicts(od->converter, od->dicts);
-		return retval;
+		retval = dict_load(od->dicts, dict_filename, dict_type);
 	}
+
+	converter_assign_dicts(od->converter, od->dicts);
+	return retval;
+}
+
+opencc_error opencc_errno(void)
+{
+	return errno;
+}
+
+void opencc_perror(const char * spec)
+{
+	perr(spec);
+	perr("\n");
+	switch (errno)
+	{
+	case OPENCC_ERROR_VOID:
+		break;
+	case OPENCC_ERROR_DICTLOAD:
+		dict_perror("Dictionary load error");
+		break;
+	case OPENCC_ERROR_CONFIG:
+		config_perror("Config error");
+		break;
+	case OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH:
+		perr("Output buffer is not enough for one segment");
+		break;
+	}
+	perr("\n");
 }

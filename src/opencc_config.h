@@ -41,6 +41,6 @@ opencc_dictionary * config_get_dictionary(config_t ct, size_t * dict_count);
 
 config_error config_errno(void);
 
-const char * config_strerror(void);
+void config_perror(const char * spec);
 
 #endif /* __OPENCC_CONFIG_H_ */

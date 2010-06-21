@@ -37,7 +37,7 @@ void convert(const char * input_file, const char * output_file, const char * con
 	opencc_t od = opencc_open(config_file);
 	if (od == (opencc_t) -1)
 	{
-		fprintf(stderr, "Can not create OpenCC.\n");
+		opencc_perror("Can not create OpenCC");
 		exit(1);
 	}
 
@@ -107,6 +107,13 @@ void show_usage()
 	printf("\n");
 }
 
+char * mstrcpy(const char * str)
+{
+	char * strbuf = (char *) malloc(sizeof(char) * (strlen(str) + 1));
+	strcpy(strbuf, str);
+	return strbuf;
+}
+
 int main(int argc, char ** argv)
 {
 	static int oc;
@@ -132,13 +139,13 @@ int main(int argc, char ** argv)
 				show_usage();
 			return;
 		case 'i':
-			input_file = (char *) mstrcpy(optarg);
+			input_file = mstrcpy(optarg);
 			break;
 		case 'o':
-			output_file = (char *) mstrcpy(optarg);
+			output_file = mstrcpy(optarg);
 			break;
 		case 'c':
-			config_file = (char *) mstrcpy(optarg);
+			config_file = mstrcpy(optarg);
 			break;
 		}
 	}

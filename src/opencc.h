@@ -87,7 +87,7 @@ int opencc_dict_load(opencc_t odt, const char * dict_filename,
  * OPENCC_CONVERT_ERROR_VOID
  *
  */
-opencc_convert_errno_t opencc_errno(opencc_t od);
+opencc_error opencc_errno(void);
 
 /**
  * opencc_perror:
@@ -96,7 +96,7 @@ opencc_convert_errno_t opencc_errno(opencc_t od);
  * Print the error message to stderr when errno is set.
  *
  */
-void opencc_perror(opencc_t od);
+const char * opencc_strerror(void);
 
 #ifdef __cplusplus
 };

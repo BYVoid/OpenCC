@@ -18,6 +18,11 @@
 
 #include "opencc_utils.h"
 
+void perr(const char * str)
+{
+	fputs(str, stderr);
+}
+
 int qsort_int_cmp(const void * a, const void * b)
 {
 	return *((int *) a) - *((int *) b);

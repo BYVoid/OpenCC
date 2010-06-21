@@ -30,7 +30,7 @@ typedef struct
 	size_t dicts_count;
 } config_desc;
 
-config_error errno;
+static config_error errno = CONFIG_ERROR_VOID;
 
 static int parse_add_dict(config_desc * cd, const char * dictstr)
 {
@@ -43,9 +43,9 @@ static int parse_add_dict(config_desc * cd, const char * dictstr)
 
 	opencc_dictionary_type dict_type;
 
-	if (strncmp(dictstr, CONFIG_DICT_TYPE_OCD, dict_type_len) == 0)
+	if (strncmp(dictstr, CONFIG_DICT_TYPE_OCD, sizeof(CONFIG_DICT_TYPE_OCD) - 1) == 0)
 		dict_type = OPENCC_DICTIONARY_TYPE_DATRIE;
-	else if (strncmp(dictstr, CONFIG_DICT_TYPE_TEXT, dict_type_len) == 0)
+	else if (strncmp(dictstr, CONFIG_DICT_TYPE_TEXT, sizeof(CONFIG_DICT_TYPE_OCD) - 1) == 0)
 		dict_type = OPENCC_DICTIONARY_TYPE_TEXT;
 	else
 	{
@@ -211,22 +211,28 @@ config_error config_errno(void)
 	return errno;
 }
 
-const char * config_strerror(void)
+void config_perror(const char * spec)
 {
+	perr(spec);
+	perr("\n");
 	switch (errno)
 	{
 	case CONFIG_ERROR_VOID:
-		return "";
+		break;
 	case CONFIG_ERROR_CANNOT_ACCESS_CONFIG_FILE:
-		return "Can not access configureation file";
+		perr("Can not access configureation file");
+		break;
 	case CONFIG_ERROR_PARSE:
-		return "Configureation file parse error";
+		perr("Configureation file parse error");
+		break;
 	case CONFIG_ERROR_NO_PROPERTY:
-		return "Invalid property";
+		perr("Invalid property");
+		break;
 	case CONFIG_ERROR_INVALID_DICT_TYPE:
-		return "Invalid dictionary type";
+		perr("Invalid dictionary type");
+		break;
 	default:
-		return "Unknown error";
+		perr("Unknown error");
 	}
 }
 
@@ -238,7 +244,6 @@ config_t config_open(const char * filename)
 	cd->description = NULL;
 	cd->dicts = NULL;
 	cd->dicts_count = 0;
-	errno = CONFIG_ERROR_VOID;
 
 	if (parse(cd, filename) == -1)
 	{

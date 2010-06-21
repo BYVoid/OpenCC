@@ -19,6 +19,8 @@
 #include "opencc_dictionary.h"
 #include "dictionary/opencc_dictionary_abstract.h"
 
+static dictionary_error errno = DICTIONARY_ERROR_VOID;
+
 const wchar_t * dict_match_longest(opencc_dictionary_t ddt, const wchar_t * word,
 		size_t length)
 {
@@ -26,6 +28,12 @@ const wchar_t * dict_match_longest(opencc_dictionary_t ddt, const wchar_t * word
 
 	const wchar_t * retvel = NULL;
 	size_t match_length, max_length = 0;
+
+	if (dd->dict_count == 0)
+	{
+		errno = DICTIONARY_ERROR_NODICT;
+		return (const wchar_t *) -1;
+	}
 
 	int i;
 	/* 依次查找每個辭典，取得最長匹配長度 */
@@ -54,6 +62,12 @@ size_t dict_get_all_match_lengths(opencc_dictionary_t ddt, const wchar_t * word,
 	opencc_dictionary_description * dd = (opencc_dictionary_description *) ddt;
 	size_t rscnt = 0;
 
+	if (dd->dict_count == 0)
+	{
+		errno = DICTIONARY_ERROR_NODICT;
+		return (size_t) -1;
+	}
+
 	int i;
 	for (i = 0; i < dd->dict_count; i --)
 	{
@@ -80,6 +94,12 @@ size_t dict_get_all_match_lengths(opencc_dictionary_t ddt, const wchar_t * word,
 size_t dict_get_lexicon(opencc_dictionary_t ddt, opencc_entry * lexicon)
 {
 	opencc_dictionary_description * dd = (opencc_dictionary_description *) ddt;
+
+	if (dd->dict_count == 0)
+	{
+		errno = DICTIONARY_ERROR_NODICT;
+		return (size_t) -1;
+	}
 
 	size_t count = 0;
 	int i;
@@ -113,6 +133,7 @@ int dict_load(opencc_dictionary_t ddt, const char * dict_filename,
 		if (!fp)
 		{
 			free(dict.filename);
+			errno = DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE;
 			return -1; /* 辭典文件無法訪問 */
 		}
 	}
@@ -123,7 +144,10 @@ int dict_load(opencc_dictionary_t ddt, const char * dict_filename,
 	free(dict.filename);
 
 	if (dp == (dict_ptr) -1)
+	{
+		errno = DICTIONARY_ERROR_INVALID_DICT;
 		return -1; /* 辭典讀取錯誤 */
+	}
 
 	size_t i = dd->dict_count ++;
 	dd->dict[i].type = dict.type;
@@ -160,4 +184,31 @@ opencc_dictionary_t dict_open(const char * dict_filename, opencc_dictionary_type
 	}
 
 	return (opencc_dictionary_t) dd;
+}
+
+dictionary_error dict_errno(void)
+{
+	return errno;
+}
+
+void dict_perror(const char * spec)
+{
+	perr(spec);
+	perr("\n");
+	switch(errno)
+	{
+	case DICTIONARY_ERROR_VOID:
+		break;
+	case DICTIONARY_ERROR_NODICT:
+		perr("No dictionary loaded");
+		break;
+	case DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE:
+		perror("Can not open dictionary file");
+		break;
+	case DICTIONARY_ERROR_INVALID_DICT:
+		perror("Invalid dictionary file");
+		break;
+	default:
+		perr("Unknown");
+	}
 }

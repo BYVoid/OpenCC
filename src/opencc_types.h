@@ -16,29 +16,42 @@
 * limitations under the License.
 */
 
-#ifndef __OPENCC_UTILS_H_
-#define __OPENCC_UTILS_H_
+#ifndef __OPENCC_TYPES_H_
+#define __OPENCC_TYPES_H_
 
-#include <wchar.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#define FALSE (0)
-#define TRUE (!(0))
-#define INFINITY_INT ((~0U)>>1)
+typedef void * opencc_t;
 
-#define debug_should_not_be_here() \
-	do { \
-	fprintf(stderr, "Should not be here: %d %s\n", __LINE__, __FILE__); \
-	exit(1); \
-	} while(0)\
+typedef enum
+{
+	OPENCC_CONVERT_SIMP_TO_TRAD,
+	OPENCC_CONVERT_TRAD_TO_SIMP,
+	OPENCC_CONVERT_CUSTOM,
+} opencc_convert_direction_t;
 
-int qsort_int_cmp(const void * a, const void * b);
+typedef enum
+{
+	OPENCC_CONVERT_ERROR_VOID,
+	OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH,
+} opencc_convert_errno_t;
 
-char * mstrcpy(const char * str);
+typedef enum
+{
+	OPENCC_DICTIONARY_TYPE_TEXT,
+	OPENCC_DICTIONARY_TYPE_DATRIE,
+} opencc_dictionary_type;
 
-char * mstrncpy(const char * str, size_t n);
+typedef struct
+{
+	opencc_dictionary_type dict_type;
+	char * file_name;
+} opencc_dictionary;
 
-#endif /* __OPENCC_UTILS_H_ */
+#ifdef __cplusplus
+};
+#endif
+
+#endif /* __OPENCC_TYPES_H_ */

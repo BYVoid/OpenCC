@@ -19,6 +19,8 @@
 #ifndef __OPENCC_H_
 #define __OPENCC_H_
 
+#include "opencc_types.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,32 +30,9 @@ extern "C" {
  */
 #include <wchar.h>
 
-/*
- * Macros
- */
+/* Macros */
 #define OPENCC_CONVERT_ERROR ((size_t) -1)
 #define OPENCC_DICHEADER "OPENCCDATRIE"
-
-typedef void * opencc_t;
-
-typedef enum
-{
-	OPENCC_CONVERT_SIMP_TO_TRAD,
-	OPENCC_CONVERT_TRAD_TO_SIMP,
-	OPENCC_CONVERT_CUSTOM,
-} opencc_convert_direction_t;
-
-typedef enum
-{
-	OPENCC_CONVERT_ERROR_VOID,
-	OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH,
-} opencc_convert_errno_t;
-
-typedef enum
-{
-	OPENCC_DICTIONARY_TYPE_TEXT,
-	OPENCC_DICTIONARY_TYPE_DATRIE,
-} opencc_dictionary_type;
 
 /**
  * opencc_open:
@@ -63,7 +42,7 @@ typedef enum
  * Make an instance of opencc.
  *
  */
-opencc_t opencc_open(opencc_convert_direction_t convert_direction);
+opencc_t opencc_open(const char * config_file);
 
 /**
  * opencc_close:

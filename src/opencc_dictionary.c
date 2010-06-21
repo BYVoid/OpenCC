@@ -95,7 +95,7 @@ int dict_load(opencc_dictionary_t ddt, const char * dict_filename,
 		opencc_dictionary_type dict_type)
 {
 	opencc_dictionary_description * dd = (opencc_dictionary_description *) ddt;
-	opencc_dictionary dict;
+	dictionary dict;
 
 	dict.filename = (char *) malloc(sizeof(char) * (strlen(dict_filename) + 1));
 	strcpy(dict.filename, dict_filename);

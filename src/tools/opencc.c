@@ -30,11 +30,11 @@
 
 #define BUFFER_SIZE 32768
 
-void convert(const char * input_file, const char * output_file)
+void convert(const char * input_file, const char * output_file, const char * config_file)
 {
 	static char inbuf[BUFFER_SIZE + 1];
 	
-	opencc_t od = opencc_open(OPENCC_CONVERT_SIMP_TO_TRAD);
+	opencc_t od = opencc_open(config_file);
 	if (od == (opencc_t) -1)
 	{
 		fprintf(stderr, "Can not create OpenCC.\n");
@@ -44,7 +44,7 @@ void convert(const char * input_file, const char * output_file)
 	FILE * fp = stdin;
 	FILE * fpo = stdout;
 	
-	if (*input_file)
+	if (input_file)
 	{
 		fp = fopen(input_file, "r");
 		if (!fp)
@@ -54,7 +54,7 @@ void convert(const char * input_file, const char * output_file)
 		}
 	}
 	
-	if (*output_file)
+	if (output_file)
 	{
 		fpo = fopen(output_file, "w");
 		if (!fpo)
@@ -91,15 +91,18 @@ void show_usage()
 {
 	show_version();
 	printf("Usage:\n");
-	printf("  opencc [-i input_file] [-o output_file]\n\n");
-	printf("    -i\n");
+	printf("  opencc [-i input_file] [-o output_file] [-c config_file]\n\n");
+	printf("    -i input_file\n");
 	printf("      Read original text from input_file.\n");
-	printf("    -o\n");
+	printf("    -o output_file\n");
 	printf("      Write converted text to output_file.\n");
+	printf("    -c config_file\n");
+	printf("      Load dictionary configuration from config_file.\n");
 	printf("\n");
 	printf("  Note:\n");
 	printf("    Text from standard input will be read if input_file is not set\n");
 	printf("    and will be written to standard output if output_file is not set.\n");
+	printf("    Default configuration will be load if config_file.\n");
 	printf("\n");
 	printf("\n");
 }
@@ -107,9 +110,9 @@ void show_usage()
 int main(int argc, char ** argv)
 {
 	static int oc;
-	static char input_file[BUFFER_SIZE], output_file[BUFFER_SIZE];
+	static char *input_file, *output_file, *config_file;
 	
-	while((oc = getopt(argc, argv, "vh-:i:o:")) != -1)
+	while((oc = getopt(argc, argv, "vh-:i:o:c:")) != -1)
 	{
 		switch (oc)
 		{
@@ -129,15 +132,22 @@ int main(int argc, char ** argv)
 				show_usage();
 			return;
 		case 'i':
-			strcpy(input_file, optarg);
+			input_file = (char *) mstrcpy(optarg);
 			break;
 		case 'o':
-			strcpy(output_file, optarg);
+			output_file = (char *) mstrcpy(optarg);
+			break;
+		case 'c':
+			config_file = (char *) mstrcpy(optarg);
 			break;
 		}
 	}
 	
-	convert(input_file, output_file);
+	convert(input_file, output_file, config_file);
 	
+	free(input_file);
+	free(output_file);
+	free(config_file);
+
 	return 0;
 }

@@ -16,29 +16,31 @@
 * limitations under the License.
 */
 
-#ifndef __OPENCC_UTILS_H_
-#define __OPENCC_UTILS_H_
+#ifndef __OPENCC_CONFIG_H_
+#define __OPENCC_CONFIG_H_
 
-#include <wchar.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
+#include "opencc_types.h"
+#include "opencc_utils.h"
 
-#define FALSE (0)
-#define TRUE (!(0))
-#define INFINITY_INT ((~0U)>>1)
+typedef void * config_t;
 
-#define debug_should_not_be_here() \
-	do { \
-	fprintf(stderr, "Should not be here: %d %s\n", __LINE__, __FILE__); \
-	exit(1); \
-	} while(0)\
+typedef enum
+{
+	CONFIG_ERROR_VOID,
+	CONFIG_ERROR_CANNOT_ACCESS_CONFIG_FILE,
+	CONFIG_ERROR_PARSE,
+	CONFIG_ERROR_NO_PROPERTY,
+	CONFIG_ERROR_INVALID_DICT_TYPE,
+} config_error;
 
-int qsort_int_cmp(const void * a, const void * b);
+config_t config_open(const char * filename);
 
-char * mstrcpy(const char * str);
+int config_close(config_t ct);
 
-char * mstrncpy(const char * str, size_t n);
+opencc_dictionary * config_get_dictionary(config_t ct, size_t * dict_count);
 
-#endif /* __OPENCC_UTILS_H_ */
+config_error config_errno(void);
+
+const char * config_strerror(void);
+
+#endif /* __OPENCC_CONFIG_H_ */

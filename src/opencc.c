@@ -17,15 +17,10 @@
 */
 
 #include "opencc.h"
+#include "opencc_config.h"
 #include "opencc_converter.h"
 #include "opencc_encoding.h"
 #include "opencc_utils.h"
-
-/* 默認辭典 */
-#define DEFAULT_DICT_SIMP_TO_TRAD "simp_to_trad.ocd"
-#define DEFAULT_DICT_SIMP_TO_TRAD_TYPE OPENCC_DICTIONARY_TYPE_DATRIE
-#define DEFAULT_DICT_TRAD_TO_SIMP "trad_to_simp.ocd"
-#define DEFAULT_DICT_TRAD_TO_SIMP_TYPE OPENCC_DICTIONARY_TYPE_DATRIE
 
 typedef struct
 {
@@ -132,33 +127,47 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 	return original_outbuf;
 }
 
-opencc_t opencc_open(opencc_convert_direction_t convert_direction)
+opencc_t opencc_open(const char * config_file)
 {
 	opencc_description * od;
 	od = (opencc_description *) malloc(sizeof(opencc_description));
 
-	od->convert_direction = convert_direction;
 	od->errno = OPENCC_CONVERT_ERROR_VOID;
 	od->dicts = NULL;
 	od->converter = converter_open();
 
 	/* 加載默認辭典 */
 	int retval;
-	if (convert_direction == OPENCC_CONVERT_SIMP_TO_TRAD)
-		retval = opencc_dict_load((opencc_t) od, DEFAULT_DICT_SIMP_TO_TRAD,
-				DEFAULT_DICT_SIMP_TO_TRAD_TYPE);
-	else if (convert_direction == OPENCC_CONVERT_TRAD_TO_SIMP)
-		retval = opencc_dict_load((opencc_t) od, DEFAULT_DICT_TRAD_TO_SIMP,
-				DEFAULT_DICT_TRAD_TO_SIMP_TYPE);
-	else if (convert_direction == OPENCC_CONVERT_CUSTOM)
+	if (config_file == NULL)
 		retval = 0;
 	else
-		debug_should_not_be_here();
-
-	if (retval == -1)
 	{
-		opencc_close((opencc_t) od);
-		return (opencc_t) -1;
+		size_t dict_count;
+		config_t ct = config_open(config_file);
+
+		if (ct == (config_t) -1)
+		{
+			fprintf(stderr, "Config Error: %s\n", config_strerror());
+			return (opencc_t) -1;
+		}
+
+		opencc_dictionary * dicts = config_get_dictionary(ct, &dict_count);
+
+		int i, ret;
+		for (i = dict_count - 1; i >= 0 ; i --)
+		{
+			ret = opencc_dict_load((opencc_t) od, dicts[i].file_name, dicts[i].dict_type);
+
+			if (ret == -1)
+			{
+				opencc_close((opencc_t) od);
+				config_close(ct);
+				/* todo */
+				return (opencc_t) -1;
+			}
+		}
+
+		config_close(ct);
 	}
 
 	return (opencc_t) od;

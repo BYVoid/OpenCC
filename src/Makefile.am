@@ -23,6 +23,7 @@ bin_PROGRAMS = opencc opencc_dict
 
 libopencc_headers = \
 	opencc.h \
+	opencc_types.h \
 	wrapper/cplusplus/openccxx.h \
 	$(NULL)
 
@@ -36,11 +37,13 @@ libopencc_dictionary_sources = \
 	$(NULL)
 
 libopencc_la_SOURCES = \
+	opencc_config.c \
 	opencc_converter.c \
 	opencc_dictionary.c \
 	opencc_encoding.c \
 	opencc_utils.c \
 	opencc.c \
+	opencc_config.h \
 	opencc_converter.h \
 	opencc_dictionary.h \
 	opencc_encoding.h \

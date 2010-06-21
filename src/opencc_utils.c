@@ -22,3 +22,18 @@ int qsort_int_cmp(const void * a, const void * b)
 {
 	return *((int *) a) - *((int *) b);
 }
+
+char * mstrcpy(const char * str)
+{
+	char * strbuf = (char *) malloc(sizeof(char) * (strlen(str) + 1));
+	strcpy(strbuf, str);
+	return strbuf;
+}
+
+char * mstrncpy(const char * str, size_t n)
+{
+	char * strbuf = (char *) malloc(sizeof(char) * (n + 1));
+	strncpy(strbuf, str, n);
+	strbuf[n] = '\0';
+	return strbuf;
+}

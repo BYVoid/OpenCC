@@ -346,6 +346,10 @@ int main(int argc, char ** argv)
 	static char input_file[BUFFER_SIZE], output_file[BUFFER_SIZE];
 	int input_file_specified = FALSE, output_file_specified = FALSE;
 
+	setlocale(LC_ALL, "");
+	bindtextdomain(GETTEXT_PACKAGE, "/usr/share/locale");
+	textdomain(GETTEXT_PACKAGE);
+
 	while((oc = getopt(argc, argv, "vh-:i:o:")) != -1)
 	{
 		switch (oc)

@@ -113,6 +113,10 @@ int main(int argc, char ** argv)
 	static int oc;
 	static char *input_file, *output_file, *config_file;
 	
+	setlocale(LC_ALL, "");
+	bindtextdomain(GETTEXT_PACKAGE, "/usr/share/locale");
+	textdomain(GETTEXT_PACKAGE);
+
 	while((oc = getopt(argc, argv, "vh-:i:o:c:")) != -1)
 	{
 		switch (oc)

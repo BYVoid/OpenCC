@@ -37,7 +37,7 @@ void convert(const char * input_file, const char * output_file, const char * con
 	opencc_t od = opencc_open(config_file);
 	if (od == (opencc_t) -1)
 	{
-		opencc_perror("Can not create OpenCC");
+		opencc_perror("OpenCC initialization error");
 		exit(1);
 	}
 
@@ -68,9 +68,9 @@ void convert(const char * input_file, const char * output_file, const char * con
 	{
 		char * outbuf;
 		outbuf = opencc_convert_utf8(od, inbuf, (size_t) -1);
-		if (outbuf == NULL)
+		if (outbuf == (char *) -1)
 		{
-			opencc_perror(od);
+			opencc_perror("OpenCC error");
 			break;
 		}
 		fprintf(fpo,"%s",outbuf);

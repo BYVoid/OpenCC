@@ -38,7 +38,9 @@ typedef struct
 	opencc_dictionary_t dicts;
 } opencc_converter_description;
 
-void sp_seg_buffer_free(opencc_sp_seg_buffer * ossb)
+static converter_error errno = CONVERTER_ERROR_VOID;
+
+static void sp_seg_buffer_free(opencc_sp_seg_buffer * ossb)
 {
 	free(ossb->match_length);
 	free(ossb->min_len);
@@ -46,7 +48,7 @@ void sp_seg_buffer_free(opencc_sp_seg_buffer * ossb)
 	free(ossb->path);
 }
 
-void sp_seg_set_buffer_size(opencc_sp_seg_buffer * ossb, size_t buffer_size)
+static void sp_seg_set_buffer_size(opencc_sp_seg_buffer * ossb, size_t buffer_size)
 {
 	if (ossb->initialized == TRUE)
 		sp_seg_buffer_free(ossb);
@@ -60,7 +62,7 @@ void sp_seg_set_buffer_size(opencc_sp_seg_buffer * ossb, size_t buffer_size)
 	ossb->initialized = TRUE;
 }
 
-size_t sp_seg(opencc_converter_description * cd, wchar_t ** inbuf, size_t * inbuf_left,
+static size_t sp_seg(opencc_converter_description * cd, wchar_t ** inbuf, size_t * inbuf_left,
 		wchar_t ** outbuf, size_t * outbuf_left, size_t length)
 {
 	/* 最短路徑分詞 */
@@ -158,10 +160,10 @@ size_t sp_seg(opencc_converter_description * cd, wchar_t ** inbuf, size_t * inbu
 	return inbuf_left_start - *inbuf_left;
 }
 
-size_t converter_convert(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbuf_left,
+static size_t agspseg(opencc_converter_description * cd,
+		wchar_t ** inbuf, size_t * inbuf_left,
 		wchar_t ** outbuf, size_t * outbuf_left)
 {
-	opencc_converter_description * cd = (opencc_converter_description *) cdt;
 	/* 歧義分割最短路徑分詞 */
 	size_t i, start, bound;
 	const wchar_t * inbuf_start = *inbuf;
@@ -183,6 +185,7 @@ size_t converter_convert(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbu
 				if (inbuf_left_start - *inbuf_left > 0)
 					return inbuf_left_start - *inbuf_left;
 				/* 空間不足 */
+				errno = CONVERTER_ERROR_OUTBUF;
 				return (size_t) -1;
 			}
 			start = i;
@@ -208,6 +211,7 @@ size_t converter_convert(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbu
 			if (inbuf_left_start - *inbuf_left > 0)
 				return inbuf_left_start - *inbuf_left;
 			/* 空間不足 */
+			errno = CONVERTER_ERROR_OUTBUF;
 			return (size_t) -1;
 		}
 	}
@@ -215,11 +219,10 @@ size_t converter_convert(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbu
 	return inbuf_left_start - *inbuf_left;
 }
 
-size_t converter_convert1(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbuf_left,
+static size_t mmseg(opencc_converter_description * cd,
+		wchar_t ** inbuf, size_t * inbuf_left,
 		wchar_t ** outbuf, size_t * outbuf_left)
 {
-	opencc_converter_description * cd = (opencc_converter_description *) cdt;
-
 	/* 正向最大分詞 */
 	size_t inbuf_left_start = *inbuf_left;
 	wchar_t * ous = *outbuf;
@@ -242,6 +245,7 @@ size_t converter_convert1(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inb
 			{
 				if (inbuf_left_start - *inbuf_left > 0)
 					break;
+				errno = CONVERTER_ERROR_OUTBUF;
 				return (size_t) -1;
 			}
 
@@ -255,6 +259,27 @@ size_t converter_convert1(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inb
 	}
 
 	return inbuf_left_start - *inbuf_left;
+}
+
+size_t converter_convert(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbuf_left,
+		wchar_t ** outbuf, size_t * outbuf_left)
+{
+	opencc_converter_description * cd = (opencc_converter_description *) cdt;
+
+	if (cd->dicts == NULL)
+	{
+		errno = CONVERTER_ERROR_NODICT;
+		return (size_t) -1;
+	}
+
+	return agspseg
+	(
+		cd,
+		inbuf,
+		inbuf_left,
+		outbuf,
+		outbuf_left
+	);
 }
 
 void converter_assign_dicts(opencc_converter_t cdt, opencc_dictionary_t dicts)
@@ -286,4 +311,28 @@ void converter_close(opencc_converter_t cdt)
 	sp_seg_buffer_free(&(cd->sp_seg_buffer));
 
 	free(cd);
+}
+
+converter_error converter_errno(void)
+{
+	return errno;
+}
+
+void converter_perror(const char * spec)
+{
+	perr(spec);
+	perr("\n");
+	switch(errno)
+	{
+	case CONVERTER_ERROR_VOID:
+		break;
+	case CONVERTER_ERROR_NODICT:
+		perr("No dictionary loaded");
+		break;
+	case CONVERTER_ERROR_OUTBUF:
+		perr("Output buffer not enough for one segment");
+		break;
+	default:
+		perr("Unknown");
+	}
 }

@@ -23,6 +23,13 @@
 
 typedef void * opencc_converter_t;
 
+typedef enum
+{
+	CONVERTER_ERROR_VOID,
+	CONVERTER_ERROR_NODICT,
+	CONVERTER_ERROR_OUTBUF,
+} converter_error;
+
 void converter_assign_dicts(opencc_converter_t cdt, opencc_dictionary_t dicts);
 
 opencc_converter_t converter_open();
@@ -31,5 +38,8 @@ void converter_close(opencc_converter_t cdt);
 
 size_t converter_convert(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbuf_left,
 		wchar_t ** outbuf, size_t * outbuf_left);
+
+converter_error converter_errno(void);
+void converter_perror(const char * spec);
 
 #endif /* __OPENCC_CONVERT_H_ */

@@ -35,13 +35,13 @@ size_t opencc_convert(opencc_t odt, wchar_t ** inbuf, size_t * inbuf_left,
 {
 	opencc_description * od = (opencc_description *) odt;
 
-	if (od->dicts == NULL)
-	{
-		/* TODO:沒有加載辭典 */
-		return (size_t) -1;
-	}
+	size_t retval = converter_convert
+			(od->converter, inbuf, inbuf_left, outbuf, outbuf_left);
 
-	return converter_convert(od->converter, inbuf, inbuf_left, outbuf, outbuf_left);
+	if (retval == (size_t) -1)
+		errno = OPENCC_ERROR_CONVERTER;
+
+	return retval;
 }
 
 char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
@@ -51,10 +51,11 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 
 	/* 將輸入數據轉換爲wchar_t字符串 */
 	wchar_t * winbuf = utf8_to_wcs(inbuf, length);
-	if (winbuf == NULL)
+	if (winbuf == (wchar_t *) -1)
 	{
 		/* 輸入數據轉換失敗 */
-		return NULL;
+		errno = OPENCC_ERROR_ENCODIND;
+		return (char *) -1;
 	}
 
 	/* 設置輸出UTF8文本緩衝區空間 */
@@ -82,19 +83,20 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 			free(outbuf);
 			free(winbuf);
 			free(woutbuf);
-			return NULL;
+			return (char *) -1;
 		}
 
 		*poutbuf = L'\0';
 
 		char * ubuff = wcs_to_utf8(woutbuf, (size_t) -1);
 
-		if (ubuff == NULL)
+		if (ubuff == (char *) -1)
 		{
 			free(outbuf);
 			free(winbuf);
 			free(woutbuf);
-			return NULL;
+			errno = OPENCC_ERROR_ENCODIND;
+			return (char *) -1;
 		}
 
 		size_t ubuff_len = strlen(ubuff);
@@ -223,13 +225,13 @@ void opencc_perror(const char * spec)
 	case OPENCC_ERROR_VOID:
 		break;
 	case OPENCC_ERROR_DICTLOAD:
-		dict_perror("Dictionary load error");
+		dict_perror("Dictionary loading error");
 		break;
 	case OPENCC_ERROR_CONFIG:
 		config_perror("Config error");
 		break;
-	case OPENCC_CONVERT_ERROR_OUTBUF_NOT_ENOUGH:
-		perr("Output buffer is not enough for one segment");
+	case OPENCC_ERROR_CONVERTER:
+		converter_perror("Converter error");
 		break;
 	}
 	perr("\n");

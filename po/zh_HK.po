@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: opencc 0.0.3.20100621\n"
 "Report-Msgid-Bugs-To: http://code.google.com/p/open-chinese-convert/issues/"
 "entry\n"
-"POT-Creation-Date: 2010-06-21 17:10+0800\n"
+"POT-Creation-Date: 2010-06-21 20:32+0800\n"
 "PO-Revision-Date: 2010-06-21 17:04+0800\n"
 "Last-Translator: BYVoid <byvoid.kcp@gmail.com>\n"
 "Language-Team: Chinese (Hong Kong) <>\n"
@@ -28,32 +28,32 @@ msgstr "配置錯誤"
 msgid "Converter error"
 msgstr "轉換器錯誤"
 
-#: src/opencc.c:237 src/opencc_config.c:235 src/opencc_converter.c:336
+#: src/opencc.c:237 src/opencc_config.c:234 src/opencc_converter.c:337
 #: src/opencc_dictionary.c:212
 msgid "Unknown"
 msgstr "未知"
 
-#: src/opencc_config.c:223
+#: src/opencc_config.c:222
 msgid "Can not access configureation file"
 msgstr "無法訪問配置文件"
 
-#: src/opencc_config.c:226
+#: src/opencc_config.c:225
 msgid "Configuration file parse error"
 msgstr "配置文件解析錯誤"
 
-#: src/opencc_config.c:229
+#: src/opencc_config.c:228
 msgid "Invalid property"
 msgstr "無效屬性"
 
-#: src/opencc_config.c:232
+#: src/opencc_config.c:231
 msgid "Invalid dictionary type"
 msgstr "無效的辭典類型"
 
-#: src/opencc_converter.c:330 src/opencc_dictionary.c:203
+#: src/opencc_converter.c:331 src/opencc_dictionary.c:203
 msgid "No dictionary loaded"
 msgstr "沒有辭典已經加載"
 
-#: src/opencc_converter.c:333
+#: src/opencc_converter.c:334
 msgid "Output buffer not enough for one segment"
 msgstr "輸出緩衝區不足以存儲一個分詞"
 
@@ -198,12 +198,12 @@ msgstr "      從input_file讀取數據。\n"
 msgid "      Write converted data to output_file.\n"
 msgstr "      將生成的辭典寫入output_file。\n"
 
-#: src/tools/opencc_dict.c:381
+#: src/tools/opencc_dict.c:385
 #, c-format
 msgid "Please specify input file using -i.\n"
 msgstr "請使用-i指定輸入文件。\n"
 
-#: src/tools/opencc_dict.c:388
+#: src/tools/opencc_dict.c:392
 #, c-format
 msgid "Please specify output file using -o.\n"
 msgstr "請使用-o指定輸入文件。\n"

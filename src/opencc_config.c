@@ -39,8 +39,6 @@ static int parse_add_dict(config_desc * cd, const char * dictstr)
 	while (*pstr != '\0' && *pstr !=' ')
 		pstr ++;
 
-	size_t dict_type_len = pstr - dictstr;
-
 	opencc_dictionary_type dict_type;
 
 	if (strncmp(dictstr, CONFIG_DICT_TYPE_OCD, sizeof(CONFIG_DICT_TYPE_OCD) - 1) == 0)
@@ -53,7 +51,7 @@ static int parse_add_dict(config_desc * cd, const char * dictstr)
 		return -1;
 	}
 
-	while (*pstr != '\0' && *pstr == ' ' || *pstr == '\t')
+	while (*pstr != '\0' && (*pstr == ' ' || *pstr == '\t'))
 		pstr ++;
 
 	size_t i = cd->dicts_count ++;
@@ -195,6 +193,7 @@ static int parse(config_desc * cd, const char * filename)
 	}
 
 	fclose(fp);
+	return 0;
 }
 
 opencc_dictionary * config_get_dictionary(config_t ct, size_t * dict_count)

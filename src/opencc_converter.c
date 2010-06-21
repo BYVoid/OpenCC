@@ -219,13 +219,13 @@ static size_t agspseg(opencc_converter_description * cd,
 	return inbuf_left_start - *inbuf_left;
 }
 
+#if 0
 static size_t mmseg(opencc_converter_description * cd,
 		wchar_t ** inbuf, size_t * inbuf_left,
 		wchar_t ** outbuf, size_t * outbuf_left)
 {
 	/* 正向最大分詞 */
 	size_t inbuf_left_start = *inbuf_left;
-	wchar_t * ous = *outbuf;
 
 	for (; **inbuf && *inbuf_left > 0 && *outbuf_left > 0;)
 	{
@@ -260,6 +260,7 @@ static size_t mmseg(opencc_converter_description * cd,
 
 	return inbuf_left_start - *inbuf_left;
 }
+#endif
 
 size_t converter_convert(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbuf_left,
 		wchar_t ** outbuf, size_t * outbuf_left)

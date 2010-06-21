@@ -76,6 +76,7 @@ Open Chinese Convert (OpenCC)
     Version                     $VERSION
 
 Build options:
+    General C Build Flags       $CFLAGS
     Install prefix              $prefix
 
 Use make && make install to install.

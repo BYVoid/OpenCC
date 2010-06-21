@@ -123,11 +123,11 @@ int main(int argc, char ** argv)
 		{
 		case 'v':
 			show_version();
-			return;
+			return 0;
 		case 'h':
 		case '?':
 			show_usage();
-			return;
+			return 0;
 		case '-':
 			if (strcmp(optarg, "version") == 0)
 				show_version();
@@ -135,7 +135,7 @@ int main(int argc, char ** argv)
 				show_usage();
 			else
 				show_usage();
-			return;
+			return 0;
 		case 'i':
 			input_file = mstrcpy(optarg);
 			break;

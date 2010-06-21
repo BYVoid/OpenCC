@@ -45,7 +45,6 @@ int load_dict_mmap(datrie_dictionary * dd, FILE * fp)
 		return -1;
 	}
 
-	static char header_buff[sizeof(OPENCC_DICHEADER)];
 	size_t header_len = strlen(OPENCC_DICHEADER);
 
 	if (strncmp((const char *)dd->mmap_origin, OPENCC_DICHEADER, header_len) != 0)
@@ -65,13 +64,15 @@ int load_dict_mmap(datrie_dictionary * dd, FILE * fp)
 	offset += sizeof(size_t);
 
 	size_t lexicon_size = dd->lexicon_length * sizeof(wchar_t);
-	size_t dat_size = dd->dat_item_count * sizeof(DoubleArrayTrieItem);
+	/* size_t dat_size = dd->dat_item_count * sizeof(DoubleArrayTrieItem); */
 
 	dd->lexicon = (wchar_t *) (dd->mmap_origin + offset);
 
 	offset += lexicon_size;
 
 	dd->dat = (DoubleArrayTrieItem * ) (dd->mmap_origin + offset);
+
+	return 0;
 }
 
 int unload_dict_mmap(datrie_dictionary * dd)
@@ -115,6 +116,7 @@ int dict_datrie_close(dict_ptr dp)
 	}
 
 	free(dd);
+	return 0;
 }
 
 int encode_char(wchar_t ch)

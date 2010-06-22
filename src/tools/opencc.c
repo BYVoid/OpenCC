@@ -112,10 +112,11 @@ int main(int argc, char ** argv)
 {
 	static int oc;
 	static char *input_file, *output_file, *config_file;
-	
+
+#ifdef HAVE_GETTEXT
 	setlocale(LC_ALL, "");
 	bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
-	textdomain(GETTEXT_PACKAGE);
+#endif
 
 	while((oc = getopt(argc, argv, "vh-:i:o:c:")) != -1)
 	{

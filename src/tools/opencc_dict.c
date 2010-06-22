@@ -21,12 +21,6 @@
 #include "dictionary/opencc_dictionary_datrie.h"
 #include <unistd.h>
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#else
-#define VERSION "Unknown"
-#endif
-
 #define DATRIE_SIZE 1000000
 #define DATRIE_WORD_MAX_COUNT 500000
 #define DATRIE_WORD_MAX_LENGTH 32
@@ -346,9 +340,10 @@ int main(int argc, char ** argv)
 	static char input_file[BUFFER_SIZE], output_file[BUFFER_SIZE];
 	int input_file_specified = FALSE, output_file_specified = FALSE;
 
+#ifdef HAVE_GETTEXT
 	setlocale(LC_ALL, "");
 	bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
-	textdomain(GETTEXT_PACKAGE);
+#endif
 
 	while((oc = getopt(argc, argv, "vh-:i:o:")) != -1)
 	{

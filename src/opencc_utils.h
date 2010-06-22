@@ -25,14 +25,21 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include <libintl.h>
-#include <locale.h>
-
 #define FALSE (0)
 #define TRUE (!(0))
 #define INFINITY_INT ((~0U)>>1)
 
-#define _(STR) gettext(STR)
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
+
+#ifdef HAVE_GETTEXT
+#	include <libintl.h>
+#	include <locale.h>
+#	define _(STRING) dgettext(PACKAGE,STRING)
+#else
+#	define _(STRING) STRING
+#endif
 
 #define debug_should_not_be_here() \
 	do { \

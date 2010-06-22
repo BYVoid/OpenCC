@@ -22,17 +22,29 @@
 #include "opencc_encoding.h"
 #include "opencc_utils.h"
 
-static opencc_error errno = OPENCC_ERROR_VOID;
-
 typedef struct
 {
 	opencc_dictionary_t dicts;
 	opencc_converter_t converter;
 } opencc_description;
 
+static opencc_error errno = OPENCC_ERROR_VOID;
+static int lib_initialized = FALSE;
+
+static void lib_initialize(void)
+{
+#ifdef HAVE_GETTEXT
+	bindtextdomain(PACKAGE, LOCALEDIR);
+#endif
+	lib_initialized = TRUE;
+}
+
 size_t opencc_convert(opencc_t odt, wchar_t ** inbuf, size_t * inbuf_left,
 		wchar_t ** outbuf, size_t * outbuf_left)
 {
+	if (!lib_initialized)
+		lib_initialize();
+
 	opencc_description * od = (opencc_description *) odt;
 
 	size_t retval = converter_convert
@@ -46,6 +58,9 @@ size_t opencc_convert(opencc_t odt, wchar_t ** inbuf, size_t * inbuf_left,
 
 char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 {
+	if (!lib_initialized)
+		lib_initialize();
+
 	if (length == (size_t) -1 || length > strlen(inbuf))
 		length = strlen(inbuf);
 
@@ -131,6 +146,9 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 
 opencc_t opencc_open(const char * config_file)
 {
+	if (!lib_initialized)
+		lib_initialize();
+
 	opencc_description * od;
 	od = (opencc_description *) malloc(sizeof(opencc_description));
 
@@ -176,6 +194,9 @@ opencc_t opencc_open(const char * config_file)
 
 int opencc_close(opencc_t odt)
 {
+	if (!lib_initialized)
+		lib_initialize();
+
 	opencc_description * od = (opencc_description *) odt;
 
 	converter_close(od->converter);
@@ -189,6 +210,9 @@ int opencc_close(opencc_t odt)
 int opencc_dict_load(opencc_t odt, const char * dict_filename,
 		opencc_dictionary_type dict_type)
 {
+	if (!lib_initialized)
+		lib_initialize();
+
 	opencc_description * od = (opencc_description *) odt;
 
 	int retval;
@@ -213,11 +237,17 @@ int opencc_dict_load(opencc_t odt, const char * dict_filename,
 
 opencc_error opencc_errno(void)
 {
+	if (!lib_initialized)
+		lib_initialize();
+
 	return errno;
 }
 
 void opencc_perror(const char * spec)
 {
+	if (!lib_initialized)
+		lib_initialize();
+
 	perr(spec);
 	perr("\n");
 	switch (errno)

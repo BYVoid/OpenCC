@@ -27,7 +27,10 @@ m4_define(opencc_maybe_datestamp,
 m4_define([opencc_version],
 	opencc_major_version.opencc_minor_version.opencc_micro_version[]opencc_maybe_datestamp)
 
-AC_INIT([package_name], [opencc_version], [http://code.google.com/p/open-chinese-convert/issues/entry], [package_name])
+m4_define([package_url], [http://code.google.com/p/open-chinese-convert])
+m4_define([package_url_bugreport], [http://code.google.com/p/open-chinese-convert/issues/entry])
+
+AC_INIT([package_name], [opencc_version], [package_url_bugreport], [package_name], [package_url])
 AM_INIT_AUTOMAKE([1.10])
 AC_GNU_SOURCE
 
@@ -35,7 +38,6 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
-# define PACKAGE_VERSION_* variables
 AS_VERSION
 AS_NANO
 AM_SANITY_CHECK
@@ -43,17 +45,12 @@ AM_MAINTAINER_MODE
 AM_DISABLE_STATIC
 AC_PROG_CC
 AM_PROG_CC_C_O
-# AC_PROG_CXX
+AC_PROG_RANLIB
 AC_ISC_POSIX
 AC_HEADER_STDC
 AM_PROG_LIBTOOL
-# IT_PROG_INTLTOOL([0.35.0])
 
-
-# define GETTEXT_* variables
-GETTEXT_PACKAGE="$PACKAGE_NAME"
-AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE,"$GETTEXT_PACKAGE", [Define to the read-only architecture-independent data directory.])
-
+# define GETTEXT
 AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION(0.16.1)
 
@@ -75,8 +72,8 @@ Open Chinese Convert (OpenCC)
     Version                     $VERSION
 
 Build options:
-    General C Build Flags       $CFLAGS
+    C Build Flags               $CFLAGS
     Install prefix              $prefix
 
-Use make && make install to install.
+Use "make && make install" to install.
 ])

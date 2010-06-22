@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: opencc 0.0.3.20100621\n"
 "Report-Msgid-Bugs-To: http://code.google.com/p/open-chinese-convert/issues/"
 "entry\n"
-"POT-Creation-Date: 2010-06-21 20:32+0800\n"
+"POT-Creation-Date: 2010-06-22 16:39+0800\n"
 "PO-Revision-Date: 2010-06-21 17:04+0800\n"
 "Last-Translator: BYVoid <byvoid.kcp@gmail.com>\n"
 "Language-Team: Chinese (Hong Kong) <>\n"
@@ -16,19 +16,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/opencc.c:228 src/tools/opencc_dict.c:242
+#: src/opencc.c:258 src/tools/opencc_dict.c:236
 msgid "Dictionary loading error"
 msgstr "辭典讀取錯誤"
 
-#: src/opencc.c:231
+#: src/opencc.c:261
 msgid "Configuration error"
 msgstr "配置錯誤"
 
-#: src/opencc.c:234
+#: src/opencc.c:264
 msgid "Converter error"
 msgstr "轉換器錯誤"
 
-#: src/opencc.c:237 src/opencc_config.c:234 src/opencc_converter.c:337
+#: src/opencc.c:267 src/opencc_config.c:234 src/opencc_converter.c:337
 #: src/opencc_dictionary.c:212
 msgid "Unknown"
 msgstr "未知"
@@ -74,7 +74,7 @@ msgstr "OpenCC初始化錯誤"
 msgid "Can not read file: %s\n"
 msgstr "無法讀取文件：%s\n"
 
-#: src/tools/opencc.c:63 src/tools/opencc_dict.c:272
+#: src/tools/opencc.c:63 src/tools/opencc_dict.c:266
 #, c-format
 msgid "Can not write file: %s\n"
 msgstr "無法寫入文件： %s\n"
@@ -96,7 +96,7 @@ msgstr ""
 "版本 %s\n"
 "\n"
 
-#: src/tools/opencc.c:94 src/tools/opencc_dict.c:333
+#: src/tools/opencc.c:94 src/tools/opencc_dict.c:327
 #, c-format
 msgid "Usage:\n"
 msgstr "使用方法：\n"
@@ -110,7 +110,7 @@ msgstr ""
 "  opencc [-i input_file] [-o output_file] [-c config_file]\n"
 "\n"
 
-#: src/tools/opencc.c:96 src/tools/opencc_dict.c:335
+#: src/tools/opencc.c:96 src/tools/opencc_dict.c:329
 #, c-format
 msgid "    -i input_file\n"
 msgstr "    -i input_file\n"
@@ -120,7 +120,7 @@ msgstr "    -i input_file\n"
 msgid "      Read original text from input_file.\n"
 msgstr "      從 input_file 讀取原始文本。\n"
 
-#: src/tools/opencc.c:98 src/tools/opencc_dict.c:337
+#: src/tools/opencc.c:98 src/tools/opencc_dict.c:331
 #, c-format
 msgid "    -o output_file\n"
 msgstr "    -o output_file\n"
@@ -141,8 +141,8 @@ msgid "      Load dictionary configuration from config_file.\n"
 msgstr "      從config_file讀取配置。\n"
 
 #: src/tools/opencc.c:102 src/tools/opencc.c:107 src/tools/opencc.c:108
-#: src/tools/opencc_dict.c:243 src/tools/opencc_dict.c:339
-#: src/tools/opencc_dict.c:340
+#: src/tools/opencc_dict.c:237 src/tools/opencc_dict.c:333
+#: src/tools/opencc_dict.c:334
 #, c-format
 msgid "\n"
 msgstr "\n"
@@ -166,7 +166,7 @@ msgstr ""
 msgid "    Default configuration(%s) will be load if config_file is not set.\n"
 msgstr "    如果沒有設置config_file，則會讀取默認配置文件(%s)。\n"
 
-#: src/tools/opencc_dict.c:327
+#: src/tools/opencc_dict.c:321
 #, c-format
 msgid ""
 "\n"
@@ -179,7 +179,7 @@ msgstr ""
 "版本 %s\n"
 "\n"
 
-#: src/tools/opencc_dict.c:334
+#: src/tools/opencc_dict.c:328
 #, c-format
 msgid ""
 "  opencc_dict -i input_file -o output_file\n"
@@ -188,22 +188,22 @@ msgstr ""
 "  opencc_dict -i input_file -o output_file\n"
 "\n"
 
-#: src/tools/opencc_dict.c:336
+#: src/tools/opencc_dict.c:330
 #, c-format
 msgid "      Read data from input_file.\n"
 msgstr "      從input_file讀取數據。\n"
 
-#: src/tools/opencc_dict.c:338
+#: src/tools/opencc_dict.c:332
 #, c-format
 msgid "      Write converted data to output_file.\n"
 msgstr "      將生成的辭典寫入output_file。\n"
 
-#: src/tools/opencc_dict.c:385
+#: src/tools/opencc_dict.c:380
 #, c-format
 msgid "Please specify input file using -i.\n"
 msgstr "請使用-i指定輸入文件。\n"
 
-#: src/tools/opencc_dict.c:392
+#: src/tools/opencc_dict.c:387
 #, c-format
 msgid "Please specify output file using -o.\n"
 msgstr "請使用-o指定輸入文件。\n"

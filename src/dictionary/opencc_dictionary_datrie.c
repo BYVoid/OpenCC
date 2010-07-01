@@ -17,7 +17,15 @@
 */
 
 #include "opencc_dictionary_datrie.h"
+#include <unistd.h>
+#include <fcntl.h>
 #include <sys/mman.h>
+
+typedef enum
+{
+	MEMORY_TYPE_MMAP,
+	MEMORY_TYPE_ALLOCATE
+} memory_type;
 
 typedef struct
 {
@@ -26,28 +34,58 @@ typedef struct
 	const wchar_t * lexicon;
 	size_t lexicon_length;
 
-	void * mmap_origin;
-	size_t mmap_size;
+	void * dic_memory;
+	size_t dic_size;
+	memory_type dic_memory_type;
 
 } datrie_dictionary;
 
-int load_dict_mmap(datrie_dictionary * dd, FILE * fp)
+static int load_allocate(datrie_dictionary * dd, int fd)
+{
+	dd->dic_memory_type = MEMORY_TYPE_ALLOCATE;
+	dd->dic_memory = malloc(dd->dic_size);
+	if (dd->dic_memory == NULL)
+	{
+		/* 內存申請失敗 */
+		return -1;
+	}
+	lseek(fd, 0, SEEK_SET);
+	read(fd, dd->dic_memory, dd->dic_size);
+	return 0;
+}
+
+static int load_mmap(datrie_dictionary * dd, int fd)
+{
+	dd->dic_memory_type = MEMORY_TYPE_MMAP;
+	dd->dic_memory = mmap (NULL, dd->dic_size, PROT_READ, MAP_PRIVATE, fd, 0);
+	if (dd->dic_memory == MAP_FAILED)
+	{
+		/* 內存映射創建失敗 */
+		dd->dic_memory = NULL;
+		return -1;
+	}
+	return 0;
+}
+
+static int load_dict(datrie_dictionary * dd, FILE * fp)
 {
 	int fd = fileno(fp);
 
 	fseek(fp, 0, SEEK_END);
-	dd->mmap_size = ftell(fp);
+	dd->dic_size = ftell(fp);
 
-	dd->mmap_origin = mmap (NULL, dd->mmap_size, PROT_READ, MAP_PRIVATE, fd, 0);
-	if (dd->mmap_origin == MAP_FAILED)
+	/* 首先嘗試mmap，如果失敗嘗試申請內存 */
+	if (load_mmap(dd, fd) == -1)
 	{
-		/* TODO 內存映射創建失敗 */
-		return -1;
+		if (load_allocate(dd, fd) == -1)
+		{
+			return -1;
+		}
 	}
 
 	size_t header_len = strlen(OPENCC_DICHEADER);
 
-	if (strncmp((const char *)dd->mmap_origin, OPENCC_DICHEADER, header_len) != 0)
+	if (strncmp((const char *)dd->dic_memory, OPENCC_DICHEADER, header_len) != 0)
 	{
 		/* TODO 文件頭校驗失敗 */
 		return -1;
@@ -57,31 +95,40 @@ int load_dict_mmap(datrie_dictionary * dd, FILE * fp)
 
 	offset += header_len * sizeof(char);
 
-	dd->lexicon_length = *((size_t *) (dd->mmap_origin + offset));
+	dd->lexicon_length = *((size_t *) (dd->dic_memory + offset));
 	offset += sizeof(size_t);
 
-	dd->dat_item_count = *((size_t *) (dd->mmap_origin + offset));
+	dd->dat_item_count = *((size_t *) (dd->dic_memory + offset));
 	offset += sizeof(size_t);
 
 	size_t lexicon_size = dd->lexicon_length * sizeof(wchar_t);
 	/* size_t dat_size = dd->dat_item_count * sizeof(DoubleArrayTrieItem); */
 
-	dd->lexicon = (wchar_t *) (dd->mmap_origin + offset);
+	dd->lexicon = (wchar_t *) (dd->dic_memory + offset);
 
 	offset += lexicon_size;
 
-	dd->dat = (DoubleArrayTrieItem * ) (dd->mmap_origin + offset);
+	dd->dat = (DoubleArrayTrieItem * ) (dd->dic_memory + offset);
 
 	return 0;
 }
 
-int unload_dict_mmap(datrie_dictionary * dd)
+static int unload_dict(datrie_dictionary * dd)
 {
-	if (dd->mmap_origin != NULL && dd->mmap_origin != MAP_FAILED &&
-			munmap(dd->mmap_origin, dd->mmap_size) == -1)
+	if (dd->dic_memory != NULL)
 	{
-		/* 內存映射撤銷失敗 */
-		return -1;
+		if (MEMORY_TYPE_MMAP == dd->dic_memory_type)
+		{
+			return munmap(dd->dic_memory, dd->dic_size);
+		}
+		else if (MEMORY_TYPE_ALLOCATE == dd->dic_memory_type)
+		{
+			free(dd->dic_memory);
+		}
+		else
+		{
+			return -1;
+		}
 	}
 	return 0;
 }
@@ -94,7 +141,7 @@ dict_ptr dict_datrie_open(const char * filename)
 
 	FILE * fp = fopen(filename, "rb");
 
-	if (load_dict_mmap(dd, fp) == -1)
+	if (load_dict(dd, fp) == -1)
 	{
 		dict_datrie_close((dict_ptr) dd);
 		return (dict_ptr) -1;
@@ -109,7 +156,7 @@ int dict_datrie_close(dict_ptr dp)
 {
 	datrie_dictionary * dd = (datrie_dictionary *) dp;
 
-	if (unload_dict_mmap(dd) == -1)
+	if (unload_dict(dd) == -1)
 	{
 		free(dd);
 		return -1;

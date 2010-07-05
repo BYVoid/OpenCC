@@ -24,6 +24,12 @@
  */
 #ifdef __cplusplus
 
+extern "C" {
+
+#include <opencc.h>
+
+}
+
 #include <string>
 #include <cstdlib>
 

@@ -50,7 +50,11 @@ static int load_allocate(datrie_dictionary * dd, int fd)
 		return -1;
 	}
 	lseek(fd, 0, SEEK_SET);
-	read(fd, dd->dic_memory, dd->dic_size);
+	if (read(fd, dd->dic_memory, dd->dic_size) == -1)
+	{
+		/* 讀取失敗 */
+		return -1;
+	}
 	return 0;
 }
 

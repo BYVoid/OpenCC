@@ -112,7 +112,12 @@ static size_t sp_seg(opencc_converter_description * cd, wchar_t ** inbuf, size_t
 			size_t k = ossb->match_length[j];
 			ossb->match_length[j] = 0;
 			
-			if (ossb->min_len[i] + 1 <= ossb->min_len[i + k])
+			if (k > 1 && ossb->min_len[i] + 1 <= ossb->min_len[i + k])
+			{
+				ossb->min_len[i + k] = ossb->min_len[i] + 1;
+				ossb->parent[i + k] = i;
+			}
+			else if (k == 1 && ossb->min_len[i] + 1 < ossb->min_len[i + k])
 			{
 				ossb->min_len[i + k] = ossb->min_len[i] + 1;
 				ossb->parent[i + k] = i;

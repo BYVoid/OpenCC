@@ -104,12 +104,4 @@ void opencc_perror(const char * spec);
 };
 #endif
 
-/**
- * c++ wrapper for opencc
- */
-
-#ifdef __cplusplus
-#include "openccxx.h"
-#endif
-
 #endif /* __OPENCC_H_ */

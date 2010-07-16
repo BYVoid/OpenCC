@@ -24,6 +24,12 @@
  */
 #ifdef __cplusplus
 
+extern "C" {
+
+#include <opencc.h>
+
+}
+
 #include <string>
 #include <cstdlib>
 
@@ -49,9 +55,9 @@ public:
 			opencc_close(od);
 	}
 
-	operator int() const
+	operator bool() const
 	{
-		return (int) od;
+		return od != (opencc_t) -1;
 	}
 
 	int open(const char * config_file)
@@ -106,7 +112,7 @@ public:
 
 			retval = opencc_convert (od, (wchar_t **)&inbuf,
 						&inbuf_left, &outbuf, &outbuf_left);
-			if (retval == -1)
+			if (retval == (size_t) -1)
 				return -1;
 			count += retval;
 		}

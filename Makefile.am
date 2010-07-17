@@ -42,20 +42,11 @@ DISTCLEANFILES = \
 	$(NULL)
 
 rpm: dist @PACKAGE_NAME@.spec
-	rpmbuild -bb \
+	rpmbuild -ba --clean \
 	--define "_sourcedir `pwd`" \
-	--define "_builddir `pwd`/rpm" \
-	--define "_srcrpmdir `pwd`/rpm" \
-	--define "_rpmdir `pwd`"/rpm \
-	--define "_specdir `pwd`/rpm" \
-	@PACKAGE_NAME@.spec
-
-srpm: dist @PACKAGE_NAME@.spec
-	rpmbuild -bs \
-	--define "_sourcedir `pwd`" \
-	--define "_builddir `pwd`/rpm" \
-	--define "_srcrpmdir `pwd`/rpm" \
-	--define "_rpmdir `pwd`/rpm" \
-	--define "_specdir `pwd`/rpm" \
+	--define "_builddir `pwd`/package/rpm" \
+	--define "_srcrpmdir `pwd`/package/rpm" \
+	--define "_rpmdir `pwd`/package/rpm" \
+	--define "_specdir `pwd`/package/rpm" \
 	@PACKAGE_NAME@.spec
 

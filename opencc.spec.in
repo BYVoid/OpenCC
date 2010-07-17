@@ -9,30 +9,40 @@ Source0:    http://open-chinese-convert.googlecode.com/files/%{name}-%{version}.
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
+Requires:   %{name}-libs = %{version}-%{release}
+
 %description
-The open Chinese convert.
+OpenCC - Simplified-Traditional Chinese Conversion Library Command Line Tools.
+
+
+%package libs
+Summary:    Runtime library for OpenCC
+Group:      Development/Libraries
+
+%description libs
+OpenCC - Simplified-Traditional Chinese Conversion Library.
+
 
 %package devel
-Summary:    Development tools for opencc
+Summary:    Development tools for OpenCC
 Group:      Development/Libraries
-Requires:   %{name} = %{version}-%{release}
+Requires:   %{name}-libs = %{version}-%{release}
 
 %description devel
-Development tools for opencc.
+Development tools for OpenCC.
+
 
 %prep
 %setup -q
 
 %build
-%configure --disable-static
-make %{?_smp_mflags}
+%configure --enable-static --enable-shared
+make %{?_smp_mflags} -j -s V=0
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make DESTDIR=${RPM_BUILD_ROOT} install
+make DESTDIR=${RPM_BUILD_ROOT} install -s
 rm -f $RPM_BUILD_ROOT%{_libdir}/libopencc.la
-
-# %find_lang %{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -40,17 +50,22 @@ rm -rf $RPM_BUILD_ROOT
 %post
 
 %files
-# -f %{name}.lang
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README
 %{_bindir}/*
-%{_libdir}/libopencc.so.*
+%{_datadir}/man/*
+
+%files libs
+%{_libdir}/lib*.so.*
+%{_datadir}/opencc/*
+%{_datadir}/locale/*
 
 %files devel
-%{_libdir}/libopencc.so
-%{_includedir}/opencc
-%{_libdir}/pkgconfig/opencc.pc
+%{_includedir}/*
+%{_libdir}/*.a
+%{_libdir}/*.so
+%{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Fri Aug 08 2008 Peng Huang <shawn.p.huang@gmail.com> - @VERSION@-1
-- The first version.
+* Fri Jul 16 2010 BYVoid <byvoid.kcp@gmail.com> - 0.0.4-1
+- Initial release of RPM.

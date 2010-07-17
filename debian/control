@@ -1,0 +1,41 @@
+Source: opencc
+Priority: optional
+Maintainer: IME Packaging Team <pkg-ime-devel@lists.alioth.debian.org> 
+Uploaders: LI Daobing <lidaobing@debian.org>, BYVoid <byvoid.kcp@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~), autotools-dev
+Standards-Version: 3.9.0
+Section: libs
+Homepage: http://code.google.com/p/open-chinese-convert
+Vcs-Bzr: lp:~pkg-ime/opencc/debian-opencc
+Vcs-Browser: https://code.launchpad.net/~pkg-ime/opencc/debian-opencc
+
+Package: libopencc-dev
+Section: libdevel
+Architecture: any
+Depends: libopencc0 (= ${binary:Version}), ${misc:Depends}
+Description: Simplified-Traditional Chinese Conversion Library - Development
+ OpenCC is a library for converting text between traditional Chinese and
+ simplified Chinese. 
+ .
+ This package includes the development support files.
+
+Package: libopencc0
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: opencc (= ${binary:Version})
+Description: Simplified-Traditional Chinese Conversion Library - Runtime
+ OpenCC is a library for converting text between traditional Chinese and
+ simplified Chinese. 
+ .
+ This package includes the shared library.
+
+Package: opencc
+Section: utils
+Architecture: any
+Depends: libopencc0 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Simplified-Traditional Chinese Conversion Command Line Tool
+ OpenCC is a library for converting text between traditional Chinese and
+ simplified Chinese. 
+ .
+ This package includes the conversion tool.

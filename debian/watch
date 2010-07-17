@@ -1,0 +1,4 @@
+version=3
+opts=downloadurlmangle=s#.*(opencc-([\d.]+)\.tar\.gz).*#http://open-chinese-convert.googlecode.com/files/$1#,\
+filenamemangle=s#.*(opencc-([\d.]+)\.tar\.gz).*#$1# \
+	http://code.google.com/p/open-chinese-convert/downloads/list ^.*detail\?name=opencc-([\d.]+)\.tar\.gz.*

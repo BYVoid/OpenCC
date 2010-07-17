@@ -1,0 +1,28 @@
+opencc (0.0.4-1) lucid; urgency=low
+
+  * New upstream release.
+  * debian/control: update descpription.
+  * debian/copyright: update packager.
+
+ -- BYVoid <byvoid.kcp@gmail.com>  Fri, 16 Jul 2010 16:22:10 +0800
+
+opencc (0.0.4~pre.1-1~ppa1) lucid; urgency=low
+
+  * New upstream release.
+  * debian/control: bump standards version to 3.9.0.
+
+ -- LI Daobing <lidaobing@debian.org>  Mon, 05 Jul 2010 19:28:10 +0800
+
+opencc (0.0.3-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/opencc.install: updated.
+  * debian/control: opencc depends on libopencc0 at the same version. 
+
+ -- LI Daobing <lidaobing@debian.org>  Tue, 22 Jun 2010 19:08:33 +0800
+
+opencc (0.0.2-1) unstable; urgency=low
+
+  * Initial release (Closes: #585621)
+
+ -- LI Daobing <lidaobing@debian.org>  Sat, 19 Jun 2010 18:27:20 +0800

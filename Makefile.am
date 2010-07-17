@@ -50,3 +50,17 @@ rpm: dist @PACKAGE_NAME@.spec
 	--define "_specdir `pwd`/package/rpm" \
 	@PACKAGE_NAME@.spec
 
+deb: dist debian
+	$(AM_V_GEN) \
+	( \
+		mkdir -p package/deb ;\
+		cd package/deb ;\
+		rm -rf * ;\
+		tar xf ../../$(distdir).tar.gz ;\
+		cd $(distdir) ;\
+		cp -r ../../../debian . ;\
+		dpkg-buildpackage -rfakeroot -tc -S ;\
+		dpkg-buildpackage -rfakeroot -tc ;\
+		cd .. ;\
+		rm -rf opencc-0.0.4 ;\
+	)

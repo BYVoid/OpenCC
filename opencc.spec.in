@@ -2,14 +2,13 @@ Name:       @PACKAGE_NAME@
 Version:    @PACKAGE_VERSION@
 Release:    1%{?dist}
 Summary:    Simplified-Traditional Chinese Conversion
-License:    Apache License
+License:    Apache Software License 2.0
 Group:      System Environment/Libraries
 URL:        http://code.google.com/p/open-chinese-convert/
 Source0:    http://open-chinese-convert.googlecode.com/files/%{name}-%{version}.tar.gz
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:  gettext-devel
-BuildRequires:  intltool
+BuildRequires:  gettext
 BuildRequires:  libtool
 BuildRequires:  pkgconfig
 
@@ -52,21 +51,25 @@ make DESTDIR=${RPM_BUILD_ROOT} install -s
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post
+%post libs -p /sbin/ldconfig
+
+%postun libs -p /sbin/ldconfig
 
 %files
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README
 %{_bindir}/*
-%{_datadir}/man/*
+%{_datadir}/man/man1/*
 
 %files libs -f %{name}.lang
 %defattr(-,root,root,-)
+%doc AUTHORS COPYING README
 %{_libdir}/lib*.so.*
 %{_datadir}/opencc/*
 
 %files devel
 %defattr(-,root,root,-)
+%doc AUTHORS COPYING README
 %{_includedir}/*
 %{_libdir}/*.a
 %{_libdir}/*.la

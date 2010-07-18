@@ -43,8 +43,8 @@
 
 #define debug_should_not_be_here() \
 	do { \
-	fprintf(stderr, "Should not be here: %d %s\n", __LINE__, __FILE__); \
-	exit(1); \
+	fprintf(stderr, "Should not be here"); \
+	assert(0); \
 	} while(0)\
 
 void perr(const char * str);

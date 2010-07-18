@@ -1,18 +1,22 @@
 Name:       @PACKAGE_NAME@
 Version:    @PACKAGE_VERSION@
 Release:    1%{?dist}
-Summary:    The Open Chinese Convert
-License:    Apache
+Summary:    Simplified-Traditional Chinese Conversion
+License:    Apache License
 Group:      System Environment/Libraries
 URL:        http://code.google.com/p/open-chinese-convert/
 Source0:    http://open-chinese-convert.googlecode.com/files/%{name}-%{version}.tar.gz
 
 BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRequires:  gettext-devel
+BuildRequires:  intltool
+BuildRequires:  libtool
+BuildRequires:  pkgconfig
 
 Requires:   %{name}-libs = %{version}-%{release}
 
 %description
-OpenCC - Simplified-Traditional Chinese Conversion Library Command Line Tools.
+OpenCC - Simplified-Traditional Chinese Conversion.
 
 
 %package libs
@@ -20,7 +24,7 @@ Summary:    Runtime library for OpenCC
 Group:      Development/Libraries
 
 %description libs
-OpenCC - Simplified-Traditional Chinese Conversion Library.
+Runtime Libraries for OpenCC.
 
 
 %package devel
@@ -42,7 +46,8 @@ make %{?_smp_mflags} -j -s V=0
 %install
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=${RPM_BUILD_ROOT} install -s
-rm -f $RPM_BUILD_ROOT%{_libdir}/libopencc.la
+
+%find_lang %{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -55,14 +60,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/*
 %{_datadir}/man/*
 
-%files libs
+%files libs -f %{name}.lang
+%defattr(-,root,root,-)
 %{_libdir}/lib*.so.*
 %{_datadir}/opencc/*
-%{_datadir}/locale/*
 
 %files devel
+%defattr(-,root,root,-)
 %{_includedir}/*
 %{_libdir}/*.a
+%{_libdir}/*.la
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 

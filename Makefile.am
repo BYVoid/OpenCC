@@ -48,6 +48,7 @@ rpm: dist @PACKAGE_NAME@.spec
 	--define "_srcrpmdir `pwd`/package/rpm" \
 	--define "_rpmdir `pwd`/package/rpm" \
 	--define "_specdir `pwd`/package/rpm" \
+	--nodeps \
 	@PACKAGE_NAME@.spec
 
 deb: dist debian

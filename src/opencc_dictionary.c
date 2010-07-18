@@ -126,7 +126,7 @@ int dict_load(opencc_dictionary_t ddt, const char * dict_filename,
 	{
 		/* 使用 PKGDATADIR 路徑 */
 		dict.filename = (char *) realloc(dict.filename,
-				sizeof(char) * (strlen(dict_filename) + strlen(PKGDATADIR) + 1));
+				sizeof(char) * (strlen(dict_filename) + strlen(PKGDATADIR) + 2));
 		sprintf(dict.filename, "%s/%s", PKGDATADIR, dict_filename);
 
 		fp = fopen(dict.filename, "rb");

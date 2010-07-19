@@ -19,7 +19,13 @@
 #include "opencc_dictionary_datrie.h"
 #include <unistd.h>
 #include <fcntl.h>
-#include <sys/mman.h>
+
+#ifdef __WIN32
+	/* Todo: Win32 mmap*/
+#else
+#	include <sys/mman.h>
+#	define MMAP_ENABLED
+#endif
 
 typedef enum
 {
@@ -60,6 +66,7 @@ static int load_allocate(datrie_dictionary * dd, int fd)
 
 static int load_mmap(datrie_dictionary * dd, int fd)
 {
+#ifdef MMAP_ENABLED
 	dd->dic_memory_type = MEMORY_TYPE_MMAP;
 	dd->dic_memory = mmap (NULL, dd->dic_size, PROT_READ, MAP_PRIVATE, fd, 0);
 	if (dd->dic_memory == MAP_FAILED)
@@ -69,6 +76,9 @@ static int load_mmap(datrie_dictionary * dd, int fd)
 		return -1;
 	}
 	return 0;
+#else
+	return -1;
+#endif
 }
 
 static int load_dict(datrie_dictionary * dd, FILE * fp)
@@ -123,7 +133,11 @@ static int unload_dict(datrie_dictionary * dd)
 	{
 		if (MEMORY_TYPE_MMAP == dd->dic_memory_type)
 		{
+		#ifdef MMAP_ENABLED
 			return munmap(dd->dic_memory, dd->dic_size);
+		#else
+			debug_should_not_be_here();
+		#endif
 		}
 		else if (MEMORY_TYPE_ALLOCATE == dd->dic_memory_type)
 		{

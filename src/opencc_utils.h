@@ -41,6 +41,12 @@
 #	define _(STRING) STRING
 #endif
 
+#ifdef __WIN32
+#	ifndef PKGDATADIR
+#		define PKGDATADIR ""
+#	endif
+#endif
+
 #define debug_should_not_be_here() \
 	do { \
 	fprintf(stderr, "Should not be here: %d %s\n", __LINE__, __FILE__); \

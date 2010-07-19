@@ -28,7 +28,7 @@ typedef struct
 	opencc_converter_t converter;
 } opencc_description;
 
-static opencc_error errno = OPENCC_ERROR_VOID;
+static opencc_error errnum = OPENCC_ERROR_VOID;
 static int lib_initialized = FALSE;
 
 static void lib_initialize(void)
@@ -51,7 +51,7 @@ size_t opencc_convert(opencc_t odt, wchar_t ** inbuf, size_t * inbuf_left,
 			(od->converter, inbuf, inbuf_left, outbuf, outbuf_left);
 
 	if (retval == (size_t) -1)
-		errno = OPENCC_ERROR_CONVERTER;
+		errnum = OPENCC_ERROR_CONVERTER;
 
 	return retval;
 }
@@ -69,7 +69,7 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 	if (winbuf == (wchar_t *) -1)
 	{
 		/* 輸入數據轉換失敗 */
-		errno = OPENCC_ERROR_ENCODIND;
+		errnum = OPENCC_ERROR_ENCODIND;
 		return (char *) -1;
 	}
 
@@ -110,7 +110,7 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 			free(outbuf);
 			free(winbuf);
 			free(woutbuf);
-			errno = OPENCC_ERROR_ENCODIND;
+			errnum = OPENCC_ERROR_ENCODIND;
 			return (char *) -1;
 		}
 
@@ -166,7 +166,7 @@ opencc_t opencc_open(const char * config_file)
 
 		if (ct == (config_t) -1)
 		{
-			errno = OPENCC_ERROR_CONFIG;
+			errnum = OPENCC_ERROR_CONFIG;
 			return (opencc_t) -1;
 		}
 
@@ -181,7 +181,7 @@ opencc_t opencc_open(const char * config_file)
 			{
 				opencc_close((opencc_t) od);
 				config_close(ct);
-				errno = OPENCC_ERROR_DICTLOAD;
+				errnum = OPENCC_ERROR_DICTLOAD;
 				return (opencc_t) -1;
 			}
 		}
@@ -235,12 +235,12 @@ int opencc_dict_load(opencc_t odt, const char * dict_filename,
 	return retval;
 }
 
-opencc_error opencc_errno(void)
+opencc_error opencc_errnum(void)
 {
 	if (!lib_initialized)
 		lib_initialize();
 
-	return errno;
+	return errnum;
 }
 
 void opencc_perror(const char * spec)
@@ -250,7 +250,7 @@ void opencc_perror(const char * spec)
 
 	perr(spec);
 	perr("\n");
-	switch (errno)
+	switch (errnum)
 	{
 	case OPENCC_ERROR_VOID:
 		break;

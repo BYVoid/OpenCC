@@ -32,7 +32,7 @@ wchar_t * utf8_to_wcs(const char * inbuf, size_t inbuf_len)
 		return (wchar_t *) -1;
 	}
 	
-	char * pinbuf = (char *) inbuf;
+	const char * pinbuf = (char *) inbuf;
 	size_t insize = strlen(inbuf);
 	if (inbuf_len < insize)
 		insize = inbuf_len;
@@ -78,7 +78,7 @@ char * wcs_to_utf8(const wchar_t * inbuf, size_t inbuf_len)
 		return (char *) -1;
 	}
 	
-	char * pinbuf = (char *) inbuf;
+	const char * pinbuf = (char *) inbuf;
 	size_t insize = wcslen(inbuf);
 	if (inbuf_len < insize)
 		insize = inbuf_len;

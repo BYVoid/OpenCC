@@ -19,7 +19,7 @@
 #include "opencc_dictionary.h"
 #include "dictionary/opencc_dictionary_abstract.h"
 
-static dictionary_error errno = DICTIONARY_ERROR_VOID;
+static dictionary_error errnum = DICTIONARY_ERROR_VOID;
 
 const wchar_t * dict_match_longest(opencc_dictionary_t ddt, const wchar_t * word,
 		size_t length)
@@ -31,7 +31,7 @@ const wchar_t * dict_match_longest(opencc_dictionary_t ddt, const wchar_t * word
 
 	if (dd->dict_count == 0)
 	{
-		errno = DICTIONARY_ERROR_NODICT;
+		errnum = DICTIONARY_ERROR_NODICT;
 		return (const wchar_t *) -1;
 	}
 
@@ -64,7 +64,7 @@ size_t dict_get_all_match_lengths(opencc_dictionary_t ddt, const wchar_t * word,
 
 	if (dd->dict_count == 0)
 	{
-		errno = DICTIONARY_ERROR_NODICT;
+		errnum = DICTIONARY_ERROR_NODICT;
 		return (size_t) -1;
 	}
 
@@ -97,7 +97,7 @@ size_t dict_get_lexicon(opencc_dictionary_t ddt, opencc_entry * lexicon)
 
 	if (dd->dict_count == 0)
 	{
-		errno = DICTIONARY_ERROR_NODICT;
+		errnum = DICTIONARY_ERROR_NODICT;
 		return (size_t) -1;
 	}
 
@@ -133,7 +133,7 @@ int dict_load(opencc_dictionary_t ddt, const char * dict_filename,
 		if (!fp)
 		{
 			free(dict.filename);
-			errno = DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE;
+			errnum = DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE;
 			return -1; /* 辭典文件無法訪問 */
 		}
 	}
@@ -145,7 +145,7 @@ int dict_load(opencc_dictionary_t ddt, const char * dict_filename,
 
 	if (dp == (dict_ptr) -1)
 	{
-		errno = DICTIONARY_ERROR_INVALID_DICT;
+		errnum = DICTIONARY_ERROR_INVALID_DICT;
 		return -1; /* 辭典讀取錯誤 */
 	}
 
@@ -186,16 +186,16 @@ opencc_dictionary_t dict_open(const char * dict_filename, opencc_dictionary_type
 	return (opencc_dictionary_t) dd;
 }
 
-dictionary_error dict_errno(void)
+dictionary_error dict_errnum(void)
 {
-	return errno;
+	return errnum;
 }
 
 void dict_perror(const char * spec)
 {
 	perr(spec);
 	perr("\n");
-	switch(errno)
+	switch(errnum)
 	{
 	case DICTIONARY_ERROR_VOID:
 		break;

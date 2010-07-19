@@ -38,7 +38,7 @@ typedef struct
 	opencc_dictionary_t dicts;
 } opencc_converter_description;
 
-static converter_error errno = CONVERTER_ERROR_VOID;
+static converter_error errnum = CONVERTER_ERROR_VOID;
 
 static void sp_seg_buffer_free(opencc_sp_seg_buffer * ossb)
 {
@@ -190,7 +190,7 @@ static size_t agspseg(opencc_converter_description * cd,
 				if (inbuf_left_start - *inbuf_left > 0)
 					return inbuf_left_start - *inbuf_left;
 				/* 空間不足 */
-				errno = CONVERTER_ERROR_OUTBUF;
+				errnum = CONVERTER_ERROR_OUTBUF;
 				return (size_t) -1;
 			}
 			start = i;
@@ -216,7 +216,7 @@ static size_t agspseg(opencc_converter_description * cd,
 			if (inbuf_left_start - *inbuf_left > 0)
 				return inbuf_left_start - *inbuf_left;
 			/* 空間不足 */
-			errno = CONVERTER_ERROR_OUTBUF;
+			errnum = CONVERTER_ERROR_OUTBUF;
 			return (size_t) -1;
 		}
 	}
@@ -250,7 +250,7 @@ static size_t mmseg(opencc_converter_description * cd,
 			{
 				if (inbuf_left_start - *inbuf_left > 0)
 					break;
-				errno = CONVERTER_ERROR_OUTBUF;
+				errnum = CONVERTER_ERROR_OUTBUF;
 				return (size_t) -1;
 			}
 
@@ -274,7 +274,7 @@ size_t converter_convert(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbu
 
 	if (cd->dicts == NULL)
 	{
-		errno = CONVERTER_ERROR_NODICT;
+		errnum = CONVERTER_ERROR_NODICT;
 		return (size_t) -1;
 	}
 
@@ -319,16 +319,16 @@ void converter_close(opencc_converter_t cdt)
 	free(cd);
 }
 
-converter_error converter_errno(void)
+converter_error converter_errnum(void)
 {
-	return errno;
+	return errnum;
 }
 
 void converter_perror(const char * spec)
 {
 	perr(spec);
 	perr("\n");
-	switch(errno)
+	switch(errnum)
 	{
 	case CONVERTER_ERROR_VOID:
 		break;

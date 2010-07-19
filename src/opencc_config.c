@@ -30,7 +30,7 @@ typedef struct
 	size_t dicts_count;
 } config_desc;
 
-static config_error errno = CONFIG_ERROR_VOID;
+static config_error errnum = CONFIG_ERROR_VOID;
 
 static int parse_add_dict(config_desc * cd, const char * dictstr)
 {
@@ -47,7 +47,7 @@ static int parse_add_dict(config_desc * cd, const char * dictstr)
 		dict_type = OPENCC_DICTIONARY_TYPE_TEXT;
 	else
 	{
-		errno = CONFIG_ERROR_INVALID_DICT_TYPE;
+		errnum = CONFIG_ERROR_INVALID_DICT_TYPE;
 		return -1;
 	}
 
@@ -90,7 +90,7 @@ static int parse_property(config_desc * cd, const char * key, const char * value
 		return 0;
 	}
 
-	errno = CONFIG_ERROR_NO_PROPERTY;
+	errnum = CONFIG_ERROR_NO_PROPERTY;
 	return -1;
 }
 
@@ -152,7 +152,7 @@ static int parse(config_desc * cd, const char * filename)
 		if (!fp)
 		{
 			free(pkg_filename);
-			errno = CONFIG_ERROR_CANNOT_ACCESS_CONFIG_FILE;
+			errnum = CONFIG_ERROR_CANNOT_ACCESS_CONFIG_FILE;
 			return -1;
 		}
 		free(pkg_filename);
@@ -176,7 +176,7 @@ static int parse(config_desc * cd, const char * filename)
 			free(key);
 			free(value);
 			fclose(fp);
-			errno = CONFIG_ERROR_PARSE;
+			errnum = CONFIG_ERROR_PARSE;
 			return -1;
 		}
 
@@ -205,16 +205,16 @@ opencc_dictionary * config_get_dictionary(config_t ct, size_t * dict_count)
 	return cd->dicts;
 }
 
-config_error config_errno(void)
+config_error config_errnum(void)
 {
-	return errno;
+	return errnum;
 }
 
 void config_perror(const char * spec)
 {
 	perr(spec);
 	perr("\n");
-	switch (errno)
+	switch (errnum)
 	{
 	case CONFIG_ERROR_VOID:
 		break;

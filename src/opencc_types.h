@@ -23,7 +23,11 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+
 typedef void * opencc_t;
+
+typedef uint32_t ucs4_t;
 
 typedef enum
 {

@@ -39,8 +39,8 @@ static void lib_initialize(void)
 	lib_initialized = TRUE;
 }
 
-size_t opencc_convert(opencc_t odt, wchar_t ** inbuf, size_t * inbuf_left,
-		wchar_t ** outbuf, size_t * outbuf_left)
+size_t opencc_convert(opencc_t odt, ucs4_t ** inbuf, size_t * inbuf_left,
+		ucs4_t ** outbuf, size_t * outbuf_left)
 {
 	if (!lib_initialized)
 		lib_initialize();
@@ -64,9 +64,9 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 	if (length == (size_t) -1 || length > strlen(inbuf))
 		length = strlen(inbuf);
 
-	/* 將輸入數據轉換爲wchar_t字符串 */
-	wchar_t * winbuf = utf8_to_wcs(inbuf, length);
-	if (winbuf == (wchar_t *) -1)
+	/* 將輸入數據轉換爲ucs4_t字符串 */
+	ucs4_t * winbuf = utf8_to_wcs(inbuf, length);
+	if (winbuf == (ucs4_t *) -1)
 	{
 		/* 輸入數據轉換失敗 */
 		errnum = OPENCC_ERROR_ENCODIND;
@@ -81,13 +81,13 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 
 	/* 設置轉換緩衝區空間 */
 	size_t wbufsize = length;
-	wchar_t * woutbuf = (wchar_t *) malloc(sizeof(wchar_t) * (wbufsize + 1));
+	ucs4_t * woutbuf = (ucs4_t *) malloc(sizeof(ucs4_t) * (wbufsize + 1));
 
-	wchar_t * pinbuf = winbuf;
-	wchar_t * poutbuf = woutbuf;
+	ucs4_t * pinbuf = winbuf;
+	ucs4_t * poutbuf = woutbuf;
 	size_t inbuf_left, outbuf_left;
 
-	inbuf_left = wcslen(winbuf);
+	inbuf_left = ucs4len(winbuf);
 	outbuf_left = wbufsize;
 
 	while (inbuf_left > 0)

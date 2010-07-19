@@ -37,7 +37,7 @@ typedef struct
 {
 	const DoubleArrayTrieItem * dat;
 	size_t dat_item_count;
-	const wchar_t * lexicon;
+	const ucs4_t * lexicon;
 	size_t lexicon_length;
 
 	void * dic_memory;
@@ -115,10 +115,10 @@ static int load_dict(datrie_dictionary * dd, FILE * fp)
 	dd->dat_item_count = *((size_t *) (dd->dic_memory + offset));
 	offset += sizeof(size_t);
 
-	size_t lexicon_size = dd->lexicon_length * sizeof(wchar_t);
+	size_t lexicon_size = dd->lexicon_length * sizeof(ucs4_t);
 	/* size_t dat_size = dd->dat_item_count * sizeof(DoubleArrayTrieItem); */
 
-	dd->lexicon = (wchar_t *) (dd->dic_memory + offset);
+	dd->lexicon = (ucs4_t *) (dd->dic_memory + offset);
 
 	offset += lexicon_size;
 
@@ -184,12 +184,12 @@ int dict_datrie_close(dict_ptr dp)
 	return 0;
 }
 
-int encode_char(wchar_t ch)
+int encode_char(ucs4_t ch)
 {
 	return (int)ch;
 }
 
-void datrie_match(const datrie_dictionary * dd, const wchar_t * word,
+void datrie_match(const datrie_dictionary * dd, const ucs4_t * word,
 		size_t *match_pos, size_t *id, size_t limit)
 {
 	size_t i, p;
@@ -208,7 +208,7 @@ void datrie_match(const datrie_dictionary * dd, const wchar_t * word,
 		*id = i;
 }
 
-const wchar_t * dict_datrie_match_longest(dict_ptr dp, const wchar_t * word,
+const ucs4_t * dict_datrie_match_longest(dict_ptr dp, const ucs4_t * word,
 		size_t length)
 {
 	datrie_dictionary * dd = (datrie_dictionary *) dp;
@@ -225,7 +225,7 @@ const wchar_t * dict_datrie_match_longest(dict_ptr dp, const wchar_t * word,
 	return dd->lexicon + dd->dat[item].word;
 }
 
-size_t dict_datrie_get_all_match_lengths(dict_ptr dp, const wchar_t * word,
+size_t dict_datrie_get_all_match_lengths(dict_ptr dp, const ucs4_t * word,
 		size_t * match_length)
 {
 	datrie_dictionary * dd = (datrie_dictionary *) dp;

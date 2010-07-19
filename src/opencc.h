@@ -71,8 +71,8 @@ int opencc_close(opencc_t od);
  * (Note: Don't forget to assign **outbuf to L'\0' after this method called.)
  *
  */
-size_t opencc_convert(opencc_t od, wchar_t ** inbuf, size_t * inbufleft,
-		wchar_t ** outbuf, size_t * outbufleft);
+size_t opencc_convert(opencc_t od, ucs4_t ** inbuf, size_t * inbufleft,
+		ucs4_t ** outbuf, size_t * outbufleft);
 
 char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length);
 

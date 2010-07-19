@@ -19,7 +19,6 @@
 #ifndef __OPENCC_CONFIG_H_
 #define __OPENCC_CONFIG_H_
 
-#include "opencc_types.h"
 #include "opencc_utils.h"
 
 typedef void * config_t;

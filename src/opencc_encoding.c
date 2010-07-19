@@ -25,7 +25,7 @@
 
 wchar_t * utf8_to_wcs(const char * inbuf, size_t inbuf_len)
 {
-	iconv_t cd = iconv_open("WCHAR_T", "UTF8");
+	iconv_t cd = iconv_open("UCS-4", "UTF-8");
 	
 	if (cd == (iconv_t) -1)
 	{
@@ -71,7 +71,7 @@ wchar_t * utf8_to_wcs(const char * inbuf, size_t inbuf_len)
 
 char * wcs_to_utf8(const wchar_t * inbuf, size_t inbuf_len)
 {
-	iconv_t cd = iconv_open("UTF8", "WCHAR_T");
+	iconv_t cd = iconv_open("UTF-8", "UCS-4");
 
 	if (cd == (iconv_t) -1)
 	{

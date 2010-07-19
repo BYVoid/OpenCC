@@ -50,7 +50,7 @@ dict_ptr dict_text_open(const char * filename)
 	static char value_buff[ENTRY_BUFF_SIZE];
 	wchar_t * wbuff;
 
-	FILE * fp = fopen(filename,"r");
+	FILE * fp = fopen(filename,"rb");
 	if (fp == NULL)
 	{
 		dict_text_close((dict_ptr) td);

@@ -16,9 +16,9 @@
 * limitations under the License.
 */
 
-#include "opencc_dictionary.h"
-#include "opencc_utils.h"
-#include "dictionary/opencc_dictionary_datrie.h"
+#include "../opencc_dictionary.h"
+#include "../opencc_utils.h"
+#include "../dictionary/opencc_dictionary_datrie.h"
 #include <unistd.h>
 
 #define DATRIE_SIZE 1000000

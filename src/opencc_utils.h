@@ -19,11 +19,12 @@
 #ifndef __OPENCC_UTILS_H_
 #define __OPENCC_UTILS_H_
 
-#include <wchar.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+
+#include "opencc_types.h"
 
 #define FALSE (0)
 #define TRUE (!(0))
@@ -39,6 +40,15 @@
 #	define _(STRING) dgettext(PACKAGE,STRING)
 #else
 #	define _(STRING) STRING
+#endif
+
+#ifdef __WIN32
+#	ifndef PKGDATADIR
+#		define PKGDATADIR ""
+#	endif
+#	ifndef VERSION
+#		define VERSION ""
+#	endif
 #endif
 
 #define debug_should_not_be_here() \

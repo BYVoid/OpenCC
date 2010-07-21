@@ -17,34 +17,35 @@
 */
 
 #include "opencc_dictionary.h"
+#include "opencc_encoding.h"
 #include "dictionary/opencc_dictionary_abstract.h"
 
-static dictionary_error errno = DICTIONARY_ERROR_VOID;
+static dictionary_error errnum = DICTIONARY_ERROR_VOID;
 
-const wchar_t * dict_match_longest(opencc_dictionary_t ddt, const wchar_t * word,
+const ucs4_t * dict_match_longest(opencc_dictionary_t ddt, const ucs4_t * word,
 		size_t length)
 {
 	opencc_dictionary_description * dd = (opencc_dictionary_description *) ddt;
 
-	const wchar_t * retvel = NULL;
+	const ucs4_t * retvel = NULL;
 	size_t match_length, max_length = 0;
 
 	if (dd->dict_count == 0)
 	{
-		errno = DICTIONARY_ERROR_NODICT;
-		return (const wchar_t *) -1;
+		errnum = DICTIONARY_ERROR_NODICT;
+		return (const ucs4_t *) -1;
 	}
 
 	int i;
 	/* 依次查找每個辭典，取得最長匹配長度 */
 	for (i = dd->dict_count - 1; i >= 0; i --)
 	{
-		const wchar_t * t_retvel =
+		const ucs4_t * t_retvel =
 				dict_abstract_match_longest(dd->dict + i, word, length);
 
 		if (t_retvel != NULL)
 		{
-			match_length = wcslen(t_retvel);
+			match_length = ucs4len(t_retvel);
 			if (match_length > max_length)
 			{
 				max_length = match_length;
@@ -56,7 +57,7 @@ const wchar_t * dict_match_longest(opencc_dictionary_t ddt, const wchar_t * word
 	return retvel;
 }
 
-size_t dict_get_all_match_lengths(opencc_dictionary_t ddt, const wchar_t * word,
+size_t dict_get_all_match_lengths(opencc_dictionary_t ddt, const ucs4_t * word,
 		size_t * match_length)
 {
 	opencc_dictionary_description * dd = (opencc_dictionary_description *) ddt;
@@ -64,7 +65,7 @@ size_t dict_get_all_match_lengths(opencc_dictionary_t ddt, const wchar_t * word,
 
 	if (dd->dict_count == 0)
 	{
-		errno = DICTIONARY_ERROR_NODICT;
+		errnum = DICTIONARY_ERROR_NODICT;
 		return (size_t) -1;
 	}
 
@@ -97,7 +98,7 @@ size_t dict_get_lexicon(opencc_dictionary_t ddt, opencc_entry * lexicon)
 
 	if (dd->dict_count == 0)
 	{
-		errno = DICTIONARY_ERROR_NODICT;
+		errnum = DICTIONARY_ERROR_NODICT;
 		return (size_t) -1;
 	}
 
@@ -126,14 +127,14 @@ int dict_load(opencc_dictionary_t ddt, const char * dict_filename,
 	{
 		/* 使用 PKGDATADIR 路徑 */
 		dict.filename = (char *) realloc(dict.filename,
-				sizeof(char) * (strlen(dict_filename) + strlen(PKGDATADIR) + 1));
+				sizeof(char) * (strlen(dict_filename) + strlen(PKGDATADIR) + 2));
 		sprintf(dict.filename, "%s/%s", PKGDATADIR, dict_filename);
 
 		fp = fopen(dict.filename, "rb");
 		if (!fp)
 		{
 			free(dict.filename);
-			errno = DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE;
+			errnum = DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE;
 			return -1; /* 辭典文件無法訪問 */
 		}
 	}
@@ -145,7 +146,7 @@ int dict_load(opencc_dictionary_t ddt, const char * dict_filename,
 
 	if (dp == (dict_ptr) -1)
 	{
-		errno = DICTIONARY_ERROR_INVALID_DICT;
+		errnum = DICTIONARY_ERROR_INVALID_DICT;
 		return -1; /* 辭典讀取錯誤 */
 	}
 
@@ -186,16 +187,16 @@ opencc_dictionary_t dict_open(const char * dict_filename, opencc_dictionary_type
 	return (opencc_dictionary_t) dd;
 }
 
-dictionary_error dict_errno(void)
+dictionary_error dict_errnum(void)
 {
-	return errno;
+	return errnum;
 }
 
 void dict_perror(const char * spec)
 {
 	perr(spec);
 	perr("\n");
-	switch(errno)
+	switch(errnum)
 	{
 	case DICTIONARY_ERROR_VOID:
 		break;

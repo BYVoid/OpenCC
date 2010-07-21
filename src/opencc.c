@@ -28,7 +28,7 @@ typedef struct
 	opencc_converter_t converter;
 } opencc_description;
 
-static opencc_error errno = OPENCC_ERROR_VOID;
+static opencc_error errnum = OPENCC_ERROR_VOID;
 static int lib_initialized = FALSE;
 
 static void lib_initialize(void)
@@ -39,8 +39,8 @@ static void lib_initialize(void)
 	lib_initialized = TRUE;
 }
 
-size_t opencc_convert(opencc_t odt, wchar_t ** inbuf, size_t * inbuf_left,
-		wchar_t ** outbuf, size_t * outbuf_left)
+size_t opencc_convert(opencc_t odt, ucs4_t ** inbuf, size_t * inbuf_left,
+		ucs4_t ** outbuf, size_t * outbuf_left)
 {
 	if (!lib_initialized)
 		lib_initialize();
@@ -51,7 +51,7 @@ size_t opencc_convert(opencc_t odt, wchar_t ** inbuf, size_t * inbuf_left,
 			(od->converter, inbuf, inbuf_left, outbuf, outbuf_left);
 
 	if (retval == (size_t) -1)
-		errno = OPENCC_ERROR_CONVERTER;
+		errnum = OPENCC_ERROR_CONVERTER;
 
 	return retval;
 }
@@ -64,12 +64,12 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 	if (length == (size_t) -1 || length > strlen(inbuf))
 		length = strlen(inbuf);
 
-	/* 將輸入數據轉換爲wchar_t字符串 */
-	wchar_t * winbuf = utf8_to_wcs(inbuf, length);
-	if (winbuf == (wchar_t *) -1)
+	/* 將輸入數據轉換爲ucs4_t字符串 */
+	ucs4_t * winbuf = utf8_to_ucs4(inbuf, length);
+	if (winbuf == (ucs4_t *) -1)
 	{
 		/* 輸入數據轉換失敗 */
-		errno = OPENCC_ERROR_ENCODIND;
+		errnum = OPENCC_ERROR_ENCODIND;
 		return (char *) -1;
 	}
 
@@ -81,13 +81,13 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 
 	/* 設置轉換緩衝區空間 */
 	size_t wbufsize = length;
-	wchar_t * woutbuf = (wchar_t *) malloc(sizeof(wchar_t) * (wbufsize + 1));
+	ucs4_t * woutbuf = (ucs4_t *) malloc(sizeof(ucs4_t) * (wbufsize + 1));
 
-	wchar_t * pinbuf = winbuf;
-	wchar_t * poutbuf = woutbuf;
+	ucs4_t * pinbuf = winbuf;
+	ucs4_t * poutbuf = woutbuf;
 	size_t inbuf_left, outbuf_left;
 
-	inbuf_left = wcslen(winbuf);
+	inbuf_left = ucs4len(winbuf);
 	outbuf_left = wbufsize;
 
 	while (inbuf_left > 0)
@@ -103,14 +103,14 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 
 		*poutbuf = L'\0';
 
-		char * ubuff = wcs_to_utf8(woutbuf, (size_t) -1);
+		char * ubuff = ucs4_to_utf8(woutbuf, (size_t) -1);
 
 		if (ubuff == (char *) -1)
 		{
 			free(outbuf);
 			free(winbuf);
 			free(woutbuf);
-			errno = OPENCC_ERROR_ENCODIND;
+			errnum = OPENCC_ERROR_ENCODIND;
 			return (char *) -1;
 		}
 
@@ -166,7 +166,7 @@ opencc_t opencc_open(const char * config_file)
 
 		if (ct == (config_t) -1)
 		{
-			errno = OPENCC_ERROR_CONFIG;
+			errnum = OPENCC_ERROR_CONFIG;
 			return (opencc_t) -1;
 		}
 
@@ -181,7 +181,7 @@ opencc_t opencc_open(const char * config_file)
 			{
 				opencc_close((opencc_t) od);
 				config_close(ct);
-				errno = OPENCC_ERROR_DICTLOAD;
+				errnum = OPENCC_ERROR_DICTLOAD;
 				return (opencc_t) -1;
 			}
 		}
@@ -235,12 +235,12 @@ int opencc_dict_load(opencc_t odt, const char * dict_filename,
 	return retval;
 }
 
-opencc_error opencc_errno(void)
+opencc_error opencc_errnum(void)
 {
 	if (!lib_initialized)
 		lib_initialize();
 
-	return errno;
+	return errnum;
 }
 
 void opencc_perror(const char * spec)
@@ -250,7 +250,7 @@ void opencc_perror(const char * spec)
 
 	perr(spec);
 	perr("\n");
-	switch (errno)
+	switch (errnum)
 	{
 	case OPENCC_ERROR_VOID:
 		break;

@@ -16,9 +16,10 @@
 * limitations under the License.
 */
 
-#include "opencc_dictionary.h"
-#include "opencc_utils.h"
-#include "dictionary/opencc_dictionary_datrie.h"
+#include "../opencc_dictionary.h"
+#include "../opencc_encoding.h"
+#include "../opencc_utils.h"
+#include "../dictionary/opencc_dictionary_datrie.h"
 #include <unistd.h>
 
 #define DATRIE_SIZE 1000000
@@ -28,8 +29,8 @@
 
 typedef struct
 {
-	wchar_t * key;
-	wchar_t * value;
+	ucs4_t * key;
+	ucs4_t * value;
 	int length;
 	int pos;
 } Entry;
@@ -37,10 +38,10 @@ typedef struct
 Entry lexicon[DATRIE_WORD_MAX_COUNT];
 size_t lexicon_count, words_set_count;
 int words_set[DATRIE_WORD_MAX_COUNT];
-wchar_t words_set_char[DATRIE_WORD_MAX_COUNT];
+ucs4_t words_set_char[DATRIE_WORD_MAX_COUNT];
 DoubleArrayTrieItem dat[DATRIE_SIZE];
 
-void match_word(const DoubleArrayTrieItem *dat, const wchar_t * word,
+void match_word(const DoubleArrayTrieItem *dat, const ucs4_t * word,
 		int *match_pos, int *id, int limit)
 {
 	int i, j, p;
@@ -65,9 +66,9 @@ int unused(int i)
 	return FALSE;
 }
 
-int is_prefix(const wchar_t *a,const wchar_t *b)
+int is_prefix(const ucs4_t *a,const ucs4_t *b)
 {
-	const wchar_t *p = a,*q = b;
+	const ucs4_t *p = a,*q = b;
 	while (*p != 0)
 	{
 		if (*q == 0)
@@ -80,13 +81,13 @@ int is_prefix(const wchar_t *a,const wchar_t *b)
 	return TRUE;
 }
 
-int binary_search(const wchar_t *str)
+int binary_search(const ucs4_t *str)
 {
 	int a = 0,b = lexicon_count - 1,c;
 	while (a + 1 < b)
 	{
 		c = (a + b) / 2;
-		if (wcscmp(str,lexicon[c].key) <= 0)
+		if (ucs4cmp(str,lexicon[c].key) <= 0)
 			b = c;
 		else
 			a = c+1;
@@ -100,14 +101,14 @@ int binary_search(const wchar_t *str)
 
 int wcmp(const void *a, const void *b)
 {
-	return *(const wchar_t *)a < *(const wchar_t *)b ? -1 : 1;
+	return *(const ucs4_t *)a < *(const ucs4_t *)b ? -1 : 1;
 }
 
-void get_words_with_prefix(wchar_t * word, int p)
+void get_words_with_prefix(ucs4_t * word, int p)
 {
 	int i;
-	static wchar_t buff[DATRIE_WORD_MAX_LENGTH];
-	static wchar_t words_set_char_buff[DATRIE_WORD_MAX_COUNT];
+	static ucs4_t buff[DATRIE_WORD_MAX_LENGTH];
+	static ucs4_t words_set_char_buff[DATRIE_WORD_MAX_COUNT];
 	
 	for (i = 0; i < p; i ++)
 		buff[i] = word[i];
@@ -116,7 +117,7 @@ void get_words_with_prefix(wchar_t * word, int p)
 	words_set_count = 0;
 	for (i = binary_search(buff); i < lexicon_count && is_prefix(buff,lexicon[i].key); i ++)
 	{
-		if (wcscmp(buff,lexicon[i].key) == 0)
+		if (ucs4cmp(buff,lexicon[i].key) == 0)
 			continue;
 		words_set_char_buff[words_set_count] = lexicon[i].key[p];
 		words_set[words_set_count ++] = i;
@@ -125,7 +126,7 @@ void get_words_with_prefix(wchar_t * word, int p)
 	
 	qsort(words_set_char_buff, words_set_count, sizeof(words_set_char_buff[0]), wcmp);
 	
-	wchar_t * wfp, * wp, last;
+	ucs4_t * wfp, * wp, last;
 	for (last = 0, wfp = words_set_char_buff, wp = words_set_char; *wfp; wfp ++)
 	{
 		if (*wfp != last)
@@ -140,7 +141,7 @@ void get_words_with_prefix(wchar_t * word, int p)
 
 int words_space_available(int delta)
 {
-	wchar_t * wp;
+	ucs4_t * wp;
 	for (wp = words_set_char; *wp; wp ++)
 		if (!unused(encode_char(*wp) + delta))
 			return FALSE;
@@ -224,7 +225,7 @@ void make(void)
 
 int cmp(const void *a, const void *b)
 {
-	return wcscmp(((const opencc_entry *)a)->key, ((const opencc_entry *)b)->key);
+	return ucs4cmp(((const opencc_entry *)a)->key, ((const opencc_entry *)b)->key);
 }
 
 void init(const char * file_name)
@@ -249,10 +250,10 @@ void init(const char * file_name)
 	{
 		lexicon[i].key = tlexicon[i].key;
 		lexicon[i].value = tlexicon[i].value;
-		lexicon[i].length = wcslen(lexicon[i].key);
+		lexicon[i].length = ucs4len(lexicon[i].key);
 		if (i > 0)
 		{
-			lexicon[i].pos = lexicon[i-1].pos + wcslen(lexicon[i-1].value) + 1;
+			lexicon[i].pos = lexicon[i-1].pos + ucs4len(lexicon[i-1].value) + 1;
 		}
 	}
 }
@@ -275,7 +276,7 @@ void output(const char * file_name)
 	item_count = i + 1;
 
 	size_t lexicon_length = lexicon[lexicon_count - 1].pos +
-			wcslen(lexicon[lexicon_count - 1].value) + 1;
+			ucs4len(lexicon[lexicon_count - 1].value) + 1;
 
 	fwrite(OPENCC_DICHEADER, sizeof(char), strlen(OPENCC_DICHEADER), fp);
 	fwrite(&lexicon_length, sizeof(size_t), 1, fp);
@@ -283,7 +284,7 @@ void output(const char * file_name)
 
 	for (i = 0; i < lexicon_count; i ++)
 	{
-		fwrite(lexicon[i].value, sizeof(wchar_t), wcslen(lexicon[i].value) + 1, fp);
+		fwrite(lexicon[i].value, sizeof(ucs4_t), ucs4len(lexicon[i].value) + 1, fp);
 	}
 	
 	fwrite(dat, sizeof(dat[0]), item_count, fp);
@@ -291,7 +292,7 @@ void output(const char * file_name)
 	fclose(fp);
 }
 
-#if 0
+#ifdef DEBUG_WRITE_TEXT
 void write_text_file()
 {
 	FILE * fp;
@@ -301,7 +302,9 @@ void write_text_file()
 
 	for (i = 0; i < lexicon_count; i ++)
 	{
-		fprintf(fp, "%ls\n", lexicon[i].value);
+		char * buff = ucs4_to_utf8(lexicon[i].value, (size_t) -1);
+		fprintf(fp, "%s\n", buff);
+		free(buff);
 	}
 	
 	for (i = 0; i < DATRIE_SIZE; i ++)
@@ -392,6 +395,9 @@ int main(int argc, char ** argv)
 	init(input_file);
 	make();
 	output(output_file);
+#ifdef DEBUG_WRITE_TEXT
+	write_text_file();
+#endif
 
 	return 0;
 }

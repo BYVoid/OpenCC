@@ -21,15 +21,18 @@
 #include <iconv.h>
 #include <errno.h>
 
+#define OUTER_ENCODIND "UTF-8"
+#define INNER_ENCODIND "UCS-4LE"
+/* FIXME le*/
 #define INITIAL_BUFF_SIZE 1024
 
-wchar_t * utf8_to_wcs(const char * inbuf, size_t inbuf_len)
+ucs4_t * utf8_to_ucs4(const char * inbuf, size_t inbuf_len)
 {
-	iconv_t cd = iconv_open("WCHAR_T", "UTF8");
+	iconv_t cd = iconv_open(INNER_ENCODIND, OUTER_ENCODIND);
 	
 	if (cd == (iconv_t) -1)
 	{
-		return (wchar_t *) -1;
+		return (ucs4_t *) -1;
 	}
 	
 	char * pinbuf = (char *) inbuf;
@@ -38,9 +41,9 @@ wchar_t * utf8_to_wcs(const char * inbuf, size_t inbuf_len)
 		insize = inbuf_len;
 
 	size_t outbuf_len = INITIAL_BUFF_SIZE;
-	wchar_t * outbuf = (wchar_t *) malloc(sizeof(wchar_t) * outbuf_len);
+	ucs4_t * outbuf = (ucs4_t *) malloc(sizeof(ucs4_t) * outbuf_len);
 	char * poutbuf = (char *) outbuf;
-	size_t outsize = outbuf_len * sizeof(wchar_t);
+	size_t outsize = outbuf_len * sizeof(ucs4_t);
 
 	while (insize > 0)
 	{
@@ -48,30 +51,30 @@ wchar_t * utf8_to_wcs(const char * inbuf, size_t inbuf_len)
 		if (retval == (size_t) -1 && errno != E2BIG)
 		{
 			free(outbuf);
-			return (wchar_t *) -1;
+			return (ucs4_t *) -1;
 		}
 
 		if (insize == 0)
 			break;
 
-		outbuf = (wchar_t *) realloc(outbuf, sizeof(wchar_t) * (outbuf_len + outbuf_len));
-		poutbuf = (char *) outbuf + (outbuf_len * sizeof(wchar_t) - outsize);
+		outbuf = (ucs4_t *) realloc(outbuf, sizeof(ucs4_t) * (outbuf_len + outbuf_len));
+		poutbuf = (char *) outbuf + (outbuf_len * sizeof(ucs4_t) - outsize);
 		outbuf_len += outbuf_len;
-		outsize = (outbuf + outbuf_len - (wchar_t *) poutbuf) * sizeof(wchar_t);
+		outsize = (outbuf + outbuf_len - (ucs4_t *) poutbuf) * sizeof(ucs4_t);
 	}
 	
-	*((wchar_t *) poutbuf) = L'\0';
+	*((ucs4_t *) poutbuf) = L'\0';
 
-	outbuf = (wchar_t *) realloc(outbuf, sizeof(wchar_t) * ((wchar_t *) poutbuf - outbuf + 1));
+	outbuf = (ucs4_t *) realloc(outbuf, sizeof(ucs4_t) * ((ucs4_t *) poutbuf - outbuf + 1));
 	
 	iconv_close(cd);
 	
 	return outbuf;
 }
 
-char * wcs_to_utf8(const wchar_t * inbuf, size_t inbuf_len)
+char * ucs4_to_utf8(const ucs4_t * inbuf, size_t inbuf_len)
 {
-	iconv_t cd = iconv_open("UTF8", "WCHAR_T");
+	iconv_t cd = iconv_open(OUTER_ENCODIND, INNER_ENCODIND);
 
 	if (cd == (iconv_t) -1)
 	{
@@ -79,10 +82,10 @@ char * wcs_to_utf8(const wchar_t * inbuf, size_t inbuf_len)
 	}
 	
 	char * pinbuf = (char *) inbuf;
-	size_t insize = wcslen(inbuf);
+	size_t insize = ucs4len(inbuf);
 	if (inbuf_len < insize)
 		insize = inbuf_len;
-	insize *= sizeof(wchar_t);
+	insize *= sizeof(ucs4_t);
 
 	size_t outbuf_len = INITIAL_BUFF_SIZE;
 	char * outbuf = (char *) malloc(sizeof(char) * outbuf_len);
@@ -114,4 +117,33 @@ char * wcs_to_utf8(const wchar_t * inbuf, size_t inbuf_len)
 	outbuf = (char *) realloc(outbuf, sizeof(char) * (poutbuf - outbuf + 1));
 	
 	return outbuf;
+}
+
+size_t ucs4len(const ucs4_t * str)
+{
+	const register ucs4_t * pstr = str;
+	while (*pstr)
+		++ pstr;
+	return pstr - str;
+}
+
+int ucs4cmp(const ucs4_t * src, const ucs4_t * dst)
+{   
+	register int ret = 0;
+	while(!(ret = *src - *dst) && *dst)
+		++src, ++dst;
+	return ret;
+}
+
+void ucs4cpy(ucs4_t * dest, const ucs4_t * src)
+{
+	while (*src)
+		*dest ++ = *src ++;
+	*dest = 0;
+}
+
+void ucs4ncpy(ucs4_t * dest, const ucs4_t * src, size_t len)
+{
+	while (*src && len -- > 0)
+		*dest ++ = *src ++;
 }

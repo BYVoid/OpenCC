@@ -28,12 +28,12 @@ typedef struct
 	size_t entry_count;
 	size_t max_length;
 	opencc_entry * lexicon;
-	wchar_t * word_buff;
+	ucs4_t * word_buff;
 } text_dictionary;
 
 int qsort_entry_cmp(const void *a, const void *b)
 {
-	return wcscmp(((opencc_entry *)a)->key, ((opencc_entry *)b)->key);
+	return ucs4cmp(((opencc_entry *)a)->key, ((opencc_entry *)b)->key);
 }
 
 dict_ptr dict_text_open(const char * filename)
@@ -48,9 +48,9 @@ dict_ptr dict_text_open(const char * filename)
 	static char buff[ENTRY_BUFF_SIZE];
 	static char key_buff[ENTRY_BUFF_SIZE];
 	static char value_buff[ENTRY_BUFF_SIZE];
-	wchar_t * wbuff;
+	ucs4_t * wbuff;
 
-	FILE * fp = fopen(filename,"r");
+	FILE * fp = fopen(filename,"rb");
 	if (fp == NULL)
 	{
 		dict_text_close((dict_ptr) td);
@@ -68,34 +68,34 @@ dict_ptr dict_text_open(const char * filename)
 
 		sscanf(buff, "%s %s", key_buff, value_buff);
 
-		wbuff = utf8_to_wcs(key_buff,(size_t) -1);
+		wbuff = utf8_to_ucs4(key_buff,(size_t) -1);
 
-		if (wbuff == (wchar_t *) -1)
+		if (wbuff == (ucs4_t *) -1)
 		{
 			td->entry_count = i + 1;
 			dict_text_close((dict_ptr) td);
 			return (dict_ptr) -1;
 		}
 
-		size_t length = wcslen(wbuff);
+		size_t length = ucs4len(wbuff);
 		if (length > td->max_length)
 			td->max_length = length;
 
-		td->lexicon[i].key = (wchar_t *) malloc((length + 1) * sizeof(wchar_t));
-		wcscpy(td->lexicon[i].key, wbuff);
+		td->lexicon[i].key = (ucs4_t *) malloc((length + 1) * sizeof(ucs4_t));
+		ucs4cpy(td->lexicon[i].key, wbuff);
 		free(wbuff);
 
-		wbuff = utf8_to_wcs(value_buff,(size_t) -1);
+		wbuff = utf8_to_ucs4(value_buff,(size_t) -1);
 
-		if (wbuff == (wchar_t *) -1)
+		if (wbuff == (ucs4_t *) -1)
 		{
 			td->entry_count = i + 1;
 			dict_text_close((dict_ptr) td);
 			return (dict_ptr) -1;
 		}
 
-		td->lexicon[i].value = (wchar_t *) malloc((wcslen(wbuff) + 1) * sizeof(wchar_t));
-		wcscpy(td->lexicon[i].value, wbuff);
+		td->lexicon[i].value = (ucs4_t *) malloc((ucs4len(wbuff) + 1) * sizeof(ucs4_t));
+		ucs4cpy(td->lexicon[i].value, wbuff);
 		free(wbuff);
 
 		i ++;
@@ -105,7 +105,7 @@ dict_ptr dict_text_open(const char * filename)
 
 	td->entry_count = i;
 	td->lexicon = (opencc_entry *) realloc(td->lexicon, sizeof(opencc_entry) * td->entry_count);
-	td->word_buff = (wchar_t *) malloc(sizeof(wchar_t) * (td->max_length + 1));
+	td->word_buff = (ucs4_t *) malloc(sizeof(ucs4_t) * (td->max_length + 1));
 
 	qsort(td->lexicon, td->entry_count, sizeof(td->lexicon[0]), qsort_entry_cmp);
 
@@ -128,7 +128,7 @@ void dict_text_close(dict_ptr dp)
 	free(td);
 }
 
-const wchar_t * dict_text_match_longest(dict_ptr dp, const wchar_t * word,
+const ucs4_t * dict_text_match_longest(dict_ptr dp, const ucs4_t * word,
 		size_t length)
 {
 	text_dictionary * td = (text_dictionary *) dp;
@@ -137,12 +137,12 @@ const wchar_t * dict_text_match_longest(dict_ptr dp, const wchar_t * word,
 		return NULL;
 
 	if (length == 0)
-		length = wcslen(word);
+		length = ucs4len(word);
 	size_t len = td->max_length;
 	if (length < len)
 		len = length;
 
-	wcsncpy(td->word_buff, word, len);
+	ucs4ncpy(td->word_buff, word, len);
 	td->word_buff[len] = L'\0';
 
 	opencc_entry buff;
@@ -161,7 +161,7 @@ const wchar_t * dict_text_match_longest(dict_ptr dp, const wchar_t * word,
 	return NULL;
 }
 
-size_t dict_text_get_all_match_lengths(dict_ptr dp, const wchar_t * word,
+size_t dict_text_get_all_match_lengths(dict_ptr dp, const ucs4_t * word,
 		size_t * match_length)
 {
 	text_dictionary * td = (text_dictionary *) dp;
@@ -171,12 +171,12 @@ size_t dict_text_get_all_match_lengths(dict_ptr dp, const wchar_t * word,
 	if (td->entry_count == 0)
 		return rscnt;
 
-	size_t length = wcslen(word);
+	size_t length = ucs4len(word);
 	size_t len = td->max_length;
 	if (length < len)
 		len = length;
 
-	wcsncpy(td->word_buff, word, len);
+	ucs4ncpy(td->word_buff, word, len);
 	td->word_buff[len] = L'\0';
 
 	opencc_entry buff;

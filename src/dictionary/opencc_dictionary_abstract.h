@@ -43,10 +43,10 @@ dict_ptr dict_abstract_open(dictionary * dict);
 
 void dict_abstract_close(dictionary * dict);
 
-const wchar_t * dict_abstract_match_longest(dictionary * dict, const wchar_t * word,
+const ucs4_t * dict_abstract_match_longest(dictionary * dict, const ucs4_t * word,
 		size_t length);
 
-size_t dict_abstract_get_all_match_lengths(dictionary * dict, const wchar_t * word,
+size_t dict_abstract_get_all_match_lengths(dictionary * dict, const ucs4_t * word,
 		size_t * match_length);
 
 size_t dict_abstract_get_lexicon(dictionary * dict, opencc_entry * lexicon);

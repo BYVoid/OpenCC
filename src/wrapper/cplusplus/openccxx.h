@@ -96,21 +96,21 @@ public:
 		if (length >= 0 && length < (long)inbuf_left)
 			inbuf_left = length;
 
-		const wchar_t * inbuf = in.c_str();
+		const ucs4_t * inbuf = in.c_str();
 		long count = 0;
 
 		while (inbuf_left != 0)
 		{
 			size_t retval;
 			size_t outbuf_left;
-			wchar_t * outbuf;
+			ucs4_t * outbuf;
 
 			/* occupy space */
 			outbuf_left = inbuf_left + 64;
 			out.resize (count + outbuf_left);
-			outbuf = (wchar_t *)out.c_str () + count;
+			outbuf = (ucs4_t *)out.c_str () + count;
 
-			retval = opencc_convert (od, (wchar_t **)&inbuf,
+			retval = opencc_convert (od, (ucs4_t **)&inbuf,
 						&inbuf_left, &outbuf, &outbuf_left);
 			if (retval == (size_t) -1)
 				return -1;

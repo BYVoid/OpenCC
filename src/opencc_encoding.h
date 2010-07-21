@@ -21,8 +21,16 @@
 
 #include "opencc_utils.h"
 
-wchar_t * utf8_to_wcs(const char * inbuf, size_t inbuf_len);
+ucs4_t * utf8_to_wcs(const char * inbuf, size_t inbuf_len);
 
-char * wcs_to_utf8(const wchar_t * inbuf, size_t inbuf_len);
+char * wcs_to_utf8(const ucs4_t * inbuf, size_t inbuf_len);
+
+size_t ucs4len(const ucs4_t * str);
+
+int ucs4cmp(const ucs4_t * str1, const ucs4_t * str2);
+
+void ucs4cpy(ucs4_t * dest, const ucs4_t * src);
+
+void ucs4ncpy(ucs4_t * dest, const ucs4_t * src, size_t len);
 
 #endif /* __OPENCC_ENCODING_H_ */

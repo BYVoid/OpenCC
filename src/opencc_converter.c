@@ -18,6 +18,7 @@
 
 #include "opencc_utils.h"
 #include "opencc_converter.h"
+#include "opencc_encoding.h"
 #include "opencc_dictionary.h"
 
 #define OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE 1024
@@ -38,7 +39,7 @@ typedef struct
 	opencc_dictionary_t dicts;
 } opencc_converter_description;
 
-static converter_error errno = CONVERTER_ERROR_VOID;
+static converter_error errnum = CONVERTER_ERROR_VOID;
 
 static void sp_seg_buffer_free(opencc_sp_seg_buffer * ossb)
 {
@@ -62,15 +63,15 @@ static void sp_seg_set_buffer_size(opencc_sp_seg_buffer * ossb, size_t buffer_si
 	ossb->initialized = TRUE;
 }
 
-static size_t sp_seg(opencc_converter_description * cd, wchar_t ** inbuf, size_t * inbuf_left,
-		wchar_t ** outbuf, size_t * outbuf_left, size_t length)
+static size_t sp_seg(opencc_converter_description * cd, ucs4_t ** inbuf, size_t * inbuf_left,
+		ucs4_t ** outbuf, size_t * outbuf_left, size_t length)
 {
 	/* 最短路徑分詞 */
 	
 	/* 對長度爲1時特殊優化 */
 	if (length == 1)
 	{
-		const wchar_t * match_rs = dict_match_longest(cd->dicts, *inbuf, 1);
+		const ucs4_t * match_rs = dict_match_longest(cd->dicts, *inbuf, 1);
 		
 		if (match_rs == NULL)
 			**outbuf = **inbuf;
@@ -137,7 +138,7 @@ static size_t sp_seg(opencc_converter_description * cd, wchar_t ** inbuf, size_t
 	{
 		end = ossb->path[i];
 		
-		const wchar_t * match_rs = dict_match_longest(cd->dicts, *inbuf, end - begin);
+		const ucs4_t * match_rs = dict_match_longest(cd->dicts, *inbuf, end - begin);
 
 		if (match_rs == NULL)
 		{
@@ -148,7 +149,7 @@ static size_t sp_seg(opencc_converter_description * cd, wchar_t ** inbuf, size_t
 		else
 		{
 			/* 輸出緩衝區剩餘空間小於分詞長度 */
-			size_t match_len = wcslen(match_rs);
+			size_t match_len = ucs4len(match_rs);
 			if (match_len > *outbuf_left)
 				break;
 			for (; *match_rs; match_rs ++)
@@ -166,12 +167,12 @@ static size_t sp_seg(opencc_converter_description * cd, wchar_t ** inbuf, size_t
 }
 
 static size_t agspseg(opencc_converter_description * cd,
-		wchar_t ** inbuf, size_t * inbuf_left,
-		wchar_t ** outbuf, size_t * outbuf_left)
+		ucs4_t ** inbuf, size_t * inbuf_left,
+		ucs4_t ** outbuf, size_t * outbuf_left)
 {
 	/* 歧義分割最短路徑分詞 */
 	size_t i, start, bound;
-	const wchar_t * inbuf_start = *inbuf;
+	const ucs4_t * inbuf_start = *inbuf;
 	size_t inbuf_left_start = *inbuf_left;
 	size_t sp_seg_length;
 	
@@ -190,17 +191,17 @@ static size_t agspseg(opencc_converter_description * cd,
 				if (inbuf_left_start - *inbuf_left > 0)
 					return inbuf_left_start - *inbuf_left;
 				/* 空間不足 */
-				errno = CONVERTER_ERROR_OUTBUF;
+				errnum = CONVERTER_ERROR_OUTBUF;
 				return (size_t) -1;
 			}
 			start = i;
 		}
 	
-		const wchar_t * match_rs = dict_match_longest(cd->dicts, inbuf_start + i, 0);
+		const ucs4_t * match_rs = dict_match_longest(cd->dicts, inbuf_start + i, 0);
 		
 		size_t match_len = 1;
 		if (match_rs != NULL)
-			match_len = wcslen(match_rs);
+			match_len = ucs4len(match_rs);
 		
 		if (i + match_len > bound)
 			bound = i + match_len;
@@ -216,7 +217,7 @@ static size_t agspseg(opencc_converter_description * cd,
 			if (inbuf_left_start - *inbuf_left > 0)
 				return inbuf_left_start - *inbuf_left;
 			/* 空間不足 */
-			errno = CONVERTER_ERROR_OUTBUF;
+			errnum = CONVERTER_ERROR_OUTBUF;
 			return (size_t) -1;
 		}
 	}
@@ -226,15 +227,15 @@ static size_t agspseg(opencc_converter_description * cd,
 
 #if 0
 static size_t mmseg(opencc_converter_description * cd,
-		wchar_t ** inbuf, size_t * inbuf_left,
-		wchar_t ** outbuf, size_t * outbuf_left)
+		ucs4_t ** inbuf, size_t * inbuf_left,
+		ucs4_t ** outbuf, size_t * outbuf_left)
 {
 	/* 正向最大分詞 */
 	size_t inbuf_left_start = *inbuf_left;
 
 	for (; **inbuf && *inbuf_left > 0 && *outbuf_left > 0;)
 	{
-		const wchar_t * match_rs = dict_match_longest(cd->dicts, *inbuf, *inbuf_left);
+		const ucs4_t * match_rs = dict_match_longest(cd->dicts, *inbuf, *inbuf_left);
 
 		if (match_rs == NULL)
 		{
@@ -245,12 +246,12 @@ static size_t mmseg(opencc_converter_description * cd,
 		else
 		{
 			/* 輸出緩衝區剩餘空間小於分詞長度 */
-			size_t match_len = wcslen(match_rs);
+			size_t match_len = ucs4len(match_rs);
 			if (match_len > *outbuf_left)
 			{
 				if (inbuf_left_start - *inbuf_left > 0)
 					break;
-				errno = CONVERTER_ERROR_OUTBUF;
+				errnum = CONVERTER_ERROR_OUTBUF;
 				return (size_t) -1;
 			}
 
@@ -267,14 +268,14 @@ static size_t mmseg(opencc_converter_description * cd,
 }
 #endif
 
-size_t converter_convert(opencc_converter_t cdt, wchar_t ** inbuf, size_t * inbuf_left,
-		wchar_t ** outbuf, size_t * outbuf_left)
+size_t converter_convert(opencc_converter_t cdt, ucs4_t ** inbuf, size_t * inbuf_left,
+		ucs4_t ** outbuf, size_t * outbuf_left)
 {
 	opencc_converter_description * cd = (opencc_converter_description *) cdt;
 
 	if (cd->dicts == NULL)
 	{
-		errno = CONVERTER_ERROR_NODICT;
+		errnum = CONVERTER_ERROR_NODICT;
 		return (size_t) -1;
 	}
 
@@ -319,16 +320,16 @@ void converter_close(opencc_converter_t cdt)
 	free(cd);
 }
 
-converter_error converter_errno(void)
+converter_error converter_errnum(void)
 {
-	return errno;
+	return errnum;
 }
 
 void converter_perror(const char * spec)
 {
 	perr(spec);
 	perr("\n");
-	switch(errno)
+	switch(errnum)
 	{
 	case CONVERTER_ERROR_VOID:
 		break;

@@ -16,17 +16,15 @@
 * limitations under the License.
 */
 
-#include "opencc.h"
-#include "opencc_utils.h"
+#include "../opencc.h"
+#include "../opencc_utils.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
-#else
-#define VERSION "Unknown"
+#	include "config.h"
 #endif
 
 #define BUFFER_SIZE 32768

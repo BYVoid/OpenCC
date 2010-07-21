@@ -235,7 +235,7 @@ int opencc_dict_load(opencc_t odt, const char * dict_filename,
 	return retval;
 }
 
-opencc_error opencc_errnum(void)
+opencc_error opencc_errno(void)
 {
 	if (!lib_initialized)
 		lib_initialize();

@@ -1,7 +1,7 @@
 Source: opencc
 Priority: optional
 Maintainer: IME Packaging Team <pkg-ime-devel@lists.alioth.debian.org> 
-Uploaders: LI Daobing <lidaobing@debian.org>, BYVoid <byvoid.kcp@gmail.com>
+Uploaders: LI Daobing <lidaobing@debian.org>, Chia-Pao Kuo <byvoid.kcp@gmail.com>
 Build-Depends: debhelper (>= 7.0.50~), autotools-dev
 Standards-Version: 3.9.0
 Section: libs

@@ -68,7 +68,7 @@ dict_ptr dict_text_open(const char * filename)
 
 		sscanf(buff, "%s %s", key_buff, value_buff);
 
-		wbuff = utf8_to_wcs(key_buff,(size_t) -1);
+		wbuff = utf8_to_ucs4(key_buff,(size_t) -1);
 
 		if (wbuff == (ucs4_t *) -1)
 		{
@@ -85,7 +85,7 @@ dict_ptr dict_text_open(const char * filename)
 		ucs4cpy(td->lexicon[i].key, wbuff);
 		free(wbuff);
 
-		wbuff = utf8_to_wcs(value_buff,(size_t) -1);
+		wbuff = utf8_to_ucs4(value_buff,(size_t) -1);
 
 		if (wbuff == (ucs4_t *) -1)
 		{

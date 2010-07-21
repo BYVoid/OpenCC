@@ -302,7 +302,7 @@ void write_text_file()
 
 	for (i = 0; i < lexicon_count; i ++)
 	{
-		char * buff = wcs_to_utf8(lexicon[i].value, (size_t) -1);
+		char * buff = ucs4_to_utf8(lexicon[i].value, (size_t) -1);
 		fprintf(fp, "%s\n", buff);
 		free(buff);
 	}

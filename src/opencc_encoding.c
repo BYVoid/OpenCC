@@ -26,7 +26,7 @@
 /* FIXME le*/
 #define INITIAL_BUFF_SIZE 1024
 
-ucs4_t * utf8_to_wcs(const char * inbuf, size_t inbuf_len)
+ucs4_t * utf8_to_ucs4(const char * inbuf, size_t inbuf_len)
 {
 	iconv_t cd = iconv_open(INNER_ENCODIND, OUTER_ENCODIND);
 	
@@ -35,7 +35,7 @@ ucs4_t * utf8_to_wcs(const char * inbuf, size_t inbuf_len)
 		return (ucs4_t *) -1;
 	}
 	
-	const char * pinbuf = (char *) inbuf;
+	char * pinbuf = (char *) inbuf;
 	size_t insize = strlen(inbuf);
 	if (inbuf_len < insize)
 		insize = inbuf_len;
@@ -72,7 +72,7 @@ ucs4_t * utf8_to_wcs(const char * inbuf, size_t inbuf_len)
 	return outbuf;
 }
 
-char * wcs_to_utf8(const ucs4_t * inbuf, size_t inbuf_len)
+char * ucs4_to_utf8(const ucs4_t * inbuf, size_t inbuf_len)
 {
 	iconv_t cd = iconv_open(OUTER_ENCODIND, INNER_ENCODIND);
 
@@ -81,7 +81,7 @@ char * wcs_to_utf8(const ucs4_t * inbuf, size_t inbuf_len)
 		return (char *) -1;
 	}
 	
-	const char * pinbuf = (char *) inbuf;
+	char * pinbuf = (char *) inbuf;
 	size_t insize = ucs4len(inbuf);
 	if (inbuf_len < insize)
 		insize = inbuf_len;

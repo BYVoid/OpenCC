@@ -65,7 +65,7 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 		length = strlen(inbuf);
 
 	/* 將輸入數據轉換爲ucs4_t字符串 */
-	ucs4_t * winbuf = utf8_to_wcs(inbuf, length);
+	ucs4_t * winbuf = utf8_to_ucs4(inbuf, length);
 	if (winbuf == (ucs4_t *) -1)
 	{
 		/* 輸入數據轉換失敗 */
@@ -103,7 +103,7 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 
 		*poutbuf = L'\0';
 
-		char * ubuff = wcs_to_utf8(woutbuf, (size_t) -1);
+		char * ubuff = ucs4_to_utf8(woutbuf, (size_t) -1);
 
 		if (ubuff == (char *) -1)
 		{

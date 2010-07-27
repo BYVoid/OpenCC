@@ -58,7 +58,7 @@ int opencc_close(opencc_t od);
 
 /**
  * opencc_convert:
- * @od: The description pointer.
+ * @od: The opencc description pointer.
  * @inbuf: The pointer to the wide character string of the input buffer.
  * @inbufleft: The maximum number of characters in *inbuf to convert.
  * @outbuf: The pointer to the wide character string of the output buffer.
@@ -74,8 +74,32 @@ int opencc_close(opencc_t od);
 size_t opencc_convert(opencc_t od, ucs4_t ** inbuf, size_t * inbufleft,
 		ucs4_t ** outbuf, size_t * outbufleft);
 
+/**
+ * opencc_convert_utf8:
+ * @od: The opencc description pointer.
+ * @inbuf: The UTF-8 encoded string.
+ * @length: The maximum number of characters in inbuf to convert.
+ *
+ * @returns: The newly allocated UTF-8 string that converted from inbuf.
+ *
+ * Convert UTF-8 string from inbuf. This function returns a newly allocated
+ * c-style string via malloc(), which stores the converted string.
+ * DON'T FORGET TO CALL free() to recycle memory.
+ *
+ */
 char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length);
 
+/**
+ * opencc_dict_load:
+ * @od: The opencc description pointer.
+ * @dict_filename: The name (or location) of the dictionary file.
+ * @dict_type: The type of the dictionary.
+ *
+ * @returns: 0 on success or non-zero number on failure.
+ *
+ * Load a dictionary.
+ *
+ */
 int opencc_dict_load(opencc_t odt, const char * dict_filename,
 		opencc_dictionary_type dict_type);
 

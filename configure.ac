@@ -17,10 +17,10 @@
 #
 
 m4_define([package_name], [opencc])
-m4_define([opencc_released], [1])
+m4_define([opencc_released], [0])
 m4_define([opencc_major_version], [0])
-m4_define([opencc_minor_version], [0])
-m4_define([opencc_micro_version], [5])
+m4_define([opencc_minor_version], [1])
+m4_define([opencc_micro_version], [0])
 m4_define(opencc_maybe_datestamp,
 	m4_esyscmd([if test x]opencc_released[ != x1; then date +.%Y%m%d | tr -d '\n\r'; fi]))
 
@@ -31,6 +31,7 @@ m4_define([package_url], [http://code.google.com/p/open-chinese-convert])
 m4_define([package_url_bugreport], [http://code.google.com/p/open-chinese-convert/issues/entry])
 
 AC_INIT([package_name], [opencc_version], [package_url_bugreport], [package_name], [package_url])
+
 AM_INIT_AUTOMAKE([1.10])
 AC_GNU_SOURCE
 
@@ -49,6 +50,17 @@ AC_PROG_RANLIB
 AC_ISC_POSIX
 AC_HEADER_STDC
 AM_PROG_LIBTOOL
+
+# If only source code changed, lt_revision + 1
+# If any interface added, lt_age + 1
+# If any interfaces changed or removed, lt_current + 1, lt_revision = 0, lt_age = 0
+m4_define([lt_current], [1])
+m4_define([lt_revision], [0])
+m4_define([lt_age], [0])
+LT_VERSION_INFO="lt_current:lt_revision:lt_age"
+AC_SUBST(LT_VERSION_INFO)
+
+AC_CHECK_HEADERS([sys/mman.h])
 
 # define GETTEXT
 AM_GNU_GETTEXT([external])
@@ -70,10 +82,9 @@ AC_OUTPUT
 AC_MSG_RESULT([
 Open Chinese Convert (OpenCC)
     Version                     $VERSION
+    Library Version             libopencc.lt_current.lt_revision.lt_age
 
 Build options:
     C Build Flags               $CFLAGS
     Install prefix              $prefix
-
-Use "make && make install" to install.
 ])

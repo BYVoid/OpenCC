@@ -67,6 +67,7 @@ libopencc_la_CFLAGS = \
 
 libopencc_la_LDFLAGS = \
 	-export-symbols-regex "opencc_.*" \
+	-version-info @LT_VERSION_INFO@ \
 	$(NULL)
 
 opencc_DEPENDENCIES = \

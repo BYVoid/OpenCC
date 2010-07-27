@@ -36,20 +36,20 @@ extern "C" {
 namespace opencc
 {
 
-class converter
+class opencc
 {
 public:
 	static const char * CONFIG_SIMP_TO_TRAD;
 	static const char * CONFIG_TRAD_TO_SIMP;
 	static const char * CONFIG_NULL;
 
-	converter(const char * config_file = CONFIG_NULL)
+	opencc(const char * config_file = CONFIG_NULL)
 		: od((opencc_t) -1)
 	{
 		open(config_file);
 	}
 
-	virtual ~converter()
+	virtual ~opencc()
 	{
 		if (od != (opencc_t) -1)
 			opencc_close(od);
@@ -87,6 +87,10 @@ public:
 		return length;
 	}
 
+	/**
+	* Warning:
+	* This method can be used only if wchar_t is encoded in UCS4 on your platform.
+	*/
 	long convert(const std::wstring &in, std::wstring &out, long length = -1)
 	{
 		if (od == (opencc_t) -1)
@@ -96,7 +100,7 @@ public:
 		if (length >= 0 && length < (long)inbuf_left)
 			inbuf_left = length;
 
-		const ucs4_t * inbuf = in.c_str();
+		const ucs4_t * inbuf = (const ucs4_t *) in.c_str();
 		long count = 0;
 
 		while (inbuf_left != 0)
@@ -138,9 +142,9 @@ private:
 	opencc_t od;
 };
 
-const char * converter::CONFIG_SIMP_TO_TRAD = OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD;
-const char * converter::CONFIG_TRAD_TO_SIMP = OPENCC_DEFAULT_CONFIG_TRAD_TO_SIMP;
-const char * converter::CONFIG_NULL = NULL;
+const char * opencc::CONFIG_SIMP_TO_TRAD = OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD;
+const char * opencc::CONFIG_TRAD_TO_SIMP = OPENCC_DEFAULT_CONFIG_TRAD_TO_SIMP;
+const char * opencc::CONFIG_NULL = NULL;
 
 };
 

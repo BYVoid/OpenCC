@@ -17,7 +17,7 @@
 #
 
 m4_define([package_name], [opencc])
-m4_define([opencc_released], [0])
+m4_define([opencc_released], [1])
 m4_define([opencc_major_version], [0])
 m4_define([opencc_minor_version], [1])
 m4_define([opencc_micro_version], [0])

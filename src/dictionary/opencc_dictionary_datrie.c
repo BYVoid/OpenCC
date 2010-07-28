@@ -97,9 +97,9 @@ static int load_dict(datrie_dictionary * dd, FILE * fp)
 		}
 	}
 
-	size_t header_len = strlen(OPENCC_DICHEADER);
+	size_t header_len = strlen("OPENCCDATRIE");
 
-	if (strncmp((const char *)dd->dic_memory, OPENCC_DICHEADER, header_len) != 0)
+	if (strncmp((const char *)dd->dic_memory, "OPENCCDATRIE", header_len) != 0)
 	{
 		/* TODO 文件頭校驗失敗 */
 		return -1;
@@ -116,7 +116,6 @@ static int load_dict(datrie_dictionary * dd, FILE * fp)
 	offset += sizeof(size_t);
 
 	size_t lexicon_size = dd->lexicon_length * sizeof(ucs4_t);
-	/* size_t dat_size = dd->dat_item_count * sizeof(DoubleArrayTrieItem); */
 
 	dd->lexicon = (ucs4_t *) (dd->dic_memory + offset);
 

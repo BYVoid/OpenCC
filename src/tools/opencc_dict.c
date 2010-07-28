@@ -278,7 +278,7 @@ void output(const char * file_name)
 	size_t lexicon_length = lexicon[lexicon_count - 1].pos +
 			ucs4len(lexicon[lexicon_count - 1].value) + 1;
 
-	fwrite(OPENCC_DICHEADER, sizeof(char), strlen(OPENCC_DICHEADER), fp);
+	fwrite("OPENCCDATRIE", sizeof(char), strlen("OPENCCDATRIE"), fp);
 	fwrite(&lexicon_length, sizeof(size_t), 1, fp);
 	fwrite(&item_count, sizeof(size_t), 1, fp);
 

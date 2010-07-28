@@ -23,6 +23,12 @@
 
 typedef void * config_t;
 
+typedef struct
+{
+	opencc_dictionary_type dict_type;
+	char * file_name;
+} opencc_dictionary;
+
 typedef enum
 {
 	CONFIG_ERROR_VOID,

@@ -1,3 +1,9 @@
+opencc (0.0.5-1) lucid; urgency=medium
+
+  * New upstream release.
+
+ -- Chia-Pao Kuo <byvoid.kcp@gmail.com>  Wed, 21 Jul 2010 14:30:10 +0800
+
 opencc (0.0.4-1) lucid; urgency=low
 
   * New upstream release.

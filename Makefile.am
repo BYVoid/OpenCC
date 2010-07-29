@@ -58,10 +58,12 @@ deb: dist debian
 		cd package/deb ;\
 		rm -rf * ;\
 		tar xf ../../$(distdir).tar.gz ;\
+		cp ../../$(distdir).tar.gz @PACKAGE@_@VERSION@.orig.tar.gz ;\
 		cd $(distdir) ;\
 		cp -r ../../../debian . ;\
-		dpkg-buildpackage -rfakeroot -tc -S ;\
-		dpkg-buildpackage -rfakeroot -tc ;\
+		cd debian ;\
+		debuild -S -sa ;\
+		debuild -sa ;\
 		cd .. ;\
 		rm -rf opencc-0.0.4 ;\
 	)

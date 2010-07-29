@@ -142,11 +142,10 @@ int dict_load(opencc_dictionary_t ddt, const char * dict_filename,
 
 	dict_ptr dp = dict_abstract_open(&dict);
 
-	free(dict.filename);
-
 	if (dp == (dict_ptr) -1)
 	{
 		errnum = DICTIONARY_ERROR_INVALID_DICT;
+		free(dict.filename);
 		return -1; /* 辭典讀取錯誤 */
 	}
 
@@ -155,6 +154,8 @@ int dict_load(opencc_dictionary_t ddt, const char * dict_filename,
 	dd->dict[i].filename = (char *) malloc(sizeof(char) * (strlen(dict.filename) + 1));
 	strcpy(dd->dict[i].filename, dict.filename);
 	dd->dict[i].dict = dp;
+
+	free(dict.filename);
 
 	return 0;
 }

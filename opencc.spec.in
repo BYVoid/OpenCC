@@ -2,34 +2,32 @@ Name:       @PACKAGE_NAME@
 Version:    @PACKAGE_VERSION@
 Release:    1%{?dist}
 Summary:    Simplified-Traditional Chinese Conversion
-License:    Apache Software License 2.0
+License:    ASL 2.0
 Group:      System Environment/Libraries
 URL:        http://code.google.com/p/open-chinese-convert/
 Source0:    http://open-chinese-convert.googlecode.com/files/%{name}-%{version}.tar.gz
 
-BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  gettext
 BuildRequires:  libtool
 BuildRequires:  pkgconfig
 
-Requires:   %{name}-libs = %{version}-%{release}
-
 %description
-OpenCC - Simplified-Traditional Chinese Conversion.
+OpenCC - Libraries for Simplified-Traditional Chinese Conversion.
 
 
-%package libs
-Summary:    Runtime library for OpenCC
-Group:      Development/Libraries
+%package tools
+Summary:    Command line tools for OpenCC
+Group:      Applications/Text
+Requires:   %{name} = %{version}-%{release}
 
-%description libs
-Runtime Libraries for OpenCC.
+%description tools
+Command line tools for OpenCC, including opencc for 
 
 
 %package devel
 Summary:    Development tools for OpenCC
 Group:      Development/Libraries
-Requires:   %{name}-libs = %{version}-%{release}
+Requires:   %{name} = %{version}-%{release}
 
 %description devel
 Development tools for OpenCC.
@@ -39,40 +37,36 @@ Development tools for OpenCC.
 %setup -q
 
 %build
-%configure --enable-static --enable-shared
-make %{?_smp_mflags} -j -s V=0
+%configure --disable-static --enable-shared
+make %{?_smp_mflags}
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make DESTDIR=${RPM_BUILD_ROOT} install -s
+make DESTDIR=${RPM_BUILD_ROOT} install
+rm -f $RPM_BUILD_ROOT%{_libdir}/*.la
 
 %find_lang %{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post libs -p /sbin/ldconfig
+%post -p /sbin/ldconfig
 
-%postun libs -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
-%files
-%defattr(-,root,root,-)
-%doc AUTHORS COPYING README
-%{_bindir}/*
-%{_datadir}/man/man1/*
-
-%files libs -f %{name}.lang
+%files -f %{name}.lang
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README
 %{_libdir}/lib*.so.*
 %{_datadir}/opencc/*
 
+%files tools
+%defattr(-,root,root,-)
+%{_bindir}/*
+%{_datadir}/man/man1/*
+
 %files devel
 %defattr(-,root,root,-)
-%doc AUTHORS COPYING README
 %{_includedir}/*
-%{_libdir}/*.a
-%{_libdir}/*.la
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/*.pc
 

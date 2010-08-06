@@ -28,7 +28,6 @@ extern "C" {
 /*
  * Headers from C standard library
  */
-#include <stddef.h>
 
 /* Macros */
 #define OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD "zhs2zht.ini"

@@ -21,6 +21,12 @@
 #include "opencc_encoding.h"
 #include "opencc_dictionary.h"
 
+#define SEGMENT_MAXIMUM_LENGTH 0
+#define SEGMENT_SHORTEST_PATH 1
+#define SEGMENT_METHOD SEGMENT_SHORTEST_PATH
+
+#if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
+
 #define OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE 1024
 
 typedef struct
@@ -33,14 +39,18 @@ typedef struct
 	size_t * path;
 } opencc_sp_seg_buffer;
 
+#endif
+
 typedef struct
 {
+#if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
 	opencc_sp_seg_buffer sp_seg_buffer;
+#endif
 	opencc_dictionary_t dicts;
 } opencc_converter_description;
-
 static converter_error errnum = CONVERTER_ERROR_VOID;
 
+#if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
 static void sp_seg_buffer_free(opencc_sp_seg_buffer * ossb)
 {
 	free(ossb->match_length);
@@ -166,7 +176,7 @@ static size_t sp_seg(opencc_converter_description * cd, ucs4_t ** inbuf, size_t 
 	return inbuf_left_start - *inbuf_left;
 }
 
-static size_t agspseg(opencc_converter_description * cd,
+static size_t segment(opencc_converter_description * cd,
 		ucs4_t ** inbuf, size_t * inbuf_left,
 		ucs4_t ** outbuf, size_t * outbuf_left)
 {
@@ -225,8 +235,10 @@ static size_t agspseg(opencc_converter_description * cd,
 	return inbuf_left_start - *inbuf_left;
 }
 
-#if 0
-static size_t mmseg(opencc_converter_description * cd,
+#endif
+
+#if SEGMENT_METHOD == SEGMENT_MAXIMUM_LENGTH
+static size_t segment(opencc_converter_description * cd,
 		ucs4_t ** inbuf, size_t * inbuf_left,
 		ucs4_t ** outbuf, size_t * outbuf_left)
 {
@@ -279,7 +291,7 @@ size_t converter_convert(opencc_converter_t cdt, ucs4_t ** inbuf, size_t * inbuf
 		return (size_t) -1;
 	}
 
-	return agspseg
+	return segment
 	(
 		cd,
 		inbuf,
@@ -300,13 +312,15 @@ opencc_converter_t converter_open()
 	opencc_converter_description * cd = (opencc_converter_description *)
 			malloc(sizeof(opencc_converter_description));
 
+	cd->dicts = NULL;
+
+#if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
 	cd->sp_seg_buffer.initialized = FALSE;
 	cd->sp_seg_buffer.match_length = cd->sp_seg_buffer.min_len
 			= cd->sp_seg_buffer.parent = cd->sp_seg_buffer.path = NULL;
 
 	sp_seg_set_buffer_size(&cd->sp_seg_buffer, OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE);
-
-	cd->dicts = NULL;
+#endif
 
 	return (opencc_converter_t) cd;
 }
@@ -315,7 +329,9 @@ void converter_close(opencc_converter_t cdt)
 {
 	opencc_converter_description * cd = (opencc_converter_description *) cdt;
 
+#if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
 	sp_seg_buffer_free(&(cd->sp_seg_buffer));
+#endif
 
 	free(cd);
 }

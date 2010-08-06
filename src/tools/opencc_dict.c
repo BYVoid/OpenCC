@@ -230,9 +230,9 @@ int cmp(const void *a, const void *b)
 
 void init(const char * file_name)
 {
-	opencc_dictionary_t dt = dict_open(file_name, OPENCC_DICTIONARY_TYPE_TEXT);
+	opencc_dictionary_t dt = dict_open();
 
-	if (dt == (opencc_dictionary_t) -1)
+	if (dict_load(dt, file_name, OPENCC_DICTIONARY_TYPE_TEXT) == -1)
 	{
 		dict_perror(_("Dictionary loading error"));
 		fprintf(stderr, _("\n"));

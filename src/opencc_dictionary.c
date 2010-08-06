@@ -173,18 +173,11 @@ int dict_close(opencc_dictionary_t ddt)
 	return 0;
 }
 
-opencc_dictionary_t dict_open(const char * dict_filename, opencc_dictionary_type dict_type)
+opencc_dictionary_t dict_open(void)
 {
 	opencc_dictionary_description * dd;
 	dd = (opencc_dictionary_description *) malloc(sizeof(opencc_dictionary_description));
-
 	dd->dict_count = 0;
-	if (dict_load((opencc_dictionary_t) dd, dict_filename, dict_type) == -1)
-	{
-		dict_close((opencc_dictionary_t) dd);
-		return (opencc_dictionary_t) -1;
-	}
-
 	return (opencc_dictionary_t) dd;
 }
 

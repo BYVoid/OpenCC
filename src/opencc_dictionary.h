@@ -37,7 +37,7 @@ typedef struct
 	ucs4_t * value;
 } opencc_entry;
 
-opencc_dictionary_t dict_open(const char * dict_filename, opencc_dictionary_type dict_type);
+opencc_dictionary_t dict_open(void);
 
 int dict_close(opencc_dictionary_t ddt);
 

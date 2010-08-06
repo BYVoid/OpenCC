@@ -1,18 +1,17 @@
 Name:       @PACKAGE_NAME@
 Version:    @PACKAGE_VERSION@
 Release:    1%{?dist}
-Summary:    Simplified-Traditional Chinese Conversion
+Summary:    Libraries for Simplified-Traditional Chinese Conversion
 License:    ASL 2.0
 Group:      System Environment/Libraries
 URL:        http://code.google.com/p/open-chinese-convert/
 Source0:    http://open-chinese-convert.googlecode.com/files/%{name}-%{version}.tar.gz
 
 BuildRequires:  gettext
-BuildRequires:  libtool
-BuildRequires:  pkgconfig
 
 %description
-OpenCC - Libraries for Simplified-Traditional Chinese Conversion.
+OpenCC is a library for converting characters and phrases between
+Traditional Chinese and Simplified Chinese.
 
 
 %package tools
@@ -21,16 +20,18 @@ Group:      Applications/Text
 Requires:   %{name} = %{version}-%{release}
 
 %description tools
-Command line tools for OpenCC, including opencc for 
+Command line tools for OpenCC, including tools for conversion via cli and
+for building dictionaries.
 
 
 %package devel
-Summary:    Development tools for OpenCC
+Summary:    Development files for OpenCC
 Group:      Development/Libraries
 Requires:   %{name} = %{version}-%{release}
 
 %description devel
-Development tools for OpenCC.
+The %{name}-devel package contains libraries and header files for
+developing applications that use %{name}.
 
 
 %prep
@@ -57,7 +58,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %doc AUTHORS COPYING README
 %{_libdir}/lib*.so.*
-%{_datadir}/opencc/*
+%{_datadir}/opencc/
 
 %files tools
 %defattr(-,root,root,-)
@@ -73,5 +74,6 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Thu Jul 29 2010 BYVoid <byvoid.kcp@gmail.com> - 0.1.0-1
 - Upstream release.
+
 * Fri Jul 16 2010 BYVoid <byvoid.kcp@gmail.com> - 0.0.4-1
 - Initial release of RPM.

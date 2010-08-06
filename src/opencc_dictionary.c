@@ -36,7 +36,7 @@ const ucs4_t * dict_match_longest(opencc_dictionary_t ddt, const ucs4_t * word,
 		return (const ucs4_t *) -1;
 	}
 
-	int i;
+	ssize_t i;
 	/* 依次查找每個辭典，取得最長匹配長度 */
 	for (i = dd->dict_count - 1; i >= 0; i --)
 	{

@@ -20,6 +20,9 @@
 #define __OPENCC_DICTIONARY_H_
 
 #include "opencc.h"
+#include "opencc_utils.h"
+
+#define DICT_USEALL -1
 
 typedef void * opencc_dictionary_t;
 
@@ -29,6 +32,7 @@ typedef enum
 	DICTIONARY_ERROR_NODICT,
 	DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE,
 	DICTIONARY_ERROR_INVALID_DICT,
+	DICTIONARY_ERROR_INVALID_INDEX,
 } dictionary_error;
 
 typedef struct
@@ -43,6 +47,10 @@ int dict_close(opencc_dictionary_t ddt);
 
 int dict_load(opencc_dictionary_t ddt, const char * dict_filename,
 		opencc_dictionary_type dict_type);
+
+size_t dict_count(opencc_dictionary_t ddt);
+
+int dict_use(opencc_dictionary_t ddt, ssize_t index);
 
 const ucs4_t * dict_match_longest(opencc_dictionary_t ddt, const ucs4_t * word,
 		size_t length);

@@ -94,11 +94,17 @@ static size_t sp_seg(opencc_converter_description * cd, ucs4_t ** inbuf, size_t 
 		}
 		else
 		{
+			if (ucs4len(match_rs) > *outbuf_left)
+			{
+				errnum = CONVERTER_ERROR_OUTBUF;
+				return (size_t) -1;
+			}
 			for (; *match_rs; match_rs ++)
 			{
 				**outbuf = *match_rs;
-				(*outbuf) ++;(*outbuf_left) --;
+				(*outbuf) ++,(*outbuf_left) --;
 			}
+			(*inbuf) ++;	(*inbuf_left) --;
 		}
 
 		/* 必須保證有一個字符空間 */

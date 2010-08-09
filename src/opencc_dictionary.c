@@ -35,28 +35,34 @@ const ucs4_t * dict_match_longest(opencc_dictionary_t ddt, const ucs4_t * word,
 		return (const ucs4_t *) -1;
 	}
 
-	size_t t_match_length, max_length = 0;
-
-	size_t i;
-	/* 依次查找每個辭典，取得最長匹配長度 */
-	for (i = 0; i < dd->dict_count; i ++)
+	if (dd->current == DICT_USEALL)
 	{
-		const ucs4_t * t_retvel =
-				dict_abstract_match_longest(dd->dict + i, word, maxlen, &t_match_length);
-
-		if (t_retvel != NULL)
+		size_t t_match_length, max_length = 0;
+		size_t i;
+		/* 依次查找每個辭典，取得最長匹配長度 */
+		for (i = 0; i < dd->dict_count; i ++)
 		{
-			if (t_match_length > max_length)
+			const ucs4_t * t_retvel =
+					dict_abstract_match_longest(dd->dict + i, word, maxlen, &t_match_length);
+
+			if (t_retvel != NULL)
 			{
-				max_length = t_match_length;
-				retvel = t_retvel;
+				if (t_match_length > max_length)
+				{
+					max_length = t_match_length;
+					retvel = t_retvel;
+				}
 			}
 		}
-	}
 
-	if (match_length != NULL)
+		if (match_length != NULL)
+		{
+			*match_length = max_length;
+		}
+	}
+	else
 	{
-		*match_length = max_length;
+		return dict_abstract_match_longest(dd->dict + dd->current, word, maxlen, match_length);
 	}
 
 	return retvel;

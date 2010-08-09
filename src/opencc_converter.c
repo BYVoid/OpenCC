@@ -21,9 +21,6 @@
 #include "opencc_encoding.h"
 #include "opencc_dictionary.h"
 
-#include <wchar.h>
-wchar_t *ttt;
-
 #define SEGMENT_MAXIMUM_LENGTH 0
 #define SEGMENT_SHORTEST_PATH 1
 #define SEGMENT_METHOD SEGMENT_SHORTEST_PATH

@@ -16,29 +16,31 @@
 * limitations under the License.
 */
 
-#include "opencc_utils.h"
+#ifndef __CONVERTER_H_
+#define __CONVERTER_H_
 
-void perr(const char * str)
-{
-	fputs(str, stderr);
-}
+#include "dictionary_set.h"
 
-int qsort_int_cmp(const void * a, const void * b)
-{
-	return *((int *) a) - *((int *) b);
-}
+typedef void * converter_t;
 
-char * mstrcpy(const char * str)
+typedef enum
 {
-	char * strbuf = (char *) malloc(sizeof(char) * (strlen(str) + 1));
-	strcpy(strbuf, str);
-	return strbuf;
-}
+	CONVERTER_ERROR_VOID,
+	CONVERTER_ERROR_NODICT,
+	CONVERTER_ERROR_OUTBUF,
+} converter_error;
 
-char * mstrncpy(const char * str, size_t n)
-{
-	char * strbuf = (char *) malloc(sizeof(char) * (n + 1));
-	strncpy(strbuf, str, n);
-	strbuf[n] = '\0';
-	return strbuf;
-}
+void converter_assign_dictionary(converter_t t_converter, dictionary_set_t dictionary_set);
+
+converter_t converter_open(void);
+
+void converter_close(converter_t t_converter);
+
+size_t converter_convert(converter_t t_converter, ucs4_t ** inbuf, size_t * inbuf_left,
+		ucs4_t ** outbuf, size_t * outbuf_left);
+
+converter_error converter_errno(void);
+
+void converter_perror(const char * spec);
+
+#endif /* __CONVERTER_H_ */

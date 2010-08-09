@@ -19,15 +19,10 @@
 #ifndef __OPENCC_CONFIG_H_
 #define __OPENCC_CONFIG_H_
 
-#include "opencc_utils.h"
+#include "utils.h"
+#include "dictionary_set.h"
 
 typedef void * config_t;
-
-typedef struct
-{
-	opencc_dictionary_type dict_type;
-	char * file_name;
-} opencc_dictionary;
 
 typedef enum
 {
@@ -40,9 +35,9 @@ typedef enum
 
 config_t config_open(const char * filename);
 
-int config_close(config_t ct);
+void config_close(config_t t_config);
 
-opencc_dictionary * config_get_dictionary(config_t ct, size_t * dict_count);
+dictionary_set_t config_get_dictionary_set(config_t t_config);
 
 config_error config_errno(void);
 

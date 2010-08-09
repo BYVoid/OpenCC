@@ -17,16 +17,17 @@
 */
 
 #include "opencc.h"
-#include "opencc_config.h"
-#include "opencc_converter.h"
-#include "opencc_encoding.h"
-#include "opencc_utils.h"
+#include "config_reader.h"
+#include "converter.h"
+#include "dictionary_set.h"
+#include "encoding.h"
+#include "utils.h"
 
 typedef struct
 {
-	opencc_dictionary_t dicts;
-	opencc_converter_t converter;
-} opencc_description;
+	dictionary_set_t dictionary_set;
+	converter_t converter;
+} opencc_desc;
 
 static opencc_error errnum = OPENCC_ERROR_VOID;
 static int lib_initialized = FALSE;
@@ -39,16 +40,16 @@ static void lib_initialize(void)
 	lib_initialized = TRUE;
 }
 
-size_t opencc_convert(opencc_t odt, ucs4_t ** inbuf, size_t * inbuf_left,
+size_t opencc_convert(opencc_t t_opencc, ucs4_t ** inbuf, size_t * inbuf_left,
 		ucs4_t ** outbuf, size_t * outbuf_left)
 {
 	if (!lib_initialized)
 		lib_initialize();
 
-	opencc_description * od = (opencc_description *) odt;
+	opencc_desc * opencc = (opencc_desc *) t_opencc;
 
 	size_t retval = converter_convert
-			(od->converter, inbuf, inbuf_left, outbuf, outbuf_left);
+			(opencc->converter, inbuf, inbuf_left, outbuf, outbuf_left);
 
 	if (retval == (size_t) -1)
 		errnum = OPENCC_ERROR_CONVERTER;
@@ -56,7 +57,7 @@ size_t opencc_convert(opencc_t odt, ucs4_t ** inbuf, size_t * inbuf_left,
 	return retval;
 }
 
-char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
+char * opencc_convert_utf8(opencc_t t_opencc, const char * inbuf, size_t length)
 {
 	if (!lib_initialized)
 		lib_initialize();
@@ -92,7 +93,7 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length)
 
 	while (inbuf_left > 0)
 	{
-		size_t retval = opencc_convert(odt, &pinbuf, &inbuf_left, &poutbuf, &outbuf_left);
+		size_t retval = opencc_convert(t_opencc, &pinbuf, &inbuf_left, &poutbuf, &outbuf_left);
 		if (retval == (size_t) -1)
 		{
 			free(outbuf);
@@ -149,11 +150,11 @@ opencc_t opencc_open(const char * config_file)
 	if (!lib_initialized)
 		lib_initialize();
 
-	opencc_description * od;
-	od = (opencc_description *) malloc(sizeof(opencc_description));
+	opencc_desc * opencc;
+	opencc = (opencc_desc *) malloc(sizeof(opencc_desc));
 
-	od->dicts = NULL;
-	od->converter = converter_open();
+	opencc->dictionary_set = NULL;
+	opencc->converter = converter_open();
 
 	/* 加載默認辭典 */
 	int retval;
@@ -161,63 +162,59 @@ opencc_t opencc_open(const char * config_file)
 		retval = 0;
 	else
 	{
-		size_t dict_count;
-		config_t ct = config_open(config_file);
+		config_t config = config_open(config_file);
 
-		if (ct == (config_t) -1)
+		if (config == (config_t) -1)
 		{
 			errnum = OPENCC_ERROR_CONFIG;
 			return (opencc_t) -1;
 		}
 
-		opencc_dictionary * dicts = config_get_dictionary(ct, &dict_count);
+		opencc->dictionary_set = config_get_dictionary_set(config);
+		converter_assign_dictionary(opencc->converter, opencc->dictionary_set);
 
-		size_t i;
-		for (i = 0; i < dict_count ; i ++)
-		{
-			int ret = opencc_dict_load((opencc_t) od, dicts[i].file_name, dicts[i].dict_type);
-
-			if (ret == -1)
-			{
-				opencc_close((opencc_t) od);
-				config_close(ct);
-				return (opencc_t) -1;
-			}
-		}
-
-		config_close(ct);
+		config_close(config);
 	}
 
-	return (opencc_t) od;
+	return (opencc_t) opencc;
 }
 
-int opencc_close(opencc_t odt)
+int opencc_close(opencc_t t_opencc)
 {
 	if (!lib_initialized)
 		lib_initialize();
 
-	opencc_description * od = (opencc_description *) odt;
+	opencc_desc * opencc = (opencc_desc *) t_opencc;
 
-	converter_close(od->converter);
-	if (od->dicts)
-		dict_close(od->dicts);
-	free(od);
+	converter_close(opencc->converter);
+	if (opencc->dictionary_set != NULL)
+		dictionary_set_close(opencc->dictionary_set);
+	free(opencc);
 
 	return 0;
 }
 
-int opencc_dict_load(opencc_t odt, const char * dict_filename,
+int opencc_dict_load(opencc_t t_opencc, const char * dict_filename,
 		opencc_dictionary_type dict_type)
 {
 	if (!lib_initialized)
 		lib_initialize();
 
-	opencc_description * od = (opencc_description *) odt;
+	opencc_desc * opencc = (opencc_desc *) t_opencc;
 
-	if (od->dicts == NULL)
-		od->dicts = dict_open();
+	dictionary_group_t dictionary_group;
+	if (opencc->dictionary_set == NULL)
+	{
+		opencc->dictionary_set = dictionary_set_open();
+		dictionary_group = dictionary_set_new_group(opencc->dictionary_set);
+	}
+	else
+	{
+		dictionary_group = dictionary_set_get_group(opencc->dictionary_set, 0);
+	}
 
-	int retval = dict_load(od->dicts, dict_filename, dict_type);
+	int retval;
+	retval = dictionary_group_load(dictionary_group, dict_filename, dict_type);
 
 	if (retval == -1)
 	{
@@ -225,7 +222,7 @@ int opencc_dict_load(opencc_t odt, const char * dict_filename,
 		return -1;
 	}
 
-	converter_assign_dicts(od->converter, od->dicts);
+	converter_assign_dictionary(opencc->converter, opencc->dictionary_set);
 
 	return retval;
 }
@@ -250,7 +247,7 @@ void opencc_perror(const char * spec)
 	case OPENCC_ERROR_VOID:
 		break;
 	case OPENCC_ERROR_DICTLOAD:
-		dict_perror(_("Dictionary loading error"));
+		//dict_perror(_("Dictionary loading error"));
 		break;
 	case OPENCC_ERROR_CONFIG:
 		config_perror(_("Configuration error"));

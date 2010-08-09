@@ -16,23 +16,75 @@
 * limitations under the License.
 */
 
-#include "opencc_config.h"
+#include "config_reader.h"
+#include "dictionary_set.h"
 
 #define BUFFER_SIZE 8192
+#define DICTIONARY_MAX_COUNT 1024
 #define CONFIG_DICT_TYPE_OCD "OCD"
 #define CONFIG_DICT_TYPE_TEXT "TEXT"
 
 typedef struct
 {
+	opencc_dictionary_type dict_type;
+	char * file_name;
+	size_t index;
+	size_t stamp;
+} dictionary_buffer;
+
+struct _config_desc
+{
 	char * title;
 	char * description;
-	opencc_dictionary * dicts;
+	dictionary_set_t dictionary_set;
+
+	dictionary_buffer dicts[DICTIONARY_MAX_COUNT];
 	size_t dicts_count;
-} config_desc;
+	size_t stamp;
+} ;
+typedef struct _config_desc config_desc;
 
 static config_error errnum = CONFIG_ERROR_VOID;
 
-static int parse_add_dict(config_desc * cd, const char * dictstr)
+static int qsort_dictionary_buffer_cmp(const void *a, const void *b)
+{
+	if (((dictionary_buffer *)a)->index < ((dictionary_buffer *)b)->index)
+		return -1;
+	if (((dictionary_buffer *)a)->index > ((dictionary_buffer *)b)->index)
+		return 1;
+	return ((dictionary_buffer *)a)->stamp < ((dictionary_buffer *)b)->stamp ? -1 : 1;
+}
+
+static int load_dictionary(config_desc * config)
+{
+	if (config->dicts_count == 0)
+		return 0;
+
+	qsort
+	(
+			config->dicts,
+			config->dicts_count,
+			sizeof(config->dicts[0]),
+			qsort_dictionary_buffer_cmp
+	);
+
+	size_t i, last_index = 0;
+	dictionary_group_t group = dictionary_set_new_group(config->dictionary_set);
+
+	for (i = 0; i < config->dicts_count; i ++)
+	{
+		if (config->dicts[i].index > last_index)
+		{
+			last_index = config->dicts[i].index;
+			group = dictionary_set_new_group(config->dictionary_set);
+		}
+		dictionary_group_load(group, config->dicts[i].file_name, config->dicts[i].dict_type);
+	}
+
+	return 0;
+}
+
+static int parse_add_dict(config_desc * config, size_t index, const char * dictstr)
 {
 	const char * pstr = dictstr;
 
@@ -54,39 +106,34 @@ static int parse_add_dict(config_desc * cd, const char * dictstr)
 	while (*pstr != '\0' && (*pstr == ' ' || *pstr == '\t'))
 		pstr ++;
 
-	size_t i = cd->dicts_count ++;
-	if (cd->dicts_count == 1)
-	{
-		cd->dicts = (opencc_dictionary *) malloc(sizeof(opencc_dictionary));
-	}
-	else
-	{
-		cd->dicts = (opencc_dictionary *)
-				realloc(cd->dicts, cd->dicts_count * sizeof(opencc_dictionary));
-	}
+	size_t i = config->dicts_count ++;
 
-	cd->dicts[i].dict_type = dict_type;
-	cd->dicts[i].file_name = mstrcpy(pstr);
+	config->dicts[i].dict_type = dict_type;
+	config->dicts[i].file_name = mstrcpy(pstr);
+	config->dicts[i].index = index;
+	config->dicts[i].stamp = config->stamp ++;
 
 	return 0;
 }
 
-static int parse_property(config_desc * cd, const char * key, const char * value)
+static int parse_property(config_desc * config, const char * key, const char * value)
 {
-	if (strcmp(key, "dict") == 0)
+	if (strncmp(key, "dict", 4) == 0)
 	{
-		return parse_add_dict(cd, value);
+		int index = 0;
+		sscanf(key + 4, "%d", &index);
+		return parse_add_dict(config, index, value);
 	}
 	else if (strcmp(key, "title") == 0)
 	{
-		free(cd->title);
-		cd->title = mstrcpy(value);
+		free(config->title);
+		config->title = mstrcpy(value);
 		return 0;
 	}
 	else if (strcmp(key, "description") == 0)
 	{
-		free(cd->description);
-		cd->description = mstrcpy(value);
+		free(config->description);
+		config->description = mstrcpy(value);
 		return 0;
 	}
 
@@ -138,14 +185,14 @@ static char * parse_trim(char * str)
 	return str;
 }
 
-static int parse(config_desc * cd, const char * filename)
+static int parse(config_desc * config, const char * filename)
 {
 	FILE * fp = fopen(filename, "rb");
 	if (!fp)
 	{
 		/* 使用 PKGDATADIR 路徑 */
 		char * pkg_filename =
-				(char *) malloc(sizeof(char) * (strlen(filename) + strlen(PKGDATADIR) + 1));
+				(char *) malloc(sizeof(char) * (strlen(filename) + strlen(PKGDATADIR) + 2));
 		sprintf(pkg_filename, "%s/%s", PKGDATADIR, filename);
 
 		fp = fopen(pkg_filename, "rb");
@@ -180,7 +227,7 @@ static int parse(config_desc * cd, const char * filename)
 			return -1;
 		}
 
-		if (parse_property(cd, key, value) == -1)
+		if (parse_property(config, key, value) == -1)
 		{
 			free(key);
 			free(value);
@@ -196,16 +243,22 @@ static int parse(config_desc * cd, const char * filename)
 	return 0;
 }
 
-opencc_dictionary * config_get_dictionary(config_t ct, size_t * dict_count)
+dictionary_set_t config_get_dictionary_set(config_t t_config)
 {
-	config_desc * cd = (config_desc *) ct;
+	config_desc * config = (config_desc *) t_config;
 
-	*dict_count = cd->dicts_count;
+	if (config->dictionary_set != NULL)
+	{
+		dictionary_set_close(config->dictionary_set);
+	}
 
-	return cd->dicts;
+	config->dictionary_set = dictionary_set_open();
+	load_dictionary(config);
+
+	return config->dictionary_set;
 }
 
-config_error config_errnum(void)
+config_error config_errno(void)
 {
 	return errnum;
 }
@@ -219,7 +272,7 @@ void config_perror(const char * spec)
 	case CONFIG_ERROR_VOID:
 		break;
 	case CONFIG_ERROR_CANNOT_ACCESS_CONFIG_FILE:
-		perror(_("Can not access configureation file"));
+		perror(_("Can not access configuration file"));
 		break;
 	case CONFIG_ERROR_PARSE:
 		perr(_("Configuration file parse error"));
@@ -237,36 +290,32 @@ void config_perror(const char * spec)
 
 config_t config_open(const char * filename)
 {
-	config_desc * cd = (config_desc *) malloc(sizeof(config_desc));
+	config_desc * config = (config_desc *) malloc(sizeof(config_desc));
 
-	cd->title = NULL;
-	cd->description = NULL;
-	cd->dicts = NULL;
-	cd->dicts_count = 0;
+	config->title = NULL;
+	config->description = NULL;
+	config->dicts_count = 0;
+	config->stamp = 0;
+	config->dictionary_set = NULL;
 
-	if (parse(cd, filename) == -1)
+	if (parse(config, filename) == -1)
 	{
-		config_close((config_t) cd);
+		config_close((config_t) config);
 		return (config_t) -1;
 	}
 
-	return (config_t) cd;
+	return (config_t) config;
 }
 
-int config_close(config_t ct)
+void config_close(config_t t_config)
 {
-	config_desc * cd = (config_desc *) ct;
-
-	free(cd->title);
-	free(cd->description);
+	config_desc * config = (config_desc *) t_config;
 
 	size_t i;
-	for (i = 0; i < cd->dicts_count; i ++)
-		free(cd->dicts[i].file_name);
+	for (i = 0; i < config->dicts_count; i ++)
+		free(config->dicts[i].file_name);
 
-	free(cd->dicts);
-
-	free(cd);
-
-	return 0;
+	free(config->title);
+	free(config->description);
+	free(config);
 }

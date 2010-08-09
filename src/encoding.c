@@ -17,7 +17,7 @@
 */
 
 #include "opencc.h"
-#include "opencc_encoding.h"
+#include "encoding.h"
 #include <iconv.h>
 #include <errno.h>
 

@@ -16,10 +16,10 @@
 * limitations under the License.
 */
 
-#include "../opencc_dictionary.h"
-#include "../opencc_encoding.h"
-#include "../opencc_utils.h"
-#include "../dictionary/opencc_dictionary_datrie.h"
+#include "../encoding.h"
+#include "../utils.h"
+#include "../dictionary/datrie.h"
+#include "../dictionary/text.h"
 #include <unistd.h>
 
 #define DATRIE_SIZE 1000000
@@ -230,18 +230,18 @@ int cmp(const void *a, const void *b)
 
 void init(const char * file_name)
 {
-	opencc_dictionary_t dt = dict_open();
+	dictionary_t dictionary = dictionary_text_open(file_name);
 
-	if (dict_load(dt, file_name, OPENCC_DICTIONARY_TYPE_TEXT) == -1)
+	if (dictionary == (dictionary_t) -1)
 	{
-		dict_perror(_("Dictionary loading error"));
+		//TODO: dict_perror(_("Dictionary loading error"));
 		fprintf(stderr, _("\n"));
 		exit(1);
 	}
 
 	static opencc_entry tlexicon[DATRIE_WORD_MAX_COUNT];
+	lexicon_count = dictionary_text_get_lexicon(dictionary, tlexicon);
 
-	lexicon_count = dict_get_lexicon(dt, tlexicon);
 	qsort(tlexicon, lexicon_count, sizeof(tlexicon[0]), cmp);
 
 	size_t i;

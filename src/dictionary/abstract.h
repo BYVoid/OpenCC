@@ -1,7 +1,7 @@
 /*
 * Open Chinese Convert
 *
-* Copyright 2010 BYVoid <byvoid1@gmail.com>
+* Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -19,37 +19,24 @@
 #ifndef __OPENCC_DICTIONARY_ABSTRACT_H_
 #define __OPENCC_DICTIONARY_ABSTRACT_H_
 
-#include "../opencc_utils.h"
-#include "../opencc_dictionary.h"
-
-#define DICTIONARY_MAX_COUNT 128
-
-typedef void * dict_ptr;
+#include "../utils.h"
 
 typedef struct
 {
-	opencc_dictionary_type type;
-	char * filename;
-	dict_ptr dict;
-} dictionary;
+	ucs4_t * key;
+	ucs4_t * value;
+} opencc_entry;
 
-typedef struct
-{
-	size_t dict_count;
-	dictionary dict[DICTIONARY_MAX_COUNT];
-	ssize_t current;
-} opencc_dictionary_description;
+typedef void * dictionary_t;
 
-dict_ptr dict_abstract_open(dictionary * dict);
+dictionary_t dictionary_open(const char * filename, opencc_dictionary_type type);
 
-void dict_abstract_close(dictionary * dict);
+void dictionary_close(dictionary_t t_dictionary);
 
-const ucs4_t * dict_abstract_match_longest(dictionary * dict, const ucs4_t * word,
+const ucs4_t * dictionary_match_longest(dictionary_t t_dictionary, const ucs4_t * word,
 		size_t maxlen, size_t * match_length);
 
-size_t dict_abstract_get_all_match_lengths(dictionary * dict, const ucs4_t * word,
+size_t dictionary_get_all_match_lengths(dictionary_t t_dictionary, const ucs4_t * word,
 		size_t * match_length);
-
-size_t dict_abstract_get_lexicon(dictionary * dict, opencc_entry * lexicon);
 
 #endif /* __OPENCC_DICTIONARY_ABSTRACT_H_ */

@@ -1,7 +1,7 @@
 /*
 * Open Chinese Convert
 *
-* Copyright 2010 BYVoid <byvoid1@gmail.com>
+* Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,32 +16,25 @@
 * limitations under the License.
 */
 
-#ifndef __OPENCC_DICTIONARY_DATRIE_H_
-#define __OPENCC_DICTIONARY_DATRIE_H_
+#ifndef __DICTIONARY_GROUP_H_
+#define __DICTIONARY_GROUP_H_
 
-#include "opencc_dictionary_abstract.h"
+#include "utils.h"
+#include "dictionary/abstract.h"
 
-#define DATRIE_UNUSED -1
+typedef void * dictionary_group_t;
 
-typedef struct
-{
-	int base;
-	int parent;
-	int word;
-} DoubleArrayTrieItem;
+dictionary_group_t dictionary_group_open(void);
 
-dict_ptr dict_datrie_open(const char * filename);
+void dictionary_group_close(dictionary_group_t t_dictionary);
 
-int dict_datrie_close(dict_ptr dp);
+int dictionary_group_load(dictionary_group_t t_dictionary, const char * filename,
+		opencc_dictionary_type type);
 
-const ucs4_t * dict_datrie_match_longest(dict_ptr dp, const ucs4_t * word,
+const ucs4_t * dictionary_group_match_longest(dictionary_group_t t_dictionary, const ucs4_t * word,
 		size_t maxlen, size_t * match_length);
 
-size_t dict_datrie_get_all_match_lengths(dict_ptr dp, const ucs4_t * word,
+size_t dictionary_group_get_all_match_lengths(dictionary_group_t t_dictionary, const ucs4_t * word,
 		size_t * match_length);
 
-size_t dict_datrie_get_lexicon(dict_ptr dp, opencc_entry * lexicon);
-
-int encode_char(ucs4_t ch);
-
-#endif /* __OPENCC_DICTIONARY_DATRIE_H_ */
+#endif /* __DICTIONARY_GROUP_H_ */

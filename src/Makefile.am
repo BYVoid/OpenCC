@@ -1,7 +1,7 @@
 #
 # Open Chinese Convert
 #
-# Copyright 2010 BYVoid <byvoid1@gmail.com>
+# Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,27 +33,30 @@ libopencc_headers = \
 	$(NULL)
 
 libopencc_dictionary_sources = \
-	dictionary/opencc_dictionary_abstract.c \
-	dictionary/opencc_dictionary_datrie.c \
-	dictionary/opencc_dictionary_text.c \
-	dictionary/opencc_dictionary_abstract.h \
-	dictionary/opencc_dictionary_datrie.h \
-	dictionary/opencc_dictionary_text.h \
+	dictionary/abstract.c \
+	dictionary/datrie.c \
+	dictionary/text.c \
+	dictionary/abstract.h \
+	dictionary/datrie.h \
+	dictionary/text.h \
 	$(NULL)
 
 libopencc_la_SOURCES = \
-	opencc_config.c \
-	opencc_converter.c \
-	opencc_dictionary.c \
-	opencc_encoding.c \
-	opencc_utils.c \
+	config_reader.c \
+	converter.c \
+	dictionary_group.c \
+	dictionary_set.c \
+	encoding.c \
+	utils.c \
 	opencc.c \
-	opencc_config.h \
-	opencc_converter.h \
-	opencc_dictionary.h \
-	opencc_encoding.h \
-	opencc_utils.h \
+	config_reader.h \
+	converter.h \
+	dictionary_group.h \
+	dictionary_set.h \
+	encoding.h \
+	utils.h \
 	$(libopencc_dictionary_sources) \
+		$(libopencc_headers) \
 	$(NULL)
 
 libopencc_ladir = $(pkgincludedir)
@@ -76,8 +79,8 @@ opencc_DEPENDENCIES = \
 
 opencc_SOURCES = \
 	tools/opencc.c \
-	opencc_utils.c \
-	opencc_utils.h \
+	utils.c \
+	utils.h \
 	$(libopencc_headers) \
 	$(NULL)
 
@@ -95,12 +98,10 @@ opencc_dict_DEPENDENCIES = \
 
 opencc_dict_SOURCES = \
 	tools/opencc_dict.c \
-	opencc_dictionary.c \
-	opencc_dictionary.h \
-	opencc_encoding.c \
-	opencc_encoding.h \
-	opencc_utils.c \
-	opencc_utils.h \
+	encoding.c \
+	encoding.h \
+	utils.c \
+	utils.h \
 	$(libopencc_dictionary_sources) \
 	$(libopencc_headers) \
 	$(NULL)

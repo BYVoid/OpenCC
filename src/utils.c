@@ -16,21 +16,29 @@
 * limitations under the License.
 */
 
-#ifndef __OPENCC_DICTIONARY_TEXT_H_
-#define __OPENCC_DICTIONARY_TEXT_H_
+#include "utils.h"
 
-#include "opencc_dictionary_abstract.h"
+void perr(const char * str)
+{
+	fputs(str, stderr);
+}
 
-dict_ptr dict_text_open(const char * filename);
+int qsort_int_cmp(const void * a, const void * b)
+{
+	return *((int *) a) - *((int *) b);
+}
 
-void dict_text_close(dict_ptr dp);
+char * mstrcpy(const char * str)
+{
+	char * strbuf = (char *) malloc(sizeof(char) * (strlen(str) + 1));
+	strcpy(strbuf, str);
+	return strbuf;
+}
 
-const ucs4_t * dict_text_match_longest(dict_ptr dp, const ucs4_t * word,
-		size_t maxlen, size_t * match_length);
-
-size_t dict_text_get_all_match_lengths(dict_ptr dp, const ucs4_t * word,
-		size_t * match_length);
-
-size_t dict_text_get_lexicon(dict_ptr dp, opencc_entry * lexicon);
-
-#endif /* __OPENCC_DICTIONARY_TEXT_H_ */
+char * mstrncpy(const char * str, size_t n)
+{
+	char * strbuf = (char *) malloc(sizeof(char) * (n + 1));
+	strncpy(strbuf, str, n);
+	strbuf[n] = '\0';
+	return strbuf;
+}

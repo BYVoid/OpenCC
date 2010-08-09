@@ -51,15 +51,15 @@ void dict_abstract_close(dictionary * dict)
 }
 
 const ucs4_t * dict_abstract_match_longest(dictionary * dict, const ucs4_t * word,
-		size_t length)
+		size_t maxlen, size_t * match_length)
 {
 	switch (dict->type)
 	{
 	case OPENCC_DICTIONARY_TYPE_TEXT:
-		return dict_text_match_longest(dict->dict, word, length);
+		return dict_text_match_longest(dict->dict, word, maxlen, match_length);
 		break;
 	case OPENCC_DICTIONARY_TYPE_DATRIE:
-		return dict_datrie_match_longest(dict->dict, word, length);
+		return dict_datrie_match_longest(dict->dict, word, maxlen, match_length);
 		break;
 	default:
 		debug_should_not_be_here();

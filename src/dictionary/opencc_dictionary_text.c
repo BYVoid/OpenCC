@@ -129,18 +129,18 @@ void dict_text_close(dict_ptr dp)
 }
 
 const ucs4_t * dict_text_match_longest(dict_ptr dp, const ucs4_t * word,
-		size_t length)
+		size_t maxlen, size_t * match_length)
 {
 	text_dictionary * td = (text_dictionary *) dp;
 
 	if (td->entry_count == 0)
 		return NULL;
 
-	if (length == 0)
-		length = ucs4len(word);
+	if (maxlen == 0)
+		maxlen = ucs4len(word);
 	size_t len = td->max_length;
-	if (length < len)
-		len = length;
+	if (maxlen < len)
+		len = maxlen;
 
 	ucs4ncpy(td->word_buff, word, len);
 	td->word_buff[len] = L'\0';
@@ -155,9 +155,15 @@ const ucs4_t * dict_text_match_longest(dict_ptr dp, const ucs4_t * word,
 				sizeof(td->lexicon[0]), qsort_entry_cmp);
 
 		if (brs != NULL)
+		{
+			if (match_length != NULL)
+				*match_length = len;
 			return brs->value;
+		}
 	}
 
+	if (match_length != NULL)
+		*match_length = 0;
 	return NULL;
 }
 

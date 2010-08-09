@@ -208,18 +208,25 @@ void datrie_match(const datrie_dictionary * dd, const ucs4_t * word,
 }
 
 const ucs4_t * dict_datrie_match_longest(dict_ptr dp, const ucs4_t * word,
-		size_t length)
+		size_t maxlen, size_t * match_length)
 {
 	datrie_dictionary * dd = (datrie_dictionary *) dp;
 
 	size_t pos, item;
-	datrie_match(dd, word, &pos, &item, length);
+	datrie_match(dd, word, &pos, &item, maxlen);
 
 	while (dd->dat[item].word == -1 && pos > 1)
 		datrie_match(dd, word, &pos, &item, pos - 1);
 
 	if (pos == 0 || dd->dat[item].word == -1)
+	{
+		if (match_length != NULL)
+			*match_length = 0;
 		return NULL;
+	}
+
+	if (match_length != NULL)
+		*match_length = pos;
 
 	return dd->lexicon + dd->dat[item].word;
 }

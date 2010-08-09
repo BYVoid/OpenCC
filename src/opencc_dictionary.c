@@ -23,12 +23,11 @@
 static dictionary_error errnum = DICTIONARY_ERROR_VOID;
 
 const ucs4_t * dict_match_longest(opencc_dictionary_t ddt, const ucs4_t * word,
-		size_t length)
+		size_t maxlen, size_t * match_length)
 {
 	opencc_dictionary_description * dd = (opencc_dictionary_description *) ddt;
 
 	const ucs4_t * retvel = NULL;
-	size_t match_length, max_length = 0;
 
 	if (dd->dict_count == 0)
 	{
@@ -36,22 +35,28 @@ const ucs4_t * dict_match_longest(opencc_dictionary_t ddt, const ucs4_t * word,
 		return (const ucs4_t *) -1;
 	}
 
+	size_t t_match_length, max_length = 0;
+
 	ssize_t i;
 	/* 依次查找每個辭典，取得最長匹配長度 */
 	for (i = dd->dict_count - 1; i >= 0; i --)
 	{
 		const ucs4_t * t_retvel =
-				dict_abstract_match_longest(dd->dict + i, word, length);
+				dict_abstract_match_longest(dd->dict + i, word, maxlen, &t_match_length);
 
 		if (t_retvel != NULL)
 		{
-			match_length = ucs4len(t_retvel);
-			if (match_length > max_length)
+			if (t_match_length > max_length)
 			{
-				max_length = match_length;
+				max_length = t_match_length;
 				retvel = t_retvel;
 			}
 		}
+	}
+
+	if (match_length != NULL)
+	{
+		*match_length = max_length;
 	}
 
 	return retvel;

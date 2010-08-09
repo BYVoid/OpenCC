@@ -45,7 +45,7 @@ int dict_load(opencc_dictionary_t ddt, const char * dict_filename,
 		opencc_dictionary_type dict_type);
 
 const ucs4_t * dict_match_longest(opencc_dictionary_t ddt, const ucs4_t * word,
-		size_t length);
+		size_t maxlen, size_t * match_length);
 
 size_t dict_get_all_match_lengths(opencc_dictionary_t ddt, const ucs4_t * word,
 		size_t * match_length);

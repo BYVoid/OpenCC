@@ -22,6 +22,7 @@
 #include "opencc_dictionary.h"
 
 #include <wchar.h>
+wchar_t *ttt;
 
 #define SEGMENT_MAXIMUM_LENGTH 0
 #define SEGMENT_SHORTEST_PATH 1
@@ -309,39 +310,35 @@ size_t converter_convert(opencc_converter_t cdt, ucs4_t ** inbuf, size_t * inbuf
 	//啓用辭典轉換鏈
 	size_t inbuf_size = *inbuf_left;
 	size_t outbuf_size = *outbuf_left;
-	ucs4_t * tmpbuf = (ucs4_t *) malloc(sizeof(ucs4_t) * outbuf_size);
-	ucs4_t * origbuf = * outbuf;
-
-	ucs4_t * oinbuf = *inbuf;
-	ucs4_t * cinbuf, * coutbuf;
-
 	size_t retval;
 	size_t cinbuf_left, coutbuf_left, coutbuf_delta;
-
 	ssize_t i, cur;
-	wchar_t *ttt;
+
+	ucs4_t * tmpbuf = (ucs4_t *) malloc(sizeof(ucs4_t) * outbuf_size);
+	ucs4_t * orig_outbuf = * outbuf;
+	ucs4_t * cinbuf, * coutbuf;
+
+	cinbuf_left = inbuf_size;
+	coutbuf_left = outbuf_size;
+	cinbuf = *inbuf;
+	coutbuf = tmpbuf;
+
 	for (i = cur = 0; i < dict_count(cd->dicts); ++i, cur = 1 - cur)
 	{
-		if (i == 0)
-		{
-			cinbuf_left = inbuf_size;
-			coutbuf_left = outbuf_size;
-			cinbuf = oinbuf;
-			coutbuf = tmpbuf;
-		}
-		else if (cur == 1)
+		if (i > 0)
 		{
 			cinbuf_left = coutbuf_delta;
 			coutbuf_left = outbuf_size;
-			cinbuf = tmpbuf;
-			coutbuf = origbuf;
-		}
-		else
-		{
-			cinbuf_left = coutbuf_delta;
-			coutbuf_left = outbuf_size;
-			cinbuf = origbuf;
-			coutbuf = tmpbuf;
+			if (cur == 1)
+			{
+				cinbuf = tmpbuf;
+				coutbuf = orig_outbuf;
+			}
+			else
+			{
+				cinbuf = orig_outbuf;
+				coutbuf = tmpbuf;
+			}
 		}
 
 		dict_use(cd->dicts, i);
@@ -353,15 +350,12 @@ size_t converter_convert(opencc_converter_t cdt, ucs4_t ** inbuf, size_t * inbuf
 			&coutbuf,
 			&coutbuf_left
 		);
-
 		if (ret == (size_t) -1)
 		{
 			free(tmpbuf);
 			return (size_t) -1;
 		}
-
 		coutbuf_delta = outbuf_size - coutbuf_left;
-
 		if (i == 0)
 		{
 			retval = ret;

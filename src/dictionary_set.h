@@ -24,15 +24,6 @@
 
 typedef void * dictionary_set_t;
 
-typedef enum
-{
-	DICTIONARY_ERROR_VOID,
-	DICTIONARY_ERROR_NODICT,
-	DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE,
-	DICTIONARY_ERROR_INVALID_DICT,
-	DICTIONARY_ERROR_INVALID_INDEX,
-} dictionary_error;
-
 dictionary_set_t dictionary_set_open(void);
 
 void dictionary_set_close(dictionary_set_t t_dictionary);

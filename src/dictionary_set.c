@@ -54,7 +54,6 @@ dictionary_group_t dictionary_set_new_group(dictionary_set_t t_dictionary)
 
 	if (dictionary_set->count + 1 == DICTIONARY_GROUP_MAX_COUNT)
 	{
-		//TODO error limit
 		return (dictionary_group_t) -1;
 	}
 
@@ -70,7 +69,6 @@ dictionary_group_t dictionary_set_get_group(dictionary_set_t t_dictionary, size_
 
 	if (index < 0 || index >= dictionary_set->count)
 	{
-		//TODO error range
 		return (dictionary_group_t) -1;
 	}
 
@@ -81,36 +79,4 @@ size_t dictionary_set_count_group(dictionary_set_t t_dictionary)
 {
 	dictionary_set_desc * dictionary_set = (dictionary_set_desc *) t_dictionary;
 	return dictionary_set->count;
-}
-
-static dictionary_error errnum = DICTIONARY_ERROR_VOID;
-
-dictionary_error dict_errnum(void)
-{
-	return errnum;
-}
-
-void dict_perror(const char * spec)
-{
-	perr(spec);
-	perr("\n");
-	switch(errnum)
-	{
-	case DICTIONARY_ERROR_VOID:
-		break;
-	case DICTIONARY_ERROR_NODICT:
-		perr(_("No dictionary loaded"));
-		break;
-	case DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE:
-		perror(_("Can not open dictionary file"));
-		break;
-	case DICTIONARY_ERROR_INVALID_DICT:
-		perror(_("Invalid dictionary file"));
-		break;
-	case DICTIONARY_ERROR_INVALID_INDEX:
-		perror(_("Invalid dictionary index"));
-		break;
-	default:
-		perr(_("Unknown"));
-	}
 }

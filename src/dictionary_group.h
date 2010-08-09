@@ -24,6 +24,14 @@
 
 typedef void * dictionary_group_t;
 
+typedef enum
+{
+	DICTIONARY_ERROR_VOID,
+	DICTIONARY_ERROR_NODICT,
+	DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE,
+	DICTIONARY_ERROR_INVALID_DICT,
+} dictionary_error;
+
 dictionary_group_t dictionary_group_open(void);
 
 void dictionary_group_close(dictionary_group_t t_dictionary);
@@ -36,5 +44,9 @@ const ucs4_t * dictionary_group_match_longest(dictionary_group_t t_dictionary, c
 
 size_t dictionary_group_get_all_match_lengths(dictionary_group_t t_dictionary, const ucs4_t * word,
 		size_t * match_length);
+
+dictionary_error dictionary_errno(void);
+
+void dictionary_perror(const char * spec);
 
 #endif /* __DICTIONARY_GROUP_H_ */

@@ -27,6 +27,8 @@ struct _dictionary_group
 } ;
 typedef struct _dictionary_group dictionary_group_desc;
 
+static dictionary_error errnum = DICTIONARY_ERROR_VOID;
+
 dictionary_group_t dictionary_group_open(void)
 {
 	dictionary_group_desc * dictionary_group =
@@ -52,14 +54,38 @@ int dictionary_group_load(dictionary_group_t t_dictionary, const char * filename
 		opencc_dictionary_type type)
 {
 	dictionary_group_desc * dictionary_group = (dictionary_group_desc *) t_dictionary;
+	dictionary_t dictionary;
 
-	dictionary_t dict = dictionary_open(filename, type);
-	if (dict == (dictionary_t) -1)
+	FILE * fp = fopen(filename, "rb");
+	if (!fp)
 	{
-		//TODO: load fail
+		/* 使用 PKGDATADIR 路徑 */
+		char * new_filename =
+				(char *) malloc(sizeof(char) * (strlen(filename) + strlen(PKGDATADIR) + 2));
+		sprintf(new_filename, "%s/%s", PKGDATADIR, filename);
+
+		fp = fopen(new_filename, "rb");
+		if (!fp)
+		{
+			free(new_filename);
+			errnum = DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE;
+			return -1;
+		}
+		dictionary = dictionary_open(new_filename, type);
+		free(new_filename);
+	}
+	else
+	{
+		dictionary = dictionary_open(filename, type);
+	}
+	fclose(fp);
+
+	if (dictionary == (dictionary_t) -1)
+	{
+		errnum = DICTIONARY_ERROR_INVALID_DICT;
 		return -1;
 	}
-	dictionary_group->dicts[dictionary_group->count ++] = dict;
+	dictionary_group->dicts[dictionary_group->count ++] = dictionary;
 	return 0;
 }
 
@@ -70,7 +96,7 @@ const ucs4_t * dictionary_group_match_longest(dictionary_group_t t_dictionary, c
 
 	if (dictionary_group->count == 0)
 	{
-		//TODO error errnum = DICTIONARY_ERROR_NODICT;
+		errnum = DICTIONARY_ERROR_NODICT;
 		return (const ucs4_t *) -1;
 	}
 
@@ -113,7 +139,7 @@ size_t dictionary_group_get_all_match_lengths(dictionary_group_t t_dictionary,
 
 	if (dictionary_group->count == 0)
 	{
-		//TODO error errnum = DICTIONARY_ERROR_NODICT;
+		errnum = DICTIONARY_ERROR_NODICT;
 		return (size_t) -1;
 	}
 
@@ -142,4 +168,31 @@ size_t dictionary_group_get_all_match_lengths(dictionary_group_t t_dictionary,
 		}
 	}
 	return rscnt;
+}
+
+dictionary_error dictionary_errno(void)
+{
+	return errnum;
+}
+
+void dictionary_perror(const char * spec)
+{
+	perr(spec);
+	perr("\n");
+	switch(errnum)
+	{
+	case DICTIONARY_ERROR_VOID:
+		break;
+	case DICTIONARY_ERROR_NODICT:
+		perr(_("No dictionary loaded"));
+		break;
+	case DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE:
+		perror(_("Can not open dictionary file"));
+		break;
+	case DICTIONARY_ERROR_INVALID_DICT:
+		perror(_("Invalid dictionary file"));
+		break;
+	default:
+		perr(_("Unknown"));
+	}
 }

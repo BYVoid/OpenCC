@@ -247,7 +247,7 @@ void opencc_perror(const char * spec)
 	case OPENCC_ERROR_VOID:
 		break;
 	case OPENCC_ERROR_DICTLOAD:
-		//dict_perror(_("Dictionary loading error"));
+		dictionary_perror(_("Dictionary loading error"));
 		break;
 	case OPENCC_ERROR_CONFIG:
 		config_perror(_("Configuration error"));

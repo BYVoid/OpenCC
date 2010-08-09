@@ -89,6 +89,25 @@ int dictionary_group_load(dictionary_group_t t_dictionary, const char * filename
 	return 0;
 }
 
+dictionary_t dictionary_group_get_dictionary(dictionary_group_t t_dictionary, size_t index)
+{
+	dictionary_group_desc * dictionary_group = (dictionary_group_desc *) t_dictionary;
+
+	if (index < 0 || index >= dictionary_group->count)
+	{
+		errnum = DICTIONARY_ERROR_INVALID_INDEX;
+		return (dictionary_t) -1;
+	}
+
+	return dictionary_group->dicts[index];
+}
+
+size_t dictionary_group_count(dictionary_group_t t_dictionary)
+{
+	dictionary_group_desc * dictionary_group = (dictionary_group_desc *) t_dictionary;
+	return dictionary_group->count;
+}
+
 const ucs4_t * dictionary_group_match_longest(dictionary_group_t t_dictionary, const ucs4_t * word,
 		size_t maxlen, size_t * match_length)
 {
@@ -191,6 +210,9 @@ void dictionary_perror(const char * spec)
 		break;
 	case DICTIONARY_ERROR_INVALID_DICT:
 		perror(_("Invalid dictionary file"));
+		break;
+	case DICTIONARY_ERROR_INVALID_INDEX:
+		perror(_("Invalid dictionary index"));
 		break;
 	default:
 		perr(_("Unknown"));

@@ -18,6 +18,7 @@
 
 #include "../encoding.h"
 #include "../utils.h"
+#include "../dictionary_group.h"
 #include "../dictionary/datrie.h"
 #include "../dictionary/text.h"
 #include <unistd.h>
@@ -228,18 +229,29 @@ int cmp(const void *a, const void *b)
 	return ucs4cmp(((const opencc_entry *)a)->key, ((const opencc_entry *)b)->key);
 }
 
-void init(const char * file_name)
+void init(const char * filename)
 {
-	dictionary_t dictionary = dictionary_text_open(file_name);
+	dictionary_group_t dictionary_group = dictionary_group_open();
 
-	if (dictionary == (dictionary_t) -1)
+	if (dictionary_group_load(dictionary_group, filename, OPENCC_DICTIONARY_TYPE_TEXT) == -1)
 	{
-		//TODO: dict_perror(_("Dictionary loading error"));
+		dictionary_perror("Dictionary loading error");
+		fprintf(stderr, _("\n"));
+		exit(1);
+	}
+
+	dictionary_t t_dictionary = dictionary_group_get_dictionary(dictionary_group, 0);
+	if (t_dictionary == (dictionary_t) -1)
+	{
+		dictionary_perror("Dictionary loading error");
 		fprintf(stderr, _("\n"));
 		exit(1);
 	}
 
 	static opencc_entry tlexicon[DATRIE_WORD_MAX_COUNT];
+
+	/* TODO add datrie support */
+	dictionary_t dictionary = dictionary_get(t_dictionary);
 	lexicon_count = dictionary_text_get_lexicon(dictionary, tlexicon);
 
 	qsort(tlexicon, lexicon_count, sizeof(tlexicon[0]), cmp);

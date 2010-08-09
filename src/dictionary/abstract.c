@@ -46,6 +46,12 @@ dictionary_t dictionary_open(const char * filename, opencc_dictionary_type type)
 	return dictionary;
 }
 
+dictionary_t dictionary_get(dictionary_t t_dictionary)
+{
+	dictionary_desc * dictionary = (dictionary_desc *) t_dictionary;
+	return dictionary->dict;
+}
+
 void dictionary_close(dictionary_t t_dictionary)
 {
 	dictionary_desc * dictionary = (dictionary_desc *) t_dictionary;

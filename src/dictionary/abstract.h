@@ -33,6 +33,8 @@ dictionary_t dictionary_open(const char * filename, opencc_dictionary_type type)
 
 void dictionary_close(dictionary_t t_dictionary);
 
+dictionary_t dictionary_get(dictionary_t t_dictionary);
+
 const ucs4_t * dictionary_match_longest(dictionary_t t_dictionary, const ucs4_t * word,
 		size_t maxlen, size_t * match_length);
 

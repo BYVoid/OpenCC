@@ -30,6 +30,7 @@ typedef enum
 	DICTIONARY_ERROR_NODICT,
 	DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE,
 	DICTIONARY_ERROR_INVALID_DICT,
+	DICTIONARY_ERROR_INVALID_INDEX,
 } dictionary_error;
 
 dictionary_group_t dictionary_group_open(void);
@@ -44,6 +45,10 @@ const ucs4_t * dictionary_group_match_longest(dictionary_group_t t_dictionary, c
 
 size_t dictionary_group_get_all_match_lengths(dictionary_group_t t_dictionary, const ucs4_t * word,
 		size_t * match_length);
+
+dictionary_t dictionary_group_get_dictionary(dictionary_group_t t_dictionary, size_t index);
+
+size_t dictionary_group_count(dictionary_group_t t_dictionary);
 
 dictionary_error dictionary_errno(void);
 

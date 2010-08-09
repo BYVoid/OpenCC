@@ -111,6 +111,7 @@ opencc_dict_CFLAGS = \
 
 opencc_dict_LDADD = \
 	$(libopencc) \
+	@LIB_ICONV@ \
 	$(NULL)
 
 pkgdata_DATA = \

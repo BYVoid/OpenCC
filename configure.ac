@@ -31,6 +31,7 @@ m4_define([package_url], [http://code.google.com/p/open-chinese-convert])
 m4_define([package_url_bugreport], [http://code.google.com/p/open-chinese-convert/issues/entry])
 
 AC_INIT([package_name], [opencc_version], [package_url_bugreport], [package_name], [package_url])
+AC_CANONICAL_HOST
 
 AM_INIT_AUTOMAKE([1.10])
 AC_GNU_SOURCE
@@ -50,6 +51,12 @@ AC_PROG_RANLIB
 AC_ISC_POSIX
 AC_HEADER_STDC
 AM_PROG_LIBTOOL
+
+case "${host}" in
+	*-apple-*) LIB_ICONV="-liconv" ;;
+	*)	LIB_ICONV="" ;;
+esac
+AC_SUBST(LIB_ICONV)
 
 # If only source code changed, lt_revision + 1
 # If any interface added, lt_age + 1

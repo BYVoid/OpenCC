@@ -181,7 +181,6 @@ opencc_t opencc_open(const char * config_file)
 			{
 				opencc_close((opencc_t) od);
 				config_close(ct);
-				errnum = OPENCC_ERROR_DICTLOAD;
 				return (opencc_t) -1;
 			}
 		}
@@ -215,23 +214,19 @@ int opencc_dict_load(opencc_t odt, const char * dict_filename,
 
 	opencc_description * od = (opencc_description *) odt;
 
-	int retval;
 	if (od->dicts == NULL)
+		od->dicts = dict_open();
+
+	int retval = dict_load(od->dicts, dict_filename, dict_type);
+
+	if (retval == -1)
 	{
-		od->dicts = dict_open(dict_filename, dict_type);
-		if (od->dicts == (opencc_dictionary_t) -1)
-		{
-			od->dicts = NULL;
-			return -1;
-		}
-		retval = 0;
-	}
-	else
-	{
-		retval = dict_load(od->dicts, dict_filename, dict_type);
+		errnum = OPENCC_ERROR_DICTLOAD;
+		return -1;
 	}
 
 	converter_assign_dicts(od->converter, od->dicts);
+
 	return retval;
 }
 

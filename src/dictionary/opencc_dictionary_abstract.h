@@ -37,6 +37,7 @@ typedef struct
 {
 	size_t dict_count;
 	dictionary dict[DICTIONARY_MAX_COUNT];
+	ssize_t current;
 } opencc_dictionary_description;
 
 dict_ptr dict_abstract_open(dictionary * dict);

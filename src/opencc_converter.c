@@ -21,6 +21,9 @@
 #include "opencc_encoding.h"
 #include "opencc_dictionary.h"
 
+#include <wchar.h>
+wchar_t *ttt;
+
 #define SEGMENT_MAXIMUM_LENGTH 0
 #define SEGMENT_SHORTEST_PATH 1
 #define SEGMENT_METHOD SEGMENT_SHORTEST_PATH
@@ -291,14 +294,86 @@ size_t converter_convert(opencc_converter_t cdt, ucs4_t ** inbuf, size_t * inbuf
 		return (size_t) -1;
 	}
 
-	return segment
-	(
-		cd,
-		inbuf,
-		inbuf_left,
-		outbuf,
-		outbuf_left
-	);
+	if (dict_count(cd->dicts) == 1)
+	{
+		/* 只有一個辭典，直接輸出 */
+		return segment
+		(
+			cd,
+			inbuf,
+			inbuf_left,
+			outbuf,
+			outbuf_left
+		);
+	}
+
+	//啓用辭典轉換鏈
+	size_t inbuf_size = *inbuf_left;
+	size_t outbuf_size = *outbuf_left;
+	size_t retval;
+	size_t cinbuf_left, coutbuf_left, coutbuf_delta;
+	ssize_t i, cur;
+
+	ucs4_t * tmpbuf = (ucs4_t *) malloc(sizeof(ucs4_t) * outbuf_size);
+	ucs4_t * orig_outbuf = * outbuf;
+	ucs4_t * cinbuf, * coutbuf;
+
+	cinbuf_left = inbuf_size;
+	coutbuf_left = outbuf_size;
+	cinbuf = *inbuf;
+	coutbuf = tmpbuf;
+
+	for (i = cur = 0; i < dict_count(cd->dicts); ++i, cur = 1 - cur)
+	{
+		if (i > 0)
+		{
+			cinbuf_left = coutbuf_delta;
+			coutbuf_left = outbuf_size;
+			if (cur == 1)
+			{
+				cinbuf = tmpbuf;
+				coutbuf = orig_outbuf;
+			}
+			else
+			{
+				cinbuf = orig_outbuf;
+				coutbuf = tmpbuf;
+			}
+		}
+
+		dict_use(cd->dicts, i);
+		size_t ret = segment
+		(
+			cd,
+			&cinbuf,
+			&cinbuf_left,
+			&coutbuf,
+			&coutbuf_left
+		);
+		if (ret == (size_t) -1)
+		{
+			free(tmpbuf);
+			return (size_t) -1;
+		}
+		coutbuf_delta = outbuf_size - coutbuf_left;
+		if (i == 0)
+		{
+			retval = ret;
+			*inbuf = cinbuf;
+			*inbuf_left = cinbuf_left;
+		}
+	}
+
+	if (cur == 1)
+	{
+		//結果在緩衝區
+		memcpy(*outbuf, tmpbuf, coutbuf_delta);
+	}
+	*outbuf = coutbuf;
+	*outbuf_left = coutbuf_left;
+	free(tmpbuf);
+
+	return retval;
 }
 
 void converter_assign_dicts(opencc_converter_t cdt, opencc_dictionary_t dicts)

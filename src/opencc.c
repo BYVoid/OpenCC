@@ -172,10 +172,10 @@ opencc_t opencc_open(const char * config_file)
 
 		opencc_dictionary * dicts = config_get_dictionary(ct, &dict_count);
 
-		int i, ret;
-		for (i = dict_count - 1; i >= 0 ; i --)
+		size_t i;
+		for (i = 0; i < dict_count ; i ++)
 		{
-			ret = opencc_dict_load((opencc_t) od, dicts[i].file_name, dicts[i].dict_type);
+			int ret = opencc_dict_load((opencc_t) od, dicts[i].file_name, dicts[i].dict_type);
 
 			if (ret == -1)
 			{

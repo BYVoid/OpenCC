@@ -23,12 +23,11 @@
 static dictionary_error errnum = DICTIONARY_ERROR_VOID;
 
 const ucs4_t * dict_match_longest(opencc_dictionary_t ddt, const ucs4_t * word,
-		size_t length)
+		size_t maxlen, size_t * match_length)
 {
 	opencc_dictionary_description * dd = (opencc_dictionary_description *) ddt;
 
 	const ucs4_t * retvel = NULL;
-	size_t match_length, max_length = 0;
 
 	if (dd->dict_count == 0)
 	{
@@ -36,22 +35,34 @@ const ucs4_t * dict_match_longest(opencc_dictionary_t ddt, const ucs4_t * word,
 		return (const ucs4_t *) -1;
 	}
 
-	int i;
-	/* 依次查找每個辭典，取得最長匹配長度 */
-	for (i = dd->dict_count - 1; i >= 0; i --)
+	if (dd->current == DICT_USEALL)
 	{
-		const ucs4_t * t_retvel =
-				dict_abstract_match_longest(dd->dict + i, word, length);
-
-		if (t_retvel != NULL)
+		size_t t_match_length, max_length = 0;
+		size_t i;
+		/* 依次查找每個辭典，取得最長匹配長度 */
+		for (i = 0; i < dd->dict_count; i ++)
 		{
-			match_length = ucs4len(t_retvel);
-			if (match_length > max_length)
+			const ucs4_t * t_retvel =
+					dict_abstract_match_longest(dd->dict + i, word, maxlen, &t_match_length);
+
+			if (t_retvel != NULL)
 			{
-				max_length = match_length;
-				retvel = t_retvel;
+				if (t_match_length > max_length)
+				{
+					max_length = t_match_length;
+					retvel = t_retvel;
+				}
 			}
 		}
+
+		if (match_length != NULL)
+		{
+			*match_length = max_length;
+		}
+	}
+	else
+	{
+		return dict_abstract_match_longest(dd->dict + dd->current, word, maxlen, match_length);
 	}
 
 	return retvel;
@@ -61,7 +72,6 @@ size_t dict_get_all_match_lengths(opencc_dictionary_t ddt, const ucs4_t * word,
 		size_t * match_length)
 {
 	opencc_dictionary_description * dd = (opencc_dictionary_description *) ddt;
-	size_t rscnt = 0;
 
 	if (dd->dict_count == 0)
 	{
@@ -69,27 +79,34 @@ size_t dict_get_all_match_lengths(opencc_dictionary_t ddt, const ucs4_t * word,
 		return (size_t) -1;
 	}
 
-	int i;
-	for (i = 0; i < dd->dict_count; i --)
+	if (dd->current == DICT_USEALL)
 	{
-		size_t retval;
-		retval = dict_abstract_get_all_match_lengths(dd->dict + i, word, match_length + rscnt);
-		rscnt += retval;
-		/* 去除重複長度 */
-		if (i > 0 && rscnt > 1)
+		size_t rscnt = 0;
+		ssize_t i;
+		for (i = 0; i < dd->dict_count; i --)
 		{
-			qsort(match_length, rscnt, sizeof(match_length[0]), qsort_int_cmp);
-			int j, k;
-			for (j = 0, k = 1; k < rscnt; k ++)
+			size_t retval;
+			retval = dict_abstract_get_all_match_lengths(dd->dict + i, word, match_length + rscnt);
+			rscnt += retval;
+			/* 去除重複長度 */
+			if (i > 0 && rscnt > 1)
 			{
-				if (match_length[k] != match_length[j])
-					match_length[++ j] = match_length[k];
+				qsort(match_length, rscnt, sizeof(match_length[0]), qsort_int_cmp);
+				int j, k;
+				for (j = 0, k = 1; k < rscnt; k ++)
+				{
+					if (match_length[k] != match_length[j])
+						match_length[++ j] = match_length[k];
+				}
+				rscnt = j;
 			}
-			rscnt = j;
 		}
+		return rscnt;
 	}
-
-	return rscnt;
+	else
+	{
+		return dict_abstract_get_all_match_lengths(dd->dict + dd->current, word, match_length);
+	}
 }
 
 size_t dict_get_lexicon(opencc_dictionary_t ddt, opencc_entry * lexicon)
@@ -142,11 +159,10 @@ int dict_load(opencc_dictionary_t ddt, const char * dict_filename,
 
 	dict_ptr dp = dict_abstract_open(&dict);
 
-	free(dict.filename);
-
 	if (dp == (dict_ptr) -1)
 	{
 		errnum = DICTIONARY_ERROR_INVALID_DICT;
+		free(dict.filename);
 		return -1; /* 辭典讀取錯誤 */
 	}
 
@@ -155,6 +171,8 @@ int dict_load(opencc_dictionary_t ddt, const char * dict_filename,
 	dd->dict[i].filename = (char *) malloc(sizeof(char) * (strlen(dict.filename) + 1));
 	strcpy(dd->dict[i].filename, dict.filename);
 	dd->dict[i].dict = dp;
+
+	free(dict.filename);
 
 	return 0;
 }
@@ -172,19 +190,31 @@ int dict_close(opencc_dictionary_t ddt)
 	return 0;
 }
 
-opencc_dictionary_t dict_open(const char * dict_filename, opencc_dictionary_type dict_type)
+opencc_dictionary_t dict_open(void)
 {
 	opencc_dictionary_description * dd;
 	dd = (opencc_dictionary_description *) malloc(sizeof(opencc_dictionary_description));
-
 	dd->dict_count = 0;
-	if (dict_load((opencc_dictionary_t) dd, dict_filename, dict_type) == -1)
-	{
-		dict_close((opencc_dictionary_t) dd);
-		return (opencc_dictionary_t) -1;
-	}
-
+	dd->current = DICT_USEALL;
 	return (opencc_dictionary_t) dd;
+}
+
+size_t dict_count(opencc_dictionary_t ddt)
+{
+	opencc_dictionary_description * dd = (opencc_dictionary_description *) ddt;
+	return dd->dict_count;
+}
+
+int dict_use(opencc_dictionary_t ddt, ssize_t index)
+{
+	opencc_dictionary_description * dd = (opencc_dictionary_description *) ddt;
+	if (index == DICT_USEALL || (index >= 0 && index < dd->dict_count))
+	{
+		dd->current = index;
+		return 0;
+	}
+	errnum = DICTIONARY_ERROR_INVALID_INDEX;
+	return -1;
 }
 
 dictionary_error dict_errnum(void)
@@ -208,6 +238,9 @@ void dict_perror(const char * spec)
 		break;
 	case DICTIONARY_ERROR_INVALID_DICT:
 		perror(_("Invalid dictionary file"));
+		break;
+	case DICTIONARY_ERROR_INVALID_INDEX:
+		perror(_("Invalid dictionary index"));
 		break;
 	default:
 		perr(_("Unknown"));

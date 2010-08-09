@@ -23,6 +23,7 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
 #include <stdint.h>
 
 typedef void * opencc_t;
@@ -43,12 +44,6 @@ typedef enum
 	OPENCC_DICTIONARY_TYPE_TEXT,
 	OPENCC_DICTIONARY_TYPE_DATRIE,
 } opencc_dictionary_type;
-
-typedef struct
-{
-	opencc_dictionary_type dict_type;
-	char * file_name;
-} opencc_dictionary;
 
 #ifdef __cplusplus
 };

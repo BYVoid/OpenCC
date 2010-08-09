@@ -77,5 +77,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Jul 29 2010 BYVoid <byvoid.kcp@gmail.com> - 0.1.0-1
+- Upstream release.
 * Fri Jul 16 2010 BYVoid <byvoid.kcp@gmail.com> - 0.0.4-1
 - Initial release of RPM.

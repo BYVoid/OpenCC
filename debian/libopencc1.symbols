@@ -1,0 +1,8 @@
+libopencc.so.1 libopencc1 #MINVER#
+ opencc_close@Base 0.1.0
+ opencc_convert@Base 0.1.0
+ opencc_convert_utf8@Base 0.1.0
+ opencc_dict_load@Base 0.1.0
+ opencc_errno@Base 0.1.0
+ opencc_open@Base 0.1.0
+ opencc_perror@Base 0.1.0

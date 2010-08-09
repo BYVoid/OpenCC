@@ -230,9 +230,9 @@ int cmp(const void *a, const void *b)
 
 void init(const char * file_name)
 {
-	opencc_dictionary_t dt = dict_open(file_name, OPENCC_DICTIONARY_TYPE_TEXT);
+	opencc_dictionary_t dt = dict_open();
 
-	if (dt == (opencc_dictionary_t) -1)
+	if (dict_load(dt, file_name, OPENCC_DICTIONARY_TYPE_TEXT) == -1)
 	{
 		dict_perror(_("Dictionary loading error"));
 		fprintf(stderr, _("\n"));
@@ -278,7 +278,7 @@ void output(const char * file_name)
 	size_t lexicon_length = lexicon[lexicon_count - 1].pos +
 			ucs4len(lexicon[lexicon_count - 1].value) + 1;
 
-	fwrite(OPENCC_DICHEADER, sizeof(char), strlen(OPENCC_DICHEADER), fp);
+	fwrite("OPENCCDATRIE", sizeof(char), strlen("OPENCCDATRIE"), fp);
 	fwrite(&lexicon_length, sizeof(size_t), 1, fp);
 	fwrite(&item_count, sizeof(size_t), 1, fp);
 

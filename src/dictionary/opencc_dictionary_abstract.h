@@ -37,6 +37,7 @@ typedef struct
 {
 	size_t dict_count;
 	dictionary dict[DICTIONARY_MAX_COUNT];
+	ssize_t current;
 } opencc_dictionary_description;
 
 dict_ptr dict_abstract_open(dictionary * dict);
@@ -44,7 +45,7 @@ dict_ptr dict_abstract_open(dictionary * dict);
 void dict_abstract_close(dictionary * dict);
 
 const ucs4_t * dict_abstract_match_longest(dictionary * dict, const ucs4_t * word,
-		size_t length);
+		size_t maxlen, size_t * match_length);
 
 size_t dict_abstract_get_all_match_lengths(dictionary * dict, const ucs4_t * word,
 		size_t * match_length);

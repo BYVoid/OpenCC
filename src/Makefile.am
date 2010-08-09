@@ -114,8 +114,10 @@ opencc_dict_LDADD = \
 	$(NULL)
 
 pkgdata_DATA = \
-	simp_to_trad.ocd \
-	trad_to_simp.ocd \
+	simp_to_trad_characters.ocd \
+	simp_to_trad_phrases.ocd \
+	trad_to_simp_characters.ocd \
+	trad_to_simp_phrases.ocd \
 	$(NULL)
 
 EXTRA_DIST = \
@@ -125,13 +127,23 @@ CLEANFILES = \
 	$(pkgdata_DATA) \
 	$(NULL)
 
-simp_to_trad_txt = $(top_srcdir)/data/simp_to_trad.txt
-trad_to_simp_txt = $(top_srcdir)/data/trad_to_simp.txt
+simp_to_trad_characters_txt = $(top_srcdir)/data/simp_to_trad/characters.txt
+simp_to_trad_phrases_txt = $(top_srcdir)/data/simp_to_trad/phrases.txt
+trad_to_simp_characters_txt = $(top_srcdir)/data/trad_to_simp/characters.txt
+trad_to_simp_phrases_txt = $(top_srcdir)/data/trad_to_simp/phrases.txt
 
-simp_to_trad.ocd: $(simp_to_trad_txt) opencc_dict
+simp_to_trad_characters.ocd: $(simp_to_trad_characters_txt) opencc_dict
 	$(AM_V_GEN) \
-	./opencc_dict -i $(simp_to_trad_txt) -o $@
+	./opencc_dict -i $(simp_to_trad_characters_txt) -o $@
 
-trad_to_simp.ocd: $(trad_to_simp_txt) opencc_dict
+simp_to_trad_phrases.ocd: $(simp_to_trad_phrases_txt) opencc_dict
 	$(AM_V_GEN) \
-	./opencc_dict -i $(trad_to_simp_txt) -o $@
+	./opencc_dict -i $(simp_to_trad_phrases_txt) -o $@
+
+trad_to_simp_characters.ocd: $(trad_to_simp_characters_txt) opencc_dict
+	$(AM_V_GEN) \
+	./opencc_dict -i $(trad_to_simp_characters_txt) -o $@
+
+trad_to_simp_phrases.ocd: $(trad_to_simp_phrases_txt) opencc_dict
+	$(AM_V_GEN) \
+	./opencc_dict -i $(trad_to_simp_phrases_txt) -o $@

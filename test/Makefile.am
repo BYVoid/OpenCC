@@ -9,6 +9,10 @@ testcases = \
 	zhs2zht.ans \
 	zht2zhs.in \
 	zht2zhs.ans \
+	mix2zht.in \
+	mix2zht.ans \
+	mix2zhs.in \
+	mix2zhs.ans \
 	$(NULL)
 
 EXTRA_DIST = \
@@ -24,3 +28,5 @@ test: $(opencc) $(dictionary) $(config) $(check_sh) $(testcases)
 	$(link) $(config) .
 	$(SHELL) $(check_sh) zhs2zht
 	$(SHELL) $(check_sh) zht2zhs
+	$(SHELL) $(check_sh) mix2zht
+	$(SHELL) $(check_sh) mix2zhs

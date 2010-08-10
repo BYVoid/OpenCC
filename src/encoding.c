@@ -22,8 +22,13 @@
 #include <errno.h>
 
 #define OUTER_ENCODIND "UTF-8"
-#define INNER_ENCODIND "UCS-4LE"
-/* FIXME le*/
+
+#if BYTEORDER == LITTLE_ENDIAN
+#	define INNER_ENCODIND "UCS-4LE"
+#else
+#	define INNER_ENCODIND "UCS-4BE"
+#endif
+
 #define INITIAL_BUFF_SIZE 1024
 
 ucs4_t * utf8_to_ucs4(const char * inbuf, size_t inbuf_len)

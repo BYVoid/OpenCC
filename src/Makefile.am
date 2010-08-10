@@ -24,6 +24,7 @@ bin_PROGRAMS = opencc opencc_dict
 macro_cflags = \
 	-DPKGDATADIR=\"$(pkgdatadir)\" \
 	-DLOCALEDIR=\"$(localedir)\" \
+	-DBYTEORDER=@BYTEORDER@ \
 	$(NULL)
 
 libopencc_headers = \

@@ -52,6 +52,14 @@ AC_ISC_POSIX
 AC_HEADER_STDC
 AM_PROG_LIBTOOL
 
+AC_C_BIGENDIAN
+if test "x$ac_cv_c_bigendian" = "xyes"; then
+	BYTEORDER="BIG_ENDIAN"
+else
+	BYTEORDER="LITTLE_ENDIAN"
+fi
+AC_SUBST(BYTEORDER)
+
 case "${host}" in
 	*-apple-*) LIB_ICONV="-liconv" ;;
 	*)	LIB_ICONV="" ;;

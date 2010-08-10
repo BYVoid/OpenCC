@@ -30,6 +30,14 @@
 #define TRUE (!(0))
 #define INFINITY_INT ((~0U)>>1)
 
+#ifndef BIG_ENDIAN
+#	define BIG_ENDIAN (0)
+#endif
+
+#ifndef LITTLE_ENDIAN
+#	define LITTLE_ENDIAN (1)
+#endif
+
 #ifdef HAVE_CONFIG_H
 #	include "config.h"
 #endif

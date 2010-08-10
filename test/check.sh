@@ -16,6 +16,7 @@ if [ "$?" -eq "0" ]; then
 		echo $ret
 		false
 	fi
+	unlink $@.out
 else
 	false
 fi

@@ -71,7 +71,7 @@ AC_SUBST(LIB_ICONV)
 # If any interfaces changed or removed, lt_current + 1, lt_revision = 0, lt_age = 0
 m4_define([lt_current], [1])
 m4_define([lt_revision], [0])
-m4_define([lt_age], [1])
+m4_define([lt_age], [0])
 LT_VERSION_INFO="lt_current:lt_revision:lt_age"
 AC_SUBST(LT_VERSION_INFO)
 

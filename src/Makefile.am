@@ -98,6 +98,8 @@ opencc_dict_DEPENDENCIES = \
 
 opencc_dict_SOURCES = \
 	tools/opencc_dict.c \
+	dictionary_group.c \
+	dictionary_group.h \
 	encoding.c \
 	encoding.h \
 	utils.c \

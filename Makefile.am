@@ -22,6 +22,7 @@ SUBDIRS = \
 	src \
 	m4 \
 	po \
+	test \
 	$(NULL)
 
 ACLOCAL_AMFLAGS = -I m4

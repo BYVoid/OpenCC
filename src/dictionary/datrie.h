@@ -19,7 +19,7 @@
 #ifndef __OPENCC_DICTIONARY_DATRIE_H_
 #define __OPENCC_DICTIONARY_DATRIE_H_
 
-#include "opencc_dictionary_abstract.h"
+#include "abstract.h"
 
 #define DATRIE_UNUSED -1
 
@@ -30,17 +30,15 @@ typedef struct
 	int word;
 } DoubleArrayTrieItem;
 
-dict_ptr dict_datrie_open(const char * filename);
+dictionary_t dictionary_datrie_open(const char * filename);
 
-int dict_datrie_close(dict_ptr dp);
+int dictionary_datrie_close(dictionary_t t_dictionary);
 
-const ucs4_t * dict_datrie_match_longest(dict_ptr dp, const ucs4_t * word,
-		size_t length);
+const ucs4_t * dictionary_datrie_match_longest(dictionary_t t_dictionary, const ucs4_t * word,
+		size_t maxlen, size_t * match_length);
 
-size_t dict_datrie_get_all_match_lengths(dict_ptr dp, const ucs4_t * word,
+size_t dictionary_datrie_get_all_match_lengths(dictionary_t t_dictionary, const ucs4_t * word,
 		size_t * match_length);
-
-size_t dict_datrie_get_lexicon(dict_ptr dp, opencc_entry * lexicon);
 
 int encode_char(ucs4_t ch);
 

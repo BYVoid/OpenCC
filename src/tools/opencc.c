@@ -17,7 +17,7 @@
 */
 
 #include "../opencc.h"
-#include "../opencc_utils.h"
+#include "../utils.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>

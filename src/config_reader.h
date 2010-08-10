@@ -16,21 +16,31 @@
 * limitations under the License.
 */
 
-#ifndef __OPENCC_DICTIONARY_TEXT_H_
-#define __OPENCC_DICTIONARY_TEXT_H_
+#ifndef __OPENCC_CONFIG_H_
+#define __OPENCC_CONFIG_H_
 
-#include "opencc_dictionary_abstract.h"
+#include "utils.h"
+#include "dictionary_set.h"
 
-dict_ptr dict_text_open(const char * filename);
+typedef void * config_t;
 
-void dict_text_close(dict_ptr dp);
+typedef enum
+{
+	CONFIG_ERROR_VOID,
+	CONFIG_ERROR_CANNOT_ACCESS_CONFIG_FILE,
+	CONFIG_ERROR_PARSE,
+	CONFIG_ERROR_NO_PROPERTY,
+	CONFIG_ERROR_INVALID_DICT_TYPE,
+} config_error;
 
-const ucs4_t * dict_text_match_longest(dict_ptr dp, const ucs4_t * word,
-		size_t length);
+config_t config_open(const char * filename);
 
-size_t dict_text_get_all_match_lengths(dict_ptr dp, const ucs4_t * word,
-		size_t * match_length);
+void config_close(config_t t_config);
 
-size_t dict_text_get_lexicon(dict_ptr dp, opencc_entry * lexicon);
+dictionary_set_t config_get_dictionary_set(config_t t_config);
 
-#endif /* __OPENCC_DICTIONARY_TEXT_H_ */
+config_error config_errno(void);
+
+void config_perror(const char * spec);
+
+#endif /* __OPENCC_CONFIG_H_ */

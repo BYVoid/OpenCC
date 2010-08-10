@@ -1,7 +1,7 @@
 /*
 * Open Chinese Convert
 *
-* Copyright 2010 BYVoid <byvoid1@gmail.com>
+* Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,29 +16,22 @@
 * limitations under the License.
 */
 
-#include "opencc_utils.h"
+#ifndef __DICTIONARY_SET_H_
+#define __DICTIONARY_SET_H_
 
-void perr(const char * str)
-{
-	fputs(str, stderr);
-}
+#include "utils.h"
+#include "dictionary_group.h"
 
-int qsort_int_cmp(const void * a, const void * b)
-{
-	return *((int *) a) - *((int *) b);
-}
+typedef void * dictionary_set_t;
 
-char * mstrcpy(const char * str)
-{
-	char * strbuf = (char *) malloc(sizeof(char) * (strlen(str) + 1));
-	strcpy(strbuf, str);
-	return strbuf;
-}
+dictionary_set_t dictionary_set_open(void);
 
-char * mstrncpy(const char * str, size_t n)
-{
-	char * strbuf = (char *) malloc(sizeof(char) * (n + 1));
-	strncpy(strbuf, str, n);
-	strbuf[n] = '\0';
-	return strbuf;
-}
+void dictionary_set_close(dictionary_set_t t_dictionary);
+
+dictionary_group_t dictionary_set_new_group(dictionary_set_t t_dictionary);
+
+dictionary_group_t dictionary_set_get_group(dictionary_set_t t_dictionary, size_t index);
+
+size_t dictionary_set_count_group(dictionary_set_t t_dictionary);
+
+#endif /* __DICTIONARY_SET_H_ */

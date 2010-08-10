@@ -16,12 +16,12 @@
 * limitations under the License.
 */
 
-#ifndef __OPENCC_CONVERT_H_
-#define __OPENCC_CONVERT_H_
+#ifndef __CONVERTER_H_
+#define __CONVERTER_H_
 
-#include "opencc_dictionary.h"
+#include "dictionary_set.h"
 
-typedef void * opencc_converter_t;
+typedef void * converter_t;
 
 typedef enum
 {
@@ -30,16 +30,17 @@ typedef enum
 	CONVERTER_ERROR_OUTBUF,
 } converter_error;
 
-void converter_assign_dicts(opencc_converter_t cdt, opencc_dictionary_t dicts);
+void converter_assign_dictionary(converter_t t_converter, dictionary_set_t dictionary_set);
 
-opencc_converter_t converter_open();
+converter_t converter_open(void);
 
-void converter_close(opencc_converter_t cdt);
+void converter_close(converter_t t_converter);
 
-size_t converter_convert(opencc_converter_t cdt, ucs4_t ** inbuf, size_t * inbuf_left,
+size_t converter_convert(converter_t t_converter, ucs4_t ** inbuf, size_t * inbuf_left,
 		ucs4_t ** outbuf, size_t * outbuf_left);
 
 converter_error converter_errno(void);
+
 void converter_perror(const char * spec);
 
-#endif /* __OPENCC_CONVERT_H_ */
+#endif /* __CONVERTER_H_ */

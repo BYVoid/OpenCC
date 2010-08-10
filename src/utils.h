@@ -53,7 +53,7 @@
 
 #define debug_should_not_be_here() \
 	do { \
-	fprintf(stderr, "Should not be here"); \
+	fprintf(stderr, "Should not be here %s: %d\n", __FILE__, __LINE__); \
 	assert(0); \
 	} while(0)\
 

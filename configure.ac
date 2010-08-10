@@ -17,10 +17,10 @@
 #
 
 m4_define([package_name], [opencc])
-m4_define([opencc_released], [1])
+m4_define([opencc_released], [0])
 m4_define([opencc_major_version], [0])
 m4_define([opencc_minor_version], [1])
-m4_define([opencc_micro_version], [0])
+m4_define([opencc_micro_version], [1])
 m4_define(opencc_maybe_datestamp,
 	m4_esyscmd([if test x]opencc_released[ != x1; then date +.%Y%m%d | tr -d '\n\r'; fi]))
 
@@ -82,6 +82,7 @@ data/Makefile
 doc/Makefile
 m4/Makefile
 src/Makefile
+test/Makefile
 ])
 
 AC_OUTPUT

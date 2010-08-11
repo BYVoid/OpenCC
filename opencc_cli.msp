@@ -28,7 +28,7 @@ optimizeLevel=0
 libraryPath=Debug
 outputFilename=Debug\opencc.exe
 libraries=
-extraLinkerOptions=-lopencc
+extraLinkerOptions=-lopencc -lintl
 ignoreStartupFile=0
 ignoreDefaultLibs=0
 stripExecutableFile=0
@@ -66,7 +66,7 @@ optimizeLevel=2
 libraryPath=Release
 outputFilename=Release\opencc.exe
 libraries=
-extraLinkerOptions=-lopencc
+extraLinkerOptions=-lopencc -lintl
 ignoreStartupFile=0
 ignoreDefaultLibs=0
 stripExecutableFile=1
@@ -83,7 +83,12 @@ extraResourceOptions=
 1=src\opencc_utils.c
 2=src\tools\opencc.c
 [Header]
+1=src\opencc.h
+2=src\opencc_utils.h
+3=config.win32.h
 [Resource]
 [Other]
 [History]
-src\tools\opencc.c,622
+src\tools\opencc.c,1760
+src\opencc_utils.h,1109
+config.win32.h,138

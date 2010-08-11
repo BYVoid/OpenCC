@@ -1,7 +1,7 @@
 [Project]
 name=opencc_dict
 type=0
-defaultConfig=0
+defaultConfig=1
 
 [Debug]
 // compiler 
@@ -28,7 +28,7 @@ optimizeLevel=0
 libraryPath=
 outputFilename=Debug\opencc_dict.exe
 libraries=
-extraLinkerOptions=-liconv
+extraLinkerOptions=-liconv -lintl
 ignoreStartupFile=0
 ignoreDefaultLibs=0
 stripExecutableFile=0
@@ -66,7 +66,7 @@ optimizeLevel=2
 libraryPath=
 outputFilename=Release\opencc_dict.exe
 libraries=
-extraLinkerOptions=
+extraLinkerOptions=-liconv -lintl
 ignoreStartupFile=0
 ignoreDefaultLibs=0
 stripExecutableFile=1
@@ -92,6 +92,6 @@ extraResourceOptions=
 [Resource]
 [Other]
 [History]
-src\tools\opencc_dict.c,5203
 src\opencc_encoding.c,789
-src\dictionary\opencc_dictionary_text.c,515
+src\tools\opencc_dict.c,5186
+src\dictionary\opencc_dictionary_text.c,441

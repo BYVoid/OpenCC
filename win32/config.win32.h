@@ -11,9 +11,9 @@
 
 #define PACKAGE_URL "http://code.google.com/p/open-chinese-convert/"
 
-#define PACKAGE_VERSION "0.0.5"
+#define PACKAGE_VERSION "0.1.1"
 
-//#define HAVE_GETTEXT
+#undef HAVE_GETTEXT
 
 #define HAVE_ICONV
 
@@ -21,7 +21,7 @@
 
 #define PKGDATADIR ""
 
-#define VERSION PACKAGE_VERSION".MinGW"
+#define VERSION PACKAGE_VERSION".Win32"
 
 #endif
 

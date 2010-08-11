@@ -16,37 +16,31 @@
 * limitations under the License.
 */
 
-#ifndef __OPENCC_TYPES_H_
-#define __OPENCC_TYPES_H_
+#ifndef __CONVERTER_H_
+#define __CONVERTER_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "dictionary_set.h"
 
-#include <stddef.h>
-#include <stdint.h>
-
-typedef void * opencc_t;
-
-typedef uint32_t ucs4_t;
+typedef void * converter_t;
 
 typedef enum
 {
-	OPENCC_ERROR_VOID,
-	OPENCC_ERROR_DICTLOAD,
-	OPENCC_ERROR_CONFIG,
-	OPENCC_ERROR_ENCODIND,
-	OPENCC_ERROR_CONVERTER,
-} opencc_error;
+	CONVERTER_ERROR_VOID,
+	CONVERTER_ERROR_NODICT,
+	CONVERTER_ERROR_OUTBUF,
+} converter_error;
 
-typedef enum
-{
-	OPENCC_DICTIONARY_TYPE_TEXT,
-	OPENCC_DICTIONARY_TYPE_DATRIE,
-} opencc_dictionary_type;
+void converter_assign_dictionary(converter_t t_converter, dictionary_set_t dictionary_set);
 
-#ifdef __cplusplus
-};
-#endif
+converter_t converter_open(void);
 
-#endif /* __OPENCC_TYPES_H_ */
+void converter_close(converter_t t_converter);
+
+size_t converter_convert(converter_t t_converter, ucs4_t ** inbuf, size_t * inbuf_left,
+		ucs4_t ** outbuf, size_t * outbuf_left);
+
+converter_error converter_errno(void);
+
+void converter_perror(const char * spec);
+
+#endif /* __CONVERTER_H_ */

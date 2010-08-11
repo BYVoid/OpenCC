@@ -1,7 +1,7 @@
 /*
 * Open Chinese Convert
 *
-* Copyright 2010 BYVoid <byvoid1@gmail.com>
+* Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -28,21 +28,20 @@ extern "C" {
 /*
  * Headers from C standard library
  */
-#include <wchar.h>
 
 /* Macros */
-#define OPENCC_DICHEADER "OPENCCDATRIE"
-
 #define OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD "zhs2zht.ini"
 #define OPENCC_DEFAULT_CONFIG_TRAD_TO_SIMP "zht2zhs.ini"
 
 /**
  * opencc_open:
- * @convert_direction: Direction of convert.
+ * @config_file: Location of configuration file.
  * @returns: A description pointer of the newly allocated instance of opencc.
  *
  * Make an instance of opencc.
  *
+ * Note: Leave config_file to NULL if you do not want to load any configuration file.
+ * 
  */
 opencc_t opencc_open(const char * config_file);
 
@@ -58,7 +57,7 @@ int opencc_close(opencc_t od);
 
 /**
  * opencc_convert:
- * @od: The description pointer.
+ * @od: The opencc description pointer.
  * @inbuf: The pointer to the wide character string of the input buffer.
  * @inbufleft: The maximum number of characters in *inbuf to convert.
  * @outbuf: The pointer to the wide character string of the output buffer.
@@ -68,20 +67,43 @@ int opencc_close(opencc_t od);
  *
  * Convert string from *inbuf to *outbuf.
  *
- * (Note: Don't forget to assign **outbuf to L'\0' after this method called.)
+ * Note: Don't forget to assign **outbuf to L'\0' after called.
  *
  */
 size_t opencc_convert(opencc_t od, ucs4_t ** inbuf, size_t * inbufleft,
 		ucs4_t ** outbuf, size_t * outbufleft);
 
+/**
+ * opencc_convert_utf8:
+ * @od: The opencc description pointer.
+ * @inbuf: The UTF-8 encoded string.
+ * @length: The maximum number of characters in inbuf to convert.
+ *
+ * @returns: The newly allocated UTF-8 string that converted from inbuf.
+ *
+ * Convert UTF-8 string from inbuf. This function returns a newly allocated
+ * c-style string via malloc(), which stores the converted string.
+ * DON'T FORGET TO CALL free() to recycle memory.
+ *
+ */
 char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length);
 
+/**
+ * opencc_dict_load:
+ * @od: The opencc description pointer.
+ * @dict_filename: The name (or location) of the dictionary file.
+ * @dict_type: The type of the dictionary.
+ *
+ * @returns: 0 on success or non-zero number on failure.
+ *
+ * Load a dictionary.
+ *
+ */
 int opencc_dict_load(opencc_t odt, const char * dict_filename,
 		opencc_dictionary_type dict_type);
 
 /**
  * opencc_errno:
- * @od: The description pointer.
  *
  * @returns: The error number.
  *
@@ -93,9 +115,9 @@ opencc_error opencc_errno(void);
 
 /**
  * opencc_perror:
- * @od: The description pointer.
+ * @spec Prefix message.
  *
- * Print the error message to stderr when errno is set.
+ * Print the error message to stderr.
  *
  */
 void opencc_perror(const char * spec);

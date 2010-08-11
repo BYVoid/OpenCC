@@ -16,37 +16,31 @@
 * limitations under the License.
 */
 
-#ifndef __OPENCC_TYPES_H_
-#define __OPENCC_TYPES_H_
+#ifndef __OPENCC_CONFIG_H_
+#define __OPENCC_CONFIG_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "utils.h"
+#include "dictionary_set.h"
 
-#include <stddef.h>
-#include <stdint.h>
-
-typedef void * opencc_t;
-
-typedef uint32_t ucs4_t;
+typedef void * config_t;
 
 typedef enum
 {
-	OPENCC_ERROR_VOID,
-	OPENCC_ERROR_DICTLOAD,
-	OPENCC_ERROR_CONFIG,
-	OPENCC_ERROR_ENCODIND,
-	OPENCC_ERROR_CONVERTER,
-} opencc_error;
+	CONFIG_ERROR_VOID,
+	CONFIG_ERROR_CANNOT_ACCESS_CONFIG_FILE,
+	CONFIG_ERROR_PARSE,
+	CONFIG_ERROR_NO_PROPERTY,
+	CONFIG_ERROR_INVALID_DICT_TYPE,
+} config_error;
 
-typedef enum
-{
-	OPENCC_DICTIONARY_TYPE_TEXT,
-	OPENCC_DICTIONARY_TYPE_DATRIE,
-} opencc_dictionary_type;
+config_t config_open(const char * filename);
 
-#ifdef __cplusplus
-};
-#endif
+void config_close(config_t t_config);
 
-#endif /* __OPENCC_TYPES_H_ */
+dictionary_set_t config_get_dictionary_set(config_t t_config);
+
+config_error config_errno(void);
+
+void config_perror(const char * spec);
+
+#endif /* __OPENCC_CONFIG_H_ */

@@ -16,10 +16,11 @@
 * limitations under the License.
 */
 
-#include "../opencc_dictionary.h"
-#include "../opencc_encoding.h"
-#include "../opencc_utils.h"
-#include "../dictionary/opencc_dictionary_datrie.h"
+#include "../encoding.h"
+#include "../utils.h"
+#include "../dictionary_group.h"
+#include "../dictionary/datrie.h"
+#include "../dictionary/text.h"
 #include <unistd.h>
 
 #define DATRIE_SIZE 1000000
@@ -228,20 +229,31 @@ int cmp(const void *a, const void *b)
 	return ucs4cmp(((const opencc_entry *)a)->key, ((const opencc_entry *)b)->key);
 }
 
-void init(const char * file_name)
+void init(const char * filename)
 {
-	opencc_dictionary_t dt = dict_open(file_name, OPENCC_DICTIONARY_TYPE_TEXT);
+	dictionary_group_t dictionary_group = dictionary_group_open();
 
-	if (dt == (opencc_dictionary_t) -1)
+	if (dictionary_group_load(dictionary_group, filename, OPENCC_DICTIONARY_TYPE_TEXT) == -1)
 	{
-		dict_perror(_("Dictionary loading error"));
+		dictionary_perror("Dictionary loading error");
+		fprintf(stderr, _("\n"));
+		exit(1);
+	}
+
+	dictionary_t t_dictionary = dictionary_group_get_dictionary(dictionary_group, 0);
+	if (t_dictionary == (dictionary_t) -1)
+	{
+		dictionary_perror("Dictionary loading error");
 		fprintf(stderr, _("\n"));
 		exit(1);
 	}
 
 	static opencc_entry tlexicon[DATRIE_WORD_MAX_COUNT];
 
-	lexicon_count = dict_get_lexicon(dt, tlexicon);
+	/* TODO add datrie support */
+	dictionary_t dictionary = dictionary_get(t_dictionary);
+	lexicon_count = dictionary_text_get_lexicon(dictionary, tlexicon);
+
 	qsort(tlexicon, lexicon_count, sizeof(tlexicon[0]), cmp);
 
 	size_t i;
@@ -278,7 +290,7 @@ void output(const char * file_name)
 	size_t lexicon_length = lexicon[lexicon_count - 1].pos +
 			ucs4len(lexicon[lexicon_count - 1].value) + 1;
 
-	fwrite(OPENCC_DICHEADER, sizeof(char), strlen(OPENCC_DICHEADER), fp);
+	fwrite("OPENCCDATRIE", sizeof(char), strlen("OPENCCDATRIE"), fp);
 	fwrite(&lexicon_length, sizeof(size_t), 1, fp);
 	fwrite(&item_count, sizeof(size_t), 1, fp);
 

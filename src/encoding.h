@@ -16,37 +16,21 @@
 * limitations under the License.
 */
 
-#ifndef __OPENCC_TYPES_H_
-#define __OPENCC_TYPES_H_
+#ifndef __OPENCC_ENCODING_H_
+#define __OPENCC_ENCODING_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "utils.h"
 
-#include <stddef.h>
-#include <stdint.h>
+ucs4_t * utf8_to_ucs4(const char * inbuf, size_t inbuf_len);
 
-typedef void * opencc_t;
+char * ucs4_to_utf8(const ucs4_t * inbuf, size_t inbuf_len);
 
-typedef uint32_t ucs4_t;
+size_t ucs4len(const ucs4_t * str);
 
-typedef enum
-{
-	OPENCC_ERROR_VOID,
-	OPENCC_ERROR_DICTLOAD,
-	OPENCC_ERROR_CONFIG,
-	OPENCC_ERROR_ENCODIND,
-	OPENCC_ERROR_CONVERTER,
-} opencc_error;
+int ucs4cmp(const ucs4_t * str1, const ucs4_t * str2);
 
-typedef enum
-{
-	OPENCC_DICTIONARY_TYPE_TEXT,
-	OPENCC_DICTIONARY_TYPE_DATRIE,
-} opencc_dictionary_type;
+void ucs4cpy(ucs4_t * dest, const ucs4_t * src);
 
-#ifdef __cplusplus
-};
-#endif
+void ucs4ncpy(ucs4_t * dest, const ucs4_t * src, size_t len);
 
-#endif /* __OPENCC_TYPES_H_ */
+#endif /* __OPENCC_ENCODING_H_ */

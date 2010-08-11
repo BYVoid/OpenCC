@@ -22,6 +22,7 @@ SUBDIRS = \
 	src \
 	m4 \
 	po \
+	test \
 	$(NULL)
 
 ACLOCAL_AMFLAGS = -I m4
@@ -39,6 +40,7 @@ noinst_DIST = \
 
 DISTCLEANFILES = \
 	po/stamp-it \
+	package \
 	$(NULL)
 
 rpm: dist @PACKAGE_NAME@.spec
@@ -51,17 +53,34 @@ rpm: dist @PACKAGE_NAME@.spec
 	--nodeps \
 	@PACKAGE_NAME@.spec
 
-deb: dist debian
+debsource: dist debian
+	$(AM_V_GEN) \
+	( \
+		mkdir -p package/debsource ;\
+		cd package/debsource ;\
+		rm -rf * ;\
+		tar xf ../../$(distdir).tar.gz ;\
+		cp ../../$(distdir).tar.gz @PACKAGE@_@VERSION@.orig.tar.gz ;\
+		cd $(distdir) ;\
+		cp -r ../../../debian . ;\
+		cd debian ;\
+		debuild -S -sa -tc ;\
+		cd ../.. ;\
+		rm -rf $(distdir) ;\
+	)
+
+deb: debsource
 	$(AM_V_GEN) \
 	( \
 		mkdir -p package/deb ;\
 		cd package/deb ;\
 		rm -rf * ;\
 		tar xf ../../$(distdir).tar.gz ;\
+		cp ../../$(distdir).tar.gz @PACKAGE@_@VERSION@.orig.tar.gz ;\
 		cd $(distdir) ;\
 		cp -r ../../../debian . ;\
-		dpkg-buildpackage -rfakeroot -tc -S ;\
-		dpkg-buildpackage -rfakeroot -tc ;\
-		cd .. ;\
-		rm -rf opencc-0.0.4 ;\
+		cd debian ;\
+		debuild -sa -tc ;\
+		cd ../.. ;\
+		rm -rf $(distdir) ;\
 	)

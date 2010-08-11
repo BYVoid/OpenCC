@@ -1,7 +1,7 @@
 /*
 * Open Chinese Convert
 *
-* Copyright 2010 BYVoid <byvoid1@gmail.com>
+* Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,37 +16,22 @@
 * limitations under the License.
 */
 
-#ifndef __OPENCC_TYPES_H_
-#define __OPENCC_TYPES_H_
+#ifndef __DICTIONARY_SET_H_
+#define __DICTIONARY_SET_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "utils.h"
+#include "dictionary_group.h"
 
-#include <stddef.h>
-#include <stdint.h>
+typedef void * dictionary_set_t;
 
-typedef void * opencc_t;
+dictionary_set_t dictionary_set_open(void);
 
-typedef uint32_t ucs4_t;
+void dictionary_set_close(dictionary_set_t t_dictionary);
 
-typedef enum
-{
-	OPENCC_ERROR_VOID,
-	OPENCC_ERROR_DICTLOAD,
-	OPENCC_ERROR_CONFIG,
-	OPENCC_ERROR_ENCODIND,
-	OPENCC_ERROR_CONVERTER,
-} opencc_error;
+dictionary_group_t dictionary_set_new_group(dictionary_set_t t_dictionary);
 
-typedef enum
-{
-	OPENCC_DICTIONARY_TYPE_TEXT,
-	OPENCC_DICTIONARY_TYPE_DATRIE,
-} opencc_dictionary_type;
+dictionary_group_t dictionary_set_get_group(dictionary_set_t t_dictionary, size_t index);
 
-#ifdef __cplusplus
-};
-#endif
+size_t dictionary_set_count_group(dictionary_set_t t_dictionary);
 
-#endif /* __OPENCC_TYPES_H_ */
+#endif /* __DICTIONARY_SET_H_ */

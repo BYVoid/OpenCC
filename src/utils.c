@@ -16,37 +16,29 @@
 * limitations under the License.
 */
 
-#ifndef __OPENCC_TYPES_H_
-#define __OPENCC_TYPES_H_
+#include "utils.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include <stddef.h>
-#include <stdint.h>
-
-typedef void * opencc_t;
-
-typedef uint32_t ucs4_t;
-
-typedef enum
+void perr(const char * str)
 {
-	OPENCC_ERROR_VOID,
-	OPENCC_ERROR_DICTLOAD,
-	OPENCC_ERROR_CONFIG,
-	OPENCC_ERROR_ENCODIND,
-	OPENCC_ERROR_CONVERTER,
-} opencc_error;
+	fputs(str, stderr);
+}
 
-typedef enum
+int qsort_int_cmp(const void * a, const void * b)
 {
-	OPENCC_DICTIONARY_TYPE_TEXT,
-	OPENCC_DICTIONARY_TYPE_DATRIE,
-} opencc_dictionary_type;
+	return *((int *) a) - *((int *) b);
+}
 
-#ifdef __cplusplus
-};
-#endif
+char * mstrcpy(const char * str)
+{
+	char * strbuf = (char *) malloc(sizeof(char) * (strlen(str) + 1));
+	strcpy(strbuf, str);
+	return strbuf;
+}
 
-#endif /* __OPENCC_TYPES_H_ */
+char * mstrncpy(const char * str, size_t n)
+{
+	char * strbuf = (char *) malloc(sizeof(char) * (n + 1));
+	strncpy(strbuf, str, n);
+	strbuf[n] = '\0';
+	return strbuf;
+}

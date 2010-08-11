@@ -354,9 +354,10 @@ size_t converter_convert(converter_t t_converter, ucs4_t ** inbuf, size_t * inbu
 	//啓用辭典轉換鏈
 	size_t inbuf_size = *inbuf_left;
 	size_t outbuf_size = *outbuf_left;
-	size_t retval;
-	size_t cinbuf_left, coutbuf_left, coutbuf_delta;
-	ssize_t i, cur;
+	size_t retval = (size_t) -1;
+	size_t cinbuf_left, coutbuf_left;
+	size_t coutbuf_delta = 0;
+	size_t i, cur;
 
 	ucs4_t * tmpbuf = (ucs4_t *) malloc(sizeof(ucs4_t) * outbuf_size);
 	ucs4_t * orig_outbuf = * outbuf;

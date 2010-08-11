@@ -43,7 +43,7 @@
 #endif
 
 #ifdef __WIN32
-#	include "../config.win32.h"
+#	include "config.win32.h"
 #endif
 
 #ifdef HAVE_GETTEXT

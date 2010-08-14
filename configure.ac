@@ -17,10 +17,10 @@
 #
 
 m4_define([package_name], [opencc])
-m4_define([opencc_released], [1])
+m4_define([opencc_released], [0])
 m4_define([opencc_major_version], [0])
 m4_define([opencc_minor_version], [1])
-m4_define([opencc_micro_version], [1])
+m4_define([opencc_micro_version], [2])
 m4_define(opencc_maybe_datestamp,
 	m4_esyscmd([if test x]opencc_released[ != x1; then date +.%Y%m%d | tr -d '\n\r'; fi]))
 
@@ -66,9 +66,6 @@ case "${host}" in
 esac
 AC_SUBST(LIB_ICONV)
 
-# If only source code changed, lt_revision + 1
-# If any interface added, lt_age + 1
-# If any interfaces changed or removed, lt_current + 1, lt_revision = 0, lt_age = 0
 m4_define([lt_current], [1])
 m4_define([lt_revision], [0])
 m4_define([lt_age], [0])

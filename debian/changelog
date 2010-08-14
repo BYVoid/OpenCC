@@ -1,10 +1,10 @@
-opencc (0.1.1-1) unstable; urgency=medium
+opencc (0.1.1-1) lucid; urgency=medium
 
   * New upstream release.
 
  -- Chia-Pao Kuo <byvoid.kcp@gmail.com>  Tue, 10 Aug 2010 16:41:10 +0800
 
-opencc (0.1.0-1) unstable; urgency=low
+opencc (0.1.0-1) lucid; urgency=low
 
   * New upstream release.
   * debian/control:
@@ -17,7 +17,7 @@ opencc (0.1.0-1) unstable; urgency=low
 
  -- LI Daobing <lidaobing@debian.org>  Thu, 29 Jul 2010 23:05:17 +0800
 
-opencc (0.0.5-1) unstable; urgency=low
+opencc (0.0.5-1) lucid; urgency=low
 
   * New upstream release.
   * debain/control: no longer build depends on python. 
@@ -28,14 +28,14 @@ opencc (0.0.5-1) unstable; urgency=low
 
  -- LI Daobing <lidaobing@debian.org>  Wed, 21 Jul 2010 22:42:32 +0800
 
-opencc (0.0.4-1) unstable; urgency=low
+opencc (0.0.4-1) lucid; urgency=low
 
   * New upstream release.
   * debian/control: bump standards version to 3.9.0.
 
  -- LI Daobing <lidaobing@debian.org>  Fri, 16 Jul 2010 23:52:08 +0800
 
-opencc (0.0.3-1) unstable; urgency=low
+opencc (0.0.3-1) lucid; urgency=low
 
   * New upstream release.
   * debian/opencc.install: updated.
@@ -43,7 +43,7 @@ opencc (0.0.3-1) unstable; urgency=low
 
  -- LI Daobing <lidaobing@debian.org>  Tue, 22 Jun 2010 19:08:33 +0800
 
-opencc (0.0.2-1) unstable; urgency=low
+opencc (0.0.2-1) lucid; urgency=low
 
   * Initial release (Closes: #585621)
 

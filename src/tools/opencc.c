@@ -63,7 +63,6 @@ void convert(const char * input_file, const char * output_file, const char * con
 		}
 	}
 	
-	opencc_set_conversion_mode(od, OPENCC_CONVERSION_SEGMENT_ONLY);
 	while (fgets(inbuf, BUFFER_SIZE, fp) != NULL)
 	{
 		char * outbuf;

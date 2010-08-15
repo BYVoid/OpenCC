@@ -24,9 +24,9 @@
 #define DELIMITER ' '
 #define SEGMENT_MAXIMUM_LENGTH 0
 #define SEGMENT_SHORTEST_PATH 1
-#define SEGMENT_METHOD SEGMENT_MAXIMUM_LENGTH
+#define SEGMENT_METHOD SEGMENT_SHORTEST_PATH
 
-#if SEGMENT_METHOD == SEGMENT_MAXIMUM_LENGTH
+#if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
 
 #define OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE 1024
 
@@ -84,36 +84,115 @@ static size_t sp_seg(converter_desc * converter, ucs4_t ** inbuf, size_t * inbuf
 	/* 對長度爲1時特殊優化 */
 	if (length == 1)
 	{
-		const ucs4_t * match_rs = dictionary_group_match_longest(
+		const ucs4_t * const * match_rs = dictionary_group_match_longest(
 				converter->current_dictionary_group,
 				*inbuf,
 				1,
 				NULL
 		);
 		
-		if (match_rs == NULL)
+		size_t match_len = 1;
+		if (converter->conversion_mode == OPENCC_CONVERSION_FAST)
 		{
-			**outbuf = **inbuf;
-			(*outbuf) ++,(*outbuf_left) --;
-			(*inbuf) ++,(*inbuf_left) --;
+			if (match_rs == NULL)
+			{
+				**outbuf = **inbuf;
+				(*outbuf) ++, (*outbuf_left) --;
+				(*inbuf) ++, (*inbuf_left) --;
+			}
+			else
+			{
+				const ucs4_t * result = match_rs[0];
+
+				/* 輸出緩衝區剩餘空間小於分詞長度 */
+				if (ucs4len(result) > *outbuf_left)
+				{
+					errnum = CONVERTER_ERROR_OUTBUF;
+					return (size_t) -1;
+				}
+
+				for (; *result; result ++)
+				{
+					**outbuf = *result;
+					(*outbuf) ++,(*outbuf_left) --;
+				}
+
+				*inbuf += match_len;
+				*inbuf_left -= match_len;
+			}
+		}
+		else if (converter->conversion_mode == OPENCC_CONVERSION_LIST_CANDIDATES)
+		{
+			if (match_rs == NULL)
+			{
+				**outbuf = **inbuf;
+				(*outbuf) ++, (*outbuf_left) --;
+				(*inbuf) ++, (*inbuf_left) --;
+			}
+			else
+			{
+				size_t i;
+				for (i = 0; match_rs[i] != NULL; i ++)
+				{
+					const ucs4_t * result = match_rs[i];
+					int show_delimiter = match_rs[i + 1] != NULL ? 1 : 0;
+
+					/* 輸出緩衝區剩餘空間小於分詞長度 */
+					if (ucs4len(result) + show_delimiter > *outbuf_left)
+					{
+						errnum = CONVERTER_ERROR_OUTBUF;
+						return (size_t) -1;
+					}
+
+					for (; *result; result ++)
+					{
+						**outbuf = *result;
+						(*outbuf) ++,(*outbuf_left) --;
+					}
+
+					*inbuf += match_len;
+					*inbuf_left -= match_len;
+
+					if (show_delimiter)
+					{
+						**outbuf = DELIMITER;
+						(*outbuf) ++, (*outbuf_left) --;
+					}
+				}
+			}
+		}
+		else if (converter->conversion_mode == OPENCC_CONVERSION_SEGMENT_ONLY)
+		{
+			if (match_rs == NULL)
+			{
+				**outbuf = **inbuf;
+				(*outbuf) ++, (*outbuf_left) --;
+				(*inbuf) ++, (*inbuf_left) --;
+			}
+			else
+			{
+				/* 輸出緩衝區剩餘空間小於分詞長度 */
+				if (match_len + 1 > *outbuf_left)
+				{
+					errnum = CONVERTER_ERROR_OUTBUF;
+					return (size_t) -1;
+				}
+
+				size_t i;
+				for (i = 0; i < match_len; i ++)
+				{
+					**outbuf = **inbuf;
+					(*outbuf) ++, (*outbuf_left) --;
+					(*inbuf) ++, (*inbuf_left) --;
+				}
+			}
+			**outbuf = DELIMITER;
+			(*outbuf) ++, (*outbuf_left) --;
 		}
 		else
-		{
-			if (ucs4len(match_rs) > *outbuf_left)
-			{
-				errnum = CONVERTER_ERROR_OUTBUF;
-				return (size_t) -1;
-			}
-			for (; *match_rs; match_rs ++)
-			{
-				**outbuf = *match_rs;
-				(*outbuf) ++,(*outbuf_left) --;
-			}
-			(*inbuf) ++;	(*inbuf_left) --;
-		}
-
+			debug_should_not_be_here();
 		/* 必須保證有一個字符空間 */
-		return 1;
+		return match_len;
 	}
 	
 	/* 設置緩衝區空間 */
@@ -173,7 +252,7 @@ static size_t sp_seg(converter_desc * converter, ucs4_t ** inbuf, size_t * inbuf
 		end = ossb->path[i];
 		
 		size_t match_len;
-		const ucs4_t * match_rs = dictionary_group_match_longest(
+		const ucs4_t * const * match_rs = dictionary_group_match_longest(
 				converter->current_dictionary_group,
 				*inbuf,
 				end - begin,
@@ -188,23 +267,111 @@ static size_t sp_seg(converter_desc * converter, ucs4_t ** inbuf, size_t * inbuf
 		}
 		else
 		{
-			/* 輸出緩衝區剩餘空間小於分詞長度 */
-			if (ucs4len(match_rs) > *outbuf_left)
+			if (converter->conversion_mode == OPENCC_CONVERSION_FAST)
 			{
-				if (inbuf_left_start - *inbuf_left > 0)
-					break;
-				errnum = CONVERTER_ERROR_OUTBUF;
-				return (size_t) -1;
-			}
+				if (match_rs == NULL)
+				{
+					**outbuf = **inbuf;
+					(*outbuf) ++, (*outbuf_left) --;
+					(*inbuf) ++, (*inbuf_left) --;
+				}
+				else
+				{
+					const ucs4_t * result = match_rs[0];
 
-			for (; *match_rs; match_rs ++)
+					/* 輸出緩衝區剩餘空間小於分詞長度 */
+					if (ucs4len(result) > *outbuf_left)
+					{
+						if (inbuf_left_start - *inbuf_left > 0)
+							break;
+						errnum = CONVERTER_ERROR_OUTBUF;
+						return (size_t) -1;
+					}
+
+					for (; *result; result ++)
+					{
+						**outbuf = *result;
+						(*outbuf) ++,(*outbuf_left) --;
+					}
+
+					*inbuf += match_len;
+					*inbuf_left -= match_len;
+				}
+			}
+			else if (converter->conversion_mode == OPENCC_CONVERSION_LIST_CANDIDATES)
 			{
-				**outbuf = *match_rs;
-				(*outbuf) ++,(*outbuf_left) --;
-			}
+				if (match_rs == NULL)
+				{
+					**outbuf = **inbuf;
+					(*outbuf) ++, (*outbuf_left) --;
+					(*inbuf) ++, (*inbuf_left) --;
+				}
+				else
+				{
+					size_t i;
+					for (i = 0; match_rs[i] != NULL; i ++)
+					{
+						const ucs4_t * result = match_rs[i];
+						int show_delimiter = match_rs[i + 1] != NULL ? 1 : 0;
 
-			*inbuf += match_len;
-			*inbuf_left -= match_len;
+						/* 輸出緩衝區剩餘空間小於分詞長度 */
+						if (ucs4len(result) + show_delimiter > *outbuf_left)
+						{
+							if (inbuf_left_start - *inbuf_left > 0)
+								break;
+							errnum = CONVERTER_ERROR_OUTBUF;
+							return (size_t) -1;
+						}
+
+						for (; *result; result ++)
+						{
+							**outbuf = *result;
+							(*outbuf) ++,(*outbuf_left) --;
+						}
+
+						*inbuf += match_len;
+						*inbuf_left -= match_len;
+
+						if (show_delimiter)
+						{
+							**outbuf = DELIMITER;
+							(*outbuf) ++, (*outbuf_left) --;
+						}
+					}
+				}
+			}
+			else if (converter->conversion_mode == OPENCC_CONVERSION_SEGMENT_ONLY)
+			{
+				if (match_rs == NULL)
+				{
+					**outbuf = **inbuf;
+					(*outbuf) ++, (*outbuf_left) --;
+					(*inbuf) ++, (*inbuf_left) --;
+				}
+				else
+				{
+					/* 輸出緩衝區剩餘空間小於分詞長度 */
+					if (match_len + 1 > *outbuf_left)
+					{
+						if (inbuf_left_start - *inbuf_left > 0)
+							break;
+						errnum = CONVERTER_ERROR_OUTBUF;
+						return (size_t) -1;
+					}
+
+					size_t i;
+					for (i = 0; i < match_len; i ++)
+					{
+						**outbuf = **inbuf;
+						(*outbuf) ++, (*outbuf_left) --;
+						(*inbuf) ++, (*inbuf_left) --;
+					}
+				}
+				**outbuf = DELIMITER;
+				(*outbuf) ++, (*outbuf_left) --;
+			}
+			else
+				debug_should_not_be_here();
 		}
 		
 		begin = end;
@@ -272,6 +439,12 @@ static size_t segment(converter_desc * converter,
 			errnum = CONVERTER_ERROR_OUTBUF;
 			return (size_t) -1;
 		}
+	}
+
+	if (converter->conversion_mode == OPENCC_CONVERSION_SEGMENT_ONLY)
+	{
+		(*outbuf) --;
+		(*outbuf_left) ++;
 	}
 
 	return inbuf_left_start - *inbuf_left;

@@ -136,8 +136,8 @@ static int load_dict(datrie_dictionary_desc * datrie_dictionary, FILE * fp)
 
 	datrie_dictionary->dat = (DoubleArrayTrieItem * ) (datrie_dictionary->dic_memory + offset);
 
+	/* 構造索引表 */
 	datrie_dictionary->lexicon_set = (ucs4_t ***) malloc(datrie_dictionary->lexicon_count * sizeof(ucs4_t **));
-
 	size_t i, last = 0;
 	for (i = 0; i < datrie_dictionary->lexicon_count; i ++)
 	{
@@ -165,6 +165,13 @@ static int unload_dict(datrie_dictionary_desc * datrie_dictionary)
 {
 	if (datrie_dictionary->dic_memory != NULL)
 	{
+		size_t i;
+		for (i = 0; i < datrie_dictionary->lexicon_count; i ++)
+		{
+			free(datrie_dictionary->lexicon_set[i]);
+		}
+		free(datrie_dictionary->lexicon_set);
+
 		if (MEMORY_TYPE_MMAP == datrie_dictionary->dic_memory_type)
 		{
 		#ifdef MMAP_ENABLED

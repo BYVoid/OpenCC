@@ -108,7 +108,7 @@ size_t dictionary_group_count(dictionary_group_t t_dictionary)
 	return dictionary_group->count;
 }
 
-const ucs4_t * dictionary_group_match_longest(dictionary_group_t t_dictionary, const ucs4_t * word,
+const ucs4_t * const * dictionary_group_match_longest(dictionary_group_t t_dictionary, const ucs4_t * word,
 		size_t maxlen, size_t * match_length)
 {
 	dictionary_group_desc * dictionary_group = (dictionary_group_desc *) t_dictionary;
@@ -116,17 +116,17 @@ const ucs4_t * dictionary_group_match_longest(dictionary_group_t t_dictionary, c
 	if (dictionary_group->count == 0)
 	{
 		errnum = DICTIONARY_ERROR_NODICT;
-		return (const ucs4_t *) -1;
+		return (const ucs4_t * const *) -1;
 	}
 
-	const ucs4_t * retval = NULL;
+	const ucs4_t * const * retval = NULL;
 	size_t t_match_length, max_length = 0;
 
 	size_t i;
 	for (i = 0; i < dictionary_group->count; i ++)
 	{
 		/* 依次查找每個辭典，取得最長匹配長度 */
-		const ucs4_t * t_retval = dictionary_match_longest(
+		const ucs4_t * const * t_retval = dictionary_match_longest(
 				dictionary_group->dicts[i],
 				word,
 				maxlen,

@@ -23,9 +23,9 @@
 
 #define SEGMENT_MAXIMUM_LENGTH 0
 #define SEGMENT_SHORTEST_PATH 1
-#define SEGMENT_METHOD SEGMENT_SHORTEST_PATH
+#define SEGMENT_METHOD SEGMENT_MAXIMUM_LENGTH
 
-#if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
+#if SEGMENT_METHOD == SEGMENT_MAXIMUM_LENGTH
 
 #define OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE 1024
 
@@ -288,7 +288,7 @@ static size_t segment(converter_desc * converter,
 	for (; **inbuf && *inbuf_left > 0 && *outbuf_left > 0;)
 	{
 		size_t match_len;
-		const ucs4_t * match_rs = dictionary_group_match_longest(
+		const ucs4_t * const * match_rs = dictionary_group_match_longest(
 				converter->current_dictionary_group,
 				*inbuf,
 				*inbuf_left,
@@ -303,8 +303,11 @@ static size_t segment(converter_desc * converter,
 		}
 		else
 		{
+			const ucs4_t * result;
+			result = match_rs[0];
+
 			/* 輸出緩衝區剩餘空間小於分詞長度 */
-			if (ucs4len(match_rs) > *outbuf_left)
+			if (ucs4len(result) > *outbuf_left)
 			{
 				if (inbuf_left_start - *inbuf_left > 0)
 					break;
@@ -312,9 +315,9 @@ static size_t segment(converter_desc * converter,
 				return (size_t) -1;
 			}
 
-			for (; *match_rs; match_rs ++)
+			for (; *result; result ++)
 			{
-				**outbuf = *match_rs;
+				**outbuf = *result;
 				(*outbuf) ++,(*outbuf_left) --;
 			}
 

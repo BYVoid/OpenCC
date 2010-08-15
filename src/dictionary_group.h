@@ -40,7 +40,7 @@ void dictionary_group_close(dictionary_group_t t_dictionary);
 int dictionary_group_load(dictionary_group_t t_dictionary, const char * filename,
 		opencc_dictionary_type type);
 
-const ucs4_t * dictionary_group_match_longest(dictionary_group_t t_dictionary, const ucs4_t * word,
+const ucs4_t * const * dictionary_group_match_longest(dictionary_group_t t_dictionary, const ucs4_t * word,
 		size_t maxlen, size_t * match_length);
 
 size_t dictionary_group_get_all_match_lengths(dictionary_group_t t_dictionary, const ucs4_t * word,

@@ -81,7 +81,7 @@ char * opencc_convert_utf8(opencc_t t_opencc, const char * inbuf, size_t length)
 	char * outbuf = original_outbuf;
 
 	/* 設置轉換緩衝區空間 */
-	size_t wbufsize = length;
+	size_t wbufsize = length + 64;
 	ucs4_t * woutbuf = (ucs4_t *) malloc(sizeof(ucs4_t) * (wbufsize + 1));
 
 	ucs4_t * pinbuf = winbuf;

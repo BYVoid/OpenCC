@@ -39,6 +39,8 @@ void converter_close(converter_t t_converter);
 size_t converter_convert(converter_t t_converter, ucs4_t ** inbuf, size_t * inbuf_left,
 		ucs4_t ** outbuf, size_t * outbuf_left);
 
+void converter_set_conversion_mode(converter_t t_converter, opencc_conversion_mode conversion_mode);
+
 converter_error converter_errno(void);
 
 void converter_perror(const char * spec);

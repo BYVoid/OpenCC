@@ -1,7 +1,7 @@
 /*
 * Open Chinese Convert
 *
-* Copyright 2010 BYVoid <byvoid1@gmail.com>
+* Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -225,6 +225,16 @@ int opencc_dict_load(opencc_t t_opencc, const char * dict_filename,
 	converter_assign_dictionary(opencc->converter, opencc->dictionary_set);
 
 	return retval;
+}
+
+void opencc_set_conversion_mode(opencc_t t_opencc, opencc_conversion_mode conversion_mode)
+{
+	if (!lib_initialized)
+		lib_initialize();
+
+	opencc_desc * opencc = (opencc_desc *) t_opencc;
+
+	converter_set_conversion_mode(opencc->converter, conversion_mode);
 }
 
 opencc_error opencc_errno(void)

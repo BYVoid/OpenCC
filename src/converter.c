@@ -1,7 +1,7 @@
 /*
 * Open Chinese Convert
 *
-* Copyright 2010 BYVoid <byvoid1@gmail.com>
+* Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 #include "encoding.h"
 #include "dictionary_set.h"
 
+#define DELIMITER ' '
 #define SEGMENT_MAXIMUM_LENGTH 0
 #define SEGMENT_SHORTEST_PATH 1
 #define SEGMENT_METHOD SEGMENT_MAXIMUM_LENGTH
@@ -48,6 +49,7 @@ typedef struct
 #endif
 	dictionary_set_t dictionary_set;
 	dictionary_group_t current_dictionary_group;
+	opencc_conversion_mode conversion_mode;
 } converter_desc;
 static converter_error errnum = CONVERTER_ERROR_VOID;
 
@@ -295,35 +297,117 @@ static size_t segment(converter_desc * converter,
 				&match_len
 		);
 
-		if (match_rs == NULL)
+		if (converter->conversion_mode == OPENCC_CONVERSION_FAST)
 		{
-			**outbuf = **inbuf;
+			if (match_rs == NULL)
+			{
+				**outbuf = **inbuf;
+				(*outbuf) ++, (*outbuf_left) --;
+				(*inbuf) ++, (*inbuf_left) --;
+			}
+			else
+			{
+				const ucs4_t * result = match_rs[0];
+
+				/* 輸出緩衝區剩餘空間小於分詞長度 */
+				if (ucs4len(result) > *outbuf_left)
+				{
+					if (inbuf_left_start - *inbuf_left > 0)
+						break;
+					errnum = CONVERTER_ERROR_OUTBUF;
+					return (size_t) -1;
+				}
+
+				for (; *result; result ++)
+				{
+					**outbuf = *result;
+					(*outbuf) ++,(*outbuf_left) --;
+				}
+
+				*inbuf += match_len;
+				*inbuf_left -= match_len;
+			}
+		}
+		else if (converter->conversion_mode == OPENCC_CONVERSION_LIST_CANDIDATES)
+		{
+			if (match_rs == NULL)
+			{
+				**outbuf = **inbuf;
+				(*outbuf) ++, (*outbuf_left) --;
+				(*inbuf) ++, (*inbuf_left) --;
+			}
+			else
+			{
+				size_t i;
+				for (i = 0; match_rs[i] != NULL; i ++)
+				{
+					const ucs4_t * result = match_rs[i];
+					int show_delimiter = match_rs[i + 1] != NULL ? 1 : 0;
+
+					/* 輸出緩衝區剩餘空間小於分詞長度 */
+					if (ucs4len(result) + show_delimiter > *outbuf_left)
+					{
+						if (inbuf_left_start - *inbuf_left > 0)
+							break;
+						errnum = CONVERTER_ERROR_OUTBUF;
+						return (size_t) -1;
+					}
+
+					for (; *result; result ++)
+					{
+						**outbuf = *result;
+						(*outbuf) ++,(*outbuf_left) --;
+					}
+
+					*inbuf += match_len;
+					*inbuf_left -= match_len;
+
+					if (show_delimiter)
+					{
+						**outbuf = DELIMITER;
+						(*outbuf) ++, (*outbuf_left) --;
+					}
+				}
+			}
+		}
+		else if (converter->conversion_mode == OPENCC_CONVERSION_SEGMENT_ONLY)
+		{
+			if (match_rs == NULL)
+			{
+				**outbuf = **inbuf;
+				(*outbuf) ++, (*outbuf_left) --;
+				(*inbuf) ++, (*inbuf_left) --;
+			}
+			else
+			{
+				/* 輸出緩衝區剩餘空間小於分詞長度 */
+				if (match_len + 1 > *outbuf_left)
+				{
+					if (inbuf_left_start - *inbuf_left > 0)
+						break;
+					errnum = CONVERTER_ERROR_OUTBUF;
+					return (size_t) -1;
+				}
+
+				size_t i;
+				for (i = 0; i < match_len; i ++)
+				{
+					**outbuf = **inbuf;
+					(*outbuf) ++, (*outbuf_left) --;
+					(*inbuf) ++, (*inbuf_left) --;
+				}
+			}
+			**outbuf = DELIMITER;
 			(*outbuf) ++, (*outbuf_left) --;
-			(*inbuf) ++, (*inbuf_left) --;
 		}
 		else
-		{
-			const ucs4_t * result;
-			result = match_rs[0];
+			debug_should_not_be_here();
+	}
 
-			/* 輸出緩衝區剩餘空間小於分詞長度 */
-			if (ucs4len(result) > *outbuf_left)
-			{
-				if (inbuf_left_start - *inbuf_left > 0)
-					break;
-				errnum = CONVERTER_ERROR_OUTBUF;
-				return (size_t) -1;
-			}
-
-			for (; *result; result ++)
-			{
-				**outbuf = *result;
-				(*outbuf) ++,(*outbuf_left) --;
-			}
-
-			*inbuf += match_len;
-			*inbuf_left -= match_len;
-		}
+	if (converter->conversion_mode == OPENCC_CONVERSION_SEGMENT_ONLY)
+	{
+		(*outbuf) --;
+		(*outbuf_left) ++;
 	}
 
 	return inbuf_left_start - *inbuf_left;
@@ -463,7 +547,13 @@ void converter_close(converter_t t_converter)
 	free(converter);
 }
 
-converter_error converter_errnum(void)
+void converter_set_conversion_mode(converter_t t_converter, opencc_conversion_mode conversion_mode)
+{
+	converter_desc * converter = (converter_desc *) t_converter;
+	converter->conversion_mode = conversion_mode;
+}
+
+converter_error converter_errno(void)
 {
 	return errnum;
 }

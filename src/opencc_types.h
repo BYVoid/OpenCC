@@ -30,20 +30,30 @@ typedef void * opencc_t;
 
 typedef uint32_t ucs4_t;
 
-typedef enum
+enum _opencc_error
 {
 	OPENCC_ERROR_VOID,
 	OPENCC_ERROR_DICTLOAD,
 	OPENCC_ERROR_CONFIG,
 	OPENCC_ERROR_ENCODIND,
 	OPENCC_ERROR_CONVERTER,
-} opencc_error;
+};
+typedef enum _opencc_error opencc_error;
 
-typedef enum
+enum _opencc_dictionary_type
 {
 	OPENCC_DICTIONARY_TYPE_TEXT,
 	OPENCC_DICTIONARY_TYPE_DATRIE,
-} opencc_dictionary_type;
+};
+typedef enum _opencc_dictionary_type opencc_dictionary_type;
+
+enum _opencc_conversion_mode
+{
+	OPENCC_CONVERSION_FAST,
+	OPENCC_CONVERSION_SEGMENT_ONLY,
+	OPENCC_CONVERSION_LIST_CANDIDATES,
+};
+typedef enum _opencc_conversion_mode opencc_conversion_mode;
 
 #ifdef __cplusplus
 };

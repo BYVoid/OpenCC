@@ -86,7 +86,7 @@ size_t opencc_convert(opencc_t od, ucs4_t ** inbuf, size_t * inbufleft,
  * DON'T FORGET TO CALL free() to recycle memory.
  *
  */
-char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length);
+char * opencc_convert_utf8(opencc_t t_opencc, const char * inbuf, size_t length);
 
 /**
  * opencc_dict_load:
@@ -99,8 +99,10 @@ char * opencc_convert_utf8(opencc_t odt, const char * inbuf, size_t length);
  * Load a dictionary.
  *
  */
-int opencc_dict_load(opencc_t odt, const char * dict_filename,
+int opencc_dict_load(opencc_t t_opencc, const char * dict_filename,
 		opencc_dictionary_type dict_type);
+
+void opencc_set_conversion_mode(opencc_t t_opencc, opencc_conversion_mode conversion_mode);
 
 /**
  * opencc_errno:

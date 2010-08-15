@@ -11,12 +11,12 @@ if [ "$?" -eq "0" ]; then
 	ret=`diff $@.out $@.ans`
 	if [ "$ret" = "" ]; then
 		echo "${bold}passed${normal}"
+		unlink $@.out
 	else
 		echo "${bold}failed${normal}"
 		echo $ret
 		false
 	fi
-	unlink $@.out
 else
 	false
 fi

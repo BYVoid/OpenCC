@@ -39,7 +39,6 @@ typedef struct
 	ucs4_t * key;
 	value_t * value;
 	size_t length;
-	size_t cursor;
 	size_t value_count;
 } Entry;
 
@@ -48,7 +47,7 @@ size_t lexicon_count, words_set_count;
 int words_set[DATRIE_WORD_MAX_COUNT];
 ucs4_t words_set_char[DATRIE_WORD_MAX_COUNT];
 DoubleArrayTrieItem dat[DATRIE_SIZE];
-size_t cursor_end, lexicon_cursor_end;
+size_t lexicon_index_length, lexicon_cursor_end;
 
 void match_word(const DoubleArrayTrieItem *dat, const ucs4_t * word,
 		int *match_pos, int *id, int limit)
@@ -164,7 +163,7 @@ void insert_first_char(int id)
 	dat[key].base = DATRIE_UNUSED;
 	dat[key].parent = 0;
 	if (word->length == 1)
-		dat[key].word = id;
+		dat[key].word = (id);
 }
 
 void insert_words(int delta, int parent,int word_len)
@@ -177,7 +176,7 @@ void insert_words(int delta, int parent,int word_len)
 		dat[k].parent = parent;
 		if (lexicon[j].length == word_len + 1)
 		{
-			dat[k].word = j;
+			dat[k].word = (j);
 		}
 	}
 }
@@ -265,7 +264,7 @@ void init(const char * filename)
 	qsort(tlexicon, lexicon_count, sizeof(tlexicon[0]), cmp);
 
 	size_t i;
-	size_t lexicon_cursor = 0, cursor = 0;
+	size_t lexicon_cursor = 0;
 	for (i = 0; i < lexicon_count; i ++)
 	{
 		lexicon[i].key = tlexicon[i].key;
@@ -273,13 +272,10 @@ void init(const char * filename)
 
 		size_t j;
 		for (j = 0; tlexicon[i].value[j] != NULL; j ++);
-
 		lexicon[i].value_count = j;
-		lexicon[i].cursor = cursor;
-		cursor += j + 1;
+		lexicon_index_length += lexicon[i].value_count + 1;
 
-		lexicon[i].value = (value_t *) malloc(j * sizeof(value_t));
-
+		lexicon[i].value = (value_t *) malloc(lexicon[i].value_count * sizeof(value_t));
 		for (j = 0; j < lexicon[i].value_count; j ++)
 		{
 			lexicon[i].value[j].cursor = lexicon_cursor;
@@ -289,7 +285,6 @@ void init(const char * filename)
 	}
 
 	lexicon_cursor_end = lexicon_cursor;
-	cursor_end = cursor;
 }
 
 void output(const char * file_name)
@@ -325,7 +320,7 @@ void output(const char * file_name)
 	}
 
 	/* 詞彙索引表長度 */
-	fwrite(&cursor_end, sizeof(size_t), 1, fp);
+	fwrite(&lexicon_index_length, sizeof(size_t), 1, fp);
 	for (i = 0; i < lexicon_count; i ++)
 	{
 		size_t j;

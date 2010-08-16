@@ -69,7 +69,7 @@ void dictionary_close(dictionary_t t_dictionary)
 	free(dictionary);
 }
 
-const ucs4_t * dictionary_match_longest(dictionary_t t_dictionary, const ucs4_t * word,
+const ucs4_t * const * dictionary_match_longest(dictionary_t t_dictionary, const ucs4_t * word,
 		size_t maxlen, size_t * match_length)
 {
 	dictionary_desc * dictionary = (dictionary_desc *) t_dictionary;

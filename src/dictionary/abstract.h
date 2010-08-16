@@ -21,11 +21,12 @@
 
 #include "../utils.h"
 
-typedef struct
+struct _entry
 {
 	ucs4_t * key;
-	ucs4_t * value;
-} opencc_entry;
+	ucs4_t ** value;
+};
+typedef struct _entry entry;
 
 typedef void * dictionary_t;
 
@@ -35,7 +36,7 @@ void dictionary_close(dictionary_t t_dictionary);
 
 dictionary_t dictionary_get(dictionary_t t_dictionary);
 
-const ucs4_t * dictionary_match_longest(dictionary_t t_dictionary, const ucs4_t * word,
+const ucs4_t * const * dictionary_match_longest(dictionary_t t_dictionary, const ucs4_t * word,
 		size_t maxlen, size_t * match_length);
 
 size_t dictionary_get_all_match_lengths(dictionary_t t_dictionary, const ucs4_t * word,

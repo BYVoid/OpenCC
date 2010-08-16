@@ -27,14 +27,78 @@ struct _text_dictionary
 {
 	size_t entry_count;
 	size_t max_length;
-	opencc_entry * lexicon;
+	entry * lexicon;
 	ucs4_t * word_buff;
 } ;
 typedef struct _text_dictionary text_dictionary_desc;
 
 int qsort_entry_cmp(const void *a, const void *b)
 {
-	return ucs4cmp(((opencc_entry *)a)->key, ((opencc_entry *)b)->key);
+	return ucs4cmp(((entry *)a)->key, ((entry *)b)->key);
+}
+
+int parse_entry(const char * buff, entry * entry_i)
+{
+	size_t length;
+	const char * pbuff;
+
+	/* 解析鍵 */
+	for (pbuff = buff; *pbuff != '\t' && *pbuff != '\0'; ++ pbuff)
+		;
+	if (*pbuff == '\0')
+		return -1;
+	length = pbuff - buff;
+
+	ucs4_t * ucs4_buff;
+	ucs4_buff = utf8_to_ucs4(buff, length);
+	if (ucs4_buff == (ucs4_t *) -1)
+		return -1;
+	entry_i->key = (ucs4_t *) malloc((length + 1) * sizeof(ucs4_t));
+	ucs4cpy(entry_i->key, ucs4_buff);
+	free(ucs4_buff);
+
+	/* 解析值 */
+	size_t value_i, value_count = INITIAL_DICTIONARY_SIZE;
+	entry_i->value = (ucs4_t **) malloc(value_count * sizeof (ucs4_t *));
+
+	for (value_i = 0; *pbuff != '\0' && *pbuff != '\n'; ++ value_i)
+	{
+		if (value_i >= value_count)
+		{
+			value_count += value_count;
+			entry_i->value = (ucs4_t **) realloc(
+					entry_i->value,
+					value_count * sizeof (ucs4_t *)
+			);
+		}
+
+		for (buff = ++ pbuff; *pbuff != ' ' && *pbuff != '\0' && *pbuff != '\n'; ++ pbuff)
+			;
+		length = pbuff - buff;
+		ucs4_buff = utf8_to_ucs4(buff, length);
+		if (ucs4_buff == (ucs4_t *) -1)
+		{
+			/* 發生錯誤 回退內存申請 */
+			ssize_t i;
+			for (i = value_i - 1; i >= 0; -- i)
+				free(entry_i->value[i]);
+			free(entry_i->value);
+			free(entry_i->key);
+			return -1;
+		}
+
+		entry_i->value[value_i] = (ucs4_t *) malloc((length + 1) * sizeof(ucs4_t));
+		ucs4cpy(entry_i->value[value_i], ucs4_buff);
+		free(ucs4_buff);
+	}
+
+	entry_i->value = (ucs4_t **) realloc(
+			entry_i->value,
+			value_count * sizeof (ucs4_t *)
+	);
+	entry_i->value[value_i] = NULL;
+
+	return 0;
 }
 
 dictionary_t dictionary_text_open(const char * filename)
@@ -43,13 +107,10 @@ dictionary_t dictionary_text_open(const char * filename)
 	text_dictionary = (text_dictionary_desc *) malloc(sizeof(text_dictionary_desc));
 	text_dictionary->entry_count = INITIAL_DICTIONARY_SIZE;
 	text_dictionary->max_length = 0;
-	text_dictionary->lexicon = (opencc_entry *) malloc(sizeof(opencc_entry) * text_dictionary->entry_count);
+	text_dictionary->lexicon = (entry *) malloc(sizeof(entry) * text_dictionary->entry_count);
 	text_dictionary->word_buff = NULL;
 
 	static char buff[ENTRY_BUFF_SIZE];
-	static char key_buff[ENTRY_BUFF_SIZE];
-	static char value_buff[ENTRY_BUFF_SIZE];
-	ucs4_t * wbuff;
 
 	FILE * fp = fopen(filename,"rb");
 	if (fp == NULL)
@@ -64,43 +125,22 @@ dictionary_t dictionary_text_open(const char * filename)
 		if (i >= text_dictionary->entry_count)
 		{
 			text_dictionary->entry_count += text_dictionary->entry_count;
-			text_dictionary->lexicon = (opencc_entry *) realloc(
+			text_dictionary->lexicon = (entry *) realloc(
 				text_dictionary->lexicon,
-				sizeof(opencc_entry) * text_dictionary->entry_count
+				sizeof(entry) * text_dictionary->entry_count
 			);
 		}
 
-		sscanf(buff, "%s %s", key_buff, value_buff);
-
-		wbuff = utf8_to_ucs4(key_buff,(size_t) -1);
-
-		if (wbuff == (ucs4_t *) -1)
+		if (parse_entry(buff, text_dictionary->lexicon + i) == -1)
 		{
-			text_dictionary->entry_count = i + 1;
+			text_dictionary->entry_count = i;
 			dictionary_text_close((dictionary_t) text_dictionary);
 			return (dictionary_t) -1;
 		}
 
-		size_t length = ucs4len(wbuff);
+		size_t length = ucs4len(text_dictionary->lexicon[i].key);
 		if (length > text_dictionary->max_length)
 			text_dictionary->max_length = length;
-
-		text_dictionary->lexicon[i].key = (ucs4_t *) malloc((length + 1) * sizeof(ucs4_t));
-		ucs4cpy(text_dictionary->lexicon[i].key, wbuff);
-		free(wbuff);
-
-		wbuff = utf8_to_ucs4(value_buff,(size_t) -1);
-
-		if (wbuff == (ucs4_t *) -1)
-		{
-			text_dictionary->entry_count = i + 1;
-			dictionary_text_close((dictionary_t) text_dictionary);
-			return (dictionary_t) -1;
-		}
-
-		text_dictionary->lexicon[i].value = (ucs4_t *) malloc((ucs4len(wbuff) + 1) * sizeof(ucs4_t));
-		ucs4cpy(text_dictionary->lexicon[i].value, wbuff);
-		free(wbuff);
 
 		i ++;
 	}
@@ -108,9 +148,9 @@ dictionary_t dictionary_text_open(const char * filename)
 	fclose(fp);
 
 	text_dictionary->entry_count = i;
-	text_dictionary->lexicon = (opencc_entry *) realloc(
+	text_dictionary->lexicon = (entry *) realloc(
 		text_dictionary->lexicon,
-		sizeof(opencc_entry) * text_dictionary->entry_count
+		sizeof(entry) * text_dictionary->entry_count
 	);
 	text_dictionary->word_buff = (ucs4_t *)
 		malloc(sizeof(ucs4_t) * (text_dictionary->max_length + 1));
@@ -129,9 +169,15 @@ void dictionary_text_close(dictionary_t t_dictionary)
 	text_dictionary_desc * text_dictionary = (text_dictionary_desc *) t_dictionary;
 
 	size_t i;
-	for (i = 0; i < text_dictionary->entry_count; i ++)
+	for (i = 0; i < text_dictionary->entry_count; ++ i)
 	{
 		free(text_dictionary->lexicon[i].key);
+
+		ucs4_t ** j;
+		for (j = text_dictionary->lexicon[i].value; *j; ++ j)
+		{
+			free(*j);
+		}
 		free(text_dictionary->lexicon[i].value);
 	}
 
@@ -140,7 +186,7 @@ void dictionary_text_close(dictionary_t t_dictionary)
 	free(text_dictionary);
 }
 
-const ucs4_t * dictionary_text_match_longest(dictionary_t t_dictionary, const ucs4_t * word,
+const ucs4_t * const * dictionary_text_match_longest(dictionary_t t_dictionary, const ucs4_t * word,
 		size_t maxlen, size_t * match_length)
 {
 	text_dictionary_desc * text_dictionary = (text_dictionary_desc *) t_dictionary;
@@ -157,13 +203,13 @@ const ucs4_t * dictionary_text_match_longest(dictionary_t t_dictionary, const uc
 	ucs4ncpy(text_dictionary->word_buff, word, len);
 	text_dictionary->word_buff[len] = L'\0';
 
-	opencc_entry buff;
+	entry buff;
 	buff.key = text_dictionary->word_buff;
 
 	for (; len > 0; len --)
 	{
 		text_dictionary->word_buff[len] = L'\0';
-		opencc_entry * brs = (opencc_entry *) bsearch(
+		entry * brs = (entry *) bsearch(
 				&buff,
 				text_dictionary->lexicon,
 				text_dictionary->entry_count,
@@ -175,7 +221,7 @@ const ucs4_t * dictionary_text_match_longest(dictionary_t t_dictionary, const uc
 		{
 			if (match_length != NULL)
 				*match_length = len;
-			return brs->value;
+			return (const ucs4_t * const *) brs->value;
 		}
 	}
 
@@ -202,13 +248,13 @@ size_t dictionary_text_get_all_match_lengths(dictionary_t t_dictionary, const uc
 	ucs4ncpy(text_dictionary->word_buff, word, len);
 	text_dictionary->word_buff[len] = L'\0';
 
-	opencc_entry buff;
+	entry buff;
 	buff.key = text_dictionary->word_buff;
 
 	for (; len > 0; len --)
 	{
 		text_dictionary->word_buff[len] = L'\0';
-		opencc_entry * brs = (opencc_entry *) bsearch(
+		entry * brs = (entry *) bsearch(
 				&buff,
 				text_dictionary->lexicon,
 				text_dictionary->entry_count,
@@ -223,7 +269,7 @@ size_t dictionary_text_get_all_match_lengths(dictionary_t t_dictionary, const uc
 	return rscnt;
 }
 
-size_t dictionary_text_get_lexicon(dictionary_t t_dictionary, opencc_entry * lexicon)
+size_t dictionary_text_get_lexicon(dictionary_t t_dictionary, entry * lexicon)
 {
 	text_dictionary_desc * text_dictionary = (text_dictionary_desc *) t_dictionary;
 

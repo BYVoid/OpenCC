@@ -18,7 +18,7 @@
 
 #include "../opencc.h"
 #include "../utils.h"
-#include <unistd.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -83,40 +83,48 @@ void convert(const char * input_file, const char * output_file, const char * con
 
 void show_version()
 {
-	printf(_("\nOpen Chinese Convert (OpenCC) Command Line Tool\nVersion %s\n\n"),VERSION);
+	printf(_("\nOpen Chinese Convert (OpenCC) Command Line Tool\nVersion %s\n\n"), VERSION);
 }
 
 void show_usage()
 {
 	show_version();
 	printf(_("Usage:\n"));
-	printf(_("  opencc [-i input_file] [-o output_file] [-c config_file]\n\n"));
-	printf(_("    -i input_file\n"));
-	printf(_("      Read original text from input_file.\n"));
-	printf(_("    -o output_file\n"));
-	printf(_("      Write converted text to output_file.\n"));
-	printf(_("    -c config_file\n"));
-	printf(_("      Load dictionary configuration from config_file.\n"));
+	printf(_(" opencc [Options]\n"));
 	printf(_("\n"));
-	printf(_("  Note:\n"));
-	printf(_("    Text from standard input will be read if input_file is not set\n"
-			"    and will be written to standard output if output_file is not set.\n"));
-	printf(_("    Default configuration(%s) will be load if config_file is not set.\n"), OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD);
+	printf(_("Options:\n"));
+	printf(_(" -i [file], --input=[file]   Read original text from [file].\n"));
+	printf(_(" -o [file], --output=[file]  Write converted text to [file].\n"));
+	printf(_(" -c [file], --config=[file]  Load configuration of conversion from [file].\n"));
+	printf(_(" -v, --version               Print version and build information.\n"));
+	printf(_(" -h, --help                  Print this help.\n"));
 	printf(_("\n"));
+	printf(_("With no input file, reads standard input and writes converted stream to standard output.\n"));
+	printf(_("Default configuration(%s) will be loaded if not set.\n"), OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD);
 	printf(_("\n"));
 }
 
 int main(int argc, char ** argv)
 {
-	static int oc;
-	static char *input_file, *output_file, *config_file;
-
 #ifdef HAVE_GETTEXT
 	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE, LOCALEDIR);
 #endif
 
-	while((oc = getopt(argc, argv, "vh-:i:o:c:")) != -1)
+	static struct option longopts[] =
+	{
+		{ "version", no_argument, NULL, 'v' },
+		{ "help", no_argument, NULL, 'h' },
+		{ "input", required_argument, NULL, 'i' },
+		{ "output", required_argument, NULL, 'o' },
+		{ "config", required_argument, NULL, 'c' },
+		{ 0, 0, 0, 0 },
+	};
+
+	static int oc;
+	static char *input_file, *output_file, *config_file;
+
+	while((oc = getopt_long(argc, argv, "vh-:i:o:c:", longopts, NULL)) != -1)
 	{
 		switch (oc)
 		{
@@ -126,14 +134,6 @@ int main(int argc, char ** argv)
 		case 'h':
 		case '?':
 			show_usage();
-			return 0;
-		case '-':
-			if (strcmp(optarg, "version") == 0)
-				show_version();
-			else if (strcmp(optarg, "help") == 0)
-				show_usage();
-			else
-				show_usage();
 			return 0;
 		case 'i':
 			input_file = mstrcpy(optarg);
@@ -146,9 +146,11 @@ int main(int argc, char ** argv)
 			break;
 		}
 	}
-	
+
 	if (config_file == NULL)
+	{
 		config_file = mstrcpy(OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD);
+	}
 
 	convert(input_file, output_file, config_file);
 

@@ -79,6 +79,7 @@ char * opencc_convert_utf8(opencc_t t_opencc, const char * inbuf, size_t length)
 	size_t outsize = outbuf_len;
 	char * original_outbuf = (char *) malloc(sizeof(char) * (outbuf_len + 1));
 	char * outbuf = original_outbuf;
+	original_outbuf[0] = '\0';
 
 	/* 設置轉換緩衝區空間 */
 	size_t wbufsize = length + 64;
@@ -155,6 +156,7 @@ opencc_t opencc_open(const char * config_file)
 
 	opencc->dictionary_set = NULL;
 	opencc->converter = converter_open();
+	converter_set_conversion_mode(opencc->converter, OPENCC_CONVERSION_FAST);
 
 	/* 加載默認辭典 */
 	int retval;

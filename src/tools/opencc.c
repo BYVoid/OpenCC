@@ -124,7 +124,7 @@ int main(int argc, char ** argv)
 	static int oc;
 	static char *input_file, *output_file, *config_file;
 
-	while((oc = getopt_long(argc, argv, "vh-:i:o:c:", longopts, NULL)) != -1)
+	while((oc = getopt_long(argc, argv, "vh:i:o:c:", longopts, NULL)) != -1)
 	{
 		switch (oc)
 		{
@@ -132,9 +132,11 @@ int main(int argc, char ** argv)
 			show_version();
 			return 0;
 		case 'h':
-		case '?':
 			show_usage();
 			return 0;
+		case '?':
+			printf(_("Please use %s --help.\n"), argv[0]);
+			return 1;
 		case 'i':
 			input_file = mstrcpy(optarg);
 			break;

@@ -150,15 +150,14 @@ static size_t sp_seg(converter_desc * converter, ucs4_t ** inbuf, size_t * inbuf
 						(*outbuf) ++,(*outbuf_left) --;
 					}
 
-					*inbuf += match_len;
-					*inbuf_left -= match_len;
-
 					if (show_delimiter)
 					{
 						**outbuf = DELIMITER;
 						(*outbuf) ++, (*outbuf_left) --;
 					}
 				}
+				*inbuf += match_len;
+				*inbuf_left -= match_len;
 			}
 		}
 		else if (converter->conversion_mode == OPENCC_CONVERSION_SEGMENT_ONLY)
@@ -329,15 +328,14 @@ static size_t sp_seg(converter_desc * converter, ucs4_t ** inbuf, size_t * inbuf
 							(*outbuf) ++,(*outbuf_left) --;
 						}
 
-						*inbuf += match_len;
-						*inbuf_left -= match_len;
-
 						if (show_delimiter)
 						{
 							**outbuf = DELIMITER;
 							(*outbuf) ++, (*outbuf_left) --;
 						}
 					}
+					*inbuf += match_len;
+					*inbuf_left -= match_len;
 				}
 			}
 			else if (converter->conversion_mode == OPENCC_CONVERSION_SEGMENT_ONLY)
@@ -532,15 +530,15 @@ static size_t segment(converter_desc * converter,
 						(*outbuf) ++,(*outbuf_left) --;
 					}
 
-					*inbuf += match_len;
-					*inbuf_left -= match_len;
-
 					if (show_delimiter)
 					{
 						**outbuf = DELIMITER;
 						(*outbuf) ++, (*outbuf_left) --;
 					}
 				}
+
+				*inbuf += match_len;
+				*inbuf_left -= match_len;
 			}
 		}
 		else if (converter->conversion_mode == OPENCC_CONVERSION_SEGMENT_ONLY)

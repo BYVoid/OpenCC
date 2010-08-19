@@ -147,12 +147,13 @@ static int load_dict(datrie_dictionary_desc * datrie_dictionary, FILE * fp)
 		}
 		count = j - last;
 
-		datrie_dictionary->lexicon_set[i] = (ucs4_t **) malloc(count * sizeof(ucs4_t *));
+		datrie_dictionary->lexicon_set[i] = (ucs4_t **) malloc((count + 1) * sizeof(ucs4_t *));
 		for (j = 0; j < count; j ++)
 		{
 			datrie_dictionary->lexicon_set[i][j] =
 					datrie_dictionary->lexicon + lexicon_index[last + j];
 		}
+		datrie_dictionary->lexicon_set[i][count] = NULL;
 		last += j + 1;
 	}
 

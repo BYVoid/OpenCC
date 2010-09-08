@@ -91,6 +91,7 @@ opencc_CFLAGS = \
 
 opencc_LDADD = \
 	$(libopencc) \
+	@LIB_ICONV@ \
 	$(NULL)
 
 opencc_dict_DEPENDENCIES = \

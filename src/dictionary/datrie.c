@@ -36,14 +36,11 @@ typedef enum
 struct _datrie_dictionary
 {
 	const DoubleArrayTrieItem * dat;
-	size_t dat_item_count;
+	uint32_t dat_item_count;
 	ucs4_t * lexicon;
-	size_t lexicon_count;
-
-
+	uint32_t lexicon_count;
 
 	ucs4_t *** lexicon_set;
-
 	void * dic_memory;
 	size_t dic_size;
 	memory_type dic_memory_type;
@@ -113,24 +110,24 @@ static int load_dict(datrie_dictionary_desc * datrie_dictionary, FILE * fp)
 	offset += header_len * sizeof(char);
 
 	/* 詞彙表 */
-	size_t lexicon_length = *((size_t *) (datrie_dictionary->dic_memory + offset));
-	offset += sizeof(size_t);
+	uint32_t lexicon_length = *((uint32_t *) (datrie_dictionary->dic_memory + offset));
+	offset += sizeof(uint32_t);
 
 	datrie_dictionary->lexicon = (ucs4_t *) (datrie_dictionary->dic_memory + offset);
 	offset += lexicon_length * sizeof(ucs4_t);
 
 	/* 詞彙索引表 */
-	size_t lexicon_index_length = *((size_t *) (datrie_dictionary->dic_memory + offset));
-	offset += sizeof(size_t);
+	uint32_t lexicon_index_length = *((uint32_t *) (datrie_dictionary->dic_memory + offset));
+	offset += sizeof(uint32_t);
 
-	size_t * lexicon_index = (size_t *) (datrie_dictionary->dic_memory + offset);
-	offset += lexicon_index_length * sizeof(size_t);
+	uint32_t * lexicon_index = (uint32_t *) (datrie_dictionary->dic_memory + offset);
+	offset += lexicon_index_length * sizeof(uint32_t);
 
-	datrie_dictionary->lexicon_count  = *((size_t *) (datrie_dictionary->dic_memory + offset));
-	offset += sizeof(size_t);
+	datrie_dictionary->lexicon_count  = *((uint32_t *) (datrie_dictionary->dic_memory + offset));
+	offset += sizeof(uint32_t);
 
-	datrie_dictionary->dat_item_count = *((size_t *) (datrie_dictionary->dic_memory + offset));
-	offset += sizeof(size_t);
+	datrie_dictionary->dat_item_count = *((uint32_t *) (datrie_dictionary->dic_memory + offset));
+	offset += sizeof(uint32_t);
 
 	datrie_dictionary->dat = (DoubleArrayTrieItem * ) (datrie_dictionary->dic_memory + offset);
 
@@ -142,7 +139,7 @@ static int load_dict(datrie_dictionary_desc * datrie_dictionary, FILE * fp)
 		size_t count, j;
 		for (j = last; j < lexicon_index_length; j ++)
 		{
-			if (lexicon_index[j] == (size_t) -1)
+			if (lexicon_index[j] == (uint32_t) -1)
 				break;
 		}
 		count = j - last;

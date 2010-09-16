@@ -164,7 +164,7 @@ size_t dictionary_group_get_all_match_lengths(dictionary_group_t t_dictionary,
 
 	size_t rscnt = 0;
 	size_t i;
-	for (i = 0; i < dictionary_group->count; i --)
+	for (i = 0; i < dictionary_group->count; i ++)
 	{
 		size_t retval;
 		retval = dictionary_get_all_match_lengths(
@@ -183,7 +183,7 @@ size_t dictionary_group_get_all_match_lengths(dictionary_group_t t_dictionary,
 				if (match_length[k] != match_length[j])
 					match_length[++ j] = match_length[k];
 			}
-			rscnt = j;
+			rscnt = j + 1;
 		}
 	}
 	return rscnt;

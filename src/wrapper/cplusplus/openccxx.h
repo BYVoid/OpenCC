@@ -39,11 +39,7 @@ namespace opencc
 class opencc
 {
 public:
-	static const char * CONFIG_SIMP_TO_TRAD;
-	static const char * CONFIG_TRAD_TO_SIMP;
-	static const char * CONFIG_NULL;
-
-	opencc(const char * config_file = CONFIG_NULL)
+	opencc(const char * config_file = NULL)
 		: od((opencc_t) -1)
 	{
 		open(config_file);
@@ -66,6 +62,15 @@ public:
 			opencc_close(od);
 		od = opencc_open(config_file);
 		return (od == (opencc_t) -1) ? (-1) : (0);
+	}
+
+	int set_conversion_mode(opencc_conversion_mode conversion_mode)
+	{
+		if (od == (opencc_t) -1)
+			return -1;
+
+		opencc_set_conversion_mode(od, conversion_mode);
+		return 0;
 	}
 
 	long convert(const std::string &in, std::string &out, long length = -1)
@@ -141,10 +146,6 @@ public:
 private:
 	opencc_t od;
 };
-
-const char * opencc::CONFIG_SIMP_TO_TRAD = OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD;
-const char * opencc::CONFIG_TRAD_TO_SIMP = OPENCC_DEFAULT_CONFIG_TRAD_TO_SIMP;
-const char * opencc::CONFIG_NULL = NULL;
 
 };
 

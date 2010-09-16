@@ -25,12 +25,12 @@ dictionary_t dictionary_text_open(const char * filename);
 
 void dictionary_text_close(dictionary_t t_dictionary);
 
-const ucs4_t * dictionary_text_match_longest(dictionary_t t_dictionary, const ucs4_t * word,
+const ucs4_t * const * dictionary_text_match_longest(dictionary_t t_dictionary, const ucs4_t * word,
 		size_t maxlen, size_t * match_length);
 
 size_t dictionary_text_get_all_match_lengths(dictionary_t t_dictionary, const ucs4_t * word,
 		size_t * match_length);
 
-size_t dictionary_text_get_lexicon(dictionary_t t_dictionary, opencc_entry * lexicon);
+size_t dictionary_text_get_lexicon(dictionary_t t_dictionary, entry * lexicon);
 
 #endif /* __OPENCC_DICTIONARY_TEXT_H_ */

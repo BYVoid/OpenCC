@@ -42,6 +42,10 @@
 #	include "config.h"
 #endif
 
+#ifdef __WIN32
+#	include "config.win32.h"
+#endif
+
 #ifdef HAVE_GETTEXT
 #	include <libintl.h>
 #	include <locale.h>

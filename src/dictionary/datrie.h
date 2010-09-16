@@ -34,7 +34,7 @@ dictionary_t dictionary_datrie_open(const char * filename);
 
 int dictionary_datrie_close(dictionary_t t_dictionary);
 
-const ucs4_t * dictionary_datrie_match_longest(dictionary_t t_dictionary, const ucs4_t * word,
+const ucs4_t * const * dictionary_datrie_match_longest(dictionary_t t_dictionary, const ucs4_t * word,
 		size_t maxlen, size_t * match_length);
 
 size_t dictionary_datrie_get_all_match_lengths(dictionary_t t_dictionary, const ucs4_t * word,

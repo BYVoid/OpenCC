@@ -36,10 +36,11 @@ typedef enum
 struct _datrie_dictionary
 {
 	const DoubleArrayTrieItem * dat;
-	size_t dat_item_count;
-	const ucs4_t * lexicon;
-	size_t lexicon_length;
+	uint32_t dat_item_count;
+	ucs4_t * lexicon;
+	uint32_t lexicon_count;
 
+	ucs4_t *** lexicon_set;
 	void * dic_memory;
 	size_t dic_size;
 	memory_type dic_memory_type;
@@ -101,7 +102,6 @@ static int load_dict(datrie_dictionary_desc * datrie_dictionary, FILE * fp)
 
 	if (strncmp((const char *)datrie_dictionary->dic_memory, "OPENCCDATRIE", header_len) != 0)
 	{
-		/* TODO 文件頭校驗失敗 */
 		return -1;
 	}
 
@@ -109,19 +109,50 @@ static int load_dict(datrie_dictionary_desc * datrie_dictionary, FILE * fp)
 
 	offset += header_len * sizeof(char);
 
-	datrie_dictionary->lexicon_length = *((size_t *) (datrie_dictionary->dic_memory + offset));
-	offset += sizeof(size_t);
-
-	datrie_dictionary->dat_item_count = *((size_t *) (datrie_dictionary->dic_memory + offset));
-	offset += sizeof(size_t);
-
-	size_t lexicon_size = datrie_dictionary->lexicon_length * sizeof(ucs4_t);
+	/* 詞彙表 */
+	uint32_t lexicon_length = *((uint32_t *) (datrie_dictionary->dic_memory + offset));
+	offset += sizeof(uint32_t);
 
 	datrie_dictionary->lexicon = (ucs4_t *) (datrie_dictionary->dic_memory + offset);
+	offset += lexicon_length * sizeof(ucs4_t);
 
-	offset += lexicon_size;
+	/* 詞彙索引表 */
+	uint32_t lexicon_index_length = *((uint32_t *) (datrie_dictionary->dic_memory + offset));
+	offset += sizeof(uint32_t);
+
+	uint32_t * lexicon_index = (uint32_t *) (datrie_dictionary->dic_memory + offset);
+	offset += lexicon_index_length * sizeof(uint32_t);
+
+	datrie_dictionary->lexicon_count  = *((uint32_t *) (datrie_dictionary->dic_memory + offset));
+	offset += sizeof(uint32_t);
+
+	datrie_dictionary->dat_item_count = *((uint32_t *) (datrie_dictionary->dic_memory + offset));
+	offset += sizeof(uint32_t);
 
 	datrie_dictionary->dat = (DoubleArrayTrieItem * ) (datrie_dictionary->dic_memory + offset);
+
+	/* 構造索引表 */
+	datrie_dictionary->lexicon_set = (ucs4_t ***) malloc(datrie_dictionary->lexicon_count * sizeof(ucs4_t **));
+	size_t i, last = 0;
+	for (i = 0; i < datrie_dictionary->lexicon_count; i ++)
+	{
+		size_t count, j;
+		for (j = last; j < lexicon_index_length; j ++)
+		{
+			if (lexicon_index[j] == (uint32_t) -1)
+				break;
+		}
+		count = j - last;
+
+		datrie_dictionary->lexicon_set[i] = (ucs4_t **) malloc((count + 1) * sizeof(ucs4_t *));
+		for (j = 0; j < count; j ++)
+		{
+			datrie_dictionary->lexicon_set[i][j] =
+					datrie_dictionary->lexicon + lexicon_index[last + j];
+		}
+		datrie_dictionary->lexicon_set[i][count] = NULL;
+		last += j + 1;
+	}
 
 	return 0;
 }
@@ -130,6 +161,13 @@ static int unload_dict(datrie_dictionary_desc * datrie_dictionary)
 {
 	if (datrie_dictionary->dic_memory != NULL)
 	{
+		size_t i;
+		for (i = 0; i < datrie_dictionary->lexicon_count; i ++)
+		{
+			free(datrie_dictionary->lexicon_set[i]);
+		}
+		free(datrie_dictionary->lexicon_set);
+
 		if (MEMORY_TYPE_MMAP == datrie_dictionary->dic_memory_type)
 		{
 		#ifdef MMAP_ENABLED
@@ -207,7 +245,7 @@ void datrie_match(const datrie_dictionary_desc * datrie_dictionary, const ucs4_t
 		*id = i;
 }
 
-const ucs4_t * dictionary_datrie_match_longest(dictionary_t t_dictionary, const ucs4_t * word,
+const ucs4_t * const * dictionary_datrie_match_longest(dictionary_t t_dictionary, const ucs4_t * word,
 		size_t maxlen, size_t * match_length)
 {
 	datrie_dictionary_desc * datrie_dictionary = (datrie_dictionary_desc *) t_dictionary;
@@ -228,7 +266,8 @@ const ucs4_t * dictionary_datrie_match_longest(dictionary_t t_dictionary, const 
 	if (match_length != NULL)
 		*match_length = pos;
 
-	return datrie_dictionary->lexicon + datrie_dictionary->dat[item].word;
+	return (const ucs4_t * const *)
+		datrie_dictionary->lexicon_set[ datrie_dictionary->dat[item].word ];
 }
 
 size_t dictionary_datrie_get_all_match_lengths(dictionary_t t_dictionary, const ucs4_t * word,

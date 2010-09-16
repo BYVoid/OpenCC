@@ -30,17 +30,24 @@
 
 typedef struct
 {
+	uint32_t cursor;
+	ucs4_t * pointer;
+} value_t;
+
+typedef struct
+{
 	ucs4_t * key;
-	ucs4_t * value;
-	int length;
-	int pos;
+	value_t * value;
+	size_t length;
+	size_t value_count;
 } Entry;
 
 Entry lexicon[DATRIE_WORD_MAX_COUNT];
-size_t lexicon_count, words_set_count;
+uint32_t lexicon_count, words_set_count;
 int words_set[DATRIE_WORD_MAX_COUNT];
 ucs4_t words_set_char[DATRIE_WORD_MAX_COUNT];
 DoubleArrayTrieItem dat[DATRIE_SIZE];
+uint32_t lexicon_index_length, lexicon_cursor_end;
 
 void match_word(const DoubleArrayTrieItem *dat, const ucs4_t * word,
 		int *match_pos, int *id, int limit)
@@ -151,12 +158,12 @@ int words_space_available(int delta)
 
 void insert_first_char(int id)
 {
-	Entry * word = &lexicon[id];
-	int k = encode_char(word->key[0]);
-	dat[k].base = DATRIE_UNUSED;
-	dat[k].parent = 0;
+	Entry * word = lexicon + id;
+	int key = encode_char(word->key[0]);
+	dat[key].base = DATRIE_UNUSED;
+	dat[key].parent = 0;
 	if (word->length == 1)
-		dat[k].word = lexicon[id].pos;
+		dat[key].word = (id);
 }
 
 void insert_words(int delta, int parent,int word_len)
@@ -169,7 +176,7 @@ void insert_words(int delta, int parent,int word_len)
 		dat[k].parent = parent;
 		if (lexicon[j].length == word_len + 1)
 		{
-			dat[k].word = lexicon[j].pos;
+			dat[k].word = (j);
 		}
 	}
 }
@@ -226,7 +233,7 @@ void make(void)
 
 int cmp(const void *a, const void *b)
 {
-	return ucs4cmp(((const opencc_entry *)a)->key, ((const opencc_entry *)b)->key);
+	return ucs4cmp(((const entry *)a)->key, ((const entry *)b)->key);
 }
 
 void init(const char * filename)
@@ -248,7 +255,7 @@ void init(const char * filename)
 		exit(1);
 	}
 
-	static opencc_entry tlexicon[DATRIE_WORD_MAX_COUNT];
+	static entry tlexicon[DATRIE_WORD_MAX_COUNT];
 
 	/* TODO add datrie support */
 	dictionary_t dictionary = dictionary_get(t_dictionary);
@@ -257,17 +264,27 @@ void init(const char * filename)
 	qsort(tlexicon, lexicon_count, sizeof(tlexicon[0]), cmp);
 
 	size_t i;
-	lexicon[0].pos = 0;
+	size_t lexicon_cursor = 0;
 	for (i = 0; i < lexicon_count; i ++)
 	{
 		lexicon[i].key = tlexicon[i].key;
-		lexicon[i].value = tlexicon[i].value;
 		lexicon[i].length = ucs4len(lexicon[i].key);
-		if (i > 0)
+
+		size_t j;
+		for (j = 0; tlexicon[i].value[j] != NULL; j ++);
+		lexicon[i].value_count = j;
+		lexicon_index_length += lexicon[i].value_count + 1;
+
+		lexicon[i].value = (value_t *) malloc(lexicon[i].value_count * sizeof(value_t));
+		for (j = 0; j < lexicon[i].value_count; j ++)
 		{
-			lexicon[i].pos = lexicon[i-1].pos + ucs4len(lexicon[i-1].value) + 1;
+			lexicon[i].value[j].cursor = lexicon_cursor;
+			lexicon[i].value[j].pointer = tlexicon[i].value[j];
+			lexicon_cursor += ucs4len(tlexicon[i].value[j]) + 1;
 		}
 	}
+
+	lexicon_cursor_end = lexicon_cursor;
 }
 
 void output(const char * file_name)
@@ -280,25 +297,45 @@ void output(const char * file_name)
 		exit(1);
 	}
 
-	size_t i, item_count;
+	uint32_t i, item_count;
 	
 	for (i = DATRIE_SIZE - 1; i > 0; i --)
 		if (dat[i].parent != DATRIE_UNUSED)
 			break;
 	item_count = i + 1;
 
-	size_t lexicon_length = lexicon[lexicon_count - 1].pos +
-			ucs4len(lexicon[lexicon_count - 1].value) + 1;
-
 	fwrite("OPENCCDATRIE", sizeof(char), strlen("OPENCCDATRIE"), fp);
-	fwrite(&lexicon_length, sizeof(size_t), 1, fp);
-	fwrite(&item_count, sizeof(size_t), 1, fp);
 
+	/* 詞彙表長度 */
+	fwrite(&lexicon_cursor_end, sizeof(uint32_t), 1, fp);
 	for (i = 0; i < lexicon_count; i ++)
 	{
-		fwrite(lexicon[i].value, sizeof(ucs4_t), ucs4len(lexicon[i].value) + 1, fp);
+		size_t j;
+		for (j = 0; j < lexicon[i].value_count; j ++)
+		{
+			fwrite(lexicon[i].value[j].pointer, sizeof(ucs4_t),
+					ucs4len(lexicon[i].value[j].pointer) + 1, fp);
+		}
+
 	}
-	
+
+	/* 詞彙索引表長度 */
+	fwrite(&lexicon_index_length, sizeof(uint32_t), 1, fp);
+	for (i = 0; i < lexicon_count; i ++)
+	{
+		size_t j;
+		for (j = 0; j < lexicon[i].value_count; j ++)
+		{
+			fwrite(&lexicon[i].value[j].cursor, sizeof(uint32_t), 1, fp);
+		}
+		uint32_t dem = (uint32_t) -1;
+		fwrite(&dem, sizeof(uint32_t), 1, fp); /* 分隔符 */
+	}
+
+	fwrite(&lexicon_count, sizeof(uint32_t), 1, fp);
+
+	fwrite(&item_count, sizeof(uint32_t), 1, fp);
+
 	fwrite(dat, sizeof(dat[0]), item_count, fp);
 	
 	fclose(fp);

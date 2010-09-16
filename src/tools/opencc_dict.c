@@ -30,7 +30,7 @@
 
 typedef struct
 {
-	size_t cursor;
+	uint32_t cursor;
 	ucs4_t * pointer;
 } value_t;
 
@@ -43,11 +43,11 @@ typedef struct
 } Entry;
 
 Entry lexicon[DATRIE_WORD_MAX_COUNT];
-size_t lexicon_count, words_set_count;
+uint32_t lexicon_count, words_set_count;
 int words_set[DATRIE_WORD_MAX_COUNT];
 ucs4_t words_set_char[DATRIE_WORD_MAX_COUNT];
 DoubleArrayTrieItem dat[DATRIE_SIZE];
-size_t lexicon_index_length, lexicon_cursor_end;
+uint32_t lexicon_index_length, lexicon_cursor_end;
 
 void match_word(const DoubleArrayTrieItem *dat, const ucs4_t * word,
 		int *match_pos, int *id, int limit)
@@ -297,7 +297,7 @@ void output(const char * file_name)
 		exit(1);
 	}
 
-	size_t i, item_count;
+	uint32_t i, item_count;
 	
 	for (i = DATRIE_SIZE - 1; i > 0; i --)
 		if (dat[i].parent != DATRIE_UNUSED)
@@ -307,7 +307,7 @@ void output(const char * file_name)
 	fwrite("OPENCCDATRIE", sizeof(char), strlen("OPENCCDATRIE"), fp);
 
 	/* 詞彙表長度 */
-	fwrite(&lexicon_cursor_end, sizeof(size_t), 1, fp);
+	fwrite(&lexicon_cursor_end, sizeof(uint32_t), 1, fp);
 	for (i = 0; i < lexicon_count; i ++)
 	{
 		size_t j;
@@ -320,21 +320,21 @@ void output(const char * file_name)
 	}
 
 	/* 詞彙索引表長度 */
-	fwrite(&lexicon_index_length, sizeof(size_t), 1, fp);
+	fwrite(&lexicon_index_length, sizeof(uint32_t), 1, fp);
 	for (i = 0; i < lexicon_count; i ++)
 	{
 		size_t j;
 		for (j = 0; j < lexicon[i].value_count; j ++)
 		{
-			fwrite(&lexicon[i].value[j].cursor, sizeof(size_t), 1, fp);
+			fwrite(&lexicon[i].value[j].cursor, sizeof(uint32_t), 1, fp);
 		}
-		size_t dem = (size_t) -1;
-		fwrite(&dem, sizeof(size_t), 1, fp); /* 分隔符 */
+		uint32_t dem = (uint32_t) -1;
+		fwrite(&dem, sizeof(uint32_t), 1, fp); /* 分隔符 */
 	}
 
-	fwrite(&lexicon_count, sizeof(size_t), 1, fp);
+	fwrite(&lexicon_count, sizeof(uint32_t), 1, fp);
 
-	fwrite(&item_count, sizeof(size_t), 1, fp);
+	fwrite(&item_count, sizeof(uint32_t), 1, fp);
 
 	fwrite(dat, sizeof(dat[0]), item_count, fp);
 	

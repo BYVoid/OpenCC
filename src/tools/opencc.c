@@ -1,7 +1,7 @@
 /*
 * Open Chinese Convert
 *
-* Copyright 2010 BYVoid <byvoid1@gmail.com>
+* Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -83,7 +83,13 @@ void convert(const char * input_file, const char * output_file, const char * con
 
 void show_version()
 {
-	printf(_("\nOpen Chinese Convert (OpenCC) Command Line Tool\nVersion %s\n\n"), VERSION);
+  printf(_("\n"));
+	printf(_("Open Chinese Convert (OpenCC) Command Line Tool\n"));
+	printf(_("Version %s\n"), VERSION);
+	printf(_("\n"));
+	printf(_("Author: %s\n"), "BYVoid <byvoid.kcp@gmail.com>");
+	printf(_("Bug Report: %s\n"), "http://code.google.com/p/open-chinese-convert/issues/entry");
+	printf(_("\n"));
 }
 
 void show_usage()

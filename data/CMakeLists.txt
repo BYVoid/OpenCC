@@ -66,7 +66,7 @@ install(
 	FILES
 		${ocdfiles}
 	DESTINATION
-		share/opencc
+		${DIR_SHARE}/opencc
 )
 
 set(
@@ -81,5 +81,5 @@ install(
 	FILES
 		${CONFIG_FILES}
 	DESTINATION
-		share/opencc
+		${DIR_SHARE}/opencc
 )

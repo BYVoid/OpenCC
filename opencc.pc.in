@@ -1,6 +1,6 @@
-prefix=@CMAKE_INSTALL_PREFIX@
-libdir=${prefix}/@CMAKE_SHARED_LIBRARY_PREFIX@
-includedir=${prefix}/include
+prefix=@DIR_PREFIX@
+libdir=${prefix}/@DIR_LIBRARY@
+includedir=${prefix}/@DIR_INCLUDE@
 
 Name: opencc
 Description: Open Chinese Convert

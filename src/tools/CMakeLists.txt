@@ -41,7 +41,7 @@ install(
 		opencc_dict
 	RUNTIME
 	DESTINATION
-		bin
+		${DIR_BIN}
 )
 
 
@@ -72,5 +72,5 @@ install(
 		opencc
 	RUNTIME
 	DESTINATION
-		bin
+		${DIR_BIN}
 )

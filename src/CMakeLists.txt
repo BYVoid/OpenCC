@@ -33,10 +33,8 @@ set(
 	utils.h
 )
 
-set(
-	LIBOPENCC_TARGET
-	libopencc
-)
+set (LIBOPENCC_TARGET libopencc)
+set (LIBOPENCC_STATIC_TARGET libopencc_static)
 
 add_definitions(
 	-DPKGDATADIR="/usr/share"
@@ -51,8 +49,15 @@ add_library(
 	${LIBOPENCC_SOURCES}
 )
 
+add_library(
+	${LIBOPENCC_STATIC_TARGET}
+	STATIC
+	${LIBOPENCC_SOURCES}
+)
+
 set_target_properties(
 	${LIBOPENCC_TARGET}
+	${LIBOPENCC_STATIC_TARGET}
 	PROPERTIES
 		OUTPUT_NAME
 			opencc
@@ -66,14 +71,21 @@ install(
 	TARGETS
 		${LIBOPENCC_TARGET}
 	LIBRARY DESTINATION
-		lib
+		${DIR_LIBRARY}
+)
+
+install(
+	TARGETS
+		${LIBOPENCC_STATIC_TARGET}
+	ARCHIVE DESTINATION
+		${DIR_LIBRARY_STATIC}
 )
 
 install(
 	FILES
 		${LIBOPENCC_HEADERS}
 	DESTINATION
-		include/opencc
+		${DIR_INCLUDE}/opencc
 )
 
 add_subdirectory(tools)

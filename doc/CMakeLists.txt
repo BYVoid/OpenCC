@@ -3,5 +3,5 @@ install(
 		opencc.1
 		opencc_dict.1
 	DESTINATION
-		share/man/man1
+		${DIR_SHARE}/man/man1
 )

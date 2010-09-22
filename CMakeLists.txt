@@ -24,7 +24,6 @@ set (OPENCC_VERSION_MINOR 1)
 set (OPENCC_VERSION_REVISION 2)
 set (OPENCC_RELEASED 0)
 
-
 if (NOT OPENCC_RELEASED)
 	set (version_suffix .debug)
 endif (NOT OPENCC_RELEASED)
@@ -43,6 +42,14 @@ set (DIR_LIBRARY_STATIC ${CMAKE_STATIC_LIBRARY_PREFIX})
 set (DIR_INCLUDE include)
 set (DIR_SHARE share)
 set (DIR_BIN bin)
+
+include (TestBigEndian)
+TEST_BIG_ENDIAN(BIGENDIAN)
+if (BIGENDIAN)
+	set (BYTEORDER BIG_ENDIAN)
+else (BIGENDIAN)
+	set (BYTEORDER LITTLE_ENDIAN)
+endif (BIGENDIAN)
 
 configure_file(
 	opencc.pc.in

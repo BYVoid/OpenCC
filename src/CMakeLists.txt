@@ -37,10 +37,10 @@ set (LIBOPENCC_TARGET libopencc)
 set (LIBOPENCC_STATIC_TARGET libopencc_static)
 
 add_definitions(
-	-DPKGDATADIR="/usr/share"
-	-DLOCALEDIR="/usr/share/locale"
-	-DVERSION="0.1.2"
-	-DBYTEORDER=LITTLE_ENDIAN
+	-DPKGDATADIR="${DIR_PREFIX}/${DIR_SHARE}"
+	-DLOCALEDIR="${DIR_PREFIX}/${DIR_SHARE}/locale"
+	-DVERSION="${OPENCC_VERSION}"
+	-DBYTEORDER=${BYTEORDER}
 )
 
 add_library(

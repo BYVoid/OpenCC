@@ -59,7 +59,10 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 			/* U-00000080 - U-000007FF */
 			/* 110xxxxx 10xxxxxx */
 			if (i + 1 >= length)
+			{
+				free(ucs4);
 				return (ucs4_t *) -1;
+			}
 
 			byte[0] = (utf8[i + 1] & BITMASK(6)) +
 					((utf8[i] & BITMASK(2)) << 6);
@@ -72,7 +75,10 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 			/* U-00000800 - U-0000FFFF */
 			/* 1110xxxx 10xxxxxx 10xxxxxx */
 			if (i + 2 >= length)
+			{
+				free(ucs4);
 				return (ucs4_t *) -1;
+			}
 
 			byte[0] = (utf8[i + 2] & BITMASK(6)) +
 					((utf8[i + 1] & BITMASK(2)) << 6);
@@ -86,7 +92,10 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 			/* U-00010000 - U-001FFFFF */
 			/* 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx */
 			if (i + 3 >= length)
+			{
+				free(ucs4);
 				return (ucs4_t *) -1;
+			}
 
 			byte[0] = (utf8[i + 3] & BITMASK(6)) +
 					((utf8[i + 2] & BITMASK(2)) << 6);
@@ -102,7 +111,10 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 			/* U-00200000 - U-03FFFFFF */
 			/* 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx */
 			if (i + 4 >= length)
+			{
+				free(ucs4);
 				return (ucs4_t *) -1;
+			}
 
 			byte[0] = (utf8[i + 4] & BITMASK(6)) +
 					((utf8[i + 3] & BITMASK(2)) << 6);
@@ -118,7 +130,10 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 			/* U-04000000 - U-7FFFFFFF */
 			/* 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx */
 			if (i + 5 >= length)
+			{
+				free(ucs4);
 				return (ucs4_t *) -1;
+			}
 
 			byte[0] = (utf8[i + 5] & BITMASK(6)) +
 					((utf8[i + 4] & BITMASK(2)) << 6);
@@ -132,6 +147,7 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 		}
 		else
 		{
+			free(ucs4);
 			return (ucs4_t *) -1;
 		}
 

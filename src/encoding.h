@@ -21,9 +21,9 @@
 
 #include "utils.h"
 
-ucs4_t * utf8_to_ucs4(const char * inbuf, size_t inbuf_len);
+ucs4_t * utf8_to_ucs4(const char * utf8, size_t length);
 
-char * ucs4_to_utf8(const ucs4_t * inbuf, size_t inbuf_len);
+char * ucs4_to_utf8(const ucs4_t * ucs4, size_t length);
 
 size_t ucs4len(const ucs4_t * str);
 

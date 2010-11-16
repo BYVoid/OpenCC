@@ -18,16 +18,6 @@
 
 #include "opencc.h"
 #include "encoding.h"
-#include <iconv.h>
-#include <errno.h>
-
-#define OUTER_ENCODIND "UTF-8"
-
-#if BYTEORDER == LITTLE_ENDIAN
-#	define INNER_ENCODIND "UCS-4LE"
-#else
-#	define INNER_ENCODIND "UCS-4BE"
-#endif
 
 #define INITIAL_BUFF_SIZE 1024
 #define GET_BIT(byte,pos) (((byte)>>(pos))&1)
@@ -47,7 +37,7 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 
 	for (i = 0; i < length; i ++)
 	{
-		ucs4_t byte[4] = {'\0'};
+		ucs4_t byte[4] = {0};
 		if (GET_BIT(utf8[i], 7) == 0)
 		{
 			/* U-00000000 - U-0000007F */
@@ -59,10 +49,7 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 			/* U-00000080 - U-000007FF */
 			/* 110xxxxx 10xxxxxx */
 			if (i + 1 >= length)
-			{
-				free(ucs4);
-				return (ucs4_t *) -1;
-			}
+				goto err;
 
 			byte[0] = (utf8[i + 1] & BITMASK(6)) +
 					((utf8[i] & BITMASK(2)) << 6);
@@ -75,10 +62,7 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 			/* U-00000800 - U-0000FFFF */
 			/* 1110xxxx 10xxxxxx 10xxxxxx */
 			if (i + 2 >= length)
-			{
-				free(ucs4);
-				return (ucs4_t *) -1;
-			}
+				goto err;
 
 			byte[0] = (utf8[i + 2] & BITMASK(6)) +
 					((utf8[i + 1] & BITMASK(2)) << 6);
@@ -92,10 +76,7 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 			/* U-00010000 - U-001FFFFF */
 			/* 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx */
 			if (i + 3 >= length)
-			{
-				free(ucs4);
-				return (ucs4_t *) -1;
-			}
+				goto err;
 
 			byte[0] = (utf8[i + 3] & BITMASK(6)) +
 					((utf8[i + 2] & BITMASK(2)) << 6);
@@ -111,10 +92,7 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 			/* U-00200000 - U-03FFFFFF */
 			/* 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx */
 			if (i + 4 >= length)
-			{
-				free(ucs4);
-				return (ucs4_t *) -1;
-			}
+				goto err;
 
 			byte[0] = (utf8[i + 4] & BITMASK(6)) +
 					((utf8[i + 3] & BITMASK(2)) << 6);
@@ -130,10 +108,7 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 			/* U-04000000 - U-7FFFFFFF */
 			/* 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx */
 			if (i + 5 >= length)
-			{
-				free(ucs4);
-				return (ucs4_t *) -1;
-			}
+				goto err;
 
 			byte[0] = (utf8[i + 5] & BITMASK(6)) +
 					((utf8[i + 4] & BITMASK(2)) << 6);
@@ -146,10 +121,7 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 			i += 5;
 		}
 		else
-		{
-			free(ucs4);
-			return (ucs4_t *) -1;
-		}
+			goto err;
 
 		if (freesize == 0)
 		{
@@ -167,56 +139,123 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 		freesize --;
 	}
 
-	*pucs4 = '\0';
+	*pucs4 = 0;
 	ucs4 = (ucs4_t *) realloc(ucs4, sizeof(ucs4_t) * (pucs4 - ucs4 + 1));
 	return ucs4;
+
+err:
+	free(ucs4);
+	return (ucs4_t *) -1;
 }
 
-char * ucs4_to_utf8(const ucs4_t * inbuf, size_t inbuf_len)
+char * ucs4_to_utf8(const ucs4_t * ucs4, size_t length)
 {
-	iconv_t cd = iconv_open(OUTER_ENCODIND, INNER_ENCODIND);
+	if (length == 0)
+		length = (size_t) -1;
+	size_t i;
+	for (i = 0; i < length && ucs4[i] != 0; i ++);
+	length = i;
 
-	if (cd == (iconv_t) -1)
+	size_t freesize = INITIAL_BUFF_SIZE;
+	char * utf8 = (char *) malloc(sizeof(char) * freesize);
+	char * putf8 = utf8;
+
+	for (i = 0; i < length; i ++)
 	{
-		return (char *) -1;
-	}
-	
-	char * pinbuf = (char *) inbuf;
-	size_t insize = ucs4len(inbuf);
-	if (inbuf_len < insize)
-		insize = inbuf_len;
-	insize *= sizeof(ucs4_t);
-
-	size_t outbuf_len = INITIAL_BUFF_SIZE;
-	char * outbuf = (char *) malloc(sizeof(char) * outbuf_len);
-	char * poutbuf = outbuf;
-	size_t outsize = outbuf_len;
-
-	while (insize > 0)
-	{
-		size_t retval = iconv(cd, &pinbuf, &insize, &poutbuf, &outsize);
-		if (retval == (size_t) -1 && errno != E2BIG)
+		if (freesize - 6 <= 0)
 		{
-			free(outbuf);
-			return (char *) -1;
+			freesize = putf8 - utf8;
+			utf8 = (char *) realloc(utf8, sizeof(char) * (freesize + freesize));
 		}
 
-		if (insize == 0)
-			break;
+		ucs4_t c = ucs4[i];
+		ucs4_t byte[4] =
+		{
+		#if BYTEORDER == LITTLE_ENDIAN
+			(c >> 0) & BITMASK(8), (c >> 8) & BITMASK(8),
+			(c >> 16) & BITMASK(8), (c >> 24) & BITMASK(8)
+		#else
+			(c >> 24) & BITMASK(8), (c >> 18) & BITMASK(8),
+			(c >> 8) & BITMASK(8), (c >> 0) & BITMASK(8)
+		#endif
+		};
 
-		outbuf = (char *) realloc(outbuf, sizeof(char) * (outbuf_len + outbuf_len));
-		poutbuf = outbuf + (outbuf_len - outsize);
-		outbuf_len += outbuf_len;
-		outsize = outbuf + outbuf_len - poutbuf;
+		if (c <= 0x7F)
+		{
+			/* U-00000000 - U-0000007F */
+			/* 0xxxxxxx */
+			putf8[0] = byte[0] & BITMASK(7);
+			putf8 ++;
+		}
+		else if (c <= 0x7FF)
+		{
+			/* U-00000080 - U-000007FF */
+			/* 110xxxxx 10xxxxxx */
+			putf8[1] = 0x80 + (byte[0] & BITMASK(6));
+			putf8[0] = 0xC0 + ((byte[0] >> 6) & BITMASK(2)) +
+					((byte[1] & BITMASK(3)) << 2);
+			putf8 += 2;
+		}
+		else if (c <= 0xFFFF)
+		{
+			/* U-00000800 - U-0000FFFF */
+			/* 1110xxxx 10xxxxxx 10xxxxxx */
+			putf8[2] = 0x80 + (byte[0] & BITMASK(6));
+			putf8[1] = 0x80 + ((byte[0] >> 6) & BITMASK(2)) +
+					((byte[1] & BITMASK(4)) << 2);
+			putf8[0] = 0xE0 + ((byte[1] >> 4) & BITMASK(4));
+			putf8 += 3;
+		}
+		else if (c <= 0x1FFFFF)
+		{
+			/* U-00010000 - U-001FFFFF */
+			/* 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx */
+			putf8[3] = 0x80 + (byte[0] & BITMASK(6));
+			putf8[2] = 0x80 + ((byte[0] >> 6) & BITMASK(2)) +
+					((byte[1] & BITMASK(4)) << 2);
+			putf8[1] = 0x80 + ((byte[1] >> 4) & BITMASK(4)) +
+					((byte[2] & BITMASK(2)) << 4);
+			putf8[0] = 0xF0 + ((byte[2] >> 2) & BITMASK(3));
+			putf8 += 4;
+		}
+		else if (c <= 0x3FFFFFF)
+		{
+			/* U-00200000 - U-03FFFFFF */
+			/* 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx */
+			putf8[4] = 0x80 + (byte[0] & BITMASK(6));
+			putf8[3] = 0x80 + ((byte[0] >> 6) & BITMASK(2)) +
+					((byte[1] & BITMASK(4)) << 2);
+			putf8[2] = 0x80 + ((byte[1] >> 4) & BITMASK(4)) +
+					((byte[2] & BITMASK(2)) << 4);
+			putf8[1] = 0x80 + ((byte[2] >> 2) & BITMASK(6));
+			putf8[0] = 0xF8 + (byte[3] & BITMASK(2));
+			putf8 += 5;
+
+		}
+		else if (c <= 0x7FFFFFFF)
+		{
+			/* U-04000000 - U-7FFFFFFF */
+			/* 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx */
+			putf8[5] = 0x80 + (byte[0] & BITMASK(6));
+			putf8[4] = 0x80 + ((byte[0] >> 6) & BITMASK(2)) +
+					((byte[1] & BITMASK(4)) << 2);
+			putf8[3] = 0x80 + ((byte[1] >> 4) & BITMASK(4)) +
+					((byte[2] & BITMASK(2)) << 4);
+			putf8[2] = 0x80 + ((byte[2] >> 2) & BITMASK(6));
+			putf8[1] = 0x80 + (byte[3] & BITMASK(6));
+			putf8[0] = 0xFC + ((byte[3] >> 6) & BITMASK(1)); 
+			putf8 += 6;
+		}
+		else
+		{
+			free(utf8);
+			return (char *) -1;
+		}
 	}
 
-	*poutbuf = '\0';
-	
-	iconv_close(cd);
-	
-	outbuf = (char *) realloc(outbuf, sizeof(char) * (poutbuf - outbuf + 1));
-	
-	return outbuf;
+	*putf8 = '\0';
+	utf8 = (char *) realloc(utf8, sizeof(char) * (putf8 - utf8 + 1));
+	return utf8;
 }
 
 size_t ucs4len(const ucs4_t * str)

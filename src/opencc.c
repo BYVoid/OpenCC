@@ -267,6 +267,9 @@ void opencc_perror(const char * spec)
 	case OPENCC_ERROR_CONVERTER:
 		converter_perror(_("Converter error"));
 		break;
+	case OPENCC_ERROR_ENCODIND:
+		perr(_("Encoding error"));
+		break;
 	default:
 		perr(_("Unknown"));
 	}

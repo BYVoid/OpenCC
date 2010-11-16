@@ -38,10 +38,6 @@
 #	define LITTLE_ENDIAN (1)
 #endif
 
-#ifdef HAVE_CONFIG_H
-#	include "config.h"
-#endif
-
 #ifdef __WIN32
 #	include "config.win32.h"
 #endif

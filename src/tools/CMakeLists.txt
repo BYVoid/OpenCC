@@ -8,12 +8,6 @@ set(
 	../dictionary/text.h
 )
 
-add_definitions(
-	-DPKGDATADIR="/usr/share"
-	-DLOCALEDIR="/usr/share/locale"
-	-DVERSION="0.1.2"
-)
-
 set(
 	OPENCC_DCIT_SOURCES
 	${LIBOPENCC_DICTIONARY_SOURCES}

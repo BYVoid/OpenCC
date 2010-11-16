@@ -23,10 +23,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef HAVE_CONFIG_H
-#	include "config.h"
-#endif
-
 #define BUFFER_SIZE 32768
 
 void convert(const char * input_file, const char * output_file, const char * config_file)

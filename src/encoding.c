@@ -162,7 +162,7 @@ char * ucs4_to_utf8(const ucs4_t * ucs4, size_t length)
 
 	for (i = 0; i < length; i ++)
 	{
-		if (freesize - 6 <= 0)
+		if ((ssize_t)freesize - 6 <= 0)
 		{
 			freesize = putf8 - utf8;
 			utf8 = (char *) realloc(utf8, sizeof(char) * (freesize + freesize));
@@ -179,13 +179,15 @@ char * ucs4_to_utf8(const ucs4_t * ucs4, size_t length)
 			(c >> 8) & BITMASK(8), (c >> 0) & BITMASK(8)
 		#endif
 		};
+		
+		size_t delta = 0;
 
 		if (c <= 0x7F)
 		{
 			/* U-00000000 - U-0000007F */
 			/* 0xxxxxxx */
 			putf8[0] = byte[0] & BITMASK(7);
-			putf8 ++;
+			delta = 1;
 		}
 		else if (c <= 0x7FF)
 		{
@@ -194,7 +196,7 @@ char * ucs4_to_utf8(const ucs4_t * ucs4, size_t length)
 			putf8[1] = 0x80 + (byte[0] & BITMASK(6));
 			putf8[0] = 0xC0 + ((byte[0] >> 6) & BITMASK(2)) +
 					((byte[1] & BITMASK(3)) << 2);
-			putf8 += 2;
+			delta = 2;
 		}
 		else if (c <= 0xFFFF)
 		{
@@ -204,7 +206,7 @@ char * ucs4_to_utf8(const ucs4_t * ucs4, size_t length)
 			putf8[1] = 0x80 + ((byte[0] >> 6) & BITMASK(2)) +
 					((byte[1] & BITMASK(4)) << 2);
 			putf8[0] = 0xE0 + ((byte[1] >> 4) & BITMASK(4));
-			putf8 += 3;
+			delta = 3;
 		}
 		else if (c <= 0x1FFFFF)
 		{
@@ -216,7 +218,7 @@ char * ucs4_to_utf8(const ucs4_t * ucs4, size_t length)
 			putf8[1] = 0x80 + ((byte[1] >> 4) & BITMASK(4)) +
 					((byte[2] & BITMASK(2)) << 4);
 			putf8[0] = 0xF0 + ((byte[2] >> 2) & BITMASK(3));
-			putf8 += 4;
+			delta = 4;
 		}
 		else if (c <= 0x3FFFFFF)
 		{
@@ -229,7 +231,7 @@ char * ucs4_to_utf8(const ucs4_t * ucs4, size_t length)
 					((byte[2] & BITMASK(2)) << 4);
 			putf8[1] = 0x80 + ((byte[2] >> 2) & BITMASK(6));
 			putf8[0] = 0xF8 + (byte[3] & BITMASK(2));
-			putf8 += 5;
+			delta = 5;
 
 		}
 		else if (c <= 0x7FFFFFFF)
@@ -244,13 +246,16 @@ char * ucs4_to_utf8(const ucs4_t * ucs4, size_t length)
 			putf8[2] = 0x80 + ((byte[2] >> 2) & BITMASK(6));
 			putf8[1] = 0x80 + (byte[3] & BITMASK(6));
 			putf8[0] = 0xFC + ((byte[3] >> 6) & BITMASK(1)); 
-			putf8 += 6;
+			delta = 6;
 		}
 		else
 		{
 			free(utf8);
 			return (char *) -1;
 		}
+		
+		putf8 += delta;
+		freesize -= delta;
 	}
 
 	*putf8 = '\0';

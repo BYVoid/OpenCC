@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <locale.h>
 
 #ifdef HAVE_CONFIG_H
 #	include "config.h"

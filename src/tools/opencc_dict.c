@@ -1,7 +1,7 @@
 /*
 * Open Chinese Convert
 *
-* Copyright 2010 BYVoid <byvoid1@gmail.com>
+* Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -22,6 +22,11 @@
 #include "../dictionary/datrie.h"
 #include "../dictionary/text.h"
 #include <unistd.h>
+#include <locale.h>
+
+#ifdef HAVE_CONFIG_H
+#	include "config.h"
+#endif
 
 #define DATRIE_SIZE 1000000
 #define DATRIE_WORD_MAX_COUNT 500000

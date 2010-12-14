@@ -109,7 +109,7 @@ opencc_dict_SOURCES = \
 	$(libopencc_dictionary_sources) \
 	$(libopencc_headers) \
 	$(NULL)
-	
+
 opencc_dict_CFLAGS = \
 	$(macro_cflags) \
 	$(NULL)

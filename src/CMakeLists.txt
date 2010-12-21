@@ -41,6 +41,16 @@ add_definitions(
 	-DLOCALEDIR="${DIR_PREFIX}/${DIR_SHARE}/locale"
 	-DVERSION="${OPENCC_VERSION}"
 	-DBYTEORDER=${BYTEORDER}
+	-DPACKAGE_NAME="${PACKAGE_NAME}"
+	-DHAVE_GETTEXT
+)
+
+link_directories(
+	${GETTEXT_LIBRARIES}
+)
+
+include_directories(
+	${GETTEXT_INCLUDE_DIR}
 )
 
 add_library(

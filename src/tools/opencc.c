@@ -110,7 +110,7 @@ int main(int argc, char ** argv)
 {
 #ifdef HAVE_GETTEXT
 	setlocale(LC_ALL, "");
-	bindtextdomain(PACKAGE, LOCALEDIR);
+	bindtextdomain(PACKAGE_NAME, LOCALEDIR);
 #endif
 
 	static struct option longopts[] =

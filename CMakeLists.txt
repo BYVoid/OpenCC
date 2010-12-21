@@ -16,7 +16,10 @@
 # limitations under the License.
 #
 
+cmake_minimum_required(VERSION 2.8)
 set (PACKAGE_NAME opencc)
+project (${PACKAGE_NAME} C)
+
 set (PACKAGE_URL http://code.google.com/p/open-chinese-convert)
 set (PACKAGE_BUGREPORT http://code.google.com/p/open-chinese-convert/issues/entry)
 set (OPENCC_VERSION_MAJOR 0)
@@ -33,15 +36,14 @@ set (
 	${OPENCC_VERSION_MAJOR}.${OPENCC_VERSION_MINOR}.${OPENCC_VERSION_REVISION}${version_suffix}
 )
 
-cmake_minimum_required(VERSION 2.8)
-project (${PACKAGE_NAME} C)
-
 set (DIR_PREFIX ${CMAKE_INSTALL_PREFIX})
 set (DIR_LIBRARY ${CMAKE_SHARED_LIBRARY_PREFIX})
 set (DIR_LIBRARY_STATIC ${CMAKE_STATIC_LIBRARY_PREFIX})
 set (DIR_INCLUDE include)
 set (DIR_SHARE share)
 set (DIR_BIN bin)
+
+find_package(Gettext REQUIRED)
 
 include (TestBigEndian)
 TEST_BIG_ENDIAN(BIGENDIAN)
@@ -67,3 +69,6 @@ install(
 add_subdirectory(src)
 add_subdirectory(doc)
 add_subdirectory(data)
+if (GETTEXT_FOUND)
+	add_subdirectory(po)
+endif (GETTEXT_FOUND)

@@ -35,7 +35,7 @@ static int lib_initialized = FALSE;
 static void lib_initialize(void)
 {
 #ifdef HAVE_GETTEXT
-	bindtextdomain(PACKAGE, LOCALEDIR);
+	bindtextdomain(PACKAGE_NAME, LOCALEDIR);
 #endif
 	lib_initialized = TRUE;
 }

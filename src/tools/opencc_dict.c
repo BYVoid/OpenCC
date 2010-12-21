@@ -394,7 +394,7 @@ int main(int argc, char ** argv)
 
 #ifdef HAVE_GETTEXT
 	setlocale(LC_ALL, "");
-	bindtextdomain(PACKAGE, LOCALEDIR);
+	bindtextdomain(PACKAGE_NAME, LOCALEDIR);
 #endif
 
 	while((oc = getopt(argc, argv, "vh-:i:o:")) != -1)

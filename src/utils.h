@@ -45,7 +45,7 @@
 #ifdef HAVE_GETTEXT
 #	include <libintl.h>
 #	include <locale.h>
-#	define _(STRING) dgettext(PACKAGE,STRING)
+#	define _(STRING) dgettext(PACKAGE_NAME, STRING)
 #else
 #	define _(STRING) STRING
 #endif

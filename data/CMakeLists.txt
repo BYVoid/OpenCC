@@ -5,72 +5,47 @@ set(
 
 add_custom_target(
 	ocds
-	DEPENDS opencc_dict
+	ALL
+	DEPENDS
+		simp_to_trad_characters.ocd
+		simp_to_trad_phrases.ocd
+		trad_to_simp_characters.ocd
+		trad_to_simp_phrases.ocd
 )
 
-add_custom_command(
-	TARGET
-		ocds
-	POST_BUILD
-	COMMENT
-		"Building simp_to_trad_characters.ocd"
-	COMMAND
-		${OPENCC_DICT_BIN} -i ${CMAKE_SOURCE_DIR}/data/simp_to_trad/characters.txt -o simp_to_trad_characters.ocd
-)
+foreach(DICT_PREFIX simp_to_trad trad_to_simp)
 
-add_custom_command(
-	TARGET
-		ocds
-	POST_BUILD
-	COMMENT
-		"Building simp_to_trad_phrases.ocd"
-	COMMAND
-		${OPENCC_DICT_BIN} -i ${CMAKE_SOURCE_DIR}/data/simp_to_trad/phrases.txt -o simp_to_trad_phrases.ocd
-)
+	foreach(DICT_SURFIX characters phrases)
 
-add_custom_command(
-	TARGET
-		ocds
-	POST_BUILD
-	COMMENT
-		"Building trad_to_simp_characters.ocd"
-	COMMAND
-		${OPENCC_DICT_BIN} -i ${CMAKE_SOURCE_DIR}/data/trad_to_simp/characters.txt -o trad_to_simp_characters.ocd
-)
+		set (DICT ${DICT_PREFIX}_${DICT_SURFIX})
 
-add_custom_command(
-	TARGET
-		ocds
-	POST_BUILD
-	COMMENT
-		"Building trad_to_simp_phrases.ocd"
-	COMMAND
-		${OPENCC_DICT_BIN} -i ${CMAKE_SOURCE_DIR}/data/trad_to_simp/phrases.txt -o trad_to_simp_phrases.ocd
-)
+		add_custom_command(
+			OUTPUT
+				${DICT}.ocd
+			COMMENT
+				"Building ${DICT}.ocd"
+			COMMAND
+				${OPENCC_DICT_BIN} -i ${CMAKE_SOURCE_DIR}/data/${DICT_PREFIX}/${DICT_SURFIX}.txt -o ${DICT}.ocd
+			DEPENDS opencc_dict
+		)
 
-set(
-	ocdfiles 
-	${CMAKE_BINARY_DIR}/data/simp_to_trad_characters.ocd
-	${CMAKE_BINARY_DIR}/data/simp_to_trad_phrases.ocd
-	${CMAKE_BINARY_DIR}/data/trad_to_simp_characters.ocd
-	${CMAKE_BINARY_DIR}/data/trad_to_simp_phrases.ocd
-)
+		install(
+			FILES
+				${CMAKE_BINARY_DIR}/data/${DICT}.ocd
+			DESTINATION
+				${DIR_SHARE}/opencc
+		)
 
-set_directory_properties(
-	PROPERTIES
-		ADDITIONAL_MAKE_CLEAN_FILES
-			"${ocdfiles}"
-)
+		set_directory_properties(
+			PROPERTIES
+				ADDITIONAL_MAKE_CLEAN_FILES
+					"${CMAKE_BINARY_DIR}/data/${DICT}.ocd"
+		)
 
-install(
-	FILES
-		${ocdfiles}
-	DESTINATION
-		${DIR_SHARE}/opencc
-)
+	endforeach(DICT_SURFIX)
+endforeach(DICT_PREFIX)
 
-set(
-	CONFIG_FILES
+set(CONFIG_FILES
 	config/zhs2zht.ini
 	config/zht2zhs.ini
 	config/mix2zht.ini

@@ -16,12 +16,13 @@
 # limitations under the License.
 #
 
+######## Project settings
 cmake_minimum_required(VERSION 2.8)
 set (PACKAGE_NAME opencc)
 project (${PACKAGE_NAME} C)
-
 enable_testing()
 
+######## Package information
 set (PACKAGE_URL http://code.google.com/p/open-chinese-convert)
 set (PACKAGE_BUGREPORT http://code.google.com/p/open-chinese-convert/issues/entry)
 set (OPENCC_VERSION_MAJOR 0)
@@ -37,12 +38,7 @@ set (
 	${OPENCC_VERSION_MAJOR}.${OPENCC_VERSION_MINOR}.${OPENCC_VERSION_REVISION}${version_suffix}
 )
 
-set (DIR_PREFIX ${CMAKE_INSTALL_PREFIX})
-set (DIR_LIBRARY ${CMAKE_SHARED_LIBRARY_PREFIX})
-set (DIR_LIBRARY_STATIC ${CMAKE_STATIC_LIBRARY_PREFIX})
-set (DIR_INCLUDE include)
-set (DIR_SHARE share)
-set (DIR_BIN bin)
+######## Validation
 
 find_package(Gettext REQUIRED)
 
@@ -53,6 +49,19 @@ if (BIGENDIAN)
 else (BIGENDIAN)
 	set (BYTEORDER LITTLE_ENDIAN)
 endif (BIGENDIAN)
+
+######## Directory
+
+set (DIR_PREFIX ${CMAKE_INSTALL_PREFIX})
+set (DIR_LIBRARY ${CMAKE_SHARED_LIBRARY_PREFIX})
+set (DIR_LIBRARY_STATIC ${CMAKE_STATIC_LIBRARY_PREFIX})
+set (DIR_INCLUDE include)
+set (DIR_SHARE share)
+set (DIR_BIN bin)
+set (PKGDATADIR ${DIR_PREFIX}/${DIR_SHARE}/opencc)
+set (LOCALEDIR ${DIR_PREFIX}/${DIR_SHARE}/locale)
+
+######## Configuration
 
 configure_file(
 	opencc.pc.in
@@ -66,6 +75,8 @@ install(
 	DESTINATION
 		${DIR_LIBRARY}/pkgconfig
 )
+
+######## Subdirectories
 
 add_subdirectory(src)
 add_subdirectory(doc)

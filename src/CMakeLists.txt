@@ -43,6 +43,7 @@ add_definitions(
 	-DBYTEORDER=${BYTEORDER}
 	-DPACKAGE_NAME="${PACKAGE_NAME}"
 	-DHAVE_GETTEXT
+	-fvisibility=hidden
 )
 
 link_directories(

@@ -43,6 +43,7 @@ extern "C" {
  * Note: Leave config_file to NULL if you do not want to load any configuration file.
  * 
  */
+__attribute ((visibility("default")))
 opencc_t opencc_open(const char * config_file);
 
 /**
@@ -53,6 +54,7 @@ opencc_t opencc_open(const char * config_file);
  * Destroy an instance of opencc.
  *
  */
+__attribute ((visibility("default")))
 int opencc_close(opencc_t od);
 
 /**
@@ -70,6 +72,7 @@ int opencc_close(opencc_t od);
  * Note: Don't forget to assign **outbuf to L'\0' after called.
  *
  */
+__attribute ((visibility("default")))
 size_t opencc_convert(opencc_t od, ucs4_t ** inbuf, size_t * inbufleft,
 		ucs4_t ** outbuf, size_t * outbufleft);
 
@@ -86,6 +89,7 @@ size_t opencc_convert(opencc_t od, ucs4_t ** inbuf, size_t * inbufleft,
  * DON'T FORGET TO CALL free() to recycle memory.
  *
  */
+__attribute ((visibility("default")))
 char * opencc_convert_utf8(opencc_t t_opencc, const char * inbuf, size_t length);
 
 /**
@@ -99,9 +103,11 @@ char * opencc_convert_utf8(opencc_t t_opencc, const char * inbuf, size_t length)
  * Load a dictionary.
  *
  */
+__attribute ((visibility("default")))
 int opencc_dict_load(opencc_t t_opencc, const char * dict_filename,
 		opencc_dictionary_type dict_type);
 
+__attribute ((visibility("default")))
 void opencc_set_conversion_mode(opencc_t t_opencc, opencc_conversion_mode conversion_mode);
 
 /**
@@ -113,6 +119,7 @@ void opencc_set_conversion_mode(opencc_t t_opencc, opencc_conversion_mode conver
  * OPENCC_CONVERT_ERROR_VOID
  *
  */
+__attribute ((visibility("default")))
 opencc_error opencc_errno(void);
 
 /**
@@ -122,6 +129,7 @@ opencc_error opencc_errno(void);
  * Print the error message to stderr.
  *
  */
+__attribute ((visibility("default")))
 void opencc_perror(const char * spec);
 
 #ifdef __cplusplus

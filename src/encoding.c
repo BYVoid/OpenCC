@@ -127,6 +127,7 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 		{
 			freesize = pucs4 - ucs4;
 			ucs4 = (ucs4_t *) realloc(ucs4, sizeof(ucs4_t) * (freesize + freesize));
+			pucs4 = ucs4 + freesize;
 		}
 
 		#if BYTEORDER == LITTLE_ENDIAN
@@ -139,8 +140,9 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 		freesize --;
 	}
 
-	*pucs4 = 0;
-	ucs4 = (ucs4_t *) realloc(ucs4, sizeof(ucs4_t) * (pucs4 - ucs4 + 1));
+	length = (pucs4 - ucs4 + 1);
+	ucs4 = (ucs4_t *) realloc(ucs4, sizeof(ucs4_t) * length);
+	ucs4[length - 1] = 0;
 	return ucs4;
 
 err:
@@ -166,6 +168,7 @@ char * ucs4_to_utf8(const ucs4_t * ucs4, size_t length)
 		{
 			freesize = putf8 - utf8;
 			utf8 = (char *) realloc(utf8, sizeof(char) * (freesize + freesize));
+			putf8 = utf8 + freesize;
 		}
 
 		ucs4_t c = ucs4[i];
@@ -258,8 +261,9 @@ char * ucs4_to_utf8(const ucs4_t * ucs4, size_t length)
 		freesize -= delta;
 	}
 
-	*putf8 = '\0';
-	utf8 = (char *) realloc(utf8, sizeof(char) * (putf8 - utf8 + 1));
+	length = (putf8 - utf8 + 1);
+	utf8 = (char *) realloc(utf8, sizeof(char) * length);
+	utf8[length - 1] = '\0';
 	return utf8;
 }
 

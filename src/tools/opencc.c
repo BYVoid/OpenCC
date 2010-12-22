@@ -22,13 +22,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <locale.h>
 
 #define BUFFER_SIZE 32768
 
 void convert(const char * input_file, const char * output_file, const char * config_file)
 {
-	static char inbuf[BUFFER_SIZE + 1];
-	
 	opencc_t od = opencc_open(config_file);
 	if (od == (opencc_t) -1)
 	{
@@ -59,19 +58,46 @@ void convert(const char * input_file, const char * output_file, const char * con
 		}
 	}
 	
-	while (fgets(inbuf, BUFFER_SIZE, fp) != NULL)
+	size_t size = BUFFER_SIZE;
+	char * buffer_in, * buffer_out;
+	buffer_in = (char *) malloc(size * sizeof(char));
+	
+	while (fgets(buffer_in, size, fp) != NULL)
 	{
-		char * outbuf;
-		outbuf = opencc_convert_utf8(od, inbuf, (size_t) -1);
-		if (outbuf == (char *) -1)
+		size_t freesize = size;
+		
+		char * buffer_in_p = buffer_in;
+		size_t line_length = strlen(buffer_in_p);
+		while (line_length + 1 == freesize && buffer_in_p[line_length - 2] != '\n')
+		{
+			//如果一行沒讀完，則最後一個字符不是換行，且讀滿緩衝區
+			buffer_in_p += size - 1;
+			freesize = size + 1;
+			size += size;
+			size_t offset = buffer_in_p - buffer_in;
+			buffer_in = (char *) realloc(buffer_in, size * sizeof(char));
+			buffer_in_p = buffer_in + offset;
+			
+			fgets(buffer_in_p, freesize, fp);
+			line_length = strlen(buffer_in_p);
+		}
+		
+		buffer_out = opencc_convert_utf8(od, buffer_in, (size_t) -1);
+		if (buffer_out != (char *) -1)
+		{
+			fprintf(fpo, "%s", buffer_out);
+		}
+		else
 		{
 			opencc_perror(_("OpenCC error"));
 			break;
 		}
-		fprintf(fpo,"%s",outbuf);
 	}
 	
 	opencc_close(od);
+	
+	free(buffer_in);
+	free(buffer_out);
 	
 	fclose(fp);
 	fclose(fpo);

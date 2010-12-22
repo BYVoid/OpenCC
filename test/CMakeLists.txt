@@ -16,5 +16,10 @@ foreach(CONFIG ${CONFIGURATIONS})
 		${PROJECT_BINARY_DIR}/test/${CONFIG}.out
 		${CMAKE_SOURCE_DIR}/test/testcases/${CONFIG}.ans
 	)
+	
+	set_property(
+		TEST ${CONFIG}_compare
+		APPEND PROPERTY
+			DEPENDS ${CONFIG}_convert)
 
 endforeach(CONFIG)

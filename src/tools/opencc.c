@@ -134,7 +134,7 @@ void show_usage()
 
 int main(int argc, char ** argv)
 {
-#ifdef HAVE_GETTEXT
+#ifdef ENABLE_GETTEXT
 	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE_NAME, LOCALEDIR);
 #endif

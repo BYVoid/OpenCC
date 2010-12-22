@@ -42,9 +42,14 @@ add_definitions(
 	-DVERSION="${OPENCC_VERSION}"
 	-DBYTEORDER=${BYTEORDER}
 	-DPACKAGE_NAME="${PACKAGE_NAME}"
-	-DHAVE_GETTEXT
 	-fvisibility=hidden
 )
+
+if (ENABLE_GETTEXT)
+	add_definitions(
+		-DENABLE_GETTEXT
+	)
+endif (ENABLE_GETTEXT)
 
 link_directories(
 	${GETTEXT_LIBRARIES}

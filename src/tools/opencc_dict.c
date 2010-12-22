@@ -393,7 +393,7 @@ int main(int argc, char ** argv)
 	static char input_file[BUFFER_SIZE], output_file[BUFFER_SIZE];
 	int input_file_specified = FALSE, output_file_specified = FALSE;
 
-#ifdef HAVE_GETTEXT
+#ifdef ENABLE_GETTEXT
 	setlocale(LC_ALL, "");
 	bindtextdomain(PACKAGE_NAME, LOCALEDIR);
 #endif

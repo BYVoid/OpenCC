@@ -38,7 +38,7 @@
 #	define LITTLE_ENDIAN (1)
 #endif
 
-#ifdef HAVE_GETTEXT
+#ifdef ENABLE_GETTEXT
 #	include <libintl.h>
 #	include <locale.h>
 #	define _(STRING) dgettext(PACKAGE_NAME, STRING)

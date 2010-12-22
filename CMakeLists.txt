@@ -40,7 +40,9 @@ set (
 
 ######## Validation
 
-find_package(Gettext REQUIRED)
+if (ENABLE_GETTEXT)
+	find_package(Gettext REQUIRED)
+endif (ENABLE_GETTEXT)
 
 include (TestBigEndian)
 TEST_BIG_ENDIAN(BIGENDIAN)
@@ -81,7 +83,9 @@ install(
 add_subdirectory(src)
 add_subdirectory(doc)
 add_subdirectory(data)
-if (GETTEXT_FOUND)
+
+if (GETTEXT_FOUND AND ENABLE_GETTEXT)
 	add_subdirectory(po)
-endif (GETTEXT_FOUND)
+endif (GETTEXT_FOUND AND ENABLE_GETTEXT)
+
 add_subdirectory(test)

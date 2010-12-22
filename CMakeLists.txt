@@ -20,6 +20,8 @@ cmake_minimum_required(VERSION 2.8)
 set (PACKAGE_NAME opencc)
 project (${PACKAGE_NAME} C)
 
+enable_testing()
+
 set (PACKAGE_URL http://code.google.com/p/open-chinese-convert)
 set (PACKAGE_BUGREPORT http://code.google.com/p/open-chinese-convert/issues/entry)
 set (OPENCC_VERSION_MAJOR 0)
@@ -72,3 +74,4 @@ add_subdirectory(data)
 if (GETTEXT_FOUND)
 	add_subdirectory(po)
 endif (GETTEXT_FOUND)
+add_subdirectory(test)

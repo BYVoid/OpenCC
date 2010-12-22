@@ -24,10 +24,6 @@
 #include <unistd.h>
 #include <locale.h>
 
-#ifdef HAVE_CONFIG_H
-#	include "config.h"
-#endif
-
 #define DATRIE_SIZE 1000000
 #define DATRIE_WORD_MAX_COUNT 500000
 #define DATRIE_WORD_MAX_LENGTH 32

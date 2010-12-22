@@ -25,13 +25,12 @@ enable_testing()
 set (PACKAGE_URL http://code.google.com/p/open-chinese-convert)
 set (PACKAGE_BUGREPORT http://code.google.com/p/open-chinese-convert/issues/entry)
 set (OPENCC_VERSION_MAJOR 0)
-set (OPENCC_VERSION_MINOR 1)
-set (OPENCC_VERSION_REVISION 2)
-set (OPENCC_RELEASED 0)
+set (OPENCC_VERSION_MINOR 2)
+set (OPENCC_VERSION_REVISION 0)
 
-if (NOT OPENCC_RELEASED)
-	set (version_suffix .debug)
-endif (NOT OPENCC_RELEASED)
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+	set (version_suffix .Debug)
+endif (CMAKE_BUILD_TYPE MATCHES Debug)
 
 set (
 	OPENCC_VERSION

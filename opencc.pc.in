@@ -1,4 +1,5 @@
 prefix=@DIR_PREFIX@
+exec_prefix=${prefix}
 libdir=${prefix}/@DIR_LIBRARY@
 includedir=${prefix}/@DIR_INCLUDE@
 

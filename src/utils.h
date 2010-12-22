@@ -38,25 +38,12 @@
 #	define LITTLE_ENDIAN (1)
 #endif
 
-#ifdef __WIN32
-#	include "config.win32.h"
-#endif
-
 #ifdef HAVE_GETTEXT
 #	include <libintl.h>
 #	include <locale.h>
 #	define _(STRING) dgettext(PACKAGE_NAME, STRING)
 #else
 #	define _(STRING) STRING
-#endif
-
-#ifdef __WIN32
-#	ifndef PKGDATADIR
-#		define PKGDATADIR ""
-#	endif
-#	ifndef VERSION
-#		define VERSION ""
-#	endif
 #endif
 
 #define debug_should_not_be_here() \

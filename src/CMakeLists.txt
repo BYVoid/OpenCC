@@ -38,12 +38,17 @@ set (LIBOPENCC_STATIC_TARGET libopencc_static)
 
 add_definitions(
 	-DPKGDATADIR="${DIR_PREFIX}/${DIR_SHARE}"
-	-DLOCALEDIR="${DIR_PREFIX}/${DIR_SHARE}/locale"
 	-DVERSION="${OPENCC_VERSION}"
 	-DBYTEORDER=${BYTEORDER}
 	-DPACKAGE_NAME="${PACKAGE_NAME}"
-	-DHAVE_GETTEXT
 )
+
+if (GETTEXT_FOUND)
+	add_definitions(
+		-DLOCALEDIR="${DIR_PREFIX}/${DIR_SHARE}/locale"
+		-DHAVE_GETTEXT
+	)
+endif (GETTEXT_FOUND)
 
 link_directories(
 	${GETTEXT_LIBRARIES}

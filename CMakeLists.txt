@@ -43,7 +43,7 @@ set (DIR_INCLUDE include)
 set (DIR_SHARE share)
 set (DIR_BIN bin)
 
-find_package(Gettext REQUIRED)
+find_package(Gettext)
 
 include (TestBigEndian)
 TEST_BIG_ENDIAN(BIGENDIAN)

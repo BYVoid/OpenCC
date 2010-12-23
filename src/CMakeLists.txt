@@ -42,21 +42,8 @@ add_definitions(
 	-DVERSION="${OPENCC_VERSION}"
 	-DBYTEORDER=${BYTEORDER}
 	-DPACKAGE_NAME="${PACKAGE_NAME}"
+	-Wall
 	-fvisibility=hidden
-)
-
-if (ENABLE_GETTEXT)
-	add_definitions(
-		-DENABLE_GETTEXT
-	)
-endif (ENABLE_GETTEXT)
-
-link_directories(
-	${GETTEXT_LIBRARIES}
-)
-
-include_directories(
-	${GETTEXT_INCLUDE_DIR}
 )
 
 add_library(
@@ -82,6 +69,31 @@ set_target_properties(
 		SOVERSION
 			1
 )
+
+if (ENABLE_GETTEXT)
+
+	add_definitions(
+		-DENABLE_GETTEXT
+	)
+	
+	link_directories(
+	${GETTEXT_LIBRARIES}
+	)
+
+	include_directories(
+		${GETTEXT_INCLUDE_DIR}
+	)
+	
+endif (ENABLE_GETTEXT)
+
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+
+	add_definitions(
+		-O0
+		-g3
+	)
+
+endif (CMAKE_BUILD_TYPE MATCHES Debug)
 
 install(
 	TARGETS

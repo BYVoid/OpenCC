@@ -78,7 +78,9 @@ void convert(const char * input_file, const char * output_file, const char * con
 			buffer_in = (char *) realloc(buffer_in, size * sizeof(char));
 			buffer_in_p = buffer_in + offset;
 			
-			fgets(buffer_in_p, freesize, fp);
+			if (fgets(buffer_in_p, freesize, fp) == NULL)
+				break;
+
 			line_length = strlen(buffer_in_p);
 		}
 		

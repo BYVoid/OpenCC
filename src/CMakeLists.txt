@@ -83,12 +83,15 @@ set_target_properties(
 			1
 )
 
+if (NOT WIN32)
 install(
 	TARGETS
 		${LIBOPENCC_TARGET}
-	LIBRARY DESTINATION
+	LIBRARY
+	DESTINATION
 		${DIR_LIBRARY}
 )
+endif (NOT WIN32)
 
 install(
 	TARGETS

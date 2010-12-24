@@ -216,7 +216,7 @@ static int parse(config_desc * config, const char * filename)
 			continue;
 		}
 
-		char * key, * value;
+		char * key = NULL, * value = NULL;
 
 		if (parse_line(trimed_buff, &key, &value) == -1)
 		{

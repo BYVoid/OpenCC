@@ -42,21 +42,7 @@ add_definitions(
 	-DVERSION="${OPENCC_VERSION}"
 	-DBYTEORDER=${BYTEORDER}
 	-DPACKAGE_NAME="${PACKAGE_NAME}"
-	-fvisibility=hidden
-)
-
-if (ENABLE_GETTEXT)
-	add_definitions(
-		-DENABLE_GETTEXT
-	)
-endif (ENABLE_GETTEXT)
-
-link_directories(
-	${GETTEXT_LIBRARIES}
-)
-
-include_directories(
-	${GETTEXT_INCLUDE_DIR}
+	-Wall
 )
 
 add_library(
@@ -83,14 +69,38 @@ set_target_properties(
 			1
 )
 
-if (NOT WIN32)
-	install(
-		TARGETS
-			${LIBOPENCC_TARGET}
-		LIBRARY
-		DESTINATION
-			${DIR_LIBRARY}
+if (ENABLE_GETTEXT)
+
+	add_definitions(
+		-DENABLE_GETTEXT
 	)
+	
+	link_directories(
+	${GETTEXT_LIBRARIES}
+	)
+
+	include_directories(
+		${GETTEXT_INCLUDE_DIR}
+	)
+	
+endif (ENABLE_GETTEXT)
+
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+
+	add_definitions(
+		-O0
+		-g3
+	)
+
+endif (CMAKE_BUILD_TYPE MATCHES Debug)
+
+if (NOT WIN32)
+install(
+	TARGETS
+		${LIBOPENCC_TARGET}
+	LIBRARY DESTINATION
+		${DIR_LIBRARY}
+)
 endif (NOT WIN32)
 
 install(
@@ -106,5 +116,7 @@ install(
 	DESTINATION
 		${DIR_INCLUDE}/opencc
 )
+
+include(symbols.cmake)
 
 add_subdirectory(tools)

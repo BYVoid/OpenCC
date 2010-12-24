@@ -84,6 +84,7 @@ const ucs4_t * const * dictionary_match_longest(dictionary_t t_dictionary, const
 	default:
 		debug_should_not_be_here();
 	}
+	return (const ucs4_t * const *) -1;
 }
 
 size_t dictionary_get_all_match_lengths(dictionary_t t_dictionary, const ucs4_t * word,
@@ -101,4 +102,5 @@ size_t dictionary_get_all_match_lengths(dictionary_t t_dictionary, const ucs4_t 
 	default:
 		debug_should_not_be_here();
 	}
+	return (size_t) -1;
 }

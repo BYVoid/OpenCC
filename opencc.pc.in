@@ -1,7 +1,7 @@
 prefix=@DIR_PREFIX@
 exec_prefix=${prefix}
-libdir=${prefix}/@DIR_LIBRARY@
-includedir=${prefix}/@DIR_INCLUDE@
+libdir=@DIR_LIBRARY@
+includedir=@DIR_INCLUDE@
 
 Name: opencc
 Description: Open Chinese Convert

@@ -33,7 +33,7 @@ foreach(DICT_PREFIX simp_to_trad trad_to_simp)
 			FILES
 				${CMAKE_BINARY_DIR}/data/${DICT}.ocd
 			DESTINATION
-				${DIR_SHARE}/opencc
+				${DIR_SHARE_OPENCC}
 		)
 
 		set_directory_properties(
@@ -56,5 +56,5 @@ install(
 	FILES
 		${CONFIG_FILES}
 	DESTINATION
-		${DIR_SHARE}/opencc
+		${DIR_SHARE_OPENCC}
 )

@@ -130,11 +130,7 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 			pucs4 = ucs4 + freesize;
 		}
 
-		#if BYTEORDER == LITTLE_ENDIAN
-			*pucs4 = (byte[3] << 24) + (byte[2] << 16) + (byte[1] << 8) + byte[0];
-		#else
-			*pucs4 = (byte[0] << 24) + (byte[1] << 16) + (byte[2] << 8) + byte[3];
-		#endif
+		*pucs4 = (byte[3] << 24) + (byte[2] << 16) + (byte[1] << 8) + byte[0];
 
 		pucs4 ++;
 		freesize --;
@@ -174,13 +170,8 @@ char * ucs4_to_utf8(const ucs4_t * ucs4, size_t length)
 		ucs4_t c = ucs4[i];
 		ucs4_t byte[4] =
 		{
-		#if BYTEORDER == LITTLE_ENDIAN
 			(c >> 0) & BITMASK(8), (c >> 8) & BITMASK(8),
 			(c >> 16) & BITMASK(8), (c >> 24) & BITMASK(8)
-		#else
-			(c >> 24) & BITMASK(8), (c >> 18) & BITMASK(8),
-			(c >> 8) & BITMASK(8), (c >> 0) & BITMASK(8)
-		#endif
 		};
 		
 		size_t delta = 0;

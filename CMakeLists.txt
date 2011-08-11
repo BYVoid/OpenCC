@@ -23,8 +23,8 @@ project (${PACKAGE_NAME} C)
 enable_testing()
 
 ######## Package information
-set (PACKAGE_URL http://code.google.com/p/open-chinese-convert)
-set (PACKAGE_BUGREPORT http://code.google.com/p/open-chinese-convert/issues/entry)
+set (PACKAGE_URL http://code.google.com/p/opencc)
+set (PACKAGE_BUGREPORT http://code.google.com/p/opencc/issues/entry)
 set (OPENCC_VERSION_MAJOR 0)
 set (OPENCC_VERSION_MINOR 2)
 set (OPENCC_VERSION_REVISION 0)

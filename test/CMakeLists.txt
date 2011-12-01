@@ -1,4 +1,13 @@
-set(CONFIGURATIONS zhs2zht zht2zhs mix2zht mix2zhs)
+set(CONFIGURATIONS
+	zhs2zht
+	zht2zhs
+	mix2zht
+	mix2zhs
+	zhs2zhtw_p
+	zhs2zhtw_vp
+	zhtw2zhcn_t
+	zhtw2zhcn_s
+)
 
 foreach(CONFIG ${CONFIGURATIONS})
 

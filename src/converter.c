@@ -671,9 +671,10 @@ size_t converter_convert(converter_t t_converter, ucs4_t ** inbuf, size_t * inbu
 	if (cur == 1)
 	{
 		//結果在緩衝區
-		memcpy(*outbuf, tmpbuf, coutbuf_delta);
+		memcpy(*outbuf, tmpbuf, coutbuf_delta * sizeof(ucs4_t));
 	}
-	*outbuf = coutbuf;
+
+	*outbuf += coutbuf_delta;
 	*outbuf_left = coutbuf_left;
 	free(tmpbuf);
 

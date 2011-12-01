@@ -26,7 +26,7 @@ enable_testing()
 set (PACKAGE_URL http://code.google.com/p/opencc)
 set (PACKAGE_BUGREPORT http://code.google.com/p/opencc/issues/entry)
 set (OPENCC_VERSION_MAJOR 0)
-set (OPENCC_VERSION_MINOR 2)
+set (OPENCC_VERSION_MINOR 3)
 set (OPENCC_VERSION_REVISION 0)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)

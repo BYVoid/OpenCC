@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <locale.h>
 
-#define BUFFER_SIZE 32768
+#define BUFFER_SIZE 65536
 
 void convert(const char * input_file, const char * output_file, const char * config_file)
 {
@@ -112,7 +112,7 @@ void show_version()
 	printf(_("Version %s\n"), VERSION);
 	printf(_("\n"));
 	printf(_("Author: %s\n"), "BYVoid <byvoid.kcp@gmail.com>");
-	printf(_("Bug Report: %s\n"), "http://code.google.com/p/open-chinese-convert/issues/entry");
+	printf(_("Bug Report: %s\n"), "http://code.google.com/p/opencc/issues/entry");
 	printf(_("\n"));
 }
 

@@ -88,6 +88,7 @@ void convert(const char * input_file, const char * output_file, const char * con
 		if (buffer_out != (char *) -1)
 		{
 			fprintf(fpo, "%s", buffer_out);
+			free(buffer_out);
 		}
 		else
 		{
@@ -99,7 +100,6 @@ void convert(const char * input_file, const char * output_file, const char * con
 	opencc_close(od);
 	
 	free(buffer_in);
-	free(buffer_out);
 	
 	fclose(fp);
 	fclose(fpo);

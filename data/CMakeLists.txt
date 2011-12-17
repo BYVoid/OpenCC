@@ -93,3 +93,9 @@ install(
 	DESTINATION
 		${DIR_SHARE_OPENCC}
 )
+
+if (BUILD_TESTING)
+	foreach (DICT ${TAIWAN_DICT_FILES} ${CHINA_DICT_FILES})
+		configure_file(${DICT} ${PROJECT_BINARY_DIR}/data COPYONLY)
+	endforeach (DICT)
+endif (BUILD_TESTING)

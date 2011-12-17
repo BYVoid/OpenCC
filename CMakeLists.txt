@@ -20,6 +20,7 @@
 cmake_minimum_required(VERSION 2.8)
 set (PACKAGE_NAME opencc)
 project (${PACKAGE_NAME} C)
+include (CTest)
 enable_testing()
 
 ######## Package information

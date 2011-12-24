@@ -7,7 +7,10 @@ def sort_items(input_filename, output_filename):
 	for line in input_file:
 		if len(line) == 0:
 			continue
-		key, value = line.split("\t")
+		try:
+		  key, value = line.split("\t")
+		except ValueError:
+		  print line
 		while value[-1] == "\n" or value[-1] == "\r":
 			value = value[:-1]
 		dic[key] = value

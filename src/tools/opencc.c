@@ -61,29 +61,33 @@ void convert(const char * input_file, const char * output_file, const char * con
 	size_t size = BUFFER_SIZE;
 	char * buffer_in = NULL, * buffer_out = NULL;
 	buffer_in = (char *) malloc(size * sizeof(char));
-	
-	while (fgets(buffer_in, size, fp) != NULL)
-	{
-		size_t freesize = size;
-		
-		char * buffer_in_p = buffer_in;
-		size_t line_length = strlen(buffer_in_p);
-		while (line_length + 1 == freesize && buffer_in_p[line_length - 2] != '\n')
-		{
-			//如果一行沒讀完，則最後一個字符不是換行，且讀滿緩衝區
-			buffer_in_p += size - 1;
-			freesize = size + 1;
-			size += size;
-			size_t offset = buffer_in_p - buffer_in;
-			buffer_in = (char *) realloc(buffer_in, size * sizeof(char));
-			buffer_in_p = buffer_in + offset;
-			
-			if (fgets(buffer_in_p, freesize, fp) == NULL)
-				break;
 
-			line_length = strlen(buffer_in_p);
-		}
-		
+    while (!feof(fp))
+    {
+        size_t read = fread(buffer_in, 1, size, fp);
+
+        // If we haven't finished reading after filling the entire buffer,
+        // then it could be that we broke within an UTF-8 character, in
+        // that case we must backtrack and find the boundary
+        if (read == size) {
+            // Find the boundary of last UTF-8 character
+            int i;
+            for (i = read - 1; i >= 0; i--)
+            {
+                char c = buffer_in[i];
+                if (!(c & 0x80) || ((c & 0xC0) == 0xC0))
+                    break;
+            }
+
+            if (i >= 0) {
+                buffer_in[i] = '\0';
+                // Since we read a bit too much, move file pointer back
+                // just that much so that we can continue reading
+                size_t n = read - i;
+                fseek(fp, -n, SEEK_CUR);
+            }
+        }
+
 		buffer_out = opencc_convert_utf8(od, buffer_in, (size_t) -1);
 		if (buffer_out != (char *) -1)
 		{

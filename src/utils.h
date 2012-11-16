@@ -60,4 +60,6 @@ char * mstrcpy(const char * str);
 
 char * mstrncpy(const char * str, size_t n);
 
+void skip_utf8_bom(FILE *fp);
+
 #endif /* __OPENCC_UTILS_H_ */

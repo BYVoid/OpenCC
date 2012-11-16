@@ -204,6 +204,7 @@ static int parse(config_desc * config, const char * filename)
 		}
 		free(pkg_filename);
 	}
+	skip_utf8_bom(fp);
 
 	static char buff[BUFFER_SIZE];
 

@@ -118,6 +118,7 @@ dictionary_t dictionary_text_open(const char * filename)
 		dictionary_text_close((dictionary_t) text_dictionary);
 		return (dictionary_t) -1;
 	}
+	skip_utf8_bom(fp);
 
 	size_t i = 0;
 	while (fgets(buff, ENTRY_BUFF_SIZE, fp))

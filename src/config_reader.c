@@ -187,7 +187,7 @@ static char * parse_trim(char * str)
 
 static int parse(config_desc * config, const char * filename)
 {
-	FILE * fp = fopen(filename, "rb");
+	FILE * fp = fopen(filename, "r");
 	if (!fp)
 	{
 		/* 使用 PKGDATADIR 路徑 */
@@ -195,7 +195,7 @@ static int parse(config_desc * config, const char * filename)
 				(char *) malloc(sizeof(char) * (strlen(filename) + strlen(PKGDATADIR) + 2));
 		sprintf(pkg_filename, "%s/%s", PKGDATADIR, filename);
 
-		fp = fopen(pkg_filename, "rb");
+		fp = fopen(pkg_filename, "r");
 		if (!fp)
 		{
 			free(pkg_filename);

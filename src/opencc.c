@@ -70,7 +70,7 @@ char * opencc_convert_utf8(opencc_t t_opencc, const char * inbuf, size_t length)
 	if (winbuf == (ucs4_t *) -1)
 	{
 		/* 輸入數據轉換失敗 */
-		errnum = OPENCC_ERROR_ENCODIND;
+		errnum = OPENCC_ERROR_ENCODING;
 		return (char *) -1;
 	}
 
@@ -112,7 +112,7 @@ char * opencc_convert_utf8(opencc_t t_opencc, const char * inbuf, size_t length)
 			free(outbuf);
 			free(winbuf);
 			free(woutbuf);
-			errnum = OPENCC_ERROR_ENCODIND;
+			errnum = OPENCC_ERROR_ENCODING;
 			return (char *) -1;
 		}
 
@@ -267,7 +267,7 @@ void opencc_perror(const char * spec)
 	case OPENCC_ERROR_CONVERTER:
 		converter_perror(_("Converter error"));
 		break;
-	case OPENCC_ERROR_ENCODIND:
+	case OPENCC_ERROR_ENCODING:
 		perr(_("Encoding error"));
 		break;
 	default:

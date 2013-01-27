@@ -87,6 +87,8 @@ void convert(const char * input_file, const char * output_file, const char * con
                 fseek(fp, -n, SEEK_CUR);
             }
         }
+        else
+            buffer_in[read] = '\0';
 
 		buffer_out = opencc_convert_utf8(od, buffer_in, (size_t) -1);
 		if (buffer_out != (char *) -1)

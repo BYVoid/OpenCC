@@ -62,9 +62,20 @@ void convert(const char * input_file, const char * output_file, const char * con
 	char * buffer_in = NULL, * buffer_out = NULL;
 	buffer_in = (char *) malloc(size * sizeof(char));
 
+	char* lookahead = (char*) malloc(size * sizeof(char));
+	size_t lookahead_size = 0;
+
     while (!feof(fp))
     {
-        size_t read = fread(buffer_in, 1, size, fp);
+	size_t read;
+
+	if (lookahead_size > 0) {
+	    memcpy(buffer_in, lookahead, lookahead_size);
+	    read = fread(buffer_in + lookahead_size, 1, size - lookahead_size, fp) + lookahead_size;
+	    lookahead_size = 0;
+	}
+	else
+	    read = fread(buffer_in, 1, size, fp);
 
         // If we haven't finished reading after filling the entire buffer,
         // then it could be that we broke within an UTF-8 character, in
@@ -79,13 +90,10 @@ void convert(const char * input_file, const char * output_file, const char * con
                     break;
             }
 
-            if (i >= 0) {
-                buffer_in[i] = '\0';
-                // Since we read a bit too much, move file pointer back
-                // just that much so that we can continue reading
-                size_t n = read - i;
-                fseek(fp, -n, SEEK_CUR);
-            }
+	    assert(i >= 0);
+	    memcpy(lookahead, buffer_in + i, read - i);
+	    lookahead_size = read - i;
+	    buffer_in[i] = '\0';
         }
         else
             buffer_in[read] = '\0';
@@ -102,9 +110,23 @@ void convert(const char * input_file, const char * output_file, const char * con
 			break;
 		}
 	}
+
+	if (lookahead_size > 0) {
+	    assert(lookahead_size < size);
+
+	    lookahead[lookahead_size] = '\0';
+	    buffer_out = opencc_convert_utf8(od, lookahead, (size_t) -1);
+	    if (buffer_out != (char*) -1) {
+		fprintf(fpo, "%s", buffer_out);
+		free(buffer_out);
+	    }
+	    else
+		opencc_perror(_("OpenCC error"));
+	}
 	
 	opencc_close(od);
 	
+	free(lookahead);
 	free(buffer_in);
 	
 	fclose(fp);

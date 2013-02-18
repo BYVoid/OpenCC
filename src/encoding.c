@@ -103,7 +103,7 @@ ucs4_t * utf8_to_ucs4(const char * utf8, size_t length)
 			byte[3] = utf8[i] & BITMASK(2);
 			i += 4;
 		}
-		else if (GET_BIT(utf8[i], 2) == 0)
+		else if (GET_BIT(utf8[i], 1) == 0)
 		{
 			/* U-04000000 - U-7FFFFFFF */
 			/* 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx */

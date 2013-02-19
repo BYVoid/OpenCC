@@ -46,6 +46,7 @@ void convert(const char * input_file, const char * output_file, const char * con
 			fprintf(stderr, _("Can not read file: %s\n"), input_file);
 			exit(1);
 		}
+		skip_utf8_bom(fp);
 	}
 	
 	if (output_file)

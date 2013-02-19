@@ -72,7 +72,7 @@ int parse_entry(const char * buff, entry * entry_i)
 			);
 		}
 
-		for (buff = ++ pbuff; *pbuff != ' ' && *pbuff != '\0' && *pbuff != '\n'; ++ pbuff)
+		for (buff = ++ pbuff; *pbuff != ' ' && *pbuff != '\0' && *pbuff != '\n' && *pbuff != '\r'; ++ pbuff)
 			;
 		length = pbuff - buff;
 		ucs4_buff = utf8_to_ucs4(buff, length);
@@ -112,12 +112,13 @@ dictionary_t dictionary_text_open(const char * filename)
 
 	static char buff[ENTRY_BUFF_SIZE];
 
-	FILE * fp = fopen(filename,"rb");
+	FILE * fp = fopen(filename,"r");
 	if (fp == NULL)
 	{
 		dictionary_text_close((dictionary_t) text_dictionary);
 		return (dictionary_t) -1;
 	}
+	skip_utf8_bom(fp);
 
 	size_t i = 0;
 	while (fgets(buff, ENTRY_BUFF_SIZE, fp))

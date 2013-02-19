@@ -42,3 +42,28 @@ char * mstrncpy(const char * str, size_t n)
 	strbuf[n] = '\0';
 	return strbuf;
 }
+
+void skip_utf8_bom(FILE *fp)
+{
+        int bom[3];
+        int n;
+        /* UTF-8 BOM is EF BB BF */
+        if (fp == NULL)
+                return;
+        /* If we are not at beginning of file, return */
+        if (ftell(fp) != 0) {
+                return;
+        }   
+        /* Try to read first 3 bytes */
+        for (n = 0; n <= 2 && (bom[n] = getc(fp)) != EOF; n++) {
+                ;   
+        }   
+        /* If we can only read <3 bytes, push them back */
+        /* Or if first 3 bytes is not BOM, push them back */
+        if (n < 3 || bom[0] != 0xEF || bom[1] != 0xBB || bom[2] != 0xBF) {
+                for (n-- ; n >= 0; n--) {
+                        ungetc(bom[n], fp);
+                }   
+        }   
+        /* Otherwise, BOM is already skipped */ 
+}

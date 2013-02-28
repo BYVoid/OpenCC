@@ -229,13 +229,13 @@ int encode_char(ucs4_t ch)
 void datrie_match(const datrie_dictionary_desc * datrie_dictionary, const ucs4_t * word,
 		size_t *match_pos, size_t *id, size_t limit)
 {
-	size_t i, p;
-	for (i = 0,p = 0; word[p] && (limit == 0 || p < limit) &&
+	int i, p;
+	for (i = 0, p = 0; word[p] && (limit == 0 || (size_t)p < limit) &&
 			datrie_dictionary->dat[i].base != DATRIE_UNUSED; p ++)
 	{
 		int k = encode_char(word[p]);
 		int j = datrie_dictionary->dat[i].base + k;
-		if (j < 0 || j >= datrie_dictionary->dat_item_count || datrie_dictionary->dat[j].parent != i)
+		if (j < 0 || (size_t)j >= datrie_dictionary->dat_item_count || datrie_dictionary->dat[j].parent != i)
 			break;
 		i = j;
 	}
@@ -277,12 +277,12 @@ size_t dictionary_datrie_get_all_match_lengths(dictionary_t t_dictionary, const 
 
 	size_t rscnt = 0;
 
-	size_t i, p;
+	int i, p;
 	for (i = 0,p = 0; word[p] && datrie_dictionary->dat[i].base != DATRIE_UNUSED; p ++)
 	{
 		int k = encode_char(word[p]);
 		int j = datrie_dictionary->dat[i].base + k;
-		if (j < 0 || j >= datrie_dictionary->dat_item_count || datrie_dictionary->dat[j].parent != i)
+		if (j < 0 || (size_t)j >= datrie_dictionary->dat_item_count || datrie_dictionary->dat[j].parent != i)
 			break;
 		i = j;
 

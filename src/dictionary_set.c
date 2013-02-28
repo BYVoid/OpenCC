@@ -67,7 +67,7 @@ dictionary_group_t dictionary_set_get_group(dictionary_set_t t_dictionary, size_
 {
 	dictionary_set_desc * dictionary_set = (dictionary_set_desc *) t_dictionary;
 
-	if (index < 0 || index >= dictionary_set->count)
+	if (index >= dictionary_set->count)
 	{
 		return (dictionary_group_t) -1;
 	}

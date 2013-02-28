@@ -124,7 +124,7 @@ void get_words_with_prefix(ucs4_t * word, int p)
 	buff[p] = 0;
 	
 	words_set_count = 0;
-	for (i = binary_search(buff); i < lexicon_count && is_prefix(buff,lexicon[i].key); i ++)
+	for (i = binary_search(buff); (uint32_t)i < lexicon_count && is_prefix(buff,lexicon[i].key); i ++)
 	{
 		if (ucs4cmp(buff,lexicon[i].key) == 0)
 			continue;
@@ -167,10 +167,10 @@ void insert_first_char(int id)
 		dat[key].word = (id);
 }
 
-void insert_words(int delta, int parent,int word_len)
+void insert_words(int delta, int parent, size_t word_len)
 {
 	int i;
-	for (i = 0; i < words_set_count; i ++)
+	for (i = 0; (uint32_t)i < words_set_count; i ++)
 	{
 		int j = words_set[i];
 		int k = encode_char(lexicon[j].key[word_len]) + delta;
@@ -188,10 +188,10 @@ void insert(int id)
 	Entry * word = &lexicon[id];
 	for (;;)
 	{
-		int p,i;
+		int p, i;
 		
 		match_word(dat, word->key, &p, &i, 0);
-		if (p == word->length)
+		if ((size_t)p == word->length)
 			return;
 		
 		get_words_with_prefix(word->key, p);
@@ -218,7 +218,7 @@ void insert(int id)
 
 void make(void)
 {
-	int i;
+	size_t i;
 	for (i = 1; i < DATRIE_SIZE; i ++)
 	{
 		dat[i].parent = dat[i].base = DATRIE_UNUSED;

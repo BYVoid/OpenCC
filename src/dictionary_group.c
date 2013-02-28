@@ -75,7 +75,7 @@ dictionary_t dictionary_group_get_dictionary(dictionary_group_t t_dictionary, si
 {
 	dictionary_group_desc * dictionary_group = (dictionary_group_desc *) t_dictionary;
 
-	if (index < 0 || index >= dictionary_group->count)
+	if (index >= dictionary_group->count)
 	{
 		errnum = DICTIONARY_ERROR_INVALID_INDEX;
 		return (dictionary_t) -1;
@@ -159,7 +159,7 @@ size_t dictionary_group_get_all_match_lengths(dictionary_group_t t_dictionary,
 		if (i > 0 && rscnt > 1)
 		{
 			qsort(match_length, rscnt, sizeof(match_length[0]), qsort_int_cmp);
-			int j, k;
+			size_t j, k;
 			for (j = 0, k = 1; k < rscnt; k ++)
 			{
 				if (match_length[k] != match_length[j])

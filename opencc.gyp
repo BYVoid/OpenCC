@@ -4,35 +4,24 @@
   },
   "target_defaults": {
     "defines": [
-      "VERSION=\"<(opencc_version)\""
+      "VERSION=\"<(opencc_version)\"",
+      "PKGDATADIR=\"\""
     ]
   },
   "targets": [{
     "target_name": "libopencc",
     "type": "<(library)",
     "sources": [
-			"src/config_reader.c",
-			"src/converter.c",
-			"src/dictionary_group.c",
-			"src/dictionary_set.c",
-			"src/encoding.c",
-			"src/utils.c",
-			"src/opencc.c",
-			"src/config_reader.h",
-			"src/converter.h",
-			"src/dictionary_group.h",
-			"src/dictionary_set.h",
-			"src/encoding.h",
-			"src/utils.h",
-			"src/dictionary/abstract.c",
-			"src/dictionary/datrie.c",
-			"src/dictionary/text.c",
-			"src/dictionary/abstract.h",
-			"src/dictionary/datrie.h",
-			"src/dictionary/text.h",
-    ],
-    "defines": [
-      "PKGDATADIR=\"\""
+      "src/config_reader.c",
+      "src/converter.c",
+      "src/dictionary_group.c",
+      "src/dictionary_set.c",
+      "src/encoding.c",
+      "src/utils.c",
+      "src/opencc.c",
+      "src/dictionary/abstract.c",
+      "src/dictionary/datrie.c",
+      "src/dictionary/text.c"
     ],
     "conditions": [
       ["OS=='linux'", {
@@ -54,10 +43,13 @@
     "target_name": "opencc_dict",
     "type": "executable",
     "sources": [
-      "src/tools/opencc_dict.c"
-    ],
-    "dependencies": [
-      "libopencc"
+      "src/tools/opencc_dict.c",
+      "src/encoding.c",
+      "src/utils.c",
+      "src/dictionary_group.c",
+      "src/dictionary/abstract.c",
+      "src/dictionary/datrie.c",
+      "src/dictionary/text.c"
     ]
   }, {
     "target_name": "configs",
@@ -65,20 +57,20 @@
     "copies": [{
       "destination": "<(PRODUCT_DIR)",
       "files": [
-				"data/config/mix2zhs.ini",
-				"data/config/mix2zht.ini",
-				"data/config/zhs2zht.ini",
-				"data/config/zhs2zhtw_p.ini",
-				"data/config/zhs2zhtw_v.ini",
-				"data/config/zhs2zhtw_vp.ini",
-				"data/config/zht2zhs.ini",
-				"data/config/zht2zhtw_p.ini",
-				"data/config/zht2zhtw_v.ini",
-				"data/config/zht2zhtw_vp.ini",
-				"data/config/zhtw2zhcn_s.ini",
-				"data/config/zhtw2zhcn_t.ini",
-				"data/config/zhtw2zhs.ini",
-				"data/config/zhtw2zht.ini"
+        "data/config/mix2zhs.ini",
+        "data/config/mix2zht.ini",
+        "data/config/zhs2zht.ini",
+        "data/config/zhs2zhtw_p.ini",
+        "data/config/zhs2zhtw_v.ini",
+        "data/config/zhs2zhtw_vp.ini",
+        "data/config/zht2zhs.ini",
+        "data/config/zht2zhtw_p.ini",
+        "data/config/zht2zhtw_v.ini",
+        "data/config/zht2zhtw_vp.ini",
+        "data/config/zhtw2zhcn_s.ini",
+        "data/config/zhtw2zhcn_t.ini",
+        "data/config/zhtw2zhs.ini",
+        "data/config/zhtw2zht.ini"
       ]
     }]
   }, {

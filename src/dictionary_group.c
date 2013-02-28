@@ -55,31 +55,13 @@ int dictionary_group_load(dictionary_group_t t_dictionary, const char * filename
 {
 	dictionary_group_desc * dictionary_group = (dictionary_group_desc *) t_dictionary;
 	dictionary_t dictionary;
-
-	FILE * fp = fopen(filename, "rb");
-	if (!fp)
-	{
-		/* 使用 PKGDATADIR 路徑 */
-		char * new_filename =
-				(char *) malloc(sizeof(char) * (strlen(filename) + strlen(PKGDATADIR) + 2));
-		sprintf(new_filename, "%s/%s", PKGDATADIR, filename);
-
-		fp = fopen(new_filename, "rb");
-		if (!fp)
-		{
-			free(new_filename);
-			errnum = DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE;
-			return -1;
-		}
-		dictionary = dictionary_open(new_filename, type);
-		free(new_filename);
+	char * path = try_open_file(filename);
+	if (path == NULL) {
+		errnum = DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE;
+		return -1;
 	}
-	else
-	{
-		dictionary = dictionary_open(filename, type);
-	}
-	fclose(fp);
-
+	dictionary = dictionary_open(path, type);
+	free(path);
 	if (dictionary == (dictionary_t) -1)
 	{
 		errnum = DICTIONARY_ERROR_INVALID_DICT;

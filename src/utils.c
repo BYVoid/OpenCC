@@ -17,6 +17,7 @@
 */
 
 #include "utils.h"
+#define PATH_BUFFER_SIZE 4096
 
 void perr(const char * str)
 {
@@ -45,25 +46,72 @@ char * mstrncpy(const char * str, size_t n)
 
 void skip_utf8_bom(FILE *fp)
 {
-        int bom[3];
-        int n;
-        /* UTF-8 BOM is EF BB BF */
-        if (fp == NULL)
-                return;
-        /* If we are not at beginning of file, return */
-        if (ftell(fp) != 0) {
-                return;
-        }   
-        /* Try to read first 3 bytes */
-        for (n = 0; n <= 2 && (bom[n] = getc(fp)) != EOF; n++) {
-                ;   
-        }   
-        /* If we can only read <3 bytes, push them back */
-        /* Or if first 3 bytes is not BOM, push them back */
-        if (n < 3 || bom[0] != 0xEF || bom[1] != 0xBB || bom[2] != 0xBF) {
-                for (n-- ; n >= 0; n--) {
-                        ungetc(bom[n], fp);
-                }   
-        }   
-        /* Otherwise, BOM is already skipped */ 
+	int bom[3];
+	int n;
+	/* UTF-8 BOM is EF BB BF */
+	if (fp == NULL)
+		return;
+	/* If we are not at beginning of file, return */
+	if (ftell(fp) != 0) {
+		return;
+	}   
+	/* Try to read first 3 bytes */
+	for (n = 0; n <= 2 && (bom[n] = getc(fp)) != EOF; n++) {
+		;   
+	}   
+	/* If we can only read <3 bytes, push them back */
+	/* Or if first 3 bytes is not BOM, push them back */
+	if (n < 3 || bom[0] != 0xEF || bom[1] != 0xBB || bom[2] != 0xBF) {
+		for (n-- ; n >= 0; n--) {
+			ungetc(bom[n], fp);
+		}   
+	}   
+	/* Otherwise, BOM is already skipped */ 
 }
+
+const char * executable_path(void)
+{
+	static char path_buffer[PATH_BUFFER_SIZE];
+	static int calculated = FALSE;
+	if (!calculated) {
+		readlink("/proc/self/exe", path_buffer, sizeof(path_buffer));
+		char * last_sep = strrchr(path_buffer, '/');
+		assert(last_sep != NULL);
+		*last_sep = '\0';
+	}
+	return path_buffer;
+}
+
+char * try_open_file(const char * path)
+{
+	/* Try to find file in current working directory */
+	FILE * fp = fopen(path, "r");
+	if (fp)
+	{
+		fclose(fp);
+		return mstrcpy(path);
+	}
+	/* Try to find file in executable directory*/
+	const char * exe_dir = executable_path();
+	char * filename = (char *) malloc(sizeof(char) * (strlen(path) + strlen(exe_dir) + 2));
+	sprintf(filename, "%s/%s", exe_dir, path);
+	fp = fopen(filename, "r");
+	if (fp)
+	{
+		fclose(fp);
+		return filename;
+	}
+	free(filename);
+	/* Try to use PKGDATADIR */
+	filename = (char *) malloc(sizeof(char) * (strlen(path) + strlen(PKGDATADIR) + 2));
+	sprintf(filename, "%s/%s", PKGDATADIR, path);
+	fp = fopen(filename, "r");
+	if (fp)
+	{
+		fclose(fp);
+		return filename;
+	}
+	free(filename);
+	return NULL;
+}
+

@@ -62,4 +62,8 @@ char * mstrncpy(const char * str, size_t n);
 
 void skip_utf8_bom(FILE *fp);
 
+const char * executable_path(void);
+
+char * try_open_file(const char * path);
+
 #endif /* __OPENCC_UTILS_H_ */

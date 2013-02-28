@@ -187,27 +187,15 @@ static char * parse_trim(char * str)
 
 static int parse(config_desc * config, const char * filename)
 {
-	FILE * fp = fopen(filename, "r");
-	if (!fp)
-	{
-		/* 使用 PKGDATADIR 路徑 */
-		char * pkg_filename =
-				(char *) malloc(sizeof(char) * (strlen(filename) + strlen(PKGDATADIR) + 2));
-		sprintf(pkg_filename, "%s/%s", PKGDATADIR, filename);
-
-		fp = fopen(pkg_filename, "r");
-		if (!fp)
-		{
-			free(pkg_filename);
-			errnum = CONFIG_ERROR_CANNOT_ACCESS_CONFIG_FILE;
-			return -1;
-		}
-		free(pkg_filename);
+	char * path = try_open_file(filename);
+	if (path == NULL) {
+		errnum = CONFIG_ERROR_CANNOT_ACCESS_CONFIG_FILE;
+		return -1;
 	}
+	FILE * fp = fopen(path, "r");
+	free(path);
 	skip_utf8_bom(fp);
-
 	static char buff[BUFFER_SIZE];
-
 	while (fgets(buff, BUFFER_SIZE, fp) != NULL)
 	{
 		char * trimed_buff = parse_trim(buff);
@@ -216,9 +204,7 @@ static int parse(config_desc * config, const char * filename)
 			/* Comment Line or empty line */
 			continue;
 		}
-
 		char * key = NULL, * value = NULL;
-
 		if (parse_line(trimed_buff, &key, &value) == -1)
 		{
 			free(key);
@@ -227,7 +213,6 @@ static int parse(config_desc * config, const char * filename)
 			errnum = CONFIG_ERROR_PARSE;
 			return -1;
 		}
-
 		if (parse_property(config, key, value) == -1)
 		{
 			free(key);
@@ -235,11 +220,9 @@ static int parse(config_desc * config, const char * filename)
 			fclose(fp);
 			return -1;
 		}
-
 		free(key);
 		free(value);
 	}
-
 	fclose(fp);
 	return 0;
 }

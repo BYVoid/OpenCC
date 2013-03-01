@@ -1,4 +1,3 @@
-#include <unistd.h>
 #include <iostream>
 #include <node.h>
 #include <v8.h>
@@ -6,31 +5,11 @@
 
 using namespace v8;
 
-bool initialized = false;
-
 char* ToUtf8String(const Local<String>& str) {
   char* utf8 = new char[str->Utf8Length() + 1];
   utf8[str->Utf8Length()] = '\0';
   str->WriteUtf8(utf8);
   return utf8;
-}
-
-Handle<Value> ModuleInit(const Arguments& args) {
-  HandleScope scope;
-  if (args.Length() < 1 || !args[0]->IsString()) {
-    ThrowException(Exception::TypeError(String::New("Wrong arguments")));
-    return scope.Close(Undefined());
-  }
-  char* dir = ToUtf8String(args[0]->ToString());
-  int res = chdir(dir);
-  delete [] dir;
-  if (res == -1) {
-    ThrowException(
-        Exception::Error(String::New("Can not change to target dir")));
-    return scope.Close(Undefined());
-  }
-  initialized = true;
-  return scope.Close(Undefined());
 }
 
 class Opencc : public node::ObjectWrap {
@@ -129,7 +108,6 @@ class Opencc : public node::ObjectWrap {
 };
 
 void init(Handle<Object> target) {
-  NODE_SET_METHOD(target, "init", ModuleInit);
   Opencc::init(target);
 }
 

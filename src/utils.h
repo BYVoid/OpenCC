@@ -66,4 +66,8 @@ const char * executable_path(void);
 
 char * try_open_file(const char * path);
 
+char * get_file_path(const char * filename);
+
+int is_absolute_path(const char * path);
+
 #endif /* __OPENCC_UTILS_H_ */

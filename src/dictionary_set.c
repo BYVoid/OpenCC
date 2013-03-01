@@ -22,17 +22,19 @@
 
 struct _dictionary_set
 {
+	config_t config;
 	size_t count;
 	dictionary_group_t groups[DICTIONARY_GROUP_MAX_COUNT];
 } ;
 typedef struct _dictionary_set dictionary_set_desc;
 
-dictionary_set_t dictionary_set_open(void)
+dictionary_set_t dictionary_set_open(config_t config)
 {
 	dictionary_set_desc * dictionary_set =
 		(dictionary_set_desc *) malloc(sizeof(dictionary_set_desc));
 
 	dictionary_set->count = 0;
+	dictionary_set->config = config;
 
 	return dictionary_set;
 }
@@ -57,7 +59,7 @@ dictionary_group_t dictionary_set_new_group(dictionary_set_t t_dictionary)
 		return (dictionary_group_t) -1;
 	}
 
-	dictionary_group_t group = dictionary_group_open();
+	dictionary_group_t group = dictionary_group_open(t_dictionary);
 	dictionary_set->groups[dictionary_set->count ++] = group;
 
 	return group;
@@ -79,4 +81,10 @@ size_t dictionary_set_count_group(dictionary_set_t t_dictionary)
 {
 	dictionary_set_desc * dictionary_set = (dictionary_set_desc *) t_dictionary;
 	return dictionary_set->count;
+}
+
+config_t dictionary_set_get_config(dictionary_set_t t_dictionary)
+{
+	dictionary_set_desc * dictionary_set = (dictionary_set_desc *) t_dictionary;
+	return dictionary_set->config;
 }

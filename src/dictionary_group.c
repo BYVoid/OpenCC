@@ -17,11 +17,14 @@
 */
 
 #include "dictionary_group.h"
+#include "dictionary_set.h"
+#include "config_reader.h"
 
 #define DICTIONARY_MAX_COUNT 128
 
 struct _dictionary_group
 {
+	dictionary_set_t dictionary_set;
 	size_t count;
 	dictionary_t dicts[DICTIONARY_MAX_COUNT];
 } ;
@@ -29,12 +32,13 @@ typedef struct _dictionary_group dictionary_group_desc;
 
 static dictionary_error errnum = DICTIONARY_ERROR_VOID;
 
-dictionary_group_t dictionary_group_open(void)
+dictionary_group_t dictionary_group_open(dictionary_set_t t_dictionary_set)
 {
 	dictionary_group_desc * dictionary_group =
 			(dictionary_group_desc *) malloc(sizeof(dictionary_group_desc));
 
 	dictionary_group->count = 0;
+	dictionary_group->dictionary_set = t_dictionary_set;
 
 	return dictionary_group;
 }
@@ -50,6 +54,38 @@ void dictionary_group_close(dictionary_group_t t_dictionary)
 	free(dictionary_group);
 }
 
+static char * try_find_dictionary_with_config(dictionary_group_desc * dictionary_group, const char * filename)
+{
+	if (is_absolute_path(filename))
+	{
+		return NULL;
+	}
+	/* Get config path */
+	if (dictionary_group->dictionary_set == NULL)
+	{
+		return NULL;
+	}
+	config_t config = dictionary_set_get_config(dictionary_group->dictionary_set);
+	if (config == NULL)
+	{
+		return NULL;
+	}
+	const char * config_path = config_get_file_path(config);
+	if (config_path == NULL)
+	{
+		return NULL;
+	}
+	char * config_path_filename = (char *) malloc(strlen(config_path) + 1 + strlen(filename) + 1);
+	sprintf(config_path_filename, "%s/%s%c", config_path, filename, '\0');
+	FILE * fp = fopen(config_path_filename, "r");
+	if (fp)
+	{
+		fclose(fp);
+		return config_path_filename;
+	}
+	return NULL;
+}
+
 int dictionary_group_load(dictionary_group_t t_dictionary, const char * filename,
 		opencc_dictionary_type type)
 {
@@ -57,8 +93,11 @@ int dictionary_group_load(dictionary_group_t t_dictionary, const char * filename
 	dictionary_t dictionary;
 	char * path = try_open_file(filename);
 	if (path == NULL) {
-		errnum = DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE;
-		return -1;
+		path = try_find_dictionary_with_config(dictionary_group, filename);
+		if (path == NULL) {
+			errnum = DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE;
+			return -1;
+		}
 	}
 	dictionary = dictionary_open(path, type);
 	free(path);
@@ -199,4 +238,10 @@ void dictionary_perror(const char * spec)
 	default:
 		perr(_("Unknown"));
 	}
+}
+
+dictionary_set_t dictionary_group_get_dictionary_set(dictionary_group_t t_dictionary)
+{
+	dictionary_group_desc * dictionary_group = (dictionary_group_desc *) t_dictionary;
+	return dictionary_group->dictionary_set;
 }

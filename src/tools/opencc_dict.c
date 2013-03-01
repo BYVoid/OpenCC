@@ -239,7 +239,7 @@ int cmp(const void *a, const void *b)
 
 void init(const char * filename)
 {
-	dictionary_group_t dictionary_group = dictionary_group_open();
+	dictionary_group_t dictionary_group = dictionary_group_open(NULL);
 
 	if (dictionary_group_load(dictionary_group, filename, OPENCC_DICTIONARY_TYPE_TEXT) == -1)
 	{

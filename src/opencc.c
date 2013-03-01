@@ -209,7 +209,7 @@ int opencc_dict_load(opencc_t t_opencc, const char * dict_filename,
 	dictionary_group_t dictionary_group;
 	if (opencc->dictionary_set == NULL)
 	{
-		opencc->dictionary_set = dictionary_set_open();
+		opencc->dictionary_set = dictionary_set_open(NULL);
 		dictionary_group = dictionary_set_new_group(opencc->dictionary_set);
 	}
 	else

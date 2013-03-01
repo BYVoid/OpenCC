@@ -75,6 +75,7 @@ const char * executable_path(void)
 	static char path_buffer[PATH_BUFFER_SIZE];
 	static int calculated = FALSE;
 	if (!calculated) {
+		//TODO support other os
 		ssize_t res = readlink("/proc/self/exe", path_buffer, sizeof(path_buffer));
 		assert(res != -1);
 		char * last_sep = strrchr(path_buffer, '/');
@@ -92,6 +93,11 @@ char * try_open_file(const char * path)
 	{
 		fclose(fp);
 		return mstrcpy(path);
+	}
+	/* If path is absolute, return NULL */
+	if (is_absolute_path(path))
+	{
+		return NULL;
 	}
 	/* Try to find file in executable directory*/
 	const char * exe_dir = executable_path();
@@ -117,3 +123,25 @@ char * try_open_file(const char * path)
 	return NULL;
 }
 
+char * get_file_path(const char * filename)
+{
+	const char * last_sep = strrchr(filename, '/');
+	if (last_sep == NULL) {
+		last_sep = filename;
+	}
+	char * path = mstrncpy(filename, last_sep - filename);
+	return path;
+}
+
+int is_absolute_path(const char * path)
+{
+	if (path[0] == '/')
+	{
+		return TRUE;
+	}
+	if (path[1] == ':')
+	{
+		return TRUE;
+	}
+	return FALSE;
+}

@@ -14,6 +14,10 @@ set(
 	opencc_dict.c
 	../dictionary_group.c
 	../dictionary_group.h
+	../dictionary_set.c
+	../dictionary_set.h
+	../config_reader.c
+	../config_reader.h
 	../encoding.c
 	../encoding.h
 	../utils.c

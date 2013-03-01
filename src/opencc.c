@@ -159,9 +159,11 @@ opencc_t opencc_open(const char * config_file)
 	converter_set_conversion_mode(opencc->converter, OPENCC_CONVERSION_FAST);
 
 	/* 加載默認辭典 */
-	int retval;
 	if (config_file == NULL)
-		retval = 0;
+	{
+		/*TODO load default*/
+		assert(0);
+	}
 	else
 	{
 		config_t config = config_open(config_file);

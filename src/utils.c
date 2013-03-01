@@ -16,6 +16,7 @@
 * limitations under the License.
 */
 
+#include <unistd.h>
 #include "utils.h"
 #define PATH_BUFFER_SIZE 4096
 
@@ -74,7 +75,8 @@ const char * executable_path(void)
 	static char path_buffer[PATH_BUFFER_SIZE];
 	static int calculated = FALSE;
 	if (!calculated) {
-		readlink("/proc/self/exe", path_buffer, sizeof(path_buffer));
+		ssize_t res = readlink("/proc/self/exe", path_buffer, sizeof(path_buffer));
+		assert(res != -1);
 		char * last_sep = strrchr(path_buffer, '/');
 		assert(last_sep != NULL);
 		*last_sep = '\0';

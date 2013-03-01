@@ -50,9 +50,9 @@ typedef enum _opencc_dictionary_type opencc_dictionary_type;
 
 enum _opencc_conversion_mode
 {
-	OPENCC_CONVERSION_FAST,
-	OPENCC_CONVERSION_SEGMENT_ONLY,
-	OPENCC_CONVERSION_LIST_CANDIDATES,
+	OPENCC_CONVERSION_FAST = 0,
+	OPENCC_CONVERSION_SEGMENT_ONLY = 1,
+	OPENCC_CONVERSION_LIST_CANDIDATES = 2,
 };
 typedef enum _opencc_conversion_mode opencc_conversion_mode;
 

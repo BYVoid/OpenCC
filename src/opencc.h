@@ -36,7 +36,8 @@ extern "C" {
 /**
  * opencc_open:
  * @config_file: Location of configuration file.
- * @returns: A description pointer of the newly allocated instance of opencc.
+ * @returns: A description pointer of the newly allocated instance of opencc. On
+ *           any error the return value will be (opencc_t) -1
  *
  * Make an instance of opencc.
  *
@@ -77,7 +78,8 @@ size_t opencc_convert(opencc_t od, ucs4_t ** inbuf, size_t * inbufleft,
  * opencc_convert_utf8:
  * @od: The opencc description pointer.
  * @inbuf: The UTF-8 encoded string.
- * @length: The maximum number of characters in inbuf to convert.
+ * @length: The maximum length of inbuf to convert. If length is set to -1,
+ *          the whole c-style string in inbuf will be converted.
  *
  * @returns: The newly allocated UTF-8 string that converted from inbuf.
  *

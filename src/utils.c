@@ -18,6 +18,19 @@
 
 #include <unistd.h>
 #include "utils.h"
+
+#ifdef __APPLE__
+	#include "TargetConditionals.h"
+	#ifdef TARGET_OS_MAC
+		#include <mach-o/dyld.h>
+	#elif TARGET_OS_IPHONE
+	#elif TARGET_IPHONE_SIMULATOR
+	#else
+	#endif
+#elif defined _WIN32 || defined _WIN64
+    #include <GL\glut.h>
+#endif 
+
 #define PATH_BUFFER_SIZE 4096
 
 void perr(const char * str)
@@ -74,13 +87,26 @@ const char * executable_path(void)
 {
 	static char path_buffer[PATH_BUFFER_SIZE];
 	static int calculated = FALSE;
-	if (!calculated) {
-		//TODO support other os
+	if (!calculated)
+	{
+#ifdef __linux
 		ssize_t res = readlink("/proc/self/exe", path_buffer, sizeof(path_buffer));
 		assert(res != -1);
+#elif __APPLE__
+		uint32_t size = sizeof(path_buffer);
+		int res = _NSGetExecutablePath(path_buffer, &size);
+		assert(res == 0);
+#elif _WIN32 || _WIN64
+		// TODO windows
+		assert(false);
+#else
+		/* Other unsupported os */
+		assert(false);
+#endif
 		char * last_sep = strrchr(path_buffer, '/');
 		assert(last_sep != NULL);
 		*last_sep = '\0';
+		calculated = TRUE;
 	}
 	return path_buffer;
 }

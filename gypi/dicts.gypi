@@ -10,6 +10,16 @@
       "input_prefix": "data/",
       "output_prefix": "<(PRODUCT_DIR)/"
     },
+    "copies": [{
+      "destination": "<(PRODUCT_DIR)",
+      "files": [
+        "../data/tw/to_tw_variants.txt",
+        "../data/tw/to_tw_phrases.txt",
+        "../data/tw/from_tw_variants.txt",
+        "../data/tw/from_tw_phrases.txt",
+        "../data/cn/to_cn_phrases.txt"
+      ]
+    }],
     "actions": [{
       "action_name": "simp_to_trad_characters",
       "variables": {

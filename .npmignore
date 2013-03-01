@@ -1,0 +1,17 @@
+.npmignore
+.gitignore
+CMakeLists.txt
+*.cmake
+merge.sh
+
+/po
+/doc
+/data/scripts
+/data/scheme
+/src/wrapper
+/build
+/debug.sh
+/release.sh
+/opencc.pc.in
+/opencc.gyp
+/INSTALL

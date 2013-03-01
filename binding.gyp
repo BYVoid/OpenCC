@@ -1,13 +1,9 @@
 {
-  "variables": {
-    "opencc_version": "0.4.0"
-  },
-  "target_defaults": {
-    "defines": [
-      "VERSION=\"<(opencc_version)\"",
-      "PKGDATADIR=\"\""
-    ]
-  },
+  "includes": [
+    "gypi/global.gypi",
+    "gypi/configs.gypi",
+    "gypi/dicts.gypi",
+  ],
   "targets": [{
     "target_name": "binding",
     "sources": [
@@ -24,8 +20,8 @@
       "src/dictionary/text.c"
     ],
     "dependencies": [
-      "opencc.gyp:dicts",
-      "opencc.gyp:configs",
+      "configs",
+      "dicts",
     ]
   }]
 }

@@ -1,4 +1,7 @@
-var assert = require('assert');
-var binding = require('../build/Release/binding');
-assert.equal('world', binding.hello());
-console.log('binding.hello() =', binding.hello());
+var OpenCC = require('./opencc');
+
+var opencc = new OpenCC();
+opencc.setConversionMode(OpenCC.CONVERSION_FAST);
+
+var converted = opencc.convert("汉字");
+console.log(converted);

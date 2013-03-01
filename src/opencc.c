@@ -16,12 +16,13 @@
 * limitations under the License.
 */
 
+#include "common.h"
 #include "opencc.h"
 #include "config_reader.h"
 #include "converter.h"
 #include "dictionary_set.h"
+#include "dictionary_group.h"
 #include "encoding.h"
-#include "utils.h"
 
 typedef struct
 {

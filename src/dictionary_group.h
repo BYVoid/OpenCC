@@ -19,11 +19,8 @@
 #ifndef __DICTIONARY_GROUP_H_
 #define __DICTIONARY_GROUP_H_
 
-#include "utils.h"
+#include "common.h"
 #include "dictionary/abstract.h"
-
-typedef void * dictionary_group_t;
-typedef void * dictionary_set_t;
 
 typedef enum
 {

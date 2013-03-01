@@ -19,10 +19,7 @@
 #ifndef __OPENCC_CONFIG_H_
 #define __OPENCC_CONFIG_H_
 
-#include "utils.h"
-#include "dictionary_set.h"
-
-typedef void * config_t;
+#include "common.h"
 
 typedef enum
 {

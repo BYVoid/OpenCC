@@ -19,9 +19,7 @@
 #ifndef __CONVERTER_H_
 #define __CONVERTER_H_
 
-#include "dictionary_set.h"
-
-typedef void * converter_t;
+#include "common.h"
 
 typedef enum
 {

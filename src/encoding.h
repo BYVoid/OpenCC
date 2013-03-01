@@ -19,7 +19,7 @@
 #ifndef __OPENCC_ENCODING_H_
 #define __OPENCC_ENCODING_H_
 
-#include "utils.h"
+#include "common.h"
 
 ucs4_t * utf8_to_ucs4(const char * utf8, size_t length);
 

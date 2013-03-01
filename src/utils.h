@@ -19,32 +19,7 @@
 #ifndef __OPENCC_UTILS_H_
 #define __OPENCC_UTILS_H_
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
-
-#include "opencc_types.h"
-
-#define FALSE (0)
-#define TRUE (!(0))
-#define INFINITY_INT ((~0U)>>1)
-
-#ifndef BIG_ENDIAN
-#	define BIG_ENDIAN (0)
-#endif
-
-#ifndef LITTLE_ENDIAN
-#	define LITTLE_ENDIAN (1)
-#endif
-
-#ifdef ENABLE_GETTEXT
-#	include <libintl.h>
-#	include <locale.h>
-#	define _(STRING) dgettext(PACKAGE_NAME, STRING)
-#else
-#	define _(STRING) STRING
-#endif
+#include "common.h"
 
 #define debug_should_not_be_here() \
 	do { \

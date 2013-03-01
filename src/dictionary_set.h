@@ -19,11 +19,7 @@
 #ifndef __DICTIONARY_SET_H_
 #define __DICTIONARY_SET_H_
 
-#include "utils.h"
-#include "dictionary_group.h"
-
-typedef void * dictionary_set_t;
-typedef void * config_t;
+#include "common.h"
 
 dictionary_set_t dictionary_set_open(config_t config);
 

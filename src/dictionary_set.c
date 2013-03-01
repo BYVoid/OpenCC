@@ -17,6 +17,7 @@
 */
 
 #include "dictionary_set.h"
+#include "dictionary_group.h"
 
 #define DICTIONARY_GROUP_MAX_COUNT 128
 

@@ -16,10 +16,11 @@
 * limitations under the License.
 */
 
-#include "utils.h"
+#include "common.h"
 #include "converter.h"
 #include "encoding.h"
 #include "dictionary_set.h"
+#include "dictionary_group.h"
 
 #define DELIMITER ' '
 #define SEGMENT_MAXIMUM_LENGTH 0

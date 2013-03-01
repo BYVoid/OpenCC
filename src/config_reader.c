@@ -18,6 +18,7 @@
 
 #include "config_reader.h"
 #include "dictionary_set.h"
+#include "dictionary_group.h"
 
 #define BUFFER_SIZE 8192
 #define DICTIONARY_MAX_COUNT 1024

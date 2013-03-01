@@ -6,7 +6,7 @@
   "license": "Apache",
   "main": "node/opencc.js",
   "scripts": {
-    "test": "mocha -R spec"
+    "test": "mocha -R spec node/test.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,6 @@
     "Traditional Chinese"
   ],
   "devDependencies": {
-    "mocha": "1.7.4"
+    "mocha": "1.8.1"
   }
 }

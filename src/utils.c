@@ -98,10 +98,10 @@ const char * executable_path(void)
 		assert(res == 0);
 #elif _WIN32 || _WIN64
 		// TODO windows
-		assert(false);
+		assert(FALSE);
 #else
 		/* Other unsupported os */
-		assert(false);
+		assert(FALSE);
 #endif
 		char * last_sep = strrchr(path_buffer, '/');
 		assert(last_sep != NULL);

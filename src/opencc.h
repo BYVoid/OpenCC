@@ -127,7 +127,7 @@ opencc_error opencc_errno(void);
 void opencc_perror(const char * spec);
 
 #ifdef __cplusplus
-};
+}
 #endif
 
 #endif /* __OPENCC_H_ */

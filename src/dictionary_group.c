@@ -75,7 +75,7 @@ static char * try_find_dictionary_with_config(dictionary_group_desc * dictionary
 	{
 		return NULL;
 	}
-	char * config_path_filename = (char *) malloc(strlen(config_path) + 1 + strlen(filename) + 1);
+	char * config_path_filename = (char *) malloc(strlen(config_path) + strlen(filename) + 3);
 	sprintf(config_path_filename, "%s/%s%c", config_path, filename, '\0');
 	FILE * fp = fopen(config_path_filename, "r");
 	if (fp)

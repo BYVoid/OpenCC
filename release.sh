@@ -6,4 +6,5 @@ mkdir -p release \
         -DCMAKE_INSTALL_PREFIX=/usr \
         .. \
 && make \
-&& make test
+&& make test \
+&& make package_source

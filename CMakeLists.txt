@@ -39,6 +39,14 @@ set (
 	${OPENCC_VERSION_MAJOR}.${OPENCC_VERSION_MINOR}.${OPENCC_VERSION_REVISION}${version_suffix}
 )
 
+set(CPACK_SOURCE_PACKAGE_FILE_NAME
+  "${PACKAGE_NAME}-${OPENCC_VERSION_MAJOR}.${OPENCC_VERSION_MINOR}.${OPENCC_VERSION_REVISION}"
+)
+set(CPACK_SOURCE_IGNORE_FILES
+  "/build/;/release/;/debug/;/.git/;.gitignore;~$;${CPACK_SOURCE_IGNORE_FILES}"
+)
+include(CPack)
+
 ######## Validation
 
 if (ENABLE_GETTEXT)

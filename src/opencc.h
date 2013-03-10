@@ -1,20 +1,20 @@
 /*
-* Open Chinese Convert
-*
-* Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*      http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Open Chinese Convert
+ *
+ * Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #ifndef __OPENCC_H_
 #define __OPENCC_H_
@@ -23,11 +23,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-/*
- * Headers from C standard library
- */
+#endif // ifdef __cplusplus
 
 /* Macros */
 #define OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD "zhs2zht.ini"
@@ -41,10 +37,11 @@ extern "C" {
  *
  * Make an instance of opencc.
  *
- * Note: Leave config_file to NULL if you do not want to load any configuration file.
- * 
+ * Note: Leave config_file to NULL if you do not want to load any configuration
+ *file.
+ *
  */
-opencc_t opencc_open(const char * config_file);
+opencc_t opencc_open(const char* config_file);
 
 /**
  * opencc_close:
@@ -71,8 +68,11 @@ int opencc_close(opencc_t od);
  * Note: Don't forget to assign **outbuf to L'\0' after called.
  *
  */
-size_t opencc_convert(opencc_t od, ucs4_t ** inbuf, size_t * inbufleft,
-		ucs4_t ** outbuf, size_t * outbufleft);
+size_t opencc_convert(opencc_t od,
+                      ucs4_t** inbuf,
+                      size_t* inbufleft,
+                      ucs4_t** outbuf,
+                      size_t* outbufleft);
 
 /**
  * opencc_convert_utf8:
@@ -88,7 +88,7 @@ size_t opencc_convert(opencc_t od, ucs4_t ** inbuf, size_t * inbufleft,
  * DON'T FORGET TO CALL free() to recycle memory.
  *
  */
-char * opencc_convert_utf8(opencc_t t_opencc, const char * inbuf, size_t length);
+char* opencc_convert_utf8(opencc_t od, const char* inbuf, size_t length);
 
 /**
  * opencc_dict_load:
@@ -101,18 +101,31 @@ char * opencc_convert_utf8(opencc_t t_opencc, const char * inbuf, size_t length)
  * Load a dictionary.
  *
  */
-int opencc_dict_load(opencc_t t_opencc, const char * dict_filename,
-		opencc_dictionary_type dict_type);
+int opencc_dict_load(opencc_t od,
+                     const char* dict_filename,
+                     opencc_dictionary_type dict_type);
 
-void opencc_set_conversion_mode(opencc_t t_opencc, opencc_conversion_mode conversion_mode);
+/**
+  * opencc_set_conversion_mode:
+  * @od: The opencc description pointer.
+  * @conversion_mode: Candidates are
+  *                   OPENCC_CONVERSION_FAST
+  *                   OPENCC_CONVERSION_SEGMENT_ONLY
+  *                   OPENCC_CONVERSION_LIST_CANDIDATES
+  *
+  * Change conversion mode.
+  *
+  */
+void opencc_set_conversion_mode(opencc_t od,
+                                opencc_conversion_mode conversion_mode);
 
 /**
  * opencc_errno:
  *
  * @returns: The error number.
  *
- * Return an opencc_convert_errno_t which describes the last error that occured or
- * OPENCC_CONVERT_ERROR_VOID
+ * Return an opencc_convert_errno_t which describes the last error that occured
+ * or OPENCC_CONVERT_ERROR_VOID
  *
  */
 opencc_error opencc_errno(void);
@@ -124,10 +137,10 @@ opencc_error opencc_errno(void);
  * Print the error message to stderr.
  *
  */
-void opencc_perror(const char * spec);
+void opencc_perror(const char* spec);
 
 #ifdef __cplusplus
 }
-#endif
+#endif // ifdef __cplusplus
 
 #endif /* __OPENCC_H_ */

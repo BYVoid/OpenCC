@@ -42,20 +42,20 @@ https://code.google.com/p/opencc/
 
 1. Make a directory and check in.
 
-    mkdir build
-    cd build
+		mkdir build
+		cd build
 
 2. Build sources.
 
-    cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -D ENABLE_GETTEXT:BOOL=ON ..
-    make
+		cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -D ENABLE_GETTEXT:BOOL=ON ..
+		make
 
 On windows, run these commands instead:
 
-    cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT:BOOL=OFF
-    make
+		cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT:BOOL=OFF
+		make
 
 3. Install.
 
-    sudo make install
+		sudo make install
 

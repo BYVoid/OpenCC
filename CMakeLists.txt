@@ -28,7 +28,7 @@ set (PACKAGE_URL http://code.google.com/p/opencc)
 set (PACKAGE_BUGREPORT http://code.google.com/p/opencc/issues/entry)
 set (OPENCC_VERSION_MAJOR 0)
 set (OPENCC_VERSION_MINOR 4)
-set (OPENCC_VERSION_REVISION 0)
+set (OPENCC_VERSION_REVISION 1)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
 	set (version_suffix .Debug)

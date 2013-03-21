@@ -10,6 +10,8 @@ merge.sh
 /data/scheme
 /src/wrapper
 /build
+/debug
+/release
 /other
 /debug.sh
 /release.sh

@@ -68,7 +68,7 @@ class Opencc : public node::ObjectWrap {
     conv_data->callback = Persistent<Function>::New(Local<Function>::Cast(args[1]));
     uv_work_t* req = new uv_work_t;
     req->data = conv_data;
-    uv_queue_work(uv_default_loop(), req, DoConnect, AfterConvert);
+    uv_queue_work(uv_default_loop(), req, DoConnect, (uv_after_work_cb)AfterConvert);
 
     return Undefined();
   }

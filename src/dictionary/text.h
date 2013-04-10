@@ -19,7 +19,7 @@
 #ifndef __OPENCC_DICTIONARY_TEXT_H_
 #define __OPENCC_DICTIONARY_TEXT_H_
 
-#include "abstract.h"
+#include "../dict.h"
 
 struct _entry {
   ucs4_t* key;

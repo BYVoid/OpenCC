@@ -14,8 +14,8 @@ src/opencc_types.h
 src/utils.c
 src/utils.h
 src/wrapper/cplusplus/openccxx.h
-src/dictionary/abstract.c
-src/dictionary/abstract.h
+src/dict.c
+src/dict.h
 src/dictionary/datrie.c
 src/dictionary/datrie.h
 src/dictionary/text.c

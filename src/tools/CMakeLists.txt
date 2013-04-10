@@ -1,9 +1,9 @@
 set(
 	LIBOPENCC_DICTIONARY_SOURCES
-	../dictionary/abstract.c
+	../dict.c
 	../dictionary/datrie.c
 	../dictionary/text.c
-	../dictionary/abstract.h
+	../dict.h
 	../dictionary/datrie.h
 	../dictionary/text.h
 )

@@ -19,7 +19,7 @@
 #ifndef __OPENCC_DICTIONARY_DATRIE_H_
 #define __OPENCC_DICTIONARY_DATRIE_H_
 
-#include "abstract.h"
+#include "../dict.h"
 
 #define DATRIE_UNUSED -1
 

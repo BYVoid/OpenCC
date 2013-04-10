@@ -19,8 +19,8 @@
 #ifndef __OPENCC_DICTIONARY_ABSTRACT_H_
 #define __OPENCC_DICTIONARY_ABSTRACT_H_
 
-#include "../common.h"
-#include "../utils.h"
+#include "common.h"
+#include "utils.h"
 
 Dict* dict_new(const char* filename, opencc_dictionary_type type);
 

@@ -20,7 +20,7 @@
 #define __DICTIONARY_GROUP_H_
 
 #include "common.h"
-#include "dictionary/abstract.h"
+#include "dict.h"
 
 typedef enum {
   DICTIONARY_ERROR_VOID,

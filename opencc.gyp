@@ -15,7 +15,7 @@
       "src/encoding.c",
       "src/utils.c",
       "src/opencc.c",
-      "src/dictionary/abstract.c",
+      "src/dict.c",
       "src/dictionary/datrie.c",
       "src/dictionary/text.c"
     ],

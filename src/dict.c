@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-#include "abstract.h"
-#include "datrie.h"
-#include "text.h"
+#include "dict.h"
+#include "dictionary/datrie.h"
+#include "dictionary/text.h"
 
 Dict* dict_new(const char* filename, opencc_dictionary_type type) {
   Dict* dictionary = (Dict*)malloc(sizeof(Dict));

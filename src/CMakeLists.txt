@@ -20,14 +20,14 @@ set(
 	${LIBOPENCC_DICTIONARY_SOURCES}
 	config_reader.c
 	converter.c
-	dictionary_group.c
+	dict_group.c
 	dict_chain.c
 	encoding.c
 	utils.c
 	opencc.c
 	config_reader.h
 	converter.h
-	dictionary_group.h
+	dict_group.h
 	dict_chain.h
 	encoding.h
 	utils.h

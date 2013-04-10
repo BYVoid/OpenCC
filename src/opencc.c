@@ -19,7 +19,7 @@
 #include "common.h"
 #include "config_reader.h"
 #include "converter.h"
-#include "dictionary_group.h"
+#include "dict_group.h"
 #include "dict_chain.h"
 #include "encoding.h"
 #include "opencc.h"
@@ -174,14 +174,14 @@ int opencc_dict_load(opencc_t t_opencc,
     lib_initialize();
   }
   opencc_desc* opencc = (opencc_desc*)t_opencc;
-  dictionary_group_t dictionary_group;
+  DictGroup_t DictGroup;
   if (opencc->DictChain == NULL) {
     opencc->DictChain = DictChain_open(NULL);
-    dictionary_group = DictChain_new_group(opencc->DictChain);
+    DictGroup = DictChain_new_group(opencc->DictChain);
   } else {
-    dictionary_group = DictChain_get_group(opencc->DictChain, 0);
+    DictGroup = DictChain_get_group(opencc->DictChain, 0);
   }
-  int retval = dictionary_group_load(dictionary_group, dict_filename, dict_type);
+  int retval = DictGroup_load(DictGroup, dict_filename, dict_type);
   if (retval == -1) {
     errnum = OPENCC_ERROR_DICTLOAD;
     return -1;

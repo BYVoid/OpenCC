@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "dictionary_group.h"
+#include "dict_group.h"
 #include "dict_chain.h"
 
 #define DICTIONARY_GROUP_MAX_COUNT 128
@@ -24,7 +24,7 @@
 struct _DictChain {
   config_t config;
   size_t count;
-  dictionary_group_t groups[DICTIONARY_GROUP_MAX_COUNT];
+  DictGroup_t groups[DICTIONARY_GROUP_MAX_COUNT];
 };
 typedef struct _DictChain DictChain_desc;
 
@@ -40,26 +40,26 @@ void DictChain_close(DictChain_t t_dictionary) {
   DictChain_desc* DictChain = (DictChain_desc*)t_dictionary;
   size_t i;
   for (i = 0; i < DictChain->count; i++) {
-    dictionary_group_close(DictChain->groups[i]);
+    DictGroup_close(DictChain->groups[i]);
   }
   free(DictChain);
 }
 
-dictionary_group_t DictChain_new_group(DictChain_t t_dictionary) {
+DictGroup_t DictChain_new_group(DictChain_t t_dictionary) {
   DictChain_desc* DictChain = (DictChain_desc*)t_dictionary;
   if (DictChain->count + 1 == DICTIONARY_GROUP_MAX_COUNT) {
-    return (dictionary_group_t)-1;
+    return (DictGroup_t)-1;
   }
-  dictionary_group_t group = dictionary_group_open(t_dictionary);
+  DictGroup_t group = DictGroup_open(t_dictionary);
   DictChain->groups[DictChain->count++] = group;
   return group;
 }
 
-dictionary_group_t DictChain_get_group(DictChain_t t_dictionary,
+DictGroup_t DictChain_get_group(DictChain_t t_dictionary,
                                             size_t index) {
   DictChain_desc* DictChain = (DictChain_desc*)t_dictionary;
   if (index >= DictChain->count) {
-    return (dictionary_group_t)-1;
+    return (DictGroup_t)-1;
   }
   return DictChain->groups[index];
 }

@@ -30,34 +30,34 @@ typedef enum {
   DICTIONARY_ERROR_INVALID_INDEX,
 } dictionary_error;
 
-dictionary_group_t dictionary_group_open(DictChain_t t_DictChain);
+DictGroup_t DictGroup_open(DictChain_t t_DictChain);
 
-void dictionary_group_close(dictionary_group_t t_dictionary);
+void DictGroup_close(DictGroup_t t_dictionary);
 
-int dictionary_group_load(dictionary_group_t t_dictionary,
+int DictGroup_load(DictGroup_t t_dictionary,
                           const char* filename,
                           opencc_dictionary_type type);
 
-const ucs4_t* const* dictionary_group_match_longest(
-    dictionary_group_t t_dictionary,
+const ucs4_t* const* DictGroup_match_longest(
+    DictGroup_t t_dictionary,
     const ucs4_t* word,
     size_t maxlen,
     size_t* match_length);
 
-size_t dictionary_group_get_all_match_lengths(dictionary_group_t t_dictionary,
+size_t DictGroup_get_all_match_lengths(DictGroup_t t_dictionary,
                                               const ucs4_t* word,
                                               size_t* match_length);
 
-dictionary_t dictionary_group_get_dictionary(dictionary_group_t t_dictionary,
+dictionary_t DictGroup_get_dictionary(DictGroup_t t_dictionary,
                                              size_t index);
 
-size_t dictionary_group_count(dictionary_group_t t_dictionary);
+size_t DictGroup_count(DictGroup_t t_dictionary);
 
 dictionary_error dictionary_errno(void);
 
 void dictionary_perror(const char* spec);
 
-DictChain_t dictionary_group_get_DictChain(
-    dictionary_group_t t_dictionary);
+DictChain_t DictGroup_get_DictChain(
+    DictGroup_t t_dictionary);
 
 #endif /* __DICTIONARY_GROUP_H_ */

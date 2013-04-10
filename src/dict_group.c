@@ -17,48 +17,48 @@
  */
 
 #include "config_reader.h"
-#include "dictionary_group.h"
+#include "dict_group.h"
 #include "dict_chain.h"
 
 #define DICTIONARY_MAX_COUNT 128
 
-struct _dictionary_group {
+struct _DictGroup {
   DictChain_t DictChain;
   size_t count;
   dictionary_t dicts[DICTIONARY_MAX_COUNT];
 };
-typedef struct _dictionary_group dictionary_group_desc;
+typedef struct _DictGroup DictGroup_desc;
 
 static dictionary_error errnum = DICTIONARY_ERROR_VOID;
 
-dictionary_group_t dictionary_group_open(DictChain_t t_DictChain) {
-  dictionary_group_desc* dictionary_group =
-    (dictionary_group_desc*)malloc(sizeof(dictionary_group_desc));
-  dictionary_group->count = 0;
-  dictionary_group->DictChain = t_DictChain;
-  return dictionary_group;
+DictGroup_t DictGroup_open(DictChain_t t_DictChain) {
+  DictGroup_desc* DictGroup =
+    (DictGroup_desc*)malloc(sizeof(DictGroup_desc));
+  DictGroup->count = 0;
+  DictGroup->DictChain = t_DictChain;
+  return DictGroup;
 }
 
-void dictionary_group_close(dictionary_group_t t_dictionary) {
-  dictionary_group_desc* dictionary_group = (dictionary_group_desc*)t_dictionary;
+void DictGroup_close(DictGroup_t t_dictionary) {
+  DictGroup_desc* DictGroup = (DictGroup_desc*)t_dictionary;
   size_t i;
-  for (i = 0; i < dictionary_group->count; i++) {
-    dictionary_close(dictionary_group->dicts[i]);
+  for (i = 0; i < DictGroup->count; i++) {
+    dictionary_close(DictGroup->dicts[i]);
   }
-  free(dictionary_group);
+  free(DictGroup);
 }
 
 static char* try_find_dictionary_with_config(
-  dictionary_group_desc* dictionary_group,
+  DictGroup_desc* DictGroup,
   const char* filename) {
   if (is_absolute_path(filename)) {
     return NULL;
   }
   /* Get config path */
-  if (dictionary_group->DictChain == NULL) {
+  if (DictGroup->DictChain == NULL) {
     return NULL;
   }
-  config_t config = DictChain_get_config(dictionary_group->DictChain);
+  config_t config = DictChain_get_config(DictGroup->DictChain);
   if (config == NULL) {
     return NULL;
   }
@@ -77,14 +77,14 @@ static char* try_find_dictionary_with_config(
   return NULL;
 }
 
-int dictionary_group_load(dictionary_group_t t_dictionary,
+int DictGroup_load(DictGroup_t t_dictionary,
                           const char* filename,
                           opencc_dictionary_type type) {
-  dictionary_group_desc* dictionary_group = (dictionary_group_desc*)t_dictionary;
+  DictGroup_desc* DictGroup = (DictGroup_desc*)t_dictionary;
   dictionary_t dictionary;
   char* path = try_open_file(filename);
   if (path == NULL) {
-    path = try_find_dictionary_with_config(dictionary_group, filename);
+    path = try_find_dictionary_with_config(DictGroup, filename);
     if (path == NULL) {
       errnum = DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE;
       return -1;
@@ -96,42 +96,42 @@ int dictionary_group_load(dictionary_group_t t_dictionary,
     errnum = DICTIONARY_ERROR_INVALID_DICT;
     return -1;
   }
-  dictionary_group->dicts[dictionary_group->count++] = dictionary;
+  DictGroup->dicts[DictGroup->count++] = dictionary;
   return 0;
 }
 
-dictionary_t dictionary_group_get_dictionary(dictionary_group_t t_dictionary,
+dictionary_t DictGroup_get_dictionary(DictGroup_t t_dictionary,
                                              size_t index) {
-  dictionary_group_desc* dictionary_group = (dictionary_group_desc*)t_dictionary;
-  if (index >= dictionary_group->count) {
+  DictGroup_desc* DictGroup = (DictGroup_desc*)t_dictionary;
+  if (index >= DictGroup->count) {
     errnum = DICTIONARY_ERROR_INVALID_INDEX;
     return (dictionary_t)-1;
   }
-  return dictionary_group->dicts[index];
+  return DictGroup->dicts[index];
 }
 
-size_t dictionary_group_count(dictionary_group_t t_dictionary) {
-  dictionary_group_desc* dictionary_group = (dictionary_group_desc*)t_dictionary;
-  return dictionary_group->count;
+size_t DictGroup_count(DictGroup_t t_dictionary) {
+  DictGroup_desc* DictGroup = (DictGroup_desc*)t_dictionary;
+  return DictGroup->count;
 }
 
-const ucs4_t* const* dictionary_group_match_longest(
-  dictionary_group_t t_dictionary,
+const ucs4_t* const* DictGroup_match_longest(
+  DictGroup_t t_dictionary,
   const ucs4_t* word,
   size_t maxlen,
   size_t* match_length) {
-  dictionary_group_desc* dictionary_group = (dictionary_group_desc*)t_dictionary;
-  if (dictionary_group->count == 0) {
+  DictGroup_desc* DictGroup = (DictGroup_desc*)t_dictionary;
+  if (DictGroup->count == 0) {
     errnum = DICTIONARY_ERROR_NODICT;
     return (const ucs4_t* const*)-1;
   }
   const ucs4_t* const* retval = NULL;
   size_t t_match_length, max_length = 0;
   size_t i;
-  for (i = 0; i < dictionary_group->count; i++) {
+  for (i = 0; i < DictGroup->count; i++) {
     /* 依次查找每個辭典，取得最長匹配長度 */
     const ucs4_t* const* t_retval = dictionary_match_longest(
-      dictionary_group->dicts[i],
+      DictGroup->dicts[i],
       word,
       maxlen,
       &t_match_length);
@@ -148,20 +148,20 @@ const ucs4_t* const* dictionary_group_match_longest(
   return retval;
 }
 
-size_t dictionary_group_get_all_match_lengths(dictionary_group_t t_dictionary,
+size_t DictGroup_get_all_match_lengths(DictGroup_t t_dictionary,
                                               const ucs4_t* word,
                                               size_t* match_length) {
-  dictionary_group_desc* dictionary_group = (dictionary_group_desc*)t_dictionary;
-  if (dictionary_group->count == 0) {
+  DictGroup_desc* DictGroup = (DictGroup_desc*)t_dictionary;
+  if (DictGroup->count == 0) {
     errnum = DICTIONARY_ERROR_NODICT;
     return (size_t)-1;
   }
   size_t rscnt = 0;
   size_t i;
-  for (i = 0; i < dictionary_group->count; i++) {
+  for (i = 0; i < DictGroup->count; i++) {
     size_t retval;
     retval = dictionary_get_all_match_lengths(
-      dictionary_group->dicts[i],
+      DictGroup->dicts[i],
       word,
       match_length + rscnt
       );
@@ -208,8 +208,8 @@ void dictionary_perror(const char* spec) {
   }
 }
 
-DictChain_t dictionary_group_get_DictChain(
-  dictionary_group_t t_dictionary) {
-  dictionary_group_desc* dictionary_group = (dictionary_group_desc*)t_dictionary;
-  return dictionary_group->DictChain;
+DictChain_t DictGroup_get_DictChain(
+  DictGroup_t t_dictionary) {
+  DictGroup_desc* DictGroup = (DictGroup_desc*)t_dictionary;
+  return DictGroup->DictChain;
 }

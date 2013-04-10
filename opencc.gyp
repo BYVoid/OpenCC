@@ -10,7 +10,7 @@
     "sources": [
       "src/config_reader.c",
       "src/converter.c",
-      "src/dictionary_group.c",
+      "src/dict_group.c",
       "src/dict_chain.c",
       "src/encoding.c",
       "src/utils.c",

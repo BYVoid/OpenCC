@@ -17,7 +17,7 @@
  */
 
 #include "config_reader.h"
-#include "dictionary_group.h"
+#include "dict_group.h"
 #include "dict_chain.h"
 
 #define BUFFER_SIZE 8192
@@ -64,13 +64,13 @@ static int load_dictionary(config_desc* config) {
 		    sizeof(config->dicts[0]),
 		    qsort_dictionary_buffer_cmp);
   size_t i, last_index = 0;
-  dictionary_group_t group = DictChain_new_group(config->DictChain);
+  DictGroup_t group = DictChain_new_group(config->DictChain);
   for (i = 0; i < config->dicts_count; i++) {
     if (config->dicts[i].index > last_index) {
       last_index = config->dicts[i].index;
       group = DictChain_new_group(config->DictChain);
     }
-    dictionary_group_load(group,
+    DictGroup_load(group,
                           config->dicts[i].file_name,
                           config->dicts[i].dict_type);
   }

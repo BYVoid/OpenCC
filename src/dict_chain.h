@@ -25,9 +25,9 @@ DictChain_t DictChain_open(config_t config);
 
 void DictChain_close(DictChain_t t_dictionary);
 
-dictionary_group_t DictChain_new_group(DictChain_t t_dictionary);
+DictGroup_t DictChain_new_group(DictChain_t t_dictionary);
 
-dictionary_group_t DictChain_get_group(DictChain_t t_dictionary,
+DictGroup_t DictChain_get_group(DictChain_t t_dictionary,
                                             size_t index);
 
 size_t DictChain_count_group(DictChain_t t_dictionary);

@@ -18,7 +18,7 @@
 
 #include "../dictionary/datrie.h"
 #include "../dictionary/text.h"
-#include "../dictionary_group.h"
+#include "../dict_group.h"
 #include "../encoding.h"
 #include "../utils.h"
 #include <locale.h>
@@ -233,15 +233,15 @@ int cmp(const void* a, const void* b) {
 }
 
 void init(const char* filename) {
-  dictionary_group_t dictionary_group = dictionary_group_open(NULL);
-  if (dictionary_group_load(dictionary_group, filename,
+  DictGroup_t DictGroup = DictGroup_open(NULL);
+  if (DictGroup_load(DictGroup, filename,
                             OPENCC_DICTIONARY_TYPE_TEXT) == -1) {
     dictionary_perror("Dictionary loading error");
     fprintf(stderr, _("\n"));
     exit(1);
   }
   dictionary_t t_dictionary =
-    dictionary_group_get_dictionary(dictionary_group, 0);
+    DictGroup_get_dictionary(DictGroup, 0);
   if (t_dictionary == (dictionary_t)-1) {
     dictionary_perror("Dictionary loading error");
     fprintf(stderr, _("\n"));

@@ -12,8 +12,8 @@ set(
 	OPENCC_DCIT_SOURCES
 	${LIBOPENCC_DICTIONARY_SOURCES}
 	opencc_dict.c
-	../dictionary_group.c
-	../dictionary_group.h
+	../dict_group.c
+	../dict_group.h
 	../dict_chain.c
 	../dict_chain.h
 	../config_reader.c

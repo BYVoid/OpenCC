@@ -35,12 +35,12 @@ msgstr "無效屬性"
 msgid "Invalid dictionary type"
 msgstr "無效的辭典類型"
 
-#: src/config_reader.c:287 src/converter.c:747 src/dictionary_group.c:218
+#: src/config_reader.c:287 src/converter.c:747 src/dict_group.c:218
 #: src/opencc.c:271
 msgid "Unknown"
 msgstr "未知"
 
-#: src/converter.c:741 src/dictionary_group.c:206
+#: src/converter.c:741 src/dict_group.c:206
 msgid "No dictionary loaded"
 msgstr "沒有辭典加載"
 
@@ -48,15 +48,15 @@ msgstr "沒有辭典加載"
 msgid "Output buffer not enough for one segment"
 msgstr "輸出緩衝區不足以存儲一個分詞"
 
-#: src/dictionary_group.c:209
+#: src/dict_group.c:209
 msgid "Can not open dictionary file"
 msgstr "無法打開辭典"
 
-#: src/dictionary_group.c:212
+#: src/dict_group.c:212
 msgid "Invalid dictionary file"
 msgstr "辭典格式無效"
 
-#: src/dictionary_group.c:215
+#: src/dict_group.c:215
 msgid "Invalid dictionary index"
 msgstr "辭典索引無效"
 

@@ -18,7 +18,7 @@
 
 #include "common.h"
 #include "converter.h"
-#include "dictionary_group.h"
+#include "dict_group.h"
 #include "dict_chain.h"
 #include "encoding.h"
 
@@ -47,7 +47,7 @@ typedef struct {
   spseg_buffer_desc spseg_buffer;
 #endif /* if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH */
   DictChain_t DictChain;
-  dictionary_group_t current_dictionary_group;
+  DictGroup_t current_DictGroup;
   opencc_conversion_mode conversion_mode;
 } converter_desc;
 static converter_error errnum = CONVERTER_ERROR_VOID;
@@ -81,8 +81,8 @@ static size_t sp_seg(converter_desc* converter,
   /* 最短路徑分詞 */
   /* 對長度爲1時特殊優化 */
   if (length == 1) {
-    const ucs4_t* const* match_rs = dictionary_group_match_longest(
-      converter->current_dictionary_group,
+    const ucs4_t* const* match_rs = DictGroup_match_longest(
+      converter->current_DictGroup,
       *inbuf,
       1,
       NULL);
@@ -174,8 +174,8 @@ static size_t sp_seg(converter_desc* converter,
   ossb->min_len[0] = ossb->parent[0] = 0;
   for (i = 0; i < length; i++) {
     /* 獲取所有匹配長度 */
-    size_t match_count = dictionary_group_get_all_match_lengths(
-      converter->current_dictionary_group,
+    size_t match_count = DictGroup_get_all_match_lengths(
+      converter->current_DictGroup,
       (*inbuf) + i,
       ossb->match_length
       );
@@ -206,8 +206,8 @@ static size_t sp_seg(converter_desc* converter,
   for (i = begin = 0; i < ossb->min_len[length]; i++) {
     end = ossb->path[i];
     size_t match_len;
-    const ucs4_t* const* match_rs = dictionary_group_match_longest(
-      converter->current_dictionary_group,
+    const ucs4_t* const* match_rs = DictGroup_match_longest(
+      converter->current_DictGroup,
       *inbuf,
       end - begin,
       &match_len
@@ -338,8 +338,8 @@ static size_t segment(converter_desc* converter,
       start = i;
     }
     size_t match_len;
-    dictionary_group_match_longest(
-      converter->current_dictionary_group,
+    DictGroup_match_longest(
+      converter->current_DictGroup,
       inbuf_start + i,
       0,
       &match_len
@@ -389,8 +389,8 @@ static size_t segment(converter_desc* converter,
   size_t inbuf_left_start = *inbuf_left;
   for (; **inbuf && *inbuf_left > 0 && *outbuf_left > 0;) {
     size_t match_len;
-    const ucs4_t* const* match_rs = dictionary_group_match_longest(
-      converter->current_dictionary_group,
+    const ucs4_t* const* match_rs = DictGroup_match_longest(
+      converter->current_DictGroup,
       *inbuf,
       *inbuf_left,
       &match_len
@@ -530,7 +530,7 @@ size_t converter_convert(converter_t t_converter,
         coutbuf = tmpbuf;
       }
     }
-    converter->current_dictionary_group = DictChain_get_group(
+    converter->current_DictGroup = DictChain_get_group(
       converter->DictChain,
       i);
     size_t ret = segment(converter,
@@ -564,7 +564,7 @@ void converter_assign_dictionary(converter_t t_converter,
   converter_desc* converter = (converter_desc*)t_converter;
   converter->DictChain = DictChain;
   if (DictChain_count_group(converter->DictChain) > 0) {
-    converter->current_dictionary_group = DictChain_get_group(
+    converter->current_DictGroup = DictChain_get_group(
       converter->DictChain,
       0);
   }
@@ -574,7 +574,7 @@ converter_t converter_open(void) {
   converter_desc* converter = (converter_desc*)
                               malloc(sizeof(converter_desc));
   converter->DictChain = NULL;
-  converter->current_dictionary_group = NULL;
+  converter->current_DictGroup = NULL;
 #if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
   converter->spseg_buffer.initialized = FALSE;
   converter->spseg_buffer.match_length = converter->spseg_buffer.min_len

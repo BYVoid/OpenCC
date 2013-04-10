@@ -102,7 +102,7 @@ int parse_entry(const char* buff, entry* entry_i) {
   return 0;
 }
 
-Dict* dictionary_text_open(const char* filename) {
+Dict* dict_text_new(const char* filename) {
   text_dictionary_desc* text_dictionary;
 
   text_dictionary = (text_dictionary_desc*)malloc(sizeof(text_dictionary_desc));
@@ -117,7 +117,7 @@ Dict* dictionary_text_open(const char* filename) {
   FILE* fp = fopen(filename, "r");
 
   if (fp == NULL) {
-    dictionary_text_close((Dict*)text_dictionary);
+    dict_text_delete((Dict*)text_dictionary);
     return (Dict*)-1;
   }
   skip_utf8_bom(fp);
@@ -135,7 +135,7 @@ Dict* dictionary_text_open(const char* filename) {
 
     if (parse_entry(buff, text_dictionary->lexicon + i) == -1) {
       text_dictionary->entry_count = i;
-      dictionary_text_close((Dict*)text_dictionary);
+      dict_text_delete((Dict*)text_dictionary);
       return (Dict*)-1;
     }
 
@@ -168,7 +168,7 @@ Dict* dictionary_text_open(const char* filename) {
   return (Dict*)text_dictionary;
 }
 
-void dictionary_text_close(Dict* dict) {
+void dict_text_delete(Dict* dict) {
   text_dictionary_desc* text_dictionary = (text_dictionary_desc*)dict;
 
   size_t i;
@@ -189,10 +189,10 @@ void dictionary_text_close(Dict* dict) {
   free(text_dictionary);
 }
 
-const ucs4_t* const* dictionary_text_match_longest(Dict* dict,
-                                                   const ucs4_t* word,
-                                                   size_t maxlen,
-                                                   size_t* match_length) {
+const ucs4_t* const* dict_text_match_longest(Dict* dict,
+                                             const ucs4_t* word,
+                                             size_t maxlen,
+                                             size_t* match_length) {
   text_dictionary_desc* text_dictionary = (text_dictionary_desc*)dict;
 
   if (text_dictionary->entry_count == 0) {
@@ -238,9 +238,9 @@ const ucs4_t* const* dictionary_text_match_longest(Dict* dict,
   return NULL;
 }
 
-size_t dictionary_text_get_all_match_lengths(Dict* dict,
-                                             const ucs4_t* word,
-                                             size_t* match_length) {
+size_t dict_text_get_all_match_lengths(Dict* dict,
+                                       const ucs4_t* word,
+                                       size_t* match_length) {
   text_dictionary_desc* text_dictionary = (text_dictionary_desc*)dict;
 
   size_t rscnt = 0;
@@ -280,7 +280,7 @@ size_t dictionary_text_get_all_match_lengths(Dict* dict,
   return rscnt;
 }
 
-size_t dictionary_text_get_lexicon(Dict* dict, entry* lexicon) {
+size_t dict_text_get_lexicon(Dict* dict, entry* lexicon) {
   text_dictionary_desc* text_dictionary = (text_dictionary_desc*)dict;
 
   size_t i;

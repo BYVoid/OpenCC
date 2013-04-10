@@ -249,7 +249,7 @@ void init(const char* filename) {
   static entry tlexicon[DATRIE_WORD_MAX_COUNT];
   /* TODO add datrie support */
   Dict* dictionary = dict_abs->dict;
-  lexicon_count = dictionary_text_get_lexicon(dictionary, tlexicon);
+  lexicon_count = dict_text_get_lexicon(dictionary, tlexicon);
   qsort(tlexicon, lexicon_count, sizeof(tlexicon[0]), cmp);
   size_t i;
   size_t lexicon_cursor = 0;

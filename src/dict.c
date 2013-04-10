@@ -25,10 +25,10 @@ Dict* dict_new(const char* filename, opencc_dictionary_type type) {
   dictionary->type = type;
   switch (type) {
   case OPENCC_DICTIONARY_TYPE_TEXT:
-    dictionary->dict = dictionary_text_open(filename);
+    dictionary->dict = dict_text_new(filename);
     break;
   case OPENCC_DICTIONARY_TYPE_DATRIE:
-    dictionary->dict = dictionary_datrie_open(filename);
+    dictionary->dict = dict_datrie_new(filename);
     break;
   default:
     free(dictionary);
@@ -40,10 +40,10 @@ Dict* dict_new(const char* filename, opencc_dictionary_type type) {
 void dict_delete(Dict* dict) {
   switch (dict->type) {
   case OPENCC_DICTIONARY_TYPE_TEXT:
-    dictionary_text_close(dict->dict);
+    dict_text_delete(dict->dict);
     break;
   case OPENCC_DICTIONARY_TYPE_DATRIE:
-    dictionary_datrie_close(dict->dict);
+    dict_datrie_delete(dict->dict);
     break;
   default:
     debug_should_not_be_here();
@@ -57,13 +57,13 @@ const ucs4_t* const* dict_match_longest(Dict* dict,
                                               size_t* match_length) {
   switch (dict->type) {
   case OPENCC_DICTIONARY_TYPE_TEXT:
-    return dictionary_text_match_longest(dict->dict,
+    return dict_text_match_longest(dict->dict,
                                          word,
                                          maxlen,
                                          match_length);
     break;
   case OPENCC_DICTIONARY_TYPE_DATRIE:
-    return dictionary_datrie_match_longest(dict->dict,
+    return dict_datrie_match_longest(dict->dict,
                                            word,
                                            maxlen,
                                            match_length);
@@ -79,12 +79,12 @@ size_t dict_get_all_match_lengths(Dict* dict,
                                         size_t* match_length) {
   switch (dict->type) {
   case OPENCC_DICTIONARY_TYPE_TEXT:
-    return dictionary_text_get_all_match_lengths(dict->dict,
+    return dict_text_get_all_match_lengths(dict->dict,
                                                  word,
                                                  match_length);
     break;
   case OPENCC_DICTIONARY_TYPE_DATRIE:
-    return dictionary_datrie_get_all_match_lengths(dict->dict,
+    return dict_datrie_get_all_match_lengths(dict->dict,
                                                    word,
                                                    match_length);
     break;

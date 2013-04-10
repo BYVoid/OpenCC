@@ -29,18 +29,18 @@ typedef struct {
   int word;
 } DoubleArrayTrieItem;
 
-Dict* dictionary_datrie_open(const char* filename);
+Dict* dict_datrie_new(const char* filename);
 
-int dictionary_datrie_close(Dict* dict);
+int dict_datrie_delete(Dict* dict);
 
-const ucs4_t* const* dictionary_datrie_match_longest(Dict* dict,
-                                                     const ucs4_t* word,
-                                                     size_t maxlen,
-                                                     size_t* match_length);
-
-size_t dictionary_datrie_get_all_match_lengths(Dict* dict,
+const ucs4_t* const* dict_datrie_match_longest(Dict* dict,
                                                const ucs4_t* word,
+                                               size_t maxlen,
                                                size_t* match_length);
+
+size_t dict_datrie_get_all_match_lengths(Dict* dict,
+                                         const ucs4_t* word,
+                                         size_t* match_length);
 
 int encode_char(ucs4_t ch);
 

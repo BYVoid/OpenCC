@@ -27,19 +27,19 @@ struct _entry {
 };
 typedef struct _entry entry;
 
-Dict* dictionary_text_open(const char* filename);
+Dict* dict_text_new(const char* filename);
 
-void dictionary_text_close(Dict* dict);
+void dict_text_delete(Dict* dict);
 
-const ucs4_t* const* dictionary_text_match_longest(Dict* dict,
-                                                   const ucs4_t* word,
-                                                   size_t maxlen,
-                                                   size_t* match_length);
-
-size_t dictionary_text_get_all_match_lengths(Dict* dict,
+const ucs4_t* const* dict_text_match_longest(Dict* dict,
                                              const ucs4_t* word,
+                                             size_t maxlen,
                                              size_t* match_length);
 
-size_t dictionary_text_get_lexicon(Dict* dict, entry* lexicon);
+size_t dict_text_get_all_match_lengths(Dict* dict,
+                                       const ucs4_t* word,
+                                       size_t* match_length);
+
+size_t dict_text_get_lexicon(Dict* dict, entry* lexicon);
 
 #endif /* __OPENCC_DICTIONARY_TEXT_H_ */

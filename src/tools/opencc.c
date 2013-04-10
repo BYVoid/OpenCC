@@ -119,8 +119,8 @@ void show_version() {
   printf(_("Open Chinese Convert (OpenCC) Command Line Tool\n"));
   printf(_("Version %s\n"), VERSION);
   printf(_("\n"));
-  printf(_("Author: %s\n"), "BYVoid <byvoid.kcp@gmail.com>");
-  printf(_("Bug Report: %s\n"), "http://code.google.com/p/opencc/issues/entry");
+  printf(_("Author: %s\n"), "BYVoid <byvoid@byvoid.com>");
+  printf(_("Bug Report: %s\n"), "http://github.com/BYVoid/OpenCC/issues");
   printf(_("\n"));
 }
 

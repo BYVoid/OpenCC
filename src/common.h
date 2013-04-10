@@ -30,14 +30,6 @@
 #define TRUE (!(0))
 #define INFINITY_INT ((~0U) >> 1)
 
-#ifndef BIG_ENDIAN
-# define BIG_ENDIAN (0)
-#endif // ifndef BIG_ENDIAN
-
-#ifndef LITTLE_ENDIAN
-# define LITTLE_ENDIAN (1)
-#endif // ifndef LITTLE_ENDIAN
-
 #ifdef ENABLE_GETTEXT
 # include <libintl.h>
 # include <locale.h>

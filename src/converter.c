@@ -530,7 +530,7 @@ size_t converter_convert(converter_t t_converter,
         coutbuf = tmpbuf;
       }
     }
-    converter->current_DictGroup = DictChain_get_group(
+    converter->current_DictGroup = dict_chain_get_group(
       converter->DictChain,
       i);
     size_t ret = segment(converter,
@@ -564,7 +564,7 @@ void converter_assign_dictionary(converter_t t_converter,
   converter_desc* converter = (converter_desc*)t_converter;
   converter->DictChain = DictChain;
   if (converter->DictChain->count > 0) {
-    converter->current_DictGroup = DictChain_get_group(
+    converter->current_DictGroup = dict_chain_get_group(
       converter->DictChain,
       0);
   }

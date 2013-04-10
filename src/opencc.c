@@ -161,7 +161,7 @@ int opencc_close(opencc_t t_opencc) {
   opencc_desc* opencc = (opencc_desc*)t_opencc;
   converter_close(opencc->converter);
   if (opencc->DictChain != NULL) {
-    DictChain_close(opencc->DictChain);
+    dict_chain_delete(opencc->DictChain);
   }
   free(opencc);
   return 0;
@@ -176,10 +176,10 @@ int opencc_dict_load(opencc_t t_opencc,
   opencc_desc* opencc = (opencc_desc*)t_opencc;
   DictGroup_t DictGroup;
   if (opencc->DictChain == NULL) {
-    opencc->DictChain = DictChain_open(NULL);
-    DictGroup = DictChain_new_group(opencc->DictChain);
+    opencc->DictChain = dict_chain_new(NULL);
+    DictGroup = dict_chain_add_group(opencc->DictChain);
   } else {
-    DictGroup = DictChain_get_group(opencc->DictChain, 0);
+    DictGroup = dict_chain_get_group(opencc->DictChain, 0);
   }
   int retval = DictGroup_load(DictGroup, dict_filename, dict_type);
   if (retval == -1) {

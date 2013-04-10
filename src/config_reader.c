@@ -64,11 +64,11 @@ static int load_dictionary(config_desc* config) {
 		    sizeof(config->dicts[0]),
 		    qsort_dictionary_buffer_cmp);
   size_t i, last_index = 0;
-  DictGroup_t group = DictChain_new_group(config->DictChain);
+  DictGroup_t group = dict_chain_add_group(config->DictChain);
   for (i = 0; i < config->dicts_count; i++) {
     if (config->dicts[i].index > last_index) {
       last_index = config->dicts[i].index;
-      group = DictChain_new_group(config->DictChain);
+      group = dict_chain_add_group(config->DictChain);
     }
     DictGroup_load(group,
                           config->dicts[i].file_name,
@@ -202,9 +202,9 @@ static int parse(config_desc* config, const char* filename) {
 DictChain* config_get_DictChain(config_t t_config) {
   config_desc* config = (config_desc*)t_config;
   if (config->DictChain != NULL) {
-    DictChain_close(config->DictChain);
+    dict_chain_delete(config->DictChain);
   }
-  config->DictChain = DictChain_open(t_config);
+  config->DictChain = dict_chain_new(t_config);
   load_dictionary(config);
   return config->DictChain;
 }

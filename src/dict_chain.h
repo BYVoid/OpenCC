@@ -28,12 +28,12 @@ typedef struct {
   DictGroup_t groups[DICTIONARY_GROUP_MAX_COUNT];
 } DictChain;
 
-DictChain* DictChain_open(config_t config);
+DictChain* dict_chain_new(config_t config);
 
-void DictChain_close(DictChain* dict_chain);
+void dict_chain_delete(DictChain* dict_chain);
 
-DictGroup_t DictChain_new_group(DictChain* dict_chain);
+DictGroup_t dict_chain_add_group(DictChain* dict_chain);
 
-DictGroup_t DictChain_get_group(DictChain* dict_chain, size_t index);
+DictGroup_t dict_chain_get_group(DictChain* dict_chain, size_t index);
 
 #endif /* __DICTIONARY_SET_H_ */

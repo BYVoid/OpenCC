@@ -19,14 +19,14 @@
 #include "dict_group.h"
 #include "dict_chain.h"
 
-DictChain* DictChain_open(config_t config) {
+DictChain* dict_chain_new(config_t config) {
   DictChain* dict_chain = (DictChain*)malloc(sizeof(DictChain));
   dict_chain->count = 0;
   dict_chain->config = config;
   return dict_chain;
 }
 
-void DictChain_close(DictChain* dict_chain) {
+void dict_chain_delete(DictChain* dict_chain) {
   size_t i;
   for (i = 0; i < dict_chain->count; i++) {
     DictGroup_close(dict_chain->groups[i]);
@@ -34,7 +34,7 @@ void DictChain_close(DictChain* dict_chain) {
   free(dict_chain);
 }
 
-DictGroup_t DictChain_new_group(DictChain* dict_chain) {
+DictGroup_t dict_chain_add_group(DictChain* dict_chain) {
   if (dict_chain->count + 1 == DICTIONARY_GROUP_MAX_COUNT) {
     return (DictGroup_t)-1;
   }
@@ -43,7 +43,7 @@ DictGroup_t DictChain_new_group(DictChain* dict_chain) {
   return group;
 }
 
-DictGroup_t DictChain_get_group(DictChain* dict_chain, size_t index) {
+DictGroup_t dict_chain_get_group(DictChain* dict_chain, size_t index) {
   if (index >= dict_chain->count) {
     return (DictGroup_t)-1;
   }

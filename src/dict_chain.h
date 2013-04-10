@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
+ * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,19 @@
 
 #include "common.h"
 
-DictChain_t DictChain_open(config_t config);
+#define DICTIONARY_GROUP_MAX_COUNT 128
+typedef struct {
+  config_t config;
+  size_t count;
+  DictGroup_t groups[DICTIONARY_GROUP_MAX_COUNT];
+} DictChain;
 
-void DictChain_close(DictChain_t t_dictionary);
+DictChain* DictChain_open(config_t config);
 
-DictGroup_t DictChain_new_group(DictChain_t t_dictionary);
+void DictChain_close(DictChain* dict_chain);
 
-DictGroup_t DictChain_get_group(DictChain_t t_dictionary,
-                                            size_t index);
+DictGroup_t DictChain_new_group(DictChain* dict_chain);
 
-size_t DictChain_count_group(DictChain_t t_dictionary);
-
-config_t DictChain_get_config(DictChain_t t_dictionary);
+DictGroup_t DictChain_get_group(DictChain* dict_chain, size_t index);
 
 #endif /* __DICTIONARY_SET_H_ */

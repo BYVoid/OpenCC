@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
+ * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,57 +19,33 @@
 #include "dict_group.h"
 #include "dict_chain.h"
 
-#define DICTIONARY_GROUP_MAX_COUNT 128
-
-struct _DictChain {
-  config_t config;
-  size_t count;
-  DictGroup_t groups[DICTIONARY_GROUP_MAX_COUNT];
-};
-typedef struct _DictChain DictChain_desc;
-
-DictChain_t DictChain_open(config_t config) {
-  DictChain_desc* DictChain =
-    (DictChain_desc*)malloc(sizeof(DictChain_desc));
-  DictChain->count = 0;
-  DictChain->config = config;
-  return DictChain;
+DictChain* DictChain_open(config_t config) {
+  DictChain* dict_chain = (DictChain*)malloc(sizeof(DictChain));
+  dict_chain->count = 0;
+  dict_chain->config = config;
+  return dict_chain;
 }
 
-void DictChain_close(DictChain_t t_dictionary) {
-  DictChain_desc* DictChain = (DictChain_desc*)t_dictionary;
+void DictChain_close(DictChain* dict_chain) {
   size_t i;
-  for (i = 0; i < DictChain->count; i++) {
-    DictGroup_close(DictChain->groups[i]);
+  for (i = 0; i < dict_chain->count; i++) {
+    DictGroup_close(dict_chain->groups[i]);
   }
-  free(DictChain);
+  free(dict_chain);
 }
 
-DictGroup_t DictChain_new_group(DictChain_t t_dictionary) {
-  DictChain_desc* DictChain = (DictChain_desc*)t_dictionary;
-  if (DictChain->count + 1 == DICTIONARY_GROUP_MAX_COUNT) {
+DictGroup_t DictChain_new_group(DictChain* dict_chain) {
+  if (dict_chain->count + 1 == DICTIONARY_GROUP_MAX_COUNT) {
     return (DictGroup_t)-1;
   }
-  DictGroup_t group = DictGroup_open(t_dictionary);
-  DictChain->groups[DictChain->count++] = group;
+  DictGroup_t group = DictGroup_open(dict_chain);
+  dict_chain->groups[dict_chain->count++] = group;
   return group;
 }
 
-DictGroup_t DictChain_get_group(DictChain_t t_dictionary,
-                                            size_t index) {
-  DictChain_desc* DictChain = (DictChain_desc*)t_dictionary;
-  if (index >= DictChain->count) {
+DictGroup_t DictChain_get_group(DictChain* dict_chain, size_t index) {
+  if (index >= dict_chain->count) {
     return (DictGroup_t)-1;
   }
-  return DictChain->groups[index];
-}
-
-size_t DictChain_count_group(DictChain_t t_dictionary) {
-  DictChain_desc* DictChain = (DictChain_desc*)t_dictionary;
-  return DictChain->count;
-}
-
-config_t DictChain_get_config(DictChain_t t_dictionary) {
-  DictChain_desc* DictChain = (DictChain_desc*)t_dictionary;
-  return DictChain->config;
+  return dict_chain->groups[index];
 }

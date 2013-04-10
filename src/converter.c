@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
+ * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ typedef struct {
 #if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
   spseg_buffer_desc spseg_buffer;
 #endif /* if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH */
-  DictChain_t DictChain;
+  DictChain* DictChain;
   DictGroup_t current_DictGroup;
   opencc_conversion_mode conversion_mode;
 } converter_desc;
@@ -494,7 +494,7 @@ size_t converter_convert(converter_t t_converter,
     errnum = CONVERTER_ERROR_NODICT;
     return (size_t)-1;
   }
-  if (DictChain_count_group(converter->DictChain) == 1) {
+  if (converter->DictChain->count == 1) {
     /* 只有一個辭典，直接輸出 */
     return segment(converter,
 							     inbuf,
@@ -516,7 +516,7 @@ size_t converter_convert(converter_t t_converter,
   coutbuf_left = outbuf_size;
   cinbuf = *inbuf;
   coutbuf = tmpbuf;
-  for (i = cur = 0; i < DictChain_count_group(converter->DictChain);
+  for (i = cur = 0; i < converter->DictChain->count;
        ++i, cur = 1 - cur) {
     if (i > 0) {
       cinbuf_left = coutbuf_delta;
@@ -560,10 +560,10 @@ size_t converter_convert(converter_t t_converter,
 }
 
 void converter_assign_dictionary(converter_t t_converter,
-                                 DictChain_t DictChain) {
+                                 DictChain* DictChain) {
   converter_desc* converter = (converter_desc*)t_converter;
   converter->DictChain = DictChain;
-  if (DictChain_count_group(converter->DictChain) > 0) {
+  if (converter->DictChain->count > 0) {
     converter->current_DictGroup = DictChain_get_group(
       converter->DictChain,
       0);

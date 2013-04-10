@@ -20,6 +20,7 @@
 #define __CONVERTER_H_
 
 #include "common.h"
+#include "dict_chain.h"
 
 typedef enum {
   CONVERTER_ERROR_VOID,
@@ -28,7 +29,7 @@ typedef enum {
 } converter_error;
 
 void converter_assign_dictionary(converter_t t_converter,
-                                 DictChain_t DictChain);
+                                 DictChain* DictChain);
 
 converter_t converter_open(void);
 

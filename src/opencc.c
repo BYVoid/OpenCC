@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
+ * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 #include "opencc.h"
 
 typedef struct {
-  DictChain_t DictChain;
+  DictChain* DictChain;
   converter_t converter;
 } opencc_desc;
 

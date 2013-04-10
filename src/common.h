@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2013 BYVoid <byvoid.kcp@gmail.com>
+ * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,5 @@
 typedef void* converter_t;
 typedef void* config_t;
 typedef void* DictGroup_t;
-typedef void* DictChain_t;
 
 #endif // ifndef __COMMON_H_

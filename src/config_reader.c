@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010 BYVoid <byvoid.kcp@gmail.com>
+ * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ typedef struct {
 struct _config_desc {
   char* title;
   char* description;
-  DictChain_t DictChain;
+  DictChain* DictChain;
   char* file_path;
   dictionary_buffer dicts[DICTIONARY_MAX_COUNT];
   size_t dicts_count;
@@ -199,7 +199,7 @@ static int parse(config_desc* config, const char* filename) {
   return 0;
 }
 
-DictChain_t config_get_DictChain(config_t t_config) {
+DictChain* config_get_DictChain(config_t t_config) {
   config_desc* config = (config_desc*)t_config;
   if (config->DictChain != NULL) {
     DictChain_close(config->DictChain);

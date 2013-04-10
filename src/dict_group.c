@@ -23,7 +23,7 @@
 #define DICTIONARY_MAX_COUNT 128
 
 struct _DictGroup {
-  DictChain_t DictChain;
+  DictChain* DictChain;
   size_t count;
   dictionary_t dicts[DICTIONARY_MAX_COUNT];
 };
@@ -31,7 +31,7 @@ typedef struct _DictGroup DictGroup_desc;
 
 static dictionary_error errnum = DICTIONARY_ERROR_VOID;
 
-DictGroup_t DictGroup_open(DictChain_t t_DictChain) {
+DictGroup_t DictGroup_open(DictChain* t_DictChain) {
   DictGroup_desc* DictGroup =
     (DictGroup_desc*)malloc(sizeof(DictGroup_desc));
   DictGroup->count = 0;
@@ -58,7 +58,7 @@ static char* try_find_dictionary_with_config(
   if (DictGroup->DictChain == NULL) {
     return NULL;
   }
-  config_t config = DictChain_get_config(DictGroup->DictChain);
+  config_t config = DictGroup->DictChain->config;
   if (config == NULL) {
     return NULL;
   }
@@ -208,7 +208,7 @@ void dictionary_perror(const char* spec) {
   }
 }
 
-DictChain_t DictGroup_get_DictChain(
+DictChain* DictGroup_get_DictChain(
   DictGroup_t t_dictionary) {
   DictGroup_desc* DictGroup = (DictGroup_desc*)t_dictionary;
   return DictGroup->DictChain;

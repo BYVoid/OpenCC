@@ -20,6 +20,7 @@
 #define __DICTIONARY_GROUP_H_
 
 #include "common.h"
+#include "dict_chain.h"
 #include "dictionary/abstract.h"
 
 typedef enum {
@@ -30,7 +31,7 @@ typedef enum {
   DICTIONARY_ERROR_INVALID_INDEX,
 } dictionary_error;
 
-DictGroup_t DictGroup_open(DictChain_t t_DictChain);
+DictGroup_t DictGroup_open(DictChain* t_DictChain);
 
 void DictGroup_close(DictGroup_t t_dictionary);
 
@@ -57,7 +58,7 @@ dictionary_error dictionary_errno(void);
 
 void dictionary_perror(const char* spec);
 
-DictChain_t DictGroup_get_DictChain(
+DictChain* DictGroup_get_DictChain(
     DictGroup_t t_dictionary);
 
 #endif /* __DICTIONARY_GROUP_H_ */

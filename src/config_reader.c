@@ -18,7 +18,7 @@
 
 #include "config_reader.h"
 #include "dictionary_group.h"
-#include "dictionary_set.h"
+#include "dict_chain.h"
 
 #define BUFFER_SIZE 8192
 #define DICTIONARY_MAX_COUNT 1024
@@ -35,7 +35,7 @@ typedef struct {
 struct _config_desc {
   char* title;
   char* description;
-  dictionary_set_t dictionary_set;
+  DictChain_t DictChain;
   char* file_path;
   dictionary_buffer dicts[DICTIONARY_MAX_COUNT];
   size_t dicts_count;
@@ -64,11 +64,11 @@ static int load_dictionary(config_desc* config) {
 		    sizeof(config->dicts[0]),
 		    qsort_dictionary_buffer_cmp);
   size_t i, last_index = 0;
-  dictionary_group_t group = dictionary_set_new_group(config->dictionary_set);
+  dictionary_group_t group = DictChain_new_group(config->DictChain);
   for (i = 0; i < config->dicts_count; i++) {
     if (config->dicts[i].index > last_index) {
       last_index = config->dicts[i].index;
-      group = dictionary_set_new_group(config->dictionary_set);
+      group = DictChain_new_group(config->DictChain);
     }
     dictionary_group_load(group,
                           config->dicts[i].file_name,
@@ -199,14 +199,14 @@ static int parse(config_desc* config, const char* filename) {
   return 0;
 }
 
-dictionary_set_t config_get_dictionary_set(config_t t_config) {
+DictChain_t config_get_DictChain(config_t t_config) {
   config_desc* config = (config_desc*)t_config;
-  if (config->dictionary_set != NULL) {
-    dictionary_set_close(config->dictionary_set);
+  if (config->DictChain != NULL) {
+    DictChain_close(config->DictChain);
   }
-  config->dictionary_set = dictionary_set_open(t_config);
+  config->DictChain = DictChain_open(t_config);
   load_dictionary(config);
-  return config->dictionary_set;
+  return config->DictChain;
 }
 
 config_error config_errno(void) {
@@ -242,7 +242,7 @@ config_t config_open(const char* filename) {
   config->description = NULL;
   config->dicts_count = 0;
   config->stamp = 0;
-  config->dictionary_set = NULL;
+  config->DictChain = NULL;
   config->file_path = NULL;
   if (parse(config, filename) == -1) {
     config_close((config_t)config);

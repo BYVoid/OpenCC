@@ -28,7 +28,7 @@ typedef enum {
 } converter_error;
 
 void converter_assign_dictionary(converter_t t_converter,
-                                 dictionary_set_t dictionary_set);
+                                 DictChain_t DictChain);
 
 converter_t converter_open(void);
 

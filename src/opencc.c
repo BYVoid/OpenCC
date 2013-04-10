@@ -20,12 +20,12 @@
 #include "config_reader.h"
 #include "converter.h"
 #include "dictionary_group.h"
-#include "dictionary_set.h"
+#include "dict_chain.h"
 #include "encoding.h"
 #include "opencc.h"
 
 typedef struct {
-  dictionary_set_t dictionary_set;
+  DictChain_t DictChain;
   converter_t converter;
 } opencc_desc;
 
@@ -134,7 +134,7 @@ opencc_t opencc_open(const char* config_file) {
   }
   opencc_desc* opencc;
   opencc = (opencc_desc*)malloc(sizeof(opencc_desc));
-  opencc->dictionary_set = NULL;
+  opencc->DictChain = NULL;
   opencc->converter = converter_open();
   converter_set_conversion_mode(opencc->converter, OPENCC_CONVERSION_FAST);
   if (config_file == NULL) {
@@ -147,8 +147,8 @@ opencc_t opencc_open(const char* config_file) {
       errnum = OPENCC_ERROR_CONFIG;
       return (opencc_t)-1;
     }
-    opencc->dictionary_set = config_get_dictionary_set(config);
-    converter_assign_dictionary(opencc->converter, opencc->dictionary_set);
+    opencc->DictChain = config_get_DictChain(config);
+    converter_assign_dictionary(opencc->converter, opencc->DictChain);
     config_close(config);
   }
   return (opencc_t)opencc;
@@ -160,8 +160,8 @@ int opencc_close(opencc_t t_opencc) {
   }
   opencc_desc* opencc = (opencc_desc*)t_opencc;
   converter_close(opencc->converter);
-  if (opencc->dictionary_set != NULL) {
-    dictionary_set_close(opencc->dictionary_set);
+  if (opencc->DictChain != NULL) {
+    DictChain_close(opencc->DictChain);
   }
   free(opencc);
   return 0;
@@ -175,18 +175,18 @@ int opencc_dict_load(opencc_t t_opencc,
   }
   opencc_desc* opencc = (opencc_desc*)t_opencc;
   dictionary_group_t dictionary_group;
-  if (opencc->dictionary_set == NULL) {
-    opencc->dictionary_set = dictionary_set_open(NULL);
-    dictionary_group = dictionary_set_new_group(opencc->dictionary_set);
+  if (opencc->DictChain == NULL) {
+    opencc->DictChain = DictChain_open(NULL);
+    dictionary_group = DictChain_new_group(opencc->DictChain);
   } else {
-    dictionary_group = dictionary_set_get_group(opencc->dictionary_set, 0);
+    dictionary_group = DictChain_get_group(opencc->DictChain, 0);
   }
   int retval = dictionary_group_load(dictionary_group, dict_filename, dict_type);
   if (retval == -1) {
     errnum = OPENCC_ERROR_DICTLOAD;
     return -1;
   }
-  converter_assign_dictionary(opencc->converter, opencc->dictionary_set);
+  converter_assign_dictionary(opencc->converter, opencc->DictChain);
   return retval;
 }
 

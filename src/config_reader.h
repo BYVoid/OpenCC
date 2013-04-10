@@ -33,7 +33,7 @@ config_t config_open(const char* filename);
 
 void config_close(config_t t_config);
 
-dictionary_set_t config_get_dictionary_set(config_t t_config);
+DictChain_t config_get_DictChain(config_t t_config);
 
 config_error config_errno(void);
 

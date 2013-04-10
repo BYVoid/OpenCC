@@ -7,7 +7,7 @@
       "../src/encoding.c",
       "../src/utils.c",
       "../src/dictionary_group.c",
-      "../src/dictionary_set.c",
+      "../src/dict_chain.c",
       "../src/config_reader.c",
       "../src/dictionary/abstract.c",
       "../src/dictionary/datrie.c",

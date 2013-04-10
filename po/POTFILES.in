@@ -4,8 +4,8 @@ src/converter.c
 src/converter.h
 src/dictionary_group.c
 src/dictionary_group.h
-src/dictionary_set.c
-src/dictionary_set.h
+src/dict_chain.c
+src/dict_chain.h
 src/encoding.c
 src/encoding.h
 src/opencc.c

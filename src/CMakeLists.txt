@@ -21,14 +21,14 @@ set(
 	config_reader.c
 	converter.c
 	dictionary_group.c
-	dictionary_set.c
+	dict_chain.c
 	encoding.c
 	utils.c
 	opencc.c
 	config_reader.h
 	converter.h
 	dictionary_group.h
-	dictionary_set.h
+	dict_chain.h
 	encoding.h
 	utils.h
 )

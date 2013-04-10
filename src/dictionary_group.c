@@ -18,12 +18,12 @@
 
 #include "config_reader.h"
 #include "dictionary_group.h"
-#include "dictionary_set.h"
+#include "dict_chain.h"
 
 #define DICTIONARY_MAX_COUNT 128
 
 struct _dictionary_group {
-  dictionary_set_t dictionary_set;
+  DictChain_t DictChain;
   size_t count;
   dictionary_t dicts[DICTIONARY_MAX_COUNT];
 };
@@ -31,11 +31,11 @@ typedef struct _dictionary_group dictionary_group_desc;
 
 static dictionary_error errnum = DICTIONARY_ERROR_VOID;
 
-dictionary_group_t dictionary_group_open(dictionary_set_t t_dictionary_set) {
+dictionary_group_t dictionary_group_open(DictChain_t t_DictChain) {
   dictionary_group_desc* dictionary_group =
     (dictionary_group_desc*)malloc(sizeof(dictionary_group_desc));
   dictionary_group->count = 0;
-  dictionary_group->dictionary_set = t_dictionary_set;
+  dictionary_group->DictChain = t_DictChain;
   return dictionary_group;
 }
 
@@ -55,10 +55,10 @@ static char* try_find_dictionary_with_config(
     return NULL;
   }
   /* Get config path */
-  if (dictionary_group->dictionary_set == NULL) {
+  if (dictionary_group->DictChain == NULL) {
     return NULL;
   }
-  config_t config = dictionary_set_get_config(dictionary_group->dictionary_set);
+  config_t config = DictChain_get_config(dictionary_group->DictChain);
   if (config == NULL) {
     return NULL;
   }
@@ -208,8 +208,8 @@ void dictionary_perror(const char* spec) {
   }
 }
 
-dictionary_set_t dictionary_group_get_dictionary_set(
+DictChain_t dictionary_group_get_DictChain(
   dictionary_group_t t_dictionary) {
   dictionary_group_desc* dictionary_group = (dictionary_group_desc*)t_dictionary;
-  return dictionary_group->dictionary_set;
+  return dictionary_group->DictChain;
 }

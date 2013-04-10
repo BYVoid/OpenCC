@@ -30,7 +30,7 @@ typedef enum {
   DICTIONARY_ERROR_INVALID_INDEX,
 } dictionary_error;
 
-dictionary_group_t dictionary_group_open(dictionary_set_t t_dictionary_set);
+dictionary_group_t dictionary_group_open(DictChain_t t_DictChain);
 
 void dictionary_group_close(dictionary_group_t t_dictionary);
 
@@ -57,7 +57,7 @@ dictionary_error dictionary_errno(void);
 
 void dictionary_perror(const char* spec);
 
-dictionary_set_t dictionary_group_get_dictionary_set(
+DictChain_t dictionary_group_get_DictChain(
     dictionary_group_t t_dictionary);
 
 #endif /* __DICTIONARY_GROUP_H_ */

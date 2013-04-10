@@ -49,6 +49,6 @@
 typedef void* converter_t;
 typedef void* config_t;
 typedef void* dictionary_group_t;
-typedef void* dictionary_set_t;
+typedef void* DictChain_t;
 
 #endif // ifndef __COMMON_H_

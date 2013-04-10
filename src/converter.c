@@ -19,7 +19,7 @@
 #include "common.h"
 #include "converter.h"
 #include "dictionary_group.h"
-#include "dictionary_set.h"
+#include "dict_chain.h"
 #include "encoding.h"
 
 #define DELIMITER ' '
@@ -46,7 +46,7 @@ typedef struct {
 #if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
   spseg_buffer_desc spseg_buffer;
 #endif /* if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH */
-  dictionary_set_t dictionary_set;
+  DictChain_t DictChain;
   dictionary_group_t current_dictionary_group;
   opencc_conversion_mode conversion_mode;
 } converter_desc;
@@ -490,11 +490,11 @@ size_t converter_convert(converter_t t_converter,
                          ucs4_t** outbuf,
                          size_t* outbuf_left) {
   converter_desc* converter = (converter_desc*)t_converter;
-  if (converter->dictionary_set == NULL) {
+  if (converter->DictChain == NULL) {
     errnum = CONVERTER_ERROR_NODICT;
     return (size_t)-1;
   }
-  if (dictionary_set_count_group(converter->dictionary_set) == 1) {
+  if (DictChain_count_group(converter->DictChain) == 1) {
     /* 只有一個辭典，直接輸出 */
     return segment(converter,
 							     inbuf,
@@ -516,7 +516,7 @@ size_t converter_convert(converter_t t_converter,
   coutbuf_left = outbuf_size;
   cinbuf = *inbuf;
   coutbuf = tmpbuf;
-  for (i = cur = 0; i < dictionary_set_count_group(converter->dictionary_set);
+  for (i = cur = 0; i < DictChain_count_group(converter->DictChain);
        ++i, cur = 1 - cur) {
     if (i > 0) {
       cinbuf_left = coutbuf_delta;
@@ -530,8 +530,8 @@ size_t converter_convert(converter_t t_converter,
         coutbuf = tmpbuf;
       }
     }
-    converter->current_dictionary_group = dictionary_set_get_group(
-      converter->dictionary_set,
+    converter->current_dictionary_group = DictChain_get_group(
+      converter->DictChain,
       i);
     size_t ret = segment(converter,
 									      &cinbuf,
@@ -560,12 +560,12 @@ size_t converter_convert(converter_t t_converter,
 }
 
 void converter_assign_dictionary(converter_t t_converter,
-                                 dictionary_set_t dictionary_set) {
+                                 DictChain_t DictChain) {
   converter_desc* converter = (converter_desc*)t_converter;
-  converter->dictionary_set = dictionary_set;
-  if (dictionary_set_count_group(converter->dictionary_set) > 0) {
-    converter->current_dictionary_group = dictionary_set_get_group(
-      converter->dictionary_set,
+  converter->DictChain = DictChain;
+  if (DictChain_count_group(converter->DictChain) > 0) {
+    converter->current_dictionary_group = DictChain_get_group(
+      converter->DictChain,
       0);
   }
 }
@@ -573,7 +573,7 @@ void converter_assign_dictionary(converter_t t_converter,
 converter_t converter_open(void) {
   converter_desc* converter = (converter_desc*)
                               malloc(sizeof(converter_desc));
-  converter->dictionary_set = NULL;
+  converter->DictChain = NULL;
   converter->current_dictionary_group = NULL;
 #if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
   converter->spseg_buffer.initialized = FALSE;

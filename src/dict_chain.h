@@ -21,17 +21,17 @@
 
 #include "common.h"
 
-dictionary_set_t dictionary_set_open(config_t config);
+DictChain_t DictChain_open(config_t config);
 
-void dictionary_set_close(dictionary_set_t t_dictionary);
+void DictChain_close(DictChain_t t_dictionary);
 
-dictionary_group_t dictionary_set_new_group(dictionary_set_t t_dictionary);
+dictionary_group_t DictChain_new_group(DictChain_t t_dictionary);
 
-dictionary_group_t dictionary_set_get_group(dictionary_set_t t_dictionary,
+dictionary_group_t DictChain_get_group(DictChain_t t_dictionary,
                                             size_t index);
 
-size_t dictionary_set_count_group(dictionary_set_t t_dictionary);
+size_t DictChain_count_group(DictChain_t t_dictionary);
 
-config_t dictionary_set_get_config(dictionary_set_t t_dictionary);
+config_t DictChain_get_config(DictChain_t t_dictionary);
 
 #endif /* __DICTIONARY_SET_H_ */

@@ -21,19 +21,25 @@
 
 #include "abstract.h"
 
-dictionary_t dictionary_text_open(const char* filename);
+struct _entry {
+  ucs4_t* key;
+  ucs4_t** value;
+};
+typedef struct _entry entry;
 
-void dictionary_text_close(dictionary_t t_dictionary);
+Dict* dictionary_text_open(const char* filename);
 
-const ucs4_t* const* dictionary_text_match_longest(dictionary_t t_dictionary,
+void dictionary_text_close(Dict* dict);
+
+const ucs4_t* const* dictionary_text_match_longest(Dict* dict,
                                                    const ucs4_t* word,
                                                    size_t maxlen,
                                                    size_t* match_length);
 
-size_t dictionary_text_get_all_match_lengths(dictionary_t t_dictionary,
+size_t dictionary_text_get_all_match_lengths(Dict* dict,
                                              const ucs4_t* word,
                                              size_t* match_length);
 
-size_t dictionary_text_get_lexicon(dictionary_t t_dictionary, entry* lexicon);
+size_t dictionary_text_get_lexicon(Dict* dict, entry* lexicon);
 
 #endif /* __OPENCC_DICTIONARY_TEXT_H_ */

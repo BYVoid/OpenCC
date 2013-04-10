@@ -240,15 +240,15 @@ void init(const char* filename) {
     fprintf(stderr, _("\n"));
     exit(1);
   }
-  dictionary_t t_dictionary = dict_group_get_dict(DictGroup, 0);
-  if (t_dictionary == (dictionary_t)-1) {
+  Dict* dict_abs = dict_group_get_dict(DictGroup, 0);
+  if (dict_abs == (Dict*)-1) {
     dictionary_perror("Dictionary loading error");
     fprintf(stderr, _("\n"));
     exit(1);
   }
   static entry tlexicon[DATRIE_WORD_MAX_COUNT];
   /* TODO add datrie support */
-  dictionary_t dictionary = dictionary_get(t_dictionary);
+  Dict* dictionary = dict_abs->dict;
   lexicon_count = dictionary_text_get_lexicon(dictionary, tlexicon);
   qsort(tlexicon, lexicon_count, sizeof(tlexicon[0]), cmp);
   size_t i;

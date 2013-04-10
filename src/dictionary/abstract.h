@@ -22,26 +22,17 @@
 #include "../common.h"
 #include "../utils.h"
 
-struct _entry {
-  ucs4_t* key;
-  ucs4_t** value;
-};
-typedef struct _entry entry;
+Dict* dict_new(const char* filename, opencc_dictionary_type type);
 
+void dict_delete(Dict* dict);
 
-dictionary_t dictionary_open(const char* filename, opencc_dictionary_type type);
-
-void dictionary_close(dictionary_t t_dictionary);
-
-dictionary_t dictionary_get(dictionary_t t_dictionary);
-
-const ucs4_t* const* dictionary_match_longest(dictionary_t t_dictionary,
-                                              const ucs4_t* word,
-                                              size_t maxlen,
-                                              size_t* match_length);
-
-size_t dictionary_get_all_match_lengths(dictionary_t t_dictionary,
+const ucs4_t* const* dict_match_longest(Dict* dict,
                                         const ucs4_t* word,
+                                        size_t maxlen,
                                         size_t* match_length);
+
+size_t dict_get_all_match_lengths(Dict* dict,
+                                  const ucs4_t* word,
+                                  size_t* match_length);
 
 #endif /* __OPENCC_DICTIONARY_ABSTRACT_H_ */

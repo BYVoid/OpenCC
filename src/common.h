@@ -48,19 +48,25 @@
 
 typedef void* converter_t;
 typedef void* config_t;
-typedef void* dictionary_t;
 
+struct SDict;
 struct SDictGroup;
 struct SDictChain;
 
+typedef struct SDict Dict;
 typedef struct SDictGroup DictGroup;
 typedef struct SDictChain DictChain;
+
+struct SDict {
+  opencc_dictionary_type type;
+  Dict* dict;
+};
 
 #define DICTIONARY_MAX_COUNT 128
 struct SDictGroup {
   DictChain* DictChain;
   size_t count;
-  dictionary_t dicts[DICTIONARY_MAX_COUNT];
+  Dict* dicts[DICTIONARY_MAX_COUNT];
 };
 
 #define DICTIONARY_GROUP_MAX_COUNT 128

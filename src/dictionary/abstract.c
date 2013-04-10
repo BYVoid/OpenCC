@@ -20,17 +20,9 @@
 #include "datrie.h"
 #include "text.h"
 
-struct _dictionary {
-  opencc_dictionary_type type;
-  dictionary_t dict;
-};
-typedef struct _dictionary dictionary_desc;
-
-dictionary_t dictionary_open(const char* filename, opencc_dictionary_type type) {
-  dictionary_desc* dictionary = (dictionary_desc*)malloc(sizeof(dictionary_desc));
-
+Dict* dict_new(const char* filename, opencc_dictionary_type type) {
+  Dict* dictionary = (Dict*)malloc(sizeof(Dict));
   dictionary->type = type;
-
   switch (type) {
   case OPENCC_DICTIONARY_TYPE_TEXT:
     dictionary->dict = dictionary_text_open(filename);
@@ -40,53 +32,41 @@ dictionary_t dictionary_open(const char* filename, opencc_dictionary_type type) 
     break;
   default:
     free(dictionary);
-    dictionary = (dictionary_t)-1;              /* TODO:辭典格式不支持 */
+    dictionary = (Dict*)-1;              /* TODO:辭典格式不支持 */
   }
   return dictionary;
 }
 
-dictionary_t dictionary_get(dictionary_t t_dictionary) {
-  dictionary_desc* dictionary = (dictionary_desc*)t_dictionary;
-
-  return dictionary->dict;
-}
-
-void dictionary_close(dictionary_t t_dictionary) {
-  dictionary_desc* dictionary = (dictionary_desc*)t_dictionary;
-
-  switch (dictionary->type) {
+void dict_delete(Dict* dict) {
+  switch (dict->type) {
   case OPENCC_DICTIONARY_TYPE_TEXT:
-    dictionary_text_close(dictionary->dict);
+    dictionary_text_close(dict->dict);
     break;
   case OPENCC_DICTIONARY_TYPE_DATRIE:
-    dictionary_datrie_close(dictionary->dict);
+    dictionary_datrie_close(dict->dict);
     break;
   default:
     debug_should_not_be_here();
   }
-  free(dictionary);
+  free(dict);
 }
 
-const ucs4_t* const* dictionary_match_longest(dictionary_t t_dictionary,
+const ucs4_t* const* dict_match_longest(Dict* dict,
                                               const ucs4_t* word,
                                               size_t maxlen,
                                               size_t* match_length) {
-  dictionary_desc* dictionary = (dictionary_desc*)t_dictionary;
-
-  switch (dictionary->type) {
+  switch (dict->type) {
   case OPENCC_DICTIONARY_TYPE_TEXT:
-    return dictionary_text_match_longest(dictionary->dict,
+    return dictionary_text_match_longest(dict->dict,
                                          word,
                                          maxlen,
                                          match_length);
-
     break;
   case OPENCC_DICTIONARY_TYPE_DATRIE:
-    return dictionary_datrie_match_longest(dictionary->dict,
+    return dictionary_datrie_match_longest(dict->dict,
                                            word,
                                            maxlen,
                                            match_length);
-
     break;
   default:
     debug_should_not_be_here();
@@ -94,23 +74,19 @@ const ucs4_t* const* dictionary_match_longest(dictionary_t t_dictionary,
   return (const ucs4_t* const*)-1;
 }
 
-size_t dictionary_get_all_match_lengths(dictionary_t t_dictionary,
+size_t dict_get_all_match_lengths(Dict* dict,
                                         const ucs4_t* word,
                                         size_t* match_length) {
-  dictionary_desc* dictionary = (dictionary_desc*)t_dictionary;
-
-  switch (dictionary->type) {
+  switch (dict->type) {
   case OPENCC_DICTIONARY_TYPE_TEXT:
-    return dictionary_text_get_all_match_lengths(dictionary->dict,
+    return dictionary_text_get_all_match_lengths(dict->dict,
                                                  word,
                                                  match_length);
-
     break;
   case OPENCC_DICTIONARY_TYPE_DATRIE:
-    return dictionary_datrie_get_all_match_lengths(dictionary->dict,
+    return dictionary_datrie_get_all_match_lengths(dict->dict,
                                                    word,
                                                    match_length);
-
     break;
   default:
     debug_should_not_be_here();

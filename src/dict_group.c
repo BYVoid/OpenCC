@@ -33,7 +33,7 @@ DictGroup* dict_group_new(DictChain* dict_chain) {
 void dict_group_delete(DictGroup* dict_group) {
   size_t i;
   for (i = 0; i < dict_group->count; i++) {
-    dictionary_close(dict_group->dicts[i]);
+    dict_delete(dict_group->dicts[i]);
   }
   free(dict_group);
 }
@@ -70,7 +70,7 @@ static char* try_find_dictionary_with_config(
 int dict_group_load(DictGroup* dict_group,
                           const char* filename,
                           opencc_dictionary_type type) {
-  dictionary_t dictionary;
+  Dict* dictionary;
   char* path = try_open_file(filename);
   if (path == NULL) {
     path = try_find_dictionary_with_config(dict_group, filename);
@@ -79,9 +79,9 @@ int dict_group_load(DictGroup* dict_group,
       return -1;
     }
   }
-  dictionary = dictionary_open(path, type);
+  dictionary = dict_new(path, type);
   free(path);
-  if (dictionary == (dictionary_t)-1) {
+  if (dictionary == (Dict*)-1) {
     errnum = DICTIONARY_ERROR_INVALID_DICT;
     return -1;
   }
@@ -89,10 +89,10 @@ int dict_group_load(DictGroup* dict_group,
   return 0;
 }
 
-dictionary_t dict_group_get_dict(DictGroup* dict_group, size_t index) {
+Dict* dict_group_get_dict(DictGroup* dict_group, size_t index) {
   if (index >= dict_group->count) {
     errnum = DICTIONARY_ERROR_INVALID_INDEX;
-    return (dictionary_t)-1;
+    return (Dict*)-1;
   }
   return dict_group->dicts[index];
 }
@@ -111,7 +111,7 @@ const ucs4_t* const* dict_group_match_longest(
   size_t i;
   for (i = 0; i < dict_group->count; i++) {
     /* 依次查找每個辭典，取得最長匹配長度 */
-    const ucs4_t* const* t_retval = dictionary_match_longest(
+    const ucs4_t* const* t_retval = dict_match_longest(
       dict_group->dicts[i],
       word,
       maxlen,
@@ -140,7 +140,7 @@ size_t dict_group_get_all_match_lengths(DictGroup* dict_group,
   size_t i;
   for (i = 0; i < dict_group->count; i++) {
     size_t retval;
-    retval = dictionary_get_all_match_lengths(
+    retval = dict_get_all_match_lengths(
       dict_group->dicts[i],
       word,
       match_length + rscnt

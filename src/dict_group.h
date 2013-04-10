@@ -48,7 +48,7 @@ size_t dict_group_get_all_match_lengths(DictGroup* dict_group,
                                               const ucs4_t* word,
                                               size_t* match_length);
 
-dictionary_t dict_group_get_dict(DictGroup* dict_group, size_t index);
+Dict* dict_group_get_dict(DictGroup* dict_group, size_t index);
 
 dictionary_error dictionary_errno(void);
 

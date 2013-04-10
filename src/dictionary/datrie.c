@@ -192,7 +192,7 @@ static int unload_dict(datrie_dictionary_desc* datrie_dictionary) {
   return 0;
 }
 
-dictionary_t dictionary_datrie_open(const char* filename) {
+Dict* dictionary_datrie_open(const char* filename) {
   datrie_dictionary_desc* datrie_dictionary = (datrie_dictionary_desc*)malloc(
     sizeof(datrie_dictionary_desc));
 
@@ -202,18 +202,18 @@ dictionary_t dictionary_datrie_open(const char* filename) {
   FILE* fp = fopen(filename, "rb");
 
   if (load_dict(datrie_dictionary, fp) == -1) {
-    dictionary_datrie_close((dictionary_t)datrie_dictionary);
-    return (dictionary_t)-1;
+    dictionary_datrie_close((Dict*)datrie_dictionary);
+    return (Dict*)-1;
   }
 
   fclose(fp);
 
-  return (dictionary_t)datrie_dictionary;
+  return (Dict*)datrie_dictionary;
 }
 
-int dictionary_datrie_close(dictionary_t t_dictionary) {
+int dictionary_datrie_close(Dict* dict) {
   datrie_dictionary_desc* datrie_dictionary =
-    (datrie_dictionary_desc*)t_dictionary;
+    (datrie_dictionary_desc*)dict;
 
   if (unload_dict(datrie_dictionary) == -1) {
     free(datrie_dictionary);
@@ -256,12 +256,12 @@ void datrie_match(const datrie_dictionary_desc* datrie_dictionary,
   }
 }
 
-const ucs4_t* const* dictionary_datrie_match_longest(dictionary_t t_dictionary,
+const ucs4_t* const* dictionary_datrie_match_longest(Dict* dict,
                                                      const ucs4_t* word,
                                                      size_t maxlen,
                                                      size_t* match_length) {
   datrie_dictionary_desc* datrie_dictionary =
-    (datrie_dictionary_desc*)t_dictionary;
+    (datrie_dictionary_desc*)dict;
 
   size_t pos, item;
 
@@ -286,11 +286,11 @@ const ucs4_t* const* dictionary_datrie_match_longest(dictionary_t t_dictionary,
          datrie_dictionary->lexicon_set[datrie_dictionary->dat[item].word];
 }
 
-size_t dictionary_datrie_get_all_match_lengths(dictionary_t t_dictionary,
+size_t dictionary_datrie_get_all_match_lengths(Dict* dict,
                                                const ucs4_t* word,
                                                size_t* match_length) {
   datrie_dictionary_desc* datrie_dictionary =
-    (datrie_dictionary_desc*)t_dictionary;
+    (datrie_dictionary_desc*)dict;
 
   size_t rscnt = 0;
 

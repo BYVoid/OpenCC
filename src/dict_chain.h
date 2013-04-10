@@ -21,19 +21,12 @@
 
 #include "common.h"
 
-#define DICTIONARY_GROUP_MAX_COUNT 128
-typedef struct {
-  config_t config;
-  size_t count;
-  DictGroup_t groups[DICTIONARY_GROUP_MAX_COUNT];
-} DictChain;
-
 DictChain* dict_chain_new(config_t config);
 
 void dict_chain_delete(DictChain* dict_chain);
 
-DictGroup_t dict_chain_add_group(DictChain* dict_chain);
+DictGroup* dict_chain_add_group(DictChain* dict_chain);
 
-DictGroup_t dict_chain_get_group(DictChain* dict_chain, size_t index);
+DictGroup* dict_chain_get_group(DictChain* dict_chain, size_t index);
 
 #endif /* __DICTIONARY_SET_H_ */

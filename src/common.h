@@ -48,6 +48,26 @@
 
 typedef void* converter_t;
 typedef void* config_t;
-typedef void* DictGroup_t;
+typedef void* dictionary_t;
+
+struct SDictGroup;
+struct SDictChain;
+
+typedef struct SDictGroup DictGroup;
+typedef struct SDictChain DictChain;
+
+#define DICTIONARY_MAX_COUNT 128
+struct SDictGroup {
+  DictChain* DictChain;
+  size_t count;
+  dictionary_t dicts[DICTIONARY_MAX_COUNT];
+};
+
+#define DICTIONARY_GROUP_MAX_COUNT 128
+struct SDictChain {
+  config_t config;
+  size_t count;
+  DictGroup* groups[DICTIONARY_GROUP_MAX_COUNT];
+};
 
 #endif // ifndef __COMMON_H_

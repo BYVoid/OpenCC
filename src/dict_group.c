@@ -20,45 +20,35 @@
 #include "dict_group.h"
 #include "dict_chain.h"
 
-#define DICTIONARY_MAX_COUNT 128
-
-struct _DictGroup {
-  DictChain* DictChain;
-  size_t count;
-  dictionary_t dicts[DICTIONARY_MAX_COUNT];
-};
-typedef struct _DictGroup DictGroup_desc;
-
 static dictionary_error errnum = DICTIONARY_ERROR_VOID;
 
-DictGroup_t DictGroup_open(DictChain* t_DictChain) {
-  DictGroup_desc* DictGroup =
-    (DictGroup_desc*)malloc(sizeof(DictGroup_desc));
-  DictGroup->count = 0;
-  DictGroup->DictChain = t_DictChain;
-  return DictGroup;
+DictGroup* dict_group_new(DictChain* dict_chain) {
+  DictGroup* dict_group =
+    (DictGroup*)malloc(sizeof(DictGroup));
+  dict_group->count = 0;
+  dict_group->DictChain = dict_chain;
+  return dict_group;
 }
 
-void DictGroup_close(DictGroup_t t_dictionary) {
-  DictGroup_desc* DictGroup = (DictGroup_desc*)t_dictionary;
+void dict_group_delete(DictGroup* dict_group) {
   size_t i;
-  for (i = 0; i < DictGroup->count; i++) {
-    dictionary_close(DictGroup->dicts[i]);
+  for (i = 0; i < dict_group->count; i++) {
+    dictionary_close(dict_group->dicts[i]);
   }
-  free(DictGroup);
+  free(dict_group);
 }
 
 static char* try_find_dictionary_with_config(
-  DictGroup_desc* DictGroup,
+  DictGroup* dict_group,
   const char* filename) {
   if (is_absolute_path(filename)) {
     return NULL;
   }
   /* Get config path */
-  if (DictGroup->DictChain == NULL) {
+  if (dict_group->DictChain == NULL) {
     return NULL;
   }
-  config_t config = DictGroup->DictChain->config;
+  config_t config = dict_group->DictChain->config;
   if (config == NULL) {
     return NULL;
   }
@@ -77,14 +67,13 @@ static char* try_find_dictionary_with_config(
   return NULL;
 }
 
-int DictGroup_load(DictGroup_t t_dictionary,
+int dict_group_load(DictGroup* dict_group,
                           const char* filename,
                           opencc_dictionary_type type) {
-  DictGroup_desc* DictGroup = (DictGroup_desc*)t_dictionary;
   dictionary_t dictionary;
   char* path = try_open_file(filename);
   if (path == NULL) {
-    path = try_find_dictionary_with_config(DictGroup, filename);
+    path = try_find_dictionary_with_config(dict_group, filename);
     if (path == NULL) {
       errnum = DICTIONARY_ERROR_CANNOT_ACCESS_DICTFILE;
       return -1;
@@ -96,42 +85,34 @@ int DictGroup_load(DictGroup_t t_dictionary,
     errnum = DICTIONARY_ERROR_INVALID_DICT;
     return -1;
   }
-  DictGroup->dicts[DictGroup->count++] = dictionary;
+  dict_group->dicts[dict_group->count++] = dictionary;
   return 0;
 }
 
-dictionary_t DictGroup_get_dictionary(DictGroup_t t_dictionary,
-                                             size_t index) {
-  DictGroup_desc* DictGroup = (DictGroup_desc*)t_dictionary;
-  if (index >= DictGroup->count) {
+dictionary_t dict_group_get_dict(DictGroup* dict_group, size_t index) {
+  if (index >= dict_group->count) {
     errnum = DICTIONARY_ERROR_INVALID_INDEX;
     return (dictionary_t)-1;
   }
-  return DictGroup->dicts[index];
+  return dict_group->dicts[index];
 }
 
-size_t DictGroup_count(DictGroup_t t_dictionary) {
-  DictGroup_desc* DictGroup = (DictGroup_desc*)t_dictionary;
-  return DictGroup->count;
-}
-
-const ucs4_t* const* DictGroup_match_longest(
-  DictGroup_t t_dictionary,
-  const ucs4_t* word,
-  size_t maxlen,
-  size_t* match_length) {
-  DictGroup_desc* DictGroup = (DictGroup_desc*)t_dictionary;
-  if (DictGroup->count == 0) {
+const ucs4_t* const* dict_group_match_longest(
+    DictGroup* dict_group,
+    const ucs4_t* word,
+    size_t maxlen,
+    size_t* match_length) {
+  if (dict_group->count == 0) {
     errnum = DICTIONARY_ERROR_NODICT;
     return (const ucs4_t* const*)-1;
   }
   const ucs4_t* const* retval = NULL;
   size_t t_match_length, max_length = 0;
   size_t i;
-  for (i = 0; i < DictGroup->count; i++) {
+  for (i = 0; i < dict_group->count; i++) {
     /* 依次查找每個辭典，取得最長匹配長度 */
     const ucs4_t* const* t_retval = dictionary_match_longest(
-      DictGroup->dicts[i],
+      dict_group->dicts[i],
       word,
       maxlen,
       &t_match_length);
@@ -148,20 +129,19 @@ const ucs4_t* const* DictGroup_match_longest(
   return retval;
 }
 
-size_t DictGroup_get_all_match_lengths(DictGroup_t t_dictionary,
+size_t dict_group_get_all_match_lengths(DictGroup* dict_group,
                                               const ucs4_t* word,
                                               size_t* match_length) {
-  DictGroup_desc* DictGroup = (DictGroup_desc*)t_dictionary;
-  if (DictGroup->count == 0) {
+  if (dict_group->count == 0) {
     errnum = DICTIONARY_ERROR_NODICT;
     return (size_t)-1;
   }
   size_t rscnt = 0;
   size_t i;
-  for (i = 0; i < DictGroup->count; i++) {
+  for (i = 0; i < dict_group->count; i++) {
     size_t retval;
     retval = dictionary_get_all_match_lengths(
-      DictGroup->dicts[i],
+      dict_group->dicts[i],
       word,
       match_length + rscnt
       );
@@ -206,10 +186,4 @@ void dictionary_perror(const char* spec) {
   default:
     perr(_("Unknown"));
   }
-}
-
-DictChain* DictGroup_get_DictChain(
-  DictGroup_t t_dictionary) {
-  DictGroup_desc* DictGroup = (DictGroup_desc*)t_dictionary;
-  return DictGroup->DictChain;
 }

@@ -19,6 +19,7 @@
 #ifndef __OPENCC_DICTIONARY_ABSTRACT_H_
 #define __OPENCC_DICTIONARY_ABSTRACT_H_
 
+#include "../common.h"
 #include "../utils.h"
 
 struct _entry {
@@ -27,7 +28,6 @@ struct _entry {
 };
 typedef struct _entry entry;
 
-typedef void* dictionary_t;
 
 dictionary_t dictionary_open(const char* filename, opencc_dictionary_type type);
 

@@ -233,15 +233,14 @@ int cmp(const void* a, const void* b) {
 }
 
 void init(const char* filename) {
-  DictGroup_t DictGroup = DictGroup_open(NULL);
-  if (DictGroup_load(DictGroup, filename,
+  DictGroup* DictGroup = dict_group_new(NULL);
+  if (dict_group_load(DictGroup, filename,
                             OPENCC_DICTIONARY_TYPE_TEXT) == -1) {
     dictionary_perror("Dictionary loading error");
     fprintf(stderr, _("\n"));
     exit(1);
   }
-  dictionary_t t_dictionary =
-    DictGroup_get_dictionary(DictGroup, 0);
+  dictionary_t t_dictionary = dict_group_get_dict(DictGroup, 0);
   if (t_dictionary == (dictionary_t)-1) {
     dictionary_perror("Dictionary loading error");
     fprintf(stderr, _("\n"));

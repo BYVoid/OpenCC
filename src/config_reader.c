@@ -21,7 +21,6 @@
 #include "dict_chain.h"
 
 #define BUFFER_SIZE 8192
-#define DICTIONARY_MAX_COUNT 1024
 #define CONFIG_DICT_TYPE_OCD "OCD"
 #define CONFIG_DICT_TYPE_TEXT "TEXT"
 
@@ -64,13 +63,13 @@ static int load_dictionary(config_desc* config) {
 		    sizeof(config->dicts[0]),
 		    qsort_dictionary_buffer_cmp);
   size_t i, last_index = 0;
-  DictGroup_t group = dict_chain_add_group(config->DictChain);
+  DictGroup* group = dict_chain_add_group(config->DictChain);
   for (i = 0; i < config->dicts_count; i++) {
     if (config->dicts[i].index > last_index) {
       last_index = config->dicts[i].index;
       group = dict_chain_add_group(config->DictChain);
     }
-    DictGroup_load(group,
+    dict_group_load(group,
                           config->dicts[i].file_name,
                           config->dicts[i].dict_type);
   }

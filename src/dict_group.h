@@ -20,7 +20,6 @@
 #define __DICTIONARY_GROUP_H_
 
 #include "common.h"
-#include "dict_chain.h"
 #include "dictionary/abstract.h"
 
 typedef enum {
@@ -31,34 +30,28 @@ typedef enum {
   DICTIONARY_ERROR_INVALID_INDEX,
 } dictionary_error;
 
-DictGroup_t DictGroup_open(DictChain* t_DictChain);
+DictGroup* dict_group_new(DictChain* t_DictChain);
 
-void DictGroup_close(DictGroup_t t_dictionary);
+void dict_group_delete(DictGroup* dict_group);
 
-int DictGroup_load(DictGroup_t t_dictionary,
+int dict_group_load(DictGroup* dict_group,
                           const char* filename,
                           opencc_dictionary_type type);
 
-const ucs4_t* const* DictGroup_match_longest(
-    DictGroup_t t_dictionary,
+const ucs4_t* const* dict_group_match_longest(
+    DictGroup* dict_group,
     const ucs4_t* word,
     size_t maxlen,
     size_t* match_length);
 
-size_t DictGroup_get_all_match_lengths(DictGroup_t t_dictionary,
+size_t dict_group_get_all_match_lengths(DictGroup* dict_group,
                                               const ucs4_t* word,
                                               size_t* match_length);
 
-dictionary_t DictGroup_get_dictionary(DictGroup_t t_dictionary,
-                                             size_t index);
-
-size_t DictGroup_count(DictGroup_t t_dictionary);
+dictionary_t dict_group_get_dict(DictGroup* dict_group, size_t index);
 
 dictionary_error dictionary_errno(void);
 
 void dictionary_perror(const char* spec);
-
-DictChain* DictGroup_get_DictChain(
-    DictGroup_t t_dictionary);
 
 #endif /* __DICTIONARY_GROUP_H_ */

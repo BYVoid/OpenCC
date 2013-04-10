@@ -29,23 +29,23 @@ DictChain* dict_chain_new(config_t config) {
 void dict_chain_delete(DictChain* dict_chain) {
   size_t i;
   for (i = 0; i < dict_chain->count; i++) {
-    DictGroup_close(dict_chain->groups[i]);
+    dict_group_delete(dict_chain->groups[i]);
   }
   free(dict_chain);
 }
 
-DictGroup_t dict_chain_add_group(DictChain* dict_chain) {
+DictGroup* dict_chain_add_group(DictChain* dict_chain) {
   if (dict_chain->count + 1 == DICTIONARY_GROUP_MAX_COUNT) {
-    return (DictGroup_t)-1;
+    return (DictGroup*)-1;
   }
-  DictGroup_t group = DictGroup_open(dict_chain);
+  DictGroup* group = dict_group_new(dict_chain);
   dict_chain->groups[dict_chain->count++] = group;
   return group;
 }
 
-DictGroup_t dict_chain_get_group(DictChain* dict_chain, size_t index) {
+DictGroup* dict_chain_get_group(DictChain* dict_chain, size_t index) {
   if (index >= dict_chain->count) {
-    return (DictGroup_t)-1;
+    return (DictGroup*)-1;
   }
   return dict_chain->groups[index];
 }

@@ -174,14 +174,14 @@ int opencc_dict_load(opencc_t t_opencc,
     lib_initialize();
   }
   opencc_desc* opencc = (opencc_desc*)t_opencc;
-  DictGroup_t DictGroup;
+  DictGroup* DictGroup;
   if (opencc->DictChain == NULL) {
     opencc->DictChain = dict_chain_new(NULL);
     DictGroup = dict_chain_add_group(opencc->DictChain);
   } else {
     DictGroup = dict_chain_get_group(opencc->DictChain, 0);
   }
-  int retval = DictGroup_load(DictGroup, dict_filename, dict_type);
+  int retval = dict_group_load(DictGroup, dict_filename, dict_type);
   if (retval == -1) {
     errnum = OPENCC_ERROR_DICTLOAD;
     return -1;

@@ -47,7 +47,7 @@ typedef struct {
   spseg_buffer_desc spseg_buffer;
 #endif /* if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH */
   DictChain* DictChain;
-  DictGroup_t current_DictGroup;
+  DictGroup* current_DictGroup;
   opencc_conversion_mode conversion_mode;
 } converter_desc;
 static converter_error errnum = CONVERTER_ERROR_VOID;
@@ -81,7 +81,7 @@ static size_t sp_seg(converter_desc* converter,
   /* 最短路徑分詞 */
   /* 對長度爲1時特殊優化 */
   if (length == 1) {
-    const ucs4_t* const* match_rs = DictGroup_match_longest(
+    const ucs4_t* const* match_rs = dict_group_match_longest(
       converter->current_DictGroup,
       *inbuf,
       1,
@@ -174,7 +174,7 @@ static size_t sp_seg(converter_desc* converter,
   ossb->min_len[0] = ossb->parent[0] = 0;
   for (i = 0; i < length; i++) {
     /* 獲取所有匹配長度 */
-    size_t match_count = DictGroup_get_all_match_lengths(
+    size_t match_count = dict_group_get_all_match_lengths(
       converter->current_DictGroup,
       (*inbuf) + i,
       ossb->match_length
@@ -206,7 +206,7 @@ static size_t sp_seg(converter_desc* converter,
   for (i = begin = 0; i < ossb->min_len[length]; i++) {
     end = ossb->path[i];
     size_t match_len;
-    const ucs4_t* const* match_rs = DictGroup_match_longest(
+    const ucs4_t* const* match_rs = dict_group_match_longest(
       converter->current_DictGroup,
       *inbuf,
       end - begin,
@@ -338,7 +338,7 @@ static size_t segment(converter_desc* converter,
       start = i;
     }
     size_t match_len;
-    DictGroup_match_longest(
+    dict_group_match_longest(
       converter->current_DictGroup,
       inbuf_start + i,
       0,
@@ -389,7 +389,7 @@ static size_t segment(converter_desc* converter,
   size_t inbuf_left_start = *inbuf_left;
   for (; **inbuf && *inbuf_left > 0 && *outbuf_left > 0;) {
     size_t match_len;
-    const ucs4_t* const* match_rs = DictGroup_match_longest(
+    const ucs4_t* const* match_rs = dict_group_match_longest(
       converter->current_DictGroup,
       *inbuf,
       *inbuf_left,

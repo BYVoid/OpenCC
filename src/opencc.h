@@ -23,6 +23,12 @@
 #ifndef __OPENCC_H_
 #define __OPENCC_H_
 
+/**
+ * @defgroup opencc_api OpenCC API
+ * 
+ * OpenCC API in C language
+ */
+
 #include "opencc_types.h"
 
 #ifdef __cplusplus
@@ -31,11 +37,15 @@ extern "C" {
 
 /**
  * Filename of default Simplified to Traditional configuration.
+ *
+ * @ingroup opencc_api
  */
 #define OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD "zhs2zht.ini"
 
 /**
  * Filename of default Traditional to Simplified configuration.
+ *
+ * @ingroup opencc_api
  */
 #define OPENCC_DEFAULT_CONFIG_TRAD_TO_SIMP "zht2zhs.ini"
 
@@ -46,6 +56,7 @@ extern "C" {
  * @param config_file Location of configuration file.
  * @return            A description pointer of the newly allocated instance of
  *                    opencc. On error the return value will be (opencc_t) -1.
+ * @ingroup opencc_api
  */
 opencc_t opencc_open(const char* config_file);
 
@@ -70,6 +81,7 @@ int opencc_close(opencc_t od);
  *
  * @return           The number of characters in the input buffer that has been
  *                   converted.
+ * @ingroup opencc_api
  */
 size_t opencc_convert(opencc_t od,
                       ucs4_t** inbuf,
@@ -90,6 +102,7 @@ size_t opencc_convert(opencc_t od,
  *
  * @return       The newly allocated UTF-8 string that stores text converted
  *               from inbuf.
+ * @ingroup opencc_api
  */
 char* opencc_convert_utf8(opencc_t od, const char* inbuf, size_t length);
 
@@ -102,21 +115,23 @@ char* opencc_convert_utf8(opencc_t od, const char* inbuf, size_t length);
  *
  * @return               0 on success or non-zero number on failure.
  *
- * @deprecated
+ * @ingroup opencc_api
+ * @deprecated This function is not recommended to use and will be removed.
  */
 int opencc_dict_load(opencc_t od,
                      const char* dict_filename,
                      opencc_dictionary_type dict_type);
 
 /**
-  * Changes the mode of conversion.
-  *
-  * @param od               The opencc description pointer.
-  * @param conversion_mode  Conversion mode. Options are
-  *                         - OPENCC_CONVERSION_FAST
-  *                         - OPENCC_CONVERSION_SEGMENT_ONLY
-  *                         - OPENCC_CONVERSION_LIST_CANDIDATES
-  */
+ * Changes the mode of conversion.
+ *
+ * @param od               The opencc description pointer.
+ * @param conversion_mode  Conversion mode. Options are
+ *                         - OPENCC_CONVERSION_FAST
+ *                         - OPENCC_CONVERSION_SEGMENT_ONLY
+ *                         - OPENCC_CONVERSION_LIST_CANDIDATES
+ * @ingroup opencc_api
+ */
 void opencc_set_conversion_mode(opencc_t od,
                                 opencc_conversion_mode conversion_mode);
 
@@ -131,6 +146,7 @@ opencc_error opencc_errno(void);
  * Prints the error message to stderr.
  *
  * @param spec Prefix message.
+ * @ingroup opencc_api
  */
 void opencc_perror(const char* spec);
 

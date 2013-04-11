@@ -14,6 +14,8 @@ Introduction (詳細介紹) https://code.google.com/p/opencc/wiki/Introduction
 
 Development Documentation http://byvoid.github.io/OpenCC/
 
+Source Code on Github https://github.com/byvoid/opencc
+
 ## Projects using Opencc
 
 * [ibus-pinyin](http://code.google.com/p/ibus/)

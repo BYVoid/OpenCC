@@ -20,64 +20,47 @@
 #include "dict_group.h"
 #include "dict_chain.h"
 
-#define BUFFER_SIZE 8192
+#define LINE_BUFFER_SIZE 8192
 #define CONFIG_DICT_TYPE_OCD "OCD"
 #define CONFIG_DICT_TYPE_TEXT "TEXT"
-
-typedef struct {
-  opencc_dictionary_type dict_type;
-  char* file_name;
-  size_t index;
-  size_t stamp;
-} dictionary_buffer;
-
-struct _config_desc {
-  char* title;
-  char* description;
-  DictChain* DictChain;
-  char* file_path;
-  dictionary_buffer dicts[DICTIONARY_MAX_COUNT];
-  size_t dicts_count;
-  size_t stamp;
-};
-typedef struct _config_desc config_desc;
 
 static config_error errnum = CONFIG_ERROR_VOID;
 
 static int qsort_dictionary_buffer_cmp(const void* a, const void* b) {
-  if (((dictionary_buffer*)a)->index < ((dictionary_buffer*)b)->index) {
+  if (((DictMeta*)a)->index < ((DictMeta*)b)->index) {
     return -1;
   }
-  if (((dictionary_buffer*)a)->index > ((dictionary_buffer*)b)->index) {
+  if (((DictMeta*)a)->index > ((DictMeta*)b)->index) {
     return 1;
   }
-  return ((dictionary_buffer*)a)->stamp < ((dictionary_buffer*)b)->stamp ? -1 : 1;
+  return ((DictMeta*)a)->stamp < ((DictMeta*)b)->stamp ? -1 : 1;
 }
 
-static int load_dictionary(config_desc* config) {
+static int load_dictionary(Config* config) {
   if (config->dicts_count == 0) {
     return 0;
   }
+  // Sort dictionaries
   qsort(config->dicts,
 		    config->dicts_count,
 		    sizeof(config->dicts[0]),
 		    qsort_dictionary_buffer_cmp);
-  size_t i, last_index = 0;
-  DictGroup* group = dict_chain_add_group(config->DictChain);
+  DictGroup* group = dict_chain_add_group(config->dict_chain);
+  size_t last_index = 0;
+  size_t i;
   for (i = 0; i < config->dicts_count; i++) {
     if (config->dicts[i].index > last_index) {
       last_index = config->dicts[i].index;
-      group = dict_chain_add_group(config->DictChain);
+      group = dict_chain_add_group(config->dict_chain);
     }
     dict_group_load(group,
-                          config->dicts[i].file_name,
-                          config->dicts[i].dict_type);
+                    config->dicts[i].file_name,
+                    config->dicts[i].dict_type);
   }
   return 0;
 }
 
-static int parse_add_dict(config_desc* config, size_t index,
-                          const char* dictstr) {
+static int parse_add_dict(Config* config, size_t index, const char* dictstr) {
   const char* pstr = dictstr;
   while (*pstr != '\0' && *pstr != ' ') {
     pstr++;
@@ -104,8 +87,7 @@ static int parse_add_dict(config_desc* config, size_t index,
   return 0;
 }
 
-static int parse_property(config_desc* config, const char* key,
-                          const char* value) {
+static int parse_property(Config* config, const char* key, const char* value) {
   if (strncmp(key, "dict", 4) == 0) {
     int index = 0;
     sscanf(key + 4, "%d", &index);
@@ -158,7 +140,7 @@ static char* parse_trim(char* str) {
   return str;
 }
 
-static int parse(config_desc* config, const char* filename) {
+static int parse(Config* config, const char* filename) {
   char* path = try_open_file(filename);
   if (path == NULL) {
     errnum = CONFIG_ERROR_CANNOT_ACCESS_CONFIG_FILE;
@@ -169,8 +151,8 @@ static int parse(config_desc* config, const char* filename) {
   assert(fp != NULL);
   free(path);
   skip_utf8_bom(fp);
-  static char buff[BUFFER_SIZE];
-  while (fgets(buff, BUFFER_SIZE, fp) != NULL) {
+  static char buff[LINE_BUFFER_SIZE];
+  while (fgets(buff, LINE_BUFFER_SIZE, fp) != NULL) {
     char* trimed_buff = parse_trim(buff);
     if ((*trimed_buff == ';') || (*trimed_buff == '#') ||
         (*trimed_buff == '\0')) {
@@ -198,14 +180,13 @@ static int parse(config_desc* config, const char* filename) {
   return 0;
 }
 
-DictChain* config_get_DictChain(config_t t_config) {
-  config_desc* config = (config_desc*)t_config;
-  if (config->DictChain != NULL) {
-    dict_chain_delete(config->DictChain);
+DictChain* config_get_dict_chain(Config* config) {
+  if (config->dict_chain != NULL) {
+    dict_chain_delete(config->dict_chain);
   }
-  config->DictChain = dict_chain_new(t_config);
+  config->dict_chain = dict_chain_new(config);
   load_dictionary(config);
-  return config->DictChain;
+  return config->dict_chain;
 }
 
 config_error config_errno(void) {
@@ -235,23 +216,22 @@ void config_perror(const char* spec) {
   }
 }
 
-config_t config_open(const char* filename) {
-  config_desc* config = (config_desc*)malloc(sizeof(config_desc));
+Config* config_open(const char* filename) {
+  Config* config = (Config*)malloc(sizeof(Config));
   config->title = NULL;
   config->description = NULL;
   config->dicts_count = 0;
   config->stamp = 0;
-  config->DictChain = NULL;
+  config->dict_chain = NULL;
   config->file_path = NULL;
   if (parse(config, filename) == -1) {
-    config_close((config_t)config);
-    return (config_t)-1;
+    config_close((Config*)config);
+    return (Config*)-1;
   }
-  return (config_t)config;
+  return (Config*)config;
 }
 
-void config_close(config_t t_config) {
-  config_desc* config = (config_desc*)t_config;
+void config_close(Config* config) {
   size_t i;
   for (i = 0; i < config->dicts_count; i++) {
     free(config->dicts[i].file_name);
@@ -260,9 +240,4 @@ void config_close(config_t t_config) {
   free(config->description);
   free(config->file_path);
   free(config);
-}
-
-const char* config_get_file_path(config_t t_config) {
-  config_desc* config = (config_desc*)t_config;
-  return config->file_path;
 }

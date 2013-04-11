@@ -30,16 +30,14 @@ typedef enum {
   CONFIG_ERROR_INVALID_DICT_TYPE,
 } config_error;
 
-config_t config_open(const char* filename);
+Config* config_open(const char* filename);
 
-void config_close(config_t t_config);
+void config_close(Config* config);
 
-DictChain* config_get_DictChain(config_t t_config);
+DictChain* config_get_dict_chain(Config* config);
 
 config_error config_errno(void);
 
 void config_perror(const char* spec);
-
-const char* config_get_file_path(config_t t_config);
 
 #endif /* __OPENCC_CONFIG_H_ */

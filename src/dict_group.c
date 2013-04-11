@@ -26,7 +26,7 @@ DictGroup* dict_group_new(DictChain* dict_chain) {
   DictGroup* dict_group =
     (DictGroup*)malloc(sizeof(DictGroup));
   dict_group->count = 0;
-  dict_group->DictChain = dict_chain;
+  dict_group->dict_chain = dict_chain;
   return dict_group;
 }
 
@@ -45,14 +45,14 @@ static char* try_find_dictionary_with_config(
     return NULL;
   }
   /* Get config path */
-  if (dict_group->DictChain == NULL) {
+  if (dict_group->dict_chain == NULL) {
     return NULL;
   }
-  config_t config = dict_group->DictChain->config;
+  Config* config = dict_group->dict_chain->config;
   if (config == NULL) {
     return NULL;
   }
-  const char* config_path = config_get_file_path(config);
+  const char* config_path = config->file_path;
   if (config_path == NULL) {
     return NULL;
   }

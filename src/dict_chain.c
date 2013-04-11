@@ -19,7 +19,7 @@
 #include "dict_group.h"
 #include "dict_chain.h"
 
-DictChain* dict_chain_new(config_t config) {
+DictChain* dict_chain_new(Config* config) {
   DictChain* dict_chain = (DictChain*)malloc(sizeof(DictChain));
   dict_chain->count = 0;
   dict_chain->config = config;

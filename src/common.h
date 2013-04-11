@@ -40,15 +40,18 @@
 #endif // ENABLE_GETTEXT
 
 typedef void* converter_t;
-typedef void* config_t;
 
+struct SConfig;
 struct SDict;
 struct SDictGroup;
 struct SDictChain;
+struct SDictMeta;
 
+typedef struct SConfig Config;
 typedef struct SDict Dict;
 typedef struct SDictGroup DictGroup;
 typedef struct SDictChain DictChain;
+typedef struct SDictMeta DictMeta;
 
 struct SDict {
   opencc_dictionary_type type;
@@ -57,16 +60,33 @@ struct SDict {
 
 #define DICTIONARY_MAX_COUNT 128
 struct SDictGroup {
-  DictChain* DictChain;
+  DictChain* dict_chain;
   size_t count;
   Dict* dicts[DICTIONARY_MAX_COUNT];
 };
 
 #define DICTIONARY_GROUP_MAX_COUNT 128
 struct SDictChain {
-  config_t config;
+  Config* config;
   size_t count;
   DictGroup* groups[DICTIONARY_GROUP_MAX_COUNT];
+};
+
+struct SDictMeta {
+  opencc_dictionary_type dict_type;
+  char* file_name;
+  size_t index;
+  size_t stamp;
+};
+
+struct SConfig {
+  char* title;
+  char* description;
+  DictChain* dict_chain;
+  char* file_path;
+  DictMeta dicts[DICTIONARY_MAX_COUNT];
+  size_t dicts_count;
+  size_t stamp;
 };
 
 #endif // __COMMON_H_

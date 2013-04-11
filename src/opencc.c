@@ -142,12 +142,12 @@ opencc_t opencc_open(const char* config_file) {
     assert(0);
   } else {
     /* Load config */
-    config_t config = config_open(config_file);
-    if (config == (config_t)-1) {
+    Config* config = config_open(config_file);
+    if (config == (Config*)-1) {
       errnum = OPENCC_ERROR_CONFIG;
       return (opencc_t)-1;
     }
-    opencc->DictChain = config_get_DictChain(config);
+    opencc->DictChain = config_get_dict_chain(config);
     converter_assign_dictionary(opencc->converter, opencc->DictChain);
     config_close(config);
   }

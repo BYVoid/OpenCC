@@ -21,7 +21,7 @@
 
 #include "common.h"
 
-DictChain* dict_chain_new(config_t config);
+DictChain* dict_chain_new(Config* config);
 
 void dict_chain_delete(DictChain* dict_chain);
 

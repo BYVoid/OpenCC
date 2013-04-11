@@ -28,9 +28,7 @@
 #define SEGMENT_METHOD SEGMENT_SHORTEST_PATH
 
 #if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
-
 # define OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE 1024
-
 typedef struct {
   int initialized;
   size_t buffer_size;
@@ -38,29 +36,20 @@ typedef struct {
   size_t* min_len;
   size_t* parent;
   size_t* path;
-} spseg_buffer_desc;
+} SpsegData;
+#endif
 
-#endif /* if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH */
-
-typedef struct {
-#if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
-  spseg_buffer_desc spseg_buffer;
-#endif /* if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH */
-  DictChain* DictChain;
-  DictGroup* current_DictGroup;
-  opencc_conversion_mode conversion_mode;
-} converter_desc;
 static converter_error errnum = CONVERTER_ERROR_VOID;
 
 #if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
-static void sp_seg_buffer_free(spseg_buffer_desc* ossb) {
+static void sp_seg_buffer_free(SpsegData* ossb) {
   free(ossb->match_length);
   free(ossb->min_len);
   free(ossb->parent);
   free(ossb->path);
 }
 
-static void sp_seg_set_buffer_size(spseg_buffer_desc* ossb, size_t buffer_size) {
+static void sp_seg_set_buffer_size(SpsegData* ossb, size_t buffer_size) {
   if (ossb->initialized == TRUE) {
     sp_seg_buffer_free(ossb);
   }
@@ -72,7 +61,7 @@ static void sp_seg_set_buffer_size(spseg_buffer_desc* ossb, size_t buffer_size) 
   ossb->initialized = TRUE;
 }
 
-static size_t sp_seg(converter_desc* converter,
+static size_t sp_seg(Converter* converter,
                      ucs4_t** inbuf,
                      size_t* inbuf_left,
                      ucs4_t** outbuf,
@@ -82,7 +71,7 @@ static size_t sp_seg(converter_desc* converter,
   /* 對長度爲1時特殊優化 */
   if (length == 1) {
     const ucs4_t* const* match_rs = dict_group_match_longest(
-      converter->current_DictGroup,
+      converter->current_dict_group,
       *inbuf,
       1,
       NULL);
@@ -162,10 +151,10 @@ static size_t sp_seg(converter_desc* converter,
   }
 
   /* 設置緩衝區空間 */
-  spseg_buffer_desc* ossb = &(converter->spseg_buffer);
+  SpsegData* ossb = converter->data;
   size_t buffer_size_need = length + 1;
   if ((ossb->initialized == FALSE) || (ossb->buffer_size < buffer_size_need)) {
-    sp_seg_set_buffer_size(&(converter->spseg_buffer), buffer_size_need);
+    sp_seg_set_buffer_size(ossb, buffer_size_need);
   }
   size_t i, j;
   for (i = 0; i <= length; i++) {
@@ -175,7 +164,7 @@ static size_t sp_seg(converter_desc* converter,
   for (i = 0; i < length; i++) {
     /* 獲取所有匹配長度 */
     size_t match_count = dict_group_get_all_match_lengths(
-      converter->current_DictGroup,
+      converter->current_dict_group,
       (*inbuf) + i,
       ossb->match_length
       );
@@ -207,7 +196,7 @@ static size_t sp_seg(converter_desc* converter,
     end = ossb->path[i];
     size_t match_len;
     const ucs4_t* const* match_rs = dict_group_match_longest(
-      converter->current_DictGroup,
+      converter->current_dict_group,
       *inbuf,
       end - begin,
       &match_len
@@ -302,7 +291,7 @@ static size_t sp_seg(converter_desc* converter,
   return inbuf_left_start - *inbuf_left;
 }
 
-static size_t segment(converter_desc* converter,
+static size_t segment(Converter* converter,
                       ucs4_t** inbuf,
                       size_t* inbuf_left,
                       ucs4_t** outbuf,
@@ -339,7 +328,7 @@ static size_t segment(converter_desc* converter,
     }
     size_t match_len;
     dict_group_match_longest(
-      converter->current_DictGroup,
+      converter->current_dict_group,
       inbuf_start + i,
       0,
       &match_len
@@ -380,7 +369,7 @@ static size_t segment(converter_desc* converter,
 #endif /* if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH */
 
 #if SEGMENT_METHOD == SEGMENT_MAXIMUM_LENGTH
-static size_t segment(converter_desc* converter,
+static size_t segment(Converter* converter,
                       ucs4_t** inbuf,
                       size_t* inbuf_left,
                       ucs4_t** outbuf,
@@ -390,7 +379,7 @@ static size_t segment(converter_desc* converter,
   for (; **inbuf && *inbuf_left > 0 && *outbuf_left > 0;) {
     size_t match_len;
     const ucs4_t* const* match_rs = dict_group_match_longest(
-      converter->current_DictGroup,
+      converter->current_dict_group,
       *inbuf,
       *inbuf_left,
       &match_len
@@ -484,17 +473,16 @@ static size_t segment(converter_desc* converter,
 
 #endif /* if SEGMENT_METHOD == SEGMENT_MAXIMUM_LENGTH */
 
-size_t converter_convert(converter_t t_converter,
+size_t converter_convert(Converter* converter,
                          ucs4_t** inbuf,
                          size_t* inbuf_left,
                          ucs4_t** outbuf,
                          size_t* outbuf_left) {
-  converter_desc* converter = (converter_desc*)t_converter;
-  if (converter->DictChain == NULL) {
+  if (converter->dict_chain == NULL) {
     errnum = CONVERTER_ERROR_NODICT;
     return (size_t)-1;
   }
-  if (converter->DictChain->count == 1) {
+  if (converter->dict_chain->count == 1) {
     /* 只有一個辭典，直接輸出 */
     return segment(converter,
 							     inbuf,
@@ -516,8 +504,7 @@ size_t converter_convert(converter_t t_converter,
   coutbuf_left = outbuf_size;
   cinbuf = *inbuf;
   coutbuf = tmpbuf;
-  for (i = cur = 0; i < converter->DictChain->count;
-       ++i, cur = 1 - cur) {
+  for (i = cur = 0; i < converter->dict_chain->count; ++i, cur = 1 - cur) {
     if (i > 0) {
       cinbuf_left = coutbuf_delta;
       coutbuf_left = outbuf_size;
@@ -530,8 +517,8 @@ size_t converter_convert(converter_t t_converter,
         coutbuf = tmpbuf;
       }
     }
-    converter->current_DictGroup = dict_chain_get_group(
-      converter->DictChain,
+    converter->current_dict_group = dict_chain_get_group(
+      converter->dict_chain,
       i);
     size_t ret = segment(converter,
 									      &cinbuf,
@@ -559,45 +546,42 @@ size_t converter_convert(converter_t t_converter,
   return retval;
 }
 
-void converter_assign_dictionary(converter_t t_converter,
-                                 DictChain* DictChain) {
-  converter_desc* converter = (converter_desc*)t_converter;
-  converter->DictChain = DictChain;
-  if (converter->DictChain->count > 0) {
-    converter->current_DictGroup = dict_chain_get_group(
-      converter->DictChain,
+void converter_assign_dictionary(Converter* converter, DictChain* dict_chain) {
+  converter->dict_chain = dict_chain;
+  if (converter->dict_chain->count > 0) {
+    converter->current_dict_group = dict_chain_get_group(
+      converter->dict_chain,
       0);
   }
 }
 
-converter_t converter_open(void) {
-  converter_desc* converter = (converter_desc*)
-                              malloc(sizeof(converter_desc));
-  converter->DictChain = NULL;
-  converter->current_DictGroup = NULL;
+Converter* converter_open(void) {
+  Converter* converter = (Converter*)malloc(sizeof(Converter));
+  converter->dict_chain = NULL;
+  converter->current_dict_group = NULL;
 #if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
-  converter->spseg_buffer.initialized = FALSE;
-  converter->spseg_buffer.match_length = converter->spseg_buffer.min_len
-                                           = converter->spseg_buffer.parent =
-                                               converter->spseg_buffer.path =
-                                                 NULL;
-  sp_seg_set_buffer_size(&converter->spseg_buffer,
-                         OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE);
+  converter->data = (SpsegData*)malloc(sizeof(SpsegData));
+  SpsegData* spseg_buffer = converter->data;
+  spseg_buffer->initialized = FALSE;
+  spseg_buffer->match_length = NULL;
+  spseg_buffer->min_len = NULL;
+  spseg_buffer->parent = NULL;
+  spseg_buffer->path = NULL;
+  sp_seg_set_buffer_size(spseg_buffer, OPENCC_SP_SEG_DEFAULT_BUFFER_SIZE);
 #endif /* if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH */
-  return (converter_t)converter;
+  return converter;
 }
 
-void converter_close(converter_t t_converter) {
-  converter_desc* converter = (converter_desc*)t_converter;
+void converter_close(Converter* converter) {
 #if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
-  sp_seg_buffer_free(&(converter->spseg_buffer));
+  sp_seg_buffer_free(converter->data);
+  free((SpsegData *)converter->data);
 #endif /* if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH */
   free(converter);
 }
 
-void converter_set_conversion_mode(converter_t t_converter,
+void converter_set_conversion_mode(Converter* converter,
                                    opencc_conversion_mode conversion_mode) {
-  converter_desc* converter = (converter_desc*)t_converter;
   converter->conversion_mode = conversion_mode;
 }
 

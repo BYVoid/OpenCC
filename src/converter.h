@@ -28,20 +28,19 @@ typedef enum {
   CONVERTER_ERROR_OUTBUF,
 } converter_error;
 
-void converter_assign_dictionary(converter_t t_converter,
-                                 DictChain* DictChain);
+void converter_assign_dictionary(Converter* converter, DictChain* DictChain);
 
-converter_t converter_open(void);
+Converter* converter_open(void);
 
-void converter_close(converter_t t_converter);
+void converter_close(Converter* converter);
 
-size_t converter_convert(converter_t t_converter,
+size_t converter_convert(Converter* converter,
                          ucs4_t** inbuf,
                          size_t* inbuf_left,
                          ucs4_t** outbuf,
                          size_t* outbuf_left);
 
-void converter_set_conversion_mode(converter_t t_converter,
+void converter_set_conversion_mode(Converter* converter,
                                    opencc_conversion_mode conversion_mode);
 
 converter_error converter_errno(void);

@@ -26,7 +26,7 @@
 
 typedef struct {
   DictChain* DictChain;
-  converter_t converter;
+  Converter* converter;
 } opencc_desc;
 
 static opencc_error errnum = OPENCC_ERROR_VOID;

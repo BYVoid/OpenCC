@@ -39,15 +39,15 @@
 # define _(STRING) STRING
 #endif // ENABLE_GETTEXT
 
-typedef void* converter_t;
-
 struct SConfig;
+struct SConverter;
 struct SDict;
 struct SDictGroup;
 struct SDictChain;
 struct SDictMeta;
 
 typedef struct SConfig Config;
+typedef struct SConverter Converter;
 typedef struct SDict Dict;
 typedef struct SDictGroup DictGroup;
 typedef struct SDictChain DictChain;
@@ -87,6 +87,13 @@ struct SConfig {
   DictMeta dicts[DICTIONARY_MAX_COUNT];
   size_t dicts_count;
   size_t stamp;
+};
+
+struct SConverter {
+  opencc_conversion_mode conversion_mode;
+  DictChain* dict_chain;
+  DictGroup* current_dict_group;
+  void* data;
 };
 
 #endif // __COMMON_H_

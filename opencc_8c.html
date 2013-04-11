@@ -40,8 +40,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -71,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -94,7 +96,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>OpenCC API.  
+<p><a class="el" href="class_open_c_c.html" title="OpenCC Node.js API.">OpenCC</a> API.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;common.h&quot;</code><br/>
 <code>#include &quot;config_reader.h&quot;</code><br/>
@@ -113,33 +115,33 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a06663d5bdc87ad1cb9e1adcd3dc35ce9"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="opencc_8c.html#a06663d5bdc87ad1cb9e1adcd3dc35ce9">opencc_convert</a> (opencc_t t_opencc, ucs4_t **inbuf, size_t *inbuf_left, ucs4_t **outbuf, size_t *outbuf_left)</td></tr>
-<tr class="memdesc:a06663d5bdc87ad1cb9e1adcd3dc35ce9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a UCS-4 string from *inbuf to *outbuf.  <a href="#a06663d5bdc87ad1cb9e1adcd3dc35ce9">More...</a><br/></td></tr>
-<tr class="separator:a06663d5bdc87ad1cb9e1adcd3dc35ce9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17979d392bd98a79c0d0981783b9d691"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="opencc_8c.html#a17979d392bd98a79c0d0981783b9d691">opencc_convert_utf8</a> (opencc_t t_opencc, const char *inbuf, size_t length)</td></tr>
-<tr class="memdesc:a17979d392bd98a79c0d0981783b9d691"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts UTF-8 string from inbuf.  <a href="#a17979d392bd98a79c0d0981783b9d691">More...</a><br/></td></tr>
-<tr class="separator:a17979d392bd98a79c0d0981783b9d691"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aff29f13f99271edf806d94826b5022c2"><td class="memItemLeft" align="right" valign="top">opencc_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="opencc_8c.html#aff29f13f99271edf806d94826b5022c2">opencc_open</a> (const char *config_file)</td></tr>
-<tr class="memdesc:aff29f13f99271edf806d94826b5022c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Makes an instance of opencc.  <a href="#aff29f13f99271edf806d94826b5022c2">More...</a><br/></td></tr>
-<tr class="separator:aff29f13f99271edf806d94826b5022c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3b51f1e8e31e01724d2e217387865d80"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__opencc__api.html#ga3b51f1e8e31e01724d2e217387865d80">opencc_convert</a> (opencc_t t_opencc, ucs4_t **inbuf, size_t *inbuf_left, ucs4_t **outbuf, size_t *outbuf_left)</td></tr>
+<tr class="memdesc:ga3b51f1e8e31e01724d2e217387865d80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts a UCS-4 string from *inbuf to *outbuf.  <a href="group__opencc__api.html#ga3b51f1e8e31e01724d2e217387865d80">More...</a><br/></td></tr>
+<tr class="separator:ga3b51f1e8e31e01724d2e217387865d80"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafab7056d17a5ef62e38087884313e8fb"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__opencc__api.html#gafab7056d17a5ef62e38087884313e8fb">opencc_convert_utf8</a> (opencc_t t_opencc, const char *inbuf, size_t length)</td></tr>
+<tr class="memdesc:gafab7056d17a5ef62e38087884313e8fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts UTF-8 string from inbuf.  <a href="group__opencc__api.html#gafab7056d17a5ef62e38087884313e8fb">More...</a><br/></td></tr>
+<tr class="separator:gafab7056d17a5ef62e38087884313e8fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaff29f13f99271edf806d94826b5022c2"><td class="memItemLeft" align="right" valign="top">opencc_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__opencc__api.html#gaff29f13f99271edf806d94826b5022c2">opencc_open</a> (const char *config_file)</td></tr>
+<tr class="memdesc:gaff29f13f99271edf806d94826b5022c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Makes an instance of opencc.  <a href="group__opencc__api.html#gaff29f13f99271edf806d94826b5022c2">More...</a><br/></td></tr>
+<tr class="separator:gaff29f13f99271edf806d94826b5022c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa723d908c62121caa954e9e9f0c0ffad"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="opencc_8c.html#aa723d908c62121caa954e9e9f0c0ffad">opencc_close</a> (opencc_t t_opencc)</td></tr>
 <tr class="memdesc:aa723d908c62121caa954e9e9f0c0ffad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroys an instance of opencc.  <a href="#aa723d908c62121caa954e9e9f0c0ffad">More...</a><br/></td></tr>
 <tr class="separator:aa723d908c62121caa954e9e9f0c0ffad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a539604677df8f6a8265adf8be79f0f45"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="opencc_8c.html#a539604677df8f6a8265adf8be79f0f45">opencc_dict_load</a> (opencc_t t_opencc, const char *dict_filename, opencc_dictionary_type dict_type)</td></tr>
-<tr class="memdesc:a539604677df8f6a8265adf8be79f0f45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads a dictionary to default dictionary chain.  <a href="#a539604677df8f6a8265adf8be79f0f45">More...</a><br/></td></tr>
-<tr class="separator:a539604677df8f6a8265adf8be79f0f45"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acc1b45d14cc77e510fb66f2fef36f048"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="opencc_8c.html#acc1b45d14cc77e510fb66f2fef36f048">opencc_set_conversion_mode</a> (opencc_t t_opencc, opencc_conversion_mode conversion_mode)</td></tr>
-<tr class="memdesc:acc1b45d14cc77e510fb66f2fef36f048"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the mode of conversion.  <a href="#acc1b45d14cc77e510fb66f2fef36f048">More...</a><br/></td></tr>
-<tr class="separator:acc1b45d14cc77e510fb66f2fef36f048"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2eccfa21b06e616b8ea1d721c23239d5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__opencc__api.html#ga2eccfa21b06e616b8ea1d721c23239d5">opencc_dict_load</a> (opencc_t t_opencc, const char *dict_filename, opencc_dictionary_type dict_type)</td></tr>
+<tr class="memdesc:ga2eccfa21b06e616b8ea1d721c23239d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads a dictionary to default dictionary chain.  <a href="group__opencc__api.html#ga2eccfa21b06e616b8ea1d721c23239d5">More...</a><br/></td></tr>
+<tr class="separator:ga2eccfa21b06e616b8ea1d721c23239d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga728494968cc73f7aefc547f905cd9cac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__opencc__api.html#ga728494968cc73f7aefc547f905cd9cac">opencc_set_conversion_mode</a> (opencc_t t_opencc, opencc_conversion_mode conversion_mode)</td></tr>
+<tr class="memdesc:ga728494968cc73f7aefc547f905cd9cac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the mode of conversion.  <a href="group__opencc__api.html#ga728494968cc73f7aefc547f905cd9cac">More...</a><br/></td></tr>
+<tr class="separator:ga728494968cc73f7aefc547f905cd9cac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87306db3be941d5a40c503d04fc47ce3"><td class="memItemLeft" align="right" valign="top">opencc_error&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="opencc_8c.html#a87306db3be941d5a40c503d04fc47ce3">opencc_errno</a> (void)</td></tr>
 <tr class="memdesc:a87306db3be941d5a40c503d04fc47ce3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an opencc_convert_errno_t which describes the last error.  <a href="#a87306db3be941d5a40c503d04fc47ce3">More...</a><br/></td></tr>
 <tr class="separator:a87306db3be941d5a40c503d04fc47ce3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a604e1c4ff24a62ecf9ea8e27b7a48df6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="opencc_8c.html#a604e1c4ff24a62ecf9ea8e27b7a48df6">opencc_perror</a> (const char *spec)</td></tr>
-<tr class="memdesc:a604e1c4ff24a62ecf9ea8e27b7a48df6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints the error message to stderr.  <a href="#a604e1c4ff24a62ecf9ea8e27b7a48df6">More...</a><br/></td></tr>
-<tr class="separator:a604e1c4ff24a62ecf9ea8e27b7a48df6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga604e1c4ff24a62ecf9ea8e27b7a48df6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__opencc__api.html#ga604e1c4ff24a62ecf9ea8e27b7a48df6">opencc_perror</a> (const char *spec)</td></tr>
+<tr class="memdesc:ga604e1c4ff24a62ecf9ea8e27b7a48df6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints the error message to stderr.  <a href="group__opencc__api.html#ga604e1c4ff24a62ecf9ea8e27b7a48df6">More...</a><br/></td></tr>
+<tr class="separator:ga604e1c4ff24a62ecf9ea8e27b7a48df6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>OpenCC API. </p>
+<div class="textblock"><p><a class="el" href="class_open_c_c.html" title="OpenCC Node.js API.">OpenCC</a> API. </p>
 <p>Open Chinese Convert</p>
 <p>Copyright 2010-2013 BYVoid <a href="#" onclick="location.href='mai'+'lto:'+'byv'+'oi'+'d@b'+'yv'+'oid'+'.c'+'om'; return false;">byvoi<span style="display: none;">.nosp@m.</span>d@by<span style="display: none;">.nosp@m.</span>void.<span style="display: none;">.nosp@m.</span>com</a></p>
 <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at </p>
@@ -175,158 +177,6 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a06663d5bdc87ad1cb9e1adcd3dc35ce9"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">size_t opencc_convert </td>
-          <td>(</td>
-          <td class="paramtype">opencc_t&#160;</td>
-          <td class="paramname"><em>od</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">ucs4_t **&#160;</td>
-          <td class="paramname"><em>inbuf</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t *&#160;</td>
-          <td class="paramname"><em>inbufleft</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">ucs4_t **&#160;</td>
-          <td class="paramname"><em>outbuf</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t *&#160;</td>
-          <td class="paramname"><em>outbufleft</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Converts a UCS-4 string from *inbuf to *outbuf. </p>
-<p>Do not forget to assign **outbuf to L'\0' after called if you want to use it as a C-Style string.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">od</td><td>The opencc description pointer. </td></tr>
-    <tr><td class="paramname">inbuf</td><td>The pointer to the UCS-4 string. </td></tr>
-    <tr><td class="paramname">inbufleft</td><td>The maximum number of characters in *inbuf to be converted. </td></tr>
-    <tr><td class="paramname">outbuf</td><td>The pointer to the output buffer. </td></tr>
-    <tr><td class="paramname">outbufleft</td><td>The size of output buffer.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The number of characters in the input buffer that has been converted. </dd></dl>
-
-<p>Definition at line <a class="el" href="opencc_8c_source.html#l00046">46</a> of file <a class="el" href="opencc_8c_source.html">opencc.c</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a17979d392bd98a79c0d0981783b9d691"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">char* opencc_convert_utf8 </td>
-          <td>(</td>
-          <td class="paramtype">opencc_t&#160;</td>
-          <td class="paramname"><em>od</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>inbuf</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>length</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Converts UTF-8 string from inbuf. </p>
-<p>This function returns an allocated C-Style string via malloc(), which stores the converted string. You should call free() to release allocated memory.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">od</td><td>The opencc description pointer. </td></tr>
-    <tr><td class="paramname">inbuf</td><td>The UTF-8 encoded string. </td></tr>
-    <tr><td class="paramname">length</td><td>The maximum length of inbuf to convert. If length is set to -1, the whole c-style string in inbuf will be converted.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The newly allocated UTF-8 string that stores text converted from inbuf. </dd></dl>
-
-<p>Definition at line <a class="el" href="opencc_8c_source.html#l00066">66</a> of file <a class="el" href="opencc_8c_source.html">opencc.c</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a539604677df8f6a8265adf8be79f0f45"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int opencc_dict_load </td>
-          <td>(</td>
-          <td class="paramtype">opencc_t&#160;</td>
-          <td class="paramname"><em>od</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>dict_filename</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">opencc_dictionary_type&#160;</td>
-          <td class="paramname"><em>dict_type</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Loads a dictionary to default dictionary chain. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">od</td><td>The opencc description pointer. </td></tr>
-    <tr><td class="paramname">dict_filename</td><td>The name (or location) of the dictionary file. </td></tr>
-    <tr><td class="paramname">dict_type</td><td>The type of the dictionary.</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>0 on success or non-zero number on failure.</dd></dl>
-<dl class="deprecated"><dt><b><a class="el" href="deprecated.html#_deprecated000001">Deprecated:</a></b></dt><dd></dd></dl>
-
-<p>Definition at line <a class="el" href="opencc_8c_source.html#l00177">177</a> of file <a class="el" href="opencc_8c_source.html">opencc.c</a>.</p>
-
-</div>
-</div>
 <a class="anchor" id="a87306db3be941d5a40c503d04fc47ce3"></a>
 <div class="memitem">
 <div class="memproto">
@@ -348,106 +198,10 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aff29f13f99271edf806d94826b5022c2"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">opencc_t opencc_open </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>config_file</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Makes an instance of opencc. </p>
-<p>Leave config_file to NULL if you do not want to load any configuration file.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">config_file</td><td>Location of configuration file. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A description pointer of the newly allocated instance of opencc. On error the return value will be (opencc_t) -1. </dd></dl>
-
-<p>Definition at line <a class="el" href="opencc_8c_source.html#l00138">138</a> of file <a class="el" href="opencc_8c_source.html">opencc.c</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a604e1c4ff24a62ecf9ea8e27b7a48df6"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void opencc_perror </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>spec</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Prints the error message to stderr. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">spec</td><td>Prefix message. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="opencc_8c_source.html#l00216">216</a> of file <a class="el" href="opencc_8c_source.html">opencc.c</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="acc1b45d14cc77e510fb66f2fef36f048"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void opencc_set_conversion_mode </td>
-          <td>(</td>
-          <td class="paramtype">opencc_t&#160;</td>
-          <td class="paramname"><em>od</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">opencc_conversion_mode&#160;</td>
-          <td class="paramname"><em>conversion_mode</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Changes the mode of conversion. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">od</td><td>The opencc description pointer. </td></tr>
-    <tr><td class="paramname">conversion_mode</td><td>Conversion mode. Options are<ul>
-<li>OPENCC_CONVERSION_FAST</li>
-<li>OPENCC_CONVERSION_SEGMENT_ONLY</li>
-<li>OPENCC_CONVERSION_LIST_CANDIDATES </li>
-</ul>
-</td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="opencc_8c_source.html#l00200">200</a> of file <a class="el" href="opencc_8c_source.html">opencc.c</a>.</p>
-
-</div>
-</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 11 2013 23:54:20 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

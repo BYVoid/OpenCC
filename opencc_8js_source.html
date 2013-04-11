@@ -40,8 +40,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -71,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -90,46 +92,50 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">opencc.js</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;var path = require(<span class="stringliteral">&#39;path&#39;</span>);</div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;var binding = require(<span class="stringliteral">&#39;../build/Release/binding&#39;</span>);</div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;var assetsPath = path.resolve(__dirname, <span class="stringliteral">&#39;../build/Release&#39;</span>);</div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;var getConfigPath = <span class="keyword">function</span> (config) {</div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;  var configPath = config;</div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;  <span class="keywordflow">if</span> (config[0] !== <span class="charliteral">&#39;/&#39;</span> &amp;&amp; config[1] !== <span class="charliteral">&#39;:&#39;</span>) {</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;    <span class="comment">// Resolve relative path</span></div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;    configPath = path.join(assetsPath, config);</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  }</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;  <span class="keywordflow">return</span> configPath;</div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;};</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;var OpenCC = module.exports = <span class="keyword">function</span> (config) {</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;  <span class="keywordflow">if</span> (!config) {</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;    config = <span class="stringliteral">&#39;zhs2zht.ini&#39;</span>;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  }</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  config = getConfigPath(config);</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;  this.handler = <span class="keyword">new</span> binding.Opencc(config);</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;};</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;OpenCC.CONVERSION_FAST = 0;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;OpenCC.CONVERSION_SEGMENT_ONLY = 1;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;OpenCC.CONVERSION_LIST_CANDIDATES = 2;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;OpenCC.prototype.convert = <span class="keyword">function</span> (input, callback) {</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keywordflow">return</span> this.handler.convert(input.toString(), callback);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;};</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;OpenCC.prototype.convertSync = <span class="keyword">function</span> (input) {</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keywordflow">return</span> this.handler.convertSync(input.toString());</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;};</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;OpenCC.prototype.setConversionMode = <span class="keyword">function</span> (conversionMode) {</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keywordflow">return</span> this.handler.setConversionMode(conversionMode);</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;};</div>
+<a href="opencc_8js.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;var path = require(<span class="stringliteral">&#39;path&#39;</span>);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;var binding = require(<span class="stringliteral">&#39;../build/Release/binding&#39;</span>);</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;var assetsPath = path.resolve(__dirname, <span class="stringliteral">&#39;../build/Release&#39;</span>);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;var getConfigPath = <span class="keyword">function</span> (config) {</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  var configPath = config;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keywordflow">if</span> (config[0] !== <span class="charliteral">&#39;/&#39;</span> &amp;&amp; config[1] !== <span class="charliteral">&#39;:&#39;</span>) {</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="comment">// Resolve relative path</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    configPath = path.join(assetsPath, config);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  }</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keywordflow">return</span> configPath;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;};</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;var <a class="code" href="class_open_c_c.html" title="OpenCC Node.js API.">OpenCC</a> = module.exports = <span class="keyword">function</span> (config) {</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <span class="keywordflow">if</span> (!config) {</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    config = <span class="stringliteral">&#39;zhs2zht.ini&#39;</span>;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  }</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  config = getConfigPath(config);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  this.handler = <span class="keyword">new</span> binding.Opencc(config);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;};</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
+<div class="line"><a name="l00063"></a><span class="lineno"><a class="code" href="group__node__api.html#ga2f5aba4a84052f2ad07ef69f8be0064d">   63</a></span>&#160;OpenCC.CONVERSION_FAST = 0;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
+<div class="line"><a name="l00070"></a><span class="lineno"><a class="code" href="group__node__api.html#gaf843c7212add2753af0250ef27f15183">   70</a></span>&#160;OpenCC.CONVERSION_SEGMENT_ONLY = 1;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
+<div class="line"><a name="l00077"></a><span class="lineno"><a class="code" href="group__node__api.html#gaf29f15c0660bcadeba52c1a542bbdaaa">   77</a></span>&#160;OpenCC.CONVERSION_LIST_CANDIDATES = 2;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;OpenCC.prototype.convert = <span class="keyword">function</span> (input, callback) {</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  <span class="keywordflow">return</span> this.handler.convert(input.toString(), callback);</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;};</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;OpenCC.prototype.convertSync = <span class="keyword">function</span> (input) {</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  <span class="keywordflow">return</span> this.handler.convertSync(input.toString());</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;};</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;OpenCC.prototype.setConversionMode = <span class="keyword">function</span> (conversionMode) {</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  <span class="keywordflow">return</span> this.handler.setConversionMode(conversionMode);</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;};</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 11 2013 23:54:20 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

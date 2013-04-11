@@ -40,8 +40,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -71,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -143,7 +145,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keywordflow">if</span> (od != (opencc_t)-1) {</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;      <a class="code" href="opencc_8c.html#aa723d908c62121caa954e9e9f0c0ffad" title="Destroys an instance of opencc.">opencc_close</a>(od);</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    }</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    od = <a class="code" href="opencc_8c.html#aff29f13f99271edf806d94826b5022c2" title="Makes an instance of opencc.">opencc_open</a>(config_file);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    od = <a class="code" href="group__opencc__api.html#gaff29f13f99271edf806d94826b5022c2" title="Makes an instance of opencc.">opencc_open</a>(config_file);</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordflow">return</span> (od == (opencc_t)-1) ? (-1) : (0);</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  }</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
@@ -151,7 +153,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordflow">if</span> (od == (opencc_t)-1) {</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      <span class="keywordflow">return</span> -1;</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    }</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <a class="code" href="opencc_8c.html#acc1b45d14cc77e510fb66f2fef36f048" title="Changes the mode of conversion.">opencc_set_conversion_mode</a>(od, conversion_mode);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <a class="code" href="group__opencc__api.html#ga728494968cc73f7aefc547f905cd9cac" title="Changes the mode of conversion.">opencc_set_conversion_mode</a>(od, conversion_mode);</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  }</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
@@ -162,7 +164,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keywordflow">if</span> (length == -1) {</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;      length = in.length();</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    }</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keywordtype">char</span>* outbuf = <a class="code" href="opencc_8c.html#a17979d392bd98a79c0d0981783b9d691" title="Converts UTF-8 string from inbuf.">opencc_convert_utf8</a>(od, in.c_str(), length);</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keywordtype">char</span>* outbuf = <a class="code" href="group__opencc__api.html#gafab7056d17a5ef62e38087884313e8fb" title="Converts UTF-8 string from inbuf.">opencc_convert_utf8</a>(od, in.c_str(), length);</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordflow">if</span> (outbuf == (<span class="keywordtype">char</span>*)-1) {</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;      <span class="keywordflow">return</span> -1;</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    }</div>
@@ -189,7 +191,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;      outbuf_left = inbuf_left + 64;</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      out.resize(count + outbuf_left);</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      outbuf = (ucs4_t*)out.c_str() + count;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      retval = <a class="code" href="opencc_8c.html#a06663d5bdc87ad1cb9e1adcd3dc35ce9" title="Converts a UCS-4 string from *inbuf to *outbuf.">opencc_convert</a>(od, (ucs4_t**)&amp;inbuf,</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      retval = <a class="code" href="group__opencc__api.html#ga3b51f1e8e31e01724d2e217387865d80" title="Converts a UCS-4 string from *inbuf to *outbuf.">opencc_convert</a>(od, (ucs4_t**)&amp;inbuf,</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;                              &amp;inbuf_left, &amp;outbuf, &amp;outbuf_left);</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;      <span class="keywordflow">if</span> (retval == (<span class="keywordtype">size_t</span>)-1) {</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        <span class="keywordflow">return</span> -1;</div>
@@ -207,7 +209,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  }</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  <span class="keywordtype">void</span> perror(<span class="keyword">const</span> <span class="keywordtype">char</span>* spec = <span class="stringliteral">&quot;OpenCC&quot;</span>)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <a class="code" href="opencc_8c.html#a604e1c4ff24a62ecf9ea8e27b7a48df6" title="Prints the error message to stderr.">opencc_perror</a>(spec);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <a class="code" href="group__opencc__api.html#ga604e1c4ff24a62ecf9ea8e27b7a48df6" title="Prints the error message to stderr.">opencc_perror</a>(spec);</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;  }</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="keyword">private</span>:</div>
@@ -221,7 +223,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 11 2013 23:54:20 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

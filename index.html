@@ -40,8 +40,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -66,7 +68,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -81,10 +83,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><h2>Introduction</h2>
-<p>Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for conversion between Traditional Chinese and Simplified Chinese, supporting character-level conversion, phrase-level conversion, variant conversion and regional idioms among Mainland China, Taiwan and Hong kong.</p>
+<p>Open Chinese Convert (<a class="el" href="class_open_c_c.html" title="OpenCC Node.js API.">OpenCC</a>, 開放中文轉換) is an opensource project for conversion between Traditional Chinese and Simplified Chinese, supporting character-level conversion, phrase-level conversion, variant conversion and regional idioms among Mainland China, Taiwan and Hong kong.</p>
 <p>中文簡繁轉換開源項目，支持詞彙級别的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港）。</p>
+<h2>Documentations</h2>
 <p>Project home page <a href="https://code.google.com/p/opencc/">https://code.google.com/p/opencc/</a></p>
-<p>詳細介紹 <a href="https://code.google.com/p/opencc/wiki/Introduction">https://code.google.com/p/opencc/wiki/Introduction</a></p>
+<p>Introduction (詳細介紹) <a href="https://code.google.com/p/opencc/wiki/Introduction">https://code.google.com/p/opencc/wiki/Introduction</a></p>
+<p>Development Documentation <a href="http://byvoid.github.io/OpenCC/">http://byvoid.github.io/OpenCC/</a></p>
 <h2>Projects using Opencc</h2>
 <ul>
 <li><a href="http://code.google.com/p/ibus/">ibus-pinyin</a></li>
@@ -104,6 +108,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <pre class="fragment">brew install opencc
 </pre><h3>Node.js</h3>
 <pre class="fragment">npm install opencc
+</pre><h2>Usage</h2>
+<pre class="fragment">$ opencc --help
+
+Open Chinese Convert (OpenCC) Command Line Tool
+
+Author: BYVoid &lt;byvoid@byvoid.com&gt;
+Bug Report: http://github.com/BYVoid/OpenCC/issues
+
+Usage:
+ opencc [Options]
+
+Options:
+ -i [file], --input=[file]   Read original text from [file].
+ -o [file], --output=[file]  Write converted text to [file].
+ -c [file], --config=[file]  Load configuration of conversion from [file].
+ -v, --version               Print version and build information.
+ -h, --help                  Print this help.
+
+With no input file, reads standard input and writes converted stream to standard output.
+Default configuration(zhs2zht.ini) will be loaded if not set.
 </pre><h2>Build</h2>
 <h3>Build with CMake</h3>
 <p>Make a directory and check in: </p>
@@ -134,7 +158,7 @@ make -C build
  </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 11 2013 23:54:20 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

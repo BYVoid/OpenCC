@@ -40,8 +40,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -71,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -103,69 +105,87 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00011"></a><span class="lineno"><a class="code" href="classopencc_1_1_dict_type.html">   11</a></span>&#160;<span class="keyword">class </span><a class="code" href="classopencc_1_1_dict_type.html">DictType</a>:</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;  TEXT,DATRIE = 0,1</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
-<div class="line"><a name="l00014"></a><span class="lineno"><a class="code" href="classopencc_1_1_open_c_c.html">   14</a></span>&#160;<span class="keyword">class </span><a class="code" href="classopencc_1_1_open_c_c.html">OpenCC</a>:</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <span class="keyword">def </span>__init__(self, config=None, verbose=True):</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;    self.<a class="code" href="classopencc_1_1_open_c_c.html#af67e82e614780de3fb3a291153a5c2e7">libopencc</a> = cdll.LoadLibrary(find_library(<span class="stringliteral">&#39;opencc&#39;</span>))</div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    self.libopencc.opencc_open.restype = c_void_p</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    self.libopencc.opencc_convert_utf8.argtypes = [c_void_p, c_char_p, c_size_t]</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="comment"># for checking for the returned &#39;-1&#39; pointer in case opencc_convert() fails.</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="comment"># c_char_p always tries to convert the returned (char *) to a Python string,</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    self.libopencc.opencc_convert_utf8.restype = c_void_p</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    self.libopencc.opencc_close.argtypes = [c_void_p]</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    self.libopencc.opencc_perror.argtypes = [c_char_p]</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    self.libopencc.opencc_dict_load.argtypes = [c_void_p, c_char_p, c_int]</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    self.<a class="code" href="classopencc_1_1_open_c_c.html#a3572de673f80f77d57f241a6669284ea">libc</a> = cdll.LoadLibrary(find_library(<span class="stringliteral">&#39;c&#39;</span>))</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    self.libc.free.argtypes = [c_void_p]</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    self.<a class="code" href="classopencc_1_1_open_c_c.html#a326f0f68fff9ee82b497f1476876f353">config</a> = config</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    self.<a class="code" href="classopencc_1_1_open_c_c.html#af93d8e6128cccf8ecc157f4041bef63c">verbose</a> = verbose</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    self.<a class="code" href="classopencc_1_1_open_c_c.html#ae329ba7066e3f07d8500c89c67e9e0cb">od</a> = <span class="keywordtype">None</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <span class="keyword">def </span>__enter__(self):</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordflow">if</span> self.<a class="code" href="classopencc_1_1_open_c_c.html#a326f0f68fff9ee82b497f1476876f353">config</a> <span class="keywordflow">is</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;      self.<a class="code" href="classopencc_1_1_open_c_c.html#ae329ba7066e3f07d8500c89c67e9e0cb">od</a> = self.libopencc.opencc_open(0)</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;      self.<a class="code" href="classopencc_1_1_open_c_c.html#ae329ba7066e3f07d8500c89c67e9e0cb">od</a> = self.libopencc.opencc_open(c_char_p(self.<a class="code" href="classopencc_1_1_open_c_c.html#a326f0f68fff9ee82b497f1476876f353">config</a>))</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordflow">return</span> self</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keyword">def </span>__exit__(self, type, value, traceback):</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    self.libopencc.opencc_close(self.<a class="code" href="classopencc_1_1_open_c_c.html#ae329ba7066e3f07d8500c89c67e9e0cb">od</a>)</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    self.<a class="code" href="classopencc_1_1_open_c_c.html#ae329ba7066e3f07d8500c89c67e9e0cb">od</a> = <span class="keywordtype">None</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keyword">def </span>__perror(self, message):</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordflow">if</span> self.<a class="code" href="classopencc_1_1_open_c_c.html#af93d8e6128cccf8ecc157f4041bef63c">verbose</a>:</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      self.libopencc.opencc_perror(message)</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <span class="keyword">def </span>convert(self, text):</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    retv_c = self.libopencc.opencc_convert_utf8(self.<a class="code" href="classopencc_1_1_open_c_c.html#ae329ba7066e3f07d8500c89c67e9e0cb">od</a>, text, len(text))</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordflow">if</span> retv_c == -1:</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;      self.<a class="code" href="classopencc_1_1_open_c_c.html#a30006f1d1a66256359755ece29756f38">__perror</a>(<span class="stringliteral">&#39;OpenCC error:&#39;</span>)</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;      <span class="keywordflow">raise</span> <a class="code" href="classopencc_1_1_convert_error.html">ConvertError</a>()</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    retv_c = cast(retv_c, c_char_p)</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    str_buffer = retv_c.value</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    self.libc.free(retv_c);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordflow">return</span> str_buffer</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keyword">def </span>dict_load(self, filename, dicttype):</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    retv = self.libopencc.opencc_dict_load(self.<a class="code" href="classopencc_1_1_open_c_c.html#ae329ba7066e3f07d8500c89c67e9e0cb">od</a>, filename, dicttype)</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordflow">if</span> retv == -1:</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      self.<a class="code" href="classopencc_1_1_open_c_c.html#a30006f1d1a66256359755ece29756f38">__perror</a>(<span class="stringliteral">&#39;OpenCC error:&#39;</span>)</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordflow">return</span> retv</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="keywordflow">if</span> __name__ == <span class="stringliteral">&quot;__main__&quot;</span>:</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  with sys.stdin <span class="keyword">as</span> fp:</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    text = fp.read()</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  with <a class="code" href="classopencc_1_1_open_c_c.html">OpenCC</a>() <span class="keyword">as</span> converter:</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">for</span> path <span class="keywordflow">in</span> [<span class="stringliteral">&#39;simp_to_trad_characters.ocd&#39;</span>,</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;           <span class="stringliteral">&#39;simp_to_trad_phrases.ocd&#39;</span>]:</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      converter.dict_load(path, DictType.DATRIE)</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordflow">print</span> converter.convert(text)</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment">## @defgroup python_api Python API</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment">#  API in python language</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">## OpenCC Python language binding</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">#  @ingroup python_api</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno"><a class="code" href="classopencc_1_1_open_c_c.html">   19</a></span>&#160;<span class="keyword">class </span><a class="code" href="classopencc_1_1_open_c_c.html" title="OpenCC Python language binding.">OpenCC</a>:</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="comment">## Constructor</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="comment">#  @param self The object pointer.</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="comment">#  @param config Filename of config.</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="comment">#  @param verbose Specifies whether error information is printed.</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="comment">#  @ingroup python_api</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="code" href="group__python__api.html#ga2894c945137133d3e364f3458cf553da">   26</a></span>&#160;  <span class="keyword">def </span><a class="code" href="group__python__api.html#ga2894c945137133d3e364f3458cf553da" title="Constructor.">__init__</a>(self, config=None, verbose=True):</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    self.<a class="code" href="classopencc_1_1_open_c_c.html#af67e82e614780de3fb3a291153a5c2e7">libopencc</a> = cdll.LoadLibrary(find_library(<span class="stringliteral">&#39;opencc&#39;</span>))</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    self.libopencc.opencc_open.restype = c_void_p</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    self.libopencc.opencc_convert_utf8.argtypes = [c_void_p, c_char_p, c_size_t]</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="comment"># for checking for the returned &#39;-1&#39; pointer in case opencc_convert() fails.</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="comment"># c_char_p always tries to convert the returned (char *) to a Python string,</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    self.libopencc.opencc_convert_utf8.restype = c_void_p</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    self.libopencc.opencc_close.argtypes = [c_void_p]</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    self.libopencc.opencc_perror.argtypes = [c_char_p]</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    self.libopencc.opencc_dict_load.argtypes = [c_void_p, c_char_p, c_int]</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    self.<a class="code" href="classopencc_1_1_open_c_c.html#a3572de673f80f77d57f241a6669284ea">libc</a> = cdll.LoadLibrary(find_library(<span class="stringliteral">&#39;c&#39;</span>))</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    self.libc.free.argtypes = [c_void_p]</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    self.<a class="code" href="classopencc_1_1_open_c_c.html#a326f0f68fff9ee82b497f1476876f353">config</a> = config</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    self.<a class="code" href="classopencc_1_1_open_c_c.html#af93d8e6128cccf8ecc157f4041bef63c">verbose</a> = verbose</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    self.<a class="code" href="classopencc_1_1_open_c_c.html#ae329ba7066e3f07d8500c89c67e9e0cb">od</a> = <span class="keywordtype">None</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="comment">## @deprecated</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno"><a class="code" href="classopencc_1_1_open_c_c.html#a0804e0ba5f0e0a616821f9dc17dd42ef">   45</a></span>&#160;  <span class="keyword">def </span><a class="code" href="classopencc_1_1_open_c_c.html#a0804e0ba5f0e0a616821f9dc17dd42ef">__enter__</a>(self):</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordflow">if</span> self.<a class="code" href="classopencc_1_1_open_c_c.html#a326f0f68fff9ee82b497f1476876f353">config</a> <span class="keywordflow">is</span> <span class="keywordtype">None</span>:</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;      self.<a class="code" href="classopencc_1_1_open_c_c.html#ae329ba7066e3f07d8500c89c67e9e0cb">od</a> = self.libopencc.opencc_open(0)</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordflow">else</span>:</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;      self.<a class="code" href="classopencc_1_1_open_c_c.html#ae329ba7066e3f07d8500c89c67e9e0cb">od</a> = self.libopencc.opencc_open(c_char_p(self.<a class="code" href="classopencc_1_1_open_c_c.html#a326f0f68fff9ee82b497f1476876f353">config</a>))</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordflow">return</span> self</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  <span class="comment">## @deprecated</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="code" href="classopencc_1_1_open_c_c.html#a49319c7dd9c54ae8067b8aea34242326">   53</a></span>&#160;  <span class="keyword">def </span><a class="code" href="classopencc_1_1_open_c_c.html#a49319c7dd9c54ae8067b8aea34242326">__exit__</a>(self, type, value, traceback):</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    self.libopencc.opencc_close(self.<a class="code" href="classopencc_1_1_open_c_c.html#ae329ba7066e3f07d8500c89c67e9e0cb">od</a>)</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    self.<a class="code" href="classopencc_1_1_open_c_c.html#ae329ba7066e3f07d8500c89c67e9e0cb">od</a> = <span class="keywordtype">None</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <span class="keyword">def </span>__perror(self, message):</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordflow">if</span> self.<a class="code" href="classopencc_1_1_open_c_c.html#af93d8e6128cccf8ecc157f4041bef63c">verbose</a>:</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;      self.libopencc.opencc_perror(message)</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  <span class="comment">## Converts text.</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="comment">#  @param self The object pointer.</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="comment">#  @param text Input text.</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <span class="comment">#  @return Converted text.</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;  <span class="comment">#  @ingroup python_api</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="code" href="group__python__api.html#ga67a682fd946a8cc86edb4022c18becbd">   66</a></span>&#160;  <span class="keyword">def </span><a class="code" href="group__python__api.html#ga67a682fd946a8cc86edb4022c18becbd" title="Converts text.">convert</a>(self, text):</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    retv_c = self.libopencc.opencc_convert_utf8(self.<a class="code" href="classopencc_1_1_open_c_c.html#ae329ba7066e3f07d8500c89c67e9e0cb">od</a>, text, len(text))</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keywordflow">if</span> retv_c == -1:</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;      self.<a class="code" href="classopencc_1_1_open_c_c.html#a30006f1d1a66256359755ece29756f38">__perror</a>(<span class="stringliteral">&#39;OpenCC error:&#39;</span>)</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;      <span class="keywordflow">raise</span> <a class="code" href="classopencc_1_1_convert_error.html">ConvertError</a>()</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    retv_c = cast(retv_c, c_char_p)</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    str_buffer = retv_c.value</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    self.libc.free(retv_c);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordflow">return</span> str_buffer</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;  </div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="comment">## @deprecated</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno"><a class="code" href="classopencc_1_1_open_c_c.html#a0b1940be436e329789a5df583fcee77a">   77</a></span>&#160;  <span class="keyword">def </span><a class="code" href="classopencc_1_1_open_c_c.html#a0b1940be436e329789a5df583fcee77a">dict_load</a>(self, filename, dicttype):</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    retv = self.libopencc.opencc_dict_load(self.<a class="code" href="classopencc_1_1_open_c_c.html#ae329ba7066e3f07d8500c89c67e9e0cb">od</a>, filename, dicttype)</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keywordflow">if</span> retv == -1:</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      self.<a class="code" href="classopencc_1_1_open_c_c.html#a30006f1d1a66256359755ece29756f38">__perror</a>(<span class="stringliteral">&#39;OpenCC error:&#39;</span>)</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordflow">return</span> retv</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="keywordflow">if</span> __name__ == <span class="stringliteral">&quot;__main__&quot;</span>:</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  with sys.stdin <span class="keyword">as</span> fp:</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    text = fp.read()</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  with <a class="code" href="classopencc_1_1_open_c_c.html" title="OpenCC Python language binding.">OpenCC</a>() <span class="keyword">as</span> converter:</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keywordflow">for</span> path <span class="keywordflow">in</span> [<span class="stringliteral">&#39;simp_to_trad_characters.ocd&#39;</span>,</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;           <span class="stringliteral">&#39;simp_to_trad_phrases.ocd&#39;</span>]:</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      converter.dict_load(path, DictType.DATRIE)</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="keywordflow">print</span> converter.convert(text)</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 11 2013 23:54:20 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

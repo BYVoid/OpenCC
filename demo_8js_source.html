@@ -40,8 +40,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -71,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -90,21 +92,28 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">demo.js</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;var OpenCC = require(<span class="stringliteral">&#39;./opencc&#39;</span>);</div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;</div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;var opencc = <span class="keyword">new</span> OpenCC(<span class="stringliteral">&#39;zhs2zht.ini&#39;</span>);</div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;opencc.setConversionMode(OpenCC.CONVERSION_FAST);</div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;</div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;var converted = opencc.convertSync(<span class="stringliteral">&quot;汉字&quot;</span>);</div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;console.log(converted);</div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;</div>
-<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;opencc.convert(<span class="stringliteral">&quot;汉字&quot;</span>, <span class="keyword">function</span> (err, converted) {</div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;  console.log(converted);</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;});</div>
+<a href="demo_8js.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="comment">// In your project you should replace &#39;./opencc&#39; with &#39;opencc&#39;</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;var <a class="code" href="class_open_c_c.html" title="OpenCC Node.js API.">OpenCC</a> = require(<span class="stringliteral">&#39;./opencc&#39;</span>);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment">// Load the default Simplified to Traditional config</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;var opencc = <span class="keyword">new</span> <a class="code" href="class_open_c_c.html" title="OpenCC Node.js API.">OpenCC</a>(<span class="stringliteral">&#39;zhs2zht.ini&#39;</span>);</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment">// Set conversion mode</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;opencc.setConversionMode(<a class="code" href="class_open_c_c.html" title="OpenCC Node.js API.">OpenCC</a>.CONVERSION_FAST);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="comment">// Sync API</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;var converted = opencc.convertSync(<span class="stringliteral">&quot;汉字&quot;</span>);</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;console.log(converted);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">// Async API</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;opencc.convert(<span class="stringliteral">&quot;汉字&quot;</span>, <span class="keyword">function</span> (err, converted) {</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  console.log(converted);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;});</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 11 2013 23:54:20 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

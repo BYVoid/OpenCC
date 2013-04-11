@@ -40,8 +40,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="modules.html"><span>Modules</span></a></li>
       <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li class="current"><a href="files.html"><span>Files</span></a></li>
+      <li><a href="examples.html"><span>Examples</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -71,7 +73,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Data Structures</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -113,7 +115,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  };</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keyword">explicit</span> <a class="code" href="class_opencc_binding.html">OpenccBinding</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> * config_file) {</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    handler_ = <a class="code" href="opencc_8c.html#aff29f13f99271edf806d94826b5022c2" title="Makes an instance of opencc.">opencc_open</a>(config_file);</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    handler_ = <a class="code" href="group__opencc__api.html#gaff29f13f99271edf806d94826b5022c2" title="Makes an instance of opencc.">opencc_open</a>(config_file);</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  }</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keyword">virtual</span> ~<a class="code" href="class_opencc_binding.html">OpenccBinding</a>() {</div>
@@ -134,7 +136,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      opencc_instance = <span class="keyword">new</span> <a class="code" href="class_opencc_binding.html">OpenccBinding</a>(config_file);</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      <span class="keyword">delete</span> [] config_file;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">char</span>* config_file = <a class="code" href="opencc_8h.html#a05b32035094049395f8975f9d2ffa1a2" title="Filename of default Simplified to Traditional configuration.">OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD</a>;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">char</span>* config_file = <a class="code" href="group__opencc__api.html#ga05b32035094049395f8975f9d2ffa1a2" title="Filename of default Simplified to Traditional configuration.">OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD</a>;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      opencc_instance = <span class="keyword">new</span> <a class="code" href="class_opencc_binding.html">OpenccBinding</a>(config_file);</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    }</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
@@ -168,7 +170,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">void</span> DoConnect(uv_work_t* req) {</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    ConvertRequest* conv_data = <span class="keyword">static_cast&lt;</span>ConvertRequest*<span class="keyword">&gt;</span>(req-&gt;data);</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    opencc_t opencc_handler = conv_data-&gt;opencc_instance-&gt;handler_;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    conv_data-&gt;output = <a class="code" href="opencc_8c.html#a17979d392bd98a79c0d0981783b9d691" title="Converts UTF-8 string from inbuf.">opencc_convert_utf8</a>(opencc_handler, conv_data-&gt;input, (<span class="keywordtype">size_t</span>) -1);</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    conv_data-&gt;output = <a class="code" href="group__opencc__api.html#gafab7056d17a5ef62e38087884313e8fb" title="Converts UTF-8 string from inbuf.">opencc_convert_utf8</a>(opencc_handler, conv_data-&gt;input, (<span class="keywordtype">size_t</span>) -1);</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  }</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">void</span> AfterConvert(uv_work_t* req) {</div>
@@ -198,7 +200,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <a class="code" href="class_opencc_binding.html">OpenccBinding</a>* opencc_instance = ObjectWrap::Unwrap&lt;OpenccBinding&gt;(args.This());</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    opencc_t opencc_handler = opencc_instance-&gt;handler_;</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keywordtype">char</span>* input = ToUtf8String(args[0]-&gt;ToString());</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordtype">char</span>* output = <a class="code" href="opencc_8c.html#a17979d392bd98a79c0d0981783b9d691" title="Converts UTF-8 string from inbuf.">opencc_convert_utf8</a>(opencc_handler, input, (<span class="keywordtype">size_t</span>) -1);</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordtype">char</span>* output = <a class="code" href="group__opencc__api.html#gafab7056d17a5ef62e38087884313e8fb" title="Converts UTF-8 string from inbuf.">opencc_convert_utf8</a>(opencc_handler, input, (<span class="keywordtype">size_t</span>) -1);</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    Local&lt;String&gt; converted = String::New(output);</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keyword">delete</span>[] input;</div>
@@ -222,7 +224,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;      <span class="keywordflow">return</span> scope.Close(Undefined());</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    }</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <a class="code" href="opencc_8c.html#acc1b45d14cc77e510fb66f2fef36f048" title="Changes the mode of conversion.">opencc_set_conversion_mode</a>(opencc_handler,</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <a class="code" href="group__opencc__api.html#ga728494968cc73f7aefc547f905cd9cac" title="Changes the mode of conversion.">opencc_set_conversion_mode</a>(opencc_handler,</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;                               (opencc_conversion_mode) conversion_mode);</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keywordflow">return</span> scope.Close(Boolean::New(<span class="keyword">true</span>));</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  }</div>
@@ -256,7 +258,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Apr 11 2013 23:54:20 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

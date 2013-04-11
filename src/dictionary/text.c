@@ -23,19 +23,18 @@
 #define ENTRY_BUFF_SIZE 128
 #define ENTRY_WBUFF_SIZE ENTRY_BUFF_SIZE / sizeof(size_t)
 
-struct _text_dictionary {
+typedef struct {
   size_t entry_count;
   size_t max_length;
-  entry* lexicon;
+  TextEntry* lexicon;
   ucs4_t* word_buff;
-};
-typedef struct _text_dictionary text_dictionary_desc;
+} TextDict;
 
 int qsort_entry_cmp(const void* a, const void* b) {
-  return ucs4cmp(((entry*)a)->key, ((entry*)b)->key);
+  return ucs4cmp(((TextEntry*)a)->key, ((TextEntry*)b)->key);
 }
 
-int parse_entry(const char* buff, entry* entry_i) {
+int parse_entry(const char* buff, TextEntry* entry_i) {
   size_t length;
   const char* pbuff;
 
@@ -103,13 +102,13 @@ int parse_entry(const char* buff, entry* entry_i) {
 }
 
 Dict* dict_text_new(const char* filename) {
-  text_dictionary_desc* text_dictionary;
+  TextDict* text_dictionary;
 
-  text_dictionary = (text_dictionary_desc*)malloc(sizeof(text_dictionary_desc));
+  text_dictionary = (TextDict*)malloc(sizeof(TextDict));
   text_dictionary->entry_count = INITIAL_DICTIONARY_SIZE;
   text_dictionary->max_length = 0;
-  text_dictionary->lexicon = (entry*)malloc(
-    sizeof(entry) * text_dictionary->entry_count);
+  text_dictionary->lexicon = (TextEntry*)malloc(
+    sizeof(TextEntry) * text_dictionary->entry_count);
   text_dictionary->word_buff = NULL;
 
   static char buff[ENTRY_BUFF_SIZE];
@@ -127,9 +126,9 @@ Dict* dict_text_new(const char* filename) {
   while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
     if (i >= text_dictionary->entry_count) {
       text_dictionary->entry_count += text_dictionary->entry_count;
-      text_dictionary->lexicon = (entry*)realloc(
+      text_dictionary->lexicon = (TextEntry*)realloc(
         text_dictionary->lexicon,
-        sizeof(entry) * text_dictionary->entry_count
+        sizeof(TextEntry) * text_dictionary->entry_count
         );
     }
 
@@ -151,9 +150,9 @@ Dict* dict_text_new(const char* filename) {
   fclose(fp);
 
   text_dictionary->entry_count = i;
-  text_dictionary->lexicon = (entry*)realloc(
+  text_dictionary->lexicon = (TextEntry*)realloc(
     text_dictionary->lexicon,
-    sizeof(entry) * text_dictionary->entry_count
+    sizeof(TextEntry) * text_dictionary->entry_count
     );
   text_dictionary->word_buff = (ucs4_t*)
                                malloc(sizeof(ucs4_t) *
@@ -169,7 +168,7 @@ Dict* dict_text_new(const char* filename) {
 }
 
 void dict_text_delete(Dict* dict) {
-  text_dictionary_desc* text_dictionary = (text_dictionary_desc*)dict;
+  TextDict* text_dictionary = (TextDict*)dict;
 
   size_t i;
 
@@ -193,7 +192,7 @@ const ucs4_t* const* dict_text_match_longest(Dict* dict,
                                              const ucs4_t* word,
                                              size_t maxlen,
                                              size_t* match_length) {
-  text_dictionary_desc* text_dictionary = (text_dictionary_desc*)dict;
+  TextDict* text_dictionary = (TextDict*)dict;
 
   if (text_dictionary->entry_count == 0) {
     return NULL;
@@ -211,12 +210,12 @@ const ucs4_t* const* dict_text_match_longest(Dict* dict,
   ucs4ncpy(text_dictionary->word_buff, word, len);
   text_dictionary->word_buff[len] = L'\0';
 
-  entry buff;
+  TextEntry buff;
   buff.key = text_dictionary->word_buff;
 
   for (; len > 0; len--) {
     text_dictionary->word_buff[len] = L'\0';
-    entry* brs = (entry*)bsearch(
+    TextEntry* brs = (TextEntry*)bsearch(
       &buff,
       text_dictionary->lexicon,
       text_dictionary->entry_count,
@@ -241,7 +240,7 @@ const ucs4_t* const* dict_text_match_longest(Dict* dict,
 size_t dict_text_get_all_match_lengths(Dict* dict,
                                        const ucs4_t* word,
                                        size_t* match_length) {
-  text_dictionary_desc* text_dictionary = (text_dictionary_desc*)dict;
+  TextDict* text_dictionary = (TextDict*)dict;
 
   size_t rscnt = 0;
 
@@ -259,12 +258,12 @@ size_t dict_text_get_all_match_lengths(Dict* dict,
   ucs4ncpy(text_dictionary->word_buff, word, len);
   text_dictionary->word_buff[len] = L'\0';
 
-  entry buff;
+  TextEntry buff;
   buff.key = text_dictionary->word_buff;
 
   for (; len > 0; len--) {
     text_dictionary->word_buff[len] = L'\0';
-    entry* brs = (entry*)bsearch(
+    TextEntry* brs = (TextEntry*)bsearch(
       &buff,
       text_dictionary->lexicon,
       text_dictionary->entry_count,
@@ -280,8 +279,8 @@ size_t dict_text_get_all_match_lengths(Dict* dict,
   return rscnt;
 }
 
-size_t dict_text_get_lexicon(Dict* dict, entry* lexicon) {
-  text_dictionary_desc* text_dictionary = (text_dictionary_desc*)dict;
+size_t dict_text_get_lexicon(Dict* dict, TextEntry* lexicon) {
+  TextDict* text_dictionary = (TextDict*)dict;
 
   size_t i;
 

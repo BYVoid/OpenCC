@@ -29,9 +29,9 @@
 #include "opencc.h"
 
 typedef struct {
-  DictChain* DictChain;
+  DictChain* dict_chain;
   Converter* converter;
-} opencc_desc;
+} OpenccDesc;
 
 static opencc_error errnum = OPENCC_ERROR_VOID;
 static int lib_initialized = FALSE;
@@ -51,7 +51,7 @@ size_t opencc_convert(opencc_t t_opencc,
   if (!lib_initialized) {
     lib_initialize();
   }
-  opencc_desc* opencc = (opencc_desc*)t_opencc;
+  OpenccDesc* opencc = (OpenccDesc*)t_opencc;
   size_t retval = converter_convert(opencc->converter,
                                     inbuf,
                                     inbuf_left,
@@ -139,9 +139,9 @@ opencc_t opencc_open(const char* config_file) {
   if (!lib_initialized) {
     lib_initialize();
   }
-  opencc_desc* opencc;
-  opencc = (opencc_desc*)malloc(sizeof(opencc_desc));
-  opencc->DictChain = NULL;
+  OpenccDesc* opencc;
+  opencc = (OpenccDesc*)malloc(sizeof(OpenccDesc));
+  opencc->dict_chain = NULL;
   opencc->converter = converter_open();
   converter_set_conversion_mode(opencc->converter, OPENCC_CONVERSION_FAST);
   if (config_file == NULL) {
@@ -154,8 +154,8 @@ opencc_t opencc_open(const char* config_file) {
       errnum = OPENCC_ERROR_CONFIG;
       return (opencc_t)-1;
     }
-    opencc->DictChain = config_get_dict_chain(config);
-    converter_assign_dictionary(opencc->converter, opencc->DictChain);
+    opencc->dict_chain = config_get_dict_chain(config);
+    converter_assign_dictionary(opencc->converter, opencc->dict_chain);
     config_close(config);
   }
   return (opencc_t)opencc;
@@ -165,10 +165,10 @@ int opencc_close(opencc_t t_opencc) {
   if (!lib_initialized) {
     lib_initialize();
   }
-  opencc_desc* opencc = (opencc_desc*)t_opencc;
+  OpenccDesc* opencc = (OpenccDesc*)t_opencc;
   converter_close(opencc->converter);
-  if (opencc->DictChain != NULL) {
-    dict_chain_delete(opencc->DictChain);
+  if (opencc->dict_chain != NULL) {
+    dict_chain_delete(opencc->dict_chain);
   }
   free(opencc);
   return 0;
@@ -180,20 +180,20 @@ int opencc_dict_load(opencc_t t_opencc,
   if (!lib_initialized) {
     lib_initialize();
   }
-  opencc_desc* opencc = (opencc_desc*)t_opencc;
+  OpenccDesc* opencc = (OpenccDesc*)t_opencc;
   DictGroup* DictGroup;
-  if (opencc->DictChain == NULL) {
-    opencc->DictChain = dict_chain_new(NULL);
-    DictGroup = dict_chain_add_group(opencc->DictChain);
+  if (opencc->dict_chain == NULL) {
+    opencc->dict_chain = dict_chain_new(NULL);
+    DictGroup = dict_chain_add_group(opencc->dict_chain);
   } else {
-    DictGroup = dict_chain_get_group(opencc->DictChain, 0);
+    DictGroup = dict_chain_get_group(opencc->dict_chain, 0);
   }
   int retval = dict_group_load(DictGroup, dict_filename, dict_type);
   if (retval == -1) {
     errnum = OPENCC_ERROR_DICTLOAD;
     return -1;
   }
-  converter_assign_dictionary(opencc->converter, opencc->DictChain);
+  converter_assign_dictionary(opencc->converter, opencc->dict_chain);
   return retval;
 }
 
@@ -202,7 +202,7 @@ void opencc_set_conversion_mode(opencc_t t_opencc,
   if (!lib_initialized) {
     lib_initialize();
   }
-  opencc_desc* opencc = (opencc_desc*)t_opencc;
+  OpenccDesc* opencc = (OpenccDesc*)t_opencc;
   converter_set_conversion_mode(opencc->converter, conversion_mode);
 }
 

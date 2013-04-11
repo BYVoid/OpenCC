@@ -27,7 +27,7 @@ typedef struct {
   int base;
   int parent;
   int word;
-} DoubleArrayTrieItem;
+} DatrieItem;
 
 Dict* dict_datrie_new(const char* filename);
 

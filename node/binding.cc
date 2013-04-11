@@ -12,19 +12,19 @@ char* ToUtf8String(const Local<String>& str) {
   return utf8;
 }
 
-class Opencc : public node::ObjectWrap {
+class OpenccBinding : public node::ObjectWrap {
   struct ConvertRequest {
-    Opencc* opencc_instance;
+    OpenccBinding* opencc_instance;
     char* input;
     char* output;
     Persistent<Function> callback;
   };
  public:
-  explicit Opencc(const char * config_file) {
+  explicit OpenccBinding(const char * config_file) {
     handler_ = opencc_open(config_file);
   }
 
-  virtual ~Opencc() {
+  virtual ~OpenccBinding() {
     if (handler_ != (opencc_t) -1)
       opencc_close(handler_);
   }
@@ -35,15 +35,15 @@ class Opencc : public node::ObjectWrap {
 
   static Handle<Value> New(const Arguments& args) {
     HandleScope scope;
-    Opencc* opencc_instance;
+    OpenccBinding* opencc_instance;
 
     if (args.Length() >= 1 && args[0]->IsString()) {
       char* config_file = ToUtf8String(args[0]->ToString());
-      opencc_instance = new Opencc(config_file);
+      opencc_instance = new OpenccBinding(config_file);
       delete [] config_file;
     } else {
       const char* config_file = OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD;
-      opencc_instance = new Opencc(config_file);
+      opencc_instance = new OpenccBinding(config_file);
     }
 
     if (!*opencc_instance) {
@@ -63,7 +63,7 @@ class Opencc : public node::ObjectWrap {
     }
 
     ConvertRequest* conv_data = new ConvertRequest;
-    conv_data->opencc_instance = ObjectWrap::Unwrap<Opencc>(args.This());
+    conv_data->opencc_instance = ObjectWrap::Unwrap<OpenccBinding>(args.This());
     conv_data->input = ToUtf8String(args[0]->ToString());
     conv_data->callback = Persistent<Function>::New(Local<Function>::Cast(args[1]));
     uv_work_t* req = new uv_work_t;
@@ -103,7 +103,7 @@ class Opencc : public node::ObjectWrap {
       return scope.Close(Undefined());
     }
 
-    Opencc* opencc_instance = ObjectWrap::Unwrap<Opencc>(args.This());
+    OpenccBinding* opencc_instance = ObjectWrap::Unwrap<OpenccBinding>(args.This());
     opencc_t opencc_handler = opencc_instance->handler_;
     char* input = ToUtf8String(args[0]->ToString());
     char* output = opencc_convert_utf8(opencc_handler, input, (size_t) -1);
@@ -121,7 +121,7 @@ class Opencc : public node::ObjectWrap {
       return scope.Close(Undefined());
     }
 
-    Opencc* opencc_instance = ObjectWrap::Unwrap<Opencc>(args.This());
+    OpenccBinding* opencc_instance = ObjectWrap::Unwrap<OpenccBinding>(args.This());
     opencc_t opencc_handler = opencc_instance->handler_;
     int conversion_mode = args[0]->ToInt32()->Value();
     if (conversion_mode < 0 || conversion_mode > 2) {
@@ -137,7 +137,7 @@ class Opencc : public node::ObjectWrap {
 
   static void init(Handle<Object> target) {
     // Prepare constructor template
-    Local<FunctionTemplate> tpl = FunctionTemplate::New(Opencc::New);
+    Local<FunctionTemplate> tpl = FunctionTemplate::New(OpenccBinding::New);
     tpl->SetClassName(String::NewSymbol("Opencc"));
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
     // Prototype
@@ -157,7 +157,7 @@ class Opencc : public node::ObjectWrap {
 };
 
 void init(Handle<Object> target) {
-  Opencc::init(target);
+  OpenccBinding::init(target);
 }
 
 NODE_MODULE(binding, init);

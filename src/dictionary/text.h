@@ -21,11 +21,10 @@
 
 #include "../dict.h"
 
-struct _entry {
+typedef struct {
   ucs4_t* key;
   ucs4_t** value;
-};
-typedef struct _entry entry;
+} TextEntry;
 
 Dict* dict_text_new(const char* filename);
 
@@ -40,6 +39,6 @@ size_t dict_text_get_all_match_lengths(Dict* dict,
                                        const ucs4_t* word,
                                        size_t* match_length);
 
-size_t dict_text_get_lexicon(Dict* dict, entry* lexicon);
+size_t dict_text_get_lexicon(Dict* dict, TextEntry* lexicon);
 
 #endif /* __OPENCC_DICTIONARY_TEXT_H_ */

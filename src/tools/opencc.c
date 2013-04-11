@@ -24,6 +24,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef VERSION
+#define VERSION ""
+#endif
+
 #define BUFFER_SIZE 65536
 
 void convert(const char* input_file,

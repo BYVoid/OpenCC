@@ -24,6 +24,10 @@
 #include <locale.h>
 #include <unistd.h>
 
+#ifndef VERSION
+#define VERSION ""
+#endif
+
 #define DATRIE_SIZE 1000000
 #define DATRIE_WORD_MAX_COUNT 500000
 #define DATRIE_WORD_MAX_LENGTH 32
@@ -32,11 +36,11 @@
 typedef struct {
   uint32_t cursor;
   ucs4_t* pointer;
-} value_t;
+} Value;
 
 typedef struct {
   ucs4_t* key;
-  value_t* value;
+  Value* value;
   size_t length;
   size_t value_count;
 } Entry;
@@ -45,10 +49,10 @@ Entry lexicon[DATRIE_WORD_MAX_COUNT];
 uint32_t lexicon_count, words_set_count;
 int words_set[DATRIE_WORD_MAX_COUNT];
 ucs4_t words_set_char[DATRIE_WORD_MAX_COUNT];
-DoubleArrayTrieItem dat[DATRIE_SIZE];
+DatrieItem dat[DATRIE_SIZE];
 uint32_t lexicon_index_length, lexicon_cursor_end;
 
-void match_word(const DoubleArrayTrieItem* dat,
+void match_word(const DatrieItem* dat,
                 const ucs4_t* word,
                 int* match_pos,
                 int* id,
@@ -229,7 +233,7 @@ void make(void) {
 }
 
 int cmp(const void* a, const void* b) {
-  return ucs4cmp(((const entry*)a)->key, ((const entry*)b)->key);
+  return ucs4cmp(((const TextEntry*)a)->key, ((const TextEntry*)b)->key);
 }
 
 void init(const char* filename) {
@@ -246,7 +250,7 @@ void init(const char* filename) {
     fprintf(stderr, _("\n"));
     exit(1);
   }
-  static entry tlexicon[DATRIE_WORD_MAX_COUNT];
+  static TextEntry tlexicon[DATRIE_WORD_MAX_COUNT];
   /* TODO add datrie support */
   Dict* dictionary = dict_abs->dict;
   lexicon_count = dict_text_get_lexicon(dictionary, tlexicon);
@@ -260,7 +264,7 @@ void init(const char* filename) {
     for (j = 0; tlexicon[i].value[j] != NULL; j++) {}
     lexicon[i].value_count = j;
     lexicon_index_length += lexicon[i].value_count + 1;
-    lexicon[i].value = (value_t*)malloc(lexicon[i].value_count * sizeof(value_t));
+    lexicon[i].value = (Value*)malloc(lexicon[i].value_count * sizeof(Value));
     for (j = 0; j < lexicon[i].value_count; j++) {
       lexicon[i].value[j].cursor = lexicon_cursor;
       lexicon[i].value[j].pointer = tlexicon[i].value[j];
@@ -331,8 +335,7 @@ void write_text_file() {
 #endif /* ifdef DEBUG_WRITE_TEXT */
 
 void show_version() {
-  printf(_(
-           "\nOpen Chinese Convert (OpenCC) Dictionary Tool\nVersion %s\n\n"),
+  printf(_("\nOpen Chinese Convert (OpenCC) Dictionary Tool\nVersion %s\n\n"),
          VERSION);
 }
 

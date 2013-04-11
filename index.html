@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Opencc by BYVoid</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Opencc</h1>
+        <p>A project for conversion between Traditional and Simplified Chinese</p>
+
+        <p class="view"><a href="https://github.com/BYVoid/OpenCC">View the Project on GitHub <small>BYVoid/OpenCC</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/BYVoid/OpenCC/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/BYVoid/OpenCC/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/BYVoid/OpenCC">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Open Chinese Convert</h1>
+
+<h2>Introduction</h2>
+
+<p>Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for conversion between Traditional Chinese and Simplified Chinese, supporting character-level conversion, phrase-level conversion, variant conversion and regional idioms among Mainland China, Taiwan and Hong kong.</p>
+
+<p>中文簡繁轉換開源項目，支持詞彙級别的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港）。</p>
+
+<p>Project home page <a href="https://code.google.com/p/opencc/">https://code.google.com/p/opencc/</a></p>
+
+<p>詳細介紹 <a href="https://code.google.com/p/opencc/wiki/Introduction">https://code.google.com/p/opencc/wiki/Introduction</a></p>
+
+<h2>Projects using Opencc</h2>
+
+<ul>
+<li><a href="http://code.google.com/p/ibus/">ibus-pinyin</a></li>
+<li><a href="http://code.google.com/p/fcitx/">fcitx</a></li>
+<li><a href="http://code.google.com/p/rimeime/">rimeime</a></li>
+<li><a href="http://code.google.com/p/libgooglepinyin/">libgooglepinyin</a></li>
+<li><a href="https://github.com/libpinyin/ibus-libpinyin">ibus-libpinyin</a></li>
+</ul><h2>Installation</h2>
+
+<h3>Debian/Ubuntu</h3>
+
+<pre><code>apt-get install opencc
+</code></pre>
+
+<h3>Fedora</h3>
+
+<pre><code>yum install opencc
+</code></pre>
+
+<h3>Arch</h3>
+
+<pre><code>yaourt -S opencc
+</code></pre>
+
+<h3>Mac OS</h3>
+
+<pre><code>brew install opencc
+</code></pre>
+
+<h3>Node.js</h3>
+
+<pre><code>npm install opencc
+</code></pre>
+
+<h2>Build</h2>
+
+<h3>Build with CMake</h3>
+
+<p>Make a directory and check in:</p>
+
+<pre><code>    mkdir build
+    cd build
+</code></pre>
+
+<p>Build sources:</p>
+
+<pre><code>cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -D ENABLE_GETTEXT:BOOL=ON ..
+make
+</code></pre>
+
+<p>On windows, run these commands instead:</p>
+
+<pre><code>    cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT:BOOL=OFF
+    make
+</code></pre>
+
+<p>Install:</p>
+
+<pre><code>    sudo make install
+</code></pre>
+
+<h3>Build with gyp</h3>
+
+<pre><code>    mkdir build
+gyp --depth . -D library=shared_library -f make --generator-output=build opencc.gyp
+make -C build
+</code></pre>
+
+<h2>Screenshoots</h2>
+
+<p><img src="http://opencc.googlecode.com/files/screenshot-gui-mac.png" alt="OpenCC Mac"></p>
+
+<p><img src="http://opencc.googlecode.com/files/screenshot-gui.png" alt="OpenCC Windows"></p>
+
+<p><img src="http://opencc.googlecode.com/files/screenshot-gui-ubuntu.png" alt="OpenCC Ubuntu"></p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/BYVoid">BYVoid</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>

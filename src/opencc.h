@@ -26,7 +26,7 @@
 /**
  * @defgroup opencc_api OpenCC API
  * 
- * OpenCC API in C language
+ * API in C language
  */
 
 #include "opencc_types.h"

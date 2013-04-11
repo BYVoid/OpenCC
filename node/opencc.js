@@ -21,9 +21,9 @@
  */
 
 /**
- * @defgroup node_api OpenCC Node.js API
+ * @defgroup node_api Node.js API
  * 
- * OpenCC Node.js bindings
+ * Node.js language binding
  */
 
 var path = require('path');

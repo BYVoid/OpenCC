@@ -1,12 +1,14 @@
 # Open Chinese Convert
 
-開放中文轉換
+## Introduction
 
-An opensource project for conversion between Traditional Chinese and Simplified Chinese, supporting phrase-level conversion and regional idioms among Mainland China, Taiwan and Hong kong.
+Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for conversion between Traditional Chinese and Simplified Chinese, supporting character-level conversion, phrase-level conversion, variant conversion and regional idioms among Mainland China, Taiwan and Hong kong.
 
 中文簡繁轉換開源項目，支持詞彙級别的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港）。
 
-https://code.google.com/p/opencc/
+Project home page https://code.google.com/p/opencc/
+
+詳細介紹 https://code.google.com/p/opencc/wiki/Introduction
 
 ## Projects using Opencc
 
@@ -38,24 +40,40 @@ https://code.google.com/p/opencc/
 
     npm install opencc
 
-### Build steps with CMake
+## Build
 
-1. Make a directory and check in.
+### Build with CMake
+
+Make a directory and check in:
 
 		mkdir build
 		cd build
 
-2. Build sources.
+Build sources:
 
-		cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -D ENABLE_GETTEXT:BOOL=ON ..
-		make
+    cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -D ENABLE_GETTEXT:BOOL=ON ..
+    make
 
 On windows, run these commands instead:
 
 		cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT:BOOL=OFF
 		make
 
-3. Install.
+Install:
 
 		sudo make install
 
+
+### Build with gyp
+
+		mkdir build
+    gyp --depth . -D library=shared_library -f make --generator-output=build opencc.gyp
+    make -C build
+
+## Screenshoots
+
+![OpenCC Mac](http://opencc.googlecode.com/files/screenshot-gui-mac.png)
+
+![OpenCC Windows](http://opencc.googlecode.com/files/screenshot-gui.png)
+
+![OpenCC Ubuntu](http://opencc.googlecode.com/files/screenshot-gui-ubuntu.png)

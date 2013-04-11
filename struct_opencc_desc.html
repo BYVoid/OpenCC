@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.3.1"/>
-<title>Open Chinese Convert: Main Page</title>
+<title>Open Chinese Convert: OpenccDesc Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -38,9 +38,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </script>
   <div id="navrow1" class="tabs">
     <ul class="tablist">
-      <li class="current"><a href="index.html"><span>Main&#160;Page</span></a></li>
+      <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
+      <li class="current"><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -60,7 +60,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
-</div><!-- top -->
+  <div id="navrow2" class="tabs2">
+    <ul class="tablist">
+      <li><a href="annotated.html"><span>Data&#160;Structures</span></a></li>
+      <li><a href="classes.html"><span>Data&#160;Structure&#160;Index</span></a></li>
+      <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
+    </ul>
+  </div>
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -75,63 +81,31 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
+</div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#pub-attribs">Data Fields</a>  </div>
   <div class="headertitle">
-<div class="title">Open Chinese Convert Documentation</div>  </div>
+<div class="title">OpenccDesc Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h2>Introduction</h2>
-<p>Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for conversion between Traditional Chinese and Simplified Chinese, supporting character-level conversion, phrase-level conversion, variant conversion and regional idioms among Mainland China, Taiwan and Hong kong.</p>
-<p>中文簡繁轉換開源項目，支持詞彙級别的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港）。</p>
-<p>Project home page <a href="https://code.google.com/p/opencc/">https://code.google.com/p/opencc/</a></p>
-<p>詳細介紹 <a href="https://code.google.com/p/opencc/wiki/Introduction">https://code.google.com/p/opencc/wiki/Introduction</a></p>
-<h2>Projects using Opencc</h2>
-<ul>
-<li><a href="http://code.google.com/p/ibus/">ibus-pinyin</a></li>
-<li><a href="http://code.google.com/p/fcitx/">fcitx</a></li>
-<li><a href="http://code.google.com/p/rimeime/">rimeime</a></li>
-<li><a href="http://code.google.com/p/libgooglepinyin/">libgooglepinyin</a></li>
-<li><a href="https://github.com/libpinyin/ibus-libpinyin">ibus-libpinyin</a></li>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Data Fields</h2></td></tr>
+<tr class="memitem:a3f68c53d265fa2a0edb9ec6f1b69d004"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3f68c53d265fa2a0edb9ec6f1b69d004"></a>
+<a class="el" href="struct_s_dict_chain.html">DictChain</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>dict_chain</b></td></tr>
+<tr class="separator:a3f68c53d265fa2a0edb9ec6f1b69d004"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c11d530f0d6eff6a73921583d9f179b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9c11d530f0d6eff6a73921583d9f179b"></a>
+<a class="el" href="struct_s_converter.html">Converter</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>converter</b></td></tr>
+<tr class="separator:a9c11d530f0d6eff6a73921583d9f179b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock">
+<p>Definition at line <a class="el" href="opencc_8c_source.html#l00031">31</a> of file <a class="el" href="opencc_8c_source.html">opencc.c</a>.</p>
+</div><hr/>The documentation for this struct was generated from the following file:<ul>
+<li>src/<a class="el" href="opencc_8c_source.html">opencc.c</a></li>
 </ul>
-<h2>Installation</h2>
-<h3>Debian/Ubuntu</h3>
-<pre class="fragment">apt-get install opencc
-</pre><h3>Fedora</h3>
-<pre class="fragment">yum install opencc
-</pre><h3>Arch</h3>
-<pre class="fragment">yaourt -S opencc
-</pre><h3>Mac OS</h3>
-<pre class="fragment">brew install opencc
-</pre><h3>Node.js</h3>
-<pre class="fragment">npm install opencc
-</pre><h2>Build</h2>
-<h3>Build with CMake</h3>
-<p>Make a directory and check in: </p>
-<pre class="fragment">mkdir build
-cd build
-</pre><p>Build sources: </p>
-<pre class="fragment">cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -D ENABLE_GETTEXT:BOOL=ON ..
-make
-</pre><p>On windows, run these commands instead: </p>
-<pre class="fragment">cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT:BOOL=OFF
-make
-</pre><p>Install: </p>
-<pre class="fragment">sudo make install
-</pre><h3>Build with gyp</h3>
-<pre class="fragment">mkdir build
-gyp --depth . -D library=shared_library -f make --generator-output=build opencc.gyp
-make -C build
-</pre><h2>Screenshoots</h2>
-<div class="image">
-<img src="http://opencc.googlecode.com/files/screenshot-gui-mac.png"  alt="OpenCC Mac"/>
-</div>
-<div class="image">
-<img src="http://opencc.googlecode.com/files/screenshot-gui.png"  alt="OpenCC Windows"/>
-</div>
-<div class="image">
-<img src="http://opencc.googlecode.com/files/screenshot-gui-ubuntu.png"  alt="OpenCC Ubuntu"/>
-</div>
- </div></div><!-- contents -->
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated on Thu Apr 11 2013 23:54:20 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">

@@ -1,5 +1,7 @@
 *.pyc
 *.tgz
+.project
+.cproject
 /build
 /debug
 /release

@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stddef.h>
 
 #include "opencc_types.h"
 
@@ -34,9 +35,9 @@
 # include <libintl.h>
 # include <locale.h>
 # define _(STRING) dgettext(PACKAGE_NAME, STRING)
-#else // ifdef ENABLE_GETTEXT
+#else // ENABLE_GETTEXT
 # define _(STRING) STRING
-#endif // ifdef ENABLE_GETTEXT
+#endif // ENABLE_GETTEXT
 
 typedef void* converter_t;
 typedef void* config_t;
@@ -68,4 +69,4 @@ struct SDictChain {
   DictGroup* groups[DICTIONARY_GROUP_MAX_COUNT];
 };
 
-#endif // ifndef __COMMON_H_
+#endif // __COMMON_H_

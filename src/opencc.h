@@ -1,4 +1,8 @@
-/*
+/**
+ * @file
+ * OpenCC API.
+ *
+ * @license
  * Open Chinese Convert
  *
  * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
@@ -23,50 +27,49 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif // ifdef __cplusplus
+#endif
 
-/* Macros */
+/**
+ * Filename of default Simplified to Traditional configuration.
+ */
 #define OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD "zhs2zht.ini"
+
+/**
+ * Filename of default Traditional to Simplified configuration.
+ */
 #define OPENCC_DEFAULT_CONFIG_TRAD_TO_SIMP "zht2zhs.ini"
 
 /**
- * opencc_open:
- * @config_file: Location of configuration file.
- * @returns: A description pointer of the newly allocated instance of opencc. On
- *           any error the return value will be (opencc_t) -1
+ * Makes an instance of opencc.
+ * Leave config_file to NULL if you do not want to load any configuration file.
  *
- * Make an instance of opencc.
- *
- * Note: Leave config_file to NULL if you do not want to load any configuration
- *file.
- *
+ * @param config_file Location of configuration file.
+ * @return            A description pointer of the newly allocated instance of
+ *                    opencc. On error the return value will be (opencc_t) -1.
  */
 opencc_t opencc_open(const char* config_file);
 
 /**
- * opencc_close:
- * @od: The description pointer.
- * @returns: 0 on success or non-zero number on failure.
+ * Destroys an instance of opencc.
  *
- * Destroy an instance of opencc.
- *
+ * @param od The description pointer.
+ * @return 0 on success or non-zero number on failure.
  */
 int opencc_close(opencc_t od);
 
 /**
- * opencc_convert:
- * @od: The opencc description pointer.
- * @inbuf: The pointer to the wide character string of the input buffer.
- * @inbufleft: The maximum number of characters in *inbuf to convert.
- * @outbuf: The pointer to the wide character string of the output buffer.
- * @outbufleft: The size of output buffer.
+ * Converts a UCS-4 string from *inbuf to *outbuf.
+ * Do not forget to assign **outbuf to L'\0' after called if you want to use it
+ * as a C-Style string.
  *
- * @returns: The number of characters of the input buffer that converted.
+ * @param od         The opencc description pointer.
+ * @param inbuf      The pointer to the UCS-4 string.
+ * @param inbufleft  The maximum number of characters in *inbuf to be converted.
+ * @param outbuf     The pointer to the output buffer.
+ * @param outbufleft The size of output buffer.
  *
- * Convert string from *inbuf to *outbuf.
- *
- * Note: Don't forget to assign **outbuf to L'\0' after called.
- *
+ * @return           The number of characters in the input buffer that has been
+ *                   converted.
  */
 size_t opencc_convert(opencc_t od,
                       ucs4_t** inbuf,
@@ -75,72 +78,64 @@ size_t opencc_convert(opencc_t od,
                       size_t* outbufleft);
 
 /**
- * opencc_convert_utf8:
- * @od: The opencc description pointer.
- * @inbuf: The UTF-8 encoded string.
- * @length: The maximum length of inbuf to convert. If length is set to -1,
- *          the whole c-style string in inbuf will be converted.
+ * Converts UTF-8 string from inbuf.
+ * This function returns an allocated C-Style string via malloc(), which stores
+ * the converted string.
+ * You should call free() to release allocated memory.
  *
- * @returns: The newly allocated UTF-8 string that converted from inbuf.
+ * @param od     The opencc description pointer.
+ * @param inbuf  The UTF-8 encoded string.
+ * @param length The maximum length of inbuf to convert. If length is set to -1,
+ *               the whole c-style string in inbuf will be converted.
  *
- * Convert UTF-8 string from inbuf. This function returns a newly allocated
- * c-style string via malloc(), which stores the converted string.
- * DON'T FORGET TO CALL free() to recycle memory.
- *
+ * @return       The newly allocated UTF-8 string that stores text converted
+ *               from inbuf.
  */
 char* opencc_convert_utf8(opencc_t od, const char* inbuf, size_t length);
 
 /**
- * opencc_dict_load:
- * @od: The opencc description pointer.
- * @dict_filename: The name (or location) of the dictionary file.
- * @dict_type: The type of the dictionary.
+ * Loads a dictionary to default dictionary chain.
  *
- * @returns: 0 on success or non-zero number on failure.
+ * @param od             The opencc description pointer.
+ * @param dict_filename  The name (or location) of the dictionary file.
+ * @param dict_type      The type of the dictionary.
  *
- * Load a dictionary.
+ * @return               0 on success or non-zero number on failure.
  *
+ * @deprecated
  */
 int opencc_dict_load(opencc_t od,
                      const char* dict_filename,
                      opencc_dictionary_type dict_type);
 
 /**
-  * opencc_set_conversion_mode:
-  * @od: The opencc description pointer.
-  * @conversion_mode: Candidates are
-  *                   OPENCC_CONVERSION_FAST
-  *                   OPENCC_CONVERSION_SEGMENT_ONLY
-  *                   OPENCC_CONVERSION_LIST_CANDIDATES
+  * Changes the mode of conversion.
   *
-  * Change conversion mode.
-  *
+  * @param od               The opencc description pointer.
+  * @param conversion_mode  Conversion mode. Options are
+  *                         - OPENCC_CONVERSION_FAST
+  *                         - OPENCC_CONVERSION_SEGMENT_ONLY
+  *                         - OPENCC_CONVERSION_LIST_CANDIDATES
   */
 void opencc_set_conversion_mode(opencc_t od,
                                 opencc_conversion_mode conversion_mode);
 
 /**
- * opencc_errno:
+ * Returns an opencc_convert_errno_t which describes the last error.
  *
- * @returns: The error number.
- *
- * Return an opencc_convert_errno_t which describes the last error that occured
- * or OPENCC_CONVERT_ERROR_VOID
- *
+ * @return The error type.
  */
 opencc_error opencc_errno(void);
 
 /**
- * opencc_perror:
- * @spec Prefix message.
+ * Prints the error message to stderr.
  *
- * Print the error message to stderr.
- *
+ * @param spec Prefix message.
  */
 void opencc_perror(const char* spec);
 
 #ifdef __cplusplus
 }
-#endif // ifdef __cplusplus
+#endif
 
 #endif /* __OPENCC_H_ */

@@ -1,4 +1,8 @@
-/*
+/**
+ * @file
+ * OpenCC API.
+ *
+ * @license
  * Open Chinese Convert
  *
  * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
@@ -48,8 +52,11 @@ size_t opencc_convert(opencc_t t_opencc,
     lib_initialize();
   }
   opencc_desc* opencc = (opencc_desc*)t_opencc;
-  size_t retval = converter_convert
-                    (opencc->converter, inbuf, inbuf_left, outbuf, outbuf_left);
+  size_t retval = converter_convert(opencc->converter,
+                                    inbuf,
+                                    inbuf_left,
+                                    outbuf,
+                                    outbuf_left);
   if (retval == (size_t)-1) {
     errnum = OPENCC_ERROR_CONVERTER;
   }

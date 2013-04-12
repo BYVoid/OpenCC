@@ -38,7 +38,7 @@ OpenCC Online (在線轉換) http://opencc.byvoid.com/
 
 ### Arch
 
-    yaourt -S opencc
+    pacman -S opencc
 
 ### Mac OS
 
@@ -100,7 +100,7 @@ Install:
     gyp --depth . -D library=shared_library -f make --generator-output=build opencc.gyp
     make -C build
 
-## Screenshoots
+## Screenshoot
 
 ![OpenCC Mac](http://opencc.googlecode.com/files/screenshot-gui-mac.png)
 

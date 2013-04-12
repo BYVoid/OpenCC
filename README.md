@@ -16,6 +16,8 @@ Development Documentation http://byvoid.github.io/OpenCC/
 
 Source Code on Github https://github.com/byvoid/opencc
 
+OpenCC Online (在線轉換) http://opencc.byvoid.com/
+
 ## Projects using Opencc
 
 * [ibus-pinyin](http://code.google.com/p/ibus/)

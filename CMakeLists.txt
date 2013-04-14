@@ -48,6 +48,7 @@ set(CPACK_SOURCE_IGNORE_FILES
 include(CPack)
 
 ######## Validation
+option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
 
 if (ENABLE_GETTEXT)
 	find_package(Gettext REQUIRED)

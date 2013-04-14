@@ -1,5 +1,12 @@
 # Change History of OpenCC
 
+## Ver 0.4.2
+
+* 修正「阪」、「薰」繁簡轉換
+* 增加四對缺失的簡繁轉換
+* 增加API文檔，由Doxygen生成
+* 重構大量代碼
+
 ## Ver 0.4.1
 
 * 修正Node.js 0.10兼容性問題。

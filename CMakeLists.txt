@@ -28,7 +28,7 @@ set (PACKAGE_URL http://code.google.com/p/opencc)
 set (PACKAGE_BUGREPORT http://code.google.com/p/opencc/issues/entry)
 set (OPENCC_VERSION_MAJOR 0)
 set (OPENCC_VERSION_MINOR 4)
-set (OPENCC_VERSION_REVISION 1)
+set (OPENCC_VERSION_REVISION 2)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
 	set (version_suffix .Debug)
@@ -43,7 +43,7 @@ set(CPACK_SOURCE_PACKAGE_FILE_NAME
   "${PACKAGE_NAME}-${OPENCC_VERSION_MAJOR}.${OPENCC_VERSION_MINOR}.${OPENCC_VERSION_REVISION}"
 )
 set(CPACK_SOURCE_IGNORE_FILES
-  "/build/;/release/;/debug/;/.git/;.gitignore;~$;${CPACK_SOURCE_IGNORE_FILES}"
+  "/build/;/release/;/debug/;/other/;/opencc.xcodeproj/;/.git/;.gitignore;~$;${CPACK_SOURCE_IGNORE_FILES}"
 )
 include(CPack)
 

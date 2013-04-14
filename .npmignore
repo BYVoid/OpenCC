@@ -18,3 +18,5 @@ merge.sh
 /opencc.pc.in
 /opencc.gyp
 /INSTALL
+/doc/html
+/opencc.xcodeproj

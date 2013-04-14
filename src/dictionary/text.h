@@ -26,6 +26,13 @@ typedef struct {
   ucs4_t** value;
 } TextEntry;
 
+typedef struct {
+  size_t entry_count;
+  size_t max_length;
+  TextEntry* lexicon;
+  ucs4_t* word_buff;
+} TextDict;
+
 Dict* dict_text_new(const char* filename);
 
 void dict_text_delete(Dict* dict);

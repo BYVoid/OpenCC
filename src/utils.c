@@ -86,7 +86,7 @@ void skip_utf8_bom(FILE* fp) {
 
 const char* executable_path(void) {
   static char path_buffer[PATH_BUFFER_SIZE];
-  static int calculated = FALSE;
+  static int calculated = 0;
 
   if (!calculated) {
 #ifdef __linux
@@ -99,16 +99,16 @@ const char* executable_path(void) {
 #elif _WIN32 || _WIN64
 
     // TODO windows
-    assert(FALSE);
+    assert(0);
 #else /* ifdef __linux */
 
     /* Other unsupported os */
-    assert(FALSE);
+    assert(0);
 #endif /* ifdef __linux */
     char* last_sep = strrchr(path_buffer, '/');
     assert(last_sep != NULL);
     *last_sep = '\0';
-    calculated = TRUE;
+    calculated = 1;
   }
   return path_buffer;
 }
@@ -166,11 +166,11 @@ char* get_file_path(const char* filename) {
 
 int is_absolute_path(const char* path) {
   if (path[0] == '/') {
-    return TRUE;
+    return 1;
   }
 
   if (path[1] == ':') {
-    return TRUE;
+    return 1;
   }
-  return FALSE;
+  return 0;
 }

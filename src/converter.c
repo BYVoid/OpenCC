@@ -50,7 +50,7 @@ static void sp_seg_buffer_free(SpsegData* ossb) {
 }
 
 static void sp_seg_set_buffer_size(SpsegData* ossb, size_t buffer_size) {
-  if (ossb->initialized == TRUE) {
+  if (ossb->initialized == 1) {
     sp_seg_buffer_free(ossb);
   }
   ossb->buffer_size = buffer_size;
@@ -58,7 +58,7 @@ static void sp_seg_set_buffer_size(SpsegData* ossb, size_t buffer_size) {
   ossb->min_len = (size_t*)malloc(buffer_size * sizeof(size_t));
   ossb->parent = (size_t*)malloc(buffer_size * sizeof(size_t));
   ossb->path = (size_t*)malloc(buffer_size * sizeof(size_t));
-  ossb->initialized = TRUE;
+  ossb->initialized = 1;
 }
 
 static size_t sp_seg(Converter* converter,
@@ -153,7 +153,7 @@ static size_t sp_seg(Converter* converter,
   /* 設置緩衝區空間 */
   SpsegData* ossb = converter->data;
   size_t buffer_size_need = length + 1;
-  if ((ossb->initialized == FALSE) || (ossb->buffer_size < buffer_size_need)) {
+  if ((ossb->initialized == 0) || (ossb->buffer_size < buffer_size_need)) {
     sp_seg_set_buffer_size(ossb, buffer_size_need);
   }
   size_t i, j;
@@ -562,7 +562,7 @@ Converter* converter_open(void) {
 #if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH
   converter->data = (SpsegData*)malloc(sizeof(SpsegData));
   SpsegData* spseg_buffer = converter->data;
-  spseg_buffer->initialized = FALSE;
+  spseg_buffer->initialized = 0;
   spseg_buffer->match_length = NULL;
   spseg_buffer->min_len = NULL;
   spseg_buffer->parent = NULL;

@@ -1,4 +1,8 @@
-/*
+/**
+ * @file
+ * UCS4-UTF8 Encoding module.
+ *
+ * @license
  * Open Chinese Convert
  *
  * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
@@ -21,8 +25,22 @@
 
 #include "common.h"
 
+/**
+ * Converts a UTF-8 string into UCS-4.
+ *
+ * @param utf8   UTF-8 string
+ * @param length Length of UTF-8 string or 0 to consider as \0 ended string
+ * @return       The converted UCS-4 string. Must be free when not in use.
+ */
 ucs4_t* utf8_to_ucs4(const char* utf8, size_t length);
 
+/**
+ * Converts a UCS-4 string into UTF-8.
+ *
+ * @param ucs4   UCS-4 string
+ * @param length Length of UCS-4 string or 0 to consider as \0 ended string
+ * @return       The converted UTF-8 string. Must be free when not in use.
+ */
 char* ucs4_to_utf8(const ucs4_t* ucs4, size_t length);
 
 size_t ucs4len(const ucs4_t* str);

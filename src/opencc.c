@@ -34,13 +34,13 @@ typedef struct {
 } OpenccDesc;
 
 static opencc_error errnum = OPENCC_ERROR_VOID;
-static int lib_initialized = FALSE;
+static int lib_initialized = 0;
 
 static void lib_initialize(void) {
 #ifdef ENABLE_GETTEXT
   bindtextdomain(PACKAGE_NAME, LOCALEDIR);
 #endif /* ifdef ENABLE_GETTEXT */
-  lib_initialized = TRUE;
+  lib_initialized = 1;
 }
 
 size_t opencc_convert(opencc_t t_opencc,

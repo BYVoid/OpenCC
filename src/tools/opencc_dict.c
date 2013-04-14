@@ -80,22 +80,22 @@ int unused(int i) {
   if ((i >= 0) && (i < DATRIE_SIZE)) {
     return dat[i].parent == DATRIE_UNUSED;
   }
-  return FALSE;
+  return 0;
 }
 
 int is_prefix(const ucs4_t* a, const ucs4_t* b) {
   const ucs4_t* p = a, * q = b;
   while (*p != 0) {
     if (*q == 0) {
-      return FALSE;
+      return 0;
     }
     if (*p != *q) {
-      return FALSE;
+      return 0;
     }
     p++;
     q++;
   }
-  return TRUE;
+  return 1;
 }
 
 int binary_search(const ucs4_t* str) {
@@ -160,10 +160,10 @@ int words_space_available(int delta) {
   ucs4_t* wp;
   for (wp = words_set_char; *wp; wp++) {
     if (!unused(encode_char(*wp) + delta)) {
-      return FALSE;
+      return 0;
     }
   }
-  return TRUE;
+  return 1;
 }
 
 void insert_first_char(int id) {
@@ -354,7 +354,7 @@ void show_usage() {
 int main(int argc, char** argv) {
   static int oc;
   static char input_file[BUFFER_SIZE], output_file[BUFFER_SIZE];
-  int input_file_specified = FALSE, output_file_specified = FALSE;
+  int input_file_specified = 0, output_file_specified = 0;
 
 #ifdef ENABLE_GETTEXT
   setlocale(LC_ALL, "");
@@ -380,11 +380,11 @@ int main(int argc, char** argv) {
       return 0;
     case 'i':
       strcpy(input_file, optarg);
-      input_file_specified = TRUE;
+      input_file_specified = 1;
       break;
     case 'o':
       strcpy(output_file, optarg);
-      output_file_specified = TRUE;
+      output_file_specified = 1;
       break;
     }
   }

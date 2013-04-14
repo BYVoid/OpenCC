@@ -27,8 +27,6 @@
 
 #include "opencc_types.h"
 
-#define FALSE (0)
-#define TRUE (!(0))
 #define INFINITY_INT ((~0U) >> 1)
 
 #ifdef ENABLE_GETTEXT
@@ -38,6 +36,10 @@
 #else // ENABLE_GETTEXT
 # define _(STRING) STRING
 #endif // ENABLE_GETTEXT
+
+#ifndef PKGDATADIR
+#define PKGDATADIR ""
+#endif
 
 struct SConfig;
 struct SConverter;

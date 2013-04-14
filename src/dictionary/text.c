@@ -23,13 +23,6 @@
 #define ENTRY_BUFF_SIZE 128
 #define ENTRY_WBUFF_SIZE ENTRY_BUFF_SIZE / sizeof(size_t)
 
-typedef struct {
-  size_t entry_count;
-  size_t max_length;
-  TextEntry* lexicon;
-  ucs4_t* word_buff;
-} TextDict;
-
 int qsort_entry_cmp(const void* a, const void* b) {
   return ucs4cmp(((TextEntry*)a)->key, ((TextEntry*)b)->key);
 }

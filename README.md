@@ -48,23 +48,23 @@ http://ytenx.org/byohlyuk/KienxPyan
 
 ## Installation
 
-### Debian/Ubuntu
+### [Debian](http://packages.qa.debian.org/o/opencc.html)/[Ubuntu](https://launchpad.net/ubuntu/+source/opencc)
 
     apt-get install opencc
 
-### Fedora
+### [Fedora](https://admin.fedoraproject.org/pkgdb/acls/name/opencc)
 
     yum install opencc
 
-### Arch
+### [Arch](https://www.archlinux.org/packages/community/x86_64/opencc/)
 
     pacman -S opencc
 
-### Mac OS
+### [Mac](https://github.com/mxcl/homebrew/blob/master/Library/Formula/opencc.rb)
 
     brew install opencc
 
-### Node.js
+### [Node.js](https://npmjs.org/package/opencc)
 
     npm install opencc
 
@@ -120,7 +120,7 @@ Install:
     gyp --depth . -D library=shared_library -f make --generator-output=build opencc.gyp
     make -C build
 
-## Screenshoot
+## Screenshot
 
 ![OpenCC Mac](http://opencc.googlecode.com/files/screenshot-gui-mac.png)
 

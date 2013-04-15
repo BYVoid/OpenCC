@@ -6,6 +6,18 @@ Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for c
 
 中文簡繁轉換開源項目，支持詞彙級别的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港）。
 
+### OpenCC特點
+
+* 嚴格區分「一簡對多繁」和「一簡對多異」。
+* 完全兼容異體字，可以實現動態替換。
+* 嚴格審校一簡對多繁詞條，原則爲「能分則不合」。
+* 支持中國大陸、臺灣、香港異體字和地區習慣用詞轉換，如「裏」「裡」、「鼠標」「滑鼠」。
+* 使用歧義分割+最少分詞算法，儘可能從技術上優化轉換效果。
+* 詞庫和函數庫完全分離，可以自由修改、導入、擴展。
+* 支持C、C++、Python、PHP、Java、Ruby、Node.js。
+* 兼容Windows、Linux、Mac平臺。
+* 已經用於ibus-pinyin、fcitx的繁體模式輸入。
+
 ## Documentations
 
 Project home page https://code.google.com/p/opencc/

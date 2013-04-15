@@ -18,19 +18,27 @@ Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for c
 * 兼容Windows、Linux、Mac平臺。
 * 已經用於ibus-pinyin、fcitx的繁體模式輸入。
 
-## Documentations
+## Links
 
-Project home page https://code.google.com/p/opencc/
+### Project home page
+http://code.google.com/p/opencc/
 
-Introduction (詳細介紹) https://code.google.com/p/opencc/wiki/Introduction
+### Introduction (詳細介紹)
+https://code.google.com/p/opencc/wiki/Introduction
 
-Development Documentation http://byvoid.github.io/OpenCC/
+### Development Documentation
+http://byvoid.github.io/OpenCC/
 
-Source Code on Github https://github.com/byvoid/opencc
+### Source Code on Github
+https://github.com/byvoid/opencc
 
-OpenCC Online (在線轉換) http://opencc.byvoid.com/
+### OpenCC Online (在線轉換)
+http://opencc.byvoid.com/
 
-## Projects using Opencc
+### 現代漢語常用簡繁一對多字義辨析表
+http://ytenx.org/byohlyuk/KienxPyan
+
+### Projects using Opencc
 
 * [ibus-pinyin](http://code.google.com/p/ibus/)
 * [fcitx](http://code.google.com/p/fcitx/)

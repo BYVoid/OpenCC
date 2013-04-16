@@ -45,6 +45,8 @@ http://ytenx.org/byohlyuk/KienxPyan
 * [rimeime](http://code.google.com/p/rimeime/)
 * [libgooglepinyin](http://code.google.com/p/libgooglepinyin/)
 * [ibus-libpinyin](https://github.com/libpinyin/ibus-libpinyin)
+* [BYVBlog](https://github.com/byvoid/byvblog)
+* [豆瓣同城微信](http://weixinqiao.com/douban-event/)
 
 ## Installation
 

@@ -28,8 +28,14 @@
         # else /* ifdef TARGET_OS_MAC */
         # endif /* ifdef TARGET_OS_MAC */
 #elif defined _WIN32 || defined _WIN64
-    # include <GL\glut.h>
+        # include "Windows.h"
 #endif /* ifdef __APPLE__ */
+
+#if defined _WIN32 || defined _WIN64
+#define PATH_SEPARATOR '\\'
+#else
+#define PATH_SEPARATOR '/'
+#endif
 
 #define PATH_BUFFER_SIZE 4096
 
@@ -97,15 +103,15 @@ const char* executable_path(void) {
     int res = _NSGetExecutablePath(path_buffer, &size);
     assert(res == 0);
 #elif _WIN32 || _WIN64
-
-    // TODO windows
-    assert(0);
+    // NOTE: for "C:\\opencc.exe" on Windows, the returned path "C:" is
+    // incorrect until a '/' is appended to it later in try_open_file()
+    DWORD res = GetModuleFileNameA(NULL, path_buffer, PATH_BUFFER_SIZE);
+    assert(res != 0);
 #else /* ifdef __linux */
-
     /* Other unsupported os */
     assert(0);
 #endif /* ifdef __linux */
-    char* last_sep = strrchr(path_buffer, '/');
+    char* last_sep = strrchr(path_buffer, PATH_SEPARATOR);
     assert(last_sep != NULL);
     *last_sep = '\0';
     calculated = 1;
@@ -127,7 +133,7 @@ char* try_open_file(const char* path) {
     return NULL;
   }
 
-  /* Try to find file in executable directory*/
+  /* Try to find file in executable directory */
   const char* exe_dir = executable_path();
   char* filename =
     (char*)malloc(sizeof(char) * (strlen(path) + strlen(exe_dir) + 2));

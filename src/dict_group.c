@@ -57,8 +57,8 @@ static char* try_find_dictionary_with_config(
     return NULL;
   }
   char* config_path_filename = (char*)malloc(strlen(config_path) + strlen(
-                                               filename) + 3);
-  sprintf(config_path_filename, "%s/%s%c", config_path, filename, '\0');
+                                               filename) + 2);
+  sprintf(config_path_filename, "%s/%s", config_path, filename);
   FILE* fp = fopen(config_path_filename, "r");
   if (fp) {
     fclose(fp);

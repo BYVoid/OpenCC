@@ -20,21 +20,21 @@
 #include <unistd.h>
 
 #ifdef __APPLE__
-        # include "TargetConditionals.h"
-        # ifdef TARGET_OS_MAC
-                #  include <mach-o/dyld.h>
-        # elif TARGET_OS_IPHONE
-        # elif TARGET_IPHONE_SIMULATOR
-        # else /* ifdef TARGET_OS_MAC */
-        # endif /* ifdef TARGET_OS_MAC */
+  #include "TargetConditionals.h"
+  #ifdef TARGET_OS_MAC
+    #include <mach-o/dyld.h>
+  #elif TARGET_OS_IPHONE
+  #elif TARGET_IPHONE_SIMULATOR
+  #else /* ifdef TARGET_OS_MAC */
+  #endif /* ifdef TARGET_OS_MAC */
 #elif defined _WIN32 || defined _WIN64
-        # include "Windows.h"
+  #include "Windows.h"
 #endif /* ifdef __APPLE__ */
 
 #if defined _WIN32 || defined _WIN64
-#define PATH_SEPARATOR '\\'
+  #define PATH_SEPARATOR '\\'
 #else
-#define PATH_SEPARATOR '/'
+  #define PATH_SEPARATOR '/'
 #endif
 
 #define PATH_BUFFER_SIZE 4096
@@ -107,7 +107,7 @@ const char* executable_path(void) {
     // incorrect until a '/' is appended to it later in try_open_file()
     DWORD res = GetModuleFileNameA(NULL, path_buffer, PATH_BUFFER_SIZE);
     assert(res != 0);
-#else /* ifdef __linux */
+#else
     /* Other unsupported os */
     assert(0);
 #endif /* ifdef __linux */

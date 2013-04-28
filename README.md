@@ -129,3 +129,10 @@ Install:
 ![OpenCC Windows](http://opencc.googlecode.com/files/screenshot-gui.png)
 
 ![OpenCC Ubuntu](http://opencc.googlecode.com/files/screenshot-gui-ubuntu.png)
+
+## Contributors
+
+* [BYVoid](http://www.byvoid.com/)
+* 佛振
+* Peng Huang
+* LI Daobing

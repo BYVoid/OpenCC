@@ -1,5 +1,11 @@
 # Change History of OpenCC
 
+## Ver 0.4.3
+
+* 增加接口`opencc_convert_utf8_free`
+* 修正Node.js插件內存泄漏問題
+* 修正Windows下獲取當前目錄的問題
+
 ## Ver 0.4.2
 
 * 修正「阪」、「薰」繁簡轉換

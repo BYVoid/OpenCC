@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.3.1"/>
-<title>Open Chinese Convert: src/dictionary/text.h Source File</title>
+<title>Open Chinese Convert: /usr/local/google/home/carbokuo/dev/opencc/src/dictionary/text.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Open Chinese Convert
-   &#160;<span id="projectnumber">0.4.1</span>
+   &#160;<span id="projectnumber">0.4.3</span>
    </div>
    <div id="projectbrief">A project for conversion between Traditional and Simplified Chinese</div>
   </td>
@@ -84,7 +84,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_3fc11ad5c12c10fd009b93d85900de5b.html">src</a></li><li class="navelem"><a class="el" href="dir_d10c71a53ae5fac852933abfdbd8df77.html">dictionary</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_ff4828fad96d9e944dd497996469e5b3.html">src</a></li><li class="navelem"><a class="el" href="dir_50e2cb48fa314d7cbfcf53c496a4e870.html">dictionary</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -120,26 +120,33 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  ucs4_t** value;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;} <a class="code" href="struct_text_entry.html">TextEntry</a>;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<a class="code" href="struct_s_dict.html">Dict</a>* dict_text_new(<span class="keyword">const</span> <span class="keywordtype">char</span>* filename);</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keywordtype">void</span> dict_text_delete(<a class="code" href="struct_s_dict.html">Dict</a>* dict);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">const</span> ucs4_t* <span class="keyword">const</span>* dict_text_match_longest(<a class="code" href="struct_s_dict.html">Dict</a>* dict,</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;                                             <span class="keyword">const</span> ucs4_t* word,</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;                                             <span class="keywordtype">size_t</span> maxlen,</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;                                             <span class="keywordtype">size_t</span>* match_length);</div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="code" href="struct_text_dict.html">   29</a></span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span>{</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keywordtype">size_t</span> entry_count;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  <span class="keywordtype">size_t</span> max_length;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;  <a class="code" href="struct_text_entry.html">TextEntry</a>* lexicon;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;  ucs4_t* word_buff;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;} <a class="code" href="struct_text_dict.html">TextDict</a>;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<a class="code" href="struct_s_dict.html">Dict</a>* dict_text_new(<span class="keyword">const</span> <span class="keywordtype">char</span>* filename);</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keywordtype">size_t</span> dict_text_get_all_match_lengths(<a class="code" href="struct_s_dict.html">Dict</a>* dict,</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;                                       <span class="keyword">const</span> ucs4_t* word,</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;                                       <span class="keywordtype">size_t</span>* match_length);</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keywordtype">size_t</span> dict_text_get_lexicon(<a class="code" href="struct_s_dict.html">Dict</a>* dict, <a class="code" href="struct_text_entry.html">TextEntry</a>* lexicon);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* __OPENCC_DICTIONARY_TEXT_H_ */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keywordtype">void</span> dict_text_delete(<a class="code" href="struct_s_dict.html">Dict</a>* dict);</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">const</span> ucs4_t* <span class="keyword">const</span>* dict_text_match_longest(<a class="code" href="struct_s_dict.html">Dict</a>* dict,</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;                                             <span class="keyword">const</span> ucs4_t* word,</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;                                             <span class="keywordtype">size_t</span> maxlen,</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;                                             <span class="keywordtype">size_t</span>* match_length);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keywordtype">size_t</span> dict_text_get_all_match_lengths(<a class="code" href="struct_s_dict.html">Dict</a>* dict,</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                                       <span class="keyword">const</span> ucs4_t* word,</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;                                       <span class="keywordtype">size_t</span>* match_length);</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keywordtype">size_t</span> dict_text_get_lexicon(<a class="code" href="struct_s_dict.html">Dict</a>* dict, <a class="code" href="struct_text_entry.html">TextEntry</a>* lexicon);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* __OPENCC_DICTIONARY_TEXT_H_ */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri May 17 2013 14:16:34 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

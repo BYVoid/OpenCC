@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.3.1"/>
-<title>Open Chinese Convert: src/tools/opencc.c Source File</title>
+<title>Open Chinese Convert: /usr/local/google/home/carbokuo/dev/opencc/src/tools/opencc.c Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Open Chinese Convert
-   &#160;<span id="projectnumber">0.4.1</span>
+   &#160;<span id="projectnumber">0.4.3</span>
    </div>
    <div id="projectbrief">A project for conversion between Traditional and Simplified Chinese</div>
   </td>
@@ -84,7 +84,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_3fc11ad5c12c10fd009b93d85900de5b.html">src</a></li><li class="navelem"><a class="el" href="dir_314f8c745ebb4f7897620df9b1c2042e.html">tools</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_ff4828fad96d9e944dd497996469e5b3.html">src</a></li><li class="navelem"><a class="el" href="dir_5816f6917e1bb85e45d7bfcfce019b7c.html">tools</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -187,7 +187,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    buffer_out = <a class="code" href="group__opencc__api.html#gafab7056d17a5ef62e38087884313e8fb" title="Converts UTF-8 string from inbuf.">opencc_convert_utf8</a>(od, buffer_in, (<span class="keywordtype">size_t</span>)-1);</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keywordflow">if</span> (buffer_out != (<span class="keywordtype">char</span>*)-1) {</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      fprintf(fpo, <span class="stringliteral">&quot;%s&quot;</span>, buffer_out);</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      free(buffer_out);</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      <a class="code" href="group__opencc__api.html#ga138feda13cb7c55cdfa75b9100c578fb" title="Releases allocated buffer by opencc_convert_utf8.">opencc_convert_utf8_free</a>(buffer_out);</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    } <span class="keywordflow">else</span> {</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;      <a class="code" href="group__opencc__api.html#ga604e1c4ff24a62ecf9ea8e27b7a48df6" title="Prints the error message to stderr.">opencc_perror</a>(_(<span class="stringliteral">&quot;OpenCC error&quot;</span>));</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;      <span class="keywordflow">break</span>;</div>
@@ -200,7 +200,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    buffer_out = <a class="code" href="group__opencc__api.html#gafab7056d17a5ef62e38087884313e8fb" title="Converts UTF-8 string from inbuf.">opencc_convert_utf8</a>(od, lookahead, (<span class="keywordtype">size_t</span>)-1);</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keywordflow">if</span> (buffer_out != (<span class="keywordtype">char</span>*)-1) {</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      fprintf(fpo, <span class="stringliteral">&quot;%s&quot;</span>, buffer_out);</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;      free(buffer_out);</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;      <a class="code" href="group__opencc__api.html#ga138feda13cb7c55cdfa75b9100c578fb" title="Releases allocated buffer by opencc_convert_utf8.">opencc_convert_utf8_free</a>(buffer_out);</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    } <span class="keywordflow">else</span> {</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;      <a class="code" href="group__opencc__api.html#ga604e1c4ff24a62ecf9ea8e27b7a48df6" title="Prints the error message to stderr.">opencc_perror</a>(_(<span class="stringliteral">&quot;OpenCC error&quot;</span>));</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    }</div>
@@ -291,7 +291,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri May 17 2013 14:16:34 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

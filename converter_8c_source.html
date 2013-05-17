@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.3.1"/>
-<title>Open Chinese Convert: src/converter.c Source File</title>
+<title>Open Chinese Convert: /usr/local/google/home/carbokuo/dev/opencc/src/converter.c Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Open Chinese Convert
-   &#160;<span id="projectnumber">0.4.1</span>
+   &#160;<span id="projectnumber">0.4.3</span>
    </div>
    <div id="projectbrief">A project for conversion between Traditional and Simplified Chinese</div>
   </td>
@@ -84,7 +84,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_3fc11ad5c12c10fd009b93d85900de5b.html">src</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_ff4828fad96d9e944dd497996469e5b3.html">src</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -114,7 +114,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &quot;converter.h&quot;</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &quot;dict_group.h&quot;</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#include &quot;dict_chain.h&quot;</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;encoding.h&quot;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="encoding_8h.html" title="UCS4-UTF8 Encoding module.">encoding.h</a>&quot;</span></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#define DELIMITER &#39; &#39;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define SEGMENT_MAXIMUM_LENGTH 0</span></div>
@@ -144,7 +144,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;}</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> sp_seg_set_buffer_size(<a class="code" href="struct_spseg_data.html">SpsegData</a>* ossb, <span class="keywordtype">size_t</span> buffer_size) {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="keywordflow">if</span> (ossb-&gt;initialized == TRUE) {</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;  <span class="keywordflow">if</span> (ossb-&gt;initialized == 1) {</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    sp_seg_buffer_free(ossb);</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;  }</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  ossb-&gt;buffer_size = buffer_size;</div>
@@ -152,7 +152,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  ossb-&gt;min_len = (<span class="keywordtype">size_t</span>*)malloc(buffer_size * <span class="keyword">sizeof</span>(<span class="keywordtype">size_t</span>));</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  ossb-&gt;parent = (<span class="keywordtype">size_t</span>*)malloc(buffer_size * <span class="keyword">sizeof</span>(<span class="keywordtype">size_t</span>));</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;  ossb-&gt;path = (<span class="keywordtype">size_t</span>*)malloc(buffer_size * <span class="keyword">sizeof</span>(<span class="keywordtype">size_t</span>));</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  ossb-&gt;initialized = TRUE;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  ossb-&gt;initialized = 1;</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;}</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="keyword">static</span> <span class="keywordtype">size_t</span> sp_seg(<a class="code" href="struct_s_converter.html">Converter</a>* converter,</div>
@@ -247,7 +247,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  <span class="comment">/* 設置緩衝區空間 */</span></div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  <a class="code" href="struct_spseg_data.html">SpsegData</a>* ossb = converter-&gt;data;</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;  <span class="keywordtype">size_t</span> buffer_size_need = length + 1;</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;  <span class="keywordflow">if</span> ((ossb-&gt;initialized == FALSE) || (ossb-&gt;buffer_size &lt; buffer_size_need)) {</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;  <span class="keywordflow">if</span> ((ossb-&gt;initialized == 0) || (ossb-&gt;buffer_size &lt; buffer_size_need)) {</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    sp_seg_set_buffer_size(ossb, buffer_size_need);</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  }</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;  <span class="keywordtype">size_t</span> i, j;</div>
@@ -656,7 +656,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;<span class="preprocessor">#if SEGMENT_METHOD == SEGMENT_SHORTEST_PATH</span></div>
 <div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;<span class="preprocessor"></span>  converter-&gt;data = (<a class="code" href="struct_spseg_data.html">SpsegData</a>*)malloc(<span class="keyword">sizeof</span>(<a class="code" href="struct_spseg_data.html">SpsegData</a>));</div>
 <div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;  <a class="code" href="struct_spseg_data.html">SpsegData</a>* spseg_buffer = converter-&gt;data;</div>
-<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;  spseg_buffer-&gt;initialized = FALSE;</div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;  spseg_buffer-&gt;initialized = 0;</div>
 <div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;  spseg_buffer-&gt;match_length = NULL;</div>
 <div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;  spseg_buffer-&gt;min_len = NULL;</div>
 <div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;  spseg_buffer-&gt;parent = NULL;</div>
@@ -702,7 +702,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri May 17 2013 14:16:34 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

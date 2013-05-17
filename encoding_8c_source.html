@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.3.1"/>
-<title>Open Chinese Convert: src/encoding.c Source File</title>
+<title>Open Chinese Convert: /usr/local/google/home/carbokuo/dev/opencc/src/encoding.c Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Open Chinese Convert
-   &#160;<span id="projectnumber">0.4.1</span>
+   &#160;<span id="projectnumber">0.4.3</span>
    </div>
    <div id="projectbrief">A project for conversion between Traditional and Simplified Chinese</div>
   </td>
@@ -84,7 +84,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_3fc11ad5c12c10fd009b93d85900de5b.html">src</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_ff4828fad96d9e944dd497996469e5b3.html">src</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -110,14 +110,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment"> * limitations under the License.</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment"> */</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &quot;encoding.h&quot;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="encoding_8h.html" title="UCS4-UTF8 Encoding module.">encoding.h</a>&quot;</span></div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="opencc_8h.html" title="OpenCC API.">opencc.h</a>&quot;</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#define INITIAL_BUFF_SIZE 1024</span></div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define GET_BIT(byte, pos) (((byte) &gt;&gt; (pos))&amp; 1)</span></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define BITMASK(length) ((1 &lt;&lt; length) - 1)</span></div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;ucs4_t* utf8_to_ucs4(<span class="keyword">const</span> <span class="keywordtype">char</span>* utf8, <span class="keywordtype">size_t</span> length) {</div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="code" href="encoding_8h.html#a7c66912c42bbee2419994bd0864d7fc6">   26</a></span>&#160;ucs4_t* utf8_to_ucs4(<span class="keyword">const</span> <span class="keywordtype">char</span>* utf8, <span class="keywordtype">size_t</span> length) {</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keywordflow">if</span> (length == 0) {</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    length = (size_t)-1;</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  }</div>
@@ -218,7 +218,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  <span class="keywordflow">return</span> (ucs4_t*)-1;</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;}</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="keywordtype">char</span>* ucs4_to_utf8(<span class="keyword">const</span> ucs4_t* ucs4, <span class="keywordtype">size_t</span> length) {</div>
+<div class="line"><a name="l00127"></a><span class="lineno"><a class="code" href="encoding_8h.html#a4f9817f290e5c6cbdb494d414e9eef88">  127</a></span>&#160;<span class="keywordtype">char</span>* ucs4_to_utf8(<span class="keyword">const</span> ucs4_t* ucs4, <span class="keywordtype">size_t</span> length) {</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  <span class="keywordflow">if</span> (length == 0) {</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    length = (size_t)-1;</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;  }</div>
@@ -337,7 +337,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri May 17 2013 14:16:34 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

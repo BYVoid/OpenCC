@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Open Chinese Convert
-   &#160;<span id="projectnumber">0.4.1</span>
+   &#160;<span id="projectnumber">0.4.3</span>
    </div>
    <div id="projectbrief">A project for conversion between Traditional and Simplified Chinese</div>
   </td>
@@ -85,28 +85,51 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="textblock"><h2>Introduction</h2>
 <p>Open Chinese Convert (<a class="el" href="class_open_c_c.html" title="OpenCC Node.js API.">OpenCC</a>, 開放中文轉換) is an opensource project for conversion between Traditional Chinese and Simplified Chinese, supporting character-level conversion, phrase-level conversion, variant conversion and regional idioms among Mainland China, Taiwan and Hong kong.</p>
 <p>中文簡繁轉換開源項目，支持詞彙級别的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港）。</p>
-<h2>Documentations</h2>
-<p>Project home page <a href="https://code.google.com/p/opencc/">https://code.google.com/p/opencc/</a></p>
-<p>Introduction (詳細介紹) <a href="https://code.google.com/p/opencc/wiki/Introduction">https://code.google.com/p/opencc/wiki/Introduction</a></p>
-<p>Development Documentation <a href="http://byvoid.github.io/OpenCC/">http://byvoid.github.io/OpenCC/</a></p>
-<h2>Projects using Opencc</h2>
+<h3>OpenCC特點</h3>
+<ul>
+<li>嚴格區分「一簡對多繁」和「一簡對多異」。</li>
+<li>完全兼容異體字，可以實現動態替換。</li>
+<li>嚴格審校一簡對多繁詞條，原則爲「能分則不合」。</li>
+<li>支持中國大陸、臺灣、香港異體字和地區習慣用詞轉換，如「裏」「裡」、「鼠標」「滑鼠」。</li>
+<li>使用歧義分割+最少分詞算法，儘可能從技術上優化轉換效果。</li>
+<li>詞庫和函數庫完全分離，可以自由修改、導入、擴展。</li>
+<li>支持C、C++、Python、PHP、Java、Ruby、Node.js。</li>
+<li>兼容Windows、Linux、Mac平臺。</li>
+<li>已經用於ibus-pinyin、fcitx的繁體模式輸入。</li>
+</ul>
+<h2>Links</h2>
+<h3>Project home page</h3>
+<p><a href="http://code.google.com/p/opencc/">http://code.google.com/p/opencc/</a></p>
+<h3>Introduction (詳細介紹)</h3>
+<p><a href="https://code.google.com/p/opencc/wiki/Introduction">https://code.google.com/p/opencc/wiki/Introduction</a></p>
+<h3>Development Documentation</h3>
+<p><a href="http://byvoid.github.io/OpenCC/">http://byvoid.github.io/OpenCC/</a></p>
+<h3>Source Code on Github</h3>
+<p><a href="https://github.com/byvoid/opencc">https://github.com/byvoid/opencc</a></p>
+<h3><a class="el" href="class_open_c_c.html" title="OpenCC Node.js API.">OpenCC</a> Online (在線轉換)</h3>
+<p><a href="http://opencc.byvoid.com/">http://opencc.byvoid.com/</a></p>
+<h3>現代漢語常用簡繁一對多字義辨析表</h3>
+<p><a href="http://ytenx.org/byohlyuk/KienxPyan">http://ytenx.org/byohlyuk/KienxPyan</a></p>
+<h3>Projects using Opencc</h3>
 <ul>
 <li><a href="http://code.google.com/p/ibus/">ibus-pinyin</a></li>
 <li><a href="http://code.google.com/p/fcitx/">fcitx</a></li>
 <li><a href="http://code.google.com/p/rimeime/">rimeime</a></li>
 <li><a href="http://code.google.com/p/libgooglepinyin/">libgooglepinyin</a></li>
 <li><a href="https://github.com/libpinyin/ibus-libpinyin">ibus-libpinyin</a></li>
+<li><a href="https://github.com/byvoid/byvblog">BYVBlog</a></li>
+<li><a href="http://weixinqiao.com/douban-event/">豆瓣同城微信</a></li>
 </ul>
 <h2>Installation</h2>
-<h3>Debian/Ubuntu</h3>
+<h3><a href="http://packages.qa.debian.org/o/opencc.html">Debian</a>/<a href="https://launchpad.net/ubuntu/+source/opencc">Ubuntu</a></h3>
 <pre class="fragment">apt-get install opencc
-</pre><h3>Fedora</h3>
+</pre><h3><a href="https://admin.fedoraproject.org/pkgdb/acls/name/opencc">Fedora</a></h3>
 <pre class="fragment">yum install opencc
-</pre><h3>Arch</h3>
-<pre class="fragment">yaourt -S opencc
-</pre><h3>Mac OS</h3>
+</pre><h3><a href="https://www.archlinux.org/packages/community/x86_64/opencc/">Arch</a></h3>
+<pre class="fragment">pacman -S opencc
+</pre><h3><a href="https://github.com/mxcl/homebrew/blob/master/Library/Formula/opencc.rb">Mac</a></h3>
 <pre class="fragment">brew install opencc
-</pre><h3>Node.js</h3>
+</pre><h3><a href="https://npmjs.org/package/opencc">Node.js</a></h3>
 <pre class="fragment">npm install opencc
 </pre><h2>Usage</h2>
 <pre class="fragment">$ opencc --help
@@ -145,7 +168,7 @@ make
 <pre class="fragment">mkdir build
 gyp --depth . -D library=shared_library -f make --generator-output=build opencc.gyp
 make -C build
-</pre><h2>Screenshoots</h2>
+</pre><h2>Screenshot</h2>
 <div class="image">
 <img src="http://opencc.googlecode.com/files/screenshot-gui-mac.png"  alt="OpenCC Mac"/>
 </div>
@@ -155,10 +178,17 @@ make -C build
 <div class="image">
 <img src="http://opencc.googlecode.com/files/screenshot-gui-ubuntu.png"  alt="OpenCC Ubuntu"/>
 </div>
- </div></div><!-- contents -->
+<h2>Contributors</h2>
+<ul>
+<li><a href="http://www.byvoid.com/">BYVoid</a></li>
+<li>佛振</li>
+<li>Peng Huang</li>
+<li>LI Daobing </li>
+</ul>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri May 17 2013 14:16:34 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

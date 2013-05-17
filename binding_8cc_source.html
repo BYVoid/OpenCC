@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.3.1"/>
-<title>Open Chinese Convert: node/binding.cc Source File</title>
+<title>Open Chinese Convert: /usr/local/google/home/carbokuo/dev/opencc/node/binding.cc Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Open Chinese Convert
-   &#160;<span id="projectnumber">0.4.1</span>
+   &#160;<span id="projectnumber">0.4.3</span>
    </div>
    <div id="projectbrief">A project for conversion between Traditional and Simplified Chinese</div>
   </td>
@@ -84,7 +84,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_11fb14c1c95a028e7c6244d848c06e87.html">node</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_e4ead305a58c0c78eea1cc50a2f6f876.html">node</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -134,7 +134,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordflow">if</span> (args.Length() &gt;= 1 &amp;&amp; args[0]-&gt;IsString()) {</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;      <span class="keywordtype">char</span>* config_file = ToUtf8String(args[0]-&gt;ToString());</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      opencc_instance = <span class="keyword">new</span> <a class="code" href="class_opencc_binding.html">OpenccBinding</a>(config_file);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      <span class="keyword">delete</span> [] config_file;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      <span class="keyword">delete</span>[] config_file;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    } <span class="keywordflow">else</span> {</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <span class="keyword">const</span> <span class="keywordtype">char</span>* config_file = <a class="code" href="group__opencc__api.html#ga05b32035094049395f8975f9d2ffa1a2" title="Filename of default Simplified to Traditional configuration.">OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD</a>;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      opencc_instance = <span class="keyword">new</span> <a class="code" href="class_opencc_binding.html">OpenccBinding</a>(config_file);</div>
@@ -185,7 +185,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    conv_data-&gt;callback-&gt;Call(Context::GetCurrent()-&gt;Global(), argc, argv);</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    conv_data-&gt;callback.Dispose();</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keyword">delete</span>[] conv_data-&gt;input;</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keyword">delete</span>[] conv_data-&gt;output;</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <a class="code" href="group__opencc__api.html#ga138feda13cb7c55cdfa75b9100c578fb" title="Releases allocated buffer by opencc_convert_utf8.">opencc_convert_utf8_free</a>(conv_data-&gt;output);</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keyword">delete</span> conv_data;</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keyword">delete</span> req;</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  }</div>
@@ -204,7 +204,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    Local&lt;String&gt; converted = String::New(output);</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keyword">delete</span>[] input;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="keyword">delete</span>[] output;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <a class="code" href="group__opencc__api.html#ga138feda13cb7c55cdfa75b9100c578fb" title="Releases allocated buffer by opencc_convert_utf8.">opencc_convert_utf8_free</a>(output);</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keywordflow">return</span> scope.Close(converted);</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  }</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;</div>
@@ -258,7 +258,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri May 17 2013 14:16:34 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.3.1"/>
-<title>Open Chinese Convert: src/opencc.c File Reference</title>
+<title>Open Chinese Convert: /usr/local/google/home/carbokuo/dev/opencc/src/opencc.c File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Open Chinese Convert
-   &#160;<span id="projectnumber">0.4.1</span>
+   &#160;<span id="projectnumber">0.4.3</span>
    </div>
    <div id="projectbrief">A project for conversion between Traditional and Simplified Chinese</div>
   </td>
@@ -84,7 +84,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_3fc11ad5c12c10fd009b93d85900de5b.html">src</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_ff4828fad96d9e944dd497996469e5b3.html">src</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -103,7 +103,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &quot;converter.h&quot;</code><br/>
 <code>#include &quot;dict_group.h&quot;</code><br/>
 <code>#include &quot;dict_chain.h&quot;</code><br/>
-<code>#include &quot;encoding.h&quot;</code><br/>
+<code>#include &quot;<a class="el" href="encoding_8h_source.html">encoding.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="opencc_8h_source.html">opencc.h</a>&quot;</code><br/>
 </div>
 <p><a href="opencc_8c_source.html">Go to the source code of this file.</a></p>
@@ -121,6 +121,9 @@ Functions</h2></td></tr>
 <tr class="memitem:gafab7056d17a5ef62e38087884313e8fb"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__opencc__api.html#gafab7056d17a5ef62e38087884313e8fb">opencc_convert_utf8</a> (opencc_t t_opencc, const char *inbuf, size_t length)</td></tr>
 <tr class="memdesc:gafab7056d17a5ef62e38087884313e8fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts UTF-8 string from inbuf.  <a href="group__opencc__api.html#gafab7056d17a5ef62e38087884313e8fb">More...</a><br/></td></tr>
 <tr class="separator:gafab7056d17a5ef62e38087884313e8fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga138feda13cb7c55cdfa75b9100c578fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__opencc__api.html#ga138feda13cb7c55cdfa75b9100c578fb">opencc_convert_utf8_free</a> (char *buf)</td></tr>
+<tr class="memdesc:ga138feda13cb7c55cdfa75b9100c578fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Releases allocated buffer by opencc_convert_utf8.  <a href="group__opencc__api.html#ga138feda13cb7c55cdfa75b9100c578fb">More...</a><br/></td></tr>
+<tr class="separator:ga138feda13cb7c55cdfa75b9100c578fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaff29f13f99271edf806d94826b5022c2"><td class="memItemLeft" align="right" valign="top">opencc_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__opencc__api.html#gaff29f13f99271edf806d94826b5022c2">opencc_open</a> (const char *config_file)</td></tr>
 <tr class="memdesc:gaff29f13f99271edf806d94826b5022c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Makes an instance of opencc.  <a href="group__opencc__api.html#gaff29f13f99271edf806d94826b5022c2">More...</a><br/></td></tr>
 <tr class="separator:gaff29f13f99271edf806d94826b5022c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -173,7 +176,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 on success or non-zero number on failure. </dd></dl>
 
-<p>Definition at line <a class="el" href="opencc_8c_source.html#l00164">164</a> of file <a class="el" href="opencc_8c_source.html">opencc.c</a>.</p>
+<p>Definition at line <a class="el" href="opencc_8c_source.html#l00168">168</a> of file <a class="el" href="opencc_8c_source.html">opencc.c</a>.</p>
 
 </div>
 </div>
@@ -194,14 +197,14 @@ Functions</h2></td></tr>
 <p>Returns an opencc_convert_errno_t which describes the last error. </p>
 <dl class="section return"><dt>Returns</dt><dd>The error type. </dd></dl>
 
-<p>Definition at line <a class="el" href="opencc_8c_source.html#l00209">209</a> of file <a class="el" href="opencc_8c_source.html">opencc.c</a>.</p>
+<p>Definition at line <a class="el" href="opencc_8c_source.html#l00213">213</a> of file <a class="el" href="opencc_8c_source.html">opencc.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri May 17 2013 14:16:34 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

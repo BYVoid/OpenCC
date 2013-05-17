@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.3.1"/>
-<title>Open Chinese Convert: src/opencc.h Source File</title>
+<title>Open Chinese Convert: /usr/local/google/home/carbokuo/dev/opencc/src/opencc.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Open Chinese Convert
-   &#160;<span id="projectnumber">0.4.1</span>
+   &#160;<span id="projectnumber">0.4.3</span>
    </div>
    <div id="projectbrief">A project for conversion between Traditional and Simplified Chinese</div>
   </td>
@@ -84,7 +84,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_3fc11ad5c12c10fd009b93d85900de5b.html">src</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_ff4828fad96d9e944dd497996469e5b3.html">src</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -118,26 +118,28 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="keywordtype">char</span>* <a class="code" href="group__opencc__api.html#gafab7056d17a5ef62e38087884313e8fb" title="Converts UTF-8 string from inbuf.">opencc_convert_utf8</a>(opencc_t od, <span class="keyword">const</span> <span class="keywordtype">char</span>* inbuf, <span class="keywordtype">size_t</span> length);</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="keywordtype">int</span> <a class="code" href="group__opencc__api.html#ga2eccfa21b06e616b8ea1d721c23239d5" title="Loads a dictionary to default dictionary chain.">opencc_dict_load</a>(opencc_t od,</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;                     <span class="keyword">const</span> <span class="keywordtype">char</span>* dict_filename,</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;                     opencc_dictionary_type dict_type);</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__opencc__api.html#ga728494968cc73f7aefc547f905cd9cac" title="Changes the mode of conversion.">opencc_set_conversion_mode</a>(opencc_t od,</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;                                opencc_conversion_mode conversion_mode);</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;opencc_error <a class="code" href="opencc_8c.html#a87306db3be941d5a40c503d04fc47ce3" title="Returns an opencc_convert_errno_t which describes the last error.">opencc_errno</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__opencc__api.html#ga604e1c4ff24a62ecf9ea8e27b7a48df6" title="Prints the error message to stderr.">opencc_perror</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* spec);</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="preprocessor">#ifdef __cplusplus</span></div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;<span class="preprocessor"></span>}</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* __OPENCC_H_ */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__opencc__api.html#ga138feda13cb7c55cdfa75b9100c578fb" title="Releases allocated buffer by opencc_convert_utf8.">opencc_convert_utf8_free</a>(<span class="keywordtype">char</span>* buf);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="keywordtype">int</span> <a class="code" href="group__opencc__api.html#ga2eccfa21b06e616b8ea1d721c23239d5" title="Loads a dictionary to default dictionary chain.">opencc_dict_load</a>(opencc_t od,</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;                     <span class="keyword">const</span> <span class="keywordtype">char</span>* dict_filename,</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;                     opencc_dictionary_type dict_type);</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__opencc__api.html#ga728494968cc73f7aefc547f905cd9cac" title="Changes the mode of conversion.">opencc_set_conversion_mode</a>(opencc_t od,</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;                                opencc_conversion_mode conversion_mode);</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;opencc_error <a class="code" href="opencc_8c.html#a87306db3be941d5a40c503d04fc47ce3" title="Returns an opencc_convert_errno_t which describes the last error.">opencc_errno</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__opencc__api.html#ga604e1c4ff24a62ecf9ea8e27b7a48df6" title="Prints the error message to stderr.">opencc_perror</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* spec);</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="preprocessor">#ifdef __cplusplus</span></div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="preprocessor"></span>}</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* __OPENCC_H_ */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri May 17 2013 14:16:34 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

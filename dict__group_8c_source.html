@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.3.1"/>
-<title>Open Chinese Convert: src/dict_group.c Source File</title>
+<title>Open Chinese Convert: /usr/local/google/home/carbokuo/dev/opencc/src/dict_group.c Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Open Chinese Convert
-   &#160;<span id="projectnumber">0.4.1</span>
+   &#160;<span id="projectnumber">0.4.3</span>
    </div>
    <div id="projectbrief">A project for conversion between Traditional and Simplified Chinese</div>
   </td>
@@ -84,7 +84,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_3fc11ad5c12c10fd009b93d85900de5b.html">src</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_ff4828fad96d9e944dd497996469e5b3.html">src</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -151,8 +151,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordflow">return</span> NULL;</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  }</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  <span class="keywordtype">char</span>* config_path_filename = (<span class="keywordtype">char</span>*)malloc(strlen(config_path) + strlen(</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                                               filename) + 3);</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  sprintf(config_path_filename, <span class="stringliteral">&quot;%s/%s%c&quot;</span>, config_path, filename, <span class="charliteral">&#39;\0&#39;</span>);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                                               filename) + 2);</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  sprintf(config_path_filename, <span class="stringliteral">&quot;%s/%s&quot;</span>, config_path, filename);</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  FILE* fp = fopen(config_path_filename, <span class="stringliteral">&quot;r&quot;</span>);</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="keywordflow">if</span> (fp) {</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    fclose(fp);</div>
@@ -284,7 +284,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri May 17 2013 14:16:34 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

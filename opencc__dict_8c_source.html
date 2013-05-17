@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.3.1"/>
-<title>Open Chinese Convert: src/tools/opencc_dict.c Source File</title>
+<title>Open Chinese Convert: /usr/local/google/home/carbokuo/dev/opencc/src/tools/opencc_dict.c Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -23,7 +23,7 @@
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
    <div id="projectname">Open Chinese Convert
-   &#160;<span id="projectnumber">0.4.1</span>
+   &#160;<span id="projectnumber">0.4.3</span>
    </div>
    <div id="projectbrief">A project for conversion between Traditional and Simplified Chinese</div>
   </td>
@@ -84,7 +84,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_3fc11ad5c12c10fd009b93d85900de5b.html">src</a></li><li class="navelem"><a class="el" href="dir_314f8c745ebb4f7897620df9b1c2042e.html">tools</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_ff4828fad96d9e944dd497996469e5b3.html">src</a></li><li class="navelem"><a class="el" href="dir_5816f6917e1bb85e45d7bfcfce019b7c.html">tools</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -174,22 +174,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <span class="keywordflow">if</span> ((i &gt;= 0) &amp;&amp; (i &lt; DATRIE_SIZE)) {</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordflow">return</span> dat[i].parent == DATRIE_UNUSED;</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  }</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="keywordflow">return</span> FALSE;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;}</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="keywordtype">int</span> is_prefix(<span class="keyword">const</span> ucs4_t* a, <span class="keyword">const</span> ucs4_t* b) {</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  <span class="keyword">const</span> ucs4_t* p = a, * q = b;</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;  <span class="keywordflow">while</span> (*p != 0) {</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordflow">if</span> (*q == 0) {</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;      <span class="keywordflow">return</span> FALSE;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;      <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    }</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordflow">if</span> (*p != *q) {</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      <span class="keywordflow">return</span> FALSE;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    }</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    p++;</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    q++;</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  }</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <span class="keywordflow">return</span> TRUE;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <span class="keywordflow">return</span> 1;</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;}</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="keywordtype">int</span> binary_search(<span class="keyword">const</span> ucs4_t* str) {</div>
@@ -254,10 +254,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  ucs4_t* wp;</div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <span class="keywordflow">for</span> (wp = words_set_char; *wp; wp++) {</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keywordflow">if</span> (!unused(encode_char(*wp) + delta)) {</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      <span class="keywordflow">return</span> FALSE;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    }</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  }</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  <span class="keywordflow">return</span> TRUE;</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;  <span class="keywordflow">return</span> 1;</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;}</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="keywordtype">void</span> insert_first_char(<span class="keywordtype">int</span> <span class="keywordtype">id</span>) {</div>
@@ -448,7 +448,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;<span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>** argv) {</div>
 <div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">int</span> oc;</div>
 <div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">char</span> input_file[BUFFER_SIZE], output_file[BUFFER_SIZE];</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;  <span class="keywordtype">int</span> input_file_specified = FALSE, output_file_specified = FALSE;</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;  <span class="keywordtype">int</span> input_file_specified = 0, output_file_specified = 0;</div>
 <div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;</div>
 <div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;<span class="preprocessor">#ifdef ENABLE_GETTEXT</span></div>
 <div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;<span class="preprocessor"></span>  setlocale(LC_ALL, <span class="stringliteral">&quot;&quot;</span>);</div>
@@ -474,11 +474,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;      <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;    <span class="keywordflow">case</span> <span class="charliteral">&#39;i&#39;</span>:</div>
 <div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;      strcpy(input_file, optarg);</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;      input_file_specified = TRUE;</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;      input_file_specified = 1;</div>
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;      <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    <span class="keywordflow">case</span> <span class="charliteral">&#39;o&#39;</span>:</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;      strcpy(output_file, optarg);</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;      output_file_specified = TRUE;</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;      output_file_specified = 1;</div>
 <div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;      <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    }</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;  }</div>
@@ -503,7 +503,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Apr 12 2013 01:20:41 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri May 17 2013 14:16:34 for Open Chinese Convert by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

@@ -93,7 +93,7 @@ void convert(const char* input_file,
     buffer_out = opencc_convert_utf8(od, buffer_in, (size_t)-1);
     if (buffer_out != (char*)-1) {
       fprintf(fpo, "%s", buffer_out);
-      free(buffer_out);
+      opencc_convert_utf8_free(buffer_out);
     } else {
       opencc_perror(_("OpenCC error"));
       break;
@@ -106,7 +106,7 @@ void convert(const char* input_file,
     buffer_out = opencc_convert_utf8(od, lookahead, (size_t)-1);
     if (buffer_out != (char*)-1) {
       fprintf(fpo, "%s", buffer_out);
-      free(buffer_out);
+      opencc_convert_utf8_free(buffer_out);
     } else {
       opencc_perror(_("OpenCC error"));
     }

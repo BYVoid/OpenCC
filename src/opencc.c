@@ -135,6 +135,10 @@ char* opencc_convert_utf8(opencc_t t_opencc, const char* inbuf, size_t length) {
   return original_outbuf;
 }
 
+void opencc_convert_utf8_free(char* buf) {
+  free(buf);
+}
+
 opencc_t opencc_open(const char* config_file) {
   if (!lib_initialized) {
     lib_initialize();

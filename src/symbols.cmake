@@ -4,6 +4,7 @@ set(
 	opencc_close
 	opencc_convert
 	opencc_convert_utf8
+	opencc_convert_utf8_free
 	opencc_dict_load
 	opencc_set_conversion_mode
 	opencc_errno

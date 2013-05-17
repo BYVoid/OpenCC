@@ -40,7 +40,7 @@ class OpenccBinding : public node::ObjectWrap {
     if (args.Length() >= 1 && args[0]->IsString()) {
       char* config_file = ToUtf8String(args[0]->ToString());
       opencc_instance = new OpenccBinding(config_file);
-      delete [] config_file;
+      delete[] config_file;
     } else {
       const char* config_file = OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD;
       opencc_instance = new OpenccBinding(config_file);
@@ -91,7 +91,7 @@ class OpenccBinding : public node::ObjectWrap {
     conv_data->callback->Call(Context::GetCurrent()->Global(), argc, argv);
     conv_data->callback.Dispose();
     delete[] conv_data->input;
-    delete[] conv_data->output;
+    opencc_convert_utf8_free(conv_data->output);
     delete conv_data;
     delete req;
   }
@@ -110,7 +110,7 @@ class OpenccBinding : public node::ObjectWrap {
 
     Local<String> converted = String::New(output);
     delete[] input;
-    delete[] output;
+    opencc_convert_utf8_free(output);
     return scope.Close(converted);
   }
 

@@ -93,7 +93,7 @@ size_t opencc_convert(opencc_t od,
  * Converts UTF-8 string from inbuf.
  * This function returns an allocated C-Style string via malloc(), which stores
  * the converted string.
- * You should call free() to release allocated memory.
+ * You should call opencc_convert_utf8_free() to release allocated memory.
  *
  * @param od     The opencc description pointer.
  * @param inbuf  The UTF-8 encoded string.
@@ -105,6 +105,15 @@ size_t opencc_convert(opencc_t od,
  * @ingroup opencc_api
  */
 char* opencc_convert_utf8(opencc_t od, const char* inbuf, size_t length);
+
+/**
+ * Releases allocated buffer by opencc_convert_utf8.
+ *
+ * @param buf    Pointer to the allocated string buffer by opencc_convert_utf8.
+ *
+ * @ingroup opencc_api
+ */
+void opencc_convert_utf8_free(char* buf);
 
 /**
  * Loads a dictionary to default dictionary chain.

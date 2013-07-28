@@ -155,6 +155,7 @@ opencc_t opencc_open(const char* config_file) {
     /* Load config */
     Config* config = config_open(config_file);
     if (config == (Config*)-1) {
+      free(opencc);
       errnum = OPENCC_ERROR_CONFIG;
       return (opencc_t)-1;
     }

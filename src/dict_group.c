@@ -64,6 +64,7 @@ static char* try_find_dictionary_with_config(
     fclose(fp);
     return config_path_filename;
   }
+  free(config_path_filename);
   return NULL;
 }
 

@@ -372,8 +372,6 @@ int main(int argc, char** argv) {
     case '-':
       if (strcmp(optarg, "version") == 0) {
         show_version();
-      } else if (strcmp(optarg, "help") == 0) {
-        show_usage();
       } else {
         show_usage();
       }

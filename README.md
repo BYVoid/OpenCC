@@ -94,6 +94,8 @@ http://ytenx.org/byohlyuk/KienxPyan
 
 ## Build
 
+[![Build Status](https://travis-ci.org/BYVoid/OpenCC.png?branch=master)](https://travis-ci.org/BYVoid/OpenCC)
+
 ### Build with CMake
 
 Make a directory and check in:
@@ -133,6 +135,6 @@ Install:
 ## Contributors
 
 * [BYVoid](http://www.byvoid.com/)
-* 佛振
-* Peng Huang
-* LI Daobing
+* [佛振](https://github.com/lotem)
+* [Peng Huang](https://github.com/phuang)
+* [LI Daobing](https://github.com/lidaobing)

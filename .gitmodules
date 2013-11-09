@@ -1,0 +1,3 @@
+[submodule "deps/libdarts"]
+	path = deps/libdarts
+	url = git@github.com:BYVoid/libdarts.git

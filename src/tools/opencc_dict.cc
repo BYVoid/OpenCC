@@ -40,6 +40,8 @@ using std::string;
 #define DATRIE_WORD_MAX_COUNT 500000
 #define BUFFER_SIZE 1024
 
+const char* OCDHEADER = "OPENCCDICTIONARY1";
+
 struct Value {
   string value;
   size_t cursor;
@@ -55,8 +57,6 @@ struct Entry {
 vector<Entry> lexicon;
 vector<Value> values;
 Darts::DoubleArray dict;
-
-size_t lexicon_index_length, lexicon_cursor_end;
 
 void make() {
   vector<const char*> keys;
@@ -103,56 +103,69 @@ void init(const char* filename) {
       lexicon[i].valueIndexes.push_back(values.size());
       char* utf8_temp = ucs4_to_utf8(tlexicon[i].value[j], (size_t)-1);
       values.push_back(Value(utf8_temp, lexicon_cursor));
+      lexicon_cursor += strlen(utf8_temp);
       free(utf8_temp);
-      lexicon_cursor += ucs4len(tlexicon[i].value[j]) + 1;
     }
-    lexicon_index_length += value_count + 1;
   }
-  lexicon_cursor_end = lexicon_cursor;
 }
 
 void output(const char* file_name) {
-  dict.save(file_name);
-  size_t dartsSize = dict.total_size();
-  
-  /*
   FILE* fp = fopen(file_name, "wb");
   if (!fp) {
     fprintf(stderr, _("Can not write file: %s\n"), file_name);
     exit(1);
   }
-  uint32_t i, item_count;
-  for (i = DATRIE_SIZE - 1; i > 0; i--) {
-    if (dat[i].parent != DATRIE_UNUSED) {
-      break;
-    }
+  /*
+   Binary Structure
+   [OCDHEADER]
+   [number of keys]
+     size_t
+   [number of values]
+     size_t
+   [bytes of values]
+     size_t
+   [bytes of darts]
+     size_t
+   [key indexes]
+     size_t(index of first value) * [number of keys]
+   [value indexes]
+     size_t(index of first char) * [number of values]
+   [value data]
+     char * [bytes of values]
+   [darts]
+     char * [bytes of darts]
+   */
+  size_t numKeys = lexicon.size();
+  size_t numValues = values.size();
+  size_t dartsSize = dict.total_size();
+  
+  fwrite(OCDHEADER, sizeof(char), strlen(OCDHEADER), fp);
+  fwrite(&numKeys, sizeof(size_t), 1, fp);
+  fwrite(&numValues, sizeof(size_t), 1, fp);
+  fwrite(&dartsSize, sizeof(size_t), 1, fp);
+  
+  // key indexes
+  for (size_t i = 0; i < numKeys; i++) {
+    size_t index = lexicon[i].valueIndexes[0];
+    fwrite(&index, sizeof(size_t), 1, fp);
   }
-  item_count = i + 1;
-  fwrite("OPENCCDATRIE", sizeof(char), strlen("OPENCCDATRIE"), fp);
-  // 詞彙表長度
-  fwrite(&lexicon_cursor_end, sizeof(uint32_t), 1, fp);
-  for (i = 0; i < lexicon_count; i++) {
-    size_t j;
-    for (j = 0; j < lexicon[i].value_count; j++) {
-      fwrite(lexicon[i].value[j].pointer, sizeof(ucs4_t),
-             ucs4len(lexicon[i].value[j].pointer) + 1, fp);
-    }
+  
+  // value indexes
+  for (size_t i = 0; i < numValues; i++) {
+    size_t index = values[i].cursor;
+    fwrite(&index, sizeof(size_t), 1, fp);
   }
-  // 詞彙索引表長度
-  fwrite(&lexicon_index_length, sizeof(uint32_t), 1, fp);
-  for (i = 0; i < lexicon_count; i++) {
-    size_t j;
-    for (j = 0; j < lexicon[i].value_count; j++) {
-      fwrite(&lexicon[i].value[j].cursor, sizeof(uint32_t), 1, fp);
-    }
-    uint32_t dem = (uint32_t)-1;
-    fwrite(&dem, sizeof(uint32_t), 1, fp);             //分隔符
+  
+  // value data
+  for (size_t i = 0; i < numValues; i++) {
+    const char* value = values[i].value.c_str();
+    fwrite(value, sizeof(char), strlen(value), fp);
   }
-  fwrite(&lexicon_count, sizeof(uint32_t), 1, fp);
-  fwrite(&item_count, sizeof(uint32_t), 1, fp);
-  fwrite(dat, sizeof(dat[0]), item_count, fp);
+  
+  // darts
+  fwrite(dict.array(), sizeof(char), dartsSize, fp);
+  
   fclose(fp);
-  */
 }
 
 #ifdef DEBUG_WRITE_TEXT

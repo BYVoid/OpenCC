@@ -25,6 +25,10 @@
 
 #include "common.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Converts a UTF-8 string into UCS-4.
  *
@@ -50,5 +54,9 @@ int ucs4cmp(const ucs4_t* str1, const ucs4_t* str2);
 void ucs4cpy(ucs4_t* dest, const ucs4_t* src);
 
 void ucs4ncpy(ucs4_t* dest, const ucs4_t* src, size_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __OPENCC_ENCODING_H_ */

@@ -21,6 +21,10 @@
 
 #include "../dict.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
   ucs4_t* key;
   ucs4_t** value;
@@ -47,5 +51,9 @@ size_t dict_text_get_all_match_lengths(Dict* dict,
                                        size_t* match_length);
 
 size_t dict_text_get_lexicon(Dict* dict, TextEntry* lexicon);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __OPENCC_DICTIONARY_TEXT_H_ */

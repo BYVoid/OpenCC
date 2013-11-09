@@ -22,6 +22,10 @@
 #include "common.h"
 #include "dict.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum {
   DICTIONARY_ERROR_VOID,
   DICTIONARY_ERROR_NODICT,
@@ -53,5 +57,9 @@ Dict* dict_group_get_dict(DictGroup* dict_group, size_t index);
 dictionary_error dictionary_errno(void);
 
 void dictionary_perror(const char* spec);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __DICTIONARY_GROUP_H_ */

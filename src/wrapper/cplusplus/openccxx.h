@@ -22,7 +22,6 @@
 /**
  * c++ wrapper for opencc
  */
-#ifdef __cplusplus
 
 # include <opencc.h>
 # include <cstdlib>

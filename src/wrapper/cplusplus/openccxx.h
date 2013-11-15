@@ -22,12 +22,8 @@
 /**
  * c++ wrapper for opencc
  */
-#ifdef __cplusplus
 
-extern "C" {
 # include <opencc.h>
-}
-
 # include <cstdlib>
 # include <string>
 
@@ -130,7 +126,5 @@ private:
   opencc_t od;
 };
 }
-
-#endif // ifdef __cplusplus
 
 #endif /* __OPENCCXX_H_ */

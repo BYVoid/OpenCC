@@ -24,10 +24,7 @@
  */
 #ifdef __cplusplus
 
-extern "C" {
 # include <opencc.h>
-}
-
 # include <cstdlib>
 # include <string>
 

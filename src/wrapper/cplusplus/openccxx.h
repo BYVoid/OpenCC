@@ -127,6 +127,4 @@ private:
 };
 }
 
-#endif // ifdef __cplusplus
-
 #endif /* __OPENCCXX_H_ */

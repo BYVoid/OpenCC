@@ -19,20 +19,14 @@
 #ifndef __OPENCC_DICTIONARY_ABSTRACT_H_
 #define __OPENCC_DICTIONARY_ABSTRACT_H_
 
-#include "common.h"
-#include "utils.h"
+#include "Common.hpp"
 
-Dict* dict_new(const char* filename, opencc_dictionary_type type);
-
-void dict_delete(Dict* dict);
-
-const ucs4_t* const* dict_match_longest(Dict* dict,
-                                        const ucs4_t* word,
-                                        size_t maxlen,
-                                        size_t* match_length);
-
-size_t dict_get_all_match_lengths(Dict* dict,
-                                  const ucs4_t* word,
-                                  size_t* match_length);
+namespace Opencc {
+  class Dict {
+  public:
+    virtual ~Dict() = 0;
+    virtual vector<size_t> getLengthsOfAllMatches(const char* word) const = 0;
+  };
+}
 
 #endif /* __OPENCC_DICTIONARY_ABSTRACT_H_ */

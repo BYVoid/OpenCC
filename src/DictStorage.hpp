@@ -19,22 +19,17 @@
 #ifndef __OPENCC_DICT_STORAGE_H_
 #define __OPENCC_DICT_STORAGE_H_
 
-#include "common.h"
-#include <string>
-#include <vector>
+#include "Common.hpp"
+#include "TextDict.hpp"
 #include "darts.hh"
 
-using std::string;
-using std::vector;
-
 namespace Opencc {
-
   class DictStorage {
   public:
-    void serialize(Dict* dictionary, const string fileName);
+    void serialize(TextDictionary& dictionary, const string fileName);
     
   private:
-    void getLexicon(Dict* dictionary);
+    void getLexicon(TextDictionary& dictionary);
     void buildDarts();
     void writeToFile(const string fileName);
     
@@ -54,7 +49,6 @@ namespace Opencc {
     vector<Value> values;
     Darts::DoubleArray dict;
   };
-
 }
 
 #endif

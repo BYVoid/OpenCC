@@ -16,44 +16,32 @@
  * limitations under the License.
  */
 
-#include "DictStorage.h"
-
-#include "encoding.h"
-#include "text.h"
+#include "DictStorage.hpp"
+#include "TextDict.hpp"
+#include "UTF8Util.hpp"
 
 using namespace Opencc;
 
 const char* OCDHEADER = "OPENCCDICTIONARY1";
 
-int cmp(const void* a, const void* b) {
-  return ucs4cmp(((const TextEntry*)a)->key, ((const TextEntry*)b)->key);
-}
-
-void DictStorage::serialize(Dict* dictionary, const string fileName) {
+void DictStorage::serialize(TextDictionary& dictionary, const string fileName) {
   getLexicon(dictionary);
   buildDarts();
   writeToFile(fileName);
 }
 
-void DictStorage::getLexicon(Dict* dictionary) {
-#define DATRIE_WORD_MAX_COUNT 500000
-  static TextEntry tlexicon[DATRIE_WORD_MAX_COUNT];
-  size_t lexicon_count = dict_text_get_lexicon(dictionary, tlexicon);
-  qsort(tlexicon, lexicon_count, sizeof(tlexicon[0]), cmp);
+void DictStorage::getLexicon(TextDictionary& dictionary) {
+  vector<TextDictionary::TextEntry> tlexicon = dictionary.getLexicon();
+  size_t lexicon_count = tlexicon.size();
   size_t lexicon_cursor = 0;
   lexicon.resize(lexicon_count);
   for (size_t i = 0; i < lexicon_count; i++) {
-    char* utf8_temp = ucs4_to_utf8(tlexicon[i].key, (size_t)-1);
-    lexicon[i].key = utf8_temp;
-    free(utf8_temp);
-    size_t value_count;
-    for (value_count = 0; tlexicon[i].value[value_count] != NULL; value_count++) {}
+    lexicon[i].key = tlexicon[i].key;
+    size_t value_count = tlexicon[i].values.size();
     for (size_t j = 0; j < value_count; j++) {
       lexicon[i].valueIndexes.push_back(values.size());
-      char* utf8_temp = ucs4_to_utf8(tlexicon[i].value[j], (size_t)-1);
-      values.push_back(Value(utf8_temp, lexicon_cursor));
-      lexicon_cursor += strlen(utf8_temp);
-      free(utf8_temp);
+      values.push_back(Value(tlexicon[i].values[j], lexicon_cursor));
+      lexicon_cursor += tlexicon[i].values[j].length();
     }
   }
 }

@@ -16,17 +16,30 @@
  * limitations under the License.
  */
 
-#ifndef __DICTIONARY_SET_H_
-#define __DICTIONARY_SET_H_
+#pragma once
 
-#include "common.h"
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <stdexcept>
 
-DictChain* dict_chain_new(Config* config);
+#include <cstdio>
+#include <cassert>
+#include <cstddef>
 
-void dict_chain_delete(DictChain* dict_chain);
+using std::string;
+using std::vector;
+using std::runtime_error;
 
-DictGroup* dict_chain_add_group(DictChain* dict_chain);
+#ifdef ENABLE_GETTEXT
+# include <libintl.h>
+# include <locale.h>
+# define _(STRING) dgettext(PACKAGE_NAME, STRING)
+#else // ENABLE_GETTEXT
+# define _(STRING) STRING
+#endif // ENABLE_GETTEXT
 
-DictGroup* dict_chain_get_group(DictChain* dict_chain, size_t index);
-
-#endif /* __DICTIONARY_SET_H_ */
+#ifndef PKGDATADIR
+#define PKGDATADIR ""
+#endif

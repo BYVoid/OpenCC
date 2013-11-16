@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2013-2013 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,24 @@
 #pragma once
 
 #include "Common.hpp"
+#include "Dict.hpp"
 #include "TextDict.hpp"
 #include "darts.hh"
 
 namespace Opencc {
-  class DictStorage {
+  class DartsDict : public Dict {
   public:
-    void serialize(TextDict& dictionary, const string fileName);
+    DartsDict(const string fileName);
+    virtual ~DartsDict();
+    virtual size_t KeyMaxLength() const;
+    virtual size_t MatchPrefix(const char* word) const;
+    virtual vector<size_t> GetLengthsOfAllMatches(const char* word) const;
+    
+    void SerializeToFile(const string fileName);
+    void FromTextDict(TextDict& dictionary);
     
   private:
-    void getLexicon(TextDict& dictionary);
-    void buildDarts();
-    void writeToFile(const string fileName);
+    void BuildDarts();
     
     struct Value {
       string value;
@@ -44,6 +50,7 @@ namespace Opencc {
       vector<size_t> valueIndexes;
     };
     
+    size_t maxLength;
     vector<Entry> lexicon;
     vector<Value> values;
     Darts::DoubleArray dict;

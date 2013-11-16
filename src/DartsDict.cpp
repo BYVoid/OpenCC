@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2013-2013 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,62 @@
  * limitations under the License.
  */
 
-#include "DictStorage.hpp"
-#include "TextDict.hpp"
+#include "DartsDict.hpp"
 #include "UTF8Util.hpp"
 
 using namespace Opencc;
 
-const char* OCDHEADER = "OPENCCDICTIONARY1";
+static const char* OCDHEADER = "OPENCCDARTS1";
 
-void DictStorage::serialize(TextDict& dictionary, const string fileName) {
-  getLexicon(dictionary);
-  buildDarts();
-  writeToFile(fileName);
+DartsDict::DartsDict(const string fileName) {
+  // TODO deserialization
+  maxLength = 0;
 }
 
-void DictStorage::getLexicon(TextDict& dictionary) {
+DartsDict::~DartsDict() {
+}
+
+size_t DartsDict::KeyMaxLength() const {
+  return maxLength;
+}
+
+size_t DartsDict::MatchPrefix(const char* word) const {
+  string wordTrunc = UTF8Util::Truncate(word, maxLength);
+  for (size_t len = wordTrunc.length(); len > 0; len--) {
+    wordTrunc[len] = '\0';
+    Darts::DoubleArray::value_type result;
+    dict.exactMatchSearch(wordTrunc.c_str(), result);
+    if (result != -1) {
+      return len;
+    }
+  }
+  return 0;
+}
+
+vector<size_t> DartsDict::GetLengthsOfAllMatches(const char* word) const {
+  // TODO copy
+  vector<size_t> matchedLengths;
+  string wordTrunc = UTF8Util::Truncate(word, maxLength);
+  for (size_t len = wordTrunc.length(); len > 0; len--) {
+    wordTrunc[len] = '\0';
+    Darts::DoubleArray::value_type result;
+    dict.exactMatchSearch(wordTrunc.c_str(), result);
+    if (result != -1) {
+      matchedLengths.push_back(len);
+    }
+  }
+  return matchedLengths;
+}
+
+void DartsDict::FromTextDict(TextDict& dictionary) {
+  maxLength = 0;
   vector<TextDict::TextEntry> tlexicon = dictionary.GetLexicon();
   size_t lexicon_count = tlexicon.size();
   size_t lexicon_cursor = 0;
   lexicon.resize(lexicon_count);
   for (size_t i = 0; i < lexicon_count; i++) {
     lexicon[i].key = tlexicon[i].key;
+    maxLength = std::max(lexicon[i].key.length(), maxLength);
     size_t value_count = tlexicon[i].values.size();
     for (size_t j = 0; j < value_count; j++) {
       lexicon[i].valueIndexes.push_back(values.size());
@@ -44,9 +79,10 @@ void DictStorage::getLexicon(TextDict& dictionary) {
       lexicon_cursor += tlexicon[i].values[j].length();
     }
   }
+  BuildDarts();
 }
 
-void DictStorage::buildDarts() {
+void DartsDict::BuildDarts() {
   vector<const char*> keys;
   vector<int> valueIndexes;
   keys.reserve(lexicon.size());
@@ -56,7 +92,7 @@ void DictStorage::buildDarts() {
   dict.build(lexicon.size(), &keys[0]);
 }
 
-void DictStorage::writeToFile(const string fileName) {
+void DartsDict::SerializeToFile(const string fileName) {
   FILE *fp = fopen(fileName.c_str(), "wb");
   if (fp == NULL) {
     fprintf(stderr, _("Can not write file: %s\n"), fileName.c_str());
@@ -114,4 +150,5 @@ void DictStorage::writeToFile(const string fileName) {
   
   fclose(fp);
 }
+
 

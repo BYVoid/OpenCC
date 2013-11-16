@@ -33,9 +33,9 @@ vector<string> MaxMatchSegmentation::Segment(const string& text) {
   while (*pstr != '\0') {
     size_t matchedLength = dictGroup.MatchPrefix(pstr);
     if (matchedLength == 0) {
-      matchedLength = UTF8Util::nextCharLength(pstr);
+      matchedLength = UTF8Util::NextCharLength(pstr);
     }
-    string segment = UTF8Util::fromSubstr(pstr, matchedLength);
+    string segment = UTF8Util::FromSubstr(pstr, matchedLength);
     segments.push_back(segment);
     pstr += matchedLength;
   }

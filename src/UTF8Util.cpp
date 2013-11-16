@@ -20,7 +20,7 @@
 
 using namespace Opencc;
 
-void UTF8Util::skipUtf8Bom(FILE* fp) {
+void UTF8Util::SkipUtf8Bom(FILE* fp) {
   /* UTF-8 BOM is EF BB BF */
   if (fp == NULL) {
     return;

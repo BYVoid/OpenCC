@@ -23,29 +23,29 @@
 namespace Opencc {
   class UTF8Util {
   public:
-    static void skipUtf8Bom(FILE* fp);
+    static void SkipUtf8Bom(FILE* fp);
 
-    static size_t nextCharLength(const char* str) {
+    static size_t NextCharLength(const char* str) {
       // FIXME next char
       return 1;
     }
     
-    static const char* nextChar(const char* str) {
-      return str + nextCharLength(str);
+    static const char* NextChar(const char* str) {
+      return str + NextCharLength(str);
     }
 
-    static const char* findNextInline(const char* str, const char ch) {
-      while (!isLineEndingOrFileEnding(*str) && *str != ch) {
-        str = nextChar(str);
+    static const char* FindNextInline(const char* str, const char ch) {
+      while (!IsLineEndingOrFileEnding(*str) && *str != ch) {
+        str = NextChar(str);
       }
       return str;
     }
     
-    static bool isLineEndingOrFileEnding(const char ch) {
+    static bool IsLineEndingOrFileEnding(const char ch) {
       return ch == '\0' || ch == '\n' || ch == '\r';
     }
     
-    static string fromSubstr(const char* str, size_t length) {
+    static string FromSubstr(const char* str, size_t length) {
       string newStr(' ', length);
       for (size_t i = 0; i < length; i++, str++) {
         newStr[i] = *str;
@@ -67,7 +67,7 @@ namespace Opencc {
     static string Truncate(const char* str, size_t maxLength) {
       string wordTrunc;
       if (NotShorterThan(str, maxLength)) {
-        wordTrunc = fromSubstr(str, maxLength);
+        wordTrunc = FromSubstr(str, maxLength);
       } else {
         wordTrunc = str;
       }

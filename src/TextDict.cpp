@@ -23,21 +23,21 @@ using namespace Opencc;
 
 #define ENTRY_BUFF_SIZE 128
 
-TextDict::TextEntry parseKeyValues(const char* buff) {
+TextDict::TextEntry ParseKeyValues(const char* buff) {
   size_t length;
-  const char* pbuff = UTF8Util::findNextInline(buff, '\t');
-  if (UTF8Util::isLineEndingOrFileEnding(*pbuff)) {
+  const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
+  if (UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
     throw runtime_error("invalid format");
   }
   length = pbuff - buff;
   // TODO copy
-  TextDict::TextEntry entry(UTF8Util::fromSubstr(buff, length));
-  while (!UTF8Util::isLineEndingOrFileEnding(*pbuff)) {
-    buff = pbuff = UTF8Util::nextChar(pbuff);
-    pbuff = UTF8Util::findNextInline(buff, ' ');
+  TextDict::TextEntry entry(UTF8Util::FromSubstr(buff, length));
+  while (!UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
+    buff = pbuff = UTF8Util::NextChar(pbuff);
+    pbuff = UTF8Util::FindNextInline(buff, ' ');
     length = pbuff - buff;
     // TODO copy
-    string value = UTF8Util::fromSubstr(buff, length);
+    string value = UTF8Util::FromSubstr(buff, length);
     entry.values.push_back(value);
   }
   return entry;
@@ -51,11 +51,11 @@ TextDict::TextDict(const string fileName) {
   if (fp == NULL) {
     throw runtime_error("file not found");
   }
-  UTF8Util::skipUtf8Bom(fp);
+  UTF8Util::SkipUtf8Bom(fp);
 
   while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
     // TODO reduce object copies
-    TextEntry entry = parseKeyValues(buff);
+    TextEntry entry = ParseKeyValues(buff);
     lexicon.push_back(entry);
     size_t keyLength = entry.key.length();
     maxLength = std::max(keyLength, maxLength);

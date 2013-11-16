@@ -16,8 +16,7 @@
  * limitations under the License.
  */
 
-#ifndef __OPENCC_DICT_STORAGE_H_
-#define __OPENCC_DICT_STORAGE_H_
+#pragma once
 
 #include "Common.hpp"
 #include "TextDict.hpp"
@@ -26,10 +25,10 @@
 namespace Opencc {
   class DictStorage {
   public:
-    void serialize(TextDictionary& dictionary, const string fileName);
+    void serialize(TextDict& dictionary, const string fileName);
     
   private:
-    void getLexicon(TextDictionary& dictionary);
+    void getLexicon(TextDict& dictionary);
     void buildDarts();
     void writeToFile(const string fileName);
     
@@ -50,5 +49,3 @@ namespace Opencc {
     Darts::DoubleArray dict;
   };
 }
-
-#endif

@@ -16,14 +16,13 @@
  * limitations under the License.
  */
 
-#ifndef __OPENCC_DICTIONARY_TEXT_H_
-#define __OPENCC_DICTIONARY_TEXT_H_
+#pragma once
 
 #include "Common.hpp"
 #include "Dict.hpp"
 
 namespace Opencc {
-  class TextDictionary : public Dict {
+  class TextDict : public Dict {
   public:
     struct TextEntry {
       string key;
@@ -34,8 +33,8 @@ namespace Opencc {
       }
     };
     
-    TextDictionary(const string fileName);
-    ~TextDictionary();
+    TextDict(const string fileName);
+    virtual ~TextDict();
     vector<size_t> getLengthsOfAllMatches(const char* word) const;
     vector<TextEntry> getLexicon() const;
   private:
@@ -43,5 +42,3 @@ namespace Opencc {
     vector<TextEntry> lexicon;
   };
 }
-
-#endif /* __OPENCC_DICTIONARY_TEXT_H_ */

@@ -24,14 +24,14 @@ using namespace Opencc;
 
 const char* OCDHEADER = "OPENCCDICTIONARY1";
 
-void DictStorage::serialize(TextDictionary& dictionary, const string fileName) {
+void DictStorage::serialize(TextDict& dictionary, const string fileName) {
   getLexicon(dictionary);
   buildDarts();
   writeToFile(fileName);
 }
 
-void DictStorage::getLexicon(TextDictionary& dictionary) {
-  vector<TextDictionary::TextEntry> tlexicon = dictionary.getLexicon();
+void DictStorage::getLexicon(TextDict& dictionary) {
+  vector<TextDict::TextEntry> tlexicon = dictionary.getLexicon();
   size_t lexicon_count = tlexicon.size();
   size_t lexicon_cursor = 0;
   lexicon.resize(lexicon_count);

@@ -23,7 +23,7 @@ using namespace Opencc;
 
 #define ENTRY_BUFF_SIZE 128
 
-TextDictionary::TextEntry parseKeyValues(const char* buff) {
+TextDict::TextEntry parseKeyValues(const char* buff) {
   size_t length;
   const char* pbuff = UTF8Util::findNextInline(buff, '\t');
   if (UTF8Util::isLineEndingOrFileEnding(*pbuff)) {
@@ -31,7 +31,7 @@ TextDictionary::TextEntry parseKeyValues(const char* buff) {
   }
   length = pbuff - buff;
   // TODO copy
-  TextDictionary::TextEntry entry(UTF8Util::fromSubstr(buff, length));
+  TextDict::TextEntry entry(UTF8Util::fromSubstr(buff, length));
   while (!UTF8Util::isLineEndingOrFileEnding(*pbuff)) {
     buff = pbuff = UTF8Util::nextChar(pbuff);
     pbuff = UTF8Util::findNextInline(buff, ' ');
@@ -43,7 +43,7 @@ TextDictionary::TextEntry parseKeyValues(const char* buff) {
   return entry;
 }
 
-TextDictionary::TextDictionary(const string fileName) {
+TextDict::TextDict(const string fileName) {
   // TODO use dynamic getline
   static char buff[ENTRY_BUFF_SIZE];
 
@@ -66,13 +66,13 @@ TextDictionary::TextDictionary(const string fileName) {
 }
 
 
-TextDictionary::~TextDictionary() {
+TextDict::~TextDict() {
 }
 
-vector<size_t> TextDictionary::getLengthsOfAllMatches(const char* word) const {
+vector<size_t> TextDict::getLengthsOfAllMatches(const char* word) const {
   // TODO copy
   vector<size_t> matchedLengths;
-  TextDictionary::TextEntry entry(word);
+  TextDict::TextEntry entry(word);
   for (size_t len = entry.key.length(); len > 0; len--) {
     entry.key[len] = '\0';
     bool found = std::binary_search(lexicon.begin(), lexicon.end(), entry);
@@ -83,7 +83,7 @@ vector<size_t> TextDictionary::getLengthsOfAllMatches(const char* word) const {
   return matchedLengths;
 }
 
-vector<TextDictionary::TextEntry> TextDictionary::getLexicon() const {
+vector<TextDict::TextEntry> TextDict::getLexicon() const {
   // TODO copy
   return lexicon;
 }

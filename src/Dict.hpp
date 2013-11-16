@@ -16,17 +16,13 @@
  * limitations under the License.
  */
 
-#ifndef __OPENCC_DICTIONARY_ABSTRACT_H_
-#define __OPENCC_DICTIONARY_ABSTRACT_H_
+#pragma once
 
 #include "Common.hpp"
 
 namespace Opencc {
   class Dict {
   public:
-    virtual ~Dict() = 0;
     virtual vector<size_t> getLengthsOfAllMatches(const char* word) const = 0;
   };
 }
-
-#endif /* __OPENCC_DICTIONARY_ABSTRACT_H_ */

@@ -25,9 +25,13 @@ namespace Opencc {
   public:
     static void skipUtf8Bom(FILE* fp);
 
-    static const char* nextChar(const char* str) {
+    static size_t nextCharLength(const char* str) {
       // FIXME next char
-      return str + 1;
+      return 1;
+    }
+    
+    static const char* nextChar(const char* str) {
+      return str + nextCharLength(str);
     }
 
     static const char* findNextInline(const char* str, const char ch) {
@@ -47,6 +51,27 @@ namespace Opencc {
         newStr[i] = *str;
       }
       return newStr;
+    }
+    
+    static bool NotShorterThan(const char* str, size_t length) {
+      while (length > 0) {
+        if (*str == '\0') {
+          return false;
+        }
+        length--;
+        str++;
+      }
+      return true;
+    }
+    
+    static string Truncate(const char* str, size_t maxLength) {
+      string wordTrunc;
+      if (NotShorterThan(str, maxLength)) {
+        wordTrunc = fromSubstr(str, maxLength);
+      } else {
+        wordTrunc = str;
+      }
+      return wordTrunc;
     }
   };
 }

@@ -28,6 +28,6 @@ namespace Opencc {
     virtual ~DictChain();
     void AddDictGroup(const DictGroup* dictGroup);
   private:
-    vector<const DictGroup*> dictGroups;
+    list<const DictGroup*> dictGroups;
   };
 }

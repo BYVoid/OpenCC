@@ -65,14 +65,29 @@ TextDict::TextDict(const string fileName) {
   std::sort(lexicon.begin(), lexicon.end());
 }
 
-
 TextDict::~TextDict() {
+}
+
+size_t TextDict::KeyMaxLength() const {
+  return maxLength;
+}
+
+size_t TextDict::MatchPrefix(const char* word) const {
+  TextDict::TextEntry entry(UTF8Util::Truncate(word, maxLength));
+  for (size_t len = entry.key.length(); len > 0; len--) {
+    entry.key[len] = '\0';
+    bool found = std::binary_search(lexicon.begin(), lexicon.end(), entry);
+    if (found) {
+      return len;
+    }
+  }
+  return 0;
 }
 
 vector<size_t> TextDict::GetLengthsOfAllMatches(const char* word) const {
   // TODO copy
   vector<size_t> matchedLengths;
-  TextDict::TextEntry entry(word);
+  TextDict::TextEntry entry(UTF8Util::Truncate(word, maxLength));
   for (size_t len = entry.key.length(); len > 0; len--) {
     entry.key[len] = '\0';
     bool found = std::binary_search(lexicon.begin(), lexicon.end(), entry);

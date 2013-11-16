@@ -23,6 +23,8 @@
 namespace Opencc {
   class Dict {
   public:
+    virtual size_t KeyMaxLength() const = 0;
+    virtual size_t MatchPrefix(const char* word) const = 0;
     virtual vector<size_t> GetLengthsOfAllMatches(const char* word) const = 0;
   };
 }

@@ -21,6 +21,7 @@
 using namespace Opencc;
 
 DictGroup::DictGroup() {
+  keyMaxLength = 0;
 }
 
 DictGroup::~DictGroup() {
@@ -28,9 +29,24 @@ DictGroup::~DictGroup() {
 
 void DictGroup::AddDict(const Dict* dict) {
   dicts.push_back(dict);
+  keyMaxLength = std::max(dict->KeyMaxLength(), keyMaxLength);
 }
 
-vector<size_t> DictGroup::GetLengthsOfAllMatches(const char* word) {
+size_t DictGroup::KeyMaxLength() const {
+  return keyMaxLength;
+}
+
+size_t DictGroup::MatchPrefix(const char* word) const {
+  for (const Dict* dict : dicts) {
+    size_t prefixLength = dict->MatchPrefix(word);
+    if (prefixLength > 0) {
+      return prefixLength;
+    }
+  }
+  return 0;
+}
+
+vector<size_t> DictGroup::GetLengthsOfAllMatches(const char* word) const {
   vector<size_t> matchedLengths;
   for (const Dict* dict : dicts) {
     vector<size_t> lengths = dict->GetLengthsOfAllMatches(word);

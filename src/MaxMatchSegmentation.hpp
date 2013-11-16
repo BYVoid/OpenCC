@@ -19,28 +19,15 @@
 #pragma once
 
 #include "Common.hpp"
-#include "Dict.hpp"
+#include "DictGroup.hpp"
+#include "Segmentation.hpp"
 
 namespace Opencc {
-  class TextDict : public Dict {
+  class MaxMatchSegmentation : public Segmentation {
   public:
-    struct TextEntry {
-      string key;
-      vector<string> values;
-      TextEntry(string key_) : key(key_) {}
-      bool operator < (const TextEntry& that) const {
-        return key < that.key;
-      }
-    };
-    
-    TextDict(const string fileName);
-    virtual ~TextDict();
-    virtual size_t KeyMaxLength() const;
-    virtual size_t MatchPrefix(const char* word) const;
-    virtual vector<size_t> GetLengthsOfAllMatches(const char* word) const;
-    vector<TextEntry> GetLexicon() const;
+    MaxMatchSegmentation(DictGroup& dictGroup);
+    virtual vector<string> Segment(const string& text);
   private:
-    size_t maxLength;
-    vector<TextEntry> lexicon;
+    DictGroup& dictGroup;
   };
 }

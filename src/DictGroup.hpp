@@ -27,8 +27,11 @@ namespace Opencc {
     DictGroup();
     virtual ~DictGroup();
     void AddDict(const Dict* dict);
-    vector<size_t> GetLengthsOfAllMatches(const char* word);
+    size_t KeyMaxLength() const;
+    size_t MatchPrefix(const char* word) const;
+    vector<size_t> GetLengthsOfAllMatches(const char* word) const;
   private:
-    vector<const Dict*> dicts;
+    size_t keyMaxLength;
+    list<const Dict*> dicts;
   };
 }

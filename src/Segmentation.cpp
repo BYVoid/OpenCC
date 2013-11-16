@@ -16,32 +16,6 @@
  * limitations under the License.
  */
 
-#pragma once
+#include "Segmentation.hpp"
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <list>
-#include <stdexcept>
-
-#include <cstdio>
-#include <cassert>
-#include <cstddef>
-
-using std::string;
-using std::vector;
-using std::list;
-using std::runtime_error;
-
-#ifdef ENABLE_GETTEXT
-# include <libintl.h>
-# include <locale.h>
-# define _(STRING) dgettext(PACKAGE_NAME, STRING)
-#else // ENABLE_GETTEXT
-# define _(STRING) STRING
-#endif // ENABLE_GETTEXT
-
-#ifndef PKGDATADIR
-#define PKGDATADIR ""
-#endif
+using namespace Opencc;

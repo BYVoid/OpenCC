@@ -19,28 +19,10 @@
 #pragma once
 
 #include "Common.hpp"
-#include "Dict.hpp"
 
 namespace Opencc {
-  class TextDict : public Dict {
+  class Segmentation {
   public:
-    struct TextEntry {
-      string key;
-      vector<string> values;
-      TextEntry(string key_) : key(key_) {}
-      bool operator < (const TextEntry& that) const {
-        return key < that.key;
-      }
-    };
-    
-    TextDict(const string fileName);
-    virtual ~TextDict();
-    virtual size_t KeyMaxLength() const;
-    virtual size_t MatchPrefix(const char* word) const;
-    virtual vector<size_t> GetLengthsOfAllMatches(const char* word) const;
-    vector<TextEntry> GetLexicon() const;
-  private:
-    size_t maxLength;
-    vector<TextEntry> lexicon;
+    virtual vector<string> Segment(const string& text) = 0;
   };
 }

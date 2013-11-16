@@ -31,7 +31,7 @@ void DictStorage::serialize(TextDict& dictionary, const string fileName) {
 }
 
 void DictStorage::getLexicon(TextDict& dictionary) {
-  vector<TextDict::TextEntry> tlexicon = dictionary.getLexicon();
+  vector<TextDict::TextEntry> tlexicon = dictionary.GetLexicon();
   size_t lexicon_count = tlexicon.size();
   size_t lexicon_cursor = 0;
   lexicon.resize(lexicon_count);

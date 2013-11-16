@@ -16,29 +16,10 @@
  * limitations under the License.
  */
 
-#pragma once
+#include "DictChain.hpp"
 
-#include "Common.hpp"
-#include "Dict.hpp"
+using namespace Opencc;
 
-namespace Opencc {
-  class TextDict : public Dict {
-  public:
-    struct TextEntry {
-      string key;
-      vector<string> values;
-      TextEntry(string key_) : key(key_) {}
-      bool operator < (const TextEntry& that) const {
-        return key < that.key;
-      }
-    };
-    
-    TextDict(const string fileName);
-    virtual ~TextDict();
-    virtual vector<size_t> GetLengthsOfAllMatches(const char* word) const;
-    vector<TextEntry> GetLexicon() const;
-  private:
-    size_t maxLength;
-    vector<TextEntry> lexicon;
-  };
+void DictChain::AddDictGroup(const DictGroup* dictGroup) {
+  dictGroups.push_back(dictGroup);
 }

@@ -22,23 +22,13 @@
 #include "Dict.hpp"
 
 namespace Opencc {
-  class TextDict : public Dict {
+  class DictGroup {
   public:
-    struct TextEntry {
-      string key;
-      vector<string> values;
-      TextEntry(string key_) : key(key_) {}
-      bool operator < (const TextEntry& that) const {
-        return key < that.key;
-      }
-    };
-    
-    TextDict(const string fileName);
-    virtual ~TextDict();
-    virtual vector<size_t> GetLengthsOfAllMatches(const char* word) const;
-    vector<TextEntry> GetLexicon() const;
+    DictGroup();
+    virtual ~DictGroup();
+    void AddDict(const Dict* dict);
+    vector<size_t> GetLengthsOfAllMatches(const char* word);
   private:
-    size_t maxLength;
-    vector<TextEntry> lexicon;
+    vector<const Dict*> dicts;
   };
 }

@@ -23,6 +23,6 @@
 namespace Opencc {
   class Dict {
   public:
-    virtual vector<size_t> getLengthsOfAllMatches(const char* word) const = 0;
+    virtual vector<size_t> GetLengthsOfAllMatches(const char* word) const = 0;
   };
 }

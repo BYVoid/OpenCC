@@ -69,7 +69,7 @@ TextDict::TextDict(const string fileName) {
 TextDict::~TextDict() {
 }
 
-vector<size_t> TextDict::getLengthsOfAllMatches(const char* word) const {
+vector<size_t> TextDict::GetLengthsOfAllMatches(const char* word) const {
   // TODO copy
   vector<size_t> matchedLengths;
   TextDict::TextEntry entry(word);
@@ -83,7 +83,7 @@ vector<size_t> TextDict::getLengthsOfAllMatches(const char* word) const {
   return matchedLengths;
 }
 
-vector<TextDict::TextEntry> TextDict::getLexicon() const {
+vector<TextDict::TextEntry> TextDict::GetLexicon() const {
   // TODO copy
   return lexicon;
 }

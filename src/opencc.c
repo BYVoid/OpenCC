@@ -160,6 +160,10 @@ opencc_t opencc_open(const char* config_file) {
       return (opencc_t)-1;
     }
     opencc->dict_chain = config_get_dict_chain(config);
+    if (opencc->dict_chain == NULL) {
+      free(opencc);
+      return (opencc_t)-1;
+    }
     converter_assign_dictionary(opencc->converter, opencc->dict_chain);
     config_close(config);
   }

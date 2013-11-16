@@ -53,9 +53,10 @@ static int load_dictionary(Config* config) {
       last_index = config->dicts[i].index;
       group = dict_chain_add_group(config->dict_chain);
     }
-    dict_group_load(group,
-                    config->dicts[i].file_name,
-                    config->dicts[i].dict_type);
+    if (dict_group_load(group,
+                        config->dicts[i].file_name,
+                        config->dicts[i].dict_type) == -1)
+      return -1;
   }
   return 0;
 }
@@ -185,7 +186,10 @@ DictChain* config_get_dict_chain(Config* config) {
     dict_chain_delete(config->dict_chain);
   }
   config->dict_chain = dict_chain_new(config);
-  load_dictionary(config);
+  if (load_dictionary(config) == -1) {
+    dict_chain_delete(config->dict_chain);
+    config->dict_chain = NULL;
+  }
   return config->dict_chain;
 }
 

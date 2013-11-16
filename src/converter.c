@@ -326,13 +326,15 @@ static size_t segment(Converter* converter,
       }
       start = i;
     }
-    size_t match_len;
-    dict_group_match_longest(
+    size_t match_len = 0;
+    const ucs4_t* const* match_rs = dict_group_match_longest(
       converter->current_dict_group,
       inbuf_start + i,
       0,
       &match_len
       );
+    if (match_rs == (const ucs4_t* const*)-1)
+      return (size_t)-1;
     if (match_len == 0) {
       match_len = 1;
     }
@@ -347,7 +349,7 @@ static size_t segment(Converter* converter,
                            outbuf,
                            outbuf_left,
                            bound - start);
-    if (sp_seg_length ==  (size_t)-1) {
+    if (sp_seg_length == (size_t)-1) {
       return (size_t)-1;
     }
     if (sp_seg_length == 0) {

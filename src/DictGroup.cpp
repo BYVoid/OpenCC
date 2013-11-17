@@ -65,3 +65,8 @@ vector<size_t> DictGroup::GetLengthsOfAllMatches(const char* word) const {
   }
   return matchedLengthsDeduplicated;
 }
+
+string DictGroup::Convert(const char* word) const {
+  // TODO
+  return "";
+}

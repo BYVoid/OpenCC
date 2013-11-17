@@ -16,10 +16,19 @@
  * limitations under the License.
  */
 
-#include "DictChain.hpp"
+#pragma once
 
-using namespace Opencc;
+#include "Common.hpp"
+#include "Conversion.hpp"
 
-void DictChain::AddDictGroup(const DictGroup* dictGroup) {
-  dictGroups.push_back(dictGroup);
+namespace Opencc {
+  class ConversionChain {
+  public:
+    ConversionChain();
+    virtual ~ConversionChain();
+    void AddConversion(Conversion* conversion);
+    string Convert(const string& text);
+  private:
+    list<Conversion*> conversions;
+  };
 }

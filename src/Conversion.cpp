@@ -19,3 +19,22 @@
 #include "Conversion.hpp"
 
 using namespace Opencc;
+
+Conversion::Conversion(DictGroup* dictGroup, Segmentation* segmentator) {
+  this->dictGroup = dictGroup;
+  this->segmentator = segmentator;
+}
+
+vector<string> Conversion::Segment(const string& text) {
+  // TODO copy
+  return segmentator->Segment(text);
+}
+
+string Conversion::Convert(const string& text) {
+  vector<string> segments = segmentator->Segment(text);
+  std::ostringstream buffer;
+  for (const string& segment : segments) {
+    buffer << dictGroup->Convert(segment.c_str());
+  }
+  return buffer.str();
+}

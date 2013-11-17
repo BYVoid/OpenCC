@@ -30,6 +30,7 @@ namespace Opencc {
     size_t KeyMaxLength() const;
     size_t MatchPrefix(const char* word) const;
     vector<size_t> GetLengthsOfAllMatches(const char* word) const;
+    string Convert(const char* word) const;
   private:
     size_t keyMaxLength;
     list<const Dict*> dicts;

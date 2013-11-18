@@ -23,7 +23,7 @@ using namespace Opencc;
 
 #define ENTRY_BUFF_SIZE 128
 
-TextDict::TextEntry ParseKeyValues(const char* buff) {
+DictEntry ParseKeyValues(const char* buff) {
   size_t length;
   const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
   if (UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
@@ -31,7 +31,7 @@ TextDict::TextEntry ParseKeyValues(const char* buff) {
   }
   length = pbuff - buff;
   // TODO copy
-  TextDict::TextEntry entry(UTF8Util::FromSubstr(buff, length));
+  DictEntry entry(UTF8Util::FromSubstr(buff, length));
   while (!UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
     buff = pbuff = UTF8Util::NextChar(pbuff);
     pbuff = UTF8Util::FindNextInline(buff, ' ');
@@ -55,7 +55,7 @@ TextDict::TextDict(const string fileName) {
 
   while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
     // TODO reduce object copies
-    TextEntry entry = ParseKeyValues(buff);
+    DictEntry entry = ParseKeyValues(buff);
     lexicon.push_back(entry);
     size_t keyLength = entry.key.length();
     maxLength = std::max(keyLength, maxLength);
@@ -73,7 +73,7 @@ size_t TextDict::KeyMaxLength() const {
 }
 
 size_t TextDict::MatchPrefix(const char* word) const {
-  TextDict::TextEntry entry(UTF8Util::Truncate(word, maxLength));
+  DictEntry entry(UTF8Util::Truncate(word, maxLength));
   for (size_t len = entry.key.length(); len > 0; len--) {
     entry.key[len] = '\0';
     bool found = std::binary_search(lexicon.begin(), lexicon.end(), entry);
@@ -87,7 +87,7 @@ size_t TextDict::MatchPrefix(const char* word) const {
 vector<size_t> TextDict::GetLengthsOfAllMatches(const char* word) const {
   // TODO copy
   vector<size_t> matchedLengths;
-  TextDict::TextEntry entry(UTF8Util::Truncate(word, maxLength));
+  DictEntry entry(UTF8Util::Truncate(word, maxLength));
   for (size_t len = entry.key.length(); len > 0; len--) {
     entry.key[len] = '\0';
     bool found = std::binary_search(lexicon.begin(), lexicon.end(), entry);
@@ -98,7 +98,7 @@ vector<size_t> TextDict::GetLengthsOfAllMatches(const char* word) const {
   return matchedLengths;
 }
 
-vector<TextDict::TextEntry> TextDict::GetLexicon() const {
+vector<DictEntry> TextDict::GetLexicon() const {
   // TODO copy
   return lexicon;
 }

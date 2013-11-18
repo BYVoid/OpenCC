@@ -65,7 +65,7 @@ vector<size_t> DartsDict::GetLengthsOfAllMatches(const char* word) const {
 
 void DartsDict::FromTextDict(TextDict& dictionary) {
   maxLength = 0;
-  vector<TextDict::TextEntry> tlexicon = dictionary.GetLexicon();
+  vector<DictEntry> tlexicon = dictionary.GetLexicon();
   size_t lexicon_count = tlexicon.size();
   size_t lexicon_cursor = 0;
   lexicon.resize(lexicon_count);

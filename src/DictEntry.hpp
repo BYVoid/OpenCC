@@ -19,19 +19,15 @@
 #pragma once
 
 #include "Common.hpp"
-#include "Dict.hpp"
 
 namespace Opencc {
-  class TextDict : public Dict {
+  class DictEntry {
   public:
-    TextDict(const string fileName);
-    virtual ~TextDict();
-    virtual size_t KeyMaxLength() const;
-    virtual size_t MatchPrefix(const char* word) const;
-    virtual vector<size_t> GetLengthsOfAllMatches(const char* word) const;
-    vector<DictEntry> GetLexicon() const;
-  private:
-    size_t maxLength;
-    vector<DictEntry> lexicon;
+    string key;
+    vector<string> values;
+    DictEntry(string key_) : key(key_) {}
+    bool operator < (const DictEntry& that) const {
+      return key < that.key;
+    }
   };
 }

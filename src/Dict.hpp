@@ -19,6 +19,7 @@
 #pragma once
 
 #include "Common.hpp"
+#include "DictEntry.hpp"
 
 namespace Opencc {
   class Dict {

@@ -36,37 +36,30 @@ size_t DictGroup::KeyMaxLength() const {
   return keyMaxLength;
 }
 
-size_t DictGroup::MatchPrefix(const char* word) const {
+Optional<DictEntry> DictGroup::MatchPrefix(const char* word) const {
   for (const Dict* dict : dicts) {
-    size_t prefixLength = dict->MatchPrefix(word);
-    if (prefixLength > 0) {
-      return prefixLength;
+    Optional<DictEntry> prefix = dict->MatchPrefix(word);
+    if (!prefix.IsNull()) {
+      return prefix;
     }
   }
-  return 0;
+  return Optional<DictEntry>();
 }
 
-vector<size_t> DictGroup::GetLengthsOfAllMatches(const char* word) const {
-  vector<size_t> matchedLengths;
+vector<DictEntry> DictGroup::GetLengthsOfAllMatches(const char* word) const {
+  map<size_t, DictEntry> matched;
   for (const Dict* dict : dicts) {
-    vector<size_t> lengths = dict->GetLengthsOfAllMatches(word);
-    for (size_t length : lengths) {
-      matchedLengths.push_back(length);
+    vector<DictEntry> entries = dict->GetLengthsOfAllMatches(word);
+    for (DictEntry entry : entries) {
+      size_t len = entry.key.length();
+      if (matched.find(len) != matched.end()) {
+        matched[len] = entry;
+      }
     }
   }
-  std::sort(matchedLengths.begin(), matchedLengths.end());
-  vector<size_t> matchedLengthsDeduplicated;
-  size_t last = 0;
-  for (size_t length : matchedLengths) {
-    if (length != last) {
-      matchedLengthsDeduplicated.push_back(length);
-    }
-    last = length;
+  vector<DictEntry> matchedEntries;
+  for (auto entry : matched) {
+    matchedEntries.push_back(entry.second);
   }
-  return matchedLengthsDeduplicated;
-}
-
-string DictGroup::Convert(const char* word) const {
-  // TODO
-  return "";
+  return matchedEntries;
 }

@@ -29,21 +29,15 @@ namespace Opencc {
     DartsDict(const string fileName);
     virtual ~DartsDict();
     virtual size_t KeyMaxLength() const;
-    virtual size_t MatchPrefix(const char* word) const;
-    virtual vector<size_t> GetLengthsOfAllMatches(const char* word) const;
+    virtual Optional<DictEntry> MatchPrefix(const char* word) const;
+    virtual vector<DictEntry> GetLengthsOfAllMatches(const char* word) const;
     
     void SerializeToFile(const string fileName);
     void FromTextDict(TextDict& dictionary);
     
   private:
     void BuildDarts();
-    
-    struct Value {
-      string value;
-      size_t cursor;
-      Value(string value_, size_t cursor_) : value(value_), cursor(cursor_) {
-      }
-    };
+    vector<string> GetValuesOfEntry(size_t index) const;
     
     struct Entry {
       string key;
@@ -52,7 +46,8 @@ namespace Opencc {
     
     size_t maxLength;
     vector<Entry> lexicon;
-    vector<Value> values;
+    vector<size_t> cursors;
+    vector<string> values;
     Darts::DoubleArray dict;
   };
 }

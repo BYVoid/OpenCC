@@ -26,15 +26,18 @@ Conversion::Conversion(DictGroup* dictGroup, Segmentation* segmentator) {
 }
 
 vector<string> Conversion::Segment(const string& text) {
-  // TODO copy
-  return segmentator->Segment(text);
+  vector<string> segments;
+  for (DictEntry& entry : segmentator->Segment(text)) {
+    segments.push_back(entry.key);
+  }
+  return segments;
 }
 
 string Conversion::Convert(const string& text) {
-  vector<string> segments = segmentator->Segment(text);
+  vector<DictEntry> segments = segmentator->Segment(text);
   std::ostringstream buffer;
-  for (const string& segment : segments) {
-    buffer << dictGroup->Convert(segment.c_str());
+  for (const DictEntry& segment : segments) {
+    buffer << segment.GetDefault();
   }
   return buffer.str();
 }

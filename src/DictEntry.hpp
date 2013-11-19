@@ -25,9 +25,19 @@ namespace Opencc {
   public:
     string key;
     vector<string> values;
+    DictEntry() {}
     DictEntry(string key_) : key(key_) {}
+    DictEntry(string key_, vector<string> values_)
+      : key(key_), values(values_) {}
     bool operator < (const DictEntry& that) const {
       return key < that.key;
+    }
+    string GetDefault() const {
+      if (values.size() > 0) {
+        return values[0];
+      } else {
+        return key;
+      }
     }
   };
 }

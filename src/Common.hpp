@@ -24,15 +24,19 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <map>
 #include <stdexcept>
 
 #include <cstdio>
 #include <cassert>
 #include <cstddef>
 
+#include "Optional.hpp"
+
 using std::string;
 using std::vector;
 using std::list;
+using std::map;
 using std::runtime_error;
 
 #ifdef ENABLE_GETTEXT

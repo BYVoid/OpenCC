@@ -18,20 +18,20 @@
 
 #pragma once
 
-#include "Common.hpp"
-#include "Dict.hpp"
-
 namespace Opencc {
-  class DictGroup {
+  template<typename T>
+  class Optional {
   public:
-    DictGroup();
-    virtual ~DictGroup();
-    void AddDict(const Dict* dict);
-    size_t KeyMaxLength() const;
-    Optional<DictEntry> MatchPrefix(const char* word) const;
-    vector<DictEntry> GetLengthsOfAllMatches(const char* word) const;
+    Optional() : isNull(true) {}
+    Optional(T actual) : data(actual), isNull(false) {}
+    bool IsNull() const {
+      return isNull;
+    }
+    T Get() const {
+      return data;
+    }
   private:
-    size_t keyMaxLength;
-    list<const Dict*> dicts;
+    bool isNull;
+    T data;
   };
 }

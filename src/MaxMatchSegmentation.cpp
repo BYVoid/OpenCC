@@ -26,17 +26,20 @@ MaxMatchSegmentation::MaxMatchSegmentation(DictGroup& dictGroup_) :
   dictGroup(dictGroup_) {
 }
 
-vector<string> MaxMatchSegmentation::Segment(const string& text) {
+vector<DictEntry> MaxMatchSegmentation::Segment(const string& text) {
   // TODO copy
-  vector<string> segments;
+  vector<DictEntry> segments;
   const char* pstr = text.c_str();
   while (*pstr != '\0') {
-    size_t matchedLength = dictGroup.MatchPrefix(pstr);
-    if (matchedLength == 0) {
+    Optional<DictEntry> matched = dictGroup.MatchPrefix(pstr);
+    size_t matchedLength;
+    if (matched.IsNull()) {
       matchedLength = UTF8Util::NextCharLength(pstr);
+      segments.push_back(DictEntry(UTF8Util::FromSubstr(pstr, matchedLength)));
+    } else {
+      matchedLength = matched.Get().key.length();
+      segments.push_back(matched.Get());
     }
-    string segment = UTF8Util::FromSubstr(pstr, matchedLength);
-    segments.push_back(segment);
     pstr += matchedLength;
   }
   return segments;

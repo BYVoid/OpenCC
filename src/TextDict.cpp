@@ -72,27 +72,27 @@ size_t TextDict::KeyMaxLength() const {
   return maxLength;
 }
 
-size_t TextDict::MatchPrefix(const char* word) const {
+Optional<DictEntry> TextDict::MatchPrefix(const char* word) const {
   DictEntry entry(UTF8Util::Truncate(word, maxLength));
   for (size_t len = entry.key.length(); len > 0; len--) {
     entry.key[len] = '\0';
-    bool found = std::binary_search(lexicon.begin(), lexicon.end(), entry);
-    if (found) {
-      return len;
+    auto found = std::lower_bound(lexicon.begin(), lexicon.end(), entry);
+    if (found != lexicon.end() && found->key == entry.key) {
+      return Optional<DictEntry>(*found);
     }
   }
-  return 0;
+  return Optional<DictEntry>();
 }
 
-vector<size_t> TextDict::GetLengthsOfAllMatches(const char* word) const {
+vector<DictEntry> TextDict::GetLengthsOfAllMatches(const char* word) const {
   // TODO copy
-  vector<size_t> matchedLengths;
+  vector<DictEntry> matchedLengths;
   DictEntry entry(UTF8Util::Truncate(word, maxLength));
   for (size_t len = entry.key.length(); len > 0; len--) {
     entry.key[len] = '\0';
-    bool found = std::binary_search(lexicon.begin(), lexicon.end(), entry);
-    if (found) {
-      matchedLengths.push_back(len);
+    auto found = std::lower_bound(lexicon.begin(), lexicon.end(), entry);
+    if (found != lexicon.end() && found->key == entry.key) {
+      matchedLengths.push_back(*found);
     }
   }
   return matchedLengths;

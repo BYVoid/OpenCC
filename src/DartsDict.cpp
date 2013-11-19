@@ -35,32 +35,45 @@ size_t DartsDict::KeyMaxLength() const {
   return maxLength;
 }
 
-size_t DartsDict::MatchPrefix(const char* word) const {
+Optional<DictEntry> DartsDict::MatchPrefix(const char* word) const {
   string wordTrunc = UTF8Util::Truncate(word, maxLength);
   for (size_t len = wordTrunc.length(); len > 0; len--) {
     wordTrunc[len] = '\0';
-    Darts::DoubleArray::value_type result;
+    Darts::DoubleArray::result_pair_type result;
     dict.exactMatchSearch(wordTrunc.c_str(), result);
-    if (result != -1) {
-      return len;
+    if (result.length != -1) {
+      return Optional<DictEntry>(DictEntry(wordTrunc, GetValuesOfEntry(result.value)));
     }
   }
-  return 0;
+  return Optional<DictEntry>();
 }
 
-vector<size_t> DartsDict::GetLengthsOfAllMatches(const char* word) const {
+vector<DictEntry> DartsDict::GetLengthsOfAllMatches(const char* word) const {
   // TODO copy
-  vector<size_t> matchedLengths;
+  vector<DictEntry> matchedLengths;
   string wordTrunc = UTF8Util::Truncate(word, maxLength);
   for (size_t len = wordTrunc.length(); len > 0; len--) {
     wordTrunc[len] = '\0';
-    Darts::DoubleArray::value_type result;
+    Darts::DoubleArray::result_pair_type result;
     dict.exactMatchSearch(wordTrunc.c_str(), result);
-    if (result != -1) {
-      matchedLengths.push_back(len);
+    if (result.length != -1) {
+      matchedLengths.push_back(DictEntry(wordTrunc, GetValuesOfEntry(result.value)));
     }
   }
   return matchedLengths;
+}
+
+vector<string> DartsDict::GetValuesOfEntry(size_t index) const {
+  size_t start = lexicon[index].valueIndexes[0];
+  size_t end = values.size();
+  if (index < lexicon.size() - 1) {
+    end = lexicon[index + 1].valueIndexes[0];
+  }
+  vector<string> values;
+  for (size_t i = start; i < end; i++) {
+    values.push_back(values[i]);
+  }
+  return values;
 }
 
 void DartsDict::FromTextDict(TextDict& dictionary) {
@@ -75,7 +88,8 @@ void DartsDict::FromTextDict(TextDict& dictionary) {
     size_t value_count = tlexicon[i].values.size();
     for (size_t j = 0; j < value_count; j++) {
       lexicon[i].valueIndexes.push_back(values.size());
-      values.push_back(Value(tlexicon[i].values[j], lexicon_cursor));
+      values.push_back(tlexicon[i].values[j]);
+      cursors.push_back(lexicon_cursor);
       lexicon_cursor += tlexicon[i].values[j].length();
     }
   }
@@ -135,13 +149,13 @@ void DartsDict::SerializeToFile(const string fileName) {
   
   // value indexes
   for (size_t i = 0; i < numValues; i++) {
-    size_t index = values[i].cursor;
+    size_t index = cursors[i];
     fwrite(&index, sizeof(size_t), 1, fp);
   }
   
   // value data
   for (size_t i = 0; i < numValues; i++) {
-    const char* value = values[i].value.c_str();
+    const char* value = values[i].c_str();
     fwrite(value, sizeof(char), strlen(value), fp);
   }
   

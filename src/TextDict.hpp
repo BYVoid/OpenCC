@@ -24,13 +24,19 @@
 namespace Opencc {
   class TextDict : public Dict {
   public:
-    TextDict(const string fileName);
+    TextDict();
     virtual ~TextDict();
     virtual size_t KeyMaxLength() const;
-    virtual Optional<DictEntry> MatchPrefix(const char* word) const;
-    virtual vector<DictEntry> GetLengthsOfAllMatches(const char* word) const;
+    virtual Optional<DictEntry> MatchPrefix(const char* word);
+    virtual vector<DictEntry> GetLengthsOfAllMatches(const char* word);
+    void AddKeyValue(DictEntry entry);
+    void LoadFromFile(const string fileName);
     vector<DictEntry> GetLexicon() const;
+
   private:
+    void SortLexicon();
+
+    bool sorted;
     size_t maxLength;
     vector<DictEntry> lexicon;
   };

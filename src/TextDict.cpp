@@ -43,7 +43,14 @@ DictEntry ParseKeyValues(const char* buff) {
   return entry;
 }
 
-TextDict::TextDict(const string fileName) {
+TextDict::TextDict() {
+  sorted = true;
+}
+
+TextDict::~TextDict() {
+}
+
+void TextDict::LoadFromFile(const string fileName) {
   // TODO use dynamic getline
   static char buff[ENTRY_BUFF_SIZE];
 
@@ -56,23 +63,34 @@ TextDict::TextDict(const string fileName) {
   while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
     // TODO reduce object copies
     DictEntry entry = ParseKeyValues(buff);
-    lexicon.push_back(entry);
-    size_t keyLength = entry.key.length();
-    maxLength = std::max(keyLength, maxLength);
+    AddKeyValue(entry);
   }
-
   fclose(fp);
-  std::sort(lexicon.begin(), lexicon.end());
+  
+  SortLexicon();
 }
 
-TextDict::~TextDict() {
+void TextDict::AddKeyValue(DictEntry entry) {
+  // TODO reduce object copies
+  lexicon.push_back(entry);
+  size_t keyLength = entry.key.length();
+  maxLength = std::max(keyLength, maxLength);
+  sorted = false;
+}
+
+void TextDict::SortLexicon() {
+  if (!sorted) {
+    std::sort(lexicon.begin(), lexicon.end());
+    sorted = true;
+  }
 }
 
 size_t TextDict::KeyMaxLength() const {
   return maxLength;
 }
 
-Optional<DictEntry> TextDict::MatchPrefix(const char* word) const {
+Optional<DictEntry> TextDict::MatchPrefix(const char* word) {
+  SortLexicon();
   DictEntry entry(UTF8Util::Truncate(word, maxLength));
   for (size_t len = entry.key.length(); len > 0; len--) {
     entry.key[len] = '\0';
@@ -84,7 +102,8 @@ Optional<DictEntry> TextDict::MatchPrefix(const char* word) const {
   return Optional<DictEntry>();
 }
 
-vector<DictEntry> TextDict::GetLengthsOfAllMatches(const char* word) const {
+vector<DictEntry> TextDict::GetLengthsOfAllMatches(const char* word) {
+  SortLexicon();
   // TODO copy
   vector<DictEntry> matchedLengths;
   DictEntry entry(UTF8Util::Truncate(word, maxLength));

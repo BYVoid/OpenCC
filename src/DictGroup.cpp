@@ -27,7 +27,7 @@ DictGroup::DictGroup() {
 DictGroup::~DictGroup() {
 }
 
-void DictGroup::AddDict(const Dict* dict) {
+void DictGroup::AddDict(Dict* dict) {
   dicts.push_back(dict);
   keyMaxLength = std::max(dict->KeyMaxLength(), keyMaxLength);
 }
@@ -36,8 +36,8 @@ size_t DictGroup::KeyMaxLength() const {
   return keyMaxLength;
 }
 
-Optional<DictEntry> DictGroup::MatchPrefix(const char* word) const {
-  for (const Dict* dict : dicts) {
+Optional<DictEntry> DictGroup::MatchPrefix(const char* word) {
+  for (Dict* dict : dicts) {
     Optional<DictEntry> prefix = dict->MatchPrefix(word);
     if (!prefix.IsNull()) {
       return prefix;
@@ -46,9 +46,9 @@ Optional<DictEntry> DictGroup::MatchPrefix(const char* word) const {
   return Optional<DictEntry>();
 }
 
-vector<DictEntry> DictGroup::GetLengthsOfAllMatches(const char* word) const {
+vector<DictEntry> DictGroup::GetLengthsOfAllMatches(const char* word) {
   map<size_t, DictEntry> matched;
-  for (const Dict* dict : dicts) {
+  for (Dict* dict : dicts) {
     vector<DictEntry> entries = dict->GetLengthsOfAllMatches(word);
     for (DictEntry entry : entries) {
       size_t len = entry.key.length();

@@ -27,6 +27,9 @@ namespace Opencc {
     vector<string> values;
     DictEntry() {}
     DictEntry(string key_) : key(key_) {}
+    DictEntry(string key_, string value_) : key(key_) {
+      values.push_back(value_);
+    }
     DictEntry(string key_, vector<string> values_)
       : key(key_), values(values_) {}
     bool operator < (const DictEntry& that) const {

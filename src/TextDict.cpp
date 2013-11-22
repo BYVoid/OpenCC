@@ -93,7 +93,7 @@ Optional<DictEntry> TextDict::MatchPrefix(const char* word) {
   SortLexicon();
   DictEntry entry(UTF8Util::Truncate(word, maxLength));
   for (size_t len = entry.key.length(); len > 0; len--) {
-    entry.key[len] = '\0';
+    entry.key.resize(len);
     auto found = std::lower_bound(lexicon.begin(), lexicon.end(), entry);
     if (found != lexicon.end() && found->key == entry.key) {
       return Optional<DictEntry>(*found);
@@ -108,7 +108,7 @@ vector<DictEntry> TextDict::GetLengthsOfAllMatches(const char* word) {
   vector<DictEntry> matchedLengths;
   DictEntry entry(UTF8Util::Truncate(word, maxLength));
   for (size_t len = entry.key.length(); len > 0; len--) {
-    entry.key[len] = '\0';
+    entry.key.resize(len);
     auto found = std::lower_bound(lexicon.begin(), lexicon.end(), entry);
     if (found != lexicon.end() && found->key == entry.key) {
       matchedLengths.push_back(*found);

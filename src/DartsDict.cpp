@@ -38,7 +38,7 @@ size_t DartsDict::KeyMaxLength() const {
 Optional<DictEntry> DartsDict::MatchPrefix(const char* word) {
   string wordTrunc = UTF8Util::Truncate(word, maxLength);
   for (size_t len = wordTrunc.length(); len > 0; len--) {
-    wordTrunc[len] = '\0';
+    wordTrunc.resize(len);
     Darts::DoubleArray::result_pair_type result;
     dict.exactMatchSearch(wordTrunc.c_str(), result);
     if (result.length != -1) {
@@ -53,7 +53,7 @@ vector<DictEntry> DartsDict::GetLengthsOfAllMatches(const char* word) {
   vector<DictEntry> matchedLengths;
   string wordTrunc = UTF8Util::Truncate(word, maxLength);
   for (size_t len = wordTrunc.length(); len > 0; len--) {
-    wordTrunc[len] = '\0';
+    wordTrunc.resize(len);
     Darts::DoubleArray::result_pair_type result;
     dict.exactMatchSearch(wordTrunc.c_str(), result);
     if (result.length != -1) {

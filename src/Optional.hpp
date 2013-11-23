@@ -23,7 +23,7 @@ namespace Opencc {
   class Optional {
   public:
     Optional() : isNull(true) {}
-    Optional(T actual) : data(actual), isNull(false) {}
+    Optional(T actual) : isNull(false), data(actual) {}
     bool IsNull() const {
       return isNull;
     }

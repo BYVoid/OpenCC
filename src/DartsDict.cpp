@@ -23,12 +23,15 @@ using namespace Opencc;
 
 static const char* OCDHEADER = "OPENCCDARTS1";
 
-DartsDict::DartsDict(const string fileName) {
-  // TODO deserialization
+DartsDict::DartsDict() {
   maxLength = 0;
 }
 
 DartsDict::~DartsDict() {
+}
+
+void DartsDict::LoadFromFile(const string fileName) {
+  // TODO deserialization
 }
 
 size_t DartsDict::KeyMaxLength() const {
@@ -41,7 +44,7 @@ Optional<DictEntry> DartsDict::MatchPrefix(const char* word) {
     wordTrunc.resize(len);
     Darts::DoubleArray::result_pair_type result;
     dict.exactMatchSearch(wordTrunc.c_str(), result);
-    if (result.length != -1) {
+    if (result.value != -1) {
       return Optional<DictEntry>(DictEntry(wordTrunc, GetValuesOfEntry(result.value)));
     }
   }
@@ -56,7 +59,7 @@ vector<DictEntry> DartsDict::GetLengthsOfAllMatches(const char* word) {
     wordTrunc.resize(len);
     Darts::DoubleArray::result_pair_type result;
     dict.exactMatchSearch(wordTrunc.c_str(), result);
-    if (result.length != -1) {
+    if (result.value != -1) {
       matchedLengths.push_back(DictEntry(wordTrunc, GetValuesOfEntry(result.value)));
     }
   }
@@ -69,11 +72,11 @@ vector<string> DartsDict::GetValuesOfEntry(size_t index) const {
   if (index < lexicon.size() - 1) {
     end = lexicon[index + 1].valueIndexes[0];
   }
-  vector<string> values;
+  vector<string> valuesOfEntry;
   for (size_t i = start; i < end; i++) {
-    values.push_back(values[i]);
+    valuesOfEntry.push_back(values[i]);
   }
-  return values;
+  return valuesOfEntry;
 }
 
 void DartsDict::FromTextDict(TextDict& dictionary) {

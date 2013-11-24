@@ -26,12 +26,13 @@
 namespace Opencc {
   class DartsDict : public Dict {
   public:
-    DartsDict(const string fileName);
+    DartsDict();
     virtual ~DartsDict();
     virtual size_t KeyMaxLength() const;
     virtual Optional<DictEntry> MatchPrefix(const char* word);
     virtual vector<DictEntry> GetLengthsOfAllMatches(const char* word);
     
+    void LoadFromFile(const string fileName);
     void SerializeToFile(const string fileName);
     void FromTextDict(TextDict& dictionary);
     

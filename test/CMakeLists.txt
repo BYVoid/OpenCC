@@ -1,35 +1,23 @@
-set(CONFIGURATIONS
-	zhs2zht
-	zht2zhs
-	mix2zht
-	mix2zhs
-	zhs2zhtw_p
-	zhs2zhtw_vp
-	zhtw2zhcn_t
-	zhtw2zhcn_s
+add_executable(
+  TextDictTest
+  TextDictTest.cpp
+  ${CMAKE_SOURCE_DIR}/src/TextDict.cpp
+  ${CMAKE_SOURCE_DIR}/src/UTF8Util.cpp
 )
 
-foreach(CONFIG ${CONFIGURATIONS})
+add_definitions(
+  -I${CMAKE_SOURCE_DIR}/src
+  -std=c++11
+  -Wall
+)
 
-	add_test(
-		${CONFIG}_convert
-		${CMAKE_COMMAND} -E chdir ${PROJECT_BINARY_DIR}/data
-		${PROJECT_BINARY_DIR}/src/tools/opencc
-		-i ${CMAKE_SOURCE_DIR}/test/testcases/${CONFIG}.in
-		-o ${PROJECT_BINARY_DIR}/test/${CONFIG}.out
-		-c ${CMAKE_SOURCE_DIR}/data/config/${CONFIG}.ini
-	)
-	
-	add_test(
-		${CONFIG}_compare
-		diff
-		${PROJECT_BINARY_DIR}/test/${CONFIG}.out
-		${CMAKE_SOURCE_DIR}/test/testcases/${CONFIG}.ans
-	)
-	
-	set_property(
-		TEST ${CONFIG}_compare
-		APPEND PROPERTY
-			DEPENDS ${CONFIG}_convert)
+## FIXME C++ link
+target_link_libraries(
+  TextDictTest
+  ${LIBOPENCC_TARGET}
+)
 
-endforeach(CONFIG)
+add_test(
+	TextDictTest
+	${PROJECT_BINARY_DIR}/test/TextDictTest
+)

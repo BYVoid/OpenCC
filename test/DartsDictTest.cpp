@@ -16,32 +16,13 @@
  * limitations under the License.
  */
 
-#include "DartsDict.hpp"
+#include "DictTestUtils.hpp"
 
 using namespace Opencc;
 
 int main(int argc, const char * argv[]) {
-  TextDict textDict;
-  textDict.AddKeyValue(DictEntry("BYVoid", "byv"));
-  textDict.AddKeyValue(DictEntry("zigzagzig", "zag"));
-  textDict.AddKeyValue(DictEntry("積羽沉舟", "羣輕折軸"));
-  
+  TextDict textDict = DictTestUtils::CreateTextDictForText();
   DartsDict dartsDict;
   dartsDict.FromTextDict(textDict);
-  
-  Optional<DictEntry> entry;
-  entry = dartsDict.MatchPrefix("BYVoid");
-  assert(!entry.IsNull());
-  assert(entry.Get().GetDefault() == "byv");
-  
-  entry = dartsDict.MatchPrefix("BYVoid123");
-  assert(!entry.IsNull());
-  assert(entry.Get().GetDefault() == "byv");
-  
-  entry = dartsDict.MatchPrefix("積羽沉舟");
-  assert(!entry.IsNull());
-  assert(entry.Get().GetDefault() == "羣輕折軸");
-  
-  entry = dartsDict.MatchPrefix("Unknown");
-  assert(entry.IsNull());
+  DictTestUtils::TestDict(dartsDict);
 }

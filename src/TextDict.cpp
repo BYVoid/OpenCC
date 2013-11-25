@@ -117,7 +117,8 @@ vector<DictEntry> TextDict::GetLengthsOfAllMatches(const char* word) {
   return matchedLengths;
 }
 
-vector<DictEntry> TextDict::GetLexicon() const {
+vector<DictEntry> TextDict::GetLexicon() {
   // TODO copy
+  SortLexicon();
   return lexicon;
 }

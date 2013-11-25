@@ -31,7 +31,7 @@ namespace Opencc {
     virtual vector<DictEntry> GetLengthsOfAllMatches(const char* word);
     void AddKeyValue(DictEntry entry);
     void LoadFromFile(const string fileName);
-    vector<DictEntry> GetLexicon() const;
+    vector<DictEntry> GetLexicon();
 
   private:
     void SortLexicon();

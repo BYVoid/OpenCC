@@ -26,9 +26,9 @@ MaxMatchSegmentation::MaxMatchSegmentation(DictGroup& dictGroup_) :
   dictGroup(dictGroup_) {
 }
 
-shared_ptr<vector<DictEntry*>> MaxMatchSegmentation::Segment(const string& text) {
-  shared_ptr<vector<DictEntry*>> segments;
-  segments.reset(new vector<DictEntry*>);
+shared_ptr<vector<shared_ptr<DictEntry>>> MaxMatchSegmentation::Segment(const string& text) {
+  shared_ptr<vector<shared_ptr<DictEntry>>> segments;
+  segments.reset(new vector<shared_ptr<DictEntry>>);
   const char* pstr = text.c_str();
   while (*pstr != '\0') {
     Optional<DictEntry*> matched = dictGroup.MatchPrefix(pstr);
@@ -36,10 +36,10 @@ shared_ptr<vector<DictEntry*>> MaxMatchSegmentation::Segment(const string& text)
     if (matched.IsNull()) {
       matchedLength = UTF8Util::NextCharLength(pstr);
       // FIXME memory leak
-      segments->push_back(new DictEntry(UTF8Util::FromSubstr(pstr, matchedLength)));
+      segments->push_back(shared_ptr<DictEntry>(new DictEntry(UTF8Util::FromSubstr(pstr, matchedLength))));
     } else {
       matchedLength = matched.Get()->key.length();
-      segments->push_back(matched.Get());
+      segments->push_back(shared_ptr<DictEntry>(matched.Get()));
     }
     pstr += matchedLength;
   }

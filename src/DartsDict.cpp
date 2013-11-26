@@ -23,15 +23,11 @@ using namespace Opencc;
 
 static const char* OCDHEADER = "OPENCCDARTS1";
 
-DartsDict::DartsDict() {
+DartsDict::DartsDict() : lexicon(new vector<DictEntry>) {
   maxLength = 0;
 }
 
 DartsDict::~DartsDict() {
-}
-
-void DartsDict::LoadFromFile(const string fileName) {
-  // TODO deserialization
 }
 
 size_t DartsDict::KeyMaxLength() const {
@@ -45,8 +41,7 @@ Optional<DictEntry*> DartsDict::MatchPrefix(const char* word) {
     Darts::DoubleArray::result_pair_type result;
     dict.exactMatchSearch(wordTrunc.c_str(), result);
     if (result.value != -1) {
-      // FIXME memory leak
-      return Optional<DictEntry*>(new DictEntry(wordTrunc, GetValuesOfEntry(result.value)));
+      return Optional<DictEntry*>(&lexicon->at(result.value));
     }
   }
   return Optional<DictEntry*>();
@@ -61,57 +56,23 @@ shared_ptr<vector<DictEntry*>> DartsDict::MatchAllPrefixes(const char* word) {
     Darts::DoubleArray::result_pair_type result;
     dict.exactMatchSearch(wordTrunc.c_str(), result);
     if (result.value != -1) {
-      // FIXME memory leak
-      matchedLengths->push_back(new DictEntry(wordTrunc, GetValuesOfEntry(result.value)));
+      matchedLengths->push_back(&lexicon->at(result.value));
     }
   }
   return matchedLengths;
 }
 
-vector<string> DartsDict::GetValuesOfEntry(size_t index) const {
-  size_t start = lexicon[index].valueIndexes[0];
-  size_t end = values.size();
-  if (index < lexicon.size() - 1) {
-    end = lexicon[index + 1].valueIndexes[0];
-  }
-  vector<string> valuesOfEntry;
-  for (size_t i = start; i < end; i++) {
-    valuesOfEntry.push_back(values[i]);
-  }
-  return valuesOfEntry;
-}
-
 void DartsDict::FromTextDict(TextDict& dictionary) {
-  maxLength = 0;
-  const vector<DictEntry>& tlexicon = *dictionary.GetLexicon().get();
-  size_t lexiconCount = tlexicon.size();
-  size_t valueCursor = 0;
-  lexicon.resize(lexiconCount);
-  for (size_t i = 0; i < lexiconCount; i++) {
-    Entry& entry = lexicon[i];
-    const DictEntry& textEntry = tlexicon[i];
-    // Copy key
-    entry.key = textEntry.key;
-    maxLength = std::max(entry.key.length(), maxLength);
-    // Copy values
-    for (auto& value : tlexicon[i].values) {
-      entry.valueIndexes.push_back(values.size());
-      values.push_back(value);
-      cursors.push_back(valueCursor);
-      valueCursor += value.length();
-    }
-  }
-  BuildDarts();
-}
-
-void DartsDict::BuildDarts() {
   vector<const char*> keys;
-  vector<int> valueIndexes;
-  keys.reserve(lexicon.size());
-  for (size_t i = 0; i < lexicon.size(); i++) {
-    keys.push_back(lexicon[i].key.c_str());
+  maxLength = 0;
+  lexicon = dictionary.GetLexicon();
+  size_t lexiconCount = lexicon->size();
+  for (size_t i = 0; i < lexiconCount; i++) {
+    const DictEntry& entry = lexicon->at(i);
+    keys.push_back(entry.key.c_str());
+    maxLength = std::max(entry.key.length(), maxLength);
   }
-  dict.build(lexicon.size(), &keys[0]);
+  dict.build(lexicon->size(), &keys[0]);
 }
 
 void DartsDict::SerializeToFile(const string fileName) {
@@ -119,6 +80,22 @@ void DartsDict::SerializeToFile(const string fileName) {
   if (fp == NULL) {
     fprintf(stderr, _("Can not write file: %s\n"), fileName.c_str());
     exit(1);
+  }
+
+  size_t numKeys = lexicon->size();
+  vector<size_t> valueIndexes;
+  vector<size_t> cursors;
+  vector<string> values;
+
+  size_t valueCursor = 0;
+  valueIndexes.resize(numKeys);
+  for (size_t i = 0; i < numKeys; i++) {
+    valueIndexes[i] = values.size();
+    for (auto& value : lexicon->at(i).values) {
+      values.push_back(value);
+      cursors.push_back(valueCursor);
+      valueCursor += value.length();
+    }
   }
   /*
    Binary Structure
@@ -140,7 +117,6 @@ void DartsDict::SerializeToFile(const string fileName) {
    [darts]
    char * [bytes of darts]
    */
-  size_t numKeys = lexicon.size();
   size_t numValues = values.size();
   size_t dartsSize = dict.total_size();
   
@@ -151,7 +127,7 @@ void DartsDict::SerializeToFile(const string fileName) {
   
   // key indexes
   for (size_t i = 0; i < numKeys; i++) {
-    size_t index = lexicon[i].valueIndexes[0];
+    size_t index = valueIndexes[i];
     fwrite(&index, sizeof(size_t), 1, fp);
   }
   
@@ -173,4 +149,21 @@ void DartsDict::SerializeToFile(const string fileName) {
   fclose(fp);
 }
 
+vector<string> GetValuesOfEntry(vector<size_t> valueIndexes,
+                                vector<string> values,
+                                size_t index) {
+  size_t start = valueIndexes[index];
+  size_t end = values.size();
+  if (index < valueIndexes.size() - 1) {
+    end = valueIndexes[index + 1];
+  }
+  vector<string> valuesOfEntry;
+  for (size_t i = start; i < end; i++) {
+    valuesOfEntry.push_back(values[i]);
+  }
+  return valuesOfEntry;
+}
 
+void DartsDict::LoadFromFile(const string fileName) {
+  // TODO deserialization
+}

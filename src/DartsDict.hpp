@@ -37,18 +37,8 @@ namespace Opencc {
     void FromTextDict(TextDict& dictionary);
     
   private:
-    void BuildDarts();
-    vector<string> GetValuesOfEntry(size_t index) const;
-    
-    struct Entry {
-      string key;
-      vector<size_t> valueIndexes;
-    };
-    
     size_t maxLength;
-    vector<Entry> lexicon;
-    vector<size_t> cursors;
-    vector<string> values;
     Darts::DoubleArray dict;
+    shared_ptr<vector<DictEntry>> lexicon;
   };
 }

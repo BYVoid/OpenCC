@@ -28,16 +28,16 @@ Conversion::Conversion(DictGroup* dictGroup, Segmentation* segmentator) {
 shared_ptr<vector<string>> Conversion::Segment(const string& text) {
   shared_ptr<vector<string>> segments;
   segments.reset(new vector<string>);
-  for (const DictEntry* entry : *segmentator->Segment(text)) {
+  for (auto entry : *segmentator->Segment(text)) {
     segments->push_back(entry->key);
   }
   return segments;
 }
 
 string Conversion::Convert(const string& text) {
-  shared_ptr<vector<DictEntry*>> segments = segmentator->Segment(text);
+  auto segments = segmentator->Segment(text);
   std::ostringstream buffer;
-  for (const DictEntry* segment : *segments) {
+  for (auto segment : *segments) {
     buffer << segment->GetDefault();
   }
   return buffer.str();

@@ -24,6 +24,6 @@
 namespace Opencc {
   class Segmentation {
   public:
-    virtual shared_ptr<vector<DictEntry*>> Segment(const string& text) = 0;
+    virtual shared_ptr<vector<shared_ptr<DictEntry>>> Segment(const string& text) = 0;
   };
 }

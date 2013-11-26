@@ -27,34 +27,23 @@ set(
   UTF8Util.cpp
 )
 
-set (LIBOPENCC_TARGET libopencc)
-set (LIBOPENCC_STATIC_TARGET libopencc_static)
-
-add_definitions(
-  -I${CMAKE_SOURCE_DIR}/deps/libdarts/src
-  -std=c++11
-  -DPKGDATADIR="${DIR_SHARE_OPENCC}"
-  -DLOCALEDIR="${DIR_SHARE_LOCALE}"
-  -DVERSION="${OPENCC_VERSION}"
-  -DPACKAGE_NAME="${PACKAGE_NAME}"
-  -Wall
-)
+include_directories(../deps/libdarts/src)
 
 add_library(
-  ${LIBOPENCC_TARGET}
+  libopencc
   SHARED
   ${LIBOPENCC_SOURCES}
 )
 
 # add_library(
-#   ${LIBOPENCC_STATIC_TARGET}
+#   libopencc_static
 #   STATIC
 #   ${LIBOPENCC_SOURCES}
 # )
 
 set_target_properties(
-  ${LIBOPENCC_TARGET}
-  # ${LIBOPENCC_STATIC_TARGET}
+  libopencc
+  # libopencc_static
   PROPERTIES
     LINKER_LANGUAGE
       CXX
@@ -87,14 +76,14 @@ endif (CMAKE_BUILD_TYPE MATCHES Debug)
 
 install(
   TARGETS
-    ${LIBOPENCC_TARGET}
+    libopencc
   LIBRARY DESTINATION
     ${DIR_LIBRARY}
 )
 
 # install(
 #   TARGETS
-#     ${LIBOPENCC_STATIC_TARGET}
+#     libopencc_static
 #   ARCHIVE DESTINATION
 #     ${DIR_LIBRARY_STATIC}
 # )

@@ -106,6 +106,17 @@ install(
     ${DIR_LIBRARY}/pkgconfig
 )
 
+######## Compiler flags
+
+add_definitions(
+  -std=c++11
+  -Wall
+  -DPKGDATADIR="${DIR_SHARE_OPENCC}"
+  -DLOCALEDIR="${DIR_SHARE_LOCALE}"
+  -DVERSION="${OPENCC_VERSION}"
+  -DPACKAGE_NAME="${PACKAGE_NAME}"
+)
+
 ######## Subdirectories
 
 add_subdirectory(src)

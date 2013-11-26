@@ -53,7 +53,7 @@ namespace Opencc {
       entry = dict.MatchPrefix("Unknown");
       assert(entry.IsNull());
       
-      vector<DictEntry> matches = dict.GetLengthsOfAllMatches("清華大學計算機系");
+      vector<DictEntry> matches = dict.MatchAllPrefixes("清華大學計算機系");
       assert(matches.size() == 3);
       assert(matches[0].GetDefault() == "Tsinghua University");
       assert(matches[1].GetDefault() == "Tsinghua");

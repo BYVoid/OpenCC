@@ -102,7 +102,7 @@ Optional<DictEntry> TextDict::MatchPrefix(const char* word) {
   return Optional<DictEntry>();
 }
 
-vector<DictEntry> TextDict::GetLengthsOfAllMatches(const char* word) {
+vector<DictEntry> TextDict::MatchAllPrefixes(const char* word) {
   SortLexicon();
   // TODO copy
   vector<DictEntry> matchedLengths;

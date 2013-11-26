@@ -30,7 +30,7 @@ namespace Opencc {
     virtual ~DartsDict();
     virtual size_t KeyMaxLength() const;
     virtual Optional<DictEntry> MatchPrefix(const char* word);
-    virtual vector<DictEntry> GetLengthsOfAllMatches(const char* word);
+    virtual vector<DictEntry> MatchAllPrefixes(const char* word);
     
     void LoadFromFile(const string fileName);
     void SerializeToFile(const string fileName);

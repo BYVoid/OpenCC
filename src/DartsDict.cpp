@@ -51,7 +51,7 @@ Optional<DictEntry> DartsDict::MatchPrefix(const char* word) {
   return Optional<DictEntry>();
 }
 
-vector<DictEntry> DartsDict::GetLengthsOfAllMatches(const char* word) {
+vector<DictEntry> DartsDict::MatchAllPrefixes(const char* word) {
   // TODO copy
   vector<DictEntry> matchedLengths;
   string wordTrunc = UTF8Util::Truncate(word, maxLength);

@@ -46,10 +46,10 @@ Optional<DictEntry> DictGroup::MatchPrefix(const char* word) {
   return Optional<DictEntry>();
 }
 
-vector<DictEntry> DictGroup::GetLengthsOfAllMatches(const char* word) {
+vector<DictEntry> DictGroup::MatchAllPrefixes(const char* word) {
   map<size_t, DictEntry> matched;
   for (Dict* dict : dicts) {
-    vector<DictEntry> entries = dict->GetLengthsOfAllMatches(word);
+    vector<DictEntry> entries = dict->MatchAllPrefixes(word);
     for (DictEntry entry : entries) {
       size_t len = entry.key.length();
       if (matched.find(len) != matched.end()) {

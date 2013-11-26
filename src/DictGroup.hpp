@@ -29,7 +29,7 @@ namespace Opencc {
     void AddDict(Dict* dict);
     size_t KeyMaxLength() const;
     Optional<DictEntry> MatchPrefix(const char* word);
-    vector<DictEntry> GetLengthsOfAllMatches(const char* word);
+    vector<DictEntry> MatchAllPrefixes(const char* word);
   private:
     size_t keyMaxLength;
     list<Dict*> dicts;

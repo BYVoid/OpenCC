@@ -70,6 +70,12 @@ void TextDict::LoadFromFile(const string fileName) {
   SortLexicon();
 }
 
+void TextDict::LoadFromDict(Dict& dictionary) {
+  lexicon = dictionary.GetLexicon();
+  maxLength = dictionary.KeyMaxLength();
+  sorted = true;
+}
+
 void TextDict::AddKeyValue(DictEntry entry) {
   // TODO reduce object copies
   lexicon->push_back(entry);

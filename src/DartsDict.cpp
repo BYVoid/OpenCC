@@ -62,19 +62,44 @@ shared_ptr<vector<DictEntry*>> DartsDict::MatchAllPrefixes(const char* word) {
   return matchedLengths;
 }
 
-void DartsDict::FromTextDict(TextDict& dictionary) {
+shared_ptr<vector<DictEntry>> DartsDict::GetLexicon() {
+  return lexicon;
+}
+
+void DartsDict::LoadFromDict(Dict& dictionary) {
   vector<const char*> keys;
   maxLength = 0;
   lexicon = dictionary.GetLexicon();
   size_t lexiconCount = lexicon->size();
+  keys.resize(lexiconCount);
   for (size_t i = 0; i < lexiconCount; i++) {
     const DictEntry& entry = lexicon->at(i);
-    keys.push_back(entry.key.c_str());
+    keys[i] = entry.key.c_str();
     maxLength = std::max(entry.key.length(), maxLength);
   }
   dict.build(lexicon->size(), &keys[0]);
 }
 
+/**
+ Binary Structure
+ [OCDHEADER]
+ [number of keys]
+ size_t
+ [number of values]
+ size_t
+ [bytes of values]
+ size_t
+ [bytes of darts]
+ size_t
+ [key indexes]
+ size_t(index of first value) * [number of keys]
+ [value indexes]
+ size_t(index of first char) * [number of values]
+ [value data]
+ char * [bytes of values]
+ [darts]
+ char * [bytes of darts]
+ */
 void DartsDict::SerializeToFile(const string fileName) {
   FILE *fp = fopen(fileName.c_str(), "wb");
   if (fp == NULL) {
@@ -97,26 +122,7 @@ void DartsDict::SerializeToFile(const string fileName) {
       valueCursor += value.length();
     }
   }
-  /*
-   Binary Structure
-   [OCDHEADER]
-   [number of keys]
-   size_t
-   [number of values]
-   size_t
-   [bytes of values]
-   size_t
-   [bytes of darts]
-   size_t
-   [key indexes]
-   size_t(index of first value) * [number of keys]
-   [value indexes]
-   size_t(index of first char) * [number of values]
-   [value data]
-   char * [bytes of values]
-   [darts]
-   char * [bytes of darts]
-   */
+
   size_t numValues = values.size();
   size_t dartsSize = dict.total_size();
   
@@ -165,5 +171,5 @@ vector<string> GetValuesOfEntry(vector<size_t> valueIndexes,
 }
 
 void DartsDict::LoadFromFile(const string fileName) {
-  // TODO deserialization
+//  dict.set_array();
 }

@@ -29,9 +29,10 @@ namespace Opencc {
     virtual size_t KeyMaxLength() const;
     virtual Optional<DictEntry*> MatchPrefix(const char* word);
     virtual shared_ptr<vector<DictEntry*>> MatchAllPrefixes(const char* word);
+    virtual shared_ptr<vector<DictEntry>> GetLexicon();
     void AddKeyValue(DictEntry entry);
     void LoadFromFile(const string fileName);
-    shared_ptr<vector<DictEntry>> GetLexicon();
+    void LoadFromDict(Dict& dictionary);
 
   private:
     void SortLexicon();

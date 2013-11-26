@@ -31,10 +31,11 @@ namespace Opencc {
     virtual size_t KeyMaxLength() const;
     virtual Optional<DictEntry*> MatchPrefix(const char* word);
     virtual shared_ptr<vector<DictEntry*>> MatchAllPrefixes(const char* word);
+    virtual shared_ptr<vector<DictEntry>> GetLexicon();
 
     void LoadFromFile(const string fileName);
     void SerializeToFile(const string fileName);
-    void FromTextDict(TextDict& dictionary);
+    void LoadFromDict(Dict& dictionary);
     
   private:
     size_t maxLength;

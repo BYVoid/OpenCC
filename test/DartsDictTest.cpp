@@ -23,6 +23,6 @@ using namespace Opencc;
 int main(int argc, const char * argv[]) {
   TextDict textDict = DictTestUtils::CreateTextDictForText();
   DartsDict dartsDict;
-  dartsDict.FromTextDict(textDict);
+  dartsDict.LoadFromDict(textDict);
   DictTestUtils::TestDict(dartsDict);
 }

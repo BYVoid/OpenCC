@@ -18,7 +18,9 @@
 
 #pragma once
 
+#include "Conversion.hpp"
 #include "Dict.hpp"
+#include "DictGroup.hpp"
 #include "DartsDict.hpp"
 #include "TextDict.hpp"
 
@@ -34,6 +36,34 @@ namespace Opencc {
       textDict.AddKeyValue(DictEntry("清華", "Tsinghua"));
       textDict.AddKeyValue(DictEntry("清華大學", "TsinghuaUniversity"));
       return textDict;
+    }
+    
+    static shared_ptr<Dict> CreateDictForCharacters() {
+      shared_ptr<TextDict> textDict(new TextDict);
+      textDict->AddKeyValue(DictEntry("后", vector<string>{"后", "後"}));
+      textDict->AddKeyValue(DictEntry("发", vector<string>{"發", "髮"}));
+      textDict->AddKeyValue(DictEntry("干", vector<string>{"幹", "乾", "干"}));
+      return textDict;
+    }
+    
+    static shared_ptr<Dict> CreateDictForPhrases() {
+      shared_ptr<TextDict> textDict(new TextDict);
+      textDict->AddKeyValue(DictEntry("太后", "太后"));
+      textDict->AddKeyValue(DictEntry("头发", "頭髮"));
+      textDict->AddKeyValue(DictEntry("干燥", "乾燥"));
+
+      shared_ptr<DartsDict> dartsDict(new DartsDict);
+      dartsDict->LoadFromDict(*textDict);
+      return dartsDict;
+    }
+    
+    static shared_ptr<DictGroup> CreateDictGroupForConversion() {
+      shared_ptr<DictGroup> dictGroup(new DictGroup);
+      shared_ptr<Dict> phrasesDict = CreateDictForPhrases();
+      shared_ptr<Dict> charactersDict = CreateDictForCharacters();
+      dictGroup->AddDict(phrasesDict);
+      dictGroup->AddDict(charactersDict);
+      return dictGroup;
     }
     
     static void TestDict(Dict& dict) {

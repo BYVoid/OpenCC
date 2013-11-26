@@ -16,22 +16,18 @@
  * limitations under the License.
  */
 
-#pragma once
+#include "DictTestUtils.hpp"
 
-#include "Common.hpp"
-#include "Dict.hpp"
+using namespace Opencc;
 
-namespace Opencc {
-  class DictGroup {
-  public:
-    DictGroup();
-    virtual ~DictGroup();
-    void AddDict(shared_ptr<Dict> dict);
-    size_t KeyMaxLength() const;
-    Optional<DictEntry*> MatchPrefix(const char* word);
-    shared_ptr<vector<DictEntry*>> MatchAllPrefixes(const char* word);
-  private:
-    size_t keyMaxLength;
-    list<shared_ptr<Dict>> dicts;
-  };
+int main(int argc, const char * argv[]) {
+  auto dictGroup = DictTestUtils::CreateDictGroupForConversion();
+  Optional<DictEntry*> entry;
+  entry = dictGroup->MatchPrefix("Unknown");
+  assert(entry.IsNull());
+  
+  shared_ptr<vector<DictEntry*>> matches = dictGroup->MatchAllPrefixes("干燥");
+  assert(matches->size() == 2);
+  assert(matches->at(0)->GetDefault() == "乾燥");
+  assert(matches->at(1)->GetDefault() == "幹");
 }

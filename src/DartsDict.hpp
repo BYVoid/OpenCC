@@ -32,14 +32,17 @@ namespace Opencc {
     virtual Optional<DictEntry*> MatchPrefix(const char* word);
     virtual shared_ptr<vector<DictEntry*>> MatchAllPrefixes(const char* word);
     virtual shared_ptr<vector<DictEntry>> GetLexicon();
-
-    void LoadFromFile(const string fileName);
-    void SerializeToFile(const string fileName);
-    void LoadFromDict(Dict& dictionary);
     
+    void LoadFromFile(const string fileName);
+    void LoadFromFile(FILE* fp);
+    void LoadFromDict(Dict& dictionary);
+    void SerializeToFile(const string fileName);
+    void SerializeToFile(FILE* fp);
+
   private:
     size_t maxLength;
     Darts::DoubleArray dict;
     shared_ptr<vector<DictEntry>> lexicon;
+    void* buffer;
   };
 }

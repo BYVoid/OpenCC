@@ -25,4 +25,12 @@ int main(int argc, const char * argv[]) {
   DartsDict dartsDict;
   dartsDict.LoadFromDict(textDict);
   DictTestUtils::TestDict(dartsDict);
+  
+  // Serialization
+  string fileName = "dict.ocd";
+  dartsDict.SerializeToFile(fileName);
+  
+  // Deserialization
+  dartsDict.LoadFromFile(fileName);
+  DictTestUtils::TestDict(dartsDict);
 }

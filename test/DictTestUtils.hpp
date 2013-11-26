@@ -32,7 +32,7 @@ namespace Opencc {
       textDict.AddKeyValue(DictEntry("積羽沉舟", "羣輕折軸"));
       textDict.AddKeyValue(DictEntry("清", "Tsing"));
       textDict.AddKeyValue(DictEntry("清華", "Tsinghua"));
-      textDict.AddKeyValue(DictEntry("清華大學", "Tsinghua University"));
+      textDict.AddKeyValue(DictEntry("清華大學", "TsinghuaUniversity"));
       return textDict;
     }
     
@@ -55,7 +55,7 @@ namespace Opencc {
       
       shared_ptr<vector<DictEntry*>> matches = dict.MatchAllPrefixes("清華大學計算機系");
       assert(matches->size() == 3);
-      assert(matches->at(0)->GetDefault() == "Tsinghua University");
+      assert(matches->at(0)->GetDefault() == "TsinghuaUniversity");
       assert(matches->at(1)->GetDefault() == "Tsinghua");
       assert(matches->at(2)->GetDefault() == "Tsing");
     }

@@ -51,22 +51,24 @@ TextDict::~TextDict() {
 }
 
 void TextDict::LoadFromFile(const string fileName) {
-  // TODO use dynamic getline
-  static char buff[ENTRY_BUFF_SIZE];
-
   FILE* fp = fopen(fileName.c_str(), "r");
   if (fp == NULL) {
     throw runtime_error("file not found");
   }
-  UTF8Util::SkipUtf8Bom(fp);
+  LoadFromFile(fp);
+  fclose(fp);
+}
 
+void TextDict::LoadFromFile(FILE* fp) {
+  // TODO use dynamic getline
+  static char buff[ENTRY_BUFF_SIZE];
+  UTF8Util::SkipUtf8Bom(fp);
+  
   while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
     // TODO reduce object copies
     DictEntry entry = ParseKeyValues(buff);
     AddKeyValue(entry);
   }
-  fclose(fp);
-  
   SortLexicon();
 }
 
@@ -139,6 +141,8 @@ void TextDict::SerializeToFile(const string fileName) {
 }
 
 void TextDict::SerializeToFile(FILE* fp) {
+  SortLexicon();
+  // TODO escape space
   for (auto& entry : *lexicon) {
     fprintf(fp, "%s\t", entry.key.c_str());
     size_t i = 0;

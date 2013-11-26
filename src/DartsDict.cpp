@@ -25,9 +25,13 @@ static const char* OCDHEADER = "OPENCCDARTS1";
 
 DartsDict::DartsDict() : lexicon(new vector<DictEntry>) {
   maxLength = 0;
+  buffer = nullptr;
 }
 
 DartsDict::~DartsDict() {
+  if (buffer != nullptr) {
+    free(buffer);
+  }
 }
 
 size_t DartsDict::KeyMaxLength() const {
@@ -36,6 +40,7 @@ size_t DartsDict::KeyMaxLength() const {
 
 Optional<DictEntry*> DartsDict::MatchPrefix(const char* word) {
   string wordTrunc = UTF8Util::Truncate(word, maxLength);
+  // TODO reduce 1 by utf8 char
   for (size_t len = wordTrunc.length(); len > 0; len--) {
     wordTrunc.resize(len);
     Darts::DoubleArray::result_pair_type result;
@@ -80,96 +85,58 @@ void DartsDict::LoadFromDict(Dict& dictionary) {
   dict.build(lexicon->size(), &keys[0]);
 }
 
-/**
- Binary Structure
- [OCDHEADER]
- [number of keys]
- size_t
- [number of values]
- size_t
- [bytes of values]
- size_t
- [bytes of darts]
- size_t
- [key indexes]
- size_t(index of first value) * [number of keys]
- [value indexes]
- size_t(index of first char) * [number of values]
- [value data]
- char * [bytes of values]
- [darts]
- char * [bytes of darts]
- */
 void DartsDict::SerializeToFile(const string fileName) {
   FILE *fp = fopen(fileName.c_str(), "wb");
   if (fp == NULL) {
     fprintf(stderr, _("Can not write file: %s\n"), fileName.c_str());
     exit(1);
   }
-
-  size_t numKeys = lexicon->size();
-  vector<size_t> valueIndexes;
-  vector<size_t> cursors;
-  vector<string> values;
-
-  size_t valueCursor = 0;
-  valueIndexes.resize(numKeys);
-  for (size_t i = 0; i < numKeys; i++) {
-    valueIndexes[i] = values.size();
-    for (auto& value : lexicon->at(i).values) {
-      values.push_back(value);
-      cursors.push_back(valueCursor);
-      valueCursor += value.length();
-    }
-  }
-
-  size_t numValues = values.size();
-  size_t dartsSize = dict.total_size();
-  
-  fwrite(OCDHEADER, sizeof(char), strlen(OCDHEADER), fp);
-  fwrite(&numKeys, sizeof(size_t), 1, fp);
-  fwrite(&numValues, sizeof(size_t), 1, fp);
-  fwrite(&dartsSize, sizeof(size_t), 1, fp);
-  
-  // key indexes
-  for (size_t i = 0; i < numKeys; i++) {
-    size_t index = valueIndexes[i];
-    fwrite(&index, sizeof(size_t), 1, fp);
-  }
-  
-  // value indexes
-  for (size_t i = 0; i < numValues; i++) {
-    size_t index = cursors[i];
-    fwrite(&index, sizeof(size_t), 1, fp);
-  }
-  
-  // value data
-  for (size_t i = 0; i < numValues; i++) {
-    const char* value = values[i].c_str();
-    fwrite(value, sizeof(char), strlen(value), fp);
-  }
-  
-  // darts
-  fwrite(dict.array(), sizeof(char), dartsSize, fp);
-  
+  SerializeToFile(fp);
   fclose(fp);
 }
 
-vector<string> GetValuesOfEntry(vector<size_t> valueIndexes,
-                                vector<string> values,
-                                size_t index) {
-  size_t start = valueIndexes[index];
-  size_t end = values.size();
-  if (index < valueIndexes.size() - 1) {
-    end = valueIndexes[index + 1];
-  }
-  vector<string> valuesOfEntry;
-  for (size_t i = start; i < end; i++) {
-    valuesOfEntry.push_back(values[i]);
-  }
-  return valuesOfEntry;
+void DartsDict::SerializeToFile(FILE* fp) {
+  fwrite(OCDHEADER, sizeof(char), strlen(OCDHEADER), fp);
+
+  size_t dartsSize = dict.total_size();
+  fwrite(&dartsSize, sizeof(size_t), 1, fp);
+  fwrite(dict.array(), sizeof(char), dartsSize, fp);
+
+  TextDict textDict;
+  textDict.LoadFromDict(*this);
+  textDict.SerializeToFile(fp);
 }
 
 void DartsDict::LoadFromFile(const string fileName) {
-//  dict.set_array();
+  FILE *fp = fopen(fileName.c_str(), "rb");
+  if (fp == NULL) {
+    // TODO exception
+    fprintf(stderr, _("Can not read file: %s\n"), fileName.c_str());
+    exit(1);
+  }
+  LoadFromFile(fp);
+  fclose(fp);
+}
+
+void DartsDict::LoadFromFile(FILE* fp) {
+  if (buffer != nullptr) {
+    free(buffer);
+  }
+  buffer = malloc(sizeof(char) * strlen(OCDHEADER));
+  fread(buffer, sizeof(char), strlen(OCDHEADER), fp);
+  if (memcmp(buffer, OCDHEADER, strlen(OCDHEADER)) != 0) {
+    throw std::runtime_error("Invalid format");
+  }
+  free(buffer);
+  
+  size_t dartsSize;
+  fread(&dartsSize, sizeof(size_t), 1, fp);
+  buffer = malloc(dartsSize);
+  fread(buffer, 1, dartsSize, fp);
+  dict.set_array(buffer);
+  
+  TextDict textDict;
+  textDict.LoadFromFile(fp);
+  lexicon = textDict.GetLexicon();
+  maxLength = textDict.KeyMaxLength();
 }

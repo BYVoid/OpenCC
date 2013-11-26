@@ -33,6 +33,7 @@ namespace Opencc {
     
     void AddKeyValue(DictEntry entry);
     void LoadFromFile(const string fileName);
+    void LoadFromFile(FILE* fp);
     void LoadFromDict(Dict& dictionary);
     void SerializeToFile(const string fileName);
     void SerializeToFile(FILE* fp);

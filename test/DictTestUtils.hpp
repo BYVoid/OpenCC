@@ -30,6 +30,9 @@ namespace Opencc {
       textDict.AddKeyValue(DictEntry("BYVoid", "byv"));
       textDict.AddKeyValue(DictEntry("zigzagzig", "zag"));
       textDict.AddKeyValue(DictEntry("積羽沉舟", "羣輕折軸"));
+      textDict.AddKeyValue(DictEntry("清", "Tsing"));
+      textDict.AddKeyValue(DictEntry("清華", "Tsinghua"));
+      textDict.AddKeyValue(DictEntry("清華大學", "Tsinghua University"));
       return textDict;
     }
     
@@ -49,6 +52,12 @@ namespace Opencc {
       
       entry = dict.MatchPrefix("Unknown");
       assert(entry.IsNull());
+      
+      vector<DictEntry> matches = dict.GetLengthsOfAllMatches("清華大學計算機系");
+      assert(matches.size() == 3);
+      assert(matches[0].GetDefault() == "Tsinghua University");
+      assert(matches[1].GetDefault() == "Tsinghua");
+      assert(matches[2].GetDefault() == "Tsing");
     }
   };
 }

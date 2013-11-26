@@ -81,19 +81,22 @@ vector<string> DartsDict::GetValuesOfEntry(size_t index) const {
 
 void DartsDict::FromTextDict(TextDict& dictionary) {
   maxLength = 0;
-  vector<DictEntry> tlexicon = dictionary.GetLexicon();
-  size_t lexicon_count = tlexicon.size();
-  size_t lexicon_cursor = 0;
-  lexicon.resize(lexicon_count);
-  for (size_t i = 0; i < lexicon_count; i++) {
-    lexicon[i].key = tlexicon[i].key;
-    maxLength = std::max(lexicon[i].key.length(), maxLength);
-    size_t value_count = tlexicon[i].values.size();
-    for (size_t j = 0; j < value_count; j++) {
-      lexicon[i].valueIndexes.push_back(values.size());
-      values.push_back(tlexicon[i].values[j]);
-      cursors.push_back(lexicon_cursor);
-      lexicon_cursor += tlexicon[i].values[j].length();
+  const vector<DictEntry>& tlexicon = *dictionary.GetLexicon().get();
+  size_t lexiconCount = tlexicon.size();
+  size_t valueCursor = 0;
+  lexicon.resize(lexiconCount);
+  for (size_t i = 0; i < lexiconCount; i++) {
+    Entry& entry = lexicon[i];
+    const DictEntry& textEntry = tlexicon[i];
+    // Copy key
+    entry.key = textEntry.key;
+    maxLength = std::max(entry.key.length(), maxLength);
+    // Copy values
+    for (auto& value : tlexicon[i].values) {
+      entry.valueIndexes.push_back(values.size());
+      values.push_back(value);
+      cursors.push_back(valueCursor);
+      valueCursor += value.length();
     }
   }
   BuildDarts();

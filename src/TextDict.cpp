@@ -43,7 +43,7 @@ DictEntry ParseKeyValues(const char* buff) {
   return entry;
 }
 
-TextDict::TextDict() {
+TextDict::TextDict() : lexicon(new vector<DictEntry>) {
   sorted = true;
 }
 
@@ -72,7 +72,7 @@ void TextDict::LoadFromFile(const string fileName) {
 
 void TextDict::AddKeyValue(DictEntry entry) {
   // TODO reduce object copies
-  lexicon.push_back(entry);
+  lexicon->push_back(entry);
   size_t keyLength = entry.key.length();
   maxLength = std::max(keyLength, maxLength);
   sorted = false;
@@ -80,7 +80,7 @@ void TextDict::AddKeyValue(DictEntry entry) {
 
 void TextDict::SortLexicon() {
   if (!sorted) {
-    std::sort(lexicon.begin(), lexicon.end());
+    std::sort(lexicon->begin(), lexicon->end());
     sorted = true;
   }
 }
@@ -94,8 +94,8 @@ Optional<DictEntry> TextDict::MatchPrefix(const char* word) {
   DictEntry entry(UTF8Util::Truncate(word, maxLength));
   for (size_t len = entry.key.length(); len > 0; len--) {
     entry.key.resize(len);
-    auto found = std::lower_bound(lexicon.begin(), lexicon.end(), entry);
-    if (found != lexicon.end() && found->key == entry.key) {
+    auto found = std::lower_bound(lexicon->begin(), lexicon->end(), entry);
+    if (found != lexicon->end() && found->key == entry.key) {
       return Optional<DictEntry>(*found);
     }
   }
@@ -109,16 +109,15 @@ vector<DictEntry> TextDict::MatchAllPrefixes(const char* word) {
   DictEntry entry(UTF8Util::Truncate(word, maxLength));
   for (size_t len = entry.key.length(); len > 0; len--) {
     entry.key.resize(len);
-    auto found = std::lower_bound(lexicon.begin(), lexicon.end(), entry);
-    if (found != lexicon.end() && found->key == entry.key) {
+    auto found = std::lower_bound(lexicon->begin(), lexicon->end(), entry);
+    if (found != lexicon->end() && found->key == entry.key) {
       matchedLengths.push_back(*found);
     }
   }
   return matchedLengths;
 }
 
-vector<DictEntry> TextDict::GetLexicon() {
-  // TODO copy
+shared_ptr<vector<DictEntry>> TextDict::GetLexicon() {
   SortLexicon();
   return lexicon;
 }

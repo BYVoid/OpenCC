@@ -31,13 +31,13 @@ namespace Opencc {
     virtual vector<DictEntry> MatchAllPrefixes(const char* word);
     void AddKeyValue(DictEntry entry);
     void LoadFromFile(const string fileName);
-    vector<DictEntry> GetLexicon();
+    shared_ptr<vector<DictEntry>> GetLexicon();
 
   private:
     void SortLexicon();
 
     bool sorted;
     size_t maxLength;
-    vector<DictEntry> lexicon;
+    shared_ptr<vector<DictEntry>> lexicon;
   };
 }

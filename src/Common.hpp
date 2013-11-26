@@ -26,6 +26,7 @@
 #include <list>
 #include <map>
 #include <stdexcept>
+#include <memory>
 
 #include <cstdio>
 #include <cassert>
@@ -38,6 +39,8 @@ using std::vector;
 using std::list;
 using std::map;
 using std::runtime_error;
+using std::shared_ptr;
+using std::weak_ptr;
 
 #ifdef ENABLE_GETTEXT
 # include <libintl.h>

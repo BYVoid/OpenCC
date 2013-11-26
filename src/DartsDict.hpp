@@ -29,9 +29,9 @@ namespace Opencc {
     DartsDict();
     virtual ~DartsDict();
     virtual size_t KeyMaxLength() const;
-    virtual Optional<DictEntry> MatchPrefix(const char* word);
-    virtual vector<DictEntry> MatchAllPrefixes(const char* word);
-    
+    virtual Optional<DictEntry*> MatchPrefix(const char* word);
+    virtual shared_ptr<vector<DictEntry*>> MatchAllPrefixes(const char* word);
+
     void LoadFromFile(const string fileName);
     void SerializeToFile(const string fileName);
     void FromTextDict(TextDict& dictionary);

@@ -26,7 +26,7 @@ namespace Opencc {
   class Conversion {
   public:
     Conversion(DictGroup* dictGroup, Segmentation* segmentator);
-    vector<string> Segment(const string& text);
+    shared_ptr<vector<string>> Segment(const string& text);
     string Convert(const string& text);
   private:
     DictGroup* dictGroup;

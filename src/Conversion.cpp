@@ -25,19 +25,20 @@ Conversion::Conversion(DictGroup* dictGroup, Segmentation* segmentator) {
   this->segmentator = segmentator;
 }
 
-vector<string> Conversion::Segment(const string& text) {
-  vector<string> segments;
-  for (DictEntry& entry : segmentator->Segment(text)) {
-    segments.push_back(entry.key);
+shared_ptr<vector<string>> Conversion::Segment(const string& text) {
+  shared_ptr<vector<string>> segments;
+  segments.reset(new vector<string>);
+  for (const DictEntry* entry : *segmentator->Segment(text)) {
+    segments->push_back(entry->key);
   }
   return segments;
 }
 
 string Conversion::Convert(const string& text) {
-  vector<DictEntry> segments = segmentator->Segment(text);
+  shared_ptr<vector<DictEntry*>> segments = segmentator->Segment(text);
   std::ostringstream buffer;
-  for (const DictEntry& segment : segments) {
-    buffer << segment.GetDefault();
+  for (const DictEntry* segment : *segments) {
+    buffer << segment->GetDefault();
   }
   return buffer.str();
 }

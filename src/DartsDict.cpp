@@ -38,29 +38,31 @@ size_t DartsDict::KeyMaxLength() const {
   return maxLength;
 }
 
-Optional<DictEntry> DartsDict::MatchPrefix(const char* word) {
+Optional<DictEntry*> DartsDict::MatchPrefix(const char* word) {
   string wordTrunc = UTF8Util::Truncate(word, maxLength);
   for (size_t len = wordTrunc.length(); len > 0; len--) {
     wordTrunc.resize(len);
     Darts::DoubleArray::result_pair_type result;
     dict.exactMatchSearch(wordTrunc.c_str(), result);
     if (result.value != -1) {
-      return Optional<DictEntry>(DictEntry(wordTrunc, GetValuesOfEntry(result.value)));
+      // FIXME memory leak
+      return Optional<DictEntry*>(new DictEntry(wordTrunc, GetValuesOfEntry(result.value)));
     }
   }
-  return Optional<DictEntry>();
+  return Optional<DictEntry*>();
 }
 
-vector<DictEntry> DartsDict::MatchAllPrefixes(const char* word) {
-  // TODO copy
-  vector<DictEntry> matchedLengths;
+shared_ptr<vector<DictEntry*>> DartsDict::MatchAllPrefixes(const char* word) {
+  shared_ptr<vector<DictEntry*>> matchedLengths;
+  matchedLengths.reset(new vector<DictEntry*>);
   string wordTrunc = UTF8Util::Truncate(word, maxLength);
   for (size_t len = wordTrunc.length(); len > 0; len--) {
     wordTrunc.resize(len);
     Darts::DoubleArray::result_pair_type result;
     dict.exactMatchSearch(wordTrunc.c_str(), result);
     if (result.value != -1) {
-      matchedLengths.push_back(DictEntry(wordTrunc, GetValuesOfEntry(result.value)));
+      // FIXME memory leak
+      matchedLengths->push_back(new DictEntry(wordTrunc, GetValuesOfEntry(result.value)));
     }
   }
   return matchedLengths;

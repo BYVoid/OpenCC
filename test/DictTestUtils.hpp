@@ -37,27 +37,27 @@ namespace Opencc {
     }
     
     static void TestDict(Dict& dict) {
-      Optional<DictEntry> entry;
+      Optional<DictEntry*> entry;
       entry = dict.MatchPrefix("BYVoid");
       assert(!entry.IsNull());
-      assert(entry.Get().GetDefault() == "byv");
+      assert(entry.Get()->GetDefault() == "byv");
       
       entry = dict.MatchPrefix("BYVoid123");
       assert(!entry.IsNull());
-      assert(entry.Get().GetDefault() == "byv");
+      assert(entry.Get()->GetDefault() == "byv");
       
       entry = dict.MatchPrefix("積羽沉舟");
       assert(!entry.IsNull());
-      assert(entry.Get().GetDefault() == "羣輕折軸");
+      assert(entry.Get()->GetDefault() == "羣輕折軸");
       
       entry = dict.MatchPrefix("Unknown");
       assert(entry.IsNull());
       
-      vector<DictEntry> matches = dict.MatchAllPrefixes("清華大學計算機系");
-      assert(matches.size() == 3);
-      assert(matches[0].GetDefault() == "Tsinghua University");
-      assert(matches[1].GetDefault() == "Tsinghua");
-      assert(matches[2].GetDefault() == "Tsing");
+      shared_ptr<vector<DictEntry*>> matches = dict.MatchAllPrefixes("清華大學計算機系");
+      assert(matches->size() == 3);
+      assert(matches->at(0)->GetDefault() == "Tsinghua University");
+      assert(matches->at(1)->GetDefault() == "Tsinghua");
+      assert(matches->at(2)->GetDefault() == "Tsing");
     }
   };
 }

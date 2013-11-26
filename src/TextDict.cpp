@@ -127,3 +127,28 @@ shared_ptr<vector<DictEntry>> TextDict::GetLexicon() {
   SortLexicon();
   return lexicon;
 }
+
+void TextDict::SerializeToFile(const string fileName) {
+  FILE *fp = fopen(fileName.c_str(), "wb");
+  if (fp == NULL) {
+    fprintf(stderr, _("Can not write file: %s\n"), fileName.c_str());
+    exit(1);
+  }
+  SerializeToFile(fp);
+  fclose(fp);
+}
+
+void TextDict::SerializeToFile(FILE* fp) {
+  for (auto& entry : *lexicon) {
+    fprintf(fp, "%s\t", entry.key.c_str());
+    size_t i = 0;
+    for (auto& value : entry.values) {
+      fprintf(fp, "%s", value.c_str());
+      if (i < entry.values.size() - 1) {
+        fprintf(fp, " ");
+      }
+      i++;
+    }
+    fprintf(fp, "\n");
+  }
+}

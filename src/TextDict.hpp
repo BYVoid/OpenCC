@@ -30,9 +30,12 @@ namespace Opencc {
     virtual Optional<DictEntry*> MatchPrefix(const char* word);
     virtual shared_ptr<vector<DictEntry*>> MatchAllPrefixes(const char* word);
     virtual shared_ptr<vector<DictEntry>> GetLexicon();
+    
     void AddKeyValue(DictEntry entry);
     void LoadFromFile(const string fileName);
     void LoadFromDict(Dict& dictionary);
+    void SerializeToFile(const string fileName);
+    void SerializeToFile(FILE* fp);
 
   private:
     void SortLexicon();

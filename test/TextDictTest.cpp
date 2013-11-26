@@ -23,4 +23,12 @@ using namespace Opencc;
 int main(int argc, const char * argv[]) {
   TextDict textDict = DictTestUtils::CreateTextDictForText();
   DictTestUtils::TestDict(textDict);
+  
+  // Serialization
+  string fileName = "dict.txt";
+  textDict.SerializeToFile(fileName);
+  
+  // Deserialization
+  textDict.LoadFromFile(fileName);
+  DictTestUtils::TestDict(textDict);
 }

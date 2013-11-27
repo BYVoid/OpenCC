@@ -23,6 +23,7 @@
 #include "DictGroup.hpp"
 #include "DartsDict.hpp"
 #include "TextDict.hpp"
+#include "TestUtils.hpp"
 
 namespace Opencc {
   class DictTestUtils {
@@ -69,25 +70,31 @@ namespace Opencc {
     static void TestDict(Dict& dict) {
       Optional<DictEntry*> entry;
       entry = dict.MatchPrefix("BYVoid");
-      assert(!entry.IsNull());
-      assert(entry.Get()->GetDefault() == "byv");
+      AssertTrue(!entry.IsNull());
+      AssertEquals("BYVoid", entry.Get()->key);
+      AssertEquals("byv", entry.Get()->GetDefault());
       
       entry = dict.MatchPrefix("BYVoid123");
-      assert(!entry.IsNull());
-      assert(entry.Get()->GetDefault() == "byv");
+      AssertTrue(!entry.IsNull());
+      AssertEquals("BYVoid", entry.Get()->key);
+      AssertEquals("byv", entry.Get()->GetDefault());
       
       entry = dict.MatchPrefix("積羽沉舟");
-      assert(!entry.IsNull());
-      assert(entry.Get()->GetDefault() == "羣輕折軸");
+      AssertTrue(!entry.IsNull());
+      AssertEquals("積羽沉舟", entry.Get()->key);
+      AssertEquals("羣輕折軸", entry.Get()->GetDefault());
       
       entry = dict.MatchPrefix("Unknown");
-      assert(entry.IsNull());
+      AssertTrue(entry.IsNull());
       
       shared_ptr<vector<DictEntry*>> matches = dict.MatchAllPrefixes("清華大學計算機系");
-      assert(matches->size() == 3);
-      assert(matches->at(0)->GetDefault() == "TsinghuaUniversity");
-      assert(matches->at(1)->GetDefault() == "Tsinghua");
-      assert(matches->at(2)->GetDefault() == "Tsing");
+      AssertEquals(3, matches->size());
+      AssertEquals("清華大學", matches->at(0)->key);
+      AssertEquals("TsinghuaUniversity", matches->at(0)->GetDefault());
+      AssertEquals("清華", matches->at(1)->key);
+      AssertEquals("Tsinghua", matches->at(1)->GetDefault());
+      AssertEquals("清", matches->at(2)->key);
+      AssertEquals("Tsing", matches->at(2)->GetDefault());
     }
   };
 }

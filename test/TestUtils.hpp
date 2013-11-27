@@ -16,18 +16,15 @@
  * limitations under the License.
  */
 
-#include "DictTestUtils.hpp"
+#pragma once
 
-using namespace Opencc;
+#include "Common.hpp"
 
-int main(int argc, const char * argv[]) {
-  auto dictGroup = DictTestUtils::CreateDictGroupForConversion();
-  Optional<DictEntry*> entry;
-  entry = dictGroup->MatchPrefix("Unknown");
-  AssertTrue(entry.IsNull());
-  
-  shared_ptr<vector<DictEntry*>> matches = dictGroup->MatchAllPrefixes("干燥");
-  AssertEquals(2, matches->size());
-  AssertEquals("乾燥", matches->at(0)->GetDefault());
-  AssertEquals("幹", matches->at(1)->GetDefault());
+#define AssertTrue(condition) assert(condition)
+#define AssertEquals(expected, actual) {\
+  if (!((expected) == (actual))) {\
+    std::cerr << "Expected: " << (expected) << std::endl; \
+    std::cerr << "Actual: " << (actual) << std::endl; \
+    assert((expected) == (actual));\
+  }\
 }

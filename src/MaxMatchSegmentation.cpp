@@ -30,11 +30,10 @@ shared_ptr<vector<shared_ptr<DictEntry>>> MaxMatchSegmentation::Segment(const st
   shared_ptr<vector<shared_ptr<DictEntry>>> segments(new vector<shared_ptr<DictEntry>>);
   const char* pstr = text.c_str();
   while (*pstr != '\0') {
-    Optional<DictEntry*> matched = dictGroup->MatchPrefix(pstr);
+    Optional<shared_ptr<DictEntry>> matched = dictGroup->MatchPrefix(pstr);
     size_t matchedLength;
     if (matched.IsNull()) {
       matchedLength = UTF8Util::NextCharLength(pstr);
-      // FIXME memory leak
       segments->push_back(shared_ptr<DictEntry>(new DictEntry(UTF8Util::FromSubstr(pstr, matchedLength))));
     } else {
       matchedLength = matched.Get()->key.length();

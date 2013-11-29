@@ -68,7 +68,7 @@ namespace Opencc {
     }
     
     static void TestDict(Dict& dict) {
-      Optional<DictEntry*> entry;
+      Optional<shared_ptr<DictEntry>> entry;
       entry = dict.MatchPrefix("BYVoid");
       AssertTrue(!entry.IsNull());
       AssertEquals("BYVoid", entry.Get()->key);
@@ -87,7 +87,7 @@ namespace Opencc {
       entry = dict.MatchPrefix("Unknown");
       AssertTrue(entry.IsNull());
       
-      shared_ptr<vector<DictEntry*>> matches = dict.MatchAllPrefixes("清華大學計算機系");
+      shared_ptr<vector<shared_ptr<DictEntry>>> matches = dict.MatchAllPrefixes("清華大學計算機系");
       AssertEquals(3, matches->size());
       AssertEquals("清華大學", matches->at(0)->key);
       AssertEquals("TsinghuaUniversity", matches->at(0)->GetDefault());

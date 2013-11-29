@@ -28,8 +28,8 @@ namespace Opencc {
     virtual ~DictGroup();
     void AddDict(shared_ptr<Dict> dict);
     size_t KeyMaxLength() const;
-    Optional<DictEntry*> MatchPrefix(const char* word);
-    shared_ptr<vector<DictEntry*>> MatchAllPrefixes(const char* word);
+    Optional<shared_ptr<DictEntry>> MatchPrefix(const char* word);
+    shared_ptr<vector<shared_ptr<DictEntry>>> MatchAllPrefixes(const char* word);
   private:
     size_t keyMaxLength;
     list<shared_ptr<Dict>> dicts;

@@ -36,29 +36,28 @@ size_t DictGroup::KeyMaxLength() const {
   return keyMaxLength;
 }
 
-Optional<DictEntry*> DictGroup::MatchPrefix(const char* word) {
+Optional<shared_ptr<DictEntry>> DictGroup::MatchPrefix(const char* word) {
   for (auto dict : dicts) {
-    Optional<DictEntry*> prefix = dict->MatchPrefix(word);
+    Optional<shared_ptr<DictEntry>> prefix = dict->MatchPrefix(word);
     if (!prefix.IsNull()) {
       return prefix;
     }
   }
-  return Optional<DictEntry*>();
+  return Optional<shared_ptr<DictEntry>>();
 }
 
-shared_ptr<vector<DictEntry*>> DictGroup::MatchAllPrefixes(const char* word) {
-  map<size_t, DictEntry*> matched;
+shared_ptr<vector<shared_ptr<DictEntry>>> DictGroup::MatchAllPrefixes(const char* word) {
+  map<size_t, shared_ptr<DictEntry>> matched;
   for (auto dict : dicts) {
     auto entries = dict->MatchAllPrefixes(word);
-    for (DictEntry* entry : *entries) {
+    for (shared_ptr<DictEntry> entry : *entries) {
       size_t len = entry->key.length();
       if (matched.find(len) == matched.end()) {
         matched[len] = entry;
       }
     }
   }
-  shared_ptr<vector<DictEntry*>> matchedEntries;
-  matchedEntries.reset(new vector<DictEntry*>);
+  shared_ptr<vector<shared_ptr<DictEntry>>> matchedEntries(new vector<shared_ptr<DictEntry>>);
   for (auto entry : matched) {
     matchedEntries->push_back(entry.second);
   }

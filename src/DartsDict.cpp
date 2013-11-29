@@ -23,7 +23,7 @@ using namespace Opencc;
 
 static const char* OCDHEADER = "OPENCCDARTS1";
 
-DartsDict::DartsDict() : lexicon(new vector<DictEntry>) {
+DartsDict::DartsDict() : lexicon(new vector<shared_ptr<DictEntry>>) {
   maxLength = 0;
   buffer = nullptr;
 }
@@ -38,7 +38,7 @@ size_t DartsDict::KeyMaxLength() const {
   return maxLength;
 }
 
-Optional<DictEntry*> DartsDict::MatchPrefix(const char* word) {
+Optional<shared_ptr<DictEntry>> DartsDict::MatchPrefix(const char* word) {
   string wordTrunc = UTF8Util::Truncate(word, maxLength);
   // TODO reduce 1 by utf8 char
   for (size_t len = wordTrunc.length(); len > 0; len--) {
@@ -46,28 +46,27 @@ Optional<DictEntry*> DartsDict::MatchPrefix(const char* word) {
     Darts::DoubleArray::result_pair_type result;
     dict.exactMatchSearch(wordTrunc.c_str(), result);
     if (result.value != -1) {
-      return Optional<DictEntry*>(&lexicon->at(result.value));
+      return Optional<shared_ptr<DictEntry>>(lexicon->at(result.value));
     }
   }
-  return Optional<DictEntry*>();
+  return Optional<shared_ptr<DictEntry>>();
 }
 
-shared_ptr<vector<DictEntry*>> DartsDict::MatchAllPrefixes(const char* word) {
-  shared_ptr<vector<DictEntry*>> matchedLengths;
-  matchedLengths.reset(new vector<DictEntry*>);
+shared_ptr<vector<shared_ptr<DictEntry>>> DartsDict::MatchAllPrefixes(const char* word) {
+  shared_ptr<vector<shared_ptr<DictEntry>>> matchedLengths(new vector<shared_ptr<DictEntry>>);
   string wordTrunc = UTF8Util::Truncate(word, maxLength);
   for (size_t len = wordTrunc.length(); len > 0; len--) {
     wordTrunc.resize(len);
     Darts::DoubleArray::result_pair_type result;
     dict.exactMatchSearch(wordTrunc.c_str(), result);
     if (result.value != -1) {
-      matchedLengths->push_back(&lexicon->at(result.value));
+      matchedLengths->push_back(lexicon->at(result.value));
     }
   }
   return matchedLengths;
 }
 
-shared_ptr<vector<DictEntry>> DartsDict::GetLexicon() {
+shared_ptr<vector<shared_ptr<DictEntry>>> DartsDict::GetLexicon() {
   return lexicon;
 }
 
@@ -78,9 +77,9 @@ void DartsDict::LoadFromDict(Dict& dictionary) {
   size_t lexiconCount = lexicon->size();
   keys.resize(lexiconCount);
   for (size_t i = 0; i < lexiconCount; i++) {
-    const DictEntry& entry = lexicon->at(i);
-    keys[i] = entry.key.c_str();
-    maxLength = std::max(entry.key.length(), maxLength);
+    shared_ptr<DictEntry> entry = lexicon->at(i);
+    keys[i] = entry->key.c_str();
+    maxLength = std::max(entry->key.length(), maxLength);
   }
   dict.build(lexicon->size(), &keys[0]);
 }

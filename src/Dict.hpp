@@ -25,8 +25,8 @@ namespace Opencc {
   class Dict {
   public:
     virtual size_t KeyMaxLength() const = 0;
-    virtual Optional<DictEntry*> MatchPrefix(const char* word) = 0;
-    virtual shared_ptr<vector<DictEntry*>> MatchAllPrefixes(const char* word) = 0;
-    virtual shared_ptr<vector<DictEntry>> GetLexicon() = 0;
+    virtual Optional<shared_ptr<DictEntry>> MatchPrefix(const char* word) = 0;
+    virtual shared_ptr<vector<shared_ptr<DictEntry>>> MatchAllPrefixes(const char* word) = 0;
+    virtual shared_ptr<vector<shared_ptr<DictEntry>>> GetLexicon() = 0;
   };
 }

@@ -27,11 +27,12 @@ namespace Opencc {
     TextDict();
     virtual ~TextDict();
     virtual size_t KeyMaxLength() const;
-    virtual Optional<DictEntry*> MatchPrefix(const char* word);
-    virtual shared_ptr<vector<DictEntry*>> MatchAllPrefixes(const char* word);
-    virtual shared_ptr<vector<DictEntry>> GetLexicon();
+    virtual Optional<shared_ptr<DictEntry>> MatchPrefix(const char* word);
+    virtual shared_ptr<vector<shared_ptr<DictEntry>>> MatchAllPrefixes(const char* word);
+    virtual shared_ptr<vector<shared_ptr<DictEntry>>> GetLexicon();
     
     void AddKeyValue(DictEntry entry);
+    void AddKeyValue(shared_ptr<DictEntry> entry);
     void LoadFromFile(const string fileName);
     void LoadFromFile(FILE* fp);
     void LoadFromDict(Dict& dictionary);
@@ -43,6 +44,6 @@ namespace Opencc {
 
     bool sorted;
     size_t maxLength;
-    shared_ptr<vector<DictEntry>> lexicon;
+    shared_ptr<vector<shared_ptr<DictEntry>>> lexicon;
   };
 }

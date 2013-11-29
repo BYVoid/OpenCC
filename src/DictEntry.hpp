@@ -42,5 +42,8 @@ namespace Opencc {
         return key;
       }
     }
+    static bool PtrCmp(shared_ptr<DictEntry> a, shared_ptr<DictEntry> b) {
+      return a->key < b->key;
+    };
   };
 }

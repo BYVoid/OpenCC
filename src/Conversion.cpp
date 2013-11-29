@@ -20,13 +20,12 @@
 
 using namespace Opencc;
 
-Conversion::Conversion(shared_ptr<Segmentation> segmentator) {
+Conversion::Conversion(SegmentationPtr segmentator) {
   this->segmentator = segmentator;
 }
 
-shared_ptr<vector<string>> Conversion::Segment(const string& text) {
-  shared_ptr<vector<string>> segments;
-  segments.reset(new vector<string>);
+StringVectorPtr Conversion::Segment(const string& text) {
+  StringVectorPtr segments(new StringVector);
   for (auto entry : *segmentator->Segment(text)) {
     segments->push_back(entry->key);
   }

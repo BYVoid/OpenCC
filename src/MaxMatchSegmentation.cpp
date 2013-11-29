@@ -22,22 +22,22 @@
 using namespace Opencc;
 
 
-MaxMatchSegmentation::MaxMatchSegmentation(shared_ptr<DictGroup> dictGroup_) :
+MaxMatchSegmentation::MaxMatchSegmentation(DictGroupPtr dictGroup_) :
   dictGroup(dictGroup_) {
 }
 
-shared_ptr<vector<shared_ptr<DictEntry>>> MaxMatchSegmentation::Segment(const string& text) {
-  shared_ptr<vector<shared_ptr<DictEntry>>> segments(new vector<shared_ptr<DictEntry>>);
+DictEntryPtrVectorPtr MaxMatchSegmentation::Segment(const string& text) {
+  DictEntryPtrVectorPtr segments(new DictEntryPtrVector);
   const char* pstr = text.c_str();
   while (*pstr != '\0') {
-    Optional<shared_ptr<DictEntry>> matched = dictGroup->MatchPrefix(pstr);
+    Optional<DictEntryPtr> matched = dictGroup->MatchPrefix(pstr);
     size_t matchedLength;
     if (matched.IsNull()) {
       matchedLength = UTF8Util::NextCharLength(pstr);
-      segments->push_back(shared_ptr<DictEntry>(new DictEntry(UTF8Util::FromSubstr(pstr, matchedLength))));
+      segments->push_back(DictEntryPtr(new DictEntry(UTF8Util::FromSubstr(pstr, matchedLength))));
     } else {
       matchedLength = matched.Get()->key.length();
-      segments->push_back(shared_ptr<DictEntry>(matched.Get()));
+      segments->push_back(DictEntryPtr(matched.Get()));
     }
     pstr += matchedLength;
   }

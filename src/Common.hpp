@@ -35,12 +35,31 @@
 #include "Optional.hpp"
 
 using std::string;
-using std::vector;
 using std::list;
 using std::map;
 using std::runtime_error;
-using std::shared_ptr;
-using std::weak_ptr;
+
+// Forward decalarations and alias
+namespace Opencc {
+  class DictEntry;
+  class Dict;
+  class TextDict;
+  class DartsDict;
+  class DictGroup;
+  class Segmentation;
+  class Conversion;
+  using DictEntryPtr = std::shared_ptr<DictEntry>;
+  using DictEntryPtrVector = std::vector<DictEntryPtr>;
+  using DictEntryPtrVectorPtr = std::shared_ptr<DictEntryPtrVector>;
+  using DictPtr = std::shared_ptr<Dict>;
+  using TextDictPtr = std::shared_ptr<TextDict>;
+  using DartsDictPtr = std::shared_ptr<DartsDict>;
+  using DictGroupPtr = std::shared_ptr<DictGroup>;
+  using SegmentationPtr = std::shared_ptr<Segmentation>;
+  using ConversionPtr = std::shared_ptr<Conversion>;
+}
+using StringVector = std::vector<string>;
+using StringVectorPtr = std::shared_ptr<StringVector>;
 
 #ifdef ENABLE_GETTEXT
 # include <libintl.h>

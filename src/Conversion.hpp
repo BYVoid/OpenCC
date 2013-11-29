@@ -24,10 +24,10 @@
 namespace Opencc {
   class Conversion {
   public:
-    Conversion(shared_ptr<Segmentation> segmentator);
-    shared_ptr<vector<string>> Segment(const string& text);
+    Conversion(SegmentationPtr segmentator);
+    StringVectorPtr Segment(const string& text);
     string Convert(const string& text);
   private:
-    shared_ptr<Segmentation> segmentator;
+    SegmentationPtr segmentator;
   };
 }

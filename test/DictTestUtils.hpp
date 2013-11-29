@@ -39,36 +39,36 @@ namespace Opencc {
       return textDict;
     }
     
-    static shared_ptr<Dict> CreateDictForCharacters() {
-      shared_ptr<TextDict> textDict(new TextDict);
-      textDict->AddKeyValue(DictEntry("后", vector<string>{"后", "後"}));
-      textDict->AddKeyValue(DictEntry("发", vector<string>{"發", "髮"}));
-      textDict->AddKeyValue(DictEntry("干", vector<string>{"幹", "乾", "干"}));
+    static DictPtr CreateDictForCharacters() {
+      TextDictPtr textDict(new TextDict);
+      textDict->AddKeyValue(DictEntry("后", StringVector{"后", "後"}));
+      textDict->AddKeyValue(DictEntry("发", StringVector{"發", "髮"}));
+      textDict->AddKeyValue(DictEntry("干", StringVector{"幹", "乾", "干"}));
       return textDict;
     }
     
-    static shared_ptr<Dict> CreateDictForPhrases() {
-      shared_ptr<TextDict> textDict(new TextDict);
+    static DictPtr CreateDictForPhrases() {
+      TextDictPtr textDict(new TextDict);
       textDict->AddKeyValue(DictEntry("太后", "太后"));
       textDict->AddKeyValue(DictEntry("头发", "頭髮"));
       textDict->AddKeyValue(DictEntry("干燥", "乾燥"));
 
-      shared_ptr<DartsDict> dartsDict(new DartsDict);
+      DartsDictPtr dartsDict(new DartsDict);
       dartsDict->LoadFromDict(*textDict);
       return dartsDict;
     }
     
-    static shared_ptr<DictGroup> CreateDictGroupForConversion() {
-      shared_ptr<DictGroup> dictGroup(new DictGroup);
-      shared_ptr<Dict> phrasesDict = CreateDictForPhrases();
-      shared_ptr<Dict> charactersDict = CreateDictForCharacters();
+    static DictGroupPtr CreateDictGroupForConversion() {
+      DictGroupPtr dictGroup(new DictGroup);
+      DictPtr phrasesDict = CreateDictForPhrases();
+      DictPtr charactersDict = CreateDictForCharacters();
       dictGroup->AddDict(phrasesDict);
       dictGroup->AddDict(charactersDict);
       return dictGroup;
     }
     
     static void TestDict(Dict& dict) {
-      Optional<shared_ptr<DictEntry>> entry;
+      Optional<DictEntryPtr> entry;
       entry = dict.MatchPrefix("BYVoid");
       AssertTrue(!entry.IsNull());
       AssertEquals("BYVoid", entry.Get()->key);
@@ -87,7 +87,7 @@ namespace Opencc {
       entry = dict.MatchPrefix("Unknown");
       AssertTrue(entry.IsNull());
       
-      shared_ptr<vector<shared_ptr<DictEntry>>> matches = dict.MatchAllPrefixes("清華大學計算機系");
+      DictEntryPtrVectorPtr matches = dict.MatchAllPrefixes("清華大學計算機系");
       AssertEquals(3, matches->size());
       AssertEquals("清華大學", matches->at(0)->key);
       AssertEquals("TsinghuaUniversity", matches->at(0)->GetDefault());

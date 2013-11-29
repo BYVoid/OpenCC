@@ -23,14 +23,14 @@ using namespace Opencc;
 
 #define ENTRY_BUFF_SIZE 128
 
-shared_ptr<DictEntry> ParseKeyValues(const char* buff) {
+DictEntryPtr ParseKeyValues(const char* buff) {
   size_t length;
   const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
   if (UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
     throw runtime_error("invalid format");
   }
   length = pbuff - buff;
-  shared_ptr<DictEntry> entry(new DictEntry(UTF8Util::FromSubstr(buff, length)));
+  DictEntryPtr entry(new DictEntry(UTF8Util::FromSubstr(buff, length)));
   while (!UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
     buff = pbuff = UTF8Util::NextChar(pbuff);
     pbuff = UTF8Util::FindNextInline(buff, ' ');
@@ -41,7 +41,7 @@ shared_ptr<DictEntry> ParseKeyValues(const char* buff) {
   return entry;
 }
 
-TextDict::TextDict() : lexicon(new vector<shared_ptr<DictEntry>>) {
+TextDict::TextDict() : lexicon(new DictEntryPtrVector) {
   sorted = true;
 }
 
@@ -63,7 +63,7 @@ void TextDict::LoadFromFile(FILE* fp) {
   UTF8Util::SkipUtf8Bom(fp);
   
   while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
-    shared_ptr<DictEntry> entry = ParseKeyValues(buff);
+    DictEntryPtr entry = ParseKeyValues(buff);
     AddKeyValue(entry);
   }
   SortLexicon();
@@ -76,10 +76,10 @@ void TextDict::LoadFromDict(Dict& dictionary) {
 }
 
 void TextDict::AddKeyValue(DictEntry entry) {
-  AddKeyValue(shared_ptr<DictEntry>(new DictEntry(entry)));
+  AddKeyValue(DictEntryPtr(new DictEntry(entry)));
 }
 
-void TextDict::AddKeyValue(shared_ptr<DictEntry> entry) {
+void TextDict::AddKeyValue(DictEntryPtr entry) {
   lexicon->push_back(entry);
   size_t keyLength = entry->key.length();
   maxLength = std::max(keyLength, maxLength);
@@ -97,25 +97,25 @@ size_t TextDict::KeyMaxLength() const {
   return maxLength;
 }
 
-Optional<shared_ptr<DictEntry>> TextDict::MatchPrefix(const char* word) {
+Optional<DictEntryPtr> TextDict::MatchPrefix(const char* word) {
   SortLexicon();
-  shared_ptr<DictEntry> entry(new DictEntry(UTF8Util::Truncate(word, maxLength)));
+  DictEntryPtr entry(new DictEntry(UTF8Util::Truncate(word, maxLength)));
   const char* keyPtr = entry->key.c_str();
   for (long len = entry->key.length(); len > 0; len -= UTF8Util::PrevCharLength(keyPtr)) {
     entry->key.resize(len);
     keyPtr = entry->key.c_str();
     auto found = std::lower_bound(lexicon->begin(), lexicon->end(), entry, DictEntry::PtrCmp);
     if (found != lexicon->end() && (*found)->key == entry->key) {
-      return Optional<shared_ptr<DictEntry>>(*found);
+      return Optional<DictEntryPtr>(*found);
     }
   }
-  return Optional<shared_ptr<DictEntry>>();
+  return Optional<DictEntryPtr>();
 }
 
-shared_ptr<vector<shared_ptr<DictEntry>>> TextDict::MatchAllPrefixes(const char* word) {
+DictEntryPtrVectorPtr TextDict::MatchAllPrefixes(const char* word) {
   SortLexicon();
-  shared_ptr<vector<shared_ptr<DictEntry>>> matchedLengths(new vector<shared_ptr<DictEntry>>);
-  shared_ptr<DictEntry> entry(new DictEntry(UTF8Util::Truncate(word, maxLength)));
+  DictEntryPtrVectorPtr matchedLengths(new DictEntryPtrVector);
+  DictEntryPtr entry(new DictEntry(UTF8Util::Truncate(word, maxLength)));
   const char* keyPtr = entry->key.c_str();
   for (long len = entry->key.length(); len > 0; len -= UTF8Util::PrevCharLength(keyPtr)) {
     entry->key.resize(len);
@@ -128,7 +128,7 @@ shared_ptr<vector<shared_ptr<DictEntry>>> TextDict::MatchAllPrefixes(const char*
   return matchedLengths;
 }
 
-shared_ptr<vector<shared_ptr<DictEntry>>> TextDict::GetLexicon() {
+DictEntryPtrVectorPtr TextDict::GetLexicon() {
   SortLexicon();
   return lexicon;
 }

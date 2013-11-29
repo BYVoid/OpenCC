@@ -24,13 +24,13 @@ namespace Opencc {
   class DictEntry {
   public:
     string key;
-    vector<string> values;
+    StringVector values;
     DictEntry() {}
     DictEntry(string key_) : key(key_) {}
     DictEntry(string key_, string value_) : key(key_) {
       values.push_back(value_);
     }
-    DictEntry(string key_, vector<string> values_)
+    DictEntry(string key_, StringVector values_)
       : key(key_), values(values_) {}
     bool operator < (const DictEntry& that) const {
       return key < that.key;
@@ -42,7 +42,7 @@ namespace Opencc {
         return key;
       }
     }
-    static bool PtrCmp(shared_ptr<DictEntry> a, shared_ptr<DictEntry> b) {
+    static bool PtrCmp(DictEntryPtr a, DictEntryPtr b) {
       return a->key < b->key;
     };
   };

@@ -25,17 +25,17 @@ using namespace Opencc;
 int main(int argc, const char * argv[]) {
   // DictGroup
   auto dictGroup = DictTestUtils::CreateDictGroupForConversion();
-  Optional<shared_ptr<DictEntry>> entry;
+  Optional<DictEntryPtr> entry;
   entry = dictGroup->MatchPrefix("Unknown");
   AssertTrue(entry.IsNull());
   
-  shared_ptr<vector<shared_ptr<DictEntry>>> matches = dictGroup->MatchAllPrefixes("干燥");
+  DictEntryPtrVectorPtr matches = dictGroup->MatchAllPrefixes("干燥");
   AssertEquals(2, matches->size());
   AssertEquals("乾燥", matches->at(0)->GetDefault());
   AssertEquals("幹", matches->at(1)->GetDefault());
   
   // Segmentation
-  auto segmentation = shared_ptr<Segmentation>(new MaxMatchSegmentation(dictGroup));
+  auto segmentation = SegmentationPtr(new MaxMatchSegmentation(dictGroup));
   auto segments = segmentation->Segment("太后的头发干燥");
   AssertEquals(4, segments->size());
   AssertEquals("太后", segments->at(0)->key);
@@ -48,7 +48,7 @@ int main(int argc, const char * argv[]) {
   AssertEquals("乾燥", segments->at(3)->GetDefault());
   
   // Conversion
-  auto conversion = shared_ptr<Conversion>(new Conversion(segmentation));
+  auto conversion = ConversionPtr(new Conversion(segmentation));
   string converted = conversion->Convert("太后的头发干燥");
   AssertEquals("太后的頭髮乾燥", converted);
 }

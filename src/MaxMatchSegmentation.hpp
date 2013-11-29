@@ -25,9 +25,9 @@
 namespace Opencc {
   class MaxMatchSegmentation : public Segmentation {
   public:
-    MaxMatchSegmentation(shared_ptr<DictGroup> dictGroup);
-    virtual shared_ptr<vector<shared_ptr<DictEntry>>> Segment(const string& text);
+    MaxMatchSegmentation(DictGroupPtr dictGroup);
+    virtual DictEntryPtrVectorPtr Segment(const string& text);
   private:
-    shared_ptr<DictGroup> dictGroup;
+    DictGroupPtr dictGroup;
   };
 }

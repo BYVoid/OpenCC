@@ -23,7 +23,7 @@ using namespace Opencc;
 
 static const char* OCDHEADER = "OPENCCDARTS1";
 
-DartsDict::DartsDict() : lexicon(new vector<shared_ptr<DictEntry>>) {
+DartsDict::DartsDict() : lexicon(new DictEntryPtrVector) {
   maxLength = 0;
   buffer = nullptr;
 }
@@ -38,7 +38,7 @@ size_t DartsDict::KeyMaxLength() const {
   return maxLength;
 }
 
-Optional<shared_ptr<DictEntry>> DartsDict::MatchPrefix(const char* word) {
+Optional<DictEntryPtr> DartsDict::MatchPrefix(const char* word) {
   string wordTrunc = UTF8Util::Truncate(word, maxLength);
   const char* wordTruncPtr = wordTrunc.c_str();
   for (long len = wordTrunc.length(); len > 0; len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
@@ -47,14 +47,14 @@ Optional<shared_ptr<DictEntry>> DartsDict::MatchPrefix(const char* word) {
     Darts::DoubleArray::result_pair_type result;
     dict.exactMatchSearch(wordTrunc.c_str(), result);
     if (result.value != -1) {
-      return Optional<shared_ptr<DictEntry>>(lexicon->at(result.value));
+      return Optional<DictEntryPtr>(lexicon->at(result.value));
     }
   }
-  return Optional<shared_ptr<DictEntry>>();
+  return Optional<DictEntryPtr>();
 }
 
-shared_ptr<vector<shared_ptr<DictEntry>>> DartsDict::MatchAllPrefixes(const char* word) {
-  shared_ptr<vector<shared_ptr<DictEntry>>> matchedLengths(new vector<shared_ptr<DictEntry>>);
+DictEntryPtrVectorPtr DartsDict::MatchAllPrefixes(const char* word) {
+  DictEntryPtrVectorPtr matchedLengths(new DictEntryPtrVector);
   string wordTrunc = UTF8Util::Truncate(word, maxLength);
   const char* wordTruncPtr = wordTrunc.c_str();
   for (long len = wordTrunc.length(); len > 0; len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
@@ -69,18 +69,18 @@ shared_ptr<vector<shared_ptr<DictEntry>>> DartsDict::MatchAllPrefixes(const char
   return matchedLengths;
 }
 
-shared_ptr<vector<shared_ptr<DictEntry>>> DartsDict::GetLexicon() {
+DictEntryPtrVectorPtr DartsDict::GetLexicon() {
   return lexicon;
 }
 
 void DartsDict::LoadFromDict(Dict& dictionary) {
-  vector<const char*> keys;
+  std::vector<const char*> keys;
   maxLength = 0;
   lexicon = dictionary.GetLexicon();
   size_t lexiconCount = lexicon->size();
   keys.resize(lexiconCount);
   for (size_t i = 0; i < lexiconCount; i++) {
-    shared_ptr<DictEntry> entry = lexicon->at(i);
+    DictEntryPtr entry = lexicon->at(i);
     keys[i] = entry->key.c_str();
     maxLength = std::max(entry->key.length(), maxLength);
   }

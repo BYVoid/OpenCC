@@ -29,9 +29,9 @@ namespace Opencc {
     DartsDict();
     virtual ~DartsDict();
     virtual size_t KeyMaxLength() const;
-    virtual Optional<shared_ptr<DictEntry>> MatchPrefix(const char* word);
-    virtual shared_ptr<vector<shared_ptr<DictEntry>>> MatchAllPrefixes(const char* word);
-    virtual shared_ptr<vector<shared_ptr<DictEntry>>> GetLexicon();
+    virtual Optional<DictEntryPtr> MatchPrefix(const char* word);
+    virtual DictEntryPtrVectorPtr MatchAllPrefixes(const char* word);
+    virtual DictEntryPtrVectorPtr GetLexicon();
     
     void LoadFromFile(const string fileName);
     void LoadFromFile(FILE* fp);
@@ -42,7 +42,7 @@ namespace Opencc {
   private:
     size_t maxLength;
     Darts::DoubleArray dict;
-    shared_ptr<vector<shared_ptr<DictEntry>>> lexicon;
+    DictEntryPtrVectorPtr lexicon;
     void* buffer;
   };
 }

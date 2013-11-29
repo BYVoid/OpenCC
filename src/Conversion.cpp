@@ -20,8 +20,7 @@
 
 using namespace Opencc;
 
-Conversion::Conversion(DictGroup* dictGroup, Segmentation* segmentator) {
-  this->dictGroup = dictGroup;
+Conversion::Conversion(Segmentation* segmentator) {
   this->segmentator = segmentator;
 }
 

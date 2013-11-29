@@ -17,17 +17,36 @@
  */
 
 #include "DictTestUtils.hpp"
+#include "DictEntry.hpp"
+#include "MaxMatchSegmentation.hpp"
 
 using namespace Opencc;
 
 int main(int argc, const char * argv[]) {
+  // DictGroup
   auto dictGroup = DictTestUtils::CreateDictGroupForConversion();
-  Optional<DictEntry*> entry;
+  Optional<shared_ptr<DictEntry>> entry;
   entry = dictGroup->MatchPrefix("Unknown");
   AssertTrue(entry.IsNull());
   
-  shared_ptr<vector<DictEntry*>> matches = dictGroup->MatchAllPrefixes("干燥");
+  shared_ptr<vector<shared_ptr<DictEntry>>> matches = dictGroup->MatchAllPrefixes("干燥");
   AssertEquals(2, matches->size());
   AssertEquals("乾燥", matches->at(0)->GetDefault());
   AssertEquals("幹", matches->at(1)->GetDefault());
+  
+  // Segmentation
+  auto segmentation = shared_ptr<Segmentation>(new MaxMatchSegmentation(dictGroup));
+  auto segments = segmentation->Segment("太后头发干燥");
+  AssertEquals(3, segments->size());
+  AssertEquals("太后", segments->at(0)->key);
+  AssertEquals("太后", segments->at(0)->GetDefault());
+  AssertEquals("头发", segments->at(1)->key);
+  AssertEquals("頭髮", segments->at(1)->GetDefault());
+  AssertEquals("干燥", segments->at(2)->key);
+  AssertEquals("乾燥", segments->at(2)->GetDefault());
+  
+  // Conversion
+  auto conversion = shared_ptr<Conversion>(new Conversion(segmentation));
+  string converted = conversion->Convert("太后头发干燥");
+  AssertEquals("太后頭髮乾燥", converted);
 }

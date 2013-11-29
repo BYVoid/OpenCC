@@ -20,7 +20,7 @@
 
 using namespace Opencc;
 
-Conversion::Conversion(Segmentation* segmentator) {
+Conversion::Conversion(shared_ptr<Segmentation> segmentator) {
   this->segmentator = segmentator;
 }
 

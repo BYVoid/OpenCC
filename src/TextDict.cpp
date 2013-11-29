@@ -100,8 +100,10 @@ size_t TextDict::KeyMaxLength() const {
 Optional<shared_ptr<DictEntry>> TextDict::MatchPrefix(const char* word) {
   SortLexicon();
   shared_ptr<DictEntry> entry(new DictEntry(UTF8Util::Truncate(word, maxLength)));
-  for (size_t len = entry->key.length(); len > 0; len--) {
+  const char* keyPtr = entry->key.c_str();
+  for (long len = entry->key.length(); len > 0; len -= UTF8Util::PrevCharLength(keyPtr)) {
     entry->key.resize(len);
+    keyPtr = entry->key.c_str();
     auto found = std::lower_bound(lexicon->begin(), lexicon->end(), entry, DictEntry::PtrCmp);
     if (found != lexicon->end() && (*found)->key == entry->key) {
       return Optional<shared_ptr<DictEntry>>(*found);
@@ -114,8 +116,10 @@ shared_ptr<vector<shared_ptr<DictEntry>>> TextDict::MatchAllPrefixes(const char*
   SortLexicon();
   shared_ptr<vector<shared_ptr<DictEntry>>> matchedLengths(new vector<shared_ptr<DictEntry>>);
   shared_ptr<DictEntry> entry(new DictEntry(UTF8Util::Truncate(word, maxLength)));
-  for (size_t len = entry->key.length(); len > 0; len--) {
+  const char* keyPtr = entry->key.c_str();
+  for (long len = entry->key.length(); len > 0; len -= UTF8Util::PrevCharLength(keyPtr)) {
     entry->key.resize(len);
+    keyPtr = entry->key.c_str();
     auto found = std::lower_bound(lexicon->begin(), lexicon->end(), entry, DictEntry::PtrCmp);
     if (found != lexicon->end() && (*found)->key == entry->key) {
       matchedLengths->push_back(*found);

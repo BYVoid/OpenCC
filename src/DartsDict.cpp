@@ -40,9 +40,10 @@ size_t DartsDict::KeyMaxLength() const {
 
 Optional<shared_ptr<DictEntry>> DartsDict::MatchPrefix(const char* word) {
   string wordTrunc = UTF8Util::Truncate(word, maxLength);
-  // TODO reduce 1 by utf8 char
-  for (size_t len = wordTrunc.length(); len > 0; len--) {
+  const char* wordTruncPtr = wordTrunc.c_str();
+  for (long len = wordTrunc.length(); len > 0; len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
     wordTrunc.resize(len);
+    wordTruncPtr = wordTrunc.c_str();
     Darts::DoubleArray::result_pair_type result;
     dict.exactMatchSearch(wordTrunc.c_str(), result);
     if (result.value != -1) {
@@ -55,8 +56,10 @@ Optional<shared_ptr<DictEntry>> DartsDict::MatchPrefix(const char* word) {
 shared_ptr<vector<shared_ptr<DictEntry>>> DartsDict::MatchAllPrefixes(const char* word) {
   shared_ptr<vector<shared_ptr<DictEntry>>> matchedLengths(new vector<shared_ptr<DictEntry>>);
   string wordTrunc = UTF8Util::Truncate(word, maxLength);
-  for (size_t len = wordTrunc.length(); len > 0; len--) {
+  const char* wordTruncPtr = wordTrunc.c_str();
+  for (long len = wordTrunc.length(); len > 0; len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
     wordTrunc.resize(len);
+    wordTruncPtr = wordTrunc.c_str();
     Darts::DoubleArray::result_pair_type result;
     dict.exactMatchSearch(wordTrunc.c_str(), result);
     if (result.value != -1) {

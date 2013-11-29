@@ -26,14 +26,49 @@ namespace Opencc {
     static void SkipUtf8Bom(FILE* fp);
 
     static size_t NextCharLength(const char* str) {
-      // FIXME next char
-      return 1;
+      char ch = *str;
+      if ((ch & 0x80) == 0x00) {
+        return 1;
+      } else if ((ch & 0xE0) == 0xC0) {
+        return 2;
+      } else if ((ch & 0xF0) == 0xE0) {
+        return 3;
+      } else if ((ch & 0xF8) == 0xF0) {
+        return 4;
+      } else if ((ch & 0xFC) == 0xF8) {
+        return 5;
+      } else if ((ch & 0xFE) == 0xFC) {
+        return 6;
+      }
+      // Invalid UTF8 string or in the middle of a UTF8 char
+      return 0;
     }
     
+    static size_t PrevCharLength(const char* str) {
+      for (size_t i = 1; i <= 6; i++) {
+        str--;
+        size_t length = NextCharLength(str);
+        if (length == i) {
+          return length;
+        }
+      }
+      // Invalid UTF8 string or in the middle of a UTF8 char
+      return 0;
+    }
+
     static const char* NextChar(const char* str) {
       return str + NextCharLength(str);
     }
 
+    static const char* PrevChar(const char* str) {
+      return str - PrevCharLength(str);
+    }
+
+    static bool Validate(const char* str) {
+      // TODO implement this
+      return true;
+    }
+    
     static const char* FindNextInline(const char* str, const char ch) {
       while (!IsLineEndingOrFileEnding(*str) && *str != ch) {
         str = NextChar(str);

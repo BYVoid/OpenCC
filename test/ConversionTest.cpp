@@ -36,17 +36,19 @@ int main(int argc, const char * argv[]) {
   
   // Segmentation
   auto segmentation = shared_ptr<Segmentation>(new MaxMatchSegmentation(dictGroup));
-  auto segments = segmentation->Segment("太后头发干燥");
-  AssertEquals(3, segments->size());
+  auto segments = segmentation->Segment("太后的头发干燥");
+  AssertEquals(4, segments->size());
   AssertEquals("太后", segments->at(0)->key);
   AssertEquals("太后", segments->at(0)->GetDefault());
-  AssertEquals("头发", segments->at(1)->key);
-  AssertEquals("頭髮", segments->at(1)->GetDefault());
-  AssertEquals("干燥", segments->at(2)->key);
-  AssertEquals("乾燥", segments->at(2)->GetDefault());
+  AssertEquals("的", segments->at(1)->key);
+  AssertEquals("的", segments->at(1)->GetDefault());
+  AssertEquals("头发", segments->at(2)->key);
+  AssertEquals("頭髮", segments->at(2)->GetDefault());
+  AssertEquals("干燥", segments->at(3)->key);
+  AssertEquals("乾燥", segments->at(3)->GetDefault());
   
   // Conversion
   auto conversion = shared_ptr<Conversion>(new Conversion(segmentation));
-  string converted = conversion->Convert("太后头发干燥");
-  AssertEquals("太后頭髮乾燥", converted);
+  string converted = conversion->Convert("太后的头发干燥");
+  AssertEquals("太后的頭髮乾燥", converted);
 }

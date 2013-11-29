@@ -20,13 +20,19 @@
 
 using namespace Opencc;
 
-void ConversionChain::AddConversion(Conversion* conversion) {
+ConversionChain::ConversionChain() {
+}
+
+ConversionChain::~ConversionChain() {
+}
+
+void ConversionChain::AddConversion(ConversionPtr conversion) {
   conversions.push_back(conversion);
 }
 
 string ConversionChain::Convert(const string& textToConvert) {
   string text = textToConvert;
-  for (Conversion* conversion : conversions) {
+  for (auto conversion : conversions) {
     text = conversion->Convert(text);
   }
   return text;

@@ -44,6 +44,7 @@ namespace Opencc {
       textDict->AddKeyValue(DictEntry("后", StringVector{"后", "後"}));
       textDict->AddKeyValue(DictEntry("发", StringVector{"發", "髮"}));
       textDict->AddKeyValue(DictEntry("干", StringVector{"幹", "乾", "干"}));
+      textDict->AddKeyValue(DictEntry("里", StringVector{"裏", "里"}));
       return textDict;
     }
     
@@ -64,6 +65,19 @@ namespace Opencc {
       DictPtr charactersDict = CreateDictForCharacters();
       dictGroup->AddDict(phrasesDict);
       dictGroup->AddDict(charactersDict);
+      return dictGroup;
+    }
+    
+    static DictPtr CreateDictForTaiwanVariants() {
+      TextDictPtr textDict(new TextDict);
+      textDict->AddKeyValue(DictEntry("裏", "裡"));
+      return textDict;
+    }
+    
+    static DictGroupPtr CreateDictGroupForTaiwanVariants() {
+      DictGroupPtr dictGroup(new DictGroup);
+      DictPtr variantsDict = CreateDictForTaiwanVariants();
+      dictGroup->AddDict(variantsDict);
       return dictGroup;
     }
     

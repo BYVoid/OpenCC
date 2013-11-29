@@ -26,9 +26,9 @@ namespace Opencc {
   public:
     ConversionChain();
     virtual ~ConversionChain();
-    void AddConversion(Conversion* conversion);
+    void AddConversion(ConversionPtr conversion);
     string Convert(const string& text);
   private:
-    list<Conversion*> conversions;
+    list<ConversionPtr> conversions;
   };
 }

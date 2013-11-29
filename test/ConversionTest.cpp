@@ -19,6 +19,7 @@
 #include "DictTestUtils.hpp"
 #include "DictEntry.hpp"
 #include "MaxMatchSegmentation.hpp"
+#include "ConversionChain.hpp"
 
 using namespace Opencc;
 
@@ -51,4 +52,13 @@ int main(int argc, const char * argv[]) {
   auto conversion = ConversionPtr(new Conversion(segmentation));
   string converted = conversion->Convert("太后的头发干燥");
   AssertEquals("太后的頭髮乾燥", converted);
+  
+  // ConversionChain
+  auto dictGroupVariants = DictTestUtils::CreateDictGroupForTaiwanVariants();
+  auto conversionVariants = ConversionPtr(new Conversion(SegmentationPtr(new MaxMatchSegmentation(dictGroupVariants))));
+  auto conversionChain = ConversionChainPtr(new ConversionChain());
+  conversionChain->AddConversion(conversion);
+  conversionChain->AddConversion(conversionVariants);
+  converted = conversionChain->Convert("里面");
+  AssertEquals("裡面", converted);
 }

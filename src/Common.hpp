@@ -48,6 +48,7 @@ namespace Opencc {
   class DictGroup;
   class Segmentation;
   class Conversion;
+  class ConversionChain;
   using DictEntryPtr = std::shared_ptr<DictEntry>;
   using DictEntryPtrVector = std::vector<DictEntryPtr>;
   using DictEntryPtrVectorPtr = std::shared_ptr<DictEntryPtrVector>;
@@ -57,6 +58,7 @@ namespace Opencc {
   using DictGroupPtr = std::shared_ptr<DictGroup>;
   using SegmentationPtr = std::shared_ptr<Segmentation>;
   using ConversionPtr = std::shared_ptr<Conversion>;
+  using ConversionChainPtr = std::shared_ptr<ConversionChain>;
 }
 using StringVector = std::vector<string>;
 using StringVectorPtr = std::shared_ptr<StringVector>;

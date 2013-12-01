@@ -20,11 +20,44 @@
 
 #include "Common.hpp"
 
-#define AssertTrue(condition) assert(condition)
-#define AssertEquals(expected, actual) {\
-  if (!((expected) == (actual))) {\
-    std::cerr << "Expected: " << (expected) << std::endl; \
-    std::cerr << "Actual: " << (actual) << std::endl; \
-    assert((expected) == (actual));\
+#define stringize(s) #s
+#define Assert(condition, msg) {\
+  if (!(condition)) {\
+    std::ostringstream __buffer;\
+    __buffer << "Assertion failed: " << stringize(condition) << ", function "\
+      << __func__ << ", " << __FILE__ << ":" << __LINE__ << "\n" << msg; \
+    throw AssertionFailure(__buffer.str());\
   }\
 }
+#define AssertTrue(condition) Assert(condition, "")
+#define AssertEquals(expected, actual) {\
+  if (!((expected) == (actual))) {\
+    std::ostringstream __buffer0;\
+    __buffer0 << "Expected: " << (expected) << "\n";\
+    __buffer0 << "Actual: " << (actual) << "\n";\
+    Assert((expected) == (actual), __buffer0.str());\
+  }\
+}
+
+class AssertionFailure : public runtime_error {
+public:
+  AssertionFailure(string msg) : runtime_error(msg) {
+  }
+};
+
+class TestUtils {
+public:
+  static void RunTest(const string name, void (*func)(void)) {
+    clock_t start = clock();
+    std::cout << "[" << name << "]" << "...";
+    try {
+      func();
+      clock_t end = clock();
+      double duration = (end - start) * 1000.0 / CLOCKS_PER_SEC;
+      std::cout << "Success" << " (" << duration << "ms)" << std::endl;
+    } catch (AssertionFailure e) {
+      std::cout << "Failed" << std::endl;
+      std::cout << e.what() << std::endl;
+    }
+  }
+};

@@ -23,8 +23,35 @@
 
 using namespace Opencc;
 
-int main(int argc, const char * argv[]) {
-  // DictGroup
+void TestTextDict() {
+  TextDict textDict = DictTestUtils::CreateTextDictForText();
+  DictTestUtils::TestDict(textDict);
+  
+  // Serialization
+  string fileName = "dict.txt";
+  textDict.SerializeToFile(fileName);
+  
+  // Deserialization
+  textDict.LoadFromFile(fileName);
+  DictTestUtils::TestDict(textDict);
+}
+
+void TestDartsDict() {
+  TextDict textDict = DictTestUtils::CreateTextDictForText();
+  DartsDict dartsDict;
+  dartsDict.LoadFromDict(textDict);
+  DictTestUtils::TestDict(dartsDict);
+  
+  // Serialization
+  string fileName = "dict.ocd";
+  dartsDict.SerializeToFile(fileName);
+  
+  // Deserialization
+  dartsDict.LoadFromFile(fileName);
+  DictTestUtils::TestDict(dartsDict);
+}
+
+void TestDictGroup() {
   auto dictGroup = DictTestUtils::CreateDictGroupForConversion();
   Optional<DictEntryPtr> entry;
   entry = dictGroup->MatchPrefix("Unknown");
@@ -34,9 +61,11 @@ int main(int argc, const char * argv[]) {
   AssertEquals(2, matches->size());
   AssertEquals("乾燥", matches->at(0)->GetDefault());
   AssertEquals("幹", matches->at(1)->GetDefault());
-  
-  // Segmentation
-  auto segmentation = SegmentationPtr(new MaxMatchSegmentation(dictGroup));
+}
+
+void TestSegmentation() {
+  auto dict = DictTestUtils::CreateDictGroupForConversion();
+  auto segmentation = SegmentationPtr(new MaxMatchSegmentation(dict));
   auto segments = segmentation->Segment("太后的头发干燥");
   AssertEquals(4, segments->size());
   AssertEquals("太后", segments->at(0)->key);
@@ -47,18 +76,36 @@ int main(int argc, const char * argv[]) {
   AssertEquals("頭髮", segments->at(2)->GetDefault());
   AssertEquals("干燥", segments->at(3)->key);
   AssertEquals("乾燥", segments->at(3)->GetDefault());
-  
-  // Conversion
+}
+
+void TestConversion() {
+  auto dict = DictTestUtils::CreateDictGroupForConversion();
+  auto segmentation = SegmentationPtr(new MaxMatchSegmentation(dict));
   auto conversion = ConversionPtr(new Conversion(segmentation));
   string converted = conversion->Convert("太后的头发干燥");
   AssertEquals("太后的頭髮乾燥", converted);
-  
-  // ConversionChain
+}
+
+void TestConversionChain() {
+  // Dict
+  auto dict = DictTestUtils::CreateDictGroupForConversion();
+  auto segmentation = SegmentationPtr(new MaxMatchSegmentation(dict));
+  auto conversion = ConversionPtr(new Conversion(segmentation));
+  // Variants
   auto dictVariants = DictTestUtils::CreateDictForTaiwanVariants();
   auto conversionVariants = ConversionPtr(new Conversion(SegmentationPtr(new MaxMatchSegmentation(dictVariants))));
   auto conversionChain = ConversionChainPtr(new ConversionChain());
   conversionChain->AddConversion(conversion);
   conversionChain->AddConversion(conversionVariants);
-  converted = conversionChain->Convert("里面");
+  string converted = conversionChain->Convert("里面");
   AssertEquals("裡面", converted);
+}
+
+int main(int argc, const char * argv[]) {
+  TestUtils::RunTest("TestTextDict", TestTextDict);
+  TestUtils::RunTest("TestDartsDict", TestDartsDict);
+  TestUtils::RunTest("TestDictGroup", TestDictGroup);
+  TestUtils::RunTest("TestSegmentation", TestSegmentation);
+  TestUtils::RunTest("TestConversion", TestConversion);
+  TestUtils::RunTest("TestConversionChain", TestConversionChain);
 }

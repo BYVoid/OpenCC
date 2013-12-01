@@ -1,24 +1,15 @@
 include_directories(../deps/libdarts/src)
 include_directories(../src)
 
-set(
-  UNIT_TESTS
-  TextDictTest
-  DartsDictTest
-  ConversionTest
+add_executable(
+  UnitTest
+  UnitTest.cpp
 )
-
-foreach(UNIT_TEST ${UNIT_TESTS})
-  add_executable(
-    ${UNIT_TEST}
-    ${UNIT_TEST}.cpp
-  )
-  target_link_libraries(
-    ${UNIT_TEST}
-    libopencc
-  )
-  add_test(
-  	${UNIT_TEST}
-  	${UNIT_TEST}
-  )
-endforeach(UNIT_TEST)
+target_link_libraries(
+  UnitTest
+  libopencc
+)
+add_test(
+	UnitTest
+	UnitTest
+)

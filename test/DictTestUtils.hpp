@@ -74,13 +74,6 @@ namespace Opencc {
       return textDict;
     }
     
-    static DictGroupPtr CreateDictGroupForTaiwanVariants() {
-      DictGroupPtr dictGroup(new DictGroup);
-      DictPtr variantsDict = CreateDictForTaiwanVariants();
-      dictGroup->AddDict(variantsDict);
-      return dictGroup;
-    }
-    
     static void TestDict(Dict& dict) {
       Optional<DictEntryPtr> entry;
       entry = dict.MatchPrefix("BYVoid");

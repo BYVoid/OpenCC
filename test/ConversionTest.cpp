@@ -54,8 +54,8 @@ int main(int argc, const char * argv[]) {
   AssertEquals("太后的頭髮乾燥", converted);
   
   // ConversionChain
-  auto dictGroupVariants = DictTestUtils::CreateDictGroupForTaiwanVariants();
-  auto conversionVariants = ConversionPtr(new Conversion(SegmentationPtr(new MaxMatchSegmentation(dictGroupVariants))));
+  auto dictVariants = DictTestUtils::CreateDictForTaiwanVariants();
+  auto conversionVariants = ConversionPtr(new Conversion(SegmentationPtr(new MaxMatchSegmentation(dictVariants))));
   auto conversionChain = ConversionChainPtr(new ConversionChain());
   conversionChain->AddConversion(conversion);
   conversionChain->AddConversion(conversionVariants);

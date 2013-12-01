@@ -22,15 +22,15 @@
 using namespace Opencc;
 
 
-MaxMatchSegmentation::MaxMatchSegmentation(DictGroupPtr dictGroup_) :
-  dictGroup(dictGroup_) {
+MaxMatchSegmentation::MaxMatchSegmentation(DictPtr dict_) :
+  dict(dict_) {
 }
 
 DictEntryPtrVectorPtr MaxMatchSegmentation::Segment(const string& text) {
   DictEntryPtrVectorPtr segments(new DictEntryPtrVector);
   const char* pstr = text.c_str();
   while (*pstr != '\0') {
-    Optional<DictEntryPtr> matched = dictGroup->MatchPrefix(pstr);
+    Optional<DictEntryPtr> matched = dict->MatchPrefix(pstr);
     size_t matchedLength;
     if (matched.IsNull()) {
       matchedLength = UTF8Util::NextCharLength(pstr);

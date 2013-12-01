@@ -22,14 +22,15 @@
 #include "Dict.hpp"
 
 namespace Opencc {
-  class DictGroup {
+  class DictGroup : public Dict {
   public:
     DictGroup();
     virtual ~DictGroup();
+    virtual size_t KeyMaxLength() const;
+    virtual Optional<DictEntryPtr> MatchPrefix(const char* word);
+    virtual DictEntryPtrVectorPtr MatchAllPrefixes(const char* word);
+    virtual DictEntryPtrVectorPtr GetLexicon();
     void AddDict(DictPtr dict);
-    size_t KeyMaxLength() const;
-    Optional<DictEntryPtr> MatchPrefix(const char* word);
-    DictEntryPtrVectorPtr MatchAllPrefixes(const char* word);
   private:
     size_t keyMaxLength;
     list<DictPtr> dicts;

@@ -64,3 +64,13 @@ DictEntryPtrVectorPtr DictGroup::MatchAllPrefixes(const char* word) {
   std::reverse(matchedEntries->begin(), matchedEntries->end());
   return matchedEntries;
 }
+
+DictEntryPtrVectorPtr DictGroup::GetLexicon() {
+  DictEntryPtrVectorPtr allLexicon(new DictEntryPtrVector);
+  for (auto dict : dicts) {
+    auto lexicon = dict->GetLexicon();
+    std::copy(lexicon->begin(), lexicon->end(), std::back_inserter(*allLexicon));
+  }
+  std::sort(allLexicon->begin(), allLexicon->end(), DictEntry::PtrCmp);
+  return allLexicon;
+}

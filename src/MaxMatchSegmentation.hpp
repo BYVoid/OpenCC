@@ -25,9 +25,9 @@
 namespace Opencc {
   class MaxMatchSegmentation : public Segmentation {
   public:
-    MaxMatchSegmentation(DictGroupPtr dictGroup);
+    MaxMatchSegmentation(DictPtr dict);
     virtual DictEntryPtrVectorPtr Segment(const string& text);
   private:
-    DictGroupPtr dictGroup;
+    DictPtr dict;
   };
 }

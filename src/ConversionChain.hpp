@@ -29,6 +29,6 @@ namespace Opencc {
     void AddConversion(ConversionPtr conversion);
     string Convert(const string& text);
   private:
-    list<ConversionPtr> conversions;
+    std::list<ConversionPtr> conversions;
   };
 }

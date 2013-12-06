@@ -33,6 +33,6 @@ namespace Opencc {
     void AddDict(DictPtr dict);
   private:
     size_t keyMaxLength;
-    list<DictPtr> dicts;
+    std::list<DictPtr> dicts;
   };
 }

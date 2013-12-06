@@ -47,7 +47,7 @@ Optional<DictEntryPtr> DictGroup::MatchPrefix(const char* word) {
 }
 
 DictEntryPtrVectorPtr DictGroup::MatchAllPrefixes(const char* word) {
-  map<size_t, DictEntryPtr> matched;
+  std::map<size_t, DictEntryPtr> matched;
   for (auto dict : dicts) {
     auto entries = dict->MatchAllPrefixes(word);
     for (DictEntryPtr entry : *entries) {

@@ -35,8 +35,6 @@
 #include "Exception.hpp"
 
 using std::string;
-using std::list;
-using std::map;
 
 // Forward decalarations and alias
 namespace Opencc {

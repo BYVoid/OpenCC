@@ -29,6 +29,7 @@ namespace Opencc {
     void LoadFile(const string fileName);
     ConversionChainPtr GetConversionChain() const;
   private:
+    string configDirectory;
     string name;
     ConversionChainPtr chain;
   };

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+#include "Config.hpp"
 #include "DictTestUtils.hpp"
 #include "DictEntry.hpp"
 #include "MaxMatchSegmentation.hpp"
@@ -29,10 +30,10 @@ void TestTextDict() {
   
   // Serialization
   string fileName = "dict.txt";
-  textDict.SerializeToFile(fileName);
+  textDict.Opencc::SerializableDict::SerializeToFile(fileName);
   
   // Deserialization
-  textDict.LoadFromFile(fileName);
+  textDict.Opencc::SerializableDict::LoadFromFile(fileName);
   DictTestUtils::TestDict(textDict);
 }
 
@@ -44,10 +45,10 @@ void TestDartsDict() {
   
   // Serialization
   string fileName = "dict.ocd";
-  dartsDict.SerializeToFile(fileName);
+  dartsDict.Opencc::SerializableDict::SerializeToFile(fileName);
   
   // Deserialization
-  dartsDict.LoadFromFile(fileName);
+  dartsDict.Opencc::SerializableDict::LoadFromFile(fileName);
   DictTestUtils::TestDict(dartsDict);
 }
 
@@ -101,6 +102,14 @@ void TestConversionChain() {
   AssertEquals("裡面", converted);
 }
 
+void TestConfig() {
+  Config config;
+  config.LoadFile("config_test/config_test.json");
+  auto conversionChain = config.GetConversionChain();
+  string converted = conversionChain->Convert("燕燕于飞差池其羽之子于归远送于野");
+  AssertEquals("燕燕于飛差池其羽之子于歸遠送於野", converted);
+}
+
 int main(int argc, const char * argv[]) {
   TestUtils::RunTest("TestTextDict", TestTextDict);
   TestUtils::RunTest("TestDartsDict", TestDartsDict);
@@ -108,4 +117,5 @@ int main(int argc, const char * argv[]) {
   TestUtils::RunTest("TestSegmentation", TestSegmentation);
   TestUtils::RunTest("TestConversion", TestConversion);
   TestUtils::RunTest("TestConversionChain", TestConversionChain);
+  TestUtils::RunTest("TestConfig", TestConfig);
 }

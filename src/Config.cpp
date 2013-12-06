@@ -22,6 +22,8 @@
 #include "TextDict.hpp"
 #include "DartsDict.hpp"
 #include "DictGroup.hpp"
+#include "UTF8Util.hpp"
+
 #include "document.h"
 
 using namespace Opencc;
@@ -65,45 +67,60 @@ const char* GetStringProperty(JSONValue& doc, const char* name) {
   return obj.GetString();
 }
 
-DictPtr ParseDict(JSONValue& doc) {
+void LoadDictWithPaths(SerializableDictPtr dict, string& fileName, string& configDirectory) {
+  // Working directory
+  if (dict->TryLoadFromFile(fileName)) {
+    return;
+  }
+  // Configuration directory
+  if (configDirectory != "" && dict->TryLoadFromFile(configDirectory + fileName)) {
+    return;
+  }
+  // Package data directory
+  if (PACKAGE_DATA_DIRECTORY != "" && dict->TryLoadFromFile(PACKAGE_DATA_DIRECTORY + fileName)) {
+    return;
+  }
+  throw FileNotFound(fileName);
+}
+
+DictPtr ParseDict(JSONValue& doc, string& configDirectory) {
   // Required: type
   string type = GetStringProperty(doc, "type");
   DictPtr dict;
   if (type == "group") {
-    DictGroup* dictGroup = new DictGroup;
+    DictGroupPtr dictGroup(new DictGroup);
     JSONValue& docs = GetArrayProperty(doc, "dicts");
     for (rapidjson::SizeType i = 0; i < docs.Size(); i++) {
       if (docs[i].IsObject()) {
-        DictPtr dict = ParseDict(docs[i]);
+        DictPtr dict = ParseDict(docs[i], configDirectory);
         dictGroup->AddDict(dict);
       } else {
         throw InvalidFormat("Element of the array must be an object");
       }
     }
-    dict.reset(dictGroup);
+    dict = dictGroup;
   } else if (type == "text") {
     string fileName = GetStringProperty(doc, "file");
-    TextDict* textDict = new TextDict();
-    // TODO try multiple paths
-    textDict->LoadFromFile(fileName);
-    dict.reset(textDict);
+    SerializableDictPtr textDict(new TextDict());
+    LoadDictWithPaths(textDict, fileName, configDirectory);
+    dict = textDict;
   } else if (type == "darts") {
     string fileName = GetStringProperty(doc, "file");
-    DartsDict* dartsDict = new DartsDict();
-    dartsDict->LoadFromFile(fileName);
-    dict.reset(dartsDict);
+    SerializableDictPtr dartsDict(new DartsDict());
+    LoadDictWithPaths(dartsDict, fileName, configDirectory);
+    dict = dartsDict;
   } else {
     throw InvalidFormat("Unknown type: " + type);
   }
   return dict;
 }
 
-ConversionPtr ParseConversion(JSONValue& doc) {
+ConversionPtr ParseConversion(JSONValue& doc, string& configDirectory) {
   // Required: type
   string type = GetStringProperty(doc, "type");
   if (type == "mmseg") {
     // Required: type
-    DictPtr dict = ParseDict(GetObjectProperty(doc, "dict"));
+    DictPtr dict = ParseDict(GetObjectProperty(doc, "dict"), configDirectory);
     SegmentationPtr segmentation(new MaxMatchSegmentation(dict));
     ConversionPtr conversion(new Conversion(segmentation));
     return conversion;
@@ -112,12 +129,12 @@ ConversionPtr ParseConversion(JSONValue& doc) {
   }
 }
 
-ConversionChainPtr ParseConversionChain(JSONValue& docs) {
+ConversionChainPtr ParseConversionChain(JSONValue& docs, string& configDirectory) {
   ConversionChainPtr chain(new ConversionChain);
   for (rapidjson::SizeType i = 0; i < docs.Size(); i++) {
     JSONValue& doc = docs[i];
     if (doc.IsObject()) {
-      ConversionPtr conversion = ParseConversion(doc);
+      ConversionPtr conversion = ParseConversion(doc, configDirectory);
       chain->AddConversion(conversion);
     } else {
     }
@@ -131,6 +148,15 @@ void Config::LoadFile(const string fileName) {
                  (std::istreambuf_iterator<char>()));
   if (!ifs.is_open()) {
     throw FileNotFound(fileName);
+  }
+#if defined(_WIN32) || defined(_WIN64)
+  UTF8Util::ReplaceAll(fileName, "\\", "/");
+#endif
+  size_t slashPos = fileName.rfind("/");
+  if (slashPos == string::npos) {
+    configDirectory = "";
+  } else {
+    configDirectory = fileName.substr(0, slashPos) + "/";
   }
   LoadString(content);
 }
@@ -149,7 +175,7 @@ void Config::LoadString(const string json) {
     name = doc["name"].GetString();
   }
   // Required: conversion_chain
-  chain = ParseConversionChain(GetArrayProperty(doc, "conversion_chain"));
+  chain = ParseConversionChain(GetArrayProperty(doc, "conversion_chain"), configDirectory);
 }
 
 ConversionChainPtr Config::GetConversionChain() const {

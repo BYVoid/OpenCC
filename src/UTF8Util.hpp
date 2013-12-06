@@ -109,5 +109,15 @@ namespace Opencc {
       }
       return wordTrunc;
     }
+    
+    static void ReplaceAll(string& str, const char* from, const char* to) {
+      string::size_type pos = 0;
+      string::size_type fromLen = strlen(from);
+      string::size_type toLen = strlen(to);
+      while((pos = str.find(from, pos)) != string::npos) {
+        str.replace(pos, fromLen, to);
+        pos += toLen;
+      }
+    }
   };
 }

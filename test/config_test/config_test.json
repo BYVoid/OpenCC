@@ -1,0 +1,16 @@
+{
+  "name": "Configuration Test",
+  "conversion_chain": [{
+    "type": "mmseg",
+    "dict": {
+      "type": "group",
+      "dicts": [{
+        "type": "text",
+        "file": "config_test_phrases.txt"
+      }, {
+        "type": "text",
+        "file": "config_test_characters.txt"
+      }]
+    }
+  }]
+}

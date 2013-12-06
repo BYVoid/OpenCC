@@ -34,16 +34,9 @@ Config::Config(const string fileName) {
   LoadFile(fileName);
 }
 
-void Config::LoadFile(const string fileName) {
-  std::ifstream ifs(fileName);
-  string content(std::istreambuf_iterator<char>(ifs),
-                 (std::istreambuf_iterator<char>()));
-  LoadString(content);
-}
-
 JSONValue& GetProperty(JSONValue& doc, const char* name) {
   if (!doc.HasMember(name)) {
-    throw runtime_error("Required property not found: " + string(name));
+    throw InvalidFormat("Required property not found: " + string(name));
   }
   return doc[name];
 }
@@ -51,7 +44,7 @@ JSONValue& GetProperty(JSONValue& doc, const char* name) {
 JSONValue& GetObjectProperty(JSONValue& doc, const char* name) {
   JSONValue& obj = GetProperty(doc, name);
   if (!obj.IsObject()) {
-    throw runtime_error("Property must be an object: " + string(name));
+    throw InvalidFormat("Property must be an object: " + string(name));
   }
   return obj;
 }
@@ -59,7 +52,7 @@ JSONValue& GetObjectProperty(JSONValue& doc, const char* name) {
 JSONValue& GetArrayProperty(JSONValue& doc, const char* name) {
   JSONValue& obj = GetProperty(doc, name);
   if (!obj.IsArray()) {
-    throw runtime_error("Property must be an array: " + string(name));
+    throw InvalidFormat("Property must be an array: " + string(name));
   }
   return obj;
 }
@@ -67,7 +60,7 @@ JSONValue& GetArrayProperty(JSONValue& doc, const char* name) {
 const char* GetStringProperty(JSONValue& doc, const char* name) {
   JSONValue& obj = GetProperty(doc, name);
   if (!obj.IsString()) {
-    throw runtime_error("Property must be a string: " + string(name));
+    throw InvalidFormat("Property must be a string: " + string(name));
   }
   return obj.GetString();
 }
@@ -84,7 +77,7 @@ DictPtr ParseDict(JSONValue& doc) {
         DictPtr dict = ParseDict(docs[i]);
         dictGroup->AddDict(dict);
       } else {
-        throw runtime_error("Element of the array must be an object");
+        throw InvalidFormat("Element of the array must be an object");
       }
     }
     dict.reset(dictGroup);
@@ -100,7 +93,7 @@ DictPtr ParseDict(JSONValue& doc) {
     dartsDict->LoadFromFile(fileName);
     dict.reset(dartsDict);
   } else {
-    throw runtime_error("Unknown type: " + type);
+    throw InvalidFormat("Unknown type: " + type);
   }
   return dict;
 }
@@ -115,7 +108,7 @@ ConversionPtr ParseConversion(JSONValue& doc) {
     ConversionPtr conversion(new Conversion(segmentation));
     return conversion;
   } else {
-    throw runtime_error("Unknown type: " + type);
+    throw InvalidFormat("Unknown type: " + type);
   }
 }
 
@@ -132,23 +125,33 @@ ConversionChainPtr ParseConversionChain(JSONValue& docs) {
   return chain;
 }
 
+void Config::LoadFile(const string fileName) {
+  std::ifstream ifs(fileName);
+  string content(std::istreambuf_iterator<char>(ifs),
+                 (std::istreambuf_iterator<char>()));
+  if (!ifs.is_open()) {
+    throw FileNotFound(fileName);
+  }
+  LoadString(content);
+}
+
 void Config::LoadString(const string json) {
   rapidjson::Document doc;
   doc.ParseInsitu<0>((char*)json.c_str());
   if (doc.HasParseError()) {
-    throw runtime_error("Error parsing JSON"); //doc.GetErrorOffset()
+    throw InvalidFormat("Error parsing JSON"); //doc.GetErrorOffset()
   }
   if (!doc.IsObject()) {
-    throw runtime_error("Root of configuration must be an object");
+    throw InvalidFormat("Root of configuration must be an object");
   }
   // Optional: name
   if (doc.HasMember("name") && doc["name"].IsString()) {
     name = doc["name"].GetString();
   }
   // Required: conversion_chain
-  if (doc.HasMember("conversion_chain") && doc["conversion_chain"].IsArray()) {
-    chain = ParseConversionChain(doc["conversion_chain"]);
-  } else {
-    throw runtime_error("Required property 'conversion_chain' not found.");
-  }
+  chain = ParseConversionChain(GetArrayProperty(doc, "conversion_chain"));
+}
+
+ConversionChainPtr Config::GetConversionChain() const {
+  return chain;
 }

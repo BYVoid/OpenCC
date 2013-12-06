@@ -25,7 +25,6 @@
 #include <vector>
 #include <list>
 #include <map>
-#include <stdexcept>
 #include <memory>
 
 #include <cstdio>
@@ -33,14 +32,15 @@
 #include <cstddef>
 
 #include "Optional.hpp"
+#include "Exception.hpp"
 
 using std::string;
 using std::list;
 using std::map;
-using std::runtime_error;
 
 // Forward decalarations and alias
 namespace Opencc {
+  class Config;
   class DictEntry;
   class Dict;
   class TextDict;

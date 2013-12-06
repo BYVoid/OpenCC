@@ -112,9 +112,7 @@ void DartsDict::SerializeToFile(FILE* fp) {
 void DartsDict::LoadFromFile(const string fileName) {
   FILE *fp = fopen(fileName.c_str(), "rb");
   if (fp == NULL) {
-    // TODO exception
-    fprintf(stderr, _("Can not read file: %s\n"), fileName.c_str());
-    exit(1);
+    throw FileNotFound(fileName);
   }
   LoadFromFile(fp);
   fclose(fp);
@@ -127,7 +125,7 @@ void DartsDict::LoadFromFile(FILE* fp) {
   buffer = malloc(sizeof(char) * strlen(OCDHEADER));
   fread(buffer, sizeof(char), strlen(OCDHEADER), fp);
   if (memcmp(buffer, OCDHEADER, strlen(OCDHEADER)) != 0) {
-    throw std::runtime_error("Invalid format");
+    throw InvalidFormat("Invalid OpenCC dictionary");
   }
   free(buffer);
   

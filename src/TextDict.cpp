@@ -27,7 +27,7 @@ DictEntryPtr ParseKeyValues(const char* buff) {
   size_t length;
   const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
   if (UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
-    throw runtime_error("invalid format");
+    throw InvalidFormat("Invalid text dictionary");
   }
   length = pbuff - buff;
   DictEntryPtr entry(new DictEntry(UTF8Util::FromSubstr(buff, length)));
@@ -51,7 +51,7 @@ TextDict::~TextDict() {
 void TextDict::LoadFromFile(const string fileName) {
   FILE* fp = fopen(fileName.c_str(), "r");
   if (fp == NULL) {
-    throw runtime_error("file not found");
+    throw FileNotFound(fileName);
   }
   LoadFromFile(fp);
   fclose(fp);

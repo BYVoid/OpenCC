@@ -39,9 +39,9 @@
   }\
 }
 
-class AssertionFailure : public runtime_error {
+class AssertionFailure : public std::runtime_error {
 public:
-  AssertionFailure(string msg) : runtime_error(msg) {
+  AssertionFailure(string msg) : std::runtime_error(msg) {
   }
 };
 

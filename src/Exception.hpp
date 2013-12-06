@@ -1,4 +1,4 @@
-/**
+/*
  * Open Chinese Convert
  *
  * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
@@ -17,19 +17,25 @@
  */
 
 #pragma once
-
-#include "Common.hpp"
+#include <string>
+#include <stdexcept>
 
 namespace Opencc {
-  class Config {
+  class FileNotFound : public std::exception {
   public:
-    Config();
-    Config(const string fileName);
-    void LoadString(const string json);
-    void LoadFile(const string fileName);
-    ConversionChainPtr GetConversionChain() const;
+    FileNotFound(const std::string fileName) {
+      message = fileName + " not found or not accessible.";
+    }
+    virtual const char* what() const noexcept {
+      return message.c_str();
+    }
   private:
-    string name;
-    ConversionChainPtr chain;
+    std::string message;
+  };
+  
+  class InvalidFormat : public std::logic_error {
+  public:
+    InvalidFormat(const std::string message) : std::logic_error(message) {
+    }
   };
 }

@@ -43,6 +43,7 @@ DictEntryPtr ParseKeyValues(const char* buff) {
 
 TextDict::TextDict() : lexicon(new DictEntryPtrVector) {
   sorted = true;
+  maxLength = 0;
 }
 
 TextDict::~TextDict() {

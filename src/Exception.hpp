@@ -33,6 +33,18 @@ namespace Opencc {
     std::string message;
   };
   
+  class FileNotWritable : public std::exception {
+  public:
+    FileNotWritable(const std::string fileName) {
+      message = fileName + " not writable";
+    }
+    virtual const char* what() const noexcept {
+      return message.c_str();
+    }
+  private:
+    std::string message;
+  };
+  
   class InvalidFormat : public std::logic_error {
   public:
     InvalidFormat(const std::string message) : std::logic_error(message) {

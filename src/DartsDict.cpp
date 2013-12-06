@@ -87,16 +87,6 @@ void DartsDict::LoadFromDict(Dict& dictionary) {
   dict.build(lexicon->size(), &keys[0]);
 }
 
-void DartsDict::SerializeToFile(const string fileName) {
-  FILE *fp = fopen(fileName.c_str(), "wb");
-  if (fp == NULL) {
-    fprintf(stderr, _("Can not write file: %s\n"), fileName.c_str());
-    exit(1);
-  }
-  SerializeToFile(fp);
-  fclose(fp);
-}
-
 void DartsDict::SerializeToFile(FILE* fp) {
   fwrite(OCDHEADER, sizeof(char), strlen(OCDHEADER), fp);
 
@@ -107,15 +97,6 @@ void DartsDict::SerializeToFile(FILE* fp) {
   TextDict textDict;
   textDict.LoadFromDict(*this);
   textDict.SerializeToFile(fp);
-}
-
-void DartsDict::LoadFromFile(const string fileName) {
-  FILE *fp = fopen(fileName.c_str(), "rb");
-  if (fp == NULL) {
-    throw FileNotFound(fileName);
-  }
-  LoadFromFile(fp);
-  fclose(fp);
 }
 
 void DartsDict::LoadFromFile(FILE* fp) {

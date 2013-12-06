@@ -19,12 +19,12 @@
 #pragma once
 
 #include "Common.hpp"
-#include "Dict.hpp"
+#include "SerializableDict.hpp"
 #include "TextDict.hpp"
 #include "darts.hh"
 
 namespace Opencc {
-  class DartsDict : public Dict {
+  class DartsDict : public SerializableDict {
   public:
     DartsDict();
     virtual ~DartsDict();
@@ -32,12 +32,10 @@ namespace Opencc {
     virtual Optional<DictEntryPtr> MatchPrefix(const char* word);
     virtual DictEntryPtrVectorPtr MatchAllPrefixes(const char* word);
     virtual DictEntryPtrVectorPtr GetLexicon();
+    virtual void LoadFromFile(FILE* fp);
+    virtual void SerializeToFile(FILE* fp);
     
-    void LoadFromFile(const string fileName);
-    void LoadFromFile(FILE* fp);
     void LoadFromDict(Dict& dictionary);
-    void SerializeToFile(const string fileName);
-    void SerializeToFile(FILE* fp);
 
   private:
     size_t maxLength;

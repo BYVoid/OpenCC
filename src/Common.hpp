@@ -41,6 +41,7 @@ namespace Opencc {
   class Config;
   class DictEntry;
   class Dict;
+  class SerializableDict;
   class TextDict;
   class DartsDict;
   class DictGroup;
@@ -51,6 +52,7 @@ namespace Opencc {
   using DictEntryPtrVector = std::vector<DictEntryPtr>;
   using DictEntryPtrVectorPtr = std::shared_ptr<DictEntryPtrVector>;
   using DictPtr = std::shared_ptr<Dict>;
+  using SerializableDictPtr = std::shared_ptr<SerializableDict>;
   using TextDictPtr = std::shared_ptr<TextDict>;
   using DartsDictPtr = std::shared_ptr<DartsDict>;
   using DictGroupPtr = std::shared_ptr<DictGroup>;
@@ -70,5 +72,7 @@ using StringVectorPtr = std::shared_ptr<StringVector>;
 #endif // ENABLE_GETTEXT
 
 #ifndef PKGDATADIR
-#define PKGDATADIR ""
+  const string PACKAGE_DATA_DIRECTORY = "";
+#else
+  const string PACKAGE_DATA_DIRECTORY = PKGDATADIR "/";
 #endif

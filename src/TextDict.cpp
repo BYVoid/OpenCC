@@ -48,15 +48,6 @@ TextDict::TextDict() : lexicon(new DictEntryPtrVector) {
 TextDict::~TextDict() {
 }
 
-void TextDict::LoadFromFile(const string fileName) {
-  FILE* fp = fopen(fileName.c_str(), "r");
-  if (fp == NULL) {
-    throw FileNotFound(fileName);
-  }
-  LoadFromFile(fp);
-  fclose(fp);
-}
-
 void TextDict::LoadFromFile(FILE* fp) {
   // TODO use dynamic getline
   static char buff[ENTRY_BUFF_SIZE];
@@ -131,16 +122,6 @@ DictEntryPtrVectorPtr TextDict::MatchAllPrefixes(const char* word) {
 DictEntryPtrVectorPtr TextDict::GetLexicon() {
   SortLexicon();
   return lexicon;
-}
-
-void TextDict::SerializeToFile(const string fileName) {
-  FILE *fp = fopen(fileName.c_str(), "wb");
-  if (fp == NULL) {
-    fprintf(stderr, _("Can not write file: %s\n"), fileName.c_str());
-    exit(1);
-  }
-  SerializeToFile(fp);
-  fclose(fp);
 }
 
 void TextDict::SerializeToFile(FILE* fp) {

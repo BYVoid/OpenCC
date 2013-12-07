@@ -106,9 +106,21 @@ target_link_libraries(
   opencc
   libopencc
 )
+
+add_executable(
+  opencc_dict
+  DictConverter.cpp
+)
+target_link_libraries(
+  opencc_dict
+  libopencc
+)
+
 install(
   TARGETS
     opencc
+    opencc_dict
+  RUNTIME
   DESTINATION
     ${DIR_BIN}
 )

@@ -1,6 +1,7 @@
 set(
   LIBOPENCC_HEADERS
   Common.hpp
+  Config.hpp
   Conversion.hpp
   ConversionChain.hpp
   DartsDict.hpp
@@ -16,6 +17,7 @@ set(
 
 set(
   LIBOPENCC_SOURCES
+  Config.cpp
   Conversion.cpp
   ConversionChain.cpp
   DartsDict.cpp
@@ -28,6 +30,7 @@ set(
 )
 
 include_directories(../deps/libdarts/src)
+include_directories(../deps/rapidjson-0.11)
 
 add_library(
   libopencc
@@ -93,4 +96,19 @@ install(
     ${LIBOPENCC_HEADERS}
   DESTINATION
     ${DIR_INCLUDE}/opencc
+)
+
+add_executable(
+  opencc
+  CommandLine.cpp
+)
+target_link_libraries(
+  opencc
+  libopencc
+)
+install(
+  TARGETS
+    opencc
+  DESTINATION
+    ${DIR_BIN}
 )

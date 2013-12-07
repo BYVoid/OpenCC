@@ -76,3 +76,7 @@ using StringVectorPtr = std::shared_ptr<StringVector>;
 #else
   const string PACKAGE_DATA_DIRECTORY = PKGDATADIR "/";
 #endif
+
+#ifndef VERSION
+#define VERSION "1.0.*"
+#endif

@@ -73,10 +73,10 @@ DictEntryPtrVectorPtr DartsDict::GetLexicon() {
   return lexicon;
 }
 
-void DartsDict::LoadFromDict(Dict& dictionary) {
+void DartsDict::LoadFromDict(Dict* dictionary) {
   std::vector<const char*> keys;
   maxLength = 0;
-  lexicon = dictionary.GetLexicon();
+  lexicon = dictionary->GetLexicon();
   size_t lexiconCount = lexicon->size();
   keys.resize(lexiconCount);
   for (size_t i = 0; i < lexiconCount; i++) {
@@ -95,7 +95,7 @@ void DartsDict::SerializeToFile(FILE* fp) {
   fwrite(dict.array(), sizeof(char), dartsSize, fp);
 
   TextDict textDict;
-  textDict.LoadFromDict(*this);
+  textDict.LoadFromDict(this);
   textDict.SerializeToFile(fp);
 }
 

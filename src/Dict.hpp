@@ -28,5 +28,6 @@ namespace Opencc {
     virtual Optional<DictEntryPtr> MatchPrefix(const char* word) = 0;
     virtual DictEntryPtrVectorPtr MatchAllPrefixes(const char* word) = 0;
     virtual DictEntryPtrVectorPtr GetLexicon() = 0;
+    virtual void LoadFromDict(Dict* dictionary) = 0;
   };
 }

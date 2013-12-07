@@ -32,10 +32,10 @@ namespace Opencc {
     virtual DictEntryPtrVectorPtr GetLexicon();
     virtual void LoadFromFile(FILE* fp);
     virtual void SerializeToFile(FILE* fp);
+    virtual void LoadFromDict(Dict* dictionary);
     
     void AddKeyValue(DictEntry entry);
     void AddKeyValue(DictEntryPtr entry);
-    void LoadFromDict(Dict& dictionary);
 
   private:
     void SortLexicon();

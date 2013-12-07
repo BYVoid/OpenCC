@@ -25,30 +25,30 @@
 using namespace Opencc;
 
 void TestTextDict() {
-  TextDict textDict = DictTestUtils::CreateTextDictForText();
+  TextDictPtr textDict = DictTestUtils::CreateTextDictForText();
   DictTestUtils::TestDict(textDict);
   
   // Serialization
   string fileName = "dict.txt";
-  textDict.Opencc::SerializableDict::SerializeToFile(fileName);
+  textDict->Opencc::SerializableDict::SerializeToFile(fileName);
   
   // Deserialization
-  textDict.Opencc::SerializableDict::LoadFromFile(fileName);
+  textDict->Opencc::SerializableDict::LoadFromFile(fileName);
   DictTestUtils::TestDict(textDict);
 }
 
 void TestDartsDict() {
-  TextDict textDict = DictTestUtils::CreateTextDictForText();
-  DartsDict dartsDict;
-  dartsDict.LoadFromDict(textDict);
+  TextDictPtr textDict = DictTestUtils::CreateTextDictForText();
+  DartsDictPtr dartsDict(new DartsDict());
+  dartsDict->LoadFromDict(textDict.get());
   DictTestUtils::TestDict(dartsDict);
   
   // Serialization
   string fileName = "dict.ocd";
-  dartsDict.Opencc::SerializableDict::SerializeToFile(fileName);
+  dartsDict->Opencc::SerializableDict::SerializeToFile(fileName);
   
   // Deserialization
-  dartsDict.Opencc::SerializableDict::LoadFromFile(fileName);
+  dartsDict->Opencc::SerializableDict::LoadFromFile(fileName);
   DictTestUtils::TestDict(dartsDict);
 }
 

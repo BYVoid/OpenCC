@@ -28,14 +28,14 @@
 namespace Opencc {
   class DictTestUtils {
   public:
-    static TextDict CreateTextDictForText() {
-      TextDict textDict;
-      textDict.AddKeyValue(DictEntry("BYVoid", "byv"));
-      textDict.AddKeyValue(DictEntry("zigzagzig", "zag"));
-      textDict.AddKeyValue(DictEntry("積羽沉舟", "羣輕折軸"));
-      textDict.AddKeyValue(DictEntry("清", "Tsing"));
-      textDict.AddKeyValue(DictEntry("清華", "Tsinghua"));
-      textDict.AddKeyValue(DictEntry("清華大學", "TsinghuaUniversity"));
+    static TextDictPtr CreateTextDictForText() {
+      TextDictPtr textDict(new TextDict);
+      textDict->AddKeyValue(DictEntry("BYVoid", "byv"));
+      textDict->AddKeyValue(DictEntry("zigzagzig", "zag"));
+      textDict->AddKeyValue(DictEntry("積羽沉舟", "羣輕折軸"));
+      textDict->AddKeyValue(DictEntry("清", "Tsing"));
+      textDict->AddKeyValue(DictEntry("清華", "Tsinghua"));
+      textDict->AddKeyValue(DictEntry("清華大學", "TsinghuaUniversity"));
       return textDict;
     }
     
@@ -55,7 +55,7 @@ namespace Opencc {
       textDict->AddKeyValue(DictEntry("干燥", "乾燥"));
 
       DartsDictPtr dartsDict(new DartsDict);
-      dartsDict->LoadFromDict(*textDict);
+      dartsDict->LoadFromDict(textDict.get());
       return dartsDict;
     }
     
@@ -74,27 +74,27 @@ namespace Opencc {
       return textDict;
     }
     
-    static void TestDict(Dict& dict) {
+    static void TestDict(DictPtr dict) {
       Optional<DictEntryPtr> entry;
-      entry = dict.MatchPrefix("BYVoid");
+      entry = dict->MatchPrefix("BYVoid");
       AssertTrue(!entry.IsNull());
       AssertEquals("BYVoid", entry.Get()->key);
       AssertEquals("byv", entry.Get()->GetDefault());
       
-      entry = dict.MatchPrefix("BYVoid123");
+      entry = dict->MatchPrefix("BYVoid123");
       AssertTrue(!entry.IsNull());
       AssertEquals("BYVoid", entry.Get()->key);
       AssertEquals("byv", entry.Get()->GetDefault());
       
-      entry = dict.MatchPrefix("積羽沉舟");
+      entry = dict->MatchPrefix("積羽沉舟");
       AssertTrue(!entry.IsNull());
       AssertEquals("積羽沉舟", entry.Get()->key);
       AssertEquals("羣輕折軸", entry.Get()->GetDefault());
       
-      entry = dict.MatchPrefix("Unknown");
+      entry = dict->MatchPrefix("Unknown");
       AssertTrue(entry.IsNull());
       
-      DictEntryPtrVectorPtr matches = dict.MatchAllPrefixes("清華大學計算機系");
+      DictEntryPtrVectorPtr matches = dict->MatchAllPrefixes("清華大學計算機系");
       AssertEquals(3, matches->size());
       AssertEquals("清華大學", matches->at(0)->key);
       AssertEquals("TsinghuaUniversity", matches->at(0)->GetDefault());

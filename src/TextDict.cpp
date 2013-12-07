@@ -61,9 +61,9 @@ void TextDict::LoadFromFile(FILE* fp) {
   SortLexicon();
 }
 
-void TextDict::LoadFromDict(Dict& dictionary) {
-  lexicon = dictionary.GetLexicon();
-  maxLength = dictionary.KeyMaxLength();
+void TextDict::LoadFromDict(Dict* dictionary) {
+  lexicon = dictionary->GetLexicon();
+  maxLength = dictionary->KeyMaxLength();
   sorted = true;
 }
 

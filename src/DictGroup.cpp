@@ -17,6 +17,7 @@
  */
 
 #include "DictGroup.hpp"
+#include "TextDict.hpp"
 
 using namespace Opencc;
 
@@ -73,4 +74,10 @@ DictEntryPtrVectorPtr DictGroup::GetLexicon() {
   }
   std::sort(allLexicon->begin(), allLexicon->end(), DictEntry::PtrCmp);
   return allLexicon;
+}
+
+void DictGroup::LoadFromDict(Dict* dictionary) {
+  TextDictPtr dict(new TextDict);
+  dict->LoadFromDict(dictionary);
+  AddDict(dict);
 }

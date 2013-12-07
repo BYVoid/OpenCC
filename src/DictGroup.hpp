@@ -30,6 +30,7 @@ namespace Opencc {
     virtual Optional<DictEntryPtr> MatchPrefix(const char* word);
     virtual DictEntryPtrVectorPtr MatchAllPrefixes(const char* word);
     virtual DictEntryPtrVectorPtr GetLexicon();
+    virtual void LoadFromDict(Dict* dictionary);
     void AddDict(DictPtr dict);
   private:
     size_t keyMaxLength;

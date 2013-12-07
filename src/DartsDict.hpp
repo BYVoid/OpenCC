@@ -34,8 +34,7 @@ namespace Opencc {
     virtual DictEntryPtrVectorPtr GetLexicon();
     virtual void LoadFromFile(FILE* fp);
     virtual void SerializeToFile(FILE* fp);
-    
-    void LoadFromDict(Dict& dictionary);
+    virtual void LoadFromDict(Dict* dictionary);
 
   private:
     size_t maxLength;

@@ -89,35 +89,15 @@ size_t TextDict::KeyMaxLength() const {
   return maxLength;
 }
 
-Optional<DictEntryPtr> TextDict::MatchPrefix(const char* word) {
+Optional<DictEntryPtr> TextDict::Match(const char* word) {
   SortLexicon();
-  DictEntryPtr entry(new DictEntry(UTF8Util::Truncate(word, maxLength)));
-  const char* keyPtr = entry->key.c_str();
-  for (long len = entry->key.length(); len > 0; len -= UTF8Util::PrevCharLength(keyPtr)) {
-    entry->key.resize(len);
-    keyPtr = entry->key.c_str();
-    auto found = std::lower_bound(lexicon->begin(), lexicon->end(), entry, DictEntry::PtrCmp);
-    if (found != lexicon->end() && (*found)->key == entry->key) {
-      return Optional<DictEntryPtr>(*found);
-    }
+  DictEntryPtr entry(new DictEntry(word));
+  auto found = std::lower_bound(lexicon->begin(), lexicon->end(), entry, DictEntry::PtrCmp);
+  if (found != lexicon->end() && (*found)->key == entry->key) {
+    return Optional<DictEntryPtr>(*found);
+  } else {
+    return Optional<DictEntryPtr>();
   }
-  return Optional<DictEntryPtr>();
-}
-
-DictEntryPtrVectorPtr TextDict::MatchAllPrefixes(const char* word) {
-  SortLexicon();
-  DictEntryPtrVectorPtr matchedLengths(new DictEntryPtrVector);
-  DictEntryPtr entry(new DictEntry(UTF8Util::Truncate(word, maxLength)));
-  const char* keyPtr = entry->key.c_str();
-  for (long len = entry->key.length(); len > 0; len -= UTF8Util::PrevCharLength(keyPtr)) {
-    entry->key.resize(len);
-    keyPtr = entry->key.c_str();
-    auto found = std::lower_bound(lexicon->begin(), lexicon->end(), entry, DictEntry::PtrCmp);
-    if (found != lexicon->end() && (*found)->key == entry->key) {
-      matchedLengths->push_back(*found);
-    }
-  }
-  return matchedLengths;
 }
 
 DictEntryPtrVectorPtr TextDict::GetLexicon() {

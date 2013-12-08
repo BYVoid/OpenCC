@@ -27,8 +27,7 @@ namespace Opencc {
     TextDict();
     virtual ~TextDict();
     virtual size_t KeyMaxLength() const;
-    virtual Optional<DictEntryPtr> MatchPrefix(const char* word);
-    virtual DictEntryPtrVectorPtr MatchAllPrefixes(const char* word);
+    virtual Optional<DictEntryPtr> Match(const char* word);
     virtual DictEntryPtrVectorPtr GetLexicon();
     virtual void LoadFromFile(FILE* fp);
     virtual void SerializeToFile(FILE* fp);

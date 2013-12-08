@@ -100,10 +100,17 @@ namespace Opencc {
       return true;
     }
     
-    static string Truncate(const char* str, size_t maxLength) {
+    static string TruncateUTF8(const char* str, size_t maxLength) {
       string wordTrunc;
       if (NotShorterThan(str, maxLength)) {
-        wordTrunc = FromSubstr(str, maxLength);
+        size_t len = 0;
+        const char* pStr = str;
+        while (len < maxLength) {
+          size_t nextLen = NextCharLength(pStr);
+          pStr += nextLen;
+          len += nextLen;
+        }
+        wordTrunc = FromSubstr(str, len);
       } else {
         wordTrunc = str;
       }

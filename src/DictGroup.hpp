@@ -27,6 +27,7 @@ namespace Opencc {
     DictGroup();
     virtual ~DictGroup();
     virtual size_t KeyMaxLength() const;
+    virtual Optional<DictEntryPtr> Match(const char* word);
     virtual Optional<DictEntryPtr> MatchPrefix(const char* word);
     virtual DictEntryPtrVectorPtr MatchAllPrefixes(const char* word);
     virtual DictEntryPtrVectorPtr GetLexicon();

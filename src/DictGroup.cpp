@@ -37,6 +37,16 @@ size_t DictGroup::KeyMaxLength() const {
   return keyMaxLength;
 }
 
+Optional<DictEntryPtr> DictGroup::Match(const char* word) {
+  for (auto dict : dicts) {
+    Optional<DictEntryPtr> prefix = dict->Match(word);
+    if (!prefix.IsNull()) {
+      return prefix;
+    }
+  }
+  return Optional<DictEntryPtr>();
+}
+
 Optional<DictEntryPtr> DictGroup::MatchPrefix(const char* word) {
   for (auto dict : dicts) {
     Optional<DictEntryPtr> prefix = dict->MatchPrefix(word);

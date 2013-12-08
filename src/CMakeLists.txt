@@ -21,6 +21,7 @@ set(
   Conversion.cpp
   ConversionChain.cpp
   DartsDict.cpp
+  Dict.cpp
   DictGroup.cpp
   MaxMatchSegmentation.cpp
   Opencc.cpp

@@ -104,7 +104,7 @@ DictPtr ParseDict(JSONValue& doc, string& configDirectory) {
     SerializableDictPtr textDict(new TextDict());
     LoadDictWithPaths(textDict, fileName, configDirectory);
     dict = textDict;
-  } else if (type == "darts") {
+  } else if (type == "ocd") {
     string fileName = GetStringProperty(doc, "file");
     SerializableDictPtr dartsDict(new DartsDict());
     LoadDictWithPaths(dartsDict, fileName, configDirectory);

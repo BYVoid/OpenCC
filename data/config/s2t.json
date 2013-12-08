@@ -1,0 +1,16 @@
+{
+  "name": "Simplified Chinese to Traditional Chinese",
+  "conversion_chain": [{
+    "type": "mmseg",
+    "dict": {
+      "type": "group",
+      "dicts": [{
+        "type": "ocd",
+        "file": "STPhrases.ocd"
+      }, {
+        "type": "ocd",
+        "file": "STCharacters.ocd"
+      }]
+    }
+  }]
+}

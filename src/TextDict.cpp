@@ -92,7 +92,7 @@ size_t TextDict::KeyMaxLength() const {
 Optional<DictEntryPtr> TextDict::MatchPrefix(const char* word) {
   SortLexicon();
   DictEntryPtr entry(new DictEntry(UTF8Util::Truncate(word, maxLength)));
-  const char* keyPtr;
+  const char* keyPtr = entry->key.c_str();
   for (long len = entry->key.length(); len > 0; len -= UTF8Util::PrevCharLength(keyPtr)) {
     entry->key.resize(len);
     keyPtr = entry->key.c_str();
@@ -108,7 +108,7 @@ DictEntryPtrVectorPtr TextDict::MatchAllPrefixes(const char* word) {
   SortLexicon();
   DictEntryPtrVectorPtr matchedLengths(new DictEntryPtrVector);
   DictEntryPtr entry(new DictEntry(UTF8Util::Truncate(word, maxLength)));
-  const char* keyPtr;
+  const char* keyPtr = entry->key.c_str();
   for (long len = entry->key.length(); len > 0; len -= UTF8Util::PrevCharLength(keyPtr)) {
     entry->key.resize(len);
     keyPtr = entry->key.c_str();

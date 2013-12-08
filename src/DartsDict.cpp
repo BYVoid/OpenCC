@@ -40,7 +40,7 @@ size_t DartsDict::KeyMaxLength() const {
 
 Optional<DictEntryPtr> DartsDict::MatchPrefix(const char* word) {
   string wordTrunc = UTF8Util::Truncate(word, maxLength);
-  const char* wordTruncPtr;
+  const char* wordTruncPtr = wordTrunc.c_str();
   for (long len = wordTrunc.length(); len > 0; len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
     wordTrunc.resize(len);
     wordTruncPtr = wordTrunc.c_str();
@@ -56,7 +56,7 @@ Optional<DictEntryPtr> DartsDict::MatchPrefix(const char* word) {
 DictEntryPtrVectorPtr DartsDict::MatchAllPrefixes(const char* word) {
   DictEntryPtrVectorPtr matchedLengths(new DictEntryPtrVector);
   string wordTrunc = UTF8Util::Truncate(word, maxLength);
-  const char* wordTruncPtr;
+  const char* wordTruncPtr = wordTrunc.c_str();
   for (long len = wordTrunc.length(); len > 0; len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
     wordTrunc.resize(len);
     wordTruncPtr = wordTrunc.c_str();

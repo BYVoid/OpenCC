@@ -121,7 +121,7 @@ add_definitions(
 
 add_subdirectory(src)
 add_subdirectory(doc)
-# add_subdirectory(data)
+add_subdirectory(data)
 
 if (GETTEXT_FOUND AND ENABLE_GETTEXT)
   add_subdirectory(po)

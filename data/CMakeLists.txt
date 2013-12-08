@@ -1,49 +1,54 @@
 set(
 	OPENCC_DICT_BIN
-	${CMAKE_BINARY_DIR}/src/tools/opencc_dict
+	${CMAKE_BINARY_DIR}/src/opencc_dict
 )
 
 add_custom_target(
-	ocds
+	Dictionaries
 	ALL
 	DEPENDS
-		simp_to_trad_characters.ocd
-		simp_to_trad_phrases.ocd
-		trad_to_simp_characters.ocd
-		trad_to_simp_phrases.ocd
+		STCharacters.ocd
+		STPhrases.ocd
+		TSCharacters.ocd
+		TSPhrases.ocd
 )
 
-foreach(DICT_PREFIX simp_to_trad trad_to_simp)
+set(
+  DICTS
+  STCharacters
+  STPhrases
+  TSCharacters
+  TSPhrases
+)
 
-	foreach(DICT_SURFIX characters phrases)
+foreach(DICT ${DICTS})
+	add_custom_command(
+		OUTPUT
+			${DICT}.ocd
+		COMMENT
+			"Building ${DICT}.ocd"
+		COMMAND
+			${OPENCC_DICT_BIN}
+        --input ${CMAKE_SOURCE_DIR}/data/dictionary/${DICT}.txt
+        --output ${DICT}.ocd
+        --from text
+        --to ocd
+		DEPENDS opencc_dict
+	)
 
-		set (DICT ${DICT_PREFIX}_${DICT_SURFIX})
+	install(
+		FILES
+			${CMAKE_BINARY_DIR}/data/${DICT}.ocd
+		DESTINATION
+			${DIR_SHARE_OPENCC}
+	)
 
-		add_custom_command(
-			OUTPUT
-				${DICT}.ocd
-			COMMENT
-				"Building ${DICT}.ocd"
-			COMMAND
-				${OPENCC_DICT_BIN} -i ${CMAKE_SOURCE_DIR}/data/${DICT_PREFIX}/${DICT_SURFIX}.txt -o ${DICT}.ocd
-			DEPENDS opencc_dict
-		)
-
-		install(
-			FILES
-				${CMAKE_BINARY_DIR}/data/${DICT}.ocd
-			DESTINATION
-				${DIR_SHARE_OPENCC}
-		)
-
-		set_directory_properties(
-			PROPERTIES
-				ADDITIONAL_MAKE_CLEAN_FILES
-					"${CMAKE_BINARY_DIR}/data/${DICT}.ocd"
-		)
-
-	endforeach(DICT_SURFIX)
-endforeach(DICT_PREFIX)
+	set_directory_properties(
+		PROPERTIES
+			ADDITIONAL_MAKE_CLEAN_FILES
+				"${CMAKE_BINARY_DIR}/data/${DICT}.ocd"
+	)
+endforeach(DICT)
 
 set(CONFIG_FILES
 	config/zhs2zht.ini
@@ -70,10 +75,10 @@ install(
 )
 
 set(TAIWAN_DICT_FILES
-	tw/to_tw_variants.txt
-	tw/to_tw_phrases.txt
-	tw/from_tw_variants.txt
-	tw/from_tw_phrases.txt
+	dictionary/tw/to_tw_variants.txt
+	dictionary/tw/to_tw_phrases.txt
+	dictionary/tw/from_tw_variants.txt
+	dictionary/tw/from_tw_phrases.txt
 )
 
 install(
@@ -84,7 +89,7 @@ install(
 )
 
 set(CHINA_DICT_FILES
-	cn/to_cn_phrases.txt
+	dictionary/cn/to_cn_phrases.txt
 )
 
 install(

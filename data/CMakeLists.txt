@@ -1,19 +1,8 @@
 set(OPENCC_DICT_BIN ${CMAKE_BINARY_DIR}/src/opencc_dict)
 set(DICT_MERGE_BIN python ${CMAKE_SOURCE_DIR}/data/scripts/merge.py)
+set(DICT_REVERSE_BIN python ${CMAKE_SOURCE_DIR}/data/scripts/reverse.py)
 set(DICT_DIR ${CMAKE_SOURCE_DIR}/data/dictionary)
 set(DICT_GENERATED_DIR ${CMAKE_BINARY_DIR}/data)
-
-add_custom_target(
-  Dictionaries
-  ALL
-  DEPENDS
-    STCharacters.ocd
-    STPhrases.ocd
-    TSCharacters.ocd
-    TSPhrases.ocd
-    TWVariants.ocd
-    TWPhrases.ocd
-)
 
 set(
   DICTS_RAW
@@ -24,38 +13,64 @@ set(
   TWVariants
 )
 
-add_custom_command(
-  OUTPUT
-    TWPhrases.txt
-  COMMENT
-    "Generating TWPhrases.txt"
-  COMMAND
-    ${DICT_MERGE_BIN}
-      ${DICT_DIR}/TWPhrasesIT.txt
-      ${DICT_DIR}/TWPhrasesName.txt
-      ${DICT_DIR}/TWPhrasesOther.txt
-      TWPhrases.txt
-)
-set_directory_properties(
-  PROPERTIES
-    ADDITIONAL_MAKE_CLEAN_FILES
-      "${CMAKE_BINARY_DIR}/data/TWPhrases.txt"
-)
-
 set(
   DICTS_GENERATED
   TWPhrases
+  TWVariantsRev
+)
+
+set(DICTS ${DICTS_RAW} ${DICTS_GENERATED})
+
+foreach(DICT ${DICTS})
+  set(DICT_TARGETS ${DICT_TARGETS} ${DICT}.ocd)
+endforeach(DICT)
+
+add_custom_target(
+  Dictionaries
+  ALL
+  DEPENDS
+    ${DICT_TARGETS}
 )
 
 foreach(DICT ${DICTS_RAW})
-  set(ENV{DICT_${DICT}_INPUT} ${DICT_DIR}/${DICT}.txt)
+  set(DICT_${DICT}_INPUT ${DICT_DIR}/${DICT}.txt)
 endforeach(DICT)
 
 foreach(DICT ${DICTS_GENERATED})
-  set(ENV{DICT_${DICT}_INPUT} ${DICT_GENERATED_DIR}/${DICT}.txt)
+  set(DICT_${DICT}_INPUT ${DICT_GENERATED_DIR}/${DICT}.txt)
 endforeach(DICT)
 
-set(DICTS ${DICTS_RAW} ${DICTS_GENERATED})
+set(
+  DICT_TWPhrases_GENERATING_COMMAND
+  ${DICT_MERGE_BIN}
+    ${DICT_DIR}/TWPhrasesIT.txt
+    ${DICT_DIR}/TWPhrasesName.txt
+    ${DICT_DIR}/TWPhrasesOther.txt
+    TWPhrases.txt
+)
+
+set(
+  DICT_TWVariantsRev_GENERATING_COMMAND
+  ${DICT_REVERSE_BIN}
+    ${DICT_DIR}/TWVariants.txt
+    TWVariantsRev.txt
+)
+
+foreach(DICT ${DICTS_GENERATED})
+  add_custom_command(
+    OUTPUT
+      ${DICT}.txt
+    COMMENT
+      "Generating ${DICT}.txt"
+    COMMAND
+      ${DICT_${DICT}_GENERATING_COMMAND}
+  )
+  set_directory_properties(
+    PROPERTIES
+      ADDITIONAL_MAKE_CLEAN_FILES
+        "${DICT_GENERATED_DIR}/${DICT}.txt"
+  )
+endforeach(DICT)
 
 foreach(DICT ${DICTS})
   add_custom_command(
@@ -65,18 +80,18 @@ foreach(DICT ${DICTS})
       "Building ${DICT}.ocd"
     COMMAND
       ${OPENCC_DICT_BIN}
-        --input $ENV{DICT_${DICT}_INPUT}
+        --input ${DICT_${DICT}_INPUT}
         --output ${DICT}.ocd
         --from text
         --to ocd
     DEPENDS
-      opencc_dict
-      $ENV{DICT_${DICT}_INPUT}
+      ${OPENCC_DICT_BIN}
+      ${DICT_${DICT}_INPUT}
   )
 
   install(
     FILES
-      ${CMAKE_BINARY_DIR}/data/${DICT}.ocd
+      ${DICT_GENERATED_DIR}/${DICT}.ocd
     DESTINATION
       ${DIR_SHARE_OPENCC}
   )
@@ -84,7 +99,7 @@ foreach(DICT ${DICTS})
   set_directory_properties(
     PROPERTIES
       ADDITIONAL_MAKE_CLEAN_FILES
-        "${CMAKE_BINARY_DIR}/data/${DICT}.ocd"
+        "${DICT_GENERATED_DIR}/${DICT}.ocd"
   )
 endforeach(DICT)
 
@@ -93,6 +108,7 @@ set(CONFIG_FILES
   config/t2s.json
   config/s2tw.json
   config/s2twp.json
+  config/tw2s.json
 )
 
 install(
@@ -101,9 +117,3 @@ install(
   DESTINATION
     ${DIR_SHARE_OPENCC}
 )
-
-if (BUILD_TESTING)
-  foreach (DICT ${TAIWAN_DICT_FILES} ${CHINA_DICT_FILES})
-    configure_file(${DICT} ${PROJECT_BINARY_DIR}/data COPYONLY)
-  endforeach (DICT)
-endif (BUILD_TESTING)

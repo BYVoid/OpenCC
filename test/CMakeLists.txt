@@ -30,6 +30,7 @@ set(CONFIGURATIONS
   t2s
   s2tw
   s2twp
+  tw2s
 )
 
 foreach(CONFIG ${CONFIGURATIONS})

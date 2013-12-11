@@ -19,11 +19,11 @@ set(CONFIG_TEST
   config_test/config_test_phrases.txt
 )
 
-if (BUILD_TESTING)
-  foreach (CONFIG_TEST_FILE ${CONFIG_TEST})
-    configure_file(${CONFIG_TEST_FILE} ${PROJECT_BINARY_DIR}/test/config_test COPYONLY)
-  endforeach (CONFIG_TEST_FILE)
-endif (BUILD_TESTING)
+set(CONFIG_TEST_TARGET_DIR ${PROJECT_BINARY_DIR}/test/config_test)
+make_directory(${CONFIG_TEST_TARGET_DIR})
+foreach (CONFIG_TEST_FILE ${CONFIG_TEST})
+  configure_file(${CONFIG_TEST_FILE} ${CONFIG_TEST_TARGET_DIR} COPYONLY)
+endforeach (CONFIG_TEST_FILE)
 
 set(CONFIGURATIONS
   s2t

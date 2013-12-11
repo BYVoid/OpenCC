@@ -1,36 +1,22 @@
 {
   "includes": [
     "gypi/global.gypi",
-    "gypi/configs.gypi",
-    "gypi/dicts.gypi",
+    "gypi/libopencc.gypi"
   ],
   "targets": [{
-    "target_name": "libopencc",
-    "type": "<(library)",
-    "sources": [
-      "src/config_reader.c",
-      "src/converter.c",
-      "src/dict_group.c",
-      "src/dict_chain.c",
-      "src/encoding.c",
-      "src/utils.c",
-      "src/opencc.c",
-      "src/dict.c",
-      "src/dictionary/datrie.c",
-      "src/dictionary/text.c"
-    ],
-    "conditions": [
-      ["OS=='linux'", {
-        "cflags": [
-          "-fPIC"
-        ]
-      }]
-    ]
-  }, {
     "target_name": "opencc",
     "type": "executable",
     "sources": [
-      "src/tools/opencc.c"
+      "src/CommandLine.cpp"
+    ],
+    "dependencies": [
+      "libopencc"
+    ]
+  }, {
+    "target_name": "opencc_dict",
+    "type": "executable",
+    "sources": [
+      "src/DictConverter.cpp"
     ],
     "dependencies": [
       "libopencc"

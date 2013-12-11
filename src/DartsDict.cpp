@@ -18,6 +18,7 @@
 
 #include "DartsDict.hpp"
 #include "UTF8Util.hpp"
+#include "darts.h"
 
 using namespace Opencc;
 
@@ -26,12 +27,14 @@ static const char* OCDHEADER = "OPENCCDARTS1";
 DartsDict::DartsDict() : lexicon(new DictEntryPtrVector) {
   maxLength = 0;
   buffer = nullptr;
+  dict = new Darts::DoubleArray();
 }
 
 DartsDict::~DartsDict() {
   if (buffer != nullptr) {
     free(buffer);
   }
+  delete (Darts::DoubleArray*)dict;
 }
 
 size_t DartsDict::KeyMaxLength() const {
@@ -39,6 +42,7 @@ size_t DartsDict::KeyMaxLength() const {
 }
 
 Optional<DictEntryPtr> DartsDict::Match(const char* word) {
+  Darts::DoubleArray& dict = *(Darts::DoubleArray*)this->dict;
   Darts::DoubleArray::result_pair_type result;
   dict.exactMatchSearch(word, result);
   if (result.value != -1) {
@@ -53,6 +57,7 @@ DictEntryPtrVectorPtr DartsDict::GetLexicon() {
 }
 
 void DartsDict::LoadFromDict(Dict* dictionary) {
+  Darts::DoubleArray& dict = *(Darts::DoubleArray*)this->dict;
   std::vector<const char*> keys;
   maxLength = 0;
   lexicon = dictionary->GetLexicon();
@@ -67,6 +72,7 @@ void DartsDict::LoadFromDict(Dict* dictionary) {
 }
 
 void DartsDict::SerializeToFile(FILE* fp) {
+  Darts::DoubleArray& dict = *(Darts::DoubleArray*)this->dict;
   fwrite(OCDHEADER, sizeof(char), strlen(OCDHEADER), fp);
 
   size_t dartsSize = dict.total_size();
@@ -79,6 +85,7 @@ void DartsDict::SerializeToFile(FILE* fp) {
 }
 
 void DartsDict::LoadFromFile(FILE* fp) {
+  Darts::DoubleArray& dict = *(Darts::DoubleArray*)this->dict;
   if (buffer != nullptr) {
     free(buffer);
   }

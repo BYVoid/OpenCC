@@ -21,7 +21,6 @@
 #include "Common.hpp"
 #include "SerializableDict.hpp"
 #include "TextDict.hpp"
-#include "darts.hh"
 
 namespace Opencc {
   class DartsDict : public SerializableDict {
@@ -37,7 +36,7 @@ namespace Opencc {
 
   private:
     size_t maxLength;
-    Darts::DoubleArray dict;
+    void* dict;
     DictEntryPtrVectorPtr lexicon;
     void* buffer;
   };

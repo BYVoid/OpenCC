@@ -30,7 +30,7 @@ set(
   UTF8Util.cpp
 )
 
-include_directories(../deps/libdarts/src)
+include_directories(../deps/darts-clone)
 include_directories(../deps/rapidjson-0.11)
 
 add_library(

@@ -142,13 +142,29 @@ ConversionChainPtr ParseConversionChain(JSONValue& docs, string& configDirectory
   return chain;
 }
 
+string FindConfigFile(string fileName) {
+  std::ifstream ifs;
+  // Working directory
+  ifs.open(fileName.c_str());
+  if (ifs.is_open()) {
+    return fileName;
+  }
+  // Package data directory
+  if (PACKAGE_DATA_DIRECTORY != "") {
+    string prefixedFileName = PACKAGE_DATA_DIRECTORY + fileName;
+    ifs.open(prefixedFileName.c_str());
+    if (ifs.is_open()) {
+      return prefixedFileName;
+    }
+  }
+  throw FileNotFound(fileName);
+}
+
 void Config::LoadFile(const string fileName) {
-  std::ifstream ifs(fileName);
+  string prefixedFileName = FindConfigFile(fileName);
+  std::ifstream ifs(prefixedFileName);
   string content(std::istreambuf_iterator<char>(ifs),
                  (std::istreambuf_iterator<char>()));
-  if (!ifs.is_open()) {
-    throw FileNotFound(fileName);
-  }
 #if defined(_WIN32) || defined(_WIN64)
   UTF8Util::ReplaceAll(fileName, "\\", "/");
 #endif

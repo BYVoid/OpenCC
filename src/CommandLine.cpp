@@ -112,7 +112,7 @@ int main(int argc, const char * argv[]) {
   int oc;
   Optional<string> inputFileName;
   Optional<string> outputFileName;
-  string configFileName;
+  Optional<string> configFileName;
   while ((oc = getopt_long(argc, (char*const*)argv, "vh?i:o:c:", longopts, NULL)) != -1) {
     switch (oc) {
       case 'v':
@@ -129,14 +129,13 @@ int main(int argc, const char * argv[]) {
         outputFileName = Optional<string>(optarg);
         break;
       case 'c':
-        configFileName = optarg;
+        configFileName = Optional<string>(optarg);
         break;
     }
   }
-  if (configFileName == "") {
-    // TODO
-    configFileName = "";
+  if (configFileName.IsNull()) {
+    configFileName = Optional<string>("s2t.json");
   }
-  Convert(inputFileName, outputFileName, configFileName);
+  Convert(inputFileName, outputFileName, configFileName.Get());
   return 0;
 }

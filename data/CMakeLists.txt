@@ -11,6 +11,7 @@ set(
   TSCharacters
   TSPhrases
   TWVariants
+  TWVariantsRevPhrases
   JPVariants
 )
 

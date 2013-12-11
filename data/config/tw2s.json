@@ -3,8 +3,14 @@
   "conversion_chain": [{
     "type": "mmseg",
     "dict": {
-      "type": "ocd",
-      "file": "TWVariantsRev.ocd"
+      "type": "group",
+      "dicts": [{
+        "type": "ocd",
+        "file": "TWVariantsRevPhrases.ocd"
+      }, {
+        "type": "ocd",
+        "file": "TWVariantsRev.ocd"
+      }] 
     }
   }, {
     "type": "mmseg",

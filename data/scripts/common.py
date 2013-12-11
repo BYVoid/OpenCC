@@ -5,7 +5,7 @@ def sort_items(input_filename, output_filename):
   dic = {}
   
   for line in input_file:
-    if len(line) == 0:
+    if len(line) == 0 or line == '\n':
       continue
     try:
       key, value = line.split("\t")

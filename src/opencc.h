@@ -20,14 +20,17 @@
 #define __OPENCC_H_
 
 #ifdef __cplusplus
-#include "Common.hpp"
+
+#include <string>
 
 namespace Opencc {
-  class Opencc {
+  class SimpleConverter {
   public:
-    Opencc();
-    ~Opencc();
+    SimpleConverter(const std::string configFileName);
+    ~SimpleConverter();
+    std::string Convert(const std::string input) const;
   private:
+    void* internalData;
   };
 }
 
@@ -36,8 +39,10 @@ extern "C" {
 
 typedef void* opencc_t;
   
-opencc_t opencc_new(void);
+opencc_t opencc_new(const char* configFileName);
 void opencc_delete(opencc_t opencc);
+char* opencc_convert(opencc_t opencc, const char* input);
+void opencc_free_string(char* str);
 
 #ifdef __cplusplus
 }

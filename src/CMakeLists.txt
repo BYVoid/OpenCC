@@ -24,7 +24,7 @@ set(
   Dict.cpp
   DictGroup.cpp
   MaxMatchSegmentation.cpp
-  Opencc.cpp
+  SimpleConverter.cpp
   Segmentation.cpp
   TextDict.cpp
   UTF8Util.cpp

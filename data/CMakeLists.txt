@@ -18,6 +18,7 @@ set(
 set(
   DICTS_GENERATED
   TWPhrases
+  TWPhrasesRev
   TWVariantsRev
 )
 
@@ -43,19 +44,32 @@ foreach(DICT ${DICTS_GENERATED})
 endforeach(DICT)
 
 set(
+  DICT_TWPhrases_GENERATING_INPUT
+  ${DICT_DIR}/TWPhrasesIT.txt
+  ${DICT_DIR}/TWPhrasesName.txt
+  ${DICT_DIR}/TWPhrasesOther.txt
+)
+set(
   DICT_TWPhrases_GENERATING_COMMAND
-  ${DICT_MERGE_BIN}
-    ${DICT_DIR}/TWPhrasesIT.txt
-    ${DICT_DIR}/TWPhrasesName.txt
-    ${DICT_DIR}/TWPhrasesOther.txt
-    TWPhrases.txt
+  ${DICT_MERGE_BIN} ${DICT_TWPhrases_GENERATING_INPUT} TWPhrases.txt
 )
 
 set(
+  DICT_TWVariantsRev_GENERATING_INPUT
+  ${DICT_DIR}/TWVariants.txt
+)
+set(
   DICT_TWVariantsRev_GENERATING_COMMAND
-  ${DICT_REVERSE_BIN}
-    ${DICT_DIR}/TWVariants.txt
-    TWVariantsRev.txt
+  ${DICT_REVERSE_BIN} ${DICT_TWVariantsRev_GENERATING_INPUT} TWVariantsRev.txt
+)
+
+set(
+  DICT_TWPhrasesRev_GENERATING_INPUT
+  ${DICT_GENERATED_DIR}/TWPhrases.txt
+)
+set(
+  DICT_TWPhrasesRev_GENERATING_COMMAND
+  ${DICT_REVERSE_BIN} ${DICT_TWPhrasesRev_GENERATING_INPUT} TWPhrasesRev.txt
 )
 
 foreach(DICT ${DICTS_GENERATED})
@@ -66,6 +80,8 @@ foreach(DICT ${DICTS_GENERATED})
       "Generating ${DICT}.txt"
     COMMAND
       ${DICT_${DICT}_GENERATING_COMMAND}
+    DEPENDS
+      ${DICT_${DICT}_GENERATING_INPUT}
   )
   set_directory_properties(
     PROPERTIES

@@ -28,6 +28,7 @@ endif (BUILD_TESTING)
 set(CONFIGURATIONS
   s2t
   t2s
+  s2tw
 )
 
 foreach(CONFIG ${CONFIGURATIONS})

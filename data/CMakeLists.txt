@@ -11,15 +11,23 @@ add_custom_target(
     STPhrases.ocd
     TSCharacters.ocd
     TSPhrases.ocd
+    TWVariants.ocd
 )
 
 set(
-  DICTS
+  DICTS_RAW
   STCharacters
   STPhrases
   TSCharacters
   TSPhrases
+  TWVariants
 )
+
+foreach(DICT ${DICTS_RAW})
+  set(ENV{DICT_${DICT}_INPUT} ${CMAKE_SOURCE_DIR}/data/dictionary/${DICT}.txt)
+endforeach(DICT)
+
+set(DICTS ${DICTS_RAW})
 
 foreach(DICT ${DICTS})
   add_custom_command(
@@ -29,7 +37,7 @@ foreach(DICT ${DICTS})
       "Building ${DICT}.ocd"
     COMMAND
       ${OPENCC_DICT_BIN}
-        --input ${CMAKE_SOURCE_DIR}/data/dictionary/${DICT}.txt
+        --input $ENV{DICT_${DICT}_INPUT}
         --output ${DICT}.ocd
         --from text
         --to ocd
@@ -53,36 +61,12 @@ endforeach(DICT)
 set(CONFIG_FILES
   config/s2t.json
   config/t2s.json
+  config/s2tw.json
 )
 
 install(
   FILES
     ${CONFIG_FILES}
-  DESTINATION
-    ${DIR_SHARE_OPENCC}
-)
-
-set(TAIWAN_DICT_FILES
-  dictionary/tw/to_tw_variants.txt
-  dictionary/tw/to_tw_phrases.txt
-  dictionary/tw/from_tw_variants.txt
-  dictionary/tw/from_tw_phrases.txt
-)
-
-install(
-  FILES
-    ${TAIWAN_DICT_FILES}
-  DESTINATION
-    ${DIR_SHARE_OPENCC}
-)
-
-set(CHINA_DICT_FILES
-  dictionary/cn/to_cn_phrases.txt
-)
-
-install(
-  FILES
-    ${CHINA_DICT_FILES}
   DESTINATION
     ${DIR_SHARE_OPENCC}
 )

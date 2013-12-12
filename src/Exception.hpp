@@ -20,6 +20,11 @@
 #include <string>
 #include <stdexcept>
 
+#ifdef _MSC_VER
+// Until Visual Studio 2013 (12.0), C++ 11 "noexcept" qualifier is not supported
+#define noexcept
+#endif
+
 namespace Opencc {
   class FileNotFound : public std::exception {
   public:

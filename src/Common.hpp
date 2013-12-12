@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -48,20 +49,20 @@ namespace Opencc {
   class Segmentation;
   class Conversion;
   class ConversionChain;
-  using DictEntryPtr = std::shared_ptr<DictEntry>;
-  using DictEntryPtrVector = std::vector<DictEntryPtr>;
-  using DictEntryPtrVectorPtr = std::shared_ptr<DictEntryPtrVector>;
-  using DictPtr = std::shared_ptr<Dict>;
-  using SerializableDictPtr = std::shared_ptr<SerializableDict>;
-  using TextDictPtr = std::shared_ptr<TextDict>;
-  using DartsDictPtr = std::shared_ptr<DartsDict>;
-  using DictGroupPtr = std::shared_ptr<DictGroup>;
-  using SegmentationPtr = std::shared_ptr<Segmentation>;
-  using ConversionPtr = std::shared_ptr<Conversion>;
-  using ConversionChainPtr = std::shared_ptr<ConversionChain>;
+  typedef std::shared_ptr<DictEntry> DictEntryPtr;
+  typedef std::vector<DictEntryPtr> DictEntryPtrVector;
+  typedef std::shared_ptr<DictEntryPtrVector> DictEntryPtrVectorPtr;
+  typedef std::shared_ptr<Dict> DictPtr;
+  typedef std::shared_ptr<SerializableDict> SerializableDictPtr;
+  typedef std::shared_ptr<TextDict> TextDictPtr;
+  typedef std::shared_ptr<DartsDict> DartsDictPtr;
+  typedef std::shared_ptr<DictGroup> DictGroupPtr;
+  typedef std::shared_ptr<Segmentation> SegmentationPtr;
+  typedef std::shared_ptr<Conversion> ConversionPtr;
+  typedef std::shared_ptr<ConversionChain> ConversionChainPtr;
 }
-using StringVector = std::vector<string>;
-using StringVectorPtr = std::shared_ptr<StringVector>;
+typedef std::vector<string> StringVector;
+typedef std::shared_ptr<StringVector> StringVectorPtr;
 
 #ifdef ENABLE_GETTEXT
 # include <libintl.h>

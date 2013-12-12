@@ -27,7 +27,7 @@
 #include "document.h"
 
 using namespace Opencc;
-using JSONValue = rapidjson::GenericValue<rapidjson::UTF8<>>;
+typedef rapidjson::GenericValue<rapidjson::UTF8<>> JSONValue;
 
 Config::Config() {
 }
@@ -166,13 +166,13 @@ void Config::LoadFile(const string fileName) {
   string content(std::istreambuf_iterator<char>(ifs),
                  (std::istreambuf_iterator<char>()));
 #if defined(_WIN32) || defined(_WIN64)
-  UTF8Util::ReplaceAll(fileName, "\\", "/");
+  UTF8Util::ReplaceAll(prefixedFileName, "\\", "/");
 #endif
-  size_t slashPos = fileName.rfind("/");
+  size_t slashPos = prefixedFileName.rfind("/");
   if (slashPos == string::npos) {
     configDirectory = "";
   } else {
-    configDirectory = fileName.substr(0, slashPos) + "/";
+    configDirectory = prefixedFileName.substr(0, slashPos) + "/";
   }
   LoadString(content);
 }

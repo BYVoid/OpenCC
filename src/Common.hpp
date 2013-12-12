@@ -31,6 +31,7 @@
 #include <cstdio>
 #include <cassert>
 #include <cstddef>
+#include <cstring>
 #include <ctime>
 
 #include "Optional.hpp"

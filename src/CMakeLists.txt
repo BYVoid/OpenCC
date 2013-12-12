@@ -39,12 +39,6 @@ add_library(
   ${LIBOPENCC_SOURCES}
 )
 
-# add_library(
-#   libopencc_static
-#   STATIC
-#   ${LIBOPENCC_SOURCES}
-# )
-
 set_target_properties(
   libopencc
   # libopencc_static
@@ -81,16 +75,9 @@ endif (CMAKE_BUILD_TYPE MATCHES Debug)
 install(
   TARGETS
     libopencc
-  LIBRARY DESTINATION
-    ${DIR_LIBRARY}
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib/static
 )
-
-# install(
-#   TARGETS
-#     libopencc_static
-#   ARCHIVE DESTINATION
-#     ${DIR_LIBRARY_STATIC}
-# )
 
 install(
   FILES
@@ -121,7 +108,5 @@ install(
   TARGETS
     opencc
     opencc_dict
-  RUNTIME
-  DESTINATION
-    ${DIR_BIN}
+  RUNTIME DESTINATION bin
 )

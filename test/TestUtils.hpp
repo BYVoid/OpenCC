@@ -20,6 +20,10 @@
 
 #include "Common.hpp"
 
+#ifdef _MSC_VER
+#define __func__ __FUNCTION__ 
+#endif
+
 #define stringize(s) #s
 #define Assert(condition, msg) {\
   if (!(condition)) {\

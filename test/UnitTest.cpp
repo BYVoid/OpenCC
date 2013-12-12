@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Open Chinese Convert
  *
  * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
@@ -58,33 +58,33 @@ void TestDictGroup() {
   entry = dictGroup->MatchPrefix("Unknown");
   AssertTrue(entry.IsNull());
   
-  DictEntryPtrVectorPtr matches = dictGroup->MatchAllPrefixes("干燥");
+  DictEntryPtrVectorPtr matches = dictGroup->MatchAllPrefixes(utf8("干燥"));
   AssertEquals(2, matches->size());
-  AssertEquals("乾燥", matches->at(0)->GetDefault());
-  AssertEquals("幹", matches->at(1)->GetDefault());
+  AssertEquals(utf8("乾燥"), matches->at(0)->GetDefault());
+  AssertEquals(utf8("幹"), matches->at(1)->GetDefault());
 }
 
 void TestSegmentation() {
   auto dict = DictTestUtils::CreateDictGroupForConversion();
   auto segmentation = SegmentationPtr(new MaxMatchSegmentation(dict));
-  auto segments = segmentation->Segment("太后的头发干燥");
+  auto segments = segmentation->Segment(utf8("太后的头发干燥"));
   AssertEquals(4, segments->size());
-  AssertEquals("太后", segments->at(0)->key);
-  AssertEquals("太后", segments->at(0)->GetDefault());
-  AssertEquals("的", segments->at(1)->key);
-  AssertEquals("的", segments->at(1)->GetDefault());
-  AssertEquals("头发", segments->at(2)->key);
-  AssertEquals("頭髮", segments->at(2)->GetDefault());
-  AssertEquals("干燥", segments->at(3)->key);
-  AssertEquals("乾燥", segments->at(3)->GetDefault());
+  AssertEquals(utf8("太后"), segments->at(0)->key);
+  AssertEquals(utf8("太后"), segments->at(0)->GetDefault());
+  AssertEquals(utf8("的"), segments->at(1)->key);
+  AssertEquals(utf8("的"), segments->at(1)->GetDefault());
+  AssertEquals(utf8("头发"), segments->at(2)->key);
+  AssertEquals(utf8("頭髮"), segments->at(2)->GetDefault());
+  AssertEquals(utf8("干燥"), segments->at(3)->key);
+  AssertEquals(utf8("乾燥"), segments->at(3)->GetDefault());
 }
 
 void TestConversion() {
   auto dict = DictTestUtils::CreateDictGroupForConversion();
   auto segmentation = SegmentationPtr(new MaxMatchSegmentation(dict));
   auto conversion = ConversionPtr(new Conversion(segmentation));
-  string converted = conversion->Convert("太后的头发干燥");
-  AssertEquals("太后的頭髮乾燥", converted);
+  string converted = conversion->Convert(utf8("太后的头发干燥"));
+  AssertEquals(utf8("太后的頭髮乾燥"), converted);
 }
 
 void TestConversionChain() {
@@ -98,16 +98,16 @@ void TestConversionChain() {
   auto conversionChain = ConversionChainPtr(new ConversionChain());
   conversionChain->AddConversion(conversion);
   conversionChain->AddConversion(conversionVariants);
-  string converted = conversionChain->Convert("里面");
-  AssertEquals("裡面", converted);
+  string converted = conversionChain->Convert(utf8("里面"));
+  AssertEquals(utf8("裡面"), converted);
 }
 
 void TestConfig() {
   Config config;
   config.LoadFile("config_test/config_test.json");
   auto conversionChain = config.GetConversionChain();
-  string converted = conversionChain->Convert("燕燕于飞差池其羽之子于归远送于野");
-  AssertEquals("燕燕于飛差池其羽之子于歸遠送於野", converted);
+  string converted = conversionChain->Convert(utf8("燕燕于飞差池其羽之子于归远送于野"));
+  AssertEquals(utf8("燕燕于飛差池其羽之子于歸遠送於野"), converted);
 }
 
 int main(int argc, const char * argv[]) {

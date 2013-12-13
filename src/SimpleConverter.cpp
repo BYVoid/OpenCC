@@ -27,25 +27,32 @@ struct InternalData {
   ConversionChainPtr conversionChain;
 };
 
-SimpleConverter::SimpleConverter(const std::string configFileName) {
+SimpleConverter::SimpleConverter(const std::string configFileName) try {
   InternalData* data = new InternalData();
   internalData = data;
   data->config.LoadFile(configFileName);
   data->conversionChain = data->config.GetConversionChain();
+} catch(Exception& ex) {
+  throw std::runtime_error(ex.what());
 }
 
 SimpleConverter::~SimpleConverter() {
   delete (InternalData*)internalData;
 }
 
-std::string SimpleConverter::Convert(const std::string input) const {
+std::string SimpleConverter::Convert(const std::string input) const try {
   InternalData* data = (InternalData*)internalData;
   return data->conversionChain->Convert(input);
+} catch (Exception& ex) {
+  throw std::runtime_error(ex.what());
 }
 
-opencc_t opencc_new(const char* configFileName) {
+opencc_t opencc_new(const char* configFileName) try {
   SimpleConverter* instance = new SimpleConverter(configFileName);
   return instance;
+} catch (std::runtime_error& ex) {
+  // TODO report error
+  return NULL;
 }
 
 void opencc_delete(opencc_t opencc) {
@@ -53,12 +60,15 @@ void opencc_delete(opencc_t opencc) {
   delete instance;
 }
 
-char* opencc_convert(opencc_t opencc, const char* input) {
+char* opencc_convert(opencc_t opencc, const char* input) try {
   SimpleConverter* instance = reinterpret_cast<SimpleConverter*>(opencc);
   std::string converted = instance->Convert(input);
   char* output = new char[converted.length() + 1];
   strncpy(output, converted.c_str(), converted.length());
   return output;
+} catch (std::runtime_error& ex) {
+  // TODO report error
+  return NULL;
 }
 
 void opencc_free_string(char* str) {

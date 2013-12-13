@@ -26,11 +26,9 @@
 #endif
 
 namespace Opencc {
-  class FileNotFound : public std::exception {
+  class Exception : public std::exception {
   public:
-    FileNotFound(const std::string fileName) {
-      message = fileName + " not found or not accessible.";
-    }
+    Exception(std::string message_) : message(message_) {}
     virtual const char* what() const noexcept {
       return message.c_str();
     }
@@ -38,21 +36,20 @@ namespace Opencc {
     std::string message;
   };
   
-  class FileNotWritable : public std::exception {
+  class FileNotFound : public Exception {
   public:
-    FileNotWritable(const std::string fileName) {
-      message = fileName + " not writable";
-    }
-    virtual const char* what() const noexcept {
-      return message.c_str();
-    }
-  private:
-    std::string message;
+    FileNotFound(const std::string fileName) :
+      Exception(fileName + " not found or not accessible") {}
   };
   
-  class InvalidFormat : public std::logic_error {
+  class FileNotWritable : public Exception {
   public:
-    InvalidFormat(const std::string message) : std::logic_error(message) {
-    }
+    FileNotWritable(const std::string fileName) :
+      Exception(fileName + " not writable") {}
+  };
+  
+  class InvalidFormat : public Exception {
+  public:
+    InvalidFormat(const std::string message) : Exception(message) {}
   };
 }

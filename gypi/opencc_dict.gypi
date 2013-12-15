@@ -3,15 +3,16 @@
     "target_name": "opencc_dict",
     "type": "executable",
     "sources": [
-      "../src/tools/opencc_dict.c",
-      "../src/encoding.c",
-      "../src/utils.c",
-      "../src/dict_group.c",
-      "../src/dict_chain.c",
-      "../src/config_reader.c",
-      "../src/dict.c",
-      "../src/dictionary/datrie.c",
-      "../src/dictionary/text.c"
+      "../src/DartsDict.cpp",
+      "../src/Dict.cpp",
+      "../src/DictConverter.cpp",
+      "../src/DictGroup.cpp",
+      "../src/TextDict.cpp",
+      "../src/UTF8Util.cpp",
+    ],
+    "include_dirs": [
+      "../src",
+      "../deps/darts-clone"
     ]
   }]
 }

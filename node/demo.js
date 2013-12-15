@@ -29,10 +29,7 @@
 var OpenCC = require('./opencc');
 
 // Load the default Simplified to Traditional config
-var opencc = new OpenCC('zhs2zht.ini');
-
-// Set conversion mode
-opencc.setConversionMode(OpenCC.CONVERSION_FAST);
+var opencc = new OpenCC('s2t.json');
 
 // Sync API
 var converted = opencc.convertSync("汉字");

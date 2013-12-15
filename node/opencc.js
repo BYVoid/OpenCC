@@ -48,7 +48,7 @@ var getConfigPath = function (config) {
  */
 var OpenCC = module.exports = function (config) {
   if (!config) {
-    config = 'zhs2zht.ini';
+    config = 's2t.json';
   }
   config = getConfigPath(config);
   this.handler = new binding.Opencc(config);
@@ -100,16 +100,4 @@ OpenCC.prototype.convert = function (input, callback) {
  */
 OpenCC.prototype.convertSync = function (input) {
   return this.handler.convertSync(input.toString());
-};
-
-/**
- * Sets conversion mode.
- *
- * @fn void setConversionMode(int conversionMode)
- * @memberof OpenCC
- * @param conversionMode Conversion mode.
- * @ingroup node_api
- */
-OpenCC.prototype.setConversionMode = function (conversionMode) {
-  return this.handler.setConversionMode(conversionMode);
 };

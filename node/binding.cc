@@ -19,6 +19,7 @@ class OpenccBinding : public node::ObjectWrap {
     string input;
     string output;
     Persistent<Function> callback;
+    Optional<Opencc::Exception> ex;
   };
 
   Config config_;
@@ -47,10 +48,9 @@ class OpenccBinding : public node::ObjectWrap {
       } else {
         instance = new OpenccBinding("s2t.json");
       }
-    } catch (std::exception e) {
-      // TODO pass exception message
-      ThrowException(Exception::Error(
-          String::New("Can not create opencc instance")));
+    } catch (Opencc::Exception& e) {
+      ThrowException(v8::Exception::Error(
+          String::New(e.what())));
       return scope.Close(Undefined());
     }
 
@@ -61,7 +61,7 @@ class OpenccBinding : public node::ObjectWrap {
   static Handle<Value> Convert(const Arguments& args) {
     HandleScope scope;
     if (args.Length() < 2 || !args[0]->IsString() || !args[1]->IsFunction()) {
-      ThrowException(Exception::TypeError(String::New("Wrong arguments")));
+      ThrowException(v8::Exception::TypeError(String::New("Wrong arguments")));
       return scope.Close(Undefined());
     }
 
@@ -69,6 +69,7 @@ class OpenccBinding : public node::ObjectWrap {
     conv_data->instance = ObjectWrap::Unwrap<OpenccBinding>(args.This());
     conv_data->input = ToUtf8String(args[0]->ToString());
     conv_data->callback = Persistent<Function>::New(Local<Function>::Cast(args[1]));
+    conv_data->ex = Optional<Opencc::Exception>();
     uv_work_t* req = new uv_work_t;
     req->data = conv_data;
     uv_queue_work(uv_default_loop(), req, DoConvert, (uv_after_work_cb)AfterConvert);
@@ -79,16 +80,24 @@ class OpenccBinding : public node::ObjectWrap {
   static void DoConvert(uv_work_t* req) {
     ConvertRequest* conv_data = static_cast<ConvertRequest*>(req->data);
     OpenccBinding* instance = conv_data->instance;
-    conv_data->output = instance->Convert(conv_data->input);
+    try {
+      conv_data->output = instance->Convert(conv_data->input);
+    } catch (Opencc::Exception& e) {
+      conv_data->ex = Optional<Opencc::Exception>(e);
+    }
   }
 
   static void AfterConvert(uv_work_t* req) {
     HandleScope scope;
     ConvertRequest* conv_data = static_cast<ConvertRequest*>(req->data);
+    Local<Value> err = Local<Value>::New(Undefined());
     Local<String> converted = String::New(conv_data->output.c_str());
+    if (!conv_data->ex.IsNull()) {
+      err = String::New(conv_data->ex.Get().what());
+    }
     const unsigned argc = 2;
     Local<Value> argv[argc] = {
-      Local<Value>::New(Undefined()),
+      err,
       Local<Value>::New(converted)
     };
     conv_data->callback->Call(Context::GetCurrent()->Global(), argc, argv);
@@ -100,14 +109,21 @@ class OpenccBinding : public node::ObjectWrap {
   static Handle<Value> ConvertSync(const Arguments& args) {
     HandleScope scope;
     if (args.Length() < 1 || !args[0]->IsString()) {
-      ThrowException(Exception::TypeError(String::New("Wrong arguments")));
+      ThrowException(v8::Exception::TypeError(String::New("Wrong arguments")));
       return scope.Close(Undefined());
     }
 
     OpenccBinding* instance = ObjectWrap::Unwrap<OpenccBinding>(args.This());
 
     string input = ToUtf8String(args[0]->ToString());
-    string output = instance->Convert(input);
+    string output;
+    try {
+      output = instance->Convert(input);
+    } catch (Opencc::Exception& e) {
+      ThrowException(v8::Exception::Error(
+          String::New(e.what())));
+      return scope.Close(Undefined());
+    }
 
     Local<String> converted = String::New(output.c_str());
     return scope.Close(converted);

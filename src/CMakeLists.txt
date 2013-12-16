@@ -32,6 +32,7 @@ set(
 
 include_directories(../deps/darts-clone)
 include_directories(../deps/rapidjson-0.11)
+include_directories(../deps/tclap-1.2.1)
 
 add_library(
   libopencc

@@ -16,9 +16,7 @@
  * limitations under the License.
  */
 
-#include <getopt.h>
-#include <locale.h>
-
+#include "CmdLineOutput.hpp"
 #include "Config.hpp"
 #include "ConversionChain.hpp"
 
@@ -78,14 +76,14 @@ std::ostream& GetOutputStream(const Optional<string>& outputFileName) {
   }
 }
 
-void Convert(const Optional<string>& inputFileName, const Optional<string>& outputFileName, const string& configFileName) {
+void Convert(const Optional<string>& inputFileName,
+             const Optional<string>& outputFileName,
+             const string& configFileName) {
   Config config;
   config.LoadFile(configFileName);
   auto conversionChain = config.GetConversionChain();
-  
   std::istream& inputStream = GetInputStream(inputFileName);
   std::ostream& outputStream = GetOutputStream(outputFileName);
-  
   while (!inputStream.eof()) {
     string line;
     std::getline(inputStream, line);
@@ -96,46 +94,45 @@ void Convert(const Optional<string>& inputFileName, const Optional<string>& outp
 }
 
 int main(int argc, const char * argv[]) {
-#ifdef ENABLE_GETTEXT
-  setlocale(LC_ALL, "");
-  bindtextdomain(PACKAGE_NAME, LOCALEDIR);
-#endif /* ifdef ENABLE_GETTEXT */
-  struct option longopts[] =
-  {
-    { "version", no_argument, NULL, 'v' },
-    { "help", no_argument, NULL, 'h' },
-    { "input", required_argument, NULL, 'i' },
-    { "output", required_argument, NULL, 'o' },
-    { "config", required_argument, NULL, 'c' },
-    { 0, 0, 0, 0 },
-  };
-  int oc;
-  Optional<string> inputFileName;
-  Optional<string> outputFileName;
-  Optional<string> configFileName;
-  while ((oc = getopt_long(argc, (char*const*)argv, "vh?i:o:c:", longopts, NULL)) != -1) {
-    switch (oc) {
-      case 'v':
-        ShowVersion();
-        return 0;
-      case 'h':
-      case '?':
-        ShowUsage();
-        return 0;
-      case 'i':
-        inputFileName = Optional<string>(optarg);
-        break;
-      case 'o':
-        outputFileName = Optional<string>(optarg);
-        break;
-      case 'c':
-        configFileName = Optional<string>(optarg);
-        break;
+  try {
+    TCLAP::CmdLine cmd("Open Chinese Convert (OpenCC) Command Line Tool",
+                       ' ',
+                       VERSION);
+		CmdLineOutput cmdLineOutput;
+		cmd.setOutput(&cmdLineOutput);
+    
+    TCLAP::ValueArg<string> configArg("c", "config",
+                                    "Configuration file",
+                                    false /* required */,
+                                    "s2t.json" /* default */,
+                                    "file" /* type */,
+                                    cmd);
+    TCLAP::ValueArg<string> outputArg("o", "output",
+                                      "Write converted text to",
+                                      false /* required */,
+                                      "" /* default */,
+                                      "file" /* type */,
+                                      cmd);
+    TCLAP::ValueArg<string> inputArg("i", "input",
+                                     "Read original text from",
+                                     false /* required */,
+                                     "" /* default */,
+                                     "file" /* type */,
+                                     cmd);
+    cmd.parse(argc, argv);
+    Optional<string> inputFileName;
+    Optional<string> outputFileName;
+    string configFileName = configArg.getValue();
+    if (inputArg.isSet()) {
+      inputFileName = Optional<string>(inputArg.getValue());
     }
+    if (outputArg.isSet()) {
+      outputFileName = Optional<string>(outputArg.getValue());
+    }
+    Convert(inputFileName, outputFileName, configFileName);
+	} catch (TCLAP::ArgException &e) {
+    std::cerr << "error: " << e.error()
+    << " for arg " << e.argId() << std::endl;
   }
-  if (configFileName.IsNull()) {
-    configFileName = Optional<string>("s2t.json");
-  }
-  Convert(inputFileName, outputFileName, configFileName.Get());
   return 0;
 }

@@ -12,7 +12,8 @@
     ],
     "include_dirs": [
       "../src",
-      "../deps/darts-clone"
+      "../deps/darts-clone",
+      "../deps/tclap-1.2.1"
     ]
   }]
 }

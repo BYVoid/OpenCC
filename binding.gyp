@@ -1,9 +1,9 @@
 {
   "includes": [
-    "gypi/global.gypi",
-    "gypi/configs.gypi",
-    "gypi/opencc_dict.gypi",
-    "gypi/dicts.gypi",
-    "gypi/node_binding.gypi",
+    "node/global.gypi",
+    "node/configs.gypi",
+    "node/opencc_dict.gypi",
+    "node/dicts.gypi",
+    "node/node_binding.gypi",
   ]
 }

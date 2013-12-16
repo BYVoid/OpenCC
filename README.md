@@ -117,13 +117,6 @@ Install:
 
     sudo make install
 
-
-### Build with gyp
-
-    mkdir build
-    gyp --depth . -D library=shared_library -f make --generator-output=build opencc.gyp
-    make -C build
-
 ## Screenshot
 
 ![OpenCC Mac](http://opencc.googlecode.com/files/screenshot-gui-mac.png)

@@ -1,6 +1,6 @@
 {
   "name": "opencc",
-  "version": "0.4.3",
+  "version": "1.0.0",
   "description": "A project for conversion between Traditional and Simplified Chinese",
   "author": "BYVoid <byvoid@byvoid.com>",
   "license": "Apache",
@@ -13,7 +13,7 @@
     "url": "git://github.com/BYVoid/OpenCC.git"
   },
   "bugs": {
-    "url": "https://code.google.com/p/opencc/issues/entry"
+    "url": "https://github.com/BYVoid/Opencc/issues"
   },
   "keywords": [
     "opencc",

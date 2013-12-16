@@ -54,28 +54,6 @@ var OpenCC = module.exports = function (config) {
   this.handler = new binding.Opencc(config);
 };
 
-
-/**
- * Default conversion mode.
- *
- * @ingroup node_api
- */
-OpenCC.CONVERSION_FAST = 0;
-
-/**
- * Only converts text into segments.
- *
- * @ingroup node_api
- */
-OpenCC.CONVERSION_SEGMENT_ONLY = 1;
-
-/**
- * List all candidates of every segment.
- *
- * @ingroup node_api
- */
-OpenCC.CONVERSION_LIST_CANDIDATES = 2;
-
 /**
  * Converts input text.
  *

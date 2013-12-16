@@ -3,36 +3,30 @@ var fs = require('fs');
 var OpenCC = require('./opencc');
 
 var configs = [
-  'zhs2zht',
-  'zht2zhs',
-  'mix2zht',
-  'mix2zhs',
-  'zhs2zhtw_p',
-  'zhs2zhtw_vp',
-  'zhtw2zhcn_t',
-  'zhtw2zhcn_s',
+  's2t',
+  's2tw',
+  's2twp',
+  't2s',
+  'tw2s',
+  'tw2sp',
 ];
 
 var testSync = function (config, done) {
   var inputName = 'test/testcases/' + config + '.in';
   var outputName = 'test/testcases/' + config + '.ans';
-  var configName = config + '.ini';
+  var configName = config + '.json';
   var opencc = new OpenCC(configName);
-  fs.readFile(inputName, 'utf-8', function (err, text) {
-    if (err) return done(err);
-    var converted = opencc.convertSync(text);
-    fs.readFile(outputName, 'utf-8', function (err, answer) {
-      if (err) return done(err);
-      assert.equal(converted, answer);
-      done();
-    });
-  });
+  var text = fs.readFileSync(inputName, 'utf-8');
+  var converted = opencc.convertSync(text);
+  var answer = fs.readFileSync(outputName, 'utf-8');
+  assert.equal(converted + '\n', answer);
+  done();
 };
 
 var testAsync = function (config, done) {
   var inputName = 'test/testcases/' + config + '.in';
   var outputName = 'test/testcases/' + config + '.ans';
-  var configName = config + '.ini';
+  var configName = config + '.json';
   var opencc = new OpenCC(configName);
   fs.readFile(inputName, 'utf-8', function (err, text) {
     if (err) return done(err);
@@ -40,7 +34,7 @@ var testAsync = function (config, done) {
       if (err) return done(err);
       fs.readFile(outputName, 'utf-8', function (err, answer) {
         if (err) return done(err);
-        assert.equal(converted, answer);
+        assert.equal(converted + '\n', answer);
         done();
       });
     });

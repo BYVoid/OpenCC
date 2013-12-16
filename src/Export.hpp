@@ -18,7 +18,7 @@
 
 #pragma once
 
-#ifdef Opencc_BUILT_AS_STATIC
+#if defined(Opencc_BUILT_AS_STATIC) || !defined(_WIN32)
 #  define OPENCC_EXPORT
 #  define OPENCC_NO_EXPORT
 #else

@@ -22,7 +22,7 @@
 #include "Conversion.hpp"
 
 namespace Opencc {
-  class ConversionChain {
+  class OPENCC_EXPORT ConversionChain {
   public:
     ConversionChain();
     virtual ~ConversionChain();

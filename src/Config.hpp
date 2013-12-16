@@ -21,7 +21,7 @@
 #include "Common.hpp"
 
 namespace Opencc {
-  class Config {
+  class OPENCC_EXPORT Config {
   public:
     Config();
     Config(const string fileName);

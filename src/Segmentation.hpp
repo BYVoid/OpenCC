@@ -22,7 +22,7 @@
 #include "DictEntry.hpp"
 
 namespace Opencc {
-  class Segmentation {
+  class OPENCC_EXPORT Segmentation {
   public:
     virtual DictEntryPtrVectorPtr Segment(const string& text) = 0;
   };

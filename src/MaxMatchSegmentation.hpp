@@ -23,7 +23,7 @@
 #include "Segmentation.hpp"
 
 namespace Opencc {
-  class MaxMatchSegmentation : public Segmentation {
+  class OPENCC_EXPORT MaxMatchSegmentation : public Segmentation {
   public:
     MaxMatchSegmentation(DictPtr dict);
     virtual DictEntryPtrVectorPtr Segment(const string& text);

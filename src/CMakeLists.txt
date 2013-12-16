@@ -1,3 +1,5 @@
+include (GenerateExportHeader)
+
 set(
   LIBOPENCC_HEADERS
   Common.hpp
@@ -8,6 +10,7 @@ set(
   Dict.hpp
   DictEntry.hpp
   DictGroup.hpp
+  Export.hpp
   MaxMatchSegmentation.hpp
   Optional.hpp
   Segmentation.hpp
@@ -38,6 +41,14 @@ add_library(
   libopencc
   SHARED
   ${LIBOPENCC_SOURCES}
+)
+
+GENERATE_EXPORT_HEADER(
+  libopencc
+  BASE_NAME OPENCC
+  EXPORT_MACRO_NAME OPENCC_EXPORT
+  EXPORT_FILE_NAME Opencc_Export.h
+  STATIC_DEFINE Opencc_BUILT_AS_STATIC
 )
 
 set_target_properties(

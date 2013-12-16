@@ -22,9 +22,10 @@
 #ifdef __cplusplus
 
 #include <string>
+#include "Export.hpp"
 
 namespace Opencc {
-  class SimpleConverter {
+  class OPENCC_EXPORT SimpleConverter {
   public:
     SimpleConverter(const std::string configFileName);
     ~SimpleConverter();

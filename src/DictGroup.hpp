@@ -22,7 +22,7 @@
 #include "Dict.hpp"
 
 namespace Opencc {
-  class DictGroup : public Dict {
+  class OPENCC_EXPORT DictGroup : public Dict {
   public:
     DictGroup();
     virtual ~DictGroup();

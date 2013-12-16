@@ -22,7 +22,7 @@
 #include "Segmentation.hpp"
 
 namespace Opencc {
-  class Conversion {
+  class OPENCC_EXPORT Conversion {
   public:
     Conversion(SegmentationPtr segmentator);
     StringVectorPtr Segment(const string& text);

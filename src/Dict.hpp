@@ -22,7 +22,7 @@
 #include "DictEntry.hpp"
 
 namespace Opencc {
-  class Dict {
+  class OPENCC_EXPORT Dict {
   public:
     virtual size_t KeyMaxLength() const = 0;
     virtual Optional<DictEntryPtr> Match(const char* word) = 0;

@@ -34,6 +34,7 @@
 #include <cstring>
 #include <ctime>
 
+#include "Export.hpp"
 #include "Optional.hpp"
 #include "Exception.hpp"
 

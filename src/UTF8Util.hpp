@@ -21,7 +21,7 @@
 #include "Common.hpp"
 
 namespace Opencc {
-  class UTF8Util {
+  class OPENCC_EXPORT UTF8Util {
   public:
     static void SkipUtf8Bom(FILE* fp);
 

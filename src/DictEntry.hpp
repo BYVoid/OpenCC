@@ -21,7 +21,7 @@
 #include "Common.hpp"
 
 namespace Opencc {
-  class DictEntry {
+  class OPENCC_EXPORT DictEntry {
   public:
     string key;
     StringVector values;

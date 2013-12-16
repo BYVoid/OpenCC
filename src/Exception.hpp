@@ -20,13 +20,15 @@
 #include <string>
 #include <stdexcept>
 
+#include "Export.hpp"
+
 #ifdef _MSC_VER
 // Until Visual Studio 2013 (12.0), C++ 11 "noexcept" qualifier is not supported
 #define noexcept
 #endif
 
 namespace Opencc {
-  class Exception : public std::exception {
+  class OPENCC_EXPORT Exception : public std::exception {
   public:
     Exception() {}
     Exception(std::string message_) : message(message_) {}
@@ -37,19 +39,19 @@ namespace Opencc {
     std::string message;
   };
   
-  class FileNotFound : public Exception {
+  class OPENCC_EXPORT FileNotFound : public Exception {
   public:
     FileNotFound(const std::string fileName) :
       Exception(fileName + " not found or not accessible") {}
   };
   
-  class FileNotWritable : public Exception {
+  class OPENCC_EXPORT FileNotWritable : public Exception {
   public:
     FileNotWritable(const std::string fileName) :
       Exception(fileName + " not writable") {}
   };
   
-  class InvalidFormat : public Exception {
+  class OPENCC_EXPORT InvalidFormat : public Exception {
   public:
     InvalidFormat(const std::string message) : Exception(message) {}
   };

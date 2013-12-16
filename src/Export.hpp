@@ -18,26 +18,21 @@
 
 #pragma once
 
-#include "Common.hpp"
-#include "SerializableDict.hpp"
-#include "TextDict.hpp"
+#ifdef Opencc_BUILT_AS_STATIC
+#  define OPENCC_EXPORT
+#  define OPENCC_NO_EXPORT
+#else
+#  ifndef OPENCC_EXPORT
+#    ifdef libopencc_EXPORTS
+  /* We are building this library */
+#      define OPENCC_EXPORT __declspec(dllexport)
+#    else
+  /* We are using this library */
+#      define OPENCC_EXPORT __declspec(dllimport)
+#    endif
+#  endif
 
-namespace Opencc {
-  class OPENCC_EXPORT DartsDict : public SerializableDict {
-  public:
-    DartsDict();
-    virtual ~DartsDict();
-    virtual size_t KeyMaxLength() const;
-    virtual Optional<DictEntryPtr> Match(const char* word);
-    virtual DictEntryPtrVectorPtr GetLexicon();
-    virtual void LoadFromFile(FILE* fp);
-    virtual void SerializeToFile(FILE* fp);
-    virtual void LoadFromDict(Dict* dictionary);
-
-  private:
-    size_t maxLength;
-    void* dict;
-    DictEntryPtrVectorPtr lexicon;
-    void* buffer;
-  };
-}
+#  ifndef OPENCC_NO_EXPORT
+#    define OPENCC_NO_EXPORT 
+#  endif
+#endif

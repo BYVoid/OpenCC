@@ -9,8 +9,7 @@
     "conditions": [
       ["OS=='linux'", {
         "cflags": [
-          "-std=c++11",
-          "-stdlib=libc++"
+          "-std=c++0x"
         ],
         "cflags!": ["-fno-exceptions"],
         "cflags_cc!": ["-fno-exceptions"],

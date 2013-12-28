@@ -2,11 +2,10 @@
 .gitignore
 CMakeLists.txt
 *.cmake
-merge.sh
+*.pyc
 
 /po
 /doc
-/data/scripts
 /data/scheme
 /src/wrapper
 /build

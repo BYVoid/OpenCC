@@ -111,13 +111,11 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   add_definitions(
     -std=c++11
     -Wall
-    -Wint-to-void-pointer-cast
   )
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   add_definitions(
     -std=c++0x
     -Wall
-    -Wzero-as-null-pointer-constant
   )
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   add_definitions(

@@ -113,6 +113,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     -std=c++11
     -Wall
   )
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   add_definitions(
     -std=c++0x

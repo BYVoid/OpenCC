@@ -21,8 +21,6 @@
 
 using namespace Opencc;
 
-#define ENTRY_BUFF_SIZE 128
-
 DictEntryPtr ParseKeyValues(const char* buff) {
   size_t length;
   const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
@@ -50,10 +48,9 @@ TextDict::~TextDict() {
 }
 
 void TextDict::LoadFromFile(FILE* fp) {
-  // TODO use dynamic getline
-  static char buff[ENTRY_BUFF_SIZE];
+  const int ENTRY_BUFF_SIZE = 4096;
+  char buff[ENTRY_BUFF_SIZE];
   UTF8Util::SkipUtf8Bom(fp);
-  
   while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
     DictEntryPtr entry = ParseKeyValues(buff);
     AddKeyValue(entry);

@@ -16,11 +16,14 @@
  * limitations under the License.
  */
 
+#include <thread>
+
 #include "Config.hpp"
 #include "DictTestUtils.hpp"
 #include "DictEntry.hpp"
 #include "MaxMatchSegmentation.hpp"
 #include "ConversionChain.hpp"
+#include "opencc.h"
 
 using namespace Opencc;
 
@@ -102,12 +105,27 @@ void TestConversionChain() {
   AssertEquals(utf8("裡面"), converted);
 }
 
+const string CONFIG_TEST_PATH = "config_test/config_test.json";
+
 void TestConfig() {
   Config config;
-  config.LoadFile("config_test/config_test.json");
+  config.LoadFile(CONFIG_TEST_PATH);
   auto conversionChain = config.GetConversionChain();
   string converted = conversionChain->Convert(utf8("燕燕于飞差池其羽之子于归远送于野"));
   AssertEquals(utf8("燕燕于飛差池其羽之子于歸遠送於野"), converted);
+}
+
+void TestMultithreading() {
+  auto routine = [](std::string name) {
+    SimpleConverter converter(name);
+    string converted = converter.Convert(utf8("燕燕于飞差池其羽之子于归远送于野"));
+    AssertEquals(utf8("燕燕于飛差池其羽之子于歸遠送於野"), converted);
+  };
+  std::thread thread1(routine, CONFIG_TEST_PATH);
+  std::thread thread2(routine, CONFIG_TEST_PATH);
+  routine(CONFIG_TEST_PATH);
+  thread1.join();
+  thread2.join();
 }
 
 int main(int argc, const char * argv[]) {
@@ -118,4 +136,5 @@ int main(int argc, const char * argv[]) {
   TestUtils::RunTest("TestConversion", TestConversion);
   TestUtils::RunTest("TestConversionChain", TestConversionChain);
   TestUtils::RunTest("TestConfig", TestConfig);
+  TestUtils::RunTest("TestMultithreading", TestMultithreading);
 }

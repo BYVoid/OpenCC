@@ -16,6 +16,7 @@ set(
   Segmentation.hpp
   TextDict.hpp
   UTF8Util.hpp
+  opencc.h
 )
 
 set(

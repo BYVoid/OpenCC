@@ -65,6 +65,7 @@ char* opencc_convert(opencc_t opencc, const char* input) try {
   std::string converted = instance->Convert(input);
   char* output = new char[converted.length() + 1];
   strncpy(output, converted.c_str(), converted.length());
+  output[converted.length()] = '\0';
   return output;
 } catch (std::runtime_error& ex) {
   // TODO report error

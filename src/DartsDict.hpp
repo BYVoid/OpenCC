@@ -29,6 +29,8 @@ namespace Opencc {
     virtual ~DartsDict();
     virtual size_t KeyMaxLength() const;
     virtual Optional<DictEntryPtr> Match(const char* word);
+    // 优化正向最大匹配效率
+    virtual Optional<DictEntryPtr> MatchPrefix(const char* word);
     virtual DictEntryPtrVectorPtr GetLexicon();
     virtual void LoadFromFile(FILE* fp);
     virtual void SerializeToFile(FILE* fp);

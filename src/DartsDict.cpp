@@ -52,6 +52,29 @@ Optional<DictEntryPtr> DartsDict::Match(const char* word) {
   }
 }
 
+Optional<DictEntryPtr> DartsDict::MatchPrefix(const char* word)
+{
+  Darts::DoubleArray& dict = *(Darts::DoubleArray*)this->dict;
+  Darts::DoubleArray::value_type results[64], maxMatchedResult = -1;
+
+  size_t numMatched = dict.commonPrefixSearch(word, results, 64);
+  if (numMatched > 0 && numMatched < 64) {
+  	maxMatchedResult = results[numMatched - 1];
+  } else {
+		Darts::DoubleArray::value_type *rematchedResults = 
+			new Darts::DoubleArray::value_type[numMatched];
+		numMatched = dict.commonPrefixSearch(word, rematchedResults, numMatched);
+		maxMatchedResult = rematchedResults[numMatched - 1];
+    delete[] rematchedResults;
+  }
+  if (maxMatchedResult >= 0) {
+    return Optional<DictEntryPtr>(lexicon->at(maxMatchedResult));
+  }
+  else {
+    return Optional<DictEntryPtr>();
+  }
+}
+
 DictEntryPtrVectorPtr DartsDict::GetLexicon() {
   return lexicon;
 }

@@ -26,7 +26,7 @@ namespace Opencc {
     virtual void LoadFromFile(FILE* fp) = 0;
     virtual void SerializeToFile(FILE* fp) = 0;
     virtual bool TryLoadFromFile(const string fileName) {
-      FILE* fp = fopen(fileName.c_str(), "r");
+      FILE* fp = fopen(fileName.c_str(), "rb");
       if (fp == NULL) {
         return false;
       }

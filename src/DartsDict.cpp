@@ -52,13 +52,15 @@ Optional<DictEntryPtr> DartsDict::Match(const char* word) {
   }
 }
 
-Optional<DictEntryPtr> DartsDict::MatchPrefix(const char* word)
-{
+Optional<DictEntryPtr> DartsDict::MatchPrefix(const char* word) {
+  const size_t DEFAULT_NUM_ENTRIES = 64;
   Darts::DoubleArray& dict = *(Darts::DoubleArray*)this->dict;
-  Darts::DoubleArray::value_type results[64], maxMatchedResult = -1;
-
-  size_t numMatched = dict.commonPrefixSearch(word, results, 64);
-  if (numMatched > 0 && numMatched < 64) {
+  Darts::DoubleArray::value_type results[DEFAULT_NUM_ENTRIES];
+  Darts::DoubleArray::value_type maxMatchedResult = -1;
+  size_t numMatched = dict.commonPrefixSearch(word, results, DEFAULT_NUM_ENTRIES);
+  if (numMatched == 0) {
+    return Optional<DictEntryPtr>();
+  } else if (numMatched > 0 && numMatched < DEFAULT_NUM_ENTRIES) {
   	maxMatchedResult = results[numMatched - 1];
   } else {
 		Darts::DoubleArray::value_type *rematchedResults = 

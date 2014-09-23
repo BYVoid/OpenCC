@@ -3,9 +3,16 @@
 import sys
 from common import sort_items
 
-if len(sys.argv) != 3:
+if len(sys.argv) < 2:
   print "Sort the dictionary"
-  print "Usage: ", sys.argv[0], "[input] [output]"
+  print "Usage: ", sys.argv[0], "[input] ([output])"
   exit(1)
 
-sort_items(sys.argv[1], sys.argv[2])
+input = sys.argv[1]
+
+if len(sys.argv) < 3:
+  output = input
+else:
+  output = sys.argv[2]
+
+sort_items(input, output)

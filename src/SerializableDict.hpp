@@ -22,30 +22,32 @@
 
 namespace Opencc {
   class SerializableDict : public Dict {
-  public:
-    virtual void LoadFromFile(FILE* fp) = 0;
-    virtual void SerializeToFile(FILE* fp) = 0;
-    virtual bool TryLoadFromFile(const string fileName) {
-      FILE* fp = fopen(fileName.c_str(), "rb");
-      if (fp == NULL) {
-        return false;
+    public:
+      virtual void LoadFromFile(FILE* fp) = 0;
+      virtual void SerializeToFile(FILE* fp) = 0;
+      virtual bool TryLoadFromFile(const string fileName) {
+        FILE* fp = fopen(fileName.c_str(), "rb");
+        if (fp == NULL) {
+          return false;
+        }
+        LoadFromFile(fp);
+        fclose(fp);
+        return true;
       }
-      LoadFromFile(fp);
-      fclose(fp);
-      return true;
-    }
-    virtual void LoadFromFile(const string fileName) {
-      if (!TryLoadFromFile(fileName)) {
-        throw FileNotFound(fileName);
+
+      virtual void LoadFromFile(const string fileName) {
+        if (!TryLoadFromFile(fileName)) {
+          throw FileNotFound(fileName);
+        }
       }
-    }
-    virtual void SerializeToFile(const string fileName) {
-      FILE *fp = fopen(fileName.c_str(), "wb");
-      if (fp == NULL) {
-        throw FileNotWritable(fileName);
+
+      virtual void SerializeToFile(const string fileName) {
+        FILE* fp = fopen(fileName.c_str(), "wb");
+        if (fp == NULL) {
+          throw FileNotWritable(fileName);
+        }
+        SerializeToFile(fp);
+        fclose(fp);
       }
-      SerializeToFile(fp);
-      fclose(fp);
-    }
   };
 }

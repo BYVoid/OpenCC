@@ -24,10 +24,11 @@
 
 namespace Opencc {
   class OPENCC_EXPORT MaxMatchSegmentation : public Segmentation {
-  public:
-    MaxMatchSegmentation(DictPtr _dict) : dict(_dict) {}
-    virtual StringVectorPtr Segment(const string& text);
-  private:
-    DictPtr dict;
+    public:
+      MaxMatchSegmentation(DictPtr _dict) : dict(_dict) {}
+
+      virtual StringVectorPtr Segment(const string& text);
+    private:
+      DictPtr dict;
   };
 }

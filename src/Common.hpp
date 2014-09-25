@@ -19,24 +19,24 @@
 #pragma once
 
 #include <algorithm>
-#include <iostream>
 #include <fstream>
-#include <sstream>
-#include <string>
-#include <vector>
+#include <iostream>
 #include <list>
 #include <map>
 #include <memory>
+#include <sstream>
+#include <string>
+#include <vector>
 
-#include <cstdio>
 #include <cassert>
 #include <cstddef>
+#include <cstdio>
 #include <cstring>
 #include <ctime>
 
+#include "Exception.hpp"
 #include "Export.hpp"
 #include "Optional.hpp"
-#include "Exception.hpp"
 
 using std::string;
 
@@ -78,11 +78,11 @@ typedef std::shared_ptr<StringVector> StringVectorPtr;
 #endif // ENABLE_GETTEXT
 
 #ifndef PKGDATADIR
-  const string PACKAGE_DATA_DIRECTORY = "";
-#else
-  const string PACKAGE_DATA_DIRECTORY = PKGDATADIR "/";
-#endif
+const string PACKAGE_DATA_DIRECTORY = "";
+#else // ifndef PKGDATADIR
+const string PACKAGE_DATA_DIRECTORY = PKGDATADIR "/";
+#endif // ifndef PKGDATADIR
 
 #ifndef VERSION
-#define VERSION "1.0.*"
-#endif
+# define VERSION "1.0.*"
+#endif // ifndef VERSION

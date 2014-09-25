@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "UTF8Util.hpp"
 #include "TextDict.hpp"
+#include "UTF8Util.hpp"
 
 using namespace Opencc;
 
@@ -44,8 +44,7 @@ TextDict::TextDict() : lexicon(new DictEntryPtrVector) {
   maxLength = 0;
 }
 
-TextDict::~TextDict() {
-}
+TextDict::~TextDict() {}
 
 void TextDict::LoadFromFile(FILE* fp) {
   const int ENTRY_BUFF_SIZE = 4096;
@@ -89,8 +88,9 @@ size_t TextDict::KeyMaxLength() const {
 Optional<DictEntryPtr> TextDict::Match(const char* word) {
   SortLexicon();
   DictEntryPtr entry(new DictEntry(word));
-  auto found = std::lower_bound(lexicon->begin(), lexicon->end(), entry, DictEntry::PtrCmp);
-  if (found != lexicon->end() && (*found)->key == entry->key) {
+  auto found = std::lower_bound(lexicon->begin(),
+                                lexicon->end(), entry, DictEntry::PtrCmp);
+  if ((found != lexicon->end()) && ((*found)->key == entry->key)) {
     return Optional<DictEntryPtr>(*found);
   } else {
     return Optional<DictEntryPtr>();

@@ -20,11 +20,9 @@
 
 using namespace Opencc;
 
-ConversionChain::ConversionChain() {
-}
+ConversionChain::ConversionChain() {}
 
-ConversionChain::~ConversionChain() {
-}
+ConversionChain::~ConversionChain() {}
 
 void ConversionChain::AddConversion(ConversionPtr conversion) {
   conversions.push_back(conversion);

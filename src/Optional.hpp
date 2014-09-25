@@ -21,17 +21,21 @@
 namespace Opencc {
   template<typename T>
   class Optional {
-  public:
-    Optional() : isNull(true) {}
-    Optional(T actual) : isNull(false), data(actual) {}
-    bool IsNull() const {
-      return isNull;
-    }
-    T Get() const {
-      return data;
-    }
-  private:
-    bool isNull;
-    T data;
+    public:
+      Optional() : isNull(true) {}
+
+      Optional(T actual) : isNull(false), data(actual) {}
+
+      bool IsNull() const {
+        return isNull;
+      }
+
+      T Get() const {
+        return data;
+      }
+
+    private:
+      bool isNull;
+      T data;
   };
 }

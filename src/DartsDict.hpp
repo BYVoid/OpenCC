@@ -24,21 +24,20 @@
 
 namespace Opencc {
   class OPENCC_EXPORT DartsDict : public SerializableDict {
-  public:
-    DartsDict();
-    virtual ~DartsDict();
-    virtual size_t KeyMaxLength() const;
-    virtual Optional<DictEntryPtr> Match(const char* word);
-    virtual Optional<DictEntryPtr> MatchPrefix(const char* word);
-    virtual DictEntryPtrVectorPtr GetLexicon();
-    virtual void LoadFromFile(FILE* fp);
-    virtual void SerializeToFile(FILE* fp);
-    virtual void LoadFromDict(Dict* dictionary);
-
-  private:
-    size_t maxLength;
-    void* dict;
-    DictEntryPtrVectorPtr lexicon;
-    void* buffer;
+    public:
+      DartsDict();
+      virtual ~DartsDict();
+      virtual size_t KeyMaxLength() const;
+      virtual Optional<DictEntryPtr> Match(const char* word);
+      virtual Optional<DictEntryPtr> MatchPrefix(const char* word);
+      virtual DictEntryPtrVectorPtr GetLexicon();
+      virtual void LoadFromFile(FILE* fp);
+      virtual void SerializeToFile(FILE* fp);
+      virtual void LoadFromDict(Dict* dictionary);
+    private:
+      size_t maxLength;
+      void* dict;
+      DictEntryPtrVectorPtr lexicon;
+      void* buffer;
   };
 }

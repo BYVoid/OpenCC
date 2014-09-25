@@ -24,7 +24,8 @@ using namespace Opencc;
 Optional<DictEntryPtr> Dict::MatchPrefix(const char* word) {
   string wordTrunc = UTF8Util::TruncateUTF8(word, KeyMaxLength());
   const char* wordTruncPtr = wordTrunc.c_str() + wordTrunc.length();
-  for (long len = wordTrunc.length(); len > 0; len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
+  for (long len = wordTrunc.length(); len > 0;
+       len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
     wordTrunc.resize(len);
     wordTruncPtr = wordTrunc.c_str() + len;
     Optional<DictEntryPtr> result = Match(wordTrunc.c_str());
@@ -39,7 +40,8 @@ DictEntryPtrVectorPtr Dict::MatchAllPrefixes(const char* word) {
   DictEntryPtrVectorPtr matchedLengths(new DictEntryPtrVector);
   string wordTrunc = UTF8Util::TruncateUTF8(word, KeyMaxLength());
   const char* wordTruncPtr = wordTrunc.c_str() + wordTrunc.length();
-  for (long len = wordTrunc.length(); len > 0; len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
+  for (long len = wordTrunc.length(); len > 0;
+       len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
     wordTrunc.resize(len);
     wordTruncPtr = wordTrunc.c_str() + len;
     Optional<DictEntryPtr> result = Match(wordTrunc.c_str());

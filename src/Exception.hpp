@@ -17,43 +17,48 @@
  */
 
 #pragma once
-#include <string>
 #include <stdexcept>
+#include <string>
 
 #include "Export.hpp"
 
 #ifdef _MSC_VER
+
 // Until Visual Studio 2013 (12.0), C++ 11 "noexcept" qualifier is not supported
-#define noexcept
-#endif
+# define noexcept
+#endif // ifdef _MSC_VER
 
 namespace Opencc {
   class OPENCC_EXPORT Exception : public std::exception {
-  public:
-    Exception() {}
-    virtual ~Exception() throw () {}
-    Exception(std::string message_) : message(message_) {}
-    virtual const char* what() const noexcept {
-      return message.c_str();
-    }
-  private:
-    std::string message;
+    public:
+      Exception() {}
+
+      virtual ~Exception() throw() {}
+
+      Exception(std::string message_) : message(message_) {}
+
+      virtual const char* what() const noexcept {
+        return message.c_str();
+      }
+
+    private:
+      std::string message;
   };
-  
+
   class OPENCC_EXPORT FileNotFound : public Exception {
-  public:
-    FileNotFound(const std::string fileName) :
-      Exception(fileName + " not found or not accessible") {}
+    public:
+      FileNotFound(const std::string fileName) :
+        Exception(fileName + " not found or not accessible") {}
   };
-  
+
   class OPENCC_EXPORT FileNotWritable : public Exception {
-  public:
-    FileNotWritable(const std::string fileName) :
-      Exception(fileName + " not writable") {}
+    public:
+      FileNotWritable(const std::string fileName) :
+        Exception(fileName + " not writable") {}
   };
-  
+
   class OPENCC_EXPORT InvalidFormat : public Exception {
-  public:
-    InvalidFormat(const std::string message) : Exception(message) {}
+    public:
+      InvalidFormat(const std::string message) : Exception(message) {}
   };
 }

@@ -22,14 +22,14 @@
 
 namespace Opencc {
   class OPENCC_EXPORT Config {
-  public:
-    Config();
-    Config(const string fileName);
-    void LoadString(const string json);
-    void LoadFile(const string fileName);
-    ConverterPtr GetConverter() const;
-  private:
-    string configDirectory;
-    ConverterPtr converter;
+    public:
+      Config();
+      Config(const string fileName);
+      void LoadString(const string json);
+      void LoadFile(const string fileName);
+      ConverterPtr GetConverter() const;
+    private:
+      string configDirectory;
+      ConverterPtr converter;
   };
 }

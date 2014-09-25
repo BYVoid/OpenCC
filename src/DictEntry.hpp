@@ -22,28 +22,34 @@
 
 namespace Opencc {
   class OPENCC_EXPORT DictEntry {
-  public:
-    string key;
-    StringVector values;
-    DictEntry() {}
-    DictEntry(string key_) : key(key_) {}
-    DictEntry(string key_, string value_) : key(key_) {
-      values.push_back(value_);
-    }
-    DictEntry(string key_, StringVector values_)
-      : key(key_), values(values_) {}
-    bool operator < (const DictEntry& that) const {
-      return key < that.key;
-    }
-    string GetDefault() const {
-      if (values.size() > 0) {
-        return values[0];
-      } else {
-        return key;
+    public:
+      string key;
+      StringVector values;
+      DictEntry() {}
+
+      DictEntry(string key_) : key(key_) {}
+
+      DictEntry(string key_, string value_) : key(key_) {
+        values.push_back(value_);
       }
-    }
-    static bool PtrCmp(DictEntryPtr a, DictEntryPtr b) {
-      return a->key < b->key;
-    };
+
+      DictEntry(string key_, StringVector values_)
+        : key(key_), values(values_) {}
+
+      bool operator<(const DictEntry& that) const {
+        return key < that.key;
+      }
+
+      string GetDefault() const {
+        if (values.size() > 0) {
+          return values[0];
+        } else {
+          return key;
+        }
+      }
+
+      static bool PtrCmp(DictEntryPtr a, DictEntryPtr b) {
+        return a->key < b->key;
+      }
   };
 }

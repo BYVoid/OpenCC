@@ -17,8 +17,8 @@
  */
 
 #include "CmdLineOutput.hpp"
-#include "TextDict.hpp"
 #include "DartsDict.hpp"
+#include "TextDict.hpp"
 
 using namespace Opencc;
 
@@ -34,26 +34,29 @@ SerializableDictPtr CreateDictionary(const string& format) {
   return nullptr;
 }
 
-void ConvertDictionary(const string inputFileName, const string outputFileName,
-                       const string formatFrom, const string formatTo) {
+void ConvertDictionary(const string inputFileName,
+                       const string outputFileName,
+                       const string formatFrom,
+                       const string formatTo) {
   SerializableDictPtr dictFrom = CreateDictionary(formatFrom);
   SerializableDictPtr dictTo = CreateDictionary(formatTo);
+
   dictFrom->LoadFromFile(inputFileName);
   dictTo->LoadFromDict(dictFrom.get());
   dictTo->SerializeToFile(outputFileName);
 }
 
-int main(int argc, const char * argv[]) {
-	try {
+int main(int argc, const char* argv[]) {
+  try {
     TCLAP::CmdLine cmd("Open Chinese Convert (OpenCC) Dictionary Tool",
                        ' ',
                        VERSION);
-		CmdLineOutput cmdLineOutput;
-		cmd.setOutput(&cmdLineOutput);
-    
-    StringVector dictFormats {"text", "ocd"};
+    CmdLineOutput cmdLineOutput;
+    cmd.setOutput(&cmdLineOutput);
+
+    StringVector dictFormats { "text", "ocd" };
     TCLAP::ValuesConstraint<string> allowedVals(dictFormats);
-    
+
     TCLAP::ValueArg<string> toArg("t", "to",
                                   "Output format",
                                   true /* required */,
@@ -81,7 +84,7 @@ int main(int argc, const char * argv[]) {
     cmd.parse(argc, argv);
     ConvertDictionary(inputArg.getValue(), outputArg.getValue(),
                       fromArg.getValue(), toArg.getValue());
-	} catch (TCLAP::ArgException &e) {
+  } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error()
               << " for arg " << e.argId() << std::endl;
   }

@@ -20,10 +20,10 @@
 #include "Config.hpp"
 #include "Converter.hpp"
 
-using Opencc::Optional;
 using Opencc::Config;
 using Opencc::FileNotFound;
 using Opencc::FileNotWritable;
+using Opencc::Optional;
 
 void ShowVersion() {
   printf(_("\n"));
@@ -47,8 +47,10 @@ void ShowUsage() {
   printf(_(" -v, --version               Print version and build information.\n"));
   printf(_(" -h, --help                  Print this help.\n"));
   printf(_("\n"));
-  printf(_("With no input file, reads standard input and writes converted stream to standard output.\n"));
-  printf(_("Default configuration (simplified to traditional) will be loaded if not set.\n"));
+  printf(_(
+           "With no input file, reads standard input and writes converted stream to standard output.\n"));
+  printf(_(
+           "Default configuration (simplified to traditional) will be loaded if not set.\n"));
   printf(_("\n"));
 }
 
@@ -80,6 +82,7 @@ void Convert(const Optional<string>& inputFileName,
              const Optional<string>& outputFileName,
              const string& configFileName) {
   Config config;
+
   config.LoadFile(configFileName);
   auto converter = config.GetConverter();
   std::istream& inputStream = GetInputStream(inputFileName);
@@ -93,20 +96,20 @@ void Convert(const Optional<string>& inputFileName,
   }
 }
 
-int main(int argc, const char * argv[]) {
+int main(int argc, const char* argv[]) {
   try {
     TCLAP::CmdLine cmd("Open Chinese Convert (OpenCC) Command Line Tool",
                        ' ',
                        VERSION);
-		CmdLineOutput cmdLineOutput;
-		cmd.setOutput(&cmdLineOutput);
-    
+    CmdLineOutput cmdLineOutput;
+    cmd.setOutput(&cmdLineOutput);
+
     TCLAP::ValueArg<string> configArg("c", "config",
-                                    "Configuration file",
-                                    false /* required */,
-                                    "s2t.json" /* default */,
-                                    "file" /* type */,
-                                    cmd);
+                                      "Configuration file",
+                                      false /* required */,
+                                      "s2t.json" /* default */,
+                                      "file" /* type */,
+                                      cmd);
     TCLAP::ValueArg<string> outputArg("o", "output",
                                       "Write converted text to",
                                       false /* required */,
@@ -130,9 +133,9 @@ int main(int argc, const char * argv[]) {
       outputFileName = Optional<string>(outputArg.getValue());
     }
     Convert(inputFileName, outputFileName, configFileName);
-	} catch (TCLAP::ArgException &e) {
+  } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error()
-    << " for arg " << e.argId() << std::endl;
+              << " for arg " << e.argId() << std::endl;
   }
   return 0;
 }

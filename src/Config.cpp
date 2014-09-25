@@ -17,12 +17,12 @@
  */
 
 #include "Config.hpp"
-#include "MaxMatchSegmentation.hpp"
 #include "ConversionChain.hpp"
 #include "Converter.hpp"
-#include "TextDict.hpp"
 #include "DartsDict.hpp"
 #include "DictGroup.hpp"
+#include "MaxMatchSegmentation.hpp"
+#include "TextDict.hpp"
 #include "UTF8Util.hpp"
 
 #include "document.h"
@@ -30,8 +30,7 @@
 using namespace Opencc;
 typedef rapidjson::GenericValue<rapidjson::UTF8<>> JSONValue;
 
-Config::Config() {
-}
+Config::Config() {}
 
 Config::Config(const string fileName) {
   LoadFile(fileName);
@@ -68,17 +67,21 @@ const char* GetStringProperty(JSONValue& doc, const char* name) {
   return obj.GetString();
 }
 
-void LoadDictWithPaths(SerializableDictPtr dict, string& fileName, string& configDirectory) {
+void LoadDictWithPaths(SerializableDictPtr dict,
+                       string& fileName,
+                       string& configDirectory) {
   // Working directory
   if (dict->TryLoadFromFile(fileName)) {
     return;
   }
   // Configuration directory
-  if (configDirectory != "" && dict->TryLoadFromFile(configDirectory + fileName)) {
+  if ((configDirectory != "") &&
+      dict->TryLoadFromFile(configDirectory + fileName)) {
     return;
   }
   // Package data directory
-  if (PACKAGE_DATA_DIRECTORY != "" && dict->TryLoadFromFile(PACKAGE_DATA_DIRECTORY + fileName)) {
+  if ((PACKAGE_DATA_DIRECTORY != "") &&
+      dict->TryLoadFromFile(PACKAGE_DATA_DIRECTORY + fileName)) {
     return;
   }
   throw FileNotFound(fileName);
@@ -118,6 +121,7 @@ DictPtr ParseDict(JSONValue& doc, string& configDirectory) {
 
 SegmentationPtr ParseSegmentation(JSONValue& doc, string& configDirectory) {
   SegmentationPtr segmentation;
+
   // Required: type
   string type = GetStringProperty(doc, "type");
   if (type == "mmseg") {
@@ -134,24 +138,26 @@ ConversionPtr ParseConversion(JSONValue& doc, string& configDirectory) {
   // Required: dict
   DictPtr dict = ParseDict(GetObjectProperty(doc, "dict"), configDirectory);
   ConversionPtr conversion(new Conversion(dict));
+
   return conversion;
 }
 
-ConversionChainPtr ParseConversionChain(JSONValue& docs, string& configDirectory) {
+ConversionChainPtr ParseConversionChain(JSONValue& docs,
+                                        string& configDirectory) {
   ConversionChainPtr chain(new ConversionChain);
   for (rapidjson::SizeType i = 0; i < docs.Size(); i++) {
     JSONValue& doc = docs[i];
     if (doc.IsObject()) {
       ConversionPtr conversion = ParseConversion(doc, configDirectory);
       chain->AddConversion(conversion);
-    } else {
-    }
+    } else {}
   }
   return chain;
 }
 
 string FindConfigFile(string fileName) {
   std::ifstream ifs;
+
   // Working directory
   ifs.open(fileName.c_str());
   if (ifs.is_open()) {
@@ -173,9 +179,10 @@ void Config::LoadFile(const string fileName) {
   std::ifstream ifs(prefixedFileName);
   string content(std::istreambuf_iterator<char>(ifs),
                  (std::istreambuf_iterator<char>()));
+
 #if defined(_WIN32) || defined(_WIN64)
   UTF8Util::ReplaceAll(prefixedFileName, "\\", "/");
-#endif
+#endif // if defined(_WIN32) || defined(_WIN64)
   size_t slashPos = prefixedFileName.rfind("/");
   if (slashPos == string::npos) {
     configDirectory = "";
@@ -187,22 +194,29 @@ void Config::LoadFile(const string fileName) {
 
 void Config::LoadString(const string json) {
   rapidjson::Document doc;
+
   doc.ParseInsitu<0>((char*)json.c_str());
   if (doc.HasParseError()) {
-    throw InvalidFormat("Error parsing JSON"); //doc.GetErrorOffset()
+    throw InvalidFormat("Error parsing JSON"); // doc.GetErrorOffset()
   }
   if (!doc.IsObject()) {
     throw InvalidFormat("Root of configuration must be an object");
   }
+
   // Optional: name
   string name;
   if (doc.HasMember("name") && doc["name"].IsString()) {
     name = doc["name"].GetString();
   }
+
   // Required: segmentation
-  SegmentationPtr segmentation = ParseSegmentation(GetObjectProperty(doc, "segmentation"), configDirectory);
+  SegmentationPtr segmentation =
+    ParseSegmentation(GetObjectProperty(doc, "segmentation"), configDirectory);
+
   // Required: conversion_chain
-  ConversionChainPtr chain = ParseConversionChain(GetArrayProperty(doc, "conversion_chain"), configDirectory);
+  ConversionChainPtr chain =
+    ParseConversionChain(GetArrayProperty(doc,
+                                          "conversion_chain"), configDirectory);
   converter = ConverterPtr(new Converter(name, segmentation, chain));
 }
 

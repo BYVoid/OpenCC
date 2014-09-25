@@ -23,14 +23,17 @@
 
 namespace Opencc {
   class OPENCC_EXPORT Converter {
-  public:
-    Converter(const string& _name, SegmentationPtr _segmentation, ConversionChainPtr _conversionChain) :
-    name(_name), segmentation(_segmentation), conversionChain(_conversionChain) {}
-    
-    string Convert(const string& text);
-  private:
-    const string name;
-    const SegmentationPtr segmentation;
-    const ConversionChainPtr conversionChain;
+    public:
+      Converter(const string& _name,
+                SegmentationPtr _segmentation,
+                ConversionChainPtr _conversionChain) :
+        name(_name), segmentation(_segmentation),
+        conversionChain(_conversionChain) {}
+
+      string Convert(const string& text);
+    private:
+      const string name;
+      const SegmentationPtr segmentation;
+      const ConversionChainPtr conversionChain;
   };
 }

@@ -23,18 +23,18 @@
 
 namespace Opencc {
   class OPENCC_EXPORT DictGroup : public Dict {
-  public:
-    DictGroup();
-    virtual ~DictGroup();
-    virtual size_t KeyMaxLength() const;
-    virtual Optional<DictEntryPtr> Match(const char* word);
-    virtual Optional<DictEntryPtr> MatchPrefix(const char* word);
-    virtual DictEntryPtrVectorPtr MatchAllPrefixes(const char* word);
-    virtual DictEntryPtrVectorPtr GetLexicon();
-    virtual void LoadFromDict(Dict* dictionary);
-    void AddDict(DictPtr dict);
-  private:
-    size_t keyMaxLength;
-    std::list<DictPtr> dicts;
+    public:
+      DictGroup();
+      virtual ~DictGroup();
+      virtual size_t KeyMaxLength() const;
+      virtual Optional<DictEntryPtr> Match(const char* word);
+      virtual Optional<DictEntryPtr> MatchPrefix(const char* word);
+      virtual DictEntryPtrVectorPtr MatchAllPrefixes(const char* word);
+      virtual DictEntryPtrVectorPtr GetLexicon();
+      virtual void LoadFromDict(Dict* dictionary);
+      void AddDict(DictPtr dict);
+    private:
+      size_t keyMaxLength;
+      std::list<DictPtr> dicts;
   };
 }

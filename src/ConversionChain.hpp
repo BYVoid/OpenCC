@@ -23,12 +23,12 @@
 
 namespace Opencc {
   class OPENCC_EXPORT ConversionChain {
-  public:
-    ConversionChain();
-    virtual ~ConversionChain();
-    void AddConversion(ConversionPtr conversion);
-    StringVectorPtr Convert(const StringVectorPtr input);
-  private:
-    std::list<ConversionPtr> conversions;
+    public:
+      ConversionChain();
+      virtual ~ConversionChain();
+      void AddConversion(ConversionPtr conversion);
+      StringVectorPtr Convert(const StringVectorPtr input);
+    private:
+      std::list<ConversionPtr> conversions;
   };
 }

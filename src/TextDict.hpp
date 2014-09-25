@@ -23,24 +23,23 @@
 
 namespace Opencc {
   class OPENCC_EXPORT TextDict : public SerializableDict {
-  public:
-    TextDict();
-    virtual ~TextDict();
-    virtual size_t KeyMaxLength() const;
-    virtual Optional<DictEntryPtr> Match(const char* word);
-    virtual DictEntryPtrVectorPtr GetLexicon();
-    virtual void LoadFromFile(FILE* fp);
-    virtual void SerializeToFile(FILE* fp);
-    virtual void LoadFromDict(Dict* dictionary);
-    
-    void AddKeyValue(DictEntry entry);
-    void AddKeyValue(DictEntryPtr entry);
+    public:
+      TextDict();
+      virtual ~TextDict();
+      virtual size_t KeyMaxLength() const;
+      virtual Optional<DictEntryPtr> Match(const char* word);
+      virtual DictEntryPtrVectorPtr GetLexicon();
+      virtual void LoadFromFile(FILE* fp);
+      virtual void SerializeToFile(FILE* fp);
+      virtual void LoadFromDict(Dict* dictionary);
 
-  private:
-    void SortLexicon();
+      void AddKeyValue(DictEntry entry);
+      void AddKeyValue(DictEntryPtr entry);
+    private:
+      void SortLexicon();
 
-    bool sorted;
-    size_t maxLength;
-    DictEntryPtrVectorPtr lexicon;
+      bool sorted;
+      size_t maxLength;
+      DictEntryPtrVectorPtr lexicon;
   };
 }

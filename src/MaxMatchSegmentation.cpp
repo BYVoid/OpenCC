@@ -25,10 +25,11 @@ StringVectorPtr MaxMatchSegmentation::Segment(const string& text) {
   StringVectorPtr segments(new StringVector);
   StringVectorPtr buffer(new StringVector);
   auto clearBuffer = [&segments, &buffer]() {
-    if (buffer->size() > 0) {      segments->push_back(UTF8Util::Join(buffer));
-      buffer->clear();
-    }
-  };
+                       if (buffer->size() > 0) {
+                         segments->push_back(UTF8Util::Join(buffer));
+                         buffer->clear();
+                       }
+                     };
   for (const char* pstr = text.c_str(); *pstr != '\0';) {
     Optional<DictEntryPtr> matched = dict->MatchPrefix(pstr);
     size_t matchedLength;

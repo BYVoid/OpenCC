@@ -44,6 +44,7 @@ size_t DartsDict::KeyMaxLength() const {
 Optional<DictEntryPtr> DartsDict::Match(const char* word) {
   Darts::DoubleArray& dict = *(Darts::DoubleArray*)this->dict;
   Darts::DoubleArray::result_pair_type result;
+
   dict.exactMatchSearch(word, result);
   if (result.value != -1) {
     return Optional<DictEntryPtr>(lexicon->at(result.value));
@@ -60,19 +61,18 @@ Optional<DictEntryPtr> DartsDict::MatchPrefix(const char* word) {
   size_t numMatched = dict.commonPrefixSearch(word, results, DEFAULT_NUM_ENTRIES);
   if (numMatched == 0) {
     return Optional<DictEntryPtr>();
-  } else if (numMatched > 0 && numMatched < DEFAULT_NUM_ENTRIES) {
-  	maxMatchedResult = results[numMatched - 1];
+  } else if ((numMatched > 0) && (numMatched < DEFAULT_NUM_ENTRIES)) {
+    maxMatchedResult = results[numMatched - 1];
   } else {
-		Darts::DoubleArray::value_type *rematchedResults = 
-			new Darts::DoubleArray::value_type[numMatched];
-		numMatched = dict.commonPrefixSearch(word, rematchedResults, numMatched);
-		maxMatchedResult = rematchedResults[numMatched - 1];
+    Darts::DoubleArray::value_type* rematchedResults =
+      new Darts::DoubleArray::value_type[numMatched];
+    numMatched = dict.commonPrefixSearch(word, rematchedResults, numMatched);
+    maxMatchedResult = rematchedResults[numMatched - 1];
     delete[] rematchedResults;
   }
   if (maxMatchedResult >= 0) {
     return Optional<DictEntryPtr>(lexicon->at(maxMatchedResult));
-  }
-  else {
+  } else {
     return Optional<DictEntryPtr>();
   }
 }
@@ -84,6 +84,7 @@ DictEntryPtrVectorPtr DartsDict::GetLexicon() {
 void DartsDict::LoadFromDict(Dict* dictionary) {
   Darts::DoubleArray& dict = *(Darts::DoubleArray*)this->dict;
   std::vector<const char*> keys;
+
   maxLength = 0;
   lexicon = dictionary->GetLexicon();
   size_t lexiconCount = lexicon->size();
@@ -98,6 +99,7 @@ void DartsDict::LoadFromDict(Dict* dictionary) {
 
 void DartsDict::SerializeToFile(FILE* fp) {
   Darts::DoubleArray& dict = *(Darts::DoubleArray*)this->dict;
+
   fwrite(OCDHEADER, sizeof(char), strlen(OCDHEADER), fp);
 
   size_t dartsSize = dict.total_size();
@@ -120,13 +122,13 @@ void DartsDict::LoadFromFile(FILE* fp) {
     throw InvalidFormat("Invalid OpenCC dictionary");
   }
   free(buffer);
-  
+
   size_t dartsSize;
   fread(&dartsSize, sizeof(size_t), 1, fp);
   buffer = malloc(dartsSize);
   fread(buffer, 1, dartsSize, fp);
   dict.set_array(buffer);
-  
+
   TextDict textDict;
   textDict.LoadFromFile(fp);
   lexicon = textDict.GetLexicon();

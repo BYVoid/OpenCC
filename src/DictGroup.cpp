@@ -25,8 +25,7 @@ DictGroup::DictGroup() {
   keyMaxLength = 0;
 }
 
-DictGroup::~DictGroup() {
-}
+DictGroup::~DictGroup() {}
 
 void DictGroup::AddDict(DictPtr dict) {
   dicts.push_back(dict);
@@ -88,6 +87,7 @@ DictEntryPtrVectorPtr DictGroup::GetLexicon() {
 
 void DictGroup::LoadFromDict(Dict* dictionary) {
   TextDictPtr dict(new TextDict);
+
   dict->LoadFromDict(dictionary);
   AddDict(dict);
 }

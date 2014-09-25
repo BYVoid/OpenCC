@@ -23,13 +23,15 @@
 
 namespace Opencc {
   class OPENCC_EXPORT Conversion {
-  public:
-    Conversion(DictPtr _dict) : dict(_dict) {}
-    // Convert single phrase
-    string Convert(const string& phrase);
-    // Convert segmented text
-    StringVectorPtr Convert(const StringVectorPtr input);
-  private:
-    DictPtr dict;
+    public:
+      Conversion(DictPtr _dict) : dict(_dict) {}
+
+      // Convert single phrase
+      string Convert(const string& phrase);
+
+      // Convert segmented text
+      StringVectorPtr Convert(const StringVectorPtr input);
+    private:
+      DictPtr dict;
   };
 }

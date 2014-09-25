@@ -22,7 +22,7 @@
 
 namespace Opencc {
   class OPENCC_EXPORT Segmentation {
-  public:
-    virtual StringVectorPtr Segment(const string& text) = 0;
+    public:
+      virtual StringVectorPtr Segment(const string& text) = 0;
   };
 }

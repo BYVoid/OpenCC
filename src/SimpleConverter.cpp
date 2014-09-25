@@ -18,20 +18,20 @@
 
 #include "opencc.h"
 #include "Config.hpp"
-#include "ConversionChain.hpp"
+#include "Converter.hpp"
 
 using namespace Opencc;
 
 struct InternalData {
   Config config;
-  ConversionChainPtr conversionChain;
+  ConverterPtr converter;
 };
 
 SimpleConverter::SimpleConverter(const std::string configFileName) try {
   InternalData* data = new InternalData();
   internalData = data;
   data->config.LoadFile(configFileName);
-  data->conversionChain = data->config.GetConversionChain();
+  data->converter = data->config.GetConverter();
 } catch(Exception& ex) {
   throw std::runtime_error(ex.what());
 }
@@ -42,7 +42,7 @@ SimpleConverter::~SimpleConverter() {
 
 std::string SimpleConverter::Convert(const std::string input) const try {
   InternalData* data = (InternalData*)internalData;
-  return data->conversionChain->Convert(input);
+  return data->converter->Convert(input);
 } catch (Exception& ex) {
   throw std::runtime_error(ex.what());
 }

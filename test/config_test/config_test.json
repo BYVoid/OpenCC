@@ -1,7 +1,13 @@
 {
   "name": "Configuration Test",
-  "conversion_chain": [{
+  "segmentation": {
     "type": "mmseg",
+    "dict": {
+      "type": "text",
+      "file": "config_test_phrases.txt"
+    }
+  },
+  "conversion_chain": [{
     "dict": {
       "type": "group",
       "dicts": [{

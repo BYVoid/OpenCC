@@ -21,25 +21,27 @@
 
 using namespace Opencc;
 
-
-MaxMatchSegmentation::MaxMatchSegmentation(DictPtr dict_) :
-  dict(dict_) {
-}
-
-DictEntryPtrVectorPtr MaxMatchSegmentation::Segment(const string& text) {
-  DictEntryPtrVectorPtr segments(new DictEntryPtrVector);
-  const char* pstr = text.c_str();
-  while (*pstr != '\0') {
+StringVectorPtr MaxMatchSegmentation::Segment(const string& text) {
+  StringVectorPtr segments(new StringVector);
+  StringVectorPtr buffer(new StringVector);
+  auto clearBuffer = [&segments, &buffer]() {
+    if (buffer->size() > 0) {      segments->push_back(UTF8Util::Join(buffer));
+      buffer->clear();
+    }
+  };
+  for (const char* pstr = text.c_str(); *pstr != '\0';) {
     Optional<DictEntryPtr> matched = dict->MatchPrefix(pstr);
     size_t matchedLength;
     if (matched.IsNull()) {
       matchedLength = UTF8Util::NextCharLength(pstr);
-      segments->push_back(DictEntryPtr(new DictEntry(UTF8Util::FromSubstr(pstr, matchedLength))));
+      buffer->push_back(UTF8Util::FromSubstr(pstr, matchedLength));
     } else {
+      clearBuffer();
       matchedLength = matched.Get()->key.length();
-      segments->push_back(DictEntryPtr(matched.Get()));
+      segments->push_back(matched.Get()->key);
     }
     pstr += matchedLength;
   }
+  clearBuffer();
   return segments;
 }

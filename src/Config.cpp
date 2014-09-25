@@ -19,6 +19,7 @@
 #include "Config.hpp"
 #include "MaxMatchSegmentation.hpp"
 #include "ConversionChain.hpp"
+#include "Converter.hpp"
 #include "TextDict.hpp"
 #include "DartsDict.hpp"
 #include "DictGroup.hpp"
@@ -110,23 +111,30 @@ DictPtr ParseDict(JSONValue& doc, string& configDirectory) {
     LoadDictWithPaths(dartsDict, fileName, configDirectory);
     dict = dartsDict;
   } else {
-    throw InvalidFormat("Unknown type: " + type);
+    throw InvalidFormat("Unknown dictionary type: " + type);
   }
   return dict;
 }
 
-ConversionPtr ParseConversion(JSONValue& doc, string& configDirectory) {
+SegmentationPtr ParseSegmentation(JSONValue& doc, string& configDirectory) {
+  SegmentationPtr segmentation;
   // Required: type
   string type = GetStringProperty(doc, "type");
   if (type == "mmseg") {
-    // Required: type
+    // Required: dict
     DictPtr dict = ParseDict(GetObjectProperty(doc, "dict"), configDirectory);
-    SegmentationPtr segmentation(new MaxMatchSegmentation(dict));
-    ConversionPtr conversion(new Conversion(segmentation));
-    return conversion;
+    segmentation = SegmentationPtr(new MaxMatchSegmentation(dict));
   } else {
-    throw InvalidFormat("Unknown type: " + type);
+    throw InvalidFormat("Unknown segmentation type: " + type);
   }
+  return segmentation;
+}
+
+ConversionPtr ParseConversion(JSONValue& doc, string& configDirectory) {
+  // Required: dict
+  DictPtr dict = ParseDict(GetObjectProperty(doc, "dict"), configDirectory);
+  ConversionPtr conversion(new Conversion(dict));
+  return conversion;
 }
 
 ConversionChainPtr ParseConversionChain(JSONValue& docs, string& configDirectory) {
@@ -187,13 +195,17 @@ void Config::LoadString(const string json) {
     throw InvalidFormat("Root of configuration must be an object");
   }
   // Optional: name
+  string name;
   if (doc.HasMember("name") && doc["name"].IsString()) {
     name = doc["name"].GetString();
   }
+  // Required: segmentation
+  SegmentationPtr segmentation = ParseSegmentation(GetObjectProperty(doc, "segmentation"), configDirectory);
   // Required: conversion_chain
-  chain = ParseConversionChain(GetArrayProperty(doc, "conversion_chain"), configDirectory);
+  ConversionChainPtr chain = ParseConversionChain(GetArrayProperty(doc, "conversion_chain"), configDirectory);
+  converter = ConverterPtr(new Converter(name, segmentation, chain));
 }
 
-ConversionChainPtr Config::GetConversionChain() const {
-  return chain;
+ConverterPtr Config::GetConverter() const {
+  return converter;
 }

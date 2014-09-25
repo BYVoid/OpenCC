@@ -19,17 +19,18 @@
 #pragma once
 
 #include "Common.hpp"
+#include "Segmentation.hpp"
 
 namespace Opencc {
-  class OPENCC_EXPORT Config {
+  class OPENCC_EXPORT Converter {
   public:
-    Config();
-    Config(const string fileName);
-    void LoadString(const string json);
-    void LoadFile(const string fileName);
-    ConverterPtr GetConverter() const;
+    Converter(const string& _name, SegmentationPtr _segmentation, ConversionChainPtr _conversionChain) :
+    name(_name), segmentation(_segmentation), conversionChain(_conversionChain) {}
+    
+    string Convert(const string& text);
   private:
-    string configDirectory;
-    ConverterPtr converter;
+    const string name;
+    const SegmentationPtr segmentation;
+    const ConversionChainPtr conversionChain;
   };
 }

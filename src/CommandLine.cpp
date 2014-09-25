@@ -18,7 +18,7 @@
 
 #include "CmdLineOutput.hpp"
 #include "Config.hpp"
-#include "ConversionChain.hpp"
+#include "Converter.hpp"
 
 using Opencc::Optional;
 using Opencc::Config;
@@ -81,13 +81,13 @@ void Convert(const Optional<string>& inputFileName,
              const string& configFileName) {
   Config config;
   config.LoadFile(configFileName);
-  auto conversionChain = config.GetConversionChain();
+  auto converter = config.GetConverter();
   std::istream& inputStream = GetInputStream(inputFileName);
   std::ostream& outputStream = GetOutputStream(outputFileName);
   while (!inputStream.eof()) {
     string line;
     std::getline(inputStream, line);
-    string converted = conversionChain->Convert(line);
+    string converted = converter->Convert(line);
     outputStream << converted << std::endl;
     outputStream.flush();
   }

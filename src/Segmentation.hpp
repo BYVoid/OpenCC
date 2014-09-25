@@ -19,11 +19,10 @@
 #pragma once
 
 #include "Common.hpp"
-#include "DictEntry.hpp"
 
 namespace Opencc {
   class OPENCC_EXPORT Segmentation {
   public:
-    virtual DictEntryPtrVectorPtr Segment(const string& text) = 0;
+    virtual StringVectorPtr Segment(const string& text) = 0;
   };
 }

@@ -30,10 +30,10 @@ void ConversionChain::AddConversion(ConversionPtr conversion) {
   conversions.push_back(conversion);
 }
 
-string ConversionChain::Convert(const string& textToConvert) {
-  string text = textToConvert;
+StringVectorPtr ConversionChain::Convert(const StringVectorPtr input) {
+  StringVectorPtr output = input;
   for (auto conversion : conversions) {
-    text = conversion->Convert(text);
+    output = conversion->Convert(output);
   }
-  return text;
+  return output;
 }

@@ -49,6 +49,14 @@ public:
   }
 };
 
+static inline void VectorAssertEquals(StringVectorPtr expected, StringVectorPtr actual) {
+  size_t length = expected->size();
+  AssertTrue(length == actual->size());
+  for (size_t i = 0; i < length; i++) {
+    AssertEquals(expected->at(i), actual->at(i));
+  }
+}
+
 class TestUtils {
 public:
   static void RunTest(const string name, void (*func)(void)) {

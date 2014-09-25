@@ -17,26 +17,32 @@
  */
 
 #include "Conversion.hpp"
+#include "Dict.hpp"
+#include "UTF8Util.hpp"
 
 using namespace Opencc;
 
-Conversion::Conversion(SegmentationPtr segmentator) {
-  this->segmentator = segmentator;
-}
-
-StringVectorPtr Conversion::Segment(const string& text) {
-  StringVectorPtr segments(new StringVector);
-  for (auto entry : *segmentator->Segment(text)) {
-    segments->push_back(entry->key);
-  }
-  return segments;
-}
-
-string Conversion::Convert(const string& text) {
-  auto segments = segmentator->Segment(text);
+string Conversion::Convert(const string& phrase) {
   std::ostringstream buffer;
-  for (auto segment : *segments) {
-    buffer << segment->GetDefault();
+  for (const char* pstr = phrase.c_str(); *pstr != '\0';) {
+    Optional<DictEntryPtr> matched = dict->MatchPrefix(pstr);
+    size_t matchedLength;
+    if (matched.IsNull()) {
+      matchedLength = UTF8Util::NextCharLength(pstr);
+      buffer << UTF8Util::FromSubstr(pstr, matchedLength);
+    } else {
+      matchedLength = matched.Get()->key.length();
+      buffer << matched.Get()->GetDefault();
+    }
+    pstr += matchedLength;
   }
   return buffer.str();
+}
+
+StringVectorPtr Conversion::Convert(const StringVectorPtr input) {
+  StringVectorPtr output = StringVectorPtr(new StringVector);
+  for (const auto& segment : *input) {
+    output->push_back(Convert(segment));
+  }
+  return output;
 }

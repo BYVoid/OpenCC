@@ -24,10 +24,12 @@
 namespace Opencc {
   class OPENCC_EXPORT Conversion {
   public:
-    Conversion(SegmentationPtr segmentator);
-    StringVectorPtr Segment(const string& text);
-    string Convert(const string& text);
+    Conversion(DictPtr _dict) : dict(_dict) {}
+    // Convert single phrase
+    string Convert(const string& phrase);
+    // Convert segmented text
+    StringVectorPtr Convert(const StringVectorPtr input);
   private:
-    SegmentationPtr segmentator;
+    DictPtr dict;
   };
 }

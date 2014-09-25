@@ -52,6 +52,7 @@ namespace Opencc {
   class Segmentation;
   class Conversion;
   class ConversionChain;
+  class Converter;
   typedef std::shared_ptr<DictEntry> DictEntryPtr;
   typedef std::vector<DictEntryPtr> DictEntryPtrVector;
   typedef std::shared_ptr<DictEntryPtrVector> DictEntryPtrVectorPtr;
@@ -63,6 +64,7 @@ namespace Opencc {
   typedef std::shared_ptr<Segmentation> SegmentationPtr;
   typedef std::shared_ptr<Conversion> ConversionPtr;
   typedef std::shared_ptr<ConversionChain> ConversionChainPtr;
+  typedef std::shared_ptr<Converter> ConverterPtr;
 }
 typedef std::vector<string> StringVector;
 typedef std::shared_ptr<StringVector> StringVectorPtr;

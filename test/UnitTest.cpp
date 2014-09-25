@@ -23,6 +23,7 @@
 #include "DictEntry.hpp"
 #include "MaxMatchSegmentation.hpp"
 #include "ConversionChain.hpp"
+#include "Converter.hpp"
 #include "opencc.h"
 
 using namespace Opencc;
@@ -72,20 +73,15 @@ void TestSegmentation() {
   auto segmentation = SegmentationPtr(new MaxMatchSegmentation(dict));
   auto segments = segmentation->Segment(utf8("太后的头发干燥"));
   AssertEquals(4, segments->size());
-  AssertEquals(utf8("太后"), segments->at(0)->key);
-  AssertEquals(utf8("太后"), segments->at(0)->GetDefault());
-  AssertEquals(utf8("的"), segments->at(1)->key);
-  AssertEquals(utf8("的"), segments->at(1)->GetDefault());
-  AssertEquals(utf8("头发"), segments->at(2)->key);
-  AssertEquals(utf8("頭髮"), segments->at(2)->GetDefault());
-  AssertEquals(utf8("干燥"), segments->at(3)->key);
-  AssertEquals(utf8("乾燥"), segments->at(3)->GetDefault());
+  AssertEquals(utf8("太后"), segments->at(0));
+  AssertEquals(utf8("的"), segments->at(1));
+  AssertEquals(utf8("头发"), segments->at(2));
+  AssertEquals(utf8("干燥"), segments->at(3));
 }
 
 void TestConversion() {
   auto dict = DictTestUtils::CreateDictGroupForConversion();
-  auto segmentation = SegmentationPtr(new MaxMatchSegmentation(dict));
-  auto conversion = ConversionPtr(new Conversion(segmentation));
+  auto conversion = ConversionPtr(new Conversion(dict));
   string converted = conversion->Convert(utf8("太后的头发干燥"));
   AssertEquals(utf8("太后的頭髮乾燥"), converted);
 }
@@ -93,16 +89,15 @@ void TestConversion() {
 void TestConversionChain() {
   // Dict
   auto dict = DictTestUtils::CreateDictGroupForConversion();
-  auto segmentation = SegmentationPtr(new MaxMatchSegmentation(dict));
-  auto conversion = ConversionPtr(new Conversion(segmentation));
+  auto conversion = ConversionPtr(new Conversion(dict));
   // Variants
   auto dictVariants = DictTestUtils::CreateDictForTaiwanVariants();
-  auto conversionVariants = ConversionPtr(new Conversion(SegmentationPtr(new MaxMatchSegmentation(dictVariants))));
+  auto conversionVariants = ConversionPtr(new Conversion(dictVariants));
   auto conversionChain = ConversionChainPtr(new ConversionChain());
   conversionChain->AddConversion(conversion);
   conversionChain->AddConversion(conversionVariants);
-  string converted = conversionChain->Convert(utf8("里面"));
-  AssertEquals(utf8("裡面"), converted);
+  StringVectorPtr converted = conversionChain->Convert(StringVectorPtr(new StringVector{utf8("里面")}));
+  VectorAssertEquals(StringVectorPtr(new StringVector{utf8("裡面")}), converted);
 }
 
 const string CONFIG_TEST_PATH = "config_test/config_test.json";
@@ -110,8 +105,8 @@ const string CONFIG_TEST_PATH = "config_test/config_test.json";
 void TestConfig() {
   Config config;
   config.LoadFile(CONFIG_TEST_PATH);
-  auto conversionChain = config.GetConversionChain();
-  string converted = conversionChain->Convert(utf8("燕燕于飞差池其羽之子于归远送于野"));
+  auto converter = config.GetConverter();
+  string converted = converter->Convert(utf8("燕燕于飞差池其羽之子于归远送于野"));
   AssertEquals(utf8("燕燕于飛差池其羽之子于歸遠送於野"), converted);
 }
 

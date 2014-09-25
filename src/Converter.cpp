@@ -16,20 +16,17 @@
  * limitations under the License.
  */
 
-#pragma once
+#include "Converter.hpp"
+#include "ConversionChain.hpp"
 
-#include "Common.hpp"
+using namespace Opencc;
 
-namespace Opencc {
-  class OPENCC_EXPORT Config {
-  public:
-    Config();
-    Config(const string fileName);
-    void LoadString(const string json);
-    void LoadFile(const string fileName);
-    ConverterPtr GetConverter() const;
-  private:
-    string configDirectory;
-    ConverterPtr converter;
-  };
+string Converter::Convert(const string& text) {
+  auto segments = segmentation->Segment(text);
+  auto converted = conversionChain->Convert(segments);
+  std::ostringstream buffer;
+  for (auto segment : *converted) {
+    buffer << segment;
+  }
+  return buffer.str();
 }

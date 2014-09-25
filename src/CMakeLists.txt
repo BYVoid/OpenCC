@@ -6,6 +6,7 @@ set(
   Config.hpp
   Conversion.hpp
   ConversionChain.hpp
+  Converter.hpp
   DartsDict.hpp
   Dict.hpp
   DictEntry.hpp
@@ -24,6 +25,7 @@ set(
   Config.cpp
   Conversion.cpp
   ConversionChain.cpp
+  Converter.cpp
   DartsDict.cpp
   Dict.cpp
   DictGroup.cpp

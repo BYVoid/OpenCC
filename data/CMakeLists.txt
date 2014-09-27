@@ -1,8 +1,8 @@
 set(OPENCC_DICT_BIN opencc_dict)
-set(DICT_MERGE_BIN python ${CMAKE_SOURCE_DIR}/data/scripts/merge.py)
-set(DICT_REVERSE_BIN python ${CMAKE_SOURCE_DIR}/data/scripts/reverse.py)
-set(DICT_DIR ${CMAKE_SOURCE_DIR}/data/dictionary)
-set(DICT_GENERATED_DIR ${CMAKE_BINARY_DIR}/data)
+set(DICT_MERGE_BIN python ${CMAKE_CURRENT_SOURCE_DIR}/scripts/merge.py)
+set(DICT_REVERSE_BIN python ${CMAKE_CURRENT_SOURCE_DIR}/scripts/reverse.py)
+set(DICT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dictionary)
+set(DICT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 set(
   DICTS_RAW

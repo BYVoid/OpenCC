@@ -27,7 +27,7 @@
 
 #include "document.h"
 
-using namespace Opencc;
+using namespace opencc;
 typedef rapidjson::GenericValue<rapidjson::UTF8<>> JSONValue;
 
 Config::Config() {}

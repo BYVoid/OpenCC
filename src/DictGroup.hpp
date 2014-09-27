@@ -21,7 +21,7 @@
 #include "Common.hpp"
 #include "Dict.hpp"
 
-namespace Opencc {
+namespace opencc {
   class OPENCC_EXPORT DictGroup : public Dict {
     public:
       DictGroup();

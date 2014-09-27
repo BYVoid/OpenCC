@@ -24,7 +24,7 @@
 #include <string>
 #include "Export.hpp"
 
-namespace Opencc {
+namespace opencc {
   class OPENCC_EXPORT SimpleConverter {
   public:
     SimpleConverter(const std::string configFileName);

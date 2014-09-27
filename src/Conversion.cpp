@@ -20,7 +20,7 @@
 #include "Dict.hpp"
 #include "UTF8Util.hpp"
 
-using namespace Opencc;
+using namespace opencc;
 
 string Conversion::Convert(const string& phrase) {
   std::ostringstream buffer;

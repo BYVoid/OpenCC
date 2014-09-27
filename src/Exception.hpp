@@ -28,7 +28,7 @@
 # define noexcept
 #endif // ifdef _MSC_VER
 
-namespace Opencc {
+namespace opencc {
   class OPENCC_EXPORT Exception : public std::exception {
     public:
       Exception() {}

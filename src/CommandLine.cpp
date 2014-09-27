@@ -20,10 +20,10 @@
 #include "Config.hpp"
 #include "Converter.hpp"
 
-using Opencc::Config;
-using Opencc::FileNotFound;
-using Opencc::FileNotWritable;
-using Opencc::Optional;
+using opencc::Config;
+using opencc::FileNotFound;
+using opencc::FileNotWritable;
+using opencc::Optional;
 
 void ShowVersion() {
   printf(_("\n"));

@@ -20,7 +20,7 @@
 #include "Converter.hpp"
 #include "opencc.h"
 
-using namespace Opencc;
+using namespace opencc;
 
 struct InternalData {
   Config config;

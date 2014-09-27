@@ -18,7 +18,7 @@
 
 #pragma once
 
-namespace Opencc {
+namespace opencc {
   template<typename T>
   class Optional {
     public:

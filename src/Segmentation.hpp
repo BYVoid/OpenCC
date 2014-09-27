@@ -20,7 +20,7 @@
 
 #include "Common.hpp"
 
-namespace Opencc {
+namespace opencc {
   class OPENCC_EXPORT Segmentation {
     public:
       virtual StringVectorPtr Segment(const string& text) = 0;

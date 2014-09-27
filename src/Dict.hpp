@@ -21,7 +21,7 @@
 #include "Common.hpp"
 #include "DictEntry.hpp"
 
-namespace Opencc {
+namespace opencc {
   class OPENCC_EXPORT Dict {
     public:
       virtual size_t KeyMaxLength() const = 0;

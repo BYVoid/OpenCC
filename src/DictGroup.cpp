@@ -19,7 +19,7 @@
 #include "DictGroup.hpp"
 #include "TextDict.hpp"
 
-using namespace Opencc;
+using namespace opencc;
 
 DictGroup::DictGroup() {
   keyMaxLength = 0;

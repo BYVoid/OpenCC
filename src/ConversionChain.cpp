@@ -18,7 +18,7 @@
 
 #include "ConversionChain.hpp"
 
-using namespace Opencc;
+using namespace opencc;
 
 ConversionChain::ConversionChain() {}
 

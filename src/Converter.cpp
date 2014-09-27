@@ -19,7 +19,7 @@
 #include "ConversionChain.hpp"
 #include "Converter.hpp"
 
-using namespace Opencc;
+using namespace opencc;
 
 string Converter::Convert(const string& text) {
   auto segments = segmentation->Segment(text);

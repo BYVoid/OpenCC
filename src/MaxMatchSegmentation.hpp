@@ -22,7 +22,7 @@
 #include "DictGroup.hpp"
 #include "Segmentation.hpp"
 
-namespace Opencc {
+namespace opencc {
   class OPENCC_EXPORT MaxMatchSegmentation : public Segmentation {
     public:
       MaxMatchSegmentation(DictPtr _dict) : dict(_dict) {}

@@ -44,7 +44,7 @@ const char* ConvertToUTF8(const wchar_t* pStr) {
 # define utf8(str) str
 #endif
 
-namespace Opencc {
+namespace opencc {
   class DictTestUtils {
   public:
     static TextDictPtr CreateTextDictForText() {

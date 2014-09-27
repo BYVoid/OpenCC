@@ -18,4 +18,4 @@
 
 #include "Segmentation.hpp"
 
-using namespace Opencc;
+using namespace opencc;

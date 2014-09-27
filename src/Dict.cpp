@@ -19,7 +19,7 @@
 #include "Dict.hpp"
 #include "UTF8Util.hpp"
 
-using namespace Opencc;
+using namespace opencc;
 
 Optional<DictEntryPtr> Dict::MatchPrefix(const char* word) {
   string wordTrunc = UTF8Util::TruncateUTF8(word, KeyMaxLength());

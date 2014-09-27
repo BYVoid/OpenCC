@@ -41,7 +41,7 @@
 using std::string;
 
 // Forward decalarations and alias
-namespace Opencc {
+namespace opencc {
   class Config;
   class DictEntry;
   class Dict;

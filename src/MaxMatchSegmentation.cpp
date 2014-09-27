@@ -19,7 +19,7 @@
 #include "MaxMatchSegmentation.hpp"
 #include "UTF8Util.hpp"
 
-using namespace Opencc;
+using namespace opencc;
 
 StringVectorPtr MaxMatchSegmentation::Segment(const string& text) {
   StringVectorPtr segments(new StringVector);

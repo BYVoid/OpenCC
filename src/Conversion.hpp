@@ -21,7 +21,7 @@
 #include "Common.hpp"
 #include "Segmentation.hpp"
 
-namespace Opencc {
+namespace opencc {
   class OPENCC_EXPORT Conversion {
     public:
       Conversion(DictPtr _dict) : dict(_dict) {}

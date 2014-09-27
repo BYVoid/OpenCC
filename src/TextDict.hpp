@@ -21,7 +21,7 @@
 #include "Common.hpp"
 #include "SerializableDict.hpp"
 
-namespace Opencc {
+namespace opencc {
   class OPENCC_EXPORT TextDict : public SerializableDict {
     public:
       TextDict();

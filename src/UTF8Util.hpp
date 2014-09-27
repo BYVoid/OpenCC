@@ -20,7 +20,7 @@
 
 #include "Common.hpp"
 
-namespace Opencc {
+namespace opencc {
   class OPENCC_EXPORT UTF8Util {
     public:
       static void SkipUtf8Bom(FILE* fp);

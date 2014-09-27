@@ -20,7 +20,7 @@
 #include "UTF8Util.hpp"
 #include "darts.h"
 
-using namespace Opencc;
+using namespace opencc;
 
 static const char* OCDHEADER = "OPENCCDARTS1";
 

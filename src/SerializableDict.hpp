@@ -20,7 +20,7 @@
 
 #include "Dict.hpp"
 
-namespace Opencc {
+namespace opencc {
   class SerializableDict : public Dict {
     public:
       virtual void LoadFromFile(FILE* fp) = 0;

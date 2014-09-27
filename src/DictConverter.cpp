@@ -20,7 +20,7 @@
 #include "DartsDict.hpp"
 #include "TextDict.hpp"
 
-using namespace Opencc;
+using namespace opencc;
 
 SerializableDictPtr CreateDictionary(const string& format) {
   if (format == "text") {

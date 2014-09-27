@@ -21,7 +21,7 @@
 #include "Common.hpp"
 #include "Conversion.hpp"
 
-namespace Opencc {
+namespace opencc {
   class OPENCC_EXPORT ConversionChain {
     public:
       ConversionChain();

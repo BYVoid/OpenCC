@@ -22,7 +22,7 @@
 #include "SerializableDict.hpp"
 #include "TextDict.hpp"
 
-namespace Opencc {
+namespace opencc {
   class OPENCC_EXPORT DartsDict : public SerializableDict {
     public:
       DartsDict();

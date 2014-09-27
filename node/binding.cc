@@ -3,10 +3,10 @@
 #include <v8.h>
 
 #include "Config.hpp"
-#include "ConversionChain.hpp"
+#include "Converter.hpp"
 
 using namespace v8;
-using namespace Opencc;
+using namespace opencc;
 
 string ToUtf8String(const Local<String>& str) {
   v8::String::Utf8Value utf8(str);
@@ -19,22 +19,22 @@ class OpenccBinding : public node::ObjectWrap {
     string input;
     string output;
     Persistent<Function> callback;
-    Optional<Opencc::Exception> ex;
+    Optional<opencc::Exception> ex;
   };
 
   Config config_;
-  ConversionChainPtr conversionChain_;
+  ConverterPtr converter_;
  public:
   explicit OpenccBinding(const string configFileName) {
     config_.LoadFile(configFileName);
-    conversionChain_ = config_.GetConversionChain();
+    converter_ = config_.GetConverter();
   }
 
   virtual ~OpenccBinding() {
   }
   
   string Convert(const string& input) {
-    return conversionChain_->Convert(input);
+    return converter_->Convert(input);
   }
 
   static Handle<Value> New(const Arguments& args) {
@@ -48,7 +48,7 @@ class OpenccBinding : public node::ObjectWrap {
       } else {
         instance = new OpenccBinding("s2t.json");
       }
-    } catch (Opencc::Exception& e) {
+    } catch (opencc::Exception& e) {
       ThrowException(v8::Exception::Error(
           String::New(e.what())));
       return scope.Close(Undefined());
@@ -69,7 +69,7 @@ class OpenccBinding : public node::ObjectWrap {
     conv_data->instance = ObjectWrap::Unwrap<OpenccBinding>(args.This());
     conv_data->input = ToUtf8String(args[0]->ToString());
     conv_data->callback = Persistent<Function>::New(Local<Function>::Cast(args[1]));
-    conv_data->ex = Optional<Opencc::Exception>();
+    conv_data->ex = Optional<opencc::Exception>();
     uv_work_t* req = new uv_work_t;
     req->data = conv_data;
     uv_queue_work(uv_default_loop(), req, DoConvert, (uv_after_work_cb)AfterConvert);
@@ -82,8 +82,8 @@ class OpenccBinding : public node::ObjectWrap {
     OpenccBinding* instance = conv_data->instance;
     try {
       conv_data->output = instance->Convert(conv_data->input);
-    } catch (Opencc::Exception& e) {
-      conv_data->ex = Optional<Opencc::Exception>(e);
+    } catch (opencc::Exception& e) {
+      conv_data->ex = Optional<opencc::Exception>(e);
     }
   }
 
@@ -119,7 +119,7 @@ class OpenccBinding : public node::ObjectWrap {
     string output;
     try {
       output = instance->Convert(input);
-    } catch (Opencc::Exception& e) {
+    } catch (opencc::Exception& e) {
       ThrowException(v8::Exception::Error(
           String::New(e.what())));
       return scope.Close(Undefined());

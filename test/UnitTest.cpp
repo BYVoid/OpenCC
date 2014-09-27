@@ -26,7 +26,7 @@
 #include "Converter.hpp"
 #include "opencc.h"
 
-using namespace Opencc;
+using namespace opencc;
 
 void TestTextDict() {
   TextDictPtr textDict = DictTestUtils::CreateTextDictForText();
@@ -34,10 +34,10 @@ void TestTextDict() {
   
   // Serialization
   string fileName = "dict.txt";
-  textDict->Opencc::SerializableDict::SerializeToFile(fileName);
+  textDict->opencc::SerializableDict::SerializeToFile(fileName);
   
   // Deserialization
-  textDict->Opencc::SerializableDict::LoadFromFile(fileName);
+  textDict->opencc::SerializableDict::LoadFromFile(fileName);
   DictTestUtils::TestDict(textDict);
 }
 
@@ -49,10 +49,10 @@ void TestDartsDict() {
   
   // Serialization
   string fileName = "dict.ocd";
-  dartsDict->Opencc::SerializableDict::SerializeToFile(fileName);
+  dartsDict->opencc::SerializableDict::SerializeToFile(fileName);
   
   // Deserialization
-  dartsDict->Opencc::SerializableDict::LoadFromFile(fileName);
+  dartsDict->opencc::SerializableDict::LoadFromFile(fileName);
   DictTestUtils::TestDict(dartsDict);
 }
 

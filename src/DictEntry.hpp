@@ -20,7 +20,7 @@
 
 #include "Common.hpp"
 
-namespace Opencc {
+namespace opencc {
   class OPENCC_EXPORT DictEntry {
     public:
       string key;

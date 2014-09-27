@@ -18,7 +18,7 @@
 
 #include "UTF8Util.hpp"
 
-using namespace Opencc;
+using namespace opencc;
 
 void UTF8Util::SkipUtf8Bom(FILE* fp) {
   /* UTF-8 BOM is EF BB BF */

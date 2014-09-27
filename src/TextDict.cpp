@@ -19,7 +19,7 @@
 #include "TextDict.hpp"
 #include "UTF8Util.hpp"
 
-using namespace Opencc;
+using namespace opencc;
 
 DictEntryPtr ParseKeyValues(const char* buff) {
   size_t length;

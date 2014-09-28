@@ -28,6 +28,10 @@ namespace opencc {
       MaxMatchSegmentation(DictPtr _dict) : dict(_dict) {}
 
       virtual StringVectorPtr Segment(const string& text);
+    
+      const DictPtr GetDict() const {
+        return dict;
+      }
     private:
       DictPtr dict;
   };

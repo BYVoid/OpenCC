@@ -28,6 +28,11 @@ namespace opencc {
       virtual ~ConversionChain();
       void AddConversion(ConversionPtr conversion);
       StringVectorPtr Convert(const StringVectorPtr input);
+
+      const std::list<ConversionPtr> GetConversions() const {
+        return conversions;
+      }
+
     private:
       std::list<ConversionPtr> conversions;
   };

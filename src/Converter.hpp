@@ -31,6 +31,15 @@ namespace opencc {
         conversionChain(_conversionChain) {}
 
       string Convert(const string& text);
+
+      const SegmentationPtr GetSegmentation() const {
+        return segmentation;
+      }
+
+      const ConversionChainPtr GetConversionChain() const {
+        return conversionChain;
+      }
+
     private:
       const string name;
       const SegmentationPtr segmentation;

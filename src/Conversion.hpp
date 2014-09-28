@@ -31,6 +31,11 @@ namespace opencc {
 
       // Convert segmented text
       StringVectorPtr Convert(const StringVectorPtr input);
+
+      const DictPtr GetDict() const {
+        return dict;
+      }
+
     private:
       DictPtr dict;
   };

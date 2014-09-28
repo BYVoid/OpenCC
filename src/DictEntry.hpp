@@ -48,8 +48,8 @@ namespace opencc {
         }
       }
 
-      static bool PtrCmp(DictEntryPtr a, DictEntryPtr b) {
-        return a->key < b->key;
+      static bool Cmp(DictEntry a, DictEntry b) {
+        return a.key < b.key;
       }
   };
 }

@@ -55,9 +55,6 @@ namespace opencc {
   class Conversion;
   class ConversionChain;
   class Converter;
-  typedef std::shared_ptr<DictEntry> DictEntryPtr;
-  typedef std::vector<DictEntryPtr> DictEntryPtrVector;
-  typedef std::shared_ptr<DictEntryPtrVector> DictEntryPtrVectorPtr;
   typedef std::shared_ptr<Dict> DictPtr;
   typedef std::shared_ptr<SerializableDict> SerializableDictPtr;
   typedef std::shared_ptr<TextDict> TextDictPtr;

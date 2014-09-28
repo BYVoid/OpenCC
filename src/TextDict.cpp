@@ -21,25 +21,25 @@
 
 using namespace opencc;
 
-DictEntryPtr ParseKeyValues(const char* buff) {
+DictEntry ParseKeyValues(const char* buff) {
   size_t length;
   const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
   if (UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
     throw InvalidFormat("Invalid text dictionary");
   }
   length = pbuff - buff;
-  DictEntryPtr entry(new DictEntry(UTF8Util::FromSubstr(buff, length)));
+  DictEntry entry(UTF8Util::FromSubstr(buff, length));
   while (!UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
     buff = pbuff = UTF8Util::NextChar(pbuff);
     pbuff = UTF8Util::FindNextInline(buff, ' ');
     length = pbuff - buff;
     string value = UTF8Util::FromSubstr(buff, length);
-    entry->values.push_back(value);
+    entry.values.push_back(value);
   }
   return entry;
 }
 
-TextDict::TextDict() : lexicon(new DictEntryPtrVector) {
+TextDict::TextDict() {
   sorted = true;
   maxLength = 0;
 }
@@ -51,7 +51,7 @@ void TextDict::LoadFromFile(FILE* fp) {
   char buff[ENTRY_BUFF_SIZE];
   UTF8Util::SkipUtf8Bom(fp);
   while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
-    DictEntryPtr entry = ParseKeyValues(buff);
+    DictEntry entry = ParseKeyValues(buff);
     AddKeyValue(entry);
   }
   SortLexicon();
@@ -64,19 +64,15 @@ void TextDict::LoadFromDict(Dict* dictionary) {
 }
 
 void TextDict::AddKeyValue(DictEntry entry) {
-  AddKeyValue(DictEntryPtr(new DictEntry(entry)));
-}
-
-void TextDict::AddKeyValue(DictEntryPtr entry) {
-  lexicon->push_back(entry);
-  size_t keyLength = entry->key.length();
+  lexicon.push_back(entry);
+  size_t keyLength = entry.key.length();
   maxLength = std::max(keyLength, maxLength);
   sorted = false;
 }
 
 void TextDict::SortLexicon() {
   if (!sorted) {
-    std::sort(lexicon->begin(), lexicon->end(), DictEntry::PtrCmp);
+    std::sort(lexicon.begin(), lexicon.end(), DictEntry::Cmp);
     sorted = true;
   }
 }
@@ -85,19 +81,19 @@ size_t TextDict::KeyMaxLength() const {
   return maxLength;
 }
 
-Optional<DictEntryPtr> TextDict::Match(const char* word) {
+Optional<DictEntry> TextDict::Match(const char* word) {
   SortLexicon();
-  DictEntryPtr entry(new DictEntry(word));
-  auto found = std::lower_bound(lexicon->begin(),
-                                lexicon->end(), entry, DictEntry::PtrCmp);
-  if ((found != lexicon->end()) && ((*found)->key == entry->key)) {
-    return Optional<DictEntryPtr>(*found);
+  DictEntry entry(word);
+  auto found = std::lower_bound(lexicon.begin(),
+                                lexicon.end(), entry, DictEntry::Cmp);
+  if ((found != lexicon.end()) && (found->key == entry.key)) {
+    return Optional<DictEntry>(*found);
   } else {
-    return Optional<DictEntryPtr>();
+    return Optional<DictEntry>();
   }
 }
 
-DictEntryPtrVectorPtr TextDict::GetLexicon() {
+vector<DictEntry> TextDict::GetLexicon() {
   SortLexicon();
   return lexicon;
 }
@@ -105,12 +101,12 @@ DictEntryPtrVectorPtr TextDict::GetLexicon() {
 void TextDict::SerializeToFile(FILE* fp) {
   SortLexicon();
   // TODO escape space
-  for (auto entry : *lexicon) {
-    fprintf(fp, "%s\t", entry->key.c_str());
+  for (const auto& entry : lexicon) {
+    fprintf(fp, "%s\t", entry.key.c_str());
     size_t i = 0;
-    for (auto& value : entry->values) {
+    for (auto& value : entry.values) {
       fprintf(fp, "%s", value.c_str());
-      if (i < entry->values.size() - 1) {
+      if (i < entry.values.size() - 1) {
         fprintf(fp, " ");
       }
       i++;

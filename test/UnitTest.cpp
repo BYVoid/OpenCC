@@ -58,14 +58,14 @@ void TestDartsDict() {
 
 void TestDictGroup() {
   auto dictGroup = DictTestUtils::CreateDictGroupForConversion();
-  Optional<DictEntryPtr> entry;
+  Optional<DictEntry> entry;
   entry = dictGroup->MatchPrefix("Unknown");
   AssertTrue(entry.IsNull());
   
-  DictEntryPtrVectorPtr matches = dictGroup->MatchAllPrefixes(utf8("干燥"));
-  AssertEquals(2, matches->size());
-  AssertEquals(utf8("乾燥"), matches->at(0)->GetDefault());
-  AssertEquals(utf8("幹"), matches->at(1)->GetDefault());
+  vector<DictEntry> matches = dictGroup->MatchAllPrefixes(utf8("干燥"));
+  AssertEquals(2, matches.size());
+  AssertEquals(utf8("乾燥"), matches.at(0).GetDefault());
+  AssertEquals(utf8("幹"), matches.at(1).GetDefault());
 }
 
 void TestSegmentation() {

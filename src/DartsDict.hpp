@@ -28,16 +28,16 @@ namespace opencc {
       DartsDict();
       virtual ~DartsDict();
       virtual size_t KeyMaxLength() const;
-      virtual Optional<DictEntryPtr> Match(const char* word);
-      virtual Optional<DictEntryPtr> MatchPrefix(const char* word);
-      virtual DictEntryPtrVectorPtr GetLexicon();
+      virtual Optional<DictEntry> Match(const char* word);
+      virtual Optional<DictEntry> MatchPrefix(const char* word);
+      virtual vector<DictEntry> GetLexicon();
       virtual void LoadFromFile(FILE* fp);
       virtual void SerializeToFile(FILE* fp);
       virtual void LoadFromDict(Dict* dictionary);
     private:
       size_t maxLength;
       void* dict;
-      DictEntryPtrVectorPtr lexicon;
+      vector<DictEntry> lexicon;
       void* buffer;
   };
 }

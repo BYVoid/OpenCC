@@ -94,33 +94,33 @@ namespace opencc {
     }
     
     static void TestDict(DictPtr dict) {
-      Optional<DictEntryPtr> entry;
+      Optional<DictEntry> entry;
       entry = dict->MatchPrefix("BYVoid");
       AssertTrue(!entry.IsNull());
-      AssertEquals("BYVoid", entry.Get()->key);
-      AssertEquals("byv", entry.Get()->GetDefault());
+      AssertEquals("BYVoid", entry.Get().key);
+      AssertEquals("byv", entry.Get().GetDefault());
       
       entry = dict->MatchPrefix("BYVoid123");
       AssertTrue(!entry.IsNull());
-      AssertEquals("BYVoid", entry.Get()->key);
-      AssertEquals("byv", entry.Get()->GetDefault());
+      AssertEquals("BYVoid", entry.Get().key);
+      AssertEquals("byv", entry.Get().GetDefault());
       
       entry = dict->MatchPrefix(utf8("積羽沉舟"));
       AssertTrue(!entry.IsNull());
-      AssertEquals(utf8("積羽沉舟"), entry.Get()->key);
-      AssertEquals(utf8("羣輕折軸"), entry.Get()->GetDefault());
+      AssertEquals(utf8("積羽沉舟"), entry.Get().key);
+      AssertEquals(utf8("羣輕折軸"), entry.Get().GetDefault());
       
       entry = dict->MatchPrefix("Unknown");
       AssertTrue(entry.IsNull());
       
-      DictEntryPtrVectorPtr matches = dict->MatchAllPrefixes(utf8("清華大學計算機系"));
-      AssertEquals(3, matches->size());
-      AssertEquals(utf8("清華大學"), matches->at(0)->key);
-      AssertEquals("TsinghuaUniversity", matches->at(0)->GetDefault());
-      AssertEquals(utf8("清華"), matches->at(1)->key);
-      AssertEquals("Tsinghua", matches->at(1)->GetDefault());
-      AssertEquals(utf8("清"), matches->at(2)->key);
-      AssertEquals("Tsing", matches->at(2)->GetDefault());
+      const vector<DictEntry> matches = dict->MatchAllPrefixes(utf8("清華大學計算機系"));
+      AssertEquals(3, matches.size());
+      AssertEquals(utf8("清華大學"), matches.at(0).key);
+      AssertEquals("TsinghuaUniversity", matches.at(0).GetDefault());
+      AssertEquals(utf8("清華"), matches.at(1).key);
+      AssertEquals("Tsinghua", matches.at(1).GetDefault());
+      AssertEquals(utf8("清"), matches.at(2).key);
+      AssertEquals("Tsing", matches.at(2).GetDefault());
     }
   };
 }

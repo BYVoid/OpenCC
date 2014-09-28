@@ -27,19 +27,18 @@ namespace opencc {
       TextDict();
       virtual ~TextDict();
       virtual size_t KeyMaxLength() const;
-      virtual Optional<DictEntryPtr> Match(const char* word);
-      virtual DictEntryPtrVectorPtr GetLexicon();
+      virtual Optional<DictEntry> Match(const char* word);
+      virtual vector<DictEntry> GetLexicon();
       virtual void LoadFromFile(FILE* fp);
       virtual void SerializeToFile(FILE* fp);
       virtual void LoadFromDict(Dict* dictionary);
 
       void AddKeyValue(DictEntry entry);
-      void AddKeyValue(DictEntryPtr entry);
     private:
       void SortLexicon();
 
       bool sorted;
       size_t maxLength;
-      DictEntryPtrVectorPtr lexicon;
+      vector<DictEntry> lexicon;
   };
 }

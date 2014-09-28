@@ -36,52 +36,52 @@ size_t DictGroup::KeyMaxLength() const {
   return keyMaxLength;
 }
 
-Optional<DictEntryPtr> DictGroup::Match(const char* word) {
+Optional<DictEntry> DictGroup::Match(const char* word) {
   for (auto dict : dicts) {
-    Optional<DictEntryPtr> prefix = dict->Match(word);
+    Optional<DictEntry> prefix = dict->Match(word);
     if (!prefix.IsNull()) {
       return prefix;
     }
   }
-  return Optional<DictEntryPtr>();
+  return Optional<DictEntry>();
 }
 
-Optional<DictEntryPtr> DictGroup::MatchPrefix(const char* word) {
+Optional<DictEntry> DictGroup::MatchPrefix(const char* word) {
   for (auto dict : dicts) {
-    Optional<DictEntryPtr> prefix = dict->MatchPrefix(word);
+    Optional<DictEntry> prefix = dict->MatchPrefix(word);
     if (!prefix.IsNull()) {
       return prefix;
     }
   }
-  return Optional<DictEntryPtr>();
+  return Optional<DictEntry>();
 }
 
-DictEntryPtrVectorPtr DictGroup::MatchAllPrefixes(const char* word) {
-  std::map<size_t, DictEntryPtr> matched;
+vector<DictEntry> DictGroup::MatchAllPrefixes(const char* word) {
+  std::map<size_t, DictEntry> matched;
   for (auto dict : dicts) {
     auto entries = dict->MatchAllPrefixes(word);
-    for (DictEntryPtr entry : *entries) {
-      size_t len = entry->key.length();
+    for (const auto& entry : entries) {
+      size_t len = entry.key.length();
       if (matched.find(len) == matched.end()) {
         matched[len] = entry;
       }
     }
   }
-  DictEntryPtrVectorPtr matchedEntries(new DictEntryPtrVector);
-  for (auto entry : matched) {
-    matchedEntries->push_back(entry.second);
+  vector<DictEntry> matchedEntries;
+  for (const auto& entry : matched) {
+    matchedEntries.push_back(entry.second);
   }
-  std::reverse(matchedEntries->begin(), matchedEntries->end());
+  std::reverse(matchedEntries.begin(), matchedEntries.end());
   return matchedEntries;
 }
 
-DictEntryPtrVectorPtr DictGroup::GetLexicon() {
-  DictEntryPtrVectorPtr allLexicon(new DictEntryPtrVector);
+vector<DictEntry> DictGroup::GetLexicon() {
+  vector<DictEntry> allLexicon;
   for (auto dict : dicts) {
     auto lexicon = dict->GetLexicon();
-    std::copy(lexicon->begin(), lexicon->end(), std::back_inserter(*allLexicon));
+    std::copy(lexicon.begin(), lexicon.end(), std::back_inserter(allLexicon));
   }
-  std::sort(allLexicon->begin(), allLexicon->end(), DictEntry::PtrCmp);
+  std::sort(allLexicon.begin(), allLexicon.end(), DictEntry::Cmp);
   return allLexicon;
 }
 

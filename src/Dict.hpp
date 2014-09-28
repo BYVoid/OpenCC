@@ -25,10 +25,10 @@ namespace opencc {
   class OPENCC_EXPORT Dict {
     public:
       virtual size_t KeyMaxLength() const = 0;
-      virtual Optional<DictEntryPtr> Match(const char* word) = 0;
-      virtual Optional<DictEntryPtr> MatchPrefix(const char* word);
-      virtual DictEntryPtrVectorPtr MatchAllPrefixes(const char* word);
-      virtual DictEntryPtrVectorPtr GetLexicon() = 0;
+      virtual Optional<DictEntry> Match(const char* word) = 0;
+      virtual Optional<DictEntry> MatchPrefix(const char* word);
+      virtual vector<DictEntry> MatchAllPrefixes(const char* word);
+      virtual vector<DictEntry> GetLexicon() = 0;
       virtual void LoadFromDict(Dict* dictionary) = 0;
   };
 }

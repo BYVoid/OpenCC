@@ -31,15 +31,15 @@ vector<string> MaxMatchSegmentation::Segment(const string& text) {
                        }
                      };
   for (const char* pstr = text.c_str(); *pstr != '\0';) {
-    Optional<DictEntryPtr> matched = dict->MatchPrefix(pstr);
+    Optional<DictEntry> matched = dict->MatchPrefix(pstr);
     size_t matchedLength;
     if (matched.IsNull()) {
       matchedLength = UTF8Util::NextCharLength(pstr);
       buffer.push_back(UTF8Util::FromSubstr(pstr, matchedLength));
     } else {
       clearBuffer();
-      matchedLength = matched.Get()->key.length();
-      segments.push_back(matched.Get()->key);
+      matchedLength = matched.Get().key.length();
+      segments.push_back(matched.Get().key);
     }
     pstr += matchedLength;
   }

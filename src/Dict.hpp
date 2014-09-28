@@ -28,6 +28,15 @@ namespace opencc {
       virtual Optional<DictEntry> Match(const char* word) = 0;
       virtual Optional<DictEntry> MatchPrefix(const char* word);
       virtual vector<DictEntry> MatchAllPrefixes(const char* word);
+      Optional<DictEntry> Match(const string& word) {
+        return Match(word.c_str());
+      }
+      Optional<DictEntry> MatchPrefix(const string& word) {
+        return MatchPrefix(word.c_str());
+      }
+      vector<DictEntry> MatchAllPrefixes(const string& word) {
+        return MatchAllPrefixes(word.c_str());
+      }
       virtual vector<DictEntry> GetLexicon() = 0;
       virtual void LoadFromDict(Dict* dictionary) = 0;
   };

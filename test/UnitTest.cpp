@@ -72,11 +72,11 @@ void TestSegmentation() {
   auto dict = DictTestUtils::CreateDictGroupForConversion();
   auto segmentation = SegmentationPtr(new MaxMatchSegmentation(dict));
   auto segments = segmentation->Segment(utf8("太后的头发干燥"));
-  AssertEquals(4, segments->size());
-  AssertEquals(utf8("太后"), segments->at(0));
-  AssertEquals(utf8("的"), segments->at(1));
-  AssertEquals(utf8("头发"), segments->at(2));
-  AssertEquals(utf8("干燥"), segments->at(3));
+  AssertEquals(4, segments.size());
+  AssertEquals(utf8("太后"), segments.at(0));
+  AssertEquals(utf8("的"), segments.at(1));
+  AssertEquals(utf8("头发"), segments.at(2));
+  AssertEquals(utf8("干燥"), segments.at(3));
 }
 
 void TestConversion() {
@@ -96,8 +96,8 @@ void TestConversionChain() {
   auto conversionChain = ConversionChainPtr(new ConversionChain());
   conversionChain->AddConversion(conversion);
   conversionChain->AddConversion(conversionVariants);
-  StringVectorPtr converted = conversionChain->Convert(StringVectorPtr(new StringVector{utf8("里面")}));
-  VectorAssertEquals(StringVectorPtr(new StringVector{utf8("裡面")}), converted);
+  auto converted = conversionChain->Convert(vector<string>{utf8("里面")});
+  VectorAssertEquals(vector<string>{utf8("裡面")}, converted);
 }
 
 const string CONFIG_TEST_PATH = "config_test/config_test.json";

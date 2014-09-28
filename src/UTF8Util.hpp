@@ -130,10 +130,10 @@ namespace opencc {
         }
       }
 
-      static string Join(StringVectorPtr strings, const string& separator) {
+      static string Join(vector<string> strings, const string& separator) {
         std::ostringstream buffer;
         bool first = true;
-        for (const auto& str : *strings) {
+        for (const auto& str : strings) {
           if (!first) {
             buffer << ' ';
           }
@@ -143,9 +143,9 @@ namespace opencc {
         return buffer.str();
       }
 
-      static string Join(StringVectorPtr strings) {
+      static string Join(vector<string> strings) {
         std::ostringstream buffer;
-        for (const auto& str : *strings) {
+        for (const auto& str : strings) {
           buffer << str;
         }
         return buffer.str();

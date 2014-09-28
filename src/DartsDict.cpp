@@ -83,7 +83,7 @@ DictEntryPtrVectorPtr DartsDict::GetLexicon() {
 
 void DartsDict::LoadFromDict(Dict* dictionary) {
   Darts::DoubleArray& dict = *(Darts::DoubleArray*)this->dict;
-  std::vector<const char*> keys;
+  vector<const char*> keys;
 
   maxLength = 0;
   lexicon = dictionary->GetLexicon();

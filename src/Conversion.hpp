@@ -30,7 +30,7 @@ namespace opencc {
       string Convert(const string& phrase);
 
       // Convert segmented text
-      StringVectorPtr Convert(const StringVectorPtr input);
+      vector<string> Convert(const vector<string>& input);
 
       const DictPtr GetDict() const {
         return dict;

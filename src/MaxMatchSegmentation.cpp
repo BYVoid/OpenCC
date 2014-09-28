@@ -21,13 +21,13 @@
 
 using namespace opencc;
 
-StringVectorPtr MaxMatchSegmentation::Segment(const string& text) {
-  StringVectorPtr segments(new StringVector);
-  StringVectorPtr buffer(new StringVector);
+vector<string> MaxMatchSegmentation::Segment(const string& text) {
+  vector<string> segments;
+  vector<string> buffer;
   auto clearBuffer = [&segments, &buffer]() {
-                       if (buffer->size() > 0) {
-                         segments->push_back(UTF8Util::Join(buffer));
-                         buffer->clear();
+                       if (buffer.size() > 0) {
+                         segments.push_back(UTF8Util::Join(buffer));
+                         buffer.clear();
                        }
                      };
   for (const char* pstr = text.c_str(); *pstr != '\0';) {
@@ -35,11 +35,11 @@ StringVectorPtr MaxMatchSegmentation::Segment(const string& text) {
     size_t matchedLength;
     if (matched.IsNull()) {
       matchedLength = UTF8Util::NextCharLength(pstr);
-      buffer->push_back(UTF8Util::FromSubstr(pstr, matchedLength));
+      buffer.push_back(UTF8Util::FromSubstr(pstr, matchedLength));
     } else {
       clearBuffer();
       matchedLength = matched.Get()->key.length();
-      segments->push_back(matched.Get()->key);
+      segments.push_back(matched.Get()->key);
     }
     pstr += matchedLength;
   }

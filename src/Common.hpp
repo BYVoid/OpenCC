@@ -39,6 +39,8 @@
 #include "Optional.hpp"
 
 using std::string;
+using std::vector;
+using std::list;
 
 // Forward decalarations and alias
 namespace opencc {
@@ -66,8 +68,6 @@ namespace opencc {
   typedef std::shared_ptr<ConversionChain> ConversionChainPtr;
   typedef std::shared_ptr<Converter> ConverterPtr;
 }
-typedef std::vector<string> StringVector;
-typedef std::shared_ptr<StringVector> StringVectorPtr;
 
 #ifdef ENABLE_GETTEXT
 # include <libintl.h>

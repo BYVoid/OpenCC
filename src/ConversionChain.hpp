@@ -25,15 +25,14 @@ namespace opencc {
   class OPENCC_EXPORT ConversionChain {
     public:
       ConversionChain();
-      virtual ~ConversionChain();
       void AddConversion(ConversionPtr conversion);
-      StringVectorPtr Convert(const StringVectorPtr input);
+      vector<string> Convert(const vector<string>& input);
 
-      const std::list<ConversionPtr> GetConversions() const {
+      const list<ConversionPtr> GetConversions() const {
         return conversions;
       }
 
     private:
-      std::list<ConversionPtr> conversions;
+      list<ConversionPtr> conversions;
   };
 }

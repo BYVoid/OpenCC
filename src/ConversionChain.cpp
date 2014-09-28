@@ -22,14 +22,12 @@ using namespace opencc;
 
 ConversionChain::ConversionChain() {}
 
-ConversionChain::~ConversionChain() {}
-
 void ConversionChain::AddConversion(ConversionPtr conversion) {
   conversions.push_back(conversion);
 }
 
-StringVectorPtr ConversionChain::Convert(const StringVectorPtr input) {
-  StringVectorPtr output = input;
+vector<string> ConversionChain::Convert(const vector<string>& input) {
+  vector<string> output = input;
   for (auto conversion : conversions) {
     output = conversion->Convert(output);
   }

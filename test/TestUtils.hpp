@@ -49,11 +49,12 @@ public:
   }
 };
 
-static inline void VectorAssertEquals(StringVectorPtr expected, StringVectorPtr actual) {
-  size_t length = expected->size();
-  AssertTrue(length == actual->size());
+static inline void VectorAssertEquals(const vector<string>& expected,
+                                      const vector<string>& actual) {
+  size_t length = expected.size();
+  AssertTrue(length == actual.size());
   for (size_t i = 0; i < length; i++) {
-    AssertEquals(expected->at(i), actual->at(i));
+    AssertEquals(expected.at(i), actual.at(i));
   }
 }
 

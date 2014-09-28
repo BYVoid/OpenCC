@@ -34,11 +34,11 @@ namespace opencc {
       virtual void LoadFromDict(Dict* dictionary);
       void AddDict(DictPtr dict);
     
-      const std::list<DictPtr> GetDicts() const {
+      const list<DictPtr> GetDicts() const {
         return dicts;
       }
     private:
       size_t keyMaxLength;
-      std::list<DictPtr> dicts;
+      list<DictPtr> dicts;
   };
 }

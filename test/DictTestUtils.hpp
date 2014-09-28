@@ -60,10 +60,10 @@ namespace opencc {
     
     static DictPtr CreateDictForCharacters() {
       TextDictPtr textDict(new TextDict);
-      textDict->AddKeyValue(DictEntry(utf8("后"), StringVector{utf8("后"), utf8("後")}));
-      textDict->AddKeyValue(DictEntry(utf8("发"), StringVector{utf8("發"), utf8("髮")}));
-      textDict->AddKeyValue(DictEntry(utf8("干"), StringVector{utf8("幹"), utf8("乾"), utf8("干")}));
-      textDict->AddKeyValue(DictEntry(utf8("里"), StringVector{utf8("裏"), utf8("里")}));
+      textDict->AddKeyValue(DictEntry(utf8("后"), vector<string>{utf8("后"), utf8("後")}));
+      textDict->AddKeyValue(DictEntry(utf8("发"), vector<string>{utf8("發"), utf8("髮")}));
+      textDict->AddKeyValue(DictEntry(utf8("干"), vector<string>{utf8("幹"), utf8("乾"), utf8("干")}));
+      textDict->AddKeyValue(DictEntry(utf8("里"), vector<string>{utf8("裏"), utf8("里")}));
       return textDict;
     }
     

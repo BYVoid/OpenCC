@@ -39,10 +39,10 @@ string Conversion::Convert(const string& phrase) {
   return buffer.str();
 }
 
-StringVectorPtr Conversion::Convert(const StringVectorPtr input) {
-  StringVectorPtr output = StringVectorPtr(new StringVector);
-  for (const auto& segment : *input) {
-    output->push_back(Convert(segment));
+vector<string> Conversion::Convert(const vector<string>& input) {
+  vector<string> output;
+  for (const auto& segment : input) {
+    output.push_back(Convert(segment));
   }
   return output;
 }

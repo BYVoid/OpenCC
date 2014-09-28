@@ -25,7 +25,7 @@ string Converter::Convert(const string& text) {
   auto segments = segmentation->Segment(text);
   auto converted = conversionChain->Convert(segments);
   std::ostringstream buffer;
-  for (auto segment : *converted) {
+  for (auto segment : converted) {
     buffer << segment;
   }
   return buffer.str();

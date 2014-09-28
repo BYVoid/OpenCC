@@ -11,10 +11,12 @@ set(
   Dict.hpp
   DictEntry.hpp
   DictGroup.hpp
+  Exception.hpp
   Export.hpp
   MaxMatchSegmentation.hpp
   Optional.hpp
   Segmentation.hpp
+  SerializableDict.hpp
   TextDict.hpp
   UTF8Util.hpp
   opencc.h

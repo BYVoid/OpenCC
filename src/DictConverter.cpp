@@ -98,6 +98,8 @@ int main(int argc, const char* argv[]) {
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error()
               << " for arg " << e.argId() << std::endl;
+  } catch (Exception& e) {
+    std::cerr << e.what() << std::endl;
   }
   return 0;
 }

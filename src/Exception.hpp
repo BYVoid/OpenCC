@@ -35,7 +35,7 @@ namespace opencc {
 
       virtual ~Exception() throw() {}
 
-      Exception(std::string message_) : message(message_) {}
+      Exception(const std::string& _message) : message(_message) {}
 
       virtual const char* what() const noexcept {
         return message.c_str();
@@ -47,18 +47,19 @@ namespace opencc {
 
   class OPENCC_EXPORT FileNotFound : public Exception {
     public:
-      FileNotFound(const std::string fileName) :
-        Exception(fileName + " not found or not accessible") {}
+      FileNotFound(const std::string& fileName) :
+        Exception(fileName + " not found or not accessible.") {}
   };
 
   class OPENCC_EXPORT FileNotWritable : public Exception {
     public:
-      FileNotWritable(const std::string fileName) :
-        Exception(fileName + " not writable") {}
+      FileNotWritable(const std::string& fileName) :
+        Exception(fileName + " not writable.") {}
   };
 
   class OPENCC_EXPORT InvalidFormat : public Exception {
     public:
-      InvalidFormat(const std::string message) : Exception(message) {}
+      InvalidFormat(const std::string& message) :
+        Exception("Invalid format: " + message) {}
   };
 }

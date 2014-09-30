@@ -30,7 +30,7 @@ namespace opencc {
         name(_name), segmentation(_segmentation),
         conversionChain(_conversionChain) {}
 
-      string Convert(const string& text);
+      string Convert(const string& text) const;
 
       const SegmentationPtr GetSegmentation() const {
         return segmentation;

@@ -38,9 +38,9 @@
 #include "Export.hpp"
 #include "Optional.hpp"
 
+using std::list;
 using std::string;
 using std::vector;
-using std::list;
 
 // Forward decalarations and alias
 namespace opencc {

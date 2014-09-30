@@ -25,19 +25,21 @@ namespace opencc {
   class OPENCC_EXPORT Dict {
     public:
       virtual size_t KeyMaxLength() const = 0;
-      virtual Optional<DictEntry> Match(const char* word) = 0;
-      virtual Optional<DictEntry> MatchPrefix(const char* word);
-      virtual vector<DictEntry> MatchAllPrefixes(const char* word);
-      Optional<DictEntry> Match(const string& word) {
+      virtual Optional<DictEntry> Match(const char* word) const = 0;
+      virtual Optional<DictEntry> MatchPrefix(const char* word) const;
+      virtual vector<DictEntry> MatchAllPrefixes(const char* word) const;
+      Optional<DictEntry> Match(const string& word) const {
         return Match(word.c_str());
       }
-      Optional<DictEntry> MatchPrefix(const string& word) {
+
+      Optional<DictEntry> MatchPrefix(const string& word) const {
         return MatchPrefix(word.c_str());
       }
-      vector<DictEntry> MatchAllPrefixes(const string& word) {
+
+      vector<DictEntry> MatchAllPrefixes(const string& word) const {
         return MatchAllPrefixes(word.c_str());
       }
-      virtual vector<DictEntry> GetLexicon() = 0;
-      virtual void LoadFromDict(Dict* dictionary) = 0;
+
+      virtual vector<DictEntry> GetLexicon() const = 0;
   };
 }

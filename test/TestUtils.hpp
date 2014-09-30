@@ -21,32 +21,31 @@
 #include "Common.hpp"
 
 #ifdef _MSC_VER
-#define __func__ __FUNCTION__ 
-#endif
+# define __func__ __FUNCTION__
+#endif // ifdef _MSC_VER
 
-#define stringize(s) #s
-#define Assert(condition, msg) {\
-  if (!(condition)) {\
-    std::ostringstream __buffer;\
-    __buffer << "Assertion failed: " << stringize(condition) << ", function "\
-      << __func__ << ", " << __FILE__ << ":" << __LINE__ << "\n" << msg; \
-    throw AssertionFailure(__buffer.str());\
-  }\
+#define stringize(s) # s
+#define Assert(condition, msg) {                                                  \
+    if (!(condition)) {                                                           \
+      std::ostringstream __buffer;                                                \
+      __buffer << "Assertion failed: " << stringize(condition) << ", function "   \
+               << __func__ << ", " << __FILE__ << ":" << __LINE__ << "\n" << msg; \
+      throw AssertionFailure(__buffer.str());                                     \
+    }                                                                             \
 }
 #define AssertTrue(condition) Assert(condition, "")
-#define AssertEquals(expected, actual) {\
-  if (!((expected) == (actual))) {\
-    std::ostringstream __buffer0;\
-    __buffer0 << "Expected: " << (expected) << "\n";\
-    __buffer0 << "Actual: " << (actual) << "\n";\
-    Assert((expected) == (actual), __buffer0.str());\
-  }\
+#define AssertEquals(expected, actual) {               \
+    if (!((expected) == (actual))) {                   \
+      std::ostringstream __buffer0;                    \
+      __buffer0 << "Expected: " << (expected) << "\n"; \
+      __buffer0 << "Actual: " << (actual) << "\n";     \
+      Assert((expected) == (actual), __buffer0.str()); \
+    }                                                  \
 }
 
 class AssertionFailure : public std::runtime_error {
-public:
-  AssertionFailure(string msg) : std::runtime_error(msg) {
-  }
+  public:
+    AssertionFailure(string msg) : std::runtime_error(msg) {}
 };
 
 static inline void VectorAssertEquals(const vector<string>& expected,
@@ -59,18 +58,18 @@ static inline void VectorAssertEquals(const vector<string>& expected,
 }
 
 class TestUtils {
-public:
-  static void RunTest(const string name, void (*func)(void)) {
-    clock_t start = clock();
-    std::cout << "[" << name << "]" << "...";
-    try {
-      func();
-      clock_t end = clock();
-      double duration = (end - start) * 1000.0 / CLOCKS_PER_SEC;
-      std::cout << "Success" << " (" << duration << "ms)" << std::endl;
-    } catch (AssertionFailure e) {
-      std::cout << "Failed" << std::endl;
-      std::cout << e.what() << std::endl;
+  public:
+    static void RunTest(const string name, void (* func)(void)) {
+      clock_t start = clock();
+      std::cout << "[" << name << "]" << "...";
+      try {
+        func();
+        clock_t end = clock();
+        double duration = (end - start) * 1000.0 / CLOCKS_PER_SEC;
+        std::cout << "Success" << " (" << duration << "ms)" << std::endl;
+      } catch (AssertionFailure e) {
+        std::cout << "Failed" << std::endl;
+        std::cout << e.what() << std::endl;
+      }
     }
-  }
 };

@@ -22,11 +22,25 @@
 
 using namespace opencc;
 
-SerializableDictPtr CreateDictionary(const string& format) {
+SerializableDictPtr LoadDictionary(const string& format,
+                                   const string& inputFileName) {
   if (format == "text") {
-    return SerializableDictPtr(new TextDict);
+    return SerializableDict::NewFromFile<TextDict>(inputFileName);
   } else if (format == "ocd") {
-    return SerializableDictPtr(new DartsDict);
+    return SerializableDict::NewFromFile<DartsDict>(inputFileName);
+  } else {
+    fprintf(stderr, "Unknown dictionary format: %s\n", format.c_str());
+    exit(2);
+  }
+  return nullptr;
+}
+
+SerializableDictPtr ConvertDictionary(const string& format,
+                                      const SerializableDictPtr dict) {
+  if (format == "text") {
+    return TextDict::NewFromDict(*dict.get());
+  } else if (format == "ocd") {
+    return DartsDict::NewFromDict(*dict.get());
   } else {
     fprintf(stderr, "Unknown dictionary format: %s\n", format.c_str());
     exit(2);
@@ -38,11 +52,8 @@ void ConvertDictionary(const string inputFileName,
                        const string outputFileName,
                        const string formatFrom,
                        const string formatTo) {
-  SerializableDictPtr dictFrom = CreateDictionary(formatFrom);
-  SerializableDictPtr dictTo = CreateDictionary(formatTo);
-
-  dictFrom->LoadFromFile(inputFileName);
-  dictTo->LoadFromDict(dictFrom.get());
+  SerializableDictPtr dictFrom = LoadDictionary(formatFrom, inputFileName);
+  SerializableDictPtr dictTo = ConvertDictionary(formatTo, dictFrom);
   dictTo->SerializeToFile(outputFileName);
 }
 

@@ -21,7 +21,7 @@
 
 using namespace opencc;
 
-Optional<DictEntry> Dict::MatchPrefix(const char* word) {
+Optional<DictEntry> Dict::MatchPrefix(const char* word) const {
   string wordTrunc = UTF8Util::TruncateUTF8(word, KeyMaxLength());
   const char* wordTruncPtr = wordTrunc.c_str() + wordTrunc.length();
   for (long len = wordTrunc.length(); len > 0;
@@ -36,7 +36,7 @@ Optional<DictEntry> Dict::MatchPrefix(const char* word) {
   return Optional<DictEntry>();
 }
 
-vector<DictEntry> Dict::MatchAllPrefixes(const char* word) {
+vector<DictEntry> Dict::MatchAllPrefixes(const char* word) const {
   vector<DictEntry> matchedLengths;
   string wordTrunc = UTF8Util::TruncateUTF8(word, KeyMaxLength());
   const char* wordTruncPtr = wordTrunc.c_str() + wordTrunc.length();

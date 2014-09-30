@@ -24,15 +24,14 @@
 namespace opencc {
   class OPENCC_EXPORT ConversionChain {
     public:
-      ConversionChain();
-      void AddConversion(ConversionPtr conversion);
-      vector<string> Convert(const vector<string>& input);
+      ConversionChain(const list<ConversionPtr> _conversions);
+      vector<string> Convert(const vector<string>& input) const;
 
       const list<ConversionPtr> GetConversions() const {
         return conversions;
       }
 
     private:
-      list<ConversionPtr> conversions;
+      const list<ConversionPtr> conversions;
   };
 }

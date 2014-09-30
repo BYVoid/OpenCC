@@ -28,98 +28,94 @@
 #include "document.h"
 
 using namespace opencc;
-typedef rapidjson::GenericValue<rapidjson::UTF8<>> JSONValue;
+typedef rapidjson::GenericValue < rapidjson::UTF8 < char >> JSONValue;
 
-Config::Config() {}
+Config::Config(const ConverterPtr _converter) : converter(_converter) {}
 
-Config::Config(const string fileName) {
-  LoadFile(fileName);
-}
-
-JSONValue& GetProperty(JSONValue& doc, const char* name) {
+const JSONValue& GetProperty(const JSONValue& doc, const char* name) {
   if (!doc.HasMember(name)) {
     throw InvalidFormat("Required property not found: " + string(name));
   }
   return doc[name];
 }
 
-JSONValue& GetObjectProperty(JSONValue& doc, const char* name) {
-  JSONValue& obj = GetProperty(doc, name);
+const JSONValue& GetObjectProperty(const JSONValue& doc, const char* name) {
+  const JSONValue& obj = GetProperty(doc, name);
   if (!obj.IsObject()) {
     throw InvalidFormat("Property must be an object: " + string(name));
   }
   return obj;
 }
 
-JSONValue& GetArrayProperty(JSONValue& doc, const char* name) {
-  JSONValue& obj = GetProperty(doc, name);
+const JSONValue& GetArrayProperty(const JSONValue& doc, const char* name) {
+  const JSONValue& obj = GetProperty(doc, name);
   if (!obj.IsArray()) {
     throw InvalidFormat("Property must be an array: " + string(name));
   }
   return obj;
 }
 
-const char* GetStringProperty(JSONValue& doc, const char* name) {
-  JSONValue& obj = GetProperty(doc, name);
+const char* GetStringProperty(const JSONValue& doc, const char* name) {
+  const JSONValue& obj = GetProperty(doc, name);
   if (!obj.IsString()) {
     throw InvalidFormat("Property must be a string: " + string(name));
   }
   return obj.GetString();
 }
 
-void LoadDictWithPaths(SerializableDictPtr dict,
-                       string& fileName,
-                       string& configDirectory) {
+template<typename DICT>
+SerializableDictPtr LoadDictWithPaths(const string& fileName,
+                                      const string& configDirectory) {
   // Working directory
-  if (dict->TryLoadFromFile(fileName)) {
-    return;
+  std::shared_ptr<DICT> dict;
+  if (SerializableDict::TryLoadFromFile<DICT>(fileName, &dict)) {
+    return dict;
   }
   // Configuration directory
   if ((configDirectory != "") &&
-      dict->TryLoadFromFile(configDirectory + fileName)) {
-    return;
+      SerializableDict::TryLoadFromFile<DICT>(configDirectory + fileName,
+                                              &dict)) {
+    return dict;
   }
   // Package data directory
   if ((PACKAGE_DATA_DIRECTORY != "") &&
-      dict->TryLoadFromFile(PACKAGE_DATA_DIRECTORY + fileName)) {
-    return;
+      SerializableDict::TryLoadFromFile<DICT>(PACKAGE_DATA_DIRECTORY + fileName,
+                                              &dict)) {
+    return dict;
   }
   throw FileNotFound(fileName);
 }
 
-DictPtr ParseDict(JSONValue& doc, string& configDirectory) {
+DictPtr ParseDict(const JSONValue& doc, const string& configDirectory) {
   // Required: type
   string type = GetStringProperty(doc, "type");
   DictPtr dict;
   if (type == "group") {
-    DictGroupPtr dictGroup(new DictGroup);
-    JSONValue& docs = GetArrayProperty(doc, "dicts");
+    list<DictPtr> dicts;
+    const JSONValue& docs = GetArrayProperty(doc, "dicts");
     for (rapidjson::SizeType i = 0; i < docs.Size(); i++) {
       if (docs[i].IsObject()) {
         DictPtr dict = ParseDict(docs[i], configDirectory);
-        dictGroup->AddDict(dict);
+        dicts.push_back(dict);
       } else {
         throw InvalidFormat("Element of the array must be an object");
       }
     }
-    dict = dictGroup;
+    dict = DictGroupPtr(new DictGroup(dicts));
   } else if (type == "text") {
     string fileName = GetStringProperty(doc, "file");
-    SerializableDictPtr textDict(new TextDict());
-    LoadDictWithPaths(textDict, fileName, configDirectory);
-    dict = textDict;
+    dict = LoadDictWithPaths<TextDict>(fileName, configDirectory);
   } else if (type == "ocd") {
     string fileName = GetStringProperty(doc, "file");
-    SerializableDictPtr dartsDict(new DartsDict());
-    LoadDictWithPaths(dartsDict, fileName, configDirectory);
-    dict = dartsDict;
+    dict = LoadDictWithPaths<DartsDict>(fileName, configDirectory);
   } else {
     throw InvalidFormat("Unknown dictionary type: " + type);
   }
   return dict;
 }
 
-SegmentationPtr ParseSegmentation(JSONValue& doc, string& configDirectory) {
+SegmentationPtr ParseSegmentation(const JSONValue& doc,
+                                  const string& configDirectory) {
   SegmentationPtr segmentation;
 
   // Required: type
@@ -134,7 +130,8 @@ SegmentationPtr ParseSegmentation(JSONValue& doc, string& configDirectory) {
   return segmentation;
 }
 
-ConversionPtr ParseConversion(JSONValue& doc, string& configDirectory) {
+ConversionPtr ParseConversion(const JSONValue& doc,
+                              const string& configDirectory) {
   // Required: dict
   DictPtr dict = ParseDict(GetObjectProperty(doc, "dict"), configDirectory);
   ConversionPtr conversion(new Conversion(dict));
@@ -142,16 +139,17 @@ ConversionPtr ParseConversion(JSONValue& doc, string& configDirectory) {
   return conversion;
 }
 
-ConversionChainPtr ParseConversionChain(JSONValue& docs,
-                                        string& configDirectory) {
-  ConversionChainPtr chain(new ConversionChain);
+ConversionChainPtr ParseConversionChain(const JSONValue& docs,
+                                        const string& configDirectory) {
+  list<ConversionPtr> conversions;
   for (rapidjson::SizeType i = 0; i < docs.Size(); i++) {
-    JSONValue& doc = docs[i];
+    const JSONValue& doc = docs[i];
     if (doc.IsObject()) {
       ConversionPtr conversion = ParseConversion(doc, configDirectory);
-      chain->AddConversion(conversion);
+      conversions.push_back(conversion);
     } else {}
   }
+  ConversionChainPtr chain(new ConversionChain(conversions));
   return chain;
 }
 
@@ -174,7 +172,7 @@ string FindConfigFile(string fileName) {
   throw FileNotFound(fileName);
 }
 
-void Config::LoadFile(const string fileName) {
+Config Config::NewFromFile(const string& fileName) {
   string prefixedFileName = FindConfigFile(fileName);
   std::ifstream ifs(prefixedFileName);
   string content(std::istreambuf_iterator<char>(ifs),
@@ -184,15 +182,14 @@ void Config::LoadFile(const string fileName) {
   UTF8Util::ReplaceAll(prefixedFileName, "\\", "/");
 #endif // if defined(_WIN32) || defined(_WIN64)
   size_t slashPos = prefixedFileName.rfind("/");
-  if (slashPos == string::npos) {
-    configDirectory = "";
-  } else {
+  string configDirectory = "";
+  if (slashPos != string::npos) {
     configDirectory = prefixedFileName.substr(0, slashPos) + "/";
   }
-  LoadString(content);
+  return NewFromString(content, configDirectory);
 }
 
-void Config::LoadString(const string json) {
+Config Config::NewFromString(const string& json, const string& configDirectory) {
   rapidjson::Document doc;
 
   doc.ParseInsitu<0>((char*)json.c_str());
@@ -217,7 +214,7 @@ void Config::LoadString(const string json) {
   ConversionChainPtr chain =
     ParseConversionChain(GetArrayProperty(doc,
                                           "conversion_chain"), configDirectory);
-  converter = ConverterPtr(new Converter(name, segmentation, chain));
+  return Config(ConverterPtr(new Converter(name, segmentation, chain)));
 }
 
 ConverterPtr Config::GetConverter() const {

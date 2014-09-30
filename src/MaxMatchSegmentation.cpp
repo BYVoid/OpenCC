@@ -21,15 +21,16 @@
 
 using namespace opencc;
 
-vector<string> MaxMatchSegmentation::Segment(const string& text) {
+vector<string> MaxMatchSegmentation::Segment(const string& text) const {
   vector<string> segments;
   vector<string> buffer;
-  auto clearBuffer = [&segments, &buffer]() {
-                       if (buffer.size() > 0) {
-                         segments.push_back(UTF8Util::Join(buffer));
-                         buffer.clear();
-                       }
-                     };
+  auto clearBuffer =
+    [&segments, &buffer]() {
+      if (buffer.size() > 0) {
+        segments.push_back(UTF8Util::Join(buffer));
+        buffer.clear();
+      }
+    };
   for (const char* pstr = text.c_str(); *pstr != '\0';) {
     Optional<DictEntry> matched = dict->MatchPrefix(pstr);
     size_t matchedLength;

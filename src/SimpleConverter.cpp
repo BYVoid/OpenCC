@@ -23,16 +23,17 @@
 using namespace opencc;
 
 struct InternalData {
-  Config config;
-  ConverterPtr converter;
+  const Config config;
+  const ConverterPtr converter;
+
+  InternalData(const Config& _config) : config(_config), converter(
+                                          config.GetConverter()) {}
 };
 
-SimpleConverter::SimpleConverter(const std::string configFileName) try {
-  InternalData* data = new InternalData();
-
+SimpleConverter::SimpleConverter(const std::string& configFileName) try {
+  const InternalData* data =
+    new InternalData(Config::NewFromFile(configFileName));
   internalData = data;
-  data->config.LoadFile(configFileName);
-  data->converter = data->config.GetConverter();
 } catch (Exception& ex) {
   throw std::runtime_error(ex.what());
 }
@@ -40,16 +41,14 @@ SimpleConverter::~SimpleConverter() {
   delete (InternalData*)internalData;
 }
 
-std::string SimpleConverter::Convert(const std::string input) const try {
-  InternalData* data = (InternalData*)internalData;
-
+std::string SimpleConverter::Convert(const std::string& input) const try {
+  const InternalData* data = (InternalData*)internalData;
   return data->converter->Convert(input);
 } catch (Exception& ex) {
   throw std::runtime_error(ex.what());
 }
 opencc_t opencc_new(const char* configFileName) try {
   SimpleConverter* instance = new SimpleConverter(configFileName);
-
   return instance;
 } catch (std::runtime_error& ex) {
   // TODO report error
@@ -57,7 +56,6 @@ opencc_t opencc_new(const char* configFileName) try {
 }
 void opencc_delete(opencc_t opencc) {
   SimpleConverter* instance = reinterpret_cast<SimpleConverter*>(opencc);
-
   delete instance;
 }
 

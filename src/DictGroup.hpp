@@ -24,21 +24,21 @@
 namespace opencc {
   class OPENCC_EXPORT DictGroup : public Dict {
     public:
-      DictGroup();
+      DictGroup(const list<DictPtr>& dicts);
+      static DictGroupPtr NewFromDict(const Dict& dict);
       virtual ~DictGroup();
       virtual size_t KeyMaxLength() const;
-      virtual Optional<DictEntry> Match(const char* word);
-      virtual Optional<DictEntry> MatchPrefix(const char* word);
-      virtual vector<DictEntry> MatchAllPrefixes(const char* word);
-      virtual vector<DictEntry> GetLexicon();
-      virtual void LoadFromDict(Dict* dictionary);
-      void AddDict(DictPtr dict);
-    
+      virtual Optional<DictEntry> Match(const char* word) const;
+      virtual Optional<DictEntry> MatchPrefix(const char* word) const;
+      virtual vector<DictEntry> MatchAllPrefixes(const char* word) const;
+      virtual vector<DictEntry> GetLexicon() const;
+
       const list<DictPtr> GetDicts() const {
         return dicts;
       }
+
     private:
-      size_t keyMaxLength;
-      list<DictPtr> dicts;
+      const size_t keyMaxLength;
+      const list<DictPtr> dicts;
   };
 }

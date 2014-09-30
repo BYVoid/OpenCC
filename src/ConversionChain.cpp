@@ -20,13 +20,11 @@
 
 using namespace opencc;
 
-ConversionChain::ConversionChain() {}
+ConversionChain::ConversionChain(const list<ConversionPtr> _conversions)
+  : conversions(_conversions)
+{}
 
-void ConversionChain::AddConversion(ConversionPtr conversion) {
-  conversions.push_back(conversion);
-}
-
-vector<string> ConversionChain::Convert(const vector<string>& input) {
+vector<string> ConversionChain::Convert(const vector<string>& input) const {
   vector<string> output = input;
   for (auto conversion : conversions) {
     output = conversion->Convert(output);

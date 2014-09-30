@@ -27,11 +27,11 @@
 namespace opencc {
   class OPENCC_EXPORT SimpleConverter {
   public:
-    SimpleConverter(const std::string configFileName);
+    SimpleConverter(const std::string& configFileName);
     ~SimpleConverter();
-    std::string Convert(const std::string input) const;
+    std::string Convert(const std::string& input) const;
   private:
-    void* internalData;
+    const void* internalData;
   };
 }
 

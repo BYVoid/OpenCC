@@ -22,7 +22,7 @@
 
 using namespace opencc;
 
-string Conversion::Convert(const string& phrase) {
+string Conversion::Convert(const string& phrase) const {
   std::ostringstream buffer;
   for (const char* pstr = phrase.c_str(); *pstr != '\0';) {
     Optional<DictEntry> matched = dict->MatchPrefix(pstr);
@@ -39,7 +39,7 @@ string Conversion::Convert(const string& phrase) {
   return buffer.str();
 }
 
-vector<string> Conversion::Convert(const vector<string>& input) {
+vector<string> Conversion::Convert(const vector<string>& input) const {
   vector<string> output;
   for (const auto& segment : input) {
     output.push_back(Convert(segment));

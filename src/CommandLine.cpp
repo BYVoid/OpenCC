@@ -81,9 +81,7 @@ std::ostream& GetOutputStream(const Optional<string>& outputFileName) {
 void Convert(const Optional<string>& inputFileName,
              const Optional<string>& outputFileName,
              const string& configFileName) {
-  Config config;
-
-  config.LoadFile(configFileName);
+  Config config = Config::NewFromFile(configFileName);
   auto converter = config.GetConverter();
   std::istream& inputStream = GetInputStream(inputFileName);
   std::ostream& outputStream = GetOutputStream(outputFileName);

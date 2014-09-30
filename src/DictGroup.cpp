@@ -21,22 +21,16 @@
 
 using namespace opencc;
 
-DictGroup::DictGroup() {
-  keyMaxLength = 0;
-}
+DictGroup::DictGroup(const list<DictPtr>& _dicts) :
+  keyMaxLength(0), dicts(_dicts) {}
 
 DictGroup::~DictGroup() {}
-
-void DictGroup::AddDict(DictPtr dict) {
-  dicts.push_back(dict);
-  keyMaxLength = std::max(dict->KeyMaxLength(), keyMaxLength);
-}
 
 size_t DictGroup::KeyMaxLength() const {
   return keyMaxLength;
 }
 
-Optional<DictEntry> DictGroup::Match(const char* word) {
+Optional<DictEntry> DictGroup::Match(const char* word) const {
   for (auto dict : dicts) {
     Optional<DictEntry> prefix = dict->Match(word);
     if (!prefix.IsNull()) {
@@ -46,7 +40,7 @@ Optional<DictEntry> DictGroup::Match(const char* word) {
   return Optional<DictEntry>();
 }
 
-Optional<DictEntry> DictGroup::MatchPrefix(const char* word) {
+Optional<DictEntry> DictGroup::MatchPrefix(const char* word) const {
   for (auto dict : dicts) {
     Optional<DictEntry> prefix = dict->MatchPrefix(word);
     if (!prefix.IsNull()) {
@@ -56,7 +50,7 @@ Optional<DictEntry> DictGroup::MatchPrefix(const char* word) {
   return Optional<DictEntry>();
 }
 
-vector<DictEntry> DictGroup::MatchAllPrefixes(const char* word) {
+vector<DictEntry> DictGroup::MatchAllPrefixes(const char* word) const {
   std::map<size_t, DictEntry> matched;
   for (auto dict : dicts) {
     auto entries = dict->MatchAllPrefixes(word);
@@ -75,7 +69,7 @@ vector<DictEntry> DictGroup::MatchAllPrefixes(const char* word) {
   return matchedEntries;
 }
 
-vector<DictEntry> DictGroup::GetLexicon() {
+vector<DictEntry> DictGroup::GetLexicon() const {
   vector<DictEntry> allLexicon;
   for (auto dict : dicts) {
     auto lexicon = dict->GetLexicon();
@@ -85,9 +79,7 @@ vector<DictEntry> DictGroup::GetLexicon() {
   return allLexicon;
 }
 
-void DictGroup::LoadFromDict(Dict* dictionary) {
-  TextDictPtr dict(new TextDict);
-
-  dict->LoadFromDict(dictionary);
-  AddDict(dict);
+DictGroupPtr DictGroup::NewFromDict(const Dict& dict) {
+  TextDictPtr newDict = TextDict::NewFromDict(dict);
+  return DictGroupPtr(new DictGroup(list<DictPtr>{ newDict }));
 }

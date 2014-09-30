@@ -19,11 +19,11 @@
 #include <thread>
 
 #include "Config.hpp"
-#include "DictTestUtils.hpp"
-#include "DictEntry.hpp"
-#include "MaxMatchSegmentation.hpp"
 #include "ConversionChain.hpp"
 #include "Converter.hpp"
+#include "DictEntry.hpp"
+#include "DictTestUtils.hpp"
+#include "MaxMatchSegmentation.hpp"
 #include "opencc.h"
 
 using namespace opencc;
@@ -31,29 +31,28 @@ using namespace opencc;
 void TestTextDict() {
   TextDictPtr textDict = DictTestUtils::CreateTextDictForText();
   DictTestUtils::TestDict(textDict);
-  
+
   // Serialization
   string fileName = "dict.txt";
   textDict->opencc::SerializableDict::SerializeToFile(fileName);
-  
+
   // Deserialization
-  textDict->opencc::SerializableDict::LoadFromFile(fileName);
-  DictTestUtils::TestDict(textDict);
+  TextDictPtr deserialized = SerializableDict::NewFromFile<TextDict>(fileName);
+  DictTestUtils::TestDict(deserialized);
 }
 
 void TestDartsDict() {
   TextDictPtr textDict = DictTestUtils::CreateTextDictForText();
-  DartsDictPtr dartsDict(new DartsDict());
-  dartsDict->LoadFromDict(textDict.get());
+  DartsDictPtr dartsDict = DartsDict::NewFromDict(*textDict.get());
   DictTestUtils::TestDict(dartsDict);
-  
+
   // Serialization
   string fileName = "dict.ocd";
   dartsDict->opencc::SerializableDict::SerializeToFile(fileName);
-  
+
   // Deserialization
-  dartsDict->opencc::SerializableDict::LoadFromFile(fileName);
-  DictTestUtils::TestDict(dartsDict);
+  DartsDictPtr deserialized = SerializableDict::NewFromFile<DartsDict>(fileName);
+  DictTestUtils::TestDict(deserialized);
 }
 
 void TestDictGroup() {
@@ -61,7 +60,7 @@ void TestDictGroup() {
   Optional<DictEntry> entry;
   entry = dictGroup->MatchPrefix("Unknown");
   AssertTrue(entry.IsNull());
-  
+
   vector<DictEntry> matches = dictGroup->MatchAllPrefixes(utf8("干燥"));
   AssertEquals(2, matches.size());
   AssertEquals(utf8("乾燥"), matches.at(0).GetDefault());
@@ -93,18 +92,18 @@ void TestConversionChain() {
   // Variants
   auto dictVariants = DictTestUtils::CreateDictForTaiwanVariants();
   auto conversionVariants = ConversionPtr(new Conversion(dictVariants));
-  auto conversionChain = ConversionChainPtr(new ConversionChain());
-  conversionChain->AddConversion(conversion);
-  conversionChain->AddConversion(conversionVariants);
-  auto converted = conversionChain->Convert(vector<string>{utf8("里面")});
-  VectorAssertEquals(vector<string>{utf8("裡面")}, converted);
+  list<ConversionPtr> conversions;
+  conversions.push_back(conversion);
+  conversions.push_back(conversionVariants);
+  auto conversionChain = ConversionChainPtr(new ConversionChain(conversions));
+  auto converted = conversionChain->Convert(vector<string>{ utf8("里面") });
+  VectorAssertEquals(vector<string>{ utf8("裡面") }, converted);
 }
 
 const string CONFIG_TEST_PATH = "config_test/config_test.json";
 
 void TestConfig() {
-  Config config;
-  config.LoadFile(CONFIG_TEST_PATH);
+  Config config = Config::NewFromFile(CONFIG_TEST_PATH);
   auto converter = config.GetConverter();
   string converted = converter->Convert(utf8("燕燕于飞差池其羽之子于归远送于野"));
   AssertEquals(utf8("燕燕于飛差池其羽之子于歸遠送於野"), converted);
@@ -112,10 +111,10 @@ void TestConfig() {
 
 void TestMultithreading() {
   auto routine = [](std::string name) {
-    SimpleConverter converter(name);
-    string converted = converter.Convert(utf8("燕燕于飞差池其羽之子于归远送于野"));
-    AssertEquals(utf8("燕燕于飛差池其羽之子于歸遠送於野"), converted);
-  };
+                   SimpleConverter converter(name);
+                   string converted = converter.Convert(utf8("燕燕于飞差池其羽之子于归远送于野"));
+                   AssertEquals(utf8("燕燕于飛差池其羽之子于歸遠送於野"), converted);
+                 };
   std::thread thread1(routine, CONFIG_TEST_PATH);
   std::thread thread2(routine, CONFIG_TEST_PATH);
   routine(CONFIG_TEST_PATH);
@@ -123,7 +122,7 @@ void TestMultithreading() {
   thread2.join();
 }
 
-int main(int argc, const char * argv[]) {
+int main(int argc, const char* argv[]) {
   TestUtils::RunTest("TestTextDict", TestTextDict);
   TestUtils::RunTest("TestDartsDict", TestDartsDict);
   TestUtils::RunTest("TestDictGroup", TestDictGroup);

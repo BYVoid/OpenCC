@@ -27,16 +27,16 @@ namespace opencc {
       Conversion(DictPtr _dict) : dict(_dict) {}
 
       // Convert single phrase
-      string Convert(const string& phrase);
+      string Convert(const string& phrase) const;
 
       // Convert segmented text
-      vector<string> Convert(const vector<string>& input);
+      vector<string> Convert(const vector<string>& input) const;
 
       const DictPtr GetDict() const {
         return dict;
       }
 
     private:
-      DictPtr dict;
+      const DictPtr dict;
   };
 }

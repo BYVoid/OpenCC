@@ -55,10 +55,9 @@ Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for c
 
 ### Build with CMake
 
+Linux/OSX:
+
 ```
-mkdir build
-cd build
-cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -D ENABLE_GETTEXT:BOOL=ON ..
 make
 sudo make install
 ```
@@ -66,14 +65,14 @@ sudo make install
 Windows MSYS:
 
 ```
-cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT:BOOL=OFF
+cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Release
 make
 ```
 
 Windows Visual Studio (2013 or higher required):
 
 ```
-cmake .. -G "Visual Studio 12" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT:BOOL=OFF
+cmake .. -G "Visual Studio 12" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Release
 make
 ```
 

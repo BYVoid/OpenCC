@@ -4,18 +4,15 @@ CMakeLists.txt
 *.cmake
 *.pyc
 
-/po
 /doc
 /data/scheme
-/src/wrapper
 /build
 /debug
 /release
 /other
-/debug.sh
-/release.sh
 /opencc.pc.in
-/opencc.gyp
 /INSTALL
 /doc/html
 /opencc.xcodeproj
+/test/dict.ocd
+/test/dict.txt

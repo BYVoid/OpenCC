@@ -110,6 +110,46 @@
       "inputs": ["<(cmd)", "<(input)"],
       "outputs": ["<(output_prefix)TWPhrasesRev.ocd"],
       "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from", "text", "--to", "ocd"]
+    }, {
+      "action_name": "HKVariants",
+      "variables": {
+        "input": "<(input_prefix)HKVariants.txt",
+      },
+      "inputs": ["<(cmd)", "<(input)"],
+      "outputs": ["<(output_prefix)HKVariants.ocd"],
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from", "text", "--to", "ocd"]
+    }, {
+      "action_name": "HKVariantsPhrases",
+      "variables": {
+        "input": "<(input_prefix)HKVariantsPhrases.txt",
+      },
+      "inputs": ["<(cmd)", "<(input)"],
+      "outputs": ["<(output_prefix)HKVariantsPhrases.ocd"],
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from", "text", "--to", "ocd"]
+    }, {
+      "action_name": "HKVariantsRevPhrases",
+      "variables": {
+        "input": "<(input_prefix)HKVariantsRevPhrases.txt",
+      },
+      "inputs": ["<(cmd)", "<(input)"],
+      "outputs": ["<(output_prefix)HKVariantsRevPhrases.ocd"],
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from", "text", "--to", "ocd"]
+    }, {
+      "action_name": "HKVariantsRev.txt",
+      "variables": {
+        "input": "<(input_prefix)HKVariants.txt",
+      },
+      "inputs": ["<(cmd)", "<(input)"],
+      "outputs": ["<(output_prefix)HKVariantsRev.txt"],
+      "action": ["<(dict_reverse)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "HKVariantsRev",
+      "variables": {
+        "input": "<(output_prefix)HKVariantsRev.txt",
+      },
+      "inputs": ["<(cmd)", "<(input)"],
+      "outputs": ["<(output_prefix)HKVariantsRev.ocd"],
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from", "text", "--to", "ocd"]
     }],
     "dependencies": [
       "opencc_dict"

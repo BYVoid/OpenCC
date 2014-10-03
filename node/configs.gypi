@@ -11,6 +11,8 @@
         "../data/config/t2s.json",
         "../data/config/tw2s.json",
         "../data/config/tw2sp.json",
+        "../data/config/s2hk.json",
+        "../data/config/hk2s.json",
       ]
     }]
   }]

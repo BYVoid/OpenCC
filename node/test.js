@@ -9,6 +9,8 @@ var configs = [
   't2s',
   'tw2s',
   'tw2sp',
+  's2hk',
+  'hk2s',
 ];
 
 var testSync = function (config, done) {

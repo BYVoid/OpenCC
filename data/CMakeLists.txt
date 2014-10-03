@@ -13,6 +13,9 @@ set(
   TWVariants
   TWVariantsRevPhrases
   JPVariants
+  HKVariants
+  HKVariantsPhrases
+  HKVariantsRevPhrases
 )
 
 set(
@@ -20,6 +23,7 @@ set(
   TWPhrases
   TWPhrasesRev
   TWVariantsRev
+  HKVariantsRev
 )
 
 set(DICTS ${DICTS_RAW} ${DICTS_GENERATED})
@@ -70,6 +74,15 @@ set(
 set(
   DICT_TWPhrasesRev_GENERATING_COMMAND
   ${DICT_REVERSE_BIN} ${DICT_TWPhrasesRev_GENERATING_INPUT} TWPhrasesRev.txt
+)
+
+set(
+  DICT_HKVariantsRev_GENERATING_INPUT
+  ${DICT_DIR}/HKVariants.txt
+)
+set(
+  DICT_HKVariantsRev_GENERATING_COMMAND
+  ${DICT_REVERSE_BIN} ${DICT_HKVariantsRev_GENERATING_INPUT} HKVariantsRev.txt
 )
 
 foreach(DICT ${DICTS_GENERATED})
@@ -127,6 +140,8 @@ set(CONFIG_FILES
   config/s2tw.json
   config/s2twp.json
   config/tw2s.json
+  config/s2hk.json
+  config/hk2s.json
 )
 
 install(

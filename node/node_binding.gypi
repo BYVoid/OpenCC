@@ -6,6 +6,7 @@
       "../src/Config.cpp",
       "../src/Conversion.cpp",
       "../src/ConversionChain.cpp",
+      "../src/Converter.cpp",
       "../src/DartsDict.cpp",
       "../src/Dict.cpp",
       "../src/DictGroup.cpp",

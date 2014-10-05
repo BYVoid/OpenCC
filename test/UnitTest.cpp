@@ -129,6 +129,16 @@ void TestMultithreading() {
   thread2.join();
 }
 
+void TestCInterface() {
+  const char* text = utf8("燕燕于飞差池其羽之子于归远送于野");
+  const char* expected = utf8("燕燕于飛差池其羽之子于歸遠送於野");
+  opencc_t od = opencc_new(CONFIG_TEST_PATH.c_str());
+  char* converted = opencc_convert(od, text);
+  AssertEquals(string(expected), string(converted));
+  opencc_free_string(converted);
+  opencc_delete(od);
+}
+
 int main(int argc, const char* argv[]) {
   TestUtils::RunTest("TestTextDict", TestTextDict);
   TestUtils::RunTest("TestDartsDict", TestDartsDict);
@@ -138,4 +148,5 @@ int main(int argc, const char* argv[]) {
   TestUtils::RunTest("TestConversionChain", TestConversionChain);
   TestUtils::RunTest("TestConfig", TestConfig);
   TestUtils::RunTest("TestMultithreading", TestMultithreading);
+  TestUtils::RunTest("TestCInterface", TestCInterface);
 }

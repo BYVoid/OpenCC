@@ -28,21 +28,22 @@ static DictEntry ParseKeyValues(const char* buff) {
     throw InvalidFormat("Invalid text dictionary");
   }
   length = pbuff - buff;
-  DictEntry entry(UTF8Util::FromSubstr(buff, length));
+  const string& key = UTF8Util::FromSubstr(buff, length);
+  vector<string> values;
   while (!UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
     buff = pbuff = UTF8Util::NextChar(pbuff);
     pbuff = UTF8Util::FindNextInline(buff, ' ');
     length = pbuff - buff;
-    string value = UTF8Util::FromSubstr(buff, length);
-    entry.values.push_back(value);
+    const string& value = UTF8Util::FromSubstr(buff, length);
+    values.push_back(value);
   }
-  return entry;
+  return DictEntry(key, values);
 }
 
 static size_t GetKeyMaxLength(const vector<DictEntry>& lexicon) {
   size_t maxLength = 0;
   for (const auto& entry : lexicon) {
-    size_t keyLength = entry.key.length();
+    size_t keyLength = entry.Key().length();
     maxLength = std::max(keyLength, maxLength);
   }
   return maxLength;
@@ -93,7 +94,7 @@ size_t TextDict::KeyMaxLength() const {
 Optional<DictEntry> TextDict::Match(const char* word) const {
   DictEntry entry(word);
   auto found = std::lower_bound(lexicon.begin(), lexicon.end(), entry);
-  if ((found != lexicon.end()) && (found->key == entry.key)) {
+  if ((found != lexicon.end()) && (found->Key() == entry.Key())) {
     return Optional<DictEntry>(*found);
   } else {
     return Optional<DictEntry>();
@@ -107,11 +108,11 @@ vector<DictEntry> TextDict::GetLexicon() const {
 void TextDict::SerializeToFile(FILE* fp) const {
   // TODO escape space
   for (const auto& entry : lexicon) {
-    fprintf(fp, "%s\t", entry.key.c_str());
+    fprintf(fp, "%s\t", entry.Key().c_str());
     size_t i = 0;
-    for (const auto& value : entry.values) {
+    for (const auto& value : entry.Values()) {
       fprintf(fp, "%s", value.c_str());
-      if (i < entry.values.size() - 1) {
+      if (i < entry.Values().size() - 1) {
         fprintf(fp, " ");
       }
       i++;

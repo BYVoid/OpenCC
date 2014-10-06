@@ -52,10 +52,10 @@ Optional<DictEntry> DictGroup::MatchPrefix(const char* word) const {
 
 vector<DictEntry> DictGroup::MatchAllPrefixes(const char* word) const {
   std::map<size_t, DictEntry> matched;
-  for (auto dict : dicts) {
-    auto entries = dict->MatchAllPrefixes(word);
+  for (const auto& dict : dicts) {
+    const auto& entries = dict->MatchAllPrefixes(word);
     for (const auto& entry : entries) {
-      size_t len = entry.key.length();
+      size_t len = entry.Key().length();
       if (matched.find(len) == matched.end()) {
         matched[len] = entry;
       }
@@ -71,11 +71,11 @@ vector<DictEntry> DictGroup::MatchAllPrefixes(const char* word) const {
 
 vector<DictEntry> DictGroup::GetLexicon() const {
   vector<DictEntry> allLexicon;
-  for (auto dict : dicts) {
+  for (const auto& dict : dicts) {
     auto lexicon = dict->GetLexicon();
     std::copy(lexicon.begin(), lexicon.end(), std::back_inserter(allLexicon));
   }
-  std::sort(allLexicon.begin(), allLexicon.end(), DictEntry::Cmp);
+  std::sort(allLexicon.begin(), allLexicon.end());
   return allLexicon;
 }
 

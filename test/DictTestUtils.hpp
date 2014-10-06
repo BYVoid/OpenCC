@@ -105,17 +105,17 @@ namespace opencc {
         Optional<DictEntry> entry;
         entry = dict->MatchPrefix("BYVoid");
         AssertTrue(!entry.IsNull());
-        AssertEquals("BYVoid", entry.Get().key);
+        AssertEquals("BYVoid", entry.Get().Key());
         AssertEquals("byv", entry.Get().GetDefault());
 
         entry = dict->MatchPrefix("BYVoid123");
         AssertTrue(!entry.IsNull());
-        AssertEquals("BYVoid", entry.Get().key);
+        AssertEquals("BYVoid", entry.Get().Key());
         AssertEquals("byv", entry.Get().GetDefault());
 
         entry = dict->MatchPrefix(utf8("積羽沉舟"));
         AssertTrue(!entry.IsNull());
-        AssertEquals(utf8("積羽沉舟"), entry.Get().key);
+        AssertEquals(utf8("積羽沉舟"), entry.Get().Key());
         AssertEquals(utf8("羣輕折軸"), entry.Get().GetDefault());
 
         entry = dict->MatchPrefix("Unknown");
@@ -124,11 +124,11 @@ namespace opencc {
         const vector<DictEntry> matches =
           dict->MatchAllPrefixes(utf8("清華大學計算機系"));
         AssertEquals(3, matches.size());
-        AssertEquals(utf8("清華大學"), matches.at(0).key);
+        AssertEquals(utf8("清華大學"), matches.at(0).Key());
         AssertEquals("TsinghuaUniversity", matches.at(0).GetDefault());
-        AssertEquals(utf8("清華"), matches.at(1).key);
+        AssertEquals(utf8("清華"), matches.at(1).Key());
         AssertEquals("Tsinghua", matches.at(1).GetDefault());
-        AssertEquals(utf8("清"), matches.at(2).key);
+        AssertEquals(utf8("清"), matches.at(2).Key());
         AssertEquals("Tsing", matches.at(2).GetDefault());
       }
   };

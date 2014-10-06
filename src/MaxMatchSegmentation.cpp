@@ -39,8 +39,8 @@ vector<string> MaxMatchSegmentation::Segment(const string& text) const {
       buffer.push_back(UTF8Util::FromSubstr(pstr, matchedLength));
     } else {
       clearBuffer();
-      matchedLength = matched.Get().key.length();
-      segments.push_back(matched.Get().key);
+      matchedLength = matched.Get().Key().length();
+      segments.push_back(matched.Get().Key());
     }
     pstr += matchedLength;
   }

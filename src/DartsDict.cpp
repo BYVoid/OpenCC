@@ -98,7 +98,7 @@ DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
   fread(buffer, 1, dartsSize, fp);
   doubleArray->set_array(buffer);
 
-  TextDictPtr textDict = TextDict::NewFromFile(fp);
+  TextDictPtr textDict = TextDict::NewFromSortedFile(fp);
   const vector<DictEntry>& lexicon = textDict->GetLexicon();
   const size_t maxLength = textDict->KeyMaxLength();
   return DartsDictPtr(new DartsDict(maxLength, lexicon, doubleArray, buffer));

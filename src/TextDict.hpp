@@ -32,6 +32,8 @@ namespace opencc {
       virtual void SerializeToFile(FILE* fp) const;
       static TextDictPtr NewFromDict(const Dict& dict);
       static TextDictPtr NewFromFile(FILE* fp);
+      static TextDictPtr NewFromSortedFile(FILE* fp);
+      static TextDictPtr NewFromUnsorted(const vector<DictEntry>& _lexicon);
     private:
       const size_t maxLength;
       const vector<DictEntry> lexicon;

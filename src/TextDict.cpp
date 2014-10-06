@@ -48,33 +48,42 @@ static size_t GetKeyMaxLength(const vector<DictEntry>& lexicon) {
   return maxLength;
 }
 
-static vector<DictEntry> SortLexicon(const vector<DictEntry>& lexicon) {
-  vector<DictEntry> sorted = lexicon;
-  std::sort(sorted.begin(), sorted.end(), DictEntry::Cmp);
-  return sorted;
-}
-
-TextDict::TextDict(const vector<DictEntry>& _lexicon) : maxLength(GetKeyMaxLength(
-                                                                    _lexicon)),
-                                                        lexicon(SortLexicon(
-                                                                  _lexicon)) {}
-
-TextDict::~TextDict() {}
-
-TextDictPtr TextDict::NewFromFile(FILE* fp) {
+static vector<DictEntry> ParseLexiconFromFile(FILE* fp) {
   const int ENTRY_BUFF_SIZE = 4096;
   char buff[ENTRY_BUFF_SIZE];
   vector<DictEntry> lexicon;
   UTF8Util::SkipUtf8Bom(fp);
   while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
-    DictEntry entry = ParseKeyValues(buff);
+    const DictEntry& entry = ParseKeyValues(buff);
     lexicon.push_back(entry);
   }
+  return lexicon;
+}
+
+TextDict::TextDict(const vector<DictEntry>& _lexicon) : maxLength(GetKeyMaxLength(
+                                                                    _lexicon)),
+                                                        lexicon(_lexicon) {}
+                                                                  
+TextDict::~TextDict() {}
+
+TextDictPtr TextDict::NewFromSortedFile(FILE* fp) {
+  const vector<DictEntry>& lexicon = ParseLexiconFromFile(fp);
   return TextDictPtr(new TextDict(lexicon));
+}
+
+TextDictPtr TextDict::NewFromFile(FILE* fp) {
+  vector<DictEntry> lexicon = ParseLexiconFromFile(fp);
+  return NewFromUnsorted(lexicon);
 }
 
 TextDictPtr TextDict::NewFromDict(const Dict& dict) {
   return TextDictPtr(new TextDict(dict.GetLexicon()));
+}
+
+TextDictPtr TextDict::NewFromUnsorted(const vector<DictEntry>& _lexicon) {
+  vector<DictEntry> lexicon = _lexicon;
+  std::sort(lexicon.begin(), lexicon.end());
+  return TextDictPtr(new TextDict(lexicon));
 }
 
 size_t TextDict::KeyMaxLength() const {
@@ -83,8 +92,7 @@ size_t TextDict::KeyMaxLength() const {
 
 Optional<DictEntry> TextDict::Match(const char* word) const {
   DictEntry entry(word);
-  auto found = std::lower_bound(lexicon.begin(),
-                                lexicon.end(), entry, DictEntry::Cmp);
+  auto found = std::lower_bound(lexicon.begin(), lexicon.end(), entry);
   if ((found != lexicon.end()) && (found->key == entry.key)) {
     return Optional<DictEntry>(*found);
   } else {

@@ -56,8 +56,7 @@ namespace opencc {
         lexicon.push_back(DictEntry(utf8("清"), "Tsing"));
         lexicon.push_back(DictEntry(utf8("清華"), "Tsinghua"));
         lexicon.push_back(DictEntry(utf8("清華大學"), "TsinghuaUniversity"));
-        TextDictPtr textDict(new TextDict(lexicon));
-        return textDict;
+        return TextDict::NewFromUnsorted(lexicon);
       }
 
       static DictPtr CreateDictForCharacters() {
@@ -71,8 +70,7 @@ namespace opencc {
                                                     utf8("干") }));
         lexicon.push_back(DictEntry(utf8("里"),
                                     vector<string>{ utf8("裏"), utf8("里") }));
-        TextDictPtr textDict(new TextDict(lexicon));
-        return textDict;
+        return TextDict::NewFromUnsorted(lexicon);
       }
 
       static DictPtr CreateDictForPhrases() {
@@ -80,7 +78,7 @@ namespace opencc {
         lexicon.push_back(DictEntry(utf8("太后"), utf8("太后")));
         lexicon.push_back(DictEntry(utf8("头发"), utf8("頭髮")));
         lexicon.push_back(DictEntry(utf8("干燥"), utf8("乾燥")));
-        TextDictPtr textDict(new TextDict(lexicon));
+        TextDictPtr textDict = TextDict::NewFromUnsorted(lexicon);
 
         DartsDictPtr dartsDict = DartsDict::NewFromDict(*textDict.get());
         return dartsDict;

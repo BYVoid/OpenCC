@@ -31,8 +31,8 @@ namespace opencc {
                 const void* _buffer);
       virtual ~DartsDict();
       virtual size_t KeyMaxLength() const;
-      virtual Optional<DictEntry> Match(const char* word) const;
-      virtual Optional<DictEntry> MatchPrefix(const char* word) const;
+      virtual Optional<const DictEntry*> Match(const char* word) const;
+      virtual Optional<const DictEntry*> MatchPrefix(const char* word) const;
       virtual vector<DictEntry> GetLexicon() const;
       virtual void SerializeToFile(FILE* fp) const;
 

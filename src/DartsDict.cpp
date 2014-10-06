@@ -42,26 +42,26 @@ size_t DartsDict::KeyMaxLength() const {
   return maxLength;
 }
 
-Optional<DictEntry> DartsDict::Match(const char* word) const {
+Optional<const DictEntry*> DartsDict::Match(const char* word) const {
   Darts::DoubleArray& dict = *(Darts::DoubleArray*)this->doubleArray;
   Darts::DoubleArray::result_pair_type result;
 
   dict.exactMatchSearch(word, result);
   if (result.value != -1) {
-    return Optional<DictEntry>(lexicon.at(result.value));
+    return Optional<const DictEntry*>(&lexicon.at(result.value));
   } else {
-    return Optional<DictEntry>();
+    return Optional<const DictEntry*>();
   }
 }
 
-Optional<DictEntry> DartsDict::MatchPrefix(const char* word) const {
+Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word) const {
   const size_t DEFAULT_NUM_ENTRIES = 64;
   Darts::DoubleArray& dict = *(Darts::DoubleArray*)this->doubleArray;
   Darts::DoubleArray::value_type results[DEFAULT_NUM_ENTRIES];
   Darts::DoubleArray::value_type maxMatchedResult = -1;
   size_t numMatched = dict.commonPrefixSearch(word, results, DEFAULT_NUM_ENTRIES);
   if (numMatched == 0) {
-    return Optional<DictEntry>();
+    return Optional<const DictEntry*>();
   } else if ((numMatched > 0) && (numMatched < DEFAULT_NUM_ENTRIES)) {
     maxMatchedResult = results[numMatched - 1];
   } else {
@@ -72,9 +72,9 @@ Optional<DictEntry> DartsDict::MatchPrefix(const char* word) const {
     delete[] rematchedResults;
   }
   if (maxMatchedResult >= 0) {
-    return Optional<DictEntry>(lexicon.at(maxMatchedResult));
+    return Optional<const DictEntry*>(&lexicon.at(maxMatchedResult));
   } else {
-    return Optional<DictEntry>();
+    return Optional<const DictEntry*>();
   }
 }
 

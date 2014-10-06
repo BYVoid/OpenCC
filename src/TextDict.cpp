@@ -91,13 +91,13 @@ size_t TextDict::KeyMaxLength() const {
   return maxLength;
 }
 
-Optional<DictEntry> TextDict::Match(const char* word) const {
+Optional<const DictEntry*> TextDict::Match(const char* word) const {
   DictEntry entry(word);
   auto found = std::lower_bound(lexicon.begin(), lexicon.end(), entry);
   if ((found != lexicon.end()) && (found->Key() == entry.Key())) {
-    return Optional<DictEntry>(*found);
+    return Optional<const DictEntry*>(&(*found));
   } else {
-    return Optional<DictEntry>();
+    return Optional<const DictEntry*>();
   }
 }
 

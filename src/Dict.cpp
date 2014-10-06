@@ -21,30 +21,30 @@
 
 using namespace opencc;
 
-Optional<DictEntry> Dict::MatchPrefix(const char* word) const {
+Optional<const DictEntry*> Dict::MatchPrefix(const char* word) const {
   string wordTrunc = UTF8Util::TruncateUTF8(word, KeyMaxLength());
   const char* wordTruncPtr = wordTrunc.c_str() + wordTrunc.length();
   for (long len = wordTrunc.length(); len > 0;
        len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
     wordTrunc.resize(len);
     wordTruncPtr = wordTrunc.c_str() + len;
-    const Optional<DictEntry>& result = Match(wordTrunc.c_str());
+    const Optional<const DictEntry*>& result = Match(wordTrunc.c_str());
     if (!result.IsNull()) {
       return result;
     }
   }
-  return Optional<DictEntry>();
+  return Optional<const DictEntry*>();
 }
 
-vector<DictEntry> Dict::MatchAllPrefixes(const char* word) const {
-  vector<DictEntry> matchedLengths;
+vector<const DictEntry*> Dict::MatchAllPrefixes(const char* word) const {
+  vector<const DictEntry*> matchedLengths;
   string wordTrunc = UTF8Util::TruncateUTF8(word, KeyMaxLength());
   const char* wordTruncPtr = wordTrunc.c_str() + wordTrunc.length();
   for (long len = wordTrunc.length(); len > 0;
        len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
     wordTrunc.resize(len);
     wordTruncPtr = wordTrunc.c_str() + len;
-    const Optional<DictEntry>& result = Match(wordTrunc.c_str());
+    const Optional<const DictEntry*>& result = Match(wordTrunc.c_str());
     if (!result.IsNull()) {
       matchedLengths.push_back(result.Get());
     }

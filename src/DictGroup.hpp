@@ -28,9 +28,9 @@ namespace opencc {
       static DictGroupPtr NewFromDict(const Dict& dict);
       virtual ~DictGroup();
       virtual size_t KeyMaxLength() const;
-      virtual Optional<DictEntry> Match(const char* word) const;
-      virtual Optional<DictEntry> MatchPrefix(const char* word) const;
-      virtual vector<DictEntry> MatchAllPrefixes(const char* word) const;
+      virtual Optional<const DictEntry*> Match(const char* word) const;
+      virtual Optional<const DictEntry*> MatchPrefix(const char* word) const;
+      virtual vector<const DictEntry*> MatchAllPrefixes(const char* word) const;
       virtual vector<DictEntry> GetLexicon() const;
 
       const list<DictPtr> GetDicts() const {

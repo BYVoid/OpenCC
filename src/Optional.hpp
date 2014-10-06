@@ -30,7 +30,7 @@ namespace opencc {
         return isNull;
       }
 
-      T Get() const {
+      const T& Get() const {
         return data;
       }
 

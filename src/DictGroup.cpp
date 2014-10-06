@@ -30,38 +30,40 @@ size_t DictGroup::KeyMaxLength() const {
   return keyMaxLength;
 }
 
-Optional<DictEntry> DictGroup::Match(const char* word) const {
+Optional<const DictEntry*> DictGroup::Match(const char* word) const {
   for (const auto& dict : dicts) {
-    const Optional<DictEntry>& prefix = dict->Match(word);
+    const Optional<const DictEntry*>& prefix = dict->Match(word);
     if (!prefix.IsNull()) {
       return prefix;
     }
   }
-  return Optional<DictEntry>();
+  return Optional<const DictEntry*>();
 }
 
-Optional<DictEntry> DictGroup::MatchPrefix(const char* word) const {
+Optional<const DictEntry*> DictGroup::MatchPrefix(const char* word) const {
   for (const auto& dict : dicts) {
-    const Optional<DictEntry>& prefix = dict->MatchPrefix(word);
+    const Optional<const DictEntry*>& prefix = dict->MatchPrefix(word);
     if (!prefix.IsNull()) {
       return prefix;
     }
   }
-  return Optional<DictEntry>();
+  return Optional<const DictEntry*>();
 }
 
-vector<DictEntry> DictGroup::MatchAllPrefixes(const char* word) const {
-  std::map<size_t, DictEntry> matched;
+vector<const DictEntry*> DictGroup::MatchAllPrefixes(const char* word) const {
+  std::map<size_t, const DictEntry*> matched;
+  // Match all prefixes from all dictionaries
   for (const auto& dict : dicts) {
-    const vector<DictEntry>& entries = dict->MatchAllPrefixes(word);
+    const vector<const DictEntry*>& entries = dict->MatchAllPrefixes(word);
     for (const auto& entry : entries) {
-      size_t len = entry.Key().length();
+      size_t len = entry->Key().length();
+      // If the current length has already result, skip
       if (matched.find(len) == matched.end()) {
         matched[len] = entry;
       }
     }
   }
-  vector<DictEntry> matchedEntries;
+  vector<const DictEntry*> matchedEntries;
   for (auto i = matched.rbegin(); i != matched.rend(); i++) {
     matchedEntries.push_back(i->second);
   }

@@ -31,8 +31,8 @@ size_t DictGroup::KeyMaxLength() const {
 }
 
 Optional<DictEntry> DictGroup::Match(const char* word) const {
-  for (auto dict : dicts) {
-    Optional<DictEntry> prefix = dict->Match(word);
+  for (const auto& dict : dicts) {
+    const Optional<DictEntry>& prefix = dict->Match(word);
     if (!prefix.IsNull()) {
       return prefix;
     }
@@ -41,8 +41,8 @@ Optional<DictEntry> DictGroup::Match(const char* word) const {
 }
 
 Optional<DictEntry> DictGroup::MatchPrefix(const char* word) const {
-  for (auto dict : dicts) {
-    Optional<DictEntry> prefix = dict->MatchPrefix(word);
+  for (const auto& dict : dicts) {
+    const Optional<DictEntry>& prefix = dict->MatchPrefix(word);
     if (!prefix.IsNull()) {
       return prefix;
     }
@@ -53,7 +53,7 @@ Optional<DictEntry> DictGroup::MatchPrefix(const char* word) const {
 vector<DictEntry> DictGroup::MatchAllPrefixes(const char* word) const {
   std::map<size_t, DictEntry> matched;
   for (const auto& dict : dicts) {
-    const auto& entries = dict->MatchAllPrefixes(word);
+    const vector<DictEntry>& entries = dict->MatchAllPrefixes(word);
     for (const auto& entry : entries) {
       size_t len = entry.Key().length();
       if (matched.find(len) == matched.end()) {
@@ -62,10 +62,9 @@ vector<DictEntry> DictGroup::MatchAllPrefixes(const char* word) const {
     }
   }
   vector<DictEntry> matchedEntries;
-  for (const auto& entry : matched) {
-    matchedEntries.push_back(entry.second);
+  for (auto i = matched.rbegin(); i != matched.rend(); i++) {
+    matchedEntries.push_back(i->second);
   }
-  std::reverse(matchedEntries.begin(), matchedEntries.end());
   return matchedEntries;
 }
 

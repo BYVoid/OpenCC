@@ -56,15 +56,35 @@ void TestDartsDict() {
 }
 
 void TestDictGroup() {
-  auto dictGroup = DictTestUtils::CreateDictGroupForConversion();
-  Optional<DictEntry> entry;
-  entry = dictGroup->MatchPrefix("Unknown");
-  AssertTrue(entry.IsNull());
+  {
+    const auto& dictGroup = DictTestUtils::CreateDictGroupForConversion();
+    const auto& entry = dictGroup->MatchPrefix("Unknown");
+    AssertTrue(entry.IsNull());
 
-  vector<DictEntry> matches = dictGroup->MatchAllPrefixes(utf8("干燥"));
-  AssertEquals(2, matches.size());
-  AssertEquals(utf8("乾燥"), matches.at(0).GetDefault());
-  AssertEquals(utf8("幹"), matches.at(1).GetDefault());
+    const auto& matches = dictGroup->MatchAllPrefixes(utf8("干燥"));
+    AssertEquals(2, matches.size());
+    AssertEquals(utf8("乾燥"), matches.at(0).GetDefault());
+    AssertEquals(utf8("幹"), matches.at(1).GetDefault());
+  }
+  {
+    DictGroupPtr dictGroup(new DictGroup(list<DictPtr>{
+      DictTestUtils::CreateDictForPhrases(),
+      DictTestUtils::CreateTaiwanPhraseDict()
+    }));
+    {
+      const auto& entry = dictGroup->MatchPrefix("鼠标");
+      AssertEquals(utf8("鼠標"), entry.Get().GetDefault());
+    }
+    {
+      const auto& entry = dictGroup->MatchPrefix("克罗地亚");
+      AssertEquals(utf8("克羅埃西亞"), entry.Get().GetDefault());
+    }
+    {
+      const auto& matches = dictGroup->MatchAllPrefixes("鼠标");
+      AssertEquals(1, matches.size());
+      AssertEquals(utf8("鼠標"), matches[0].GetDefault());
+    }
+  }
 }
 
 void TestSegmentation() {

@@ -28,7 +28,7 @@ Optional<DictEntry> Dict::MatchPrefix(const char* word) const {
        len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
     wordTrunc.resize(len);
     wordTruncPtr = wordTrunc.c_str() + len;
-    Optional<DictEntry> result = Match(wordTrunc.c_str());
+    const Optional<DictEntry>& result = Match(wordTrunc.c_str());
     if (!result.IsNull()) {
       return result;
     }
@@ -44,7 +44,7 @@ vector<DictEntry> Dict::MatchAllPrefixes(const char* word) const {
        len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
     wordTrunc.resize(len);
     wordTruncPtr = wordTrunc.c_str() + len;
-    Optional<DictEntry> result = Match(wordTrunc.c_str());
+    const Optional<DictEntry>& result = Match(wordTrunc.c_str());
     if (!result.IsNull()) {
       matchedLengths.push_back(result.Get());
     }

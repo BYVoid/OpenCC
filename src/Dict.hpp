@@ -25,9 +25,13 @@ namespace opencc {
   class OPENCC_EXPORT Dict {
     public:
       virtual size_t KeyMaxLength() const = 0;
+      // Returns the matched word or null.
       virtual Optional<DictEntry> Match(const char* word) const = 0;
+      // Returns the longest matched prefix of word.
       virtual Optional<DictEntry> MatchPrefix(const char* word) const;
+      // Returns all matched prefixes of word, sorted by the length (desc).
       virtual vector<DictEntry> MatchAllPrefixes(const char* word) const;
+
       Optional<DictEntry> Match(const string& word) const {
         return Match(word.c_str());
       }

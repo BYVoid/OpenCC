@@ -78,6 +78,7 @@ namespace opencc {
         lexicon.push_back(DictEntry(utf8("太后"), utf8("太后")));
         lexicon.push_back(DictEntry(utf8("头发"), utf8("頭髮")));
         lexicon.push_back(DictEntry(utf8("干燥"), utf8("乾燥")));
+        lexicon.push_back(DictEntry(utf8("鼠标"), utf8("鼠標")));
         TextDictPtr textDict = TextDict::NewFromUnsorted(lexicon);
 
         DartsDictPtr dartsDict = DartsDict::NewFromDict(*textDict.get());
@@ -87,10 +88,8 @@ namespace opencc {
       static DictGroupPtr CreateDictGroupForConversion() {
         DictPtr phrasesDict = CreateDictForPhrases();
         DictPtr charactersDict = CreateDictForCharacters();
-        list<DictPtr> dicts;
-        dicts.push_back(phrasesDict);
-        dicts.push_back(charactersDict);
-        DictGroupPtr dictGroup(new DictGroup(dicts));
+        DictGroupPtr dictGroup(
+          new DictGroup(list<DictPtr>{phrasesDict, charactersDict}));
         return dictGroup;
       }
 
@@ -99,6 +98,17 @@ namespace opencc {
         lexicon.push_back(DictEntry(utf8("裏"), utf8("裡")));
         TextDictPtr textDict(new TextDict(lexicon));
         return textDict;
+      }
+
+      static DictPtr CreateTaiwanPhraseDict() {
+        vector<DictEntry> lexicon;
+        lexicon.push_back(DictEntry(utf8("鼠标"), utf8("滑鼠")));
+        lexicon.push_back(DictEntry(utf8("服务器"), utf8("伺服器")));
+        lexicon.push_back(DictEntry(utf8("克罗地亚"), utf8("克羅埃西亞")));
+        TextDictPtr textDict = TextDict::NewFromUnsorted(lexicon);
+
+        DartsDictPtr dartsDict = DartsDict::NewFromDict(*textDict.get());
+        return dartsDict;
       }
 
       static void TestDict(DictPtr dict) {

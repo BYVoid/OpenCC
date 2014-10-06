@@ -19,10 +19,13 @@
 #pragma once
 
 #include "Common.hpp"
+#include "UTF8Util.hpp"
 
 namespace opencc {
   class OPENCC_EXPORT DictEntry {
     public:
+      static DictEntry ParseKeyValues(const char* buff);
+    
       DictEntry() {}
 
       DictEntry(const string& _key) : key(_key) {}
@@ -48,7 +51,7 @@ namespace opencc {
           return key;
         }
       }
-        
+    
       bool operator<(const DictEntry& that) const {
         return key < that.key;
       }

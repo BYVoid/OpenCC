@@ -84,11 +84,8 @@ namespace opencc {
 
       static string FromSubstr(const char* str, size_t length) {
         string newStr;
-
         newStr.resize(length);
-        for (size_t i = 0; i < length; i++, str++) {
-          newStr[i] = *str;
-        }
+        strncpy(const_cast<char*>(newStr.c_str()), str, length);
         return newStr;
       }
 

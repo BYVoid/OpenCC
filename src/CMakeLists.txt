@@ -30,6 +30,7 @@ set(
   Converter.cpp
   DartsDict.cpp
   Dict.cpp
+  DictEntry.cpp
   DictGroup.cpp
   MaxMatchSegmentation.cpp
   SimpleConverter.cpp

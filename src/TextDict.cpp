@@ -17,28 +17,8 @@
  */
 
 #include "TextDict.hpp"
-#include "UTF8Util.hpp"
 
 using namespace opencc;
-
-static DictEntry ParseKeyValues(const char* buff) {
-  size_t length;
-  const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
-  if (UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
-    throw InvalidFormat("Invalid text dictionary");
-  }
-  length = pbuff - buff;
-  const string& key = UTF8Util::FromSubstr(buff, length);
-  vector<string> values;
-  while (!UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
-    buff = pbuff = UTF8Util::NextChar(pbuff);
-    pbuff = UTF8Util::FindNextInline(buff, ' ');
-    length = pbuff - buff;
-    const string& value = UTF8Util::FromSubstr(buff, length);
-    values.push_back(value);
-  }
-  return DictEntry(key, values);
-}
 
 static size_t GetKeyMaxLength(const vector<DictEntry>& lexicon) {
   size_t maxLength = 0;
@@ -55,16 +35,14 @@ static vector<DictEntry> ParseLexiconFromFile(FILE* fp) {
   vector<DictEntry> lexicon;
   UTF8Util::SkipUtf8Bom(fp);
   while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
-    const DictEntry& entry = ParseKeyValues(buff);
-    lexicon.push_back(entry);
+    lexicon.push_back(DictEntry::ParseKeyValues(buff));
   }
   return lexicon;
 }
 
-TextDict::TextDict(const vector<DictEntry>& _lexicon) : maxLength(GetKeyMaxLength(
-                                                                    _lexicon)),
-                                                        lexicon(_lexicon) {}
-                                                                  
+TextDict::TextDict(const vector<DictEntry>& _lexicon)
+  : maxLength(GetKeyMaxLength(_lexicon)), lexicon(_lexicon) {}
+
 TextDict::~TextDict() {}
 
 TextDictPtr TextDict::NewFromSortedFile(FILE* fp) {

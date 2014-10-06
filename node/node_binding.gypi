@@ -9,6 +9,7 @@
       "../src/Converter.cpp",
       "../src/DartsDict.cpp",
       "../src/Dict.cpp",
+      "../src/DictEntry.cpp",
       "../src/DictGroup.cpp",
       "../src/MaxMatchSegmentation.cpp",
       "../src/Segmentation.cpp",

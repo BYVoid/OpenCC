@@ -27,10 +27,21 @@
 
 #include "document.h"
 
-using namespace opencc;
-typedef rapidjson::GenericValue < rapidjson::UTF8 < char >> JSONValue;
+#include <unordered_map>
+#include <mutex>
 
-Config::Config(const ConverterPtr _converter) : converter(_converter) {}
+using namespace opencc;
+
+std::unordered_map<string, // type
+  std::unordered_map<string, // configDirectory
+    std::unordered_map<string, // file
+      DictPtr
+    >
+  >
+> dictCache;
+std::mutex dictCacheLock;
+
+typedef rapidjson::GenericValue < rapidjson::UTF8 < char >> JSONValue;
 
 const JSONValue& GetProperty(const JSONValue& doc, const char* name) {
   if (!doc.HasMember(name)) {
@@ -101,17 +112,27 @@ DictPtr ParseDict(const JSONValue& doc, const string& configDirectory) {
         throw InvalidFormat("Element of the array must be an object");
       }
     }
-    dict = DictGroupPtr(new DictGroup(dicts));
-  } else if (type == "text") {
-    string fileName = GetStringProperty(doc, "file");
-    dict = LoadDictWithPaths<TextDict>(fileName, configDirectory);
-  } else if (type == "ocd") {
-    string fileName = GetStringProperty(doc, "file");
-    dict = LoadDictWithPaths<DartsDict>(fileName, configDirectory);
+    return DictGroupPtr(new DictGroup(dicts));
   } else {
-    throw InvalidFormat("Unknown dictionary type: " + type);
+    string fileName = GetStringProperty(doc, "file");
+    // Read from cache
+    DictPtr& cache = dictCache[type][configDirectory][fileName];
+    if (cache != nullptr) {
+      return cache;
+    }
+    if (type == "text") {
+      dict = LoadDictWithPaths<TextDict>(fileName, configDirectory);
+    } else if (type == "ocd") {
+      dict = LoadDictWithPaths<DartsDict>(fileName, configDirectory);
+    } else {
+      throw InvalidFormat("Unknown dictionary type: " + type);
+    }
+    // Update Cache
+    dictCacheLock.lock();
+    cache = dict;
+    dictCacheLock.unlock();
+    return dict;
   }
-  return dict;
 }
 
 SegmentationPtr ParseSegmentation(const JSONValue& doc,
@@ -171,6 +192,8 @@ string FindConfigFile(string fileName) {
   }
   throw FileNotFound(fileName);
 }
+
+Config::Config(const ConverterPtr _converter) : converter(_converter) {}
 
 Config Config::NewFromFile(const string& fileName) {
   string prefixedFileName = FindConfigFile(fileName);

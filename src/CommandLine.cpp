@@ -27,32 +27,32 @@ using opencc::FileNotWritable;
 using opencc::Optional;
 
 void ShowVersion() {
-  printf(_("\n"));
-  printf(_("Open Chinese Convert (OpenCC) Command Line Tool\n"));
-  printf(_("Version %s\n"), VERSION);
-  printf(_("\n"));
-  printf(_("Author: %s\n"), "Carbo Kuo <byvoid@byvoid.com>");
-  printf(_("Bug Report: %s\n"), "http://github.com/BYVoid/OpenCC/issues");
-  printf(_("\n"));
+  printf("\n");
+  printf("Open Chinese Convert (OpenCC) Command Line Tool\n");
+  printf("Version %s\n", VERSION);
+  printf("\n");
+  printf("Author: %s\n", "Carbo Kuo <byvoid@byvoid.com>");
+  printf("Bug Report: %s\n", "http://github.com/BYVoid/OpenCC/issues");
+  printf("\n");
 }
 
 void ShowUsage() {
   ShowVersion();
-  printf(_("Usage:\n"));
-  printf(_(" opencc [Options]\n"));
-  printf(_("\n"));
-  printf(_("Options:\n"));
-  printf(_(" -i [file], --input=[file]   Read original text from [file].\n"));
-  printf(_(" -o [file], --output=[file]  Write converted text to [file].\n"));
-  printf(_(" -c [file], --config=[file]  Load configuration from [file].\n"));
-  printf(_(" -v, --version               Print version and build information.\n"));
-  printf(_(" -h, --help                  Print this help.\n"));
-  printf(_("\n"));
-  printf(_(
-           "With no input file, reads standard input and writes converted stream to standard output.\n"));
-  printf(_(
-           "Default configuration (simplified to traditional) will be loaded if not set.\n"));
-  printf(_("\n"));
+  printf("Usage:\n");
+  printf(" opencc [Options]\n");
+  printf("\n");
+  printf("Options:\n");
+  printf(" -i [file], --input=[file]   Read original text from [file].\n");
+  printf(" -o [file], --output=[file]  Write converted text to [file].\n");
+  printf(" -c [file], --config=[file]  Load configuration from [file].\n");
+  printf(" -v, --version               Print version and build information.\n");
+  printf(" -h, --help                  Print this help.\n");
+  printf("\n");
+  printf(
+           "With no input file, reads standard input and writes converted stream to standard output.\n");
+  printf(
+           "Default configuration (simplified to traditional) will be loaded if not set.\n");
+  printf("\n");
 }
 
 std::istream& GetInputStream(const Optional<string>& inputFileName) {

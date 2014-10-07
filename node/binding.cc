@@ -22,12 +22,12 @@ class OpenccBinding : public node::ObjectWrap {
     Optional<opencc::Exception> ex;
   };
 
-  const Config config_;
+  Config config_;
   const ConverterPtr converter_;
  public:
   explicit OpenccBinding(const string configFileName)
-    : config_(Config::NewFromFile(configFileName)),
-      converter_(config_.GetConverter()) {}
+    : config_(),
+      converter_(config_.NewFromFile(configFileName)) {}
 
   virtual ~OpenccBinding() {
   }

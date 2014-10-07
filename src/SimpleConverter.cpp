@@ -23,17 +23,14 @@
 using namespace opencc;
 
 struct InternalData {
-  const Config config;
   const ConverterPtr converter;
 
-  InternalData(const Config& _config) : config(_config), converter(
-                                          config.GetConverter()) {}
+  InternalData(const ConverterPtr& _converter) : converter(_converter) {}
 };
 
 SimpleConverter::SimpleConverter(const std::string& configFileName) try {
-  const InternalData* data =
-    new InternalData(Config::NewFromFile(configFileName));
-  internalData = data;
+  Config config;
+  internalData = new InternalData(config.NewFromFile(configFileName));
 } catch (Exception& ex) {
   throw std::runtime_error(ex.what());
 }

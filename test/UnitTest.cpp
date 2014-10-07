@@ -123,14 +123,14 @@ void TestConversionChain() {
 const string CONFIG_TEST_PATH = "config_test/config_test.json";
 
 void TestConfig() {
-  Config config = Config::NewFromFile(CONFIG_TEST_PATH);
-  auto converter = config.GetConverter();
+  Config config;
+  auto converter = config.NewFromFile(CONFIG_TEST_PATH);
   string converted = converter->Convert(utf8("燕燕于飞差池其羽之子于归远送于野"));
   AssertEquals(utf8("燕燕于飛差池其羽之子于歸遠送於野"), converted);
 
   string path = "/opencc/no/such/file/or/directory";
   try {
-    Config config = Config::NewFromFile(path);
+    auto converter = config.NewFromFile(path);
   } catch (FileNotFound& e) {
     AssertEquals(path + " not found or not accessible.", e.what());
   }

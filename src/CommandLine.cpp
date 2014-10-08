@@ -19,63 +19,105 @@
 #include "CmdLineOutput.hpp"
 #include "Config.hpp"
 #include "Converter.hpp"
+#include "UTF8Util.hpp"
 
-using opencc::Config;
-using opencc::Exception;
-using opencc::FileNotFound;
-using opencc::FileNotWritable;
-using opencc::Optional;
+using namespace opencc;
 
-std::istream& GetInputStream(const Optional<string>& inputFileName) {
-  if (inputFileName.IsNull()) {
-    return std::cin;
-  } else {
-    std::ifstream* stream = new std::ifstream(inputFileName.Get());
-    if (!stream->is_open()) {
-      throw FileNotFound(inputFileName.Get());
-    }
-    return *stream;
-  }
-}
+Optional<string> inputFileName = Optional<string>::Null();
+Optional<string> outputFileName = Optional<string>::Null();
+string configFileName;
+bool noFlush;
+Config config;
+ConverterPtr converter;
 
-std::ostream& GetOutputStream(const Optional<string>& outputFileName) {
+FILE* GetOutputStream() {
   if (outputFileName.IsNull()) {
-    return std::cout;
+    return stdout;
   } else {
-    std::ofstream* stream = new std::ofstream(outputFileName.Get());
-    if (!stream->is_open()) {
+    FILE* fp = fopen(outputFileName.Get().c_str(), "w");
+    if (!fp) {
       throw FileNotWritable(outputFileName.Get());
     }
-    return *stream;
+    return fp;
   }
 }
 
-string Read(std::istream& inputStream, bool lineByLine) {
-  // TODO block read
-  string line;
-  std::getline(inputStream, line);
-  return line;
-}
-
-void Convert(const Optional<string>& inputFileName,
-             const Optional<string>& outputFileName,
-             const string& configFileName,
-             const bool noFlush) {
-  Config config;
-  auto converter = config.NewFromFile(configFileName);
-  std::istream& inputStream = GetInputStream(inputFileName);
-  std::ostream& outputStream = GetOutputStream(outputFileName);
-  bool lineByLine = inputFileName.IsNull();
+void ConvertLineByLine() {
+  std::istream& inputStream = std::cin;
+  FILE* fout = GetOutputStream();
   while (!inputStream.eof()) {
-    const string& text = Read(inputStream, lineByLine);
-    const string& converted = converter->Convert(text);
-    outputStream << converted << '\n';
+    string line;
+    std::getline(inputStream, line);
+    const string& converted = converter->Convert(line);
+    fputs(converted.c_str(), fout);
+    fputs("\n", fout);
     if (!noFlush) {
       // Flush every line if the output stream is stdout.
-      outputStream.flush();
+      fflush(fout);
     }
   }
-  outputStream.flush();
+  fclose(fout);
+}
+
+void Convert() {
+  const int BUFFER_SIZE = 1024 * 1024;
+  static bool bufferInitialized = false;
+  static string buffer;
+  static char* bufferBegin;
+  static const char* bufferEnd;
+  static char* bufferPtr;
+  static size_t bufferSizeAvailble;
+  if (!bufferInitialized) {
+    bufferInitialized = true;
+    buffer.resize(BUFFER_SIZE + 1);
+    bufferBegin = const_cast<char*>(buffer.c_str());
+    bufferEnd = buffer.c_str() + BUFFER_SIZE;
+    bufferPtr = bufferBegin;
+    bufferSizeAvailble = BUFFER_SIZE;
+  }
+  
+  FILE* fin = fopen(inputFileName.Get().c_str(), "r");
+  if (!fin) {
+    throw FileNotFound(inputFileName.Get());
+  }
+  FILE* fout = GetOutputStream();
+  while (!feof(fin)) {
+    size_t length = fread(bufferPtr, sizeof(char), bufferSizeAvailble, fin);
+    bufferPtr[length] = '\0';
+    size_t remainingLength = 0;
+    string remainingTemp;
+    if (length == bufferSizeAvailble) {
+      // fread may breaks UTF8 character
+      // Find the end of last character
+      char* lastChPtr = bufferBegin;
+      while (lastChPtr < bufferEnd) {
+        size_t nextCharLen = UTF8Util::NextCharLength(lastChPtr);
+        if (lastChPtr + nextCharLen > bufferEnd) {
+          break;
+        }
+        lastChPtr += nextCharLen;
+      }
+      remainingLength = bufferEnd - lastChPtr;
+      if (remainingLength > 0) {
+        remainingTemp = UTF8Util::FromSubstr(lastChPtr, remainingLength);
+        *lastChPtr = '\0';
+      }
+    }
+    // Perform conversion
+    const string& converted = converter->Convert(buffer);
+    fputs(converted.c_str(), fout);
+    if (!noFlush) {
+      // Flush every line if the output stream is stdout.
+      fflush(fout);
+    }
+    // Reset pointer
+    bufferPtr = bufferBegin + remainingLength;
+    bufferSizeAvailble = BUFFER_SIZE - remainingLength;
+    if (remainingLength > 0) {
+      strncpy(bufferBegin, remainingTemp.c_str(), remainingLength);
+    }
+  }
+  fclose(fout);
 }
 
 int main(int argc, const char* argv[]) {
@@ -111,10 +153,8 @@ int main(int argc, const char* argv[]) {
                                      "bool" /* type */,
                                      cmd);
     cmd.parse(argc, argv);
-    Optional<string> inputFileName = Optional<string>::Null();
-    Optional<string> outputFileName = Optional<string>::Null();
-    string configFileName = configArg.getValue();
-    bool noFlush = noFlushArg.getValue();
+    configFileName = configArg.getValue();
+    noFlush = noFlushArg.getValue();
     if (inputArg.isSet()) {
       inputFileName = Optional<string>(inputArg.getValue());
     }
@@ -122,7 +162,13 @@ int main(int argc, const char* argv[]) {
       outputFileName = Optional<string>(outputArg.getValue());
       noFlush = true;
     }
-    Convert(inputFileName, outputFileName, configFileName, noFlush);
+    converter = config.NewFromFile(configFileName);
+    bool lineByLine = inputFileName.IsNull();
+    if (lineByLine) {
+      ConvertLineByLine();
+    } else {
+      Convert();
+    }
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error()
         << " for arg " << e.argId() << std::endl;

@@ -19,7 +19,11 @@ class OpenccBinding : public node::ObjectWrap {
     string input;
     string output;
     Persistent<Function> callback;
-    Optional<opencc::Exception> ex = Optional<opencc::Exception>::Null();
+    Optional<opencc::Exception> ex;
+
+    ConvertRequest()
+        : instance(nullptr), ex(Optional<opencc::Exception>::Null()) {
+    }
   };
 
   Config config_;

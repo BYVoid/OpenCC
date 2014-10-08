@@ -25,17 +25,29 @@ namespace opencc {
 template<typename T>
 class Optional {
 public:
+  /**
+  * The constructor of Optional.
+  */
   Optional(T actual) : isNull(false), data(actual) {
   }
 
+  /**
+  * Returns true if the instance is null.
+  */
   bool IsNull() const {
     return isNull;
   }
 
+  /**
+  * Returns the containing data of the instance.
+  */
   const T& Get() const {
     return data;
   }
 
+  /**
+  * Constructs a null instance.
+  */
   static Optional<T> Null() {
     return Optional();
   }

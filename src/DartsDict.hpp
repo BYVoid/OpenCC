@@ -23,6 +23,9 @@
 #include "TextDict.hpp"
 
 namespace opencc {
+/**
+* Darts dictionary
+*/
 class OPENCC_EXPORT DartsDict : public SerializableDict {
 public:
   DartsDict(const size_t _maxLength,
@@ -42,6 +45,9 @@ public:
 
   virtual void SerializeToFile(FILE* fp) const;
 
+  /**
+  * Constructs a DartsDict from another dictionary.
+  */
   static DartsDictPtr NewFromDict(const Dict& dict);
 
   static DartsDictPtr NewFromFile(FILE* fp);

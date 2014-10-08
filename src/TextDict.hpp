@@ -22,8 +22,15 @@
 #include "SerializableDict.hpp"
 
 namespace opencc {
+/**
+* Text dictionary
+*/
 class OPENCC_EXPORT TextDict : public SerializableDict {
 public:
+  /**
+  * Constructor of TextDict.
+  * _lexicon must be sorted. If not, use NewFromUnsorted instead.
+  */
   TextDict(const vector<DictEntry>& _lexicon);
 
   virtual ~TextDict();
@@ -36,6 +43,9 @@ public:
 
   virtual void SerializeToFile(FILE* fp) const;
 
+  /**
+  * Constructs a TextDict from another dictionary.
+  */
   static TextDictPtr NewFromDict(const Dict& dict);
 
   static TextDictPtr NewFromFile(FILE* fp);

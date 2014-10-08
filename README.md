@@ -96,6 +96,16 @@ make
 * [BYVBlog](https://github.com/byvoid/byvblog)
 * [豆瓣同城微信](http://weixinqiao.com/douban-event/)
 
+## License 許可協議
+
+Apache License 2.0
+
+## Third Party Library 第三方庫
+
+* [darts-clone](https://code.google.com/p/darts-clone/) BSD License
+* [tclap](http://tclap.sourceforge.net/) MIT License
+* [rapidjson](https://github.com/miloyip/rapidjson) MIT License
+
 ## Contributors 貢獻者
 
 * [BYVoid](http://www.byvoid.com/)

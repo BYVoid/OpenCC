@@ -59,4 +59,31 @@ private:
   bool isNull;
   T data;
 };
+
+template<typename T>
+class Optional<T*> {
+private:
+  Optional() : data(nullptr) {
+  }
+
+  typedef T* TPtr;
+  TPtr data;
+
+public:
+  Optional(TPtr actual) : data(actual) {
+  }
+
+  bool IsNull() const {
+    return data == nullptr;
+  }
+
+  const TPtr& Get() const {
+    return data;
+  }
+
+  static Optional<TPtr> Null() {
+    return Optional();
+  }
+};
+
 }

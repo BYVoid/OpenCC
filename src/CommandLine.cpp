@@ -26,33 +26,6 @@ using opencc::FileNotFound;
 using opencc::FileNotWritable;
 using opencc::Optional;
 
-void ShowVersion() {
-  printf("\n");
-  printf("Open Chinese Convert (OpenCC) Command Line Tool\n");
-  printf("Version %s\n", VERSION);
-  printf("\n");
-  printf("Author: %s\n", "Carbo Kuo <byvoid@byvoid.com>");
-  printf("Bug Report: %s\n", "http://github.com/BYVoid/OpenCC/issues");
-  printf("\n");
-}
-
-void ShowUsage() {
-  ShowVersion();
-  printf("Usage:\n");
-  printf(" opencc [Options]\n");
-  printf("\n");
-  printf("Options:\n");
-  printf(" -i [file], --input=[file]   Read original text from [file].\n");
-  printf(" -o [file], --output=[file]  Write converted text to [file].\n");
-  printf(" -c [file], --config=[file]  Load configuration from [file].\n");
-  printf(" -v, --version               Print version and build information.\n");
-  printf(" -h, --help                  Print this help.\n");
-  printf("\n");
-  printf("With no input file, reads stdin and writes to stdout.\n");
-  printf("By default configuration is simplified to traditional.\n");
-  printf("\n");
-}
-
 std::istream& GetInputStream(const Optional<string>& inputFileName) {
   if (inputFileName.IsNull()) {
     return std::cin;
@@ -77,20 +50,32 @@ std::ostream& GetOutputStream(const Optional<string>& outputFileName) {
   }
 }
 
+string Read(std::istream& inputStream, bool lineByLine) {
+  // TODO block read
+  string line;
+  std::getline(inputStream, line);
+  return line;
+}
+
 void Convert(const Optional<string>& inputFileName,
              const Optional<string>& outputFileName,
-             const string& configFileName) {
+             const string& configFileName,
+             const bool noFlush) {
   Config config;
   auto converter = config.NewFromFile(configFileName);
   std::istream& inputStream = GetInputStream(inputFileName);
   std::ostream& outputStream = GetOutputStream(outputFileName);
+  bool lineByLine = inputFileName.IsNull();
   while (!inputStream.eof()) {
-    string line;
-    std::getline(inputStream, line);
-    string converted = converter->Convert(line);
-    outputStream << converted << std::endl;
-    outputStream.flush();
+    const string& text = Read(inputStream, lineByLine);
+    const string& converted = converter->Convert(text);
+    outputStream << converted << '\n';
+    if (!noFlush) {
+      // Flush every line if the output stream is stdout.
+      outputStream.flush();
+    }
   }
+  outputStream.flush();
 }
 
 int main(int argc, const char* argv[]) {
@@ -119,17 +104,25 @@ int main(int argc, const char* argv[]) {
                                      "" /* default */,
                                      "file" /* type */,
                                      cmd);
+    TCLAP::ValueArg<bool> noFlushArg("", "noflush",
+                                     "Disable flush for every line",
+                                     false /* required */,
+                                     false /* default */,
+                                     "bool" /* type */,
+                                     cmd);
     cmd.parse(argc, argv);
     Optional<string> inputFileName = Optional<string>::Null();
     Optional<string> outputFileName = Optional<string>::Null();
     string configFileName = configArg.getValue();
+    bool noFlush = noFlushArg.getValue();
     if (inputArg.isSet()) {
       inputFileName = Optional<string>(inputArg.getValue());
     }
     if (outputArg.isSet()) {
       outputFileName = Optional<string>(outputArg.getValue());
+      noFlush = true;
     }
-    Convert(inputFileName, outputFileName, configFileName);
+    Convert(inputFileName, outputFileName, configFileName, noFlush);
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error()
         << " for arg " << e.argId() << std::endl;

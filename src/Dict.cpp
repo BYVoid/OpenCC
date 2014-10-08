@@ -32,7 +32,7 @@ Optional<const DictEntry*> Dict::MatchPrefix(const char* word) const {
       return result;
     }
   }
-  return Optional<const DictEntry*>();
+  return Optional<const DictEntry*>::Null();
 }
 
 vector<const DictEntry*> Dict::MatchAllPrefixes(const char* word) const {

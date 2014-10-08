@@ -120,8 +120,8 @@ int main(int argc, const char* argv[]) {
                                      "file" /* type */,
                                      cmd);
     cmd.parse(argc, argv);
-    Optional<string> inputFileName;
-    Optional<string> outputFileName;
+    Optional<string> inputFileName = Optional<string>::Null();
+    Optional<string> outputFileName = Optional<string>::Null();
     string configFileName = configArg.getValue();
     if (inputArg.isSet()) {
       inputFileName = Optional<string>(inputArg.getValue());

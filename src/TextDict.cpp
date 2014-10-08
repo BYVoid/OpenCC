@@ -77,7 +77,7 @@ Optional<const DictEntry*> TextDict::Match(const char* word) const {
   if ((found != lexicon.end()) && (found->Key() == entry.Key())) {
     return Optional<const DictEntry*>(&(*found));
   } else {
-    return Optional<const DictEntry*>();
+    return Optional<const DictEntry*>::Null();
   }
 }
 

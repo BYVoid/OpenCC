@@ -19,7 +19,7 @@ class OpenccBinding : public node::ObjectWrap {
     string input;
     string output;
     Persistent<Function> callback;
-    Optional<opencc::Exception> ex;
+    Optional<opencc::Exception> ex = Optional<opencc::Exception>::Null();
   };
 
   Config config_;
@@ -68,7 +68,7 @@ class OpenccBinding : public node::ObjectWrap {
     conv_data->instance = ObjectWrap::Unwrap<OpenccBinding>(args.This());
     conv_data->input = ToUtf8String(args[0]->ToString());
     conv_data->callback = Persistent<Function>::New(Local<Function>::Cast(args[1]));
-    conv_data->ex = Optional<opencc::Exception>();
+    conv_data->ex = Optional<opencc::Exception>::Null();
     uv_work_t* req = new uv_work_t;
     req->data = conv_data;
     uv_queue_work(uv_default_loop(), req, DoConvert, (uv_after_work_cb)AfterConvert);

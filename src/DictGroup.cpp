@@ -39,7 +39,7 @@ Optional<const DictEntry*> DictGroup::Match(const char* word) const {
       return prefix;
     }
   }
-  return Optional<const DictEntry*>();
+  return Optional<const DictEntry*>::Null();
 }
 
 Optional<const DictEntry*> DictGroup::MatchPrefix(const char* word) const {
@@ -49,7 +49,7 @@ Optional<const DictEntry*> DictGroup::MatchPrefix(const char* word) const {
       return prefix;
     }
   }
-  return Optional<const DictEntry*>();
+  return Optional<const DictEntry*>::Null();
 }
 
 vector<const DictEntry*> DictGroup::MatchAllPrefixes(const char* word) const {

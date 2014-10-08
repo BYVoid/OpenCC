@@ -50,7 +50,7 @@ Optional<const DictEntry*> DartsDict::Match(const char* word) const {
   if (result.value != -1) {
     return Optional<const DictEntry*>(&lexicon.at(result.value));
   } else {
-    return Optional<const DictEntry*>();
+    return Optional<const DictEntry*>::Null();
   }
 }
 
@@ -61,7 +61,7 @@ Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word) const {
   Darts::DoubleArray::value_type maxMatchedResult = -1;
   size_t numMatched = dict.commonPrefixSearch(word, results, DEFAULT_NUM_ENTRIES);
   if (numMatched == 0) {
-    return Optional<const DictEntry*>();
+    return Optional<const DictEntry*>::Null();
   } else if ((numMatched > 0) && (numMatched < DEFAULT_NUM_ENTRIES)) {
     maxMatchedResult = results[numMatched - 1];
   } else {
@@ -74,7 +74,7 @@ Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word) const {
   if (maxMatchedResult >= 0) {
     return Optional<const DictEntry*>(&lexicon.at(maxMatchedResult));
   } else {
-    return Optional<const DictEntry*>();
+    return Optional<const DictEntry*>::Null();
   }
 }
 

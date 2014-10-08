@@ -23,8 +23,14 @@
 namespace opencc {
 class OPENCC_EXPORT UTF8Util {
 public:
+  /**
+  * Detect UTF8 BOM and skip it.
+  */
   static void SkipUtf8Bom(FILE* fp);
 
+  /**
+  * Returns the length in byte for the next UTF8 character.
+  */
   static size_t NextCharLength(const char* str) {
     char ch = *str;
     if ((ch & 0x80) == 0x00) {
@@ -41,10 +47,13 @@ public:
       return 6;
     }
 
-    // Invalid UTF8 string or in the middle of a UTF8 char
+    // TODO Invalid UTF8 string or in the middle of a UTF8 char
     return 0;
   }
 
+  /**
+  * Returns the length in byte for the previous UTF8 character.
+  */
   static size_t PrevCharLength(const char* str) {
     for (size_t i = 1; i <= 6; i++) {
       str--;
@@ -54,23 +63,30 @@ public:
       }
     }
 
-    // Invalid UTF8 string or in the middle of a UTF8 char
+    // TODO Invalid UTF8 string or in the middle of a UTF8 char
     return 0;
   }
 
+  /**
+  * Returns the char* pointer over the next UTF8 character.
+  */
   static const char* NextChar(const char* str) {
     return str + NextCharLength(str);
   }
 
+  /**
+  * Move the char* pointer before the previous UTF8 character.
+  */
   static const char* PrevChar(const char* str) {
     return str - PrevCharLength(str);
   }
 
-  static bool Validate(const char* str) {
-    // TODO implement this
-    return true;
-  }
-
+  /**
+  * Finds a character in the same line.
+  * @param str The text to be searched in.
+  * @param ch  The character to find.
+  * @return    The pointer that points to the found chacter in str or EOL/EOF.
+  */
   static const char* FindNextInline(const char* str, const char ch) {
     while (!IsLineEndingOrFileEnding(*str) && *str != ch) {
       str = NextChar(str);
@@ -78,10 +94,16 @@ public:
     return str;
   }
 
+  /**
+  * Returns ture if the character is a line ending or end of file.
+  */
   static bool IsLineEndingOrFileEnding(const char ch) {
     return ch == '\0' || ch == '\n' || ch == '\r';
   }
 
+  /**
+  * Copies a substring with given length to a new std::string.
+  */
   static string FromSubstr(const char* str, size_t length) {
     string newStr;
     newStr.resize(length);
@@ -89,6 +111,9 @@ public:
     return newStr;
   }
 
+  /**
+  * Returns true if the given string is longer or as long as the given length.
+  */
   static bool NotShorterThan(const char* str, size_t length) {
     while (length > 0) {
       if (*str == '\0') {
@@ -100,6 +125,10 @@ public:
     return true;
   }
 
+  /**
+  * Truncates a string with a maximal length.
+  * No UTF8 character will be broken.
+  */
   static string TruncateUTF8(const char* str, size_t maxLength) {
     string wordTrunc;
     if (NotShorterThan(str, maxLength)) {
@@ -117,6 +146,9 @@ public:
     return wordTrunc;
   }
 
+  /**
+  * Replaces all patterns in a string in place.
+  */
   static void ReplaceAll(string& str, const char* from, const char* to) {
     string::size_type pos = 0;
     string::size_type fromLen = strlen(from);
@@ -127,7 +159,10 @@ public:
     }
   }
 
-  static string Join(vector<string> strings, const string& separator) {
+  /**
+  * Joins a string vector in to a string with a separator.
+  */
+  static string Join(const vector<string>& strings, const string& separator) {
     std::ostringstream buffer;
     bool first = true;
     for (const auto& str : strings) {
@@ -140,7 +175,10 @@ public:
     return buffer.str();
   }
 
-  static string Join(vector<string> strings) {
+  /**
+  * Joins a string vector in to a string.
+  */
+  static string Join(const vector<string>& strings) {
     std::ostringstream buffer;
     for (const auto& str : strings) {
       buffer << str;

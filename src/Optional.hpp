@@ -60,6 +60,11 @@ private:
   T data;
 };
 
+/**
+* Specialization of Optional for pointers.
+*
+* Reduce a bool.
+*/
 template<typename T>
 class Optional<T*> {
 private:

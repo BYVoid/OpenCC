@@ -23,9 +23,15 @@
 namespace opencc {
 class SerializableDict : public Dict {
 public:
+  /**
+  * Serializes the dictionary and writes in to a file.
+  */
   virtual void SerializeToFile(FILE* fp) const = 0;
 
-  virtual void SerializeToFile(const string fileName) const {
+  /**
+  * Serializes the dictionary and writes in to a file.
+  */
+  virtual void SerializeToFile(const string& fileName) const {
     FILE* fp = fopen(fileName.c_str(), "wb");
     if (fp == NULL) {
       throw FileNotWritable(fileName);
@@ -35,7 +41,7 @@ public:
   }
 
   template<typename DICT>
-  static bool TryLoadFromFile(const string fileName,
+  static bool TryLoadFromFile(const string& fileName,
                               std::shared_ptr<DICT>* dict) {
     FILE* fp = fopen(fileName.c_str(), "rb");
     if (fp == NULL) {
@@ -48,7 +54,7 @@ public:
   }
 
   template<typename DICT>
-  static std::shared_ptr<DICT> NewFromFile(const string fileName) {
+  static std::shared_ptr<DICT> NewFromFile(const string& fileName) {
     std::shared_ptr<DICT> dict;
     if (!TryLoadFromFile<DICT>(fileName, &dict)) {
       throw FileNotFound(fileName);

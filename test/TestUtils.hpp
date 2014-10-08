@@ -44,8 +44,9 @@
 }
 
 class AssertionFailure : public std::runtime_error {
-  public:
-    AssertionFailure(string msg) : std::runtime_error(msg) {}
+public:
+  AssertionFailure(string msg) : std::runtime_error(msg) {
+  }
 };
 
 static inline void VectorAssertEquals(const vector<string>& expected,
@@ -58,18 +59,18 @@ static inline void VectorAssertEquals(const vector<string>& expected,
 }
 
 class TestUtils {
-  public:
-    static void RunTest(const string name, void (* func)(void)) {
-      clock_t start = clock();
-      std::cout << "[" << name << "]" << "...";
-      try {
-        func();
-        clock_t end = clock();
-        double duration = (end - start) * 1000.0 / CLOCKS_PER_SEC;
-        std::cout << "Success" << " (" << duration << "ms)" << std::endl;
-      } catch (AssertionFailure e) {
-        std::cout << "Failed" << std::endl;
-        std::cout << e.what() << std::endl;
-      }
+public:
+  static void RunTest(const string name, void (* func)(void)) {
+    clock_t start = clock();
+    std::cout << "[" << name << "]" << "...";
+    try {
+      func();
+      clock_t end = clock();
+      double duration = (end - start) * 1000.0 / CLOCKS_PER_SEC;
+      std::cout << "Success" << " (" << duration << "ms)" << std::endl;
+    } catch (AssertionFailure e) {
+      std::cout << "Failed" << std::endl;
+      std::cout << e.what() << std::endl;
     }
+  }
 };

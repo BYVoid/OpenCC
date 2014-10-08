@@ -1,4 +1,4 @@
-/**
+/*
  * Open Chinese Convert
  *
  * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
@@ -18,7 +18,6 @@
 
 #include "Conversion.hpp"
 #include "Dict.hpp"
-#include "UTF8Util.hpp"
 
 using namespace opencc;
 

@@ -22,16 +22,17 @@
 #include "Conversion.hpp"
 
 namespace opencc {
-  class OPENCC_EXPORT ConversionChain {
-    public:
-      ConversionChain(const list<ConversionPtr> _conversions);
-      vector<string> Convert(const vector<string>& input) const;
+class OPENCC_EXPORT ConversionChain {
+public:
+  ConversionChain(const list<ConversionPtr> _conversions);
 
-      const list<ConversionPtr> GetConversions() const {
-        return conversions;
-      }
+  vector<string> Convert(const vector<string>& input) const;
 
-    private:
-      const list<ConversionPtr> conversions;
-  };
+  const list<ConversionPtr> GetConversions() const {
+    return conversions;
+  }
+
+private:
+  const list<ConversionPtr> conversions;
+};
 }

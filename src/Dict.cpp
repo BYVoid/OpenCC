@@ -17,7 +17,6 @@
  */
 
 #include "Dict.hpp"
-#include "UTF8Util.hpp"
 
 using namespace opencc;
 

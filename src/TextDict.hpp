@@ -22,20 +22,30 @@
 #include "SerializableDict.hpp"
 
 namespace opencc {
-  class OPENCC_EXPORT TextDict : public SerializableDict {
-    public:
-      TextDict(const vector<DictEntry>& _lexicon);
-      virtual ~TextDict();
-      virtual size_t KeyMaxLength() const;
-      virtual Optional<const DictEntry*> Match(const char* word) const;
-      virtual vector<DictEntry> GetLexicon() const;
-      virtual void SerializeToFile(FILE* fp) const;
-      static TextDictPtr NewFromDict(const Dict& dict);
-      static TextDictPtr NewFromFile(FILE* fp);
-      static TextDictPtr NewFromSortedFile(FILE* fp);
-      static TextDictPtr NewFromUnsorted(const vector<DictEntry>& _lexicon);
-    private:
-      const size_t maxLength;
-      const vector<DictEntry> lexicon;
-  };
+class OPENCC_EXPORT TextDict : public SerializableDict {
+public:
+  TextDict(const vector<DictEntry>& _lexicon);
+
+  virtual ~TextDict();
+
+  virtual size_t KeyMaxLength() const;
+
+  virtual Optional<const DictEntry*> Match(const char* word) const;
+
+  virtual vector<DictEntry> GetLexicon() const;
+
+  virtual void SerializeToFile(FILE* fp) const;
+
+  static TextDictPtr NewFromDict(const Dict& dict);
+
+  static TextDictPtr NewFromFile(FILE* fp);
+
+  static TextDictPtr NewFromSortedFile(FILE* fp);
+
+  static TextDictPtr NewFromUnsorted(const vector<DictEntry>& _lexicon);
+
+private:
+  const size_t maxLength;
+  const vector<DictEntry> lexicon;
+};
 }

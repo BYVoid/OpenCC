@@ -22,42 +22,46 @@
 #include "UTF8Util.hpp"
 
 namespace opencc {
-  class OPENCC_EXPORT DictEntry {
-    public:
-      static DictEntry ParseKeyValues(const char* buff);
-    
-      DictEntry() {}
+class OPENCC_EXPORT DictEntry {
+public:
+  static DictEntry ParseKeyValues(const char* buff);
 
-      DictEntry(const string& _key) : key(_key) {}
+  DictEntry() {
+  }
 
-      DictEntry(const string& _key, const string& _value)
-        : key(_key), values(vector<string>{_value}) {}
+  DictEntry(const string& _key) : key(_key) {
+  }
 
-      DictEntry(const string& _key, const vector<string>& _values)
-        : key(_key), values(_values) {}
-        
-      const string& Key() const {
-        return key;
-      }
-      
-      const vector<string>& Values() const {
-        return values;
-      }
+  DictEntry(const string& _key, const string& _value)
+      : key(_key), values(vector<string>{_value}) {
+  }
 
-      const string& GetDefault() const {
-        if (values.size() > 0) {
-          return values[0];
-        } else {
-          return key;
-        }
-      }
-    
-      bool operator<(const DictEntry& that) const {
-        return key < that.key;
-      }
+  DictEntry(const string& _key, const vector<string>& _values)
+      : key(_key), values(_values) {
+  }
 
-    private:
-      string key;
-      vector<string> values;
-  };
+  const string& Key() const {
+    return key;
+  }
+
+  const vector<string>& Values() const {
+    return values;
+  }
+
+  const string& GetDefault() const {
+    if (values.size() > 0) {
+      return values[0];
+    } else {
+      return key;
+    }
+  }
+
+  bool operator<(const DictEntry& that) const {
+    return key < that.key;
+  }
+
+private:
+  string key;
+  vector<string> values;
+};
 }

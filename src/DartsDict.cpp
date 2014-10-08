@@ -17,7 +17,6 @@
  */
 
 #include "DartsDict.hpp"
-#include "UTF8Util.hpp"
 #include "darts.h"
 
 using namespace opencc;
@@ -28,8 +27,9 @@ DartsDict::DartsDict(const size_t _maxLength,
                      const vector<DictEntry>& _lexicon,
                      const void* _doubleArray,
                      const void* _buffer)
-  : maxLength(_maxLength), lexicon(_lexicon), doubleArray(_doubleArray), buffer(
-      _buffer) {}
+    : maxLength(_maxLength), lexicon(_lexicon), doubleArray(_doubleArray), buffer(
+    _buffer) {
+}
 
 DartsDict::~DartsDict() {
   if (buffer != nullptr) {
@@ -66,7 +66,7 @@ Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word) const {
     maxMatchedResult = results[numMatched - 1];
   } else {
     Darts::DoubleArray::value_type* rematchedResults =
-      new Darts::DoubleArray::value_type[numMatched];
+        new Darts::DoubleArray::value_type[numMatched];
     numMatched = dict.commonPrefixSearch(word, rematchedResults, numMatched);
     maxMatchedResult = rematchedResults[numMatched - 1];
     delete[] rematchedResults;

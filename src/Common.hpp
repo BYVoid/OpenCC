@@ -44,26 +44,26 @@ using std::vector;
 
 // Forward decalarations and alias
 namespace opencc {
-  class Config;
-  class DictEntry;
-  class Dict;
-  class SerializableDict;
-  class TextDict;
-  class DartsDict;
-  class DictGroup;
-  class Segmentation;
-  class Conversion;
-  class ConversionChain;
-  class Converter;
-  typedef std::shared_ptr<Dict> DictPtr;
-  typedef std::shared_ptr<SerializableDict> SerializableDictPtr;
-  typedef std::shared_ptr<TextDict> TextDictPtr;
-  typedef std::shared_ptr<DartsDict> DartsDictPtr;
-  typedef std::shared_ptr<DictGroup> DictGroupPtr;
-  typedef std::shared_ptr<Segmentation> SegmentationPtr;
-  typedef std::shared_ptr<Conversion> ConversionPtr;
-  typedef std::shared_ptr<ConversionChain> ConversionChainPtr;
-  typedef std::shared_ptr<Converter> ConverterPtr;
+class Config;
+class DictEntry;
+class Dict;
+class SerializableDict;
+class TextDict;
+class DartsDict;
+class DictGroup;
+class Segmentation;
+class Conversion;
+class ConversionChain;
+class Converter;
+typedef std::shared_ptr<Dict> DictPtr;
+typedef std::shared_ptr<SerializableDict> SerializableDictPtr;
+typedef std::shared_ptr<TextDict> TextDictPtr;
+typedef std::shared_ptr<DartsDict> DartsDictPtr;
+typedef std::shared_ptr<DictGroup> DictGroupPtr;
+typedef std::shared_ptr<Segmentation> SegmentationPtr;
+typedef std::shared_ptr<Conversion> ConversionPtr;
+typedef std::shared_ptr<ConversionChain> ConversionChainPtr;
+typedef std::shared_ptr<Converter> ConverterPtr;
 }
 
 #ifndef PKGDATADIR

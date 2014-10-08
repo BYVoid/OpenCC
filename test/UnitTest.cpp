@@ -68,8 +68,8 @@ void TestDictGroup() {
   }
   {
     DictGroupPtr dictGroup(new DictGroup(list<DictPtr>{
-      DictTestUtils::CreateDictForPhrases(),
-      DictTestUtils::CreateTaiwanPhraseDict()
+        DictTestUtils::CreateDictForPhrases(),
+        DictTestUtils::CreateTaiwanPhraseDict()
     }));
     {
       const auto& entry = dictGroup->MatchPrefix("鼠标");
@@ -116,8 +116,8 @@ void TestConversionChain() {
   conversions.push_back(conversion);
   conversions.push_back(conversionVariants);
   auto conversionChain = ConversionChainPtr(new ConversionChain(conversions));
-  auto converted = conversionChain->Convert(vector<string>{ utf8("里面") });
-  VectorAssertEquals(vector<string>{ utf8("裡面") }, converted);
+  auto converted = conversionChain->Convert(vector<string>{utf8("里面")});
+  VectorAssertEquals(vector<string>{utf8("裡面")}, converted);
 }
 
 const string CONFIG_TEST_PATH = "config_test/config_test.json";
@@ -138,10 +138,10 @@ void TestConfig() {
 
 void TestMultithreading() {
   auto routine = [](std::string name) {
-                   SimpleConverter converter(name);
-                   string converted = converter.Convert(utf8("燕燕于飞差池其羽之子于归远送于野"));
-                   AssertEquals(utf8("燕燕于飛差池其羽之子于歸遠送於野"), converted);
-                 };
+      SimpleConverter converter(name);
+      string converted = converter.Convert(utf8("燕燕于飞差池其羽之子于归远送于野"));
+      AssertEquals(utf8("燕燕于飛差池其羽之子于歸遠送於野"), converted);
+  };
   std::thread thread1(routine, CONFIG_TEST_PATH);
   std::thread thread2(routine, CONFIG_TEST_PATH);
   routine(CONFIG_TEST_PATH);

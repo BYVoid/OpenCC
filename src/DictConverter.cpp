@@ -18,7 +18,6 @@
 
 #include "CmdLineOutput.hpp"
 #include "DartsDict.hpp"
-#include "TextDict.hpp"
 
 using namespace opencc;
 
@@ -65,7 +64,7 @@ int main(int argc, const char* argv[]) {
     CmdLineOutput cmdLineOutput;
     cmd.setOutput(&cmdLineOutput);
 
-    vector<string> dictFormats { "text", "ocd" };
+    vector<string> dictFormats{"text", "ocd"};
     TCLAP::ValuesConstraint<string> allowedVals(dictFormats);
 
     TCLAP::ValueArg<string> toArg("t", "to",
@@ -97,7 +96,7 @@ int main(int argc, const char* argv[]) {
                       fromArg.getValue(), toArg.getValue());
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error()
-              << " for arg " << e.argId() << std::endl;
+        << " for arg " << e.argId() << std::endl;
   } catch (Exception& e) {
     std::cerr << e.what() << std::endl;
   }

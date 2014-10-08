@@ -31,7 +31,7 @@ class OpenccBinding : public node::ObjectWrap {
 
   virtual ~OpenccBinding() {
   }
-  
+
   string Convert(const string& input) {
     return converter_->Convert(input);
   }
@@ -75,7 +75,7 @@ class OpenccBinding : public node::ObjectWrap {
 
     return Undefined();
   }
-  
+
   static void DoConvert(uv_work_t* req) {
     ConvertRequest* conv_data = static_cast<ConvertRequest*>(req->data);
     OpenccBinding* instance = conv_data->instance;

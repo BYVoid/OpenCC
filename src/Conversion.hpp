@@ -1,4 +1,4 @@
-/**
+/*
  * Open Chinese Convert
  *
  * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
@@ -22,21 +22,22 @@
 #include "Segmentation.hpp"
 
 namespace opencc {
-  class OPENCC_EXPORT Conversion {
-    public:
-      Conversion(DictPtr _dict) : dict(_dict) {}
+class OPENCC_EXPORT Conversion {
+public:
+  Conversion(DictPtr _dict) : dict(_dict) {
+  }
 
-      // Convert single phrase
-      string Convert(const string& phrase) const;
+  // Convert single phrase
+  string Convert(const string& phrase) const;
 
-      // Convert segmented text
-      vector<string> Convert(const vector<string>& input) const;
+  // Convert segmented text
+  vector<string> Convert(const vector<string>& input) const;
 
-      const DictPtr GetDict() const {
-        return dict;
-      }
+  const DictPtr GetDict() const {
+    return dict;
+  }
 
-    private:
-      const DictPtr dict;
-  };
+private:
+  const DictPtr dict;
+};
 }

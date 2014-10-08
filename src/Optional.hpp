@@ -19,23 +19,25 @@
 #pragma once
 
 namespace opencc {
-  template<typename T>
-  class Optional {
-    public:
-      Optional() : isNull(true) {}
+template<typename T>
+class Optional {
+public:
+  Optional() : isNull(true) {
+  }
 
-      Optional(T actual) : isNull(false), data(actual) {}
+  Optional(T actual) : isNull(false), data(actual) {
+  }
 
-      bool IsNull() const {
-        return isNull;
-      }
+  bool IsNull() const {
+    return isNull;
+  }
 
-      const T& Get() const {
-        return data;
-      }
+  const T& Get() const {
+    return data;
+  }
 
-    private:
-      bool isNull;
-      T data;
-  };
+private:
+  bool isNull;
+  T data;
+};
 }

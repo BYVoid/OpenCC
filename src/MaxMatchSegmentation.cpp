@@ -17,7 +17,6 @@
  */
 
 #include "MaxMatchSegmentation.hpp"
-#include "UTF8Util.hpp"
 
 using namespace opencc;
 
@@ -25,13 +24,12 @@ vector<string> MaxMatchSegmentation::Segment(const string& text) const {
   vector<string> segments;
   const char* segStart = text.c_str();
   size_t segLength = 0;
-  auto clearBuffer =
-    [&segments, &segStart, &segLength]() {
+  auto clearBuffer = [&segments, &segStart, &segLength]() {
       if (segLength > 0) {
         segments.push_back(UTF8Util::FromSubstr(segStart, segLength));
         segLength = 0;
       }
-    };
+  };
   for (const char* pstr = text.c_str(); *pstr != '\0';) {
     const Optional<const DictEntry*>& matched = dict->MatchPrefix(pstr);
     size_t matchedLength;
@@ -42,7 +40,7 @@ vector<string> MaxMatchSegmentation::Segment(const string& text) const {
       clearBuffer();
       matchedLength = matched.Get()->Key().length();
       segments.push_back(matched.Get()->Key());
-      segStart = pstr + matchedLength ;
+      segStart = pstr + matchedLength;
     }
     pstr += matchedLength;
   }

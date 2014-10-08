@@ -48,10 +48,8 @@ void ShowUsage() {
   printf(" -v, --version               Print version and build information.\n");
   printf(" -h, --help                  Print this help.\n");
   printf("\n");
-  printf(
-           "With no input file, reads standard input and writes converted stream to standard output.\n");
-  printf(
-           "Default configuration (simplified to traditional) will be loaded if not set.\n");
+  printf("With no input file, reads stdin and writes to stdout.\n");
+  printf("By default configuration is simplified to traditional.\n");
   printf("\n");
 }
 
@@ -134,7 +132,7 @@ int main(int argc, const char* argv[]) {
     Convert(inputFileName, outputFileName, configFileName);
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error()
-              << " for arg " << e.argId() << std::endl;
+        << " for arg " << e.argId() << std::endl;
   } catch (Exception& e) {
     std::cerr << e.what() << std::endl;
   }

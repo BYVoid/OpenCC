@@ -22,23 +22,30 @@
 #include "Dict.hpp"
 
 namespace opencc {
-  class OPENCC_EXPORT DictGroup : public Dict {
-    public:
-      DictGroup(const list<DictPtr>& dicts);
-      static DictGroupPtr NewFromDict(const Dict& dict);
-      virtual ~DictGroup();
-      virtual size_t KeyMaxLength() const;
-      virtual Optional<const DictEntry*> Match(const char* word) const;
-      virtual Optional<const DictEntry*> MatchPrefix(const char* word) const;
-      virtual vector<const DictEntry*> MatchAllPrefixes(const char* word) const;
-      virtual vector<DictEntry> GetLexicon() const;
+class OPENCC_EXPORT DictGroup : public Dict {
+public:
+  DictGroup(const list<DictPtr>& dicts);
 
-      const list<DictPtr> GetDicts() const {
-        return dicts;
-      }
+  static DictGroupPtr NewFromDict(const Dict& dict);
 
-    private:
-      const size_t keyMaxLength;
-      const list<DictPtr> dicts;
-  };
+  virtual ~DictGroup();
+
+  virtual size_t KeyMaxLength() const;
+
+  virtual Optional<const DictEntry*> Match(const char* word) const;
+
+  virtual Optional<const DictEntry*> MatchPrefix(const char* word) const;
+
+  virtual vector<const DictEntry*> MatchAllPrefixes(const char* word) const;
+
+  virtual vector<DictEntry> GetLexicon() const;
+
+  const list<DictPtr> GetDicts() const {
+    return dicts;
+  }
+
+private:
+  const size_t keyMaxLength;
+  const list<DictPtr> dicts;
+};
 }

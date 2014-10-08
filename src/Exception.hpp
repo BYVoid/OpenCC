@@ -17,6 +17,7 @@
  */
 
 #pragma once
+
 #include <stdexcept>
 #include <string>
 
@@ -29,37 +30,43 @@
 #endif // ifdef _MSC_VER
 
 namespace opencc {
-  class OPENCC_EXPORT Exception : public std::exception {
-    public:
-      Exception() {}
+class OPENCC_EXPORT Exception : public std::exception {
+public:
+  Exception() {
+  }
 
-      virtual ~Exception() throw() {}
+  virtual ~Exception() throw() {
+  }
 
-      Exception(const std::string& _message) : message(_message) {}
+  Exception(const std::string& _message) : message(_message) {
+  }
 
-      virtual const char* what() const noexcept {
-        return message.c_str();
-      }
+  virtual const char* what() const noexcept {
+    return message.c_str();
+  }
 
-    private:
-      std::string message;
-  };
+private:
+  std::string message;
+};
 
-  class OPENCC_EXPORT FileNotFound : public Exception {
-    public:
-      FileNotFound(const std::string& fileName) :
-        Exception(fileName + " not found or not accessible.") {}
-  };
+class OPENCC_EXPORT FileNotFound : public Exception {
+public:
+  FileNotFound(const std::string& fileName) :
+      Exception(fileName + " not found or not accessible.") {
+  }
+};
 
-  class OPENCC_EXPORT FileNotWritable : public Exception {
-    public:
-      FileNotWritable(const std::string& fileName) :
-        Exception(fileName + " not writable.") {}
-  };
+class OPENCC_EXPORT FileNotWritable : public Exception {
+public:
+  FileNotWritable(const std::string& fileName) :
+      Exception(fileName + " not writable.") {
+  }
+};
 
-  class OPENCC_EXPORT InvalidFormat : public Exception {
-    public:
-      InvalidFormat(const std::string& message) :
-        Exception("Invalid format: " + message) {}
-  };
+class OPENCC_EXPORT InvalidFormat : public Exception {
+public:
+  InvalidFormat(const std::string& message) :
+      Exception("Invalid format: " + message) {
+  }
+};
 }

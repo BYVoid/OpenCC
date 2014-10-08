@@ -23,25 +23,33 @@
 #include "TextDict.hpp"
 
 namespace opencc {
-  class OPENCC_EXPORT DartsDict : public SerializableDict {
-    public:
-      DartsDict(const size_t _maxLength,
-                const vector<DictEntry>& _lexicon,
-                const void* _doubleArray,
-                const void* _buffer);
-      virtual ~DartsDict();
-      virtual size_t KeyMaxLength() const;
-      virtual Optional<const DictEntry*> Match(const char* word) const;
-      virtual Optional<const DictEntry*> MatchPrefix(const char* word) const;
-      virtual vector<DictEntry> GetLexicon() const;
-      virtual void SerializeToFile(FILE* fp) const;
+class OPENCC_EXPORT DartsDict : public SerializableDict {
+public:
+  DartsDict(const size_t _maxLength,
+            const vector<DictEntry>& _lexicon,
+            const void* _doubleArray,
+            const void* _buffer);
 
-      static DartsDictPtr NewFromDict(const Dict& dict);
-      static DartsDictPtr NewFromFile(FILE* fp);
-    private:
-      const size_t maxLength;
-      const vector<DictEntry> lexicon;
-      const void* doubleArray;
-      const void* buffer;
-  };
+  virtual ~DartsDict();
+
+  virtual size_t KeyMaxLength() const;
+
+  virtual Optional<const DictEntry*> Match(const char* word) const;
+
+  virtual Optional<const DictEntry*> MatchPrefix(const char* word) const;
+
+  virtual vector<DictEntry> GetLexicon() const;
+
+  virtual void SerializeToFile(FILE* fp) const;
+
+  static DartsDictPtr NewFromDict(const Dict& dict);
+
+  static DartsDictPtr NewFromFile(FILE* fp);
+
+private:
+  const size_t maxLength;
+  const vector<DictEntry> lexicon;
+  const void* doubleArray;
+  const void* buffer;
+};
 }

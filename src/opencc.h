@@ -1,4 +1,4 @@
-/**
+/*
  * Open Chinese Convert
  *
  * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
@@ -25,21 +25,24 @@
 #include "Export.hpp"
 
 namespace opencc {
-  class OPENCC_EXPORT SimpleConverter {
-  public:
-    SimpleConverter(const std::string& configFileName);
-    ~SimpleConverter();
-    std::string Convert(const std::string& input) const;
-  private:
-    const void* internalData;
-  };
+class OPENCC_EXPORT SimpleConverter {
+public:
+  SimpleConverter(const std::string& configFileName);
+
+  ~SimpleConverter();
+
+  std::string Convert(const std::string& input) const;
+
+private:
+  const void* internalData;
+};
 }
 
 extern "C" {
 #endif
 
 typedef void* opencc_t;
-  
+
 opencc_t opencc_new(const char* configFileName);
 void opencc_delete(opencc_t opencc);
 char* opencc_convert(opencc_t opencc, const char* input);

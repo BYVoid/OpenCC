@@ -41,9 +41,11 @@ static vector<DictEntry> ParseLexiconFromFile(FILE* fp) {
 }
 
 TextDict::TextDict(const vector<DictEntry>& _lexicon)
-  : maxLength(GetKeyMaxLength(_lexicon)), lexicon(_lexicon) {}
+    : maxLength(GetKeyMaxLength(_lexicon)), lexicon(_lexicon) {
+}
 
-TextDict::~TextDict() {}
+TextDict::~TextDict() {
+}
 
 TextDictPtr TextDict::NewFromSortedFile(FILE* fp) {
   const vector<DictEntry>& lexicon = ParseLexiconFromFile(fp);

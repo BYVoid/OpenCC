@@ -21,39 +21,39 @@
 #include "Dict.hpp"
 
 namespace opencc {
-  class SerializableDict : public Dict {
-    public:
-      virtual void SerializeToFile(FILE* fp) const = 0;
+class SerializableDict : public Dict {
+public:
+  virtual void SerializeToFile(FILE* fp) const = 0;
 
-      virtual void SerializeToFile(const string fileName) const {
-        FILE* fp = fopen(fileName.c_str(), "wb");
-        if (fp == NULL) {
-          throw FileNotWritable(fileName);
-        }
-        SerializeToFile(fp);
-        fclose(fp);
-      }
+  virtual void SerializeToFile(const string fileName) const {
+    FILE* fp = fopen(fileName.c_str(), "wb");
+    if (fp == NULL) {
+      throw FileNotWritable(fileName);
+    }
+    SerializeToFile(fp);
+    fclose(fp);
+  }
 
-      template<typename DICT>
-      static bool TryLoadFromFile(const string fileName,
-                                  std::shared_ptr<DICT>* dict) {
-        FILE* fp = fopen(fileName.c_str(), "rb");
-        if (fp == NULL) {
-          return false;
-        }
-        std::shared_ptr<DICT> loadedDict = DICT::NewFromFile(fp);
-        fclose(fp);
-        *dict = loadedDict;
-        return true;
-      }
+  template<typename DICT>
+  static bool TryLoadFromFile(const string fileName,
+                              std::shared_ptr<DICT>* dict) {
+    FILE* fp = fopen(fileName.c_str(), "rb");
+    if (fp == NULL) {
+      return false;
+    }
+    std::shared_ptr<DICT> loadedDict = DICT::NewFromFile(fp);
+    fclose(fp);
+    *dict = loadedDict;
+    return true;
+  }
 
-      template<typename DICT>
-      static std::shared_ptr<DICT> NewFromFile(const string fileName) {
-        std::shared_ptr<DICT> dict;
-        if (!TryLoadFromFile<DICT>(fileName, &dict)) {
-          throw FileNotFound(fileName);
-        }
-        return dict;
-      }
-  };
+  template<typename DICT>
+  static std::shared_ptr<DICT> NewFromFile(const string fileName) {
+    std::shared_ptr<DICT> dict;
+    if (!TryLoadFromFile<DICT>(fileName, &dict)) {
+      throw FileNotFound(fileName);
+    }
+    return dict;
+  }
+};
 }

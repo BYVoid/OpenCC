@@ -22,9 +22,11 @@
 using namespace opencc;
 
 DictGroup::DictGroup(const list<DictPtr>& _dicts) :
-  keyMaxLength(0), dicts(_dicts) {}
+    keyMaxLength(0), dicts(_dicts) {
+}
 
-DictGroup::~DictGroup() {}
+DictGroup::~DictGroup() {
+}
 
 size_t DictGroup::KeyMaxLength() const {
   return keyMaxLength;
@@ -82,5 +84,5 @@ vector<DictEntry> DictGroup::GetLexicon() const {
 
 DictGroupPtr DictGroup::NewFromDict(const Dict& dict) {
   TextDictPtr newDict = TextDict::NewFromDict(dict);
-  return DictGroupPtr(new DictGroup(list<DictPtr>{ newDict }));
+  return DictGroupPtr(new DictGroup(list<DictPtr>{newDict}));
 }

@@ -21,8 +21,8 @@
 #include "Common.hpp"
 
 namespace opencc {
-  class OPENCC_EXPORT Segmentation {
-    public:
-      virtual vector<string> Segment(const string& text) const = 0;
-  };
+class OPENCC_EXPORT Segmentation {
+public:
+  virtual vector<string> Segment(const string& text) const = 0;
+};
 }

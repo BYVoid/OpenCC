@@ -1,4 +1,4 @@
-/**
+/*
  * Open Chinese Convert
  *
  * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
@@ -21,14 +21,18 @@
 #include "Common.hpp"
 
 namespace opencc {
-  class OPENCC_EXPORT Config {
-    public:
-      Config();
-      virtual ~Config();
-      ConverterPtr NewFromString(const string& json,
-                                 const string& configDirectory);
-      ConverterPtr NewFromFile(const string& fileName);
-    private:
-      void* internal;
-  };
+class OPENCC_EXPORT Config {
+public:
+  Config();
+
+  virtual ~Config();
+
+  ConverterPtr NewFromString(const string& json,
+                             const string& configDirectory);
+
+  ConverterPtr NewFromFile(const string& fileName);
+
+private:
+  void* internal;
+};
 }

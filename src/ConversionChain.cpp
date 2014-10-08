@@ -21,8 +21,8 @@
 using namespace opencc;
 
 ConversionChain::ConversionChain(const list<ConversionPtr> _conversions)
-  : conversions(_conversions)
-{}
+    : conversions(_conversions) {
+}
 
 vector<string> ConversionChain::Convert(const vector<string>& input) const {
   vector<string> output = input;

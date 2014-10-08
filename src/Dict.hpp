@@ -22,28 +22,31 @@
 #include "DictEntry.hpp"
 
 namespace opencc {
-  class OPENCC_EXPORT Dict {
-    public:
-      virtual size_t KeyMaxLength() const = 0;
-      // Returns the matched word or null.
-      virtual Optional<const DictEntry*> Match(const char* word) const = 0;
-      // Returns the longest matched prefix of word.
-      virtual Optional<const DictEntry*> MatchPrefix(const char* word) const;
-      // Returns all matched prefixes of word, sorted by the length (desc).
-      virtual vector<const DictEntry*> MatchAllPrefixes(const char* word) const;
+class OPENCC_EXPORT Dict {
+public:
+  virtual size_t KeyMaxLength() const = 0;
 
-      Optional<const DictEntry*> Match(const string& word) const {
-        return Match(word.c_str());
-      }
+  // Returns the matched word or null.
+  virtual Optional<const DictEntry*> Match(const char* word) const = 0;
 
-      Optional<const DictEntry*> MatchPrefix(const string& word) const {
-        return MatchPrefix(word.c_str());
-      }
+  // Returns the longest matched prefix of word.
+  virtual Optional<const DictEntry*> MatchPrefix(const char* word) const;
 
-      vector<const DictEntry*> MatchAllPrefixes(const string& word) const {
-        return MatchAllPrefixes(word.c_str());
-      }
+  // Returns all matched prefixes of word, sorted by the length (desc).
+  virtual vector<const DictEntry*> MatchAllPrefixes(const char* word) const;
 
-      virtual vector<DictEntry> GetLexicon() const = 0;
-  };
+  Optional<const DictEntry*> Match(const string& word) const {
+    return Match(word.c_str());
+  }
+
+  Optional<const DictEntry*> MatchPrefix(const string& word) const {
+    return MatchPrefix(word.c_str());
+  }
+
+  vector<const DictEntry*> MatchAllPrefixes(const string& word) const {
+    return MatchAllPrefixes(word.c_str());
+  }
+
+  virtual vector<DictEntry> GetLexicon() const = 0;
+};
 }

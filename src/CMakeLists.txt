@@ -16,6 +16,7 @@ set(
   MaxMatchSegmentation.hpp
   Optional.hpp
   Segmentation.hpp
+  Segments.hpp
   SerializableDict.hpp
   TextDict.hpp
   UTF8Util.hpp

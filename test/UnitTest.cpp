@@ -24,6 +24,7 @@
 #include "DictEntry.hpp"
 #include "DictTestUtils.hpp"
 #include "MaxMatchSegmentation.hpp"
+#include "Segments.hpp"
 #include "opencc.h"
 
 using namespace opencc;
@@ -90,12 +91,12 @@ void TestDictGroup() {
 void TestSegmentation() {
   auto dict = DictTestUtils::CreateDictGroupForConversion();
   auto segmentation = SegmentationPtr(new MaxMatchSegmentation(dict));
-  auto segments = segmentation->Segment(utf8("太后的头发干燥"));
-  AssertEquals(4, segments.size());
-  AssertEquals(utf8("太后"), segments.at(0));
-  AssertEquals(utf8("的"), segments.at(1));
-  AssertEquals(utf8("头发"), segments.at(2));
-  AssertEquals(utf8("干燥"), segments.at(3));
+  const auto& segments = segmentation->Segment(utf8("太后的头发干燥"));
+  AssertEquals(4, segments.Length());
+  AssertEquals(utf8("太后"), string(segments.At(0)));
+  AssertEquals(utf8("的"), string(segments.At(1)));
+  AssertEquals(utf8("头发"), string(segments.At(2)));
+  AssertEquals(utf8("干燥"), string(segments.At(3)));
 }
 
 void TestConversion() {
@@ -116,8 +117,8 @@ void TestConversionChain() {
   conversions.push_back(conversion);
   conversions.push_back(conversionVariants);
   auto conversionChain = ConversionChainPtr(new ConversionChain(conversions));
-  auto converted = conversionChain->Convert(vector<string>{utf8("里面")});
-  VectorAssertEquals(vector<string>{utf8("裡面")}, converted);
+  auto converted = conversionChain->Convert(Segments{utf8("里面")});
+  SegmentsAssertEquals(Segments{utf8("裡面")}, converted);
 }
 
 const string CONFIG_TEST_PATH = "config_test/config_test.json";

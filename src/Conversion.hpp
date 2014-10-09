@@ -31,7 +31,7 @@ public:
   string Convert(const string& phrase) const;
 
   // Convert segmented text
-  vector<string> Convert(const vector<string>& input) const;
+  Segments Convert(const Segments& input) const;
 
   const DictPtr GetDict() const {
     return dict;

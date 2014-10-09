@@ -18,6 +18,7 @@
 
 #include "Conversion.hpp"
 #include "Dict.hpp"
+#include "Segments.hpp"
 
 using namespace opencc;
 
@@ -38,10 +39,10 @@ string Conversion::Convert(const string& phrase) const {
   return buffer.str();
 }
 
-vector<string> Conversion::Convert(const vector<string>& input) const {
-  vector<string> output;
+Segments Conversion::Convert(const Segments& input) const {
+  Segments output;
   for (const auto& segment : input) {
-    output.push_back(Convert(segment));
+    output.AddSegment(Convert(segment));
   }
   return output;
 }

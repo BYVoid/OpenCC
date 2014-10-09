@@ -18,12 +18,13 @@
 
 #include "ConversionChain.hpp"
 #include "Converter.hpp"
+#include "Segments.hpp"
 
 using namespace opencc;
 
 string Converter::Convert(const string& text) const {
-  auto segments = segmentation->Segment(text);
-  auto converted = conversionChain->Convert(segments);
+  const Segments& segments = segmentation->Segment(text);
+  const Segments& converted = conversionChain->Convert(segments);
   std::ostringstream buffer;
   for (const auto& segment : converted) {
     buffer << segment;

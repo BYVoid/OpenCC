@@ -52,6 +52,7 @@ class TextDict;
 class DartsDict;
 class DictGroup;
 class Segmentation;
+class Segments;
 class Conversion;
 class ConversionChain;
 class Converter;

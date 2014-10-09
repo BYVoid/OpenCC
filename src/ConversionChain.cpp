@@ -17,6 +17,7 @@
  */
 
 #include "ConversionChain.hpp"
+#include "Segments.hpp"
 
 using namespace opencc;
 
@@ -24,8 +25,8 @@ ConversionChain::ConversionChain(const list<ConversionPtr> _conversions)
     : conversions(_conversions) {
 }
 
-vector<string> ConversionChain::Convert(const vector<string>& input) const {
-  vector<string> output = input;
+Segments ConversionChain::Convert(const Segments& input) const {
+  Segments output = input;
   for (auto conversion : conversions) {
     output = conversion->Convert(output);
   }

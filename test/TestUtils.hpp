@@ -19,6 +19,9 @@
 #pragma once
 
 #include "Common.hpp"
+#include "Segments.hpp"
+
+namespace opencc {
 
 #ifdef _MSC_VER
 # define __func__ __FUNCTION__
@@ -49,12 +52,12 @@ public:
   }
 };
 
-static inline void VectorAssertEquals(const vector<string>& expected,
-                                      const vector<string>& actual) {
-  size_t length = expected.size();
-  AssertTrue(length == actual.size());
+static inline void SegmentsAssertEquals(const Segments& expected,
+                                        const Segments& actual) {
+  size_t length = expected.Length();
+  AssertTrue(length == actual.Length());
   for (size_t i = 0; i < length; i++) {
-    AssertEquals(expected.at(i), actual.at(i));
+    AssertEquals(string(expected.At(i)), string(actual.At(i)));
   }
 }
 
@@ -74,3 +77,4 @@ public:
     }
   }
 };
+}

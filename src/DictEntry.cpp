@@ -34,7 +34,7 @@ DictEntry DictEntry::ParseKeyValues(const char* buff) {
     pbuff = UTF8Util::FindNextInline(buff, ' ');
     length = pbuff - buff;
     const string& value = UTF8Util::FromSubstr(buff, length);
-    entry.values.push_back(value);
+    entry.values.AddSegment(value);
   }
   return entry;
 }

@@ -39,7 +39,7 @@ Segments MaxMatchSegmentation::Segment(const string& text) const {
       segLength += matchedLength;
     } else {
       clearBuffer();
-      matchedLength = matched.Get()->Key().length();
+      matchedLength = matched.Get()->KeyLength();
       segments.AddSegment(matched.Get()->Key());
       segStart = pstr + matchedLength;
     }

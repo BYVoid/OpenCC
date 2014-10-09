@@ -59,10 +59,10 @@ void TestDartsDict() {
 void TestDictGroup() {
   {
     const auto& dictGroup = DictTestUtils::CreateDictGroupForConversion();
-    const auto& entry = dictGroup->MatchPrefix("Unknown");
+    const auto& entry = dictGroup->Dict::MatchPrefix(utf8("Unknown"));
     AssertTrue(entry.IsNull());
 
-    const auto& matches = dictGroup->MatchAllPrefixes(utf8("干燥"));
+    const auto& matches = dictGroup->Dict::MatchAllPrefixes(utf8("干燥"));
     AssertEquals(2, matches.size());
     AssertEquals(utf8("乾燥"), matches.at(0)->GetDefault());
     AssertEquals(utf8("幹"), matches.at(1)->GetDefault());
@@ -73,15 +73,15 @@ void TestDictGroup() {
         DictTestUtils::CreateTaiwanPhraseDict()
     }));
     {
-      const auto& entry = dictGroup->MatchPrefix("鼠标");
+      const auto& entry = dictGroup->Dict::MatchPrefix(utf8("鼠标"));
       AssertEquals(utf8("鼠標"), entry.Get()->GetDefault());
     }
     {
-      const auto& entry = dictGroup->MatchPrefix("克罗地亚");
+      const auto& entry = dictGroup->Dict::MatchPrefix(utf8("克罗地亚"));
       AssertEquals(utf8("克羅埃西亞"), entry.Get()->GetDefault());
     }
     {
-      const auto& matches = dictGroup->MatchAllPrefixes("鼠标");
+      const auto& matches = dictGroup->Dict::MatchAllPrefixes(utf8("鼠标"));
       AssertEquals(1, matches.size());
       AssertEquals(utf8("鼠標"), matches[0]->GetDefault());
     }
@@ -151,11 +151,11 @@ void TestMultithreading() {
 }
 
 void TestCInterface() {
-  const char* text = utf8("燕燕于飞差池其羽之子于归远送于野");
-  const char* expected = utf8("燕燕于飛差池其羽之子于歸遠送於野");
+  const string& text = utf8("燕燕于飞差池其羽之子于归远送于野");
+  const string& expected = utf8("燕燕于飛差池其羽之子于歸遠送於野");
   opencc_t od = opencc_new(CONFIG_TEST_PATH.c_str());
-  char* converted = opencc_convert(od, text);
-  AssertEquals(string(expected), string(converted));
+  char* converted = opencc_convert(od, text.c_str());
+  AssertEquals(expected, converted);
   opencc_free_string(converted);
   opencc_delete(od);
 }

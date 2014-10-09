@@ -31,7 +31,7 @@ string Conversion::Convert(const string& phrase) const {
       matchedLength = UTF8Util::NextCharLength(pstr);
       buffer << UTF8Util::FromSubstr(pstr, matchedLength);
     } else {
-      matchedLength = matched.Get()->Key().length();
+      matchedLength = matched.Get()->KeyLength();
       buffer << matched.Get()->GetDefault();
     }
     pstr += matchedLength;

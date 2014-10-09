@@ -23,7 +23,7 @@ using namespace opencc;
 static size_t GetKeyMaxLength(const vector<DictEntry>& lexicon) {
   size_t maxLength = 0;
   for (const auto& entry : lexicon) {
-    size_t keyLength = entry.Key().length();
+    size_t keyLength = entry.KeyLength();
     maxLength = std::max(keyLength, maxLength);
   }
   return maxLength;
@@ -74,7 +74,7 @@ size_t TextDict::KeyMaxLength() const {
 Optional<const DictEntry*> TextDict::Match(const char* word) const {
   DictEntry entry(word);
   auto found = std::lower_bound(lexicon.begin(), lexicon.end(), entry);
-  if ((found != lexicon.end()) && (found->Key() == entry.Key())) {
+  if ((found != lexicon.end()) && (strcmp(found->Key(), entry.Key()) == 0)) {
     return Optional<const DictEntry*>(&(*found));
   } else {
     return Optional<const DictEntry*>::Null();
@@ -88,11 +88,12 @@ vector<DictEntry> TextDict::GetLexicon() const {
 void TextDict::SerializeToFile(FILE* fp) const {
   // TODO escape space
   for (const auto& entry : lexicon) {
-    fprintf(fp, "%s\t", entry.Key().c_str());
+    fprintf(fp, "%s\t", entry.Key());
     size_t i = 0;
-    for (const auto& value : entry.Values()) {
-      fprintf(fp, "%s", value.c_str());
-      if (i < entry.Values().size() - 1) {
+    size_t length = entry.Values().Length();
+    for (const char* value : entry.Values()) {
+      fprintf(fp, "%s", value);
+      if (i < length - 1) {
         fprintf(fp, " ");
       }
       i++;

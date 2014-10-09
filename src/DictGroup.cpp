@@ -58,7 +58,7 @@ vector<const DictEntry*> DictGroup::MatchAllPrefixes(const char* word) const {
   for (const auto& dict : dicts) {
     const vector<const DictEntry*>& entries = dict->MatchAllPrefixes(word);
     for (const auto& entry : entries) {
-      size_t len = entry->Key().length();
+      size_t len = entry->KeyLength();
       // If the current length has already result, skip
       if (matched.find(len) == matched.end()) {
         matched[len] = entry;

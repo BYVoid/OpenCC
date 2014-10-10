@@ -69,6 +69,10 @@ public:
     return key == that.key;
   }
 
+  static bool PtrLessThan(const DictEntry* a, const DictEntry* b) {
+    return *a < *b;
+  }
+
 private:
   string key;
   Segments values;

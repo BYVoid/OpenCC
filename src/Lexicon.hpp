@@ -19,41 +19,45 @@
 #pragma once
 
 #include "Common.hpp"
-#include "SerializableDict.hpp"
+#include "DictEntry.hpp"
 
 namespace opencc {
-/**
-* Text dictionary
-*/
-class OPENCC_EXPORT TextDict : public SerializableDict {
+class OPENCC_EXPORT Lexicon {
 public:
-  /**
-  * Constructor of TextDict.
-  * _lexicon must be sorted.
-  */
-  TextDict(const LexiconPtr& _lexicon);
+  Lexicon() {
+  }
 
-  virtual ~TextDict();
+  ~Lexicon() {
+    for (DictEntry* entry : entries) {
+      delete entry;
+    }
+  }
 
-  virtual size_t KeyMaxLength() const;
+  void Add(const DictEntry& entry) {
+    entries.push_back(new DictEntry(entry));
+  }
 
-  virtual Optional<const DictEntry*> Match(const char* word) const;
+  void Sort() {
+    std::sort(entries.begin(), entries.end(), DictEntry::PtrLessThan);
+  }
 
-  virtual LexiconPtr GetLexicon() const;
+  const DictEntry* At(size_t index) const {
+    return entries.at(index);
+  }
 
-  virtual void SerializeToFile(FILE* fp) const;
+  size_t Length() const {
+    return entries.size();
+  }
 
-  /**
-  * Constructs a TextDict from another dictionary.
-  */
-  static TextDictPtr NewFromDict(const Dict& dict);
+  vector<DictEntry*>::const_iterator begin() const {
+    return entries.begin();
+  }
 
-  static TextDictPtr NewFromFile(FILE* fp);
-
-  static TextDictPtr NewFromSortedFile(FILE* fp);
+  vector<DictEntry*>::const_iterator end() const {
+    return entries.end();
+  }
 
 private:
-  const size_t maxLength;
-  const LexiconPtr lexicon;
+  vector<DictEntry*> entries;
 };
 }

@@ -38,7 +38,7 @@ public:
 
   virtual vector<const DictEntry*> MatchAllPrefixes(const char* word) const;
 
-  virtual vector<DictEntry> GetLexicon() const;
+  virtual LexiconPtr GetLexicon() const;
 
   const list<DictPtr> GetDicts() const {
     return dicts;

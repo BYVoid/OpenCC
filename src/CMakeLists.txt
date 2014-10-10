@@ -13,6 +13,7 @@ set(
   DictGroup.hpp
   Exception.hpp
   Export.hpp
+  Lexicon.hpp
   MaxMatchSegmentation.hpp
   Optional.hpp
   Segmentation.hpp

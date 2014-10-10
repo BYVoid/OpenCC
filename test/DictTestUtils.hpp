@@ -1,7 +1,7 @@
 ﻿/*
  * Open Chinese Convert
  *
- * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 #include "DartsDict.hpp"
 #include "Dict.hpp"
 #include "DictGroup.hpp"
+#include "Lexicon.hpp"
 #include "TestUtils.hpp"
 #include "TextDict.hpp"
 #include "Segments.hpp"
@@ -50,37 +51,40 @@ namespace opencc {
 class DictTestUtils {
 public:
   static TextDictPtr CreateTextDictForText() {
-    vector<DictEntry> lexicon;
-    lexicon.push_back(DictEntry("BYVoid", "byv"));
-    lexicon.push_back(DictEntry("zigzagzig", "zag"));
-    lexicon.push_back(DictEntry(utf8("積羽沉舟"), utf8("羣輕折軸")));
-    lexicon.push_back(DictEntry(utf8("清"), "Tsing"));
-    lexicon.push_back(DictEntry(utf8("清華"), "Tsinghua"));
-    lexicon.push_back(DictEntry(utf8("清華大學"), "TsinghuaUniversity"));
-    return TextDict::NewFromUnsorted(lexicon);
+    LexiconPtr lexicon(new Lexicon);
+    lexicon->Add(DictEntry("BYVoid", "byv"));
+    lexicon->Add(DictEntry("zigzagzig", "zag"));
+    lexicon->Add(DictEntry(utf8("積羽沉舟"), utf8("羣輕折軸")));
+    lexicon->Add(DictEntry(utf8("清"), "Tsing"));
+    lexicon->Add(DictEntry(utf8("清華"), "Tsinghua"));
+    lexicon->Add(DictEntry(utf8("清華大學"), "TsinghuaUniversity"));
+    lexicon->Sort();
+    return TextDictPtr(new TextDict(lexicon));
   }
 
   static DictPtr CreateDictForCharacters() {
-    vector<DictEntry> lexicon;
-    lexicon.push_back(DictEntry(utf8("后"),
-                                Segments{utf8("后"), utf8("後")}));
-    lexicon.push_back(DictEntry(utf8("发"),
-                                Segments{utf8("發"), utf8("髮")}));
-    lexicon.push_back(DictEntry(utf8("干"),
-                                Segments{utf8("幹"), utf8("乾"),
-                                               utf8("干")}));
-    lexicon.push_back(DictEntry(utf8("里"),
-                                Segments{utf8("裏"), utf8("里")}));
-    return TextDict::NewFromUnsorted(lexicon);
+    LexiconPtr lexicon(new Lexicon);
+    lexicon->Add(DictEntry(utf8("后"),
+                           Segments{utf8("后"), utf8("後")}));
+    lexicon->Add(DictEntry(utf8("发"),
+                           Segments{utf8("發"), utf8("髮")}));
+    lexicon->Add(DictEntry(utf8("干"),
+                           Segments{utf8("幹"), utf8("乾"),
+                                    utf8("干")}));
+    lexicon->Add(DictEntry(utf8("里"),
+                           Segments{utf8("裏"), utf8("里")}));
+    lexicon->Sort();
+    return TextDictPtr(new TextDict(lexicon));
   }
 
   static DictPtr CreateDictForPhrases() {
-    vector<DictEntry> lexicon;
-    lexicon.push_back(DictEntry(utf8("太后"), utf8("太后")));
-    lexicon.push_back(DictEntry(utf8("头发"), utf8("頭髮")));
-    lexicon.push_back(DictEntry(utf8("干燥"), utf8("乾燥")));
-    lexicon.push_back(DictEntry(utf8("鼠标"), utf8("鼠標")));
-    TextDictPtr textDict = TextDict::NewFromUnsorted(lexicon);
+    LexiconPtr lexicon(new Lexicon);
+    lexicon->Add(DictEntry(utf8("太后"), utf8("太后")));
+    lexicon->Add(DictEntry(utf8("头发"), utf8("頭髮")));
+    lexicon->Add(DictEntry(utf8("干燥"), utf8("乾燥")));
+    lexicon->Add(DictEntry(utf8("鼠标"), utf8("鼠標")));
+    lexicon->Sort();
+    TextDictPtr textDict(new TextDict(lexicon));
 
     DartsDictPtr dartsDict = DartsDict::NewFromDict(*textDict.get());
     return dartsDict;
@@ -95,18 +99,19 @@ public:
   }
 
   static DictPtr CreateDictForTaiwanVariants() {
-    vector<DictEntry> lexicon;
-    lexicon.push_back(DictEntry(utf8("裏"), utf8("裡")));
+    LexiconPtr lexicon(new Lexicon);
+    lexicon->Add(DictEntry(utf8("裏"), utf8("裡")));
     TextDictPtr textDict(new TextDict(lexicon));
     return textDict;
   }
 
   static DictPtr CreateTaiwanPhraseDict() {
-    vector<DictEntry> lexicon;
-    lexicon.push_back(DictEntry(utf8("鼠标"), utf8("滑鼠")));
-    lexicon.push_back(DictEntry(utf8("服务器"), utf8("伺服器")));
-    lexicon.push_back(DictEntry(utf8("克罗地亚"), utf8("克羅埃西亞")));
-    TextDictPtr textDict = TextDict::NewFromUnsorted(lexicon);
+    LexiconPtr lexicon(new Lexicon);
+    lexicon->Add(DictEntry(utf8("鼠标"), utf8("滑鼠")));
+    lexicon->Add(DictEntry(utf8("服务器"), utf8("伺服器")));
+    lexicon->Add(DictEntry(utf8("克罗地亚"), utf8("克羅埃西亞")));
+    lexicon->Sort();
+    TextDictPtr textDict(new TextDict(lexicon));
 
     DartsDictPtr dartsDict = DartsDict::NewFromDict(*textDict.get());
     return dartsDict;

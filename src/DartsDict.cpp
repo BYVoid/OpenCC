@@ -18,13 +18,14 @@
 
 #include "DartsDict.hpp"
 #include "darts.h"
+#include "Lexicon.hpp"
 
 using namespace opencc;
 
 static const char* OCDHEADER = "OPENCCDARTS1";
 
 DartsDict::DartsDict(const size_t _maxLength,
-                     const vector<DictEntry>& _lexicon,
+                     const LexiconPtr& _lexicon,
                      const void* _doubleArray,
                      const void* _buffer)
     : maxLength(_maxLength), lexicon(_lexicon), doubleArray(_doubleArray), buffer(
@@ -48,7 +49,7 @@ Optional<const DictEntry*> DartsDict::Match(const char* word) const {
 
   dict.exactMatchSearch(word, result);
   if (result.value != -1) {
-    return Optional<const DictEntry*>(&lexicon.at(result.value));
+    return Optional<const DictEntry*>(lexicon->At(result.value));
   } else {
     return Optional<const DictEntry*>::Null();
   }
@@ -72,13 +73,13 @@ Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word) const {
     delete[] rematchedResults;
   }
   if (maxMatchedResult >= 0) {
-    return Optional<const DictEntry*>(&lexicon.at(maxMatchedResult));
+    return Optional<const DictEntry*>(lexicon->At(maxMatchedResult));
   } else {
     return Optional<const DictEntry*>::Null();
   }
 }
 
-vector<DictEntry> DartsDict::GetLexicon() const {
+LexiconPtr DartsDict::GetLexicon() const {
   return lexicon;
 }
 
@@ -99,7 +100,7 @@ DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
   doubleArray->set_array(buffer);
 
   TextDictPtr textDict = TextDict::NewFromSortedFile(fp);
-  const vector<DictEntry>& lexicon = textDict->GetLexicon();
+  const LexiconPtr& lexicon = textDict->GetLexicon();
   const size_t maxLength = textDict->KeyMaxLength();
   return DartsDictPtr(new DartsDict(maxLength, lexicon, doubleArray, buffer));
 }
@@ -108,15 +109,15 @@ DartsDictPtr DartsDict::NewFromDict(const Dict& dict) {
   Darts::DoubleArray* doubleArray = new Darts::DoubleArray();
   vector<const char*> keys;
   size_t maxLength = 0;
-  const vector<DictEntry>& lexicon = dict.GetLexicon();
-  size_t lexiconCount = lexicon.size();
+  const LexiconPtr& lexicon = dict.GetLexicon();
+  size_t lexiconCount = lexicon->Length();
   keys.resize(lexiconCount);
   for (size_t i = 0; i < lexiconCount; i++) {
-    const DictEntry& entry = lexicon.at(i);
-    keys[i] = entry.Key();
-    maxLength = std::max(entry.KeyLength(), maxLength);
+    const DictEntry* entry = lexicon->At(i);
+    keys[i] = entry->Key();
+    maxLength = std::max(entry->KeyLength(), maxLength);
   }
-  doubleArray->build(lexicon.size(), &keys[0]);
+  doubleArray->build(lexicon->Length(), &keys[0]);
   return DartsDictPtr(new DartsDict(maxLength, lexicon, doubleArray, nullptr));
 }
 

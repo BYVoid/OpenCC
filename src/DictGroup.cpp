@@ -17,6 +17,7 @@
  */
 
 #include "DictGroup.hpp"
+#include "Lexicon.hpp"
 #include "TextDict.hpp"
 
 using namespace opencc;
@@ -72,13 +73,16 @@ vector<const DictEntry*> DictGroup::MatchAllPrefixes(const char* word) const {
   return matchedEntries;
 }
 
-vector<DictEntry> DictGroup::GetLexicon() const {
-  vector<DictEntry> allLexicon;
+LexiconPtr DictGroup::GetLexicon() const {
+  LexiconPtr allLexicon(new Lexicon);
   for (const auto& dict : dicts) {
-    auto lexicon = dict->GetLexicon();
-    std::copy(lexicon.begin(), lexicon.end(), std::back_inserter(allLexicon));
+    const auto& lexicon = dict->GetLexicon();
+    for (const auto& item : *lexicon) {
+      allLexicon->Add(*item);
+    }
   }
-  std::sort(allLexicon.begin(), allLexicon.end());
+  allLexicon->Sort();
+  // Fixme deduplicate
   return allLexicon;
 }
 

@@ -75,6 +75,6 @@ public:
   /**
   * Returns all entries in the dictionary.
   */
-  virtual vector<DictEntry> GetLexicon() const = 0;
+  virtual LexiconPtr GetLexicon() const = 0;
 };
 }

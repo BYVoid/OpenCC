@@ -30,13 +30,38 @@ static size_t GetKeyMaxLength(const LexiconPtr& lexicon) {
   return maxLength;
 }
 
+static DictEntry* ParseKeyValues(const char* buff) {
+  size_t length;
+  const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
+  if (UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
+    throw InvalidFormat("Invalid text dictionary");
+  }
+  length = pbuff - buff;
+  string key = UTF8Util::FromSubstr(buff, length);
+  Segments values;
+  while (!UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
+    buff = pbuff = UTF8Util::NextChar(pbuff);
+    pbuff = UTF8Util::FindNextInline(buff, ' ');
+    length = pbuff - buff;
+    const string& value = UTF8Util::FromSubstr(buff, length);
+    values.AddSegment(value);
+  }
+  if (values.Length() == 0) {
+    throw InvalidFormat("Invalid text dictionary: No value in an item");
+  } else if (values.Length() == 1) {
+    return new DictEntry(key, values.At(0));
+  } else {
+    return new MultiValueDictEntry(key, values);
+  }
+}
+
 static LexiconPtr ParseLexiconFromFile(FILE* fp) {
   const int ENTRY_BUFF_SIZE = 4096;
   char buff[ENTRY_BUFF_SIZE];
   LexiconPtr lexicon(new Lexicon);
   UTF8Util::SkipUtf8Bom(fp);
   while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
-    lexicon->Add(DictEntry::ParseKeyValues(buff));
+    lexicon->Add(ParseKeyValues(buff));
   }
   return lexicon;
 }
@@ -83,18 +108,7 @@ LexiconPtr TextDict::GetLexicon() const {
 }
 
 void TextDict::SerializeToFile(FILE* fp) const {
-  // TODO escape space
   for (const auto& entry : *lexicon) {
-    fprintf(fp, "%s\t", entry->Key());
-    size_t i = 0;
-    size_t length = entry->Values().Length();
-    for (const char* value : entry->Values()) {
-      fprintf(fp, "%s", value);
-      if (i < length - 1) {
-        fprintf(fp, " ");
-      }
-      i++;
-    }
-    fprintf(fp, "\n");
+    fprintf(fp, "%s\n", entry->ToString().c_str());
   }
 }

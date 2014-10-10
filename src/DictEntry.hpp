@@ -25,20 +25,17 @@
 namespace opencc {
 class OPENCC_EXPORT DictEntry {
 public:
-  static DictEntry ParseKeyValues(const char* buff);
-
-  DictEntry() {
+  DictEntry() : value(Optional<string>::Null()) {
   }
 
-  DictEntry(const string& _key) : key(_key) {
+  DictEntry(const string& _key) : key(_key), value(Optional<string>::Null()) {
   }
 
   DictEntry(const string& _key, const string& _value)
-      : key(_key), values(Segments{_value}) {
+      : key(_key), value(_value) {
   }
 
-  DictEntry(const string& _key, const Segments& _values)
-      : key(_key), values(_values) {
+  virtual ~DictEntry() {
   }
 
   const char* Key() const {
@@ -49,15 +46,23 @@ public:
     return key.length();
   }
 
-  const Segments& Values() const {
-    return values;
+  virtual size_t NumValues() const {
+    return value.IsNull() ? 0 : 1;
   }
 
-  const char* GetDefault() const {
-    if (values.Length() > 0) {
-      return values.At(0);
-    } else {
+  virtual const char* GetDefault() const {
+    if (value.IsNull()) {
       return key.c_str();
+    } else {
+      return value.Get().c_str();
+    }
+  }
+
+  virtual string ToString() const {
+    if (value.IsNull()) {
+      return key;
+    } else {
+      return key + "\t" + value.Get();
     }
   }
 
@@ -74,7 +79,55 @@ public:
   }
 
 private:
+  // Disalow copy from subclass
+  DictEntry(const MultiValueDictEntry& that): value(Optional<string>::Null()) {
+  }
+
   string key;
+  Optional<string> value;
+};
+
+class OPENCC_EXPORT MultiValueDictEntry : public DictEntry {
+public:
+  MultiValueDictEntry(const string& _key, const Segments& _values)
+      : DictEntry(_key), values(_values) {
+  }
+
+  virtual ~MultiValueDictEntry() {
+  }
+
+  const Segments& Values() const {
+    return values;
+  }
+
+  virtual size_t NumValues() const {
+    return values.Length();
+  }
+
+  virtual const char* GetDefault() const {
+    if (values.Length() > 0) {
+      return values.At(0);
+    } else {
+      return Key();
+    }
+  }
+
+  virtual string ToString() const {
+    // TODO escape space
+    size_t i = 0;
+    size_t length = values.Length();
+    std::ostringstream buffer;
+    for (const char* value : values) {
+      buffer << value;
+      if (i < length - 1) {
+        buffer << ' ';
+      }
+      i++;
+    }
+    return buffer.str();
+  }
+private:
   Segments values;
 };
+
 }

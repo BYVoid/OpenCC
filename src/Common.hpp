@@ -53,6 +53,7 @@ class Dict;
 class DictEntry;
 class DictGroup;
 class Lexicon;
+class MultiValueDictEntry;
 class Segmentation;
 class Segments;
 class SerializableDict;

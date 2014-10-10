@@ -33,8 +33,8 @@ public:
     }
   }
 
-  void Add(const DictEntry& entry) {
-    entries.push_back(new DictEntry(entry));
+  void Add(DictEntry* entry) {
+    entries.push_back(entry);
   }
 
   void Sort() {

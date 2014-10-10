@@ -19,22 +19,3 @@
 #include "DictEntry.hpp"
 
 using namespace opencc;
-
-DictEntry DictEntry::ParseKeyValues(const char* buff) {
-  size_t length;
-  const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
-  if (UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
-    throw InvalidFormat("Invalid text dictionary");
-  }
-  length = pbuff - buff;
-  DictEntry entry;
-  entry.key = UTF8Util::FromSubstr(buff, length);
-  while (!UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
-    buff = pbuff = UTF8Util::NextChar(pbuff);
-    pbuff = UTF8Util::FindNextInline(buff, ' ');
-    length = pbuff - buff;
-    const string& value = UTF8Util::FromSubstr(buff, length);
-    entry.values.AddSegment(value);
-  }
-  return entry;
-}

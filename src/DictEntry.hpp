@@ -25,71 +25,107 @@
 namespace opencc {
 class OPENCC_EXPORT DictEntry {
 public:
-  DictEntry() : value(Optional<string>::Null()) {
-  }
-
-  DictEntry(const string& _key) : key(_key), value(Optional<string>::Null()) {
-  }
-
-  DictEntry(const string& _key, const string& _value)
-      : key(_key), value(_value) {
-  }
-
   virtual ~DictEntry() {
   }
 
-  const char* Key() const {
-    return key.c_str();
-  }
+  virtual const char* Key() const = 0;
+
+  virtual const char* GetDefault() const = 0;
+
+  virtual size_t NumValues() const = 0;
+
+  virtual string ToString() const = 0;
 
   size_t KeyLength() const {
-    return key.length();
+    return strlen(Key());
   }
-
-  virtual const char* GetDefault() const {
-    if (value.IsNull()) {
-      return key.c_str();
-    } else {
-      return value.Get().c_str();
-    }
-  }
-
-  virtual size_t NumValues() const;
-
-  virtual string ToString() const;
 
   bool operator<(const DictEntry& that) const {
-    return key < that.key;
+    return strcmp(Key(), that.Key()) < 0;
   }
 
   bool operator==(const DictEntry& that) const {
-    return key == that.key;
+    return strcmp(Key(), that.Key()) == 0;
   }
 
   static bool PtrLessThan(const DictEntry* a, const DictEntry* b) {
     return *a < *b;
   }
+};
 
-private:
-  // Disalow copy from subclass
-  DictEntry(const MultiValueDictEntry& that) : value(Optional<string>::Null()) {
+class OPENCC_EXPORT NoValueDictEntry : public DictEntry {
+public:
+  NoValueDictEntry(const string& _key) : key(_key) {
   }
 
+  virtual ~NoValueDictEntry() {
+  }
+
+  virtual const char* Key() const {
+    return key.c_str();
+  }
+
+  virtual const char* GetDefault() const {
+    return Key();
+  }
+
+  virtual size_t NumValues() const {
+    return 0;
+  }
+
+  virtual string ToString() const {
+    return key;
+  }
+
+private:
   string key;
-  Optional<string> value;
+};
+
+class OPENCC_EXPORT SingleValueDictEntry : public DictEntry {
+public:
+  SingleValueDictEntry(const string& _key, const string& _value)
+      : key(_key), value(_value) {
+  }
+
+  virtual ~SingleValueDictEntry() {
+  }
+
+  virtual const char* Key() const {
+    return key.c_str();
+  }
+
+  virtual const char* Value() const {
+    return value.c_str();
+  }
+
+  virtual const char* GetDefault() const {
+    return value.c_str();
+  }
+
+  virtual size_t NumValues() const {
+    return 1;
+  }
+
+  virtual string ToString() const {
+    return key + "\t" + value;
+  }
+
+private:
+  string key;
+  string value;
 };
 
 class OPENCC_EXPORT MultiValueDictEntry : public DictEntry {
 public:
   MultiValueDictEntry(const string& _key, const Segments& _values)
-      : DictEntry(_key), values(_values) {
+      : key(_key), values(_values) {
   }
 
   virtual ~MultiValueDictEntry() {
   }
 
-  const Segments& Values() const {
-    return values;
+  virtual const char* Key() const {
+    return key.c_str();
   }
 
   virtual const char* GetDefault() const {
@@ -104,8 +140,41 @@ public:
 
   virtual string ToString() const;
 
+  const Segments& Values() const {
+    return values;
+  }
+
 private:
+  string key;
   Segments values;
+};
+
+class OPENCC_EXPORT DictEntryFactory {
+public:
+  static DictEntry* New(const string& key) {
+    return new NoValueDictEntry(key);
+  }
+
+  static DictEntry* New(const string& key, const string& value) {
+    return new SingleValueDictEntry(key, value);
+  }
+
+  static DictEntry* New(const string& key, const Segments& values) {
+    return new MultiValueDictEntry(key, values);
+  }
+
+  static DictEntry* New(const DictEntry* entry) {
+    if (entry->NumValues() == 0) {
+      return new NoValueDictEntry(
+          *static_cast<const NoValueDictEntry*>(entry));
+    } else if (entry->NumValues() == 1) {
+      return new SingleValueDictEntry(
+          *static_cast<const SingleValueDictEntry*>(entry));
+    } else {
+      return new MultiValueDictEntry(
+          *static_cast<const MultiValueDictEntry*>(entry));
+    }
+  }
 };
 
 }

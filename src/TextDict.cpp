@@ -49,9 +49,9 @@ static DictEntry* ParseKeyValues(const char* buff, size_t lineNum) {
   if (values.Length() == 0) {
     throw InvalidTextDictionary("No value in an item", lineNum);
   } else if (values.Length() == 1) {
-    return new DictEntry(key, values.At(0));
+    return DictEntryFactory::New(key, values.At(0));
   } else {
-    return new MultiValueDictEntry(key, values);
+    return DictEntryFactory::New(key, values);
   }
 }
 
@@ -95,7 +95,7 @@ size_t TextDict::KeyMaxLength() const {
 }
 
 Optional<const DictEntry*> TextDict::Match(const char* word) const {
-  DictEntry entry(word);
+  NoValueDictEntry entry(word);
   const auto& found = std::lower_bound(lexicon->begin(), lexicon->end(),
                                        &entry, DictEntry::PtrLessThan);
   if ((found != lexicon->end()) && (strcmp((*found)->Key(), entry.Key()) == 0)) {

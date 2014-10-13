@@ -78,11 +78,7 @@ LexiconPtr DictGroup::GetLexicon() const {
   for (const auto& dict : dicts) {
     const auto& lexicon = dict->GetLexicon();
     for (const auto& item : *lexicon) {
-      if (item->KeyLength() <= 1) {
-        allLexicon->Add(new DictEntry(*item));
-      } else {
-        allLexicon->Add(new MultiValueDictEntry(*(MultiValueDictEntry*)item));
-      }
+      allLexicon->Add(DictEntryFactory::New(item));
     }
   }
   allLexicon->Sort();

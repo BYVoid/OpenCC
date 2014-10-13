@@ -20,18 +20,6 @@
 
 using namespace opencc;
 
-size_t DictEntry::NumValues() const {
-  return value.IsNull() ? 0 : 1;
-}
-
-string DictEntry::ToString() const {
-  if (value.IsNull()) {
-    return key;
-  } else {
-    return key + "\t" + value.Get();
-  }
-}
-
 size_t MultiValueDictEntry::NumValues() const {
   return values.Length();
 }

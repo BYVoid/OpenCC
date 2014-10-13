@@ -85,18 +85,24 @@ LexiconPtr DartsDict::GetLexicon() const {
 
 DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
   Darts::DoubleArray* doubleArray = new Darts::DoubleArray();
-
-  void* buffer = malloc(sizeof(char) * strlen(OCDHEADER));
-  fread(buffer, sizeof(char), strlen(OCDHEADER), fp);
-  if (memcmp(buffer, OCDHEADER, strlen(OCDHEADER)) != 0) {
-    throw InvalidFormat("Invalid OpenCC dictionary");
+  size_t headerLen = strlen(OCDHEADER);
+  void* buffer = malloc(sizeof(char) * headerLen);
+  size_t bytesRead = fread(buffer, sizeof(char), headerLen, fp);
+  if (bytesRead != headerLen || memcmp(buffer, OCDHEADER, headerLen) != 0) {
+    throw InvalidFormat("Invalid OpenCC dictionary header");
   }
   free(buffer);
 
   size_t dartsSize;
-  fread(&dartsSize, sizeof(size_t), 1, fp);
+  bytesRead = fread(&dartsSize, sizeof(size_t), 1, fp);
+  if (bytesRead * sizeof(size_t) != sizeof(size_t)) {
+    throw InvalidFormat("Invalid OpenCC dictionary header (dartsSize)");
+  }
   buffer = malloc(dartsSize);
-  fread(buffer, 1, dartsSize, fp);
+  bytesRead = fread(buffer, 1, dartsSize, fp);
+  if (bytesRead != dartsSize) {
+    throw InvalidFormat("Invalid OpenCC dictionary size of darts mismatch");
+  }
   doubleArray->set_array(buffer);
 
   TextDictPtr textDict = TextDict::NewFromSortedFile(fp);

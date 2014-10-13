@@ -46,10 +46,6 @@ public:
     return key.length();
   }
 
-  virtual size_t NumValues() const {
-    return value.IsNull() ? 0 : 1;
-  }
-
   virtual const char* GetDefault() const {
     if (value.IsNull()) {
       return key.c_str();
@@ -58,18 +54,14 @@ public:
     }
   }
 
-  virtual string ToString() const {
-    if (value.IsNull()) {
-      return key;
-    } else {
-      return key + "\t" + value.Get();
-    }
-  }
+  virtual size_t NumValues() const;
+
+  virtual string ToString() const;
 
   bool operator<(const DictEntry& that) const {
     return key < that.key;
   }
-  
+
   bool operator==(const DictEntry& that) const {
     return key == that.key;
   }
@@ -80,7 +72,7 @@ public:
 
 private:
   // Disalow copy from subclass
-  DictEntry(const MultiValueDictEntry& that): value(Optional<string>::Null()) {
+  DictEntry(const MultiValueDictEntry& that) : value(Optional<string>::Null()) {
   }
 
   string key;
@@ -100,10 +92,6 @@ public:
     return values;
   }
 
-  virtual size_t NumValues() const {
-    return values.Length();
-  }
-
   virtual const char* GetDefault() const {
     if (values.Length() > 0) {
       return values.At(0);
@@ -112,20 +100,10 @@ public:
     }
   }
 
-  virtual string ToString() const {
-    // TODO escape space
-    size_t i = 0;
-    size_t length = values.Length();
-    std::ostringstream buffer;
-    for (const char* value : values) {
-      buffer << value;
-      if (i < length - 1) {
-        buffer << ' ';
-      }
-      i++;
-    }
-    return buffer.str();
-  }
+  virtual size_t NumValues() const;
+
+  virtual string ToString() const;
+
 private:
   Segments values;
 };

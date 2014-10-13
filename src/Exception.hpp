@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -45,7 +46,7 @@ public:
     return message.c_str();
   }
 
-private:
+protected:
   std::string message;
 };
 
@@ -67,6 +68,17 @@ class OPENCC_EXPORT InvalidFormat : public Exception {
 public:
   InvalidFormat(const std::string& message) :
       Exception("Invalid format: " + message) {
+  }
+};
+
+class OPENCC_EXPORT InvalidTextDictionary : public InvalidFormat {
+public:
+  InvalidTextDictionary(const std::string& _message, size_t lineNum) :
+      InvalidFormat("") {
+    std::ostringstream buffer;
+    buffer << "Invalid text dictionary at line " << lineNum << ": "
+        << _message;
+    message = buffer.str();
   }
 };
 }

@@ -30,11 +30,11 @@ static size_t GetKeyMaxLength(const LexiconPtr& lexicon) {
   return maxLength;
 }
 
-static DictEntry* ParseKeyValues(const char* buff) {
+static DictEntry* ParseKeyValues(const char* buff, size_t lineNum) {
   size_t length;
   const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
   if (UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
-    throw InvalidFormat("Invalid text dictionary");
+    throw InvalidTextDictionary("Tabular not found " + string(buff), lineNum);
   }
   length = pbuff - buff;
   string key = UTF8Util::FromSubstr(buff, length);
@@ -47,7 +47,7 @@ static DictEntry* ParseKeyValues(const char* buff) {
     values.AddSegment(value);
   }
   if (values.Length() == 0) {
-    throw InvalidFormat("Invalid text dictionary: No value in an item");
+    throw InvalidTextDictionary("No value in an item", lineNum);
   } else if (values.Length() == 1) {
     return new DictEntry(key, values.At(0));
   } else {
@@ -60,8 +60,10 @@ static LexiconPtr ParseLexiconFromFile(FILE* fp) {
   char buff[ENTRY_BUFF_SIZE];
   LexiconPtr lexicon(new Lexicon);
   UTF8Util::SkipUtf8Bom(fp);
+  size_t lineNum = 1;
   while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
-    lexicon->Add(ParseKeyValues(buff));
+    lexicon->Add(ParseKeyValues(buff, lineNum));
+    lineNum++;
   }
   return lexicon;
 }

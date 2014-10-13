@@ -23,6 +23,8 @@ project (${PACKAGE_NAME} CXX)
 include (CTest)
 enable_testing()
 
+option(BUILD_SHARED_LIBS "Build opencc as shared library" ON)
+
 ######## Package information
 set (PACKAGE_URL https://github.com/BYVoid/Opencc)
 set (PACKAGE_BUGREPORT https://github.com/BYVoid/Opencc/issues)

@@ -47,7 +47,6 @@ include_directories(../deps/tclap-1.2.1)
 
 add_library(
   libopencc
-  SHARED
   ${LIBOPENCC_SOURCES}
 )
 
@@ -61,7 +60,6 @@ GENERATE_EXPORT_HEADER(
 
 set_target_properties(
   libopencc
-  # libopencc_static
   PROPERTIES
     LINKER_LANGUAGE
       CXX

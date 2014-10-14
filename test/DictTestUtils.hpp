@@ -65,14 +65,14 @@ public:
   static DictPtr CreateDictForCharacters() {
     LexiconPtr lexicon(new Lexicon);
     lexicon->Add(DictEntryFactory::New(utf8("后"),
-                                       Segments{utf8("后"), utf8("後")}));
+                                       vector<string>{utf8("后"), utf8("後")}));
     lexicon->Add(DictEntryFactory::New(utf8("发"),
-                                       Segments{utf8("發"), utf8("髮")}));
+                                       vector<string>{utf8("發"), utf8("髮")}));
     lexicon->Add(DictEntryFactory::New(utf8("干"),
-                                       Segments{utf8("幹"), utf8("乾"),
-                                                utf8("干")}));
+                                       vector<string>{utf8("幹"), utf8("乾"),
+                                                      utf8("干")}));
     lexicon->Add(DictEntryFactory::New(utf8("里"),
-                                       Segments{utf8("裏"), utf8("里")}));
+                                       vector<string>{utf8("裏"), utf8("里")}));
     lexicon->Sort();
     return TextDictPtr(new TextDict(lexicon));
   }

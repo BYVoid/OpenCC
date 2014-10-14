@@ -62,6 +62,9 @@ public:
   }
 
 private:
+  Segments(const Segments& that) {
+  }
+
   vector<const char*> segments;
   vector<string> memory;
 };

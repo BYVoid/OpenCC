@@ -75,7 +75,7 @@ void Convert() {
     bufferPtr = bufferBegin;
     bufferSizeAvailble = BUFFER_SIZE;
   }
-  
+
   FILE* fin = fopen(inputFileName.Get().c_str(), "r");
   if (!fin) {
     throw FileNotFound(inputFileName.Get());

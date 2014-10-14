@@ -25,8 +25,8 @@ ConversionChain::ConversionChain(const list<ConversionPtr> _conversions)
     : conversions(_conversions) {
 }
 
-Segments ConversionChain::Convert(const Segments& input) const {
-  Segments output = input;
+SegmentsPtr ConversionChain::Convert(const SegmentsPtr& input) const {
+  SegmentsPtr output = input;
   for (auto conversion : conversions) {
     output = conversion->Convert(output);
   }

@@ -31,7 +31,7 @@ public:
   string Convert(const string& phrase) const;
 
   // Convert segmented text
-  Segments Convert(const Segments& input) const;
+  SegmentsPtr Convert(const SegmentsPtr& input) const;
 
   const DictPtr GetDict() const {
     return dict;

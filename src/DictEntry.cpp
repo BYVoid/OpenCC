@@ -24,7 +24,7 @@ using namespace opencc;
 string MultiValueDictEntry::ToString() const {
   // TODO escape space
   size_t i = 0;
-  size_t length = Values().Length();
+  size_t length = Values().size();
   std::ostringstream buffer;
   buffer << Key() << '\t';
   for (const char* value : Values()) {

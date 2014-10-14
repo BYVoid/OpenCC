@@ -70,6 +70,7 @@ typedef std::shared_ptr<Dict> DictPtr;
 typedef std::shared_ptr<DictGroup> DictGroupPtr;
 typedef std::shared_ptr<Lexicon> LexiconPtr;
 typedef std::shared_ptr<Segmentation> SegmentationPtr;
+typedef std::shared_ptr<Segments> SegmentsPtr;
 typedef std::shared_ptr<SerializableDict> SerializableDictPtr;
 typedef std::shared_ptr<TextDict> TextDictPtr;
 }

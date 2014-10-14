@@ -23,6 +23,6 @@
 namespace opencc {
 class OPENCC_EXPORT Segmentation {
 public:
-  virtual Segments Segment(const string& text) const = 0;
+  virtual SegmentsPtr Segment(const string& text) const = 0;
 };
 }

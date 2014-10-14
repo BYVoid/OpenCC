@@ -114,7 +114,7 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
     }
     const char* key = dict->keyBuffer.c_str() + keyOffset;
     // Value offset
-    Segments values;
+    vector<const char*> values;
     for (size_t j = 0; j < numValues; j++) {
       size_t valueOffset;
       unitsRead = fread(&valueOffset, sizeof(size_t), 1, fp);
@@ -122,7 +122,7 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
         throw InvalidFormat("Invalid OpenCC binary dictionary (valueOffset)");
       }
       const char* value = dict->valueBuffer.c_str() + valueOffset;
-      values.AddSegment(value);
+      values.push_back(value);
     }
     PtrDictEntry* entry = new PtrDictEntry(key, values);
     dict->lexicon->Add(entry);

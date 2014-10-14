@@ -122,11 +122,11 @@ private:
 
 class OPENCC_EXPORT MultiValueDictEntry : public DictEntry {
 public:
-  virtual const Segments& Values() const = 0;
+  virtual vector<const char*> Values() const = 0;
 
   virtual const char* GetDefault() const {
     if (NumValues() > 0) {
-      return Values().At(0);
+      return Values().at(0);
     } else {
       return Key();
     }
@@ -137,8 +137,16 @@ public:
 
 class OPENCC_EXPORT StrMultiValueDictEntry : public MultiValueDictEntry {
 public:
-  StrMultiValueDictEntry(const string& _key, const Segments& _values)
+  StrMultiValueDictEntry(const string& _key, const vector<string>& _values)
       : key(_key), values(_values) {
+  }
+
+  StrMultiValueDictEntry(const string& _key, const vector<const char*>& _values)
+      : key(_key) {
+    values.reserve(_values.size());
+    for (const char* str : _values) {
+      values.push_back(str);
+    }
   }
 
   virtual ~StrMultiValueDictEntry() {
@@ -149,21 +157,25 @@ public:
   }
 
   size_t NumValues() const {
-    return values.Length();
+    return values.size();
   }
 
-  const Segments& Values() const {
+  vector<const char*> Values() const {
+    vector<const char*> values;
+    for (const string& value : this->values) {
+      values.push_back(value.c_str());
+    }
     return values;
   }
 
 private:
   string key;
-  Segments values;
+  vector<string> values;
 };
 
 class OPENCC_EXPORT PtrDictEntry : public MultiValueDictEntry {
 public:
-  PtrDictEntry(const char* _key, const Segments& _values)
+  PtrDictEntry(const char* _key, const vector<const char*>& _values)
       : key(_key), values(_values) {
   }
 
@@ -175,16 +187,16 @@ public:
   }
 
   size_t NumValues() const {
-    return values.Length();
+    return values.size();
   }
 
-  const Segments& Values() const {
+  vector<const char*> Values() const {
     return values;
   }
 
 private:
   const char* key;
-  Segments values;
+  vector<const char*> values;
 };
 
 class OPENCC_EXPORT DictEntryFactory {
@@ -197,7 +209,7 @@ public:
     return new StrSingleValueDictEntry(key, value);
   }
 
-  static DictEntry* New(const string& key, const Segments& values) {
+  static DictEntry* New(const string& key, const vector<string>& values) {
     return new StrMultiValueDictEntry(key, values);
   }
 

@@ -28,7 +28,7 @@ public:
   MaxMatchSegmentation(const DictPtr _dict) : dict(_dict) {
   }
 
-  virtual Segments Segment(const string& text) const;
+  virtual SegmentsPtr Segment(const string& text) const;
 
   const DictPtr GetDict() const {
     return dict;

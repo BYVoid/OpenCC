@@ -17,17 +17,16 @@
  */
 
 #include "MaxMatchSegmentation.hpp"
-#include "Segments.hpp"
 
 using namespace opencc;
 
-Segments MaxMatchSegmentation::Segment(const string& text) const {
-  Segments segments;
+SegmentsPtr MaxMatchSegmentation::Segment(const string& text) const {
+  SegmentsPtr segments(new Segments);
   const char* segStart = text.c_str();
   size_t segLength = 0;
   auto clearBuffer = [&segments, &segStart, &segLength]() {
       if (segLength > 0) {
-        segments.AddSegment(UTF8Util::FromSubstr(segStart, segLength));
+        segments->AddSegment(UTF8Util::FromSubstr(segStart, segLength));
         segLength = 0;
       }
   };
@@ -40,7 +39,7 @@ Segments MaxMatchSegmentation::Segment(const string& text) const {
     } else {
       clearBuffer();
       matchedLength = matched.Get()->KeyLength();
-      segments.AddSegment(matched.Get()->Key());
+      segments->AddSegment(matched.Get()->Key());
       segStart = pstr + matchedLength;
     }
     pstr += matchedLength;

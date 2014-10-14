@@ -26,7 +26,7 @@ class OPENCC_EXPORT ConversionChain {
 public:
   ConversionChain(const list<ConversionPtr> _conversions);
 
-  Segments Convert(const Segments& input) const;
+  SegmentsPtr Convert(const SegmentsPtr& input) const;
 
   const list<ConversionPtr> GetConversions() const {
     return conversions;

@@ -52,12 +52,12 @@ public:
   }
 };
 
-static inline void SegmentsAssertEquals(const Segments& expected,
-                                        const Segments& actual) {
-  size_t length = expected.Length();
-  AssertTrue(length == actual.Length());
+static inline void SegmentsAssertEquals(const SegmentsPtr& expected,
+                                        const SegmentsPtr& actual) {
+  size_t length = expected->Length();
+  AssertTrue(length == actual->Length());
   for (size_t i = 0; i < length; i++) {
-    AssertEquals(string(expected.At(i)), string(actual.At(i)));
+    AssertEquals(string(expected->At(i)), string(actual->At(i)));
   }
 }
 

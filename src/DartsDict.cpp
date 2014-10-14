@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+#include "BinaryDict.hpp"
 #include "DartsDict.hpp"
 #include "darts.h"
 #include "Lexicon.hpp"
@@ -24,19 +25,28 @@ using namespace opencc;
 
 static const char* OCDHEADER = "OPENCCDARTS1";
 
-DartsDict::DartsDict(const size_t _maxLength,
-                     const LexiconPtr& _lexicon,
-                     const void* _doubleArray,
-                     const void* _buffer)
-    : maxLength(_maxLength), lexicon(_lexicon), doubleArray(_doubleArray), buffer(
-    _buffer) {
+class DartsDict::DartsInternal {
+public:
+  BinaryDictPtr binary = nullptr;
+  void* buffer = nullptr;
+  Darts::DoubleArray* doubleArray = nullptr;
+
+  ~DartsInternal() {
+    if (buffer != nullptr) {
+      free(buffer);
+    }
+    if (doubleArray != nullptr) {
+      delete doubleArray;
+    }
+  }
+};
+
+DartsDict::DartsDict() {
+  internal = new DartsInternal;
 }
 
 DartsDict::~DartsDict() {
-  if (buffer != nullptr) {
-    free((void*)buffer);
-  }
-  delete (Darts::DoubleArray*)doubleArray;
+  delete internal;
 }
 
 size_t DartsDict::KeyMaxLength() const {
@@ -44,12 +54,13 @@ size_t DartsDict::KeyMaxLength() const {
 }
 
 Optional<const DictEntry*> DartsDict::Match(const char* word) const {
-  Darts::DoubleArray& dict = *(Darts::DoubleArray*)this->doubleArray;
+  Darts::DoubleArray& dict = *internal->doubleArray;
   Darts::DoubleArray::result_pair_type result;
 
   dict.exactMatchSearch(word, result);
   if (result.value != -1) {
-    return Optional<const DictEntry*>(lexicon->At(result.value));
+    return Optional<const DictEntry*>(
+        lexicon->At(static_cast<size_t>(result.value)));
   } else {
     return Optional<const DictEntry*>::Null();
   }
@@ -57,9 +68,9 @@ Optional<const DictEntry*> DartsDict::Match(const char* word) const {
 
 Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word) const {
   const size_t DEFAULT_NUM_ENTRIES = 64;
-  Darts::DoubleArray& dict = *(Darts::DoubleArray*)this->doubleArray;
+  Darts::DoubleArray& dict = *internal->doubleArray;
   Darts::DoubleArray::value_type results[DEFAULT_NUM_ENTRIES];
-  Darts::DoubleArray::value_type maxMatchedResult = -1;
+  Darts::DoubleArray::value_type maxMatchedResult;
   size_t numMatched = dict.commonPrefixSearch(word, results, DEFAULT_NUM_ENTRIES);
   if (numMatched == 0) {
     return Optional<const DictEntry*>::Null();
@@ -73,7 +84,8 @@ Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word) const {
     delete[] rematchedResults;
   }
   if (maxMatchedResult >= 0) {
-    return Optional<const DictEntry*>(lexicon->At(maxMatchedResult));
+    return Optional<const DictEntry*>(
+        lexicon->At(static_cast<size_t>(maxMatchedResult)));
   } else {
     return Optional<const DictEntry*>::Null();
   }
@@ -84,6 +96,8 @@ LexiconPtr DartsDict::GetLexicon() const {
 }
 
 DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
+  DartsDictPtr dict(new DartsDict());
+
   Darts::DoubleArray* doubleArray = new Darts::DoubleArray();
   size_t headerLen = strlen(OCDHEADER);
   void* buffer = malloc(sizeof(char) * headerLen);
@@ -105,17 +119,22 @@ DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
   }
   doubleArray->set_array(buffer);
 
-  TextDictPtr textDict = TextDict::NewFromSortedFile(fp);
-  const LexiconPtr& lexicon = textDict->GetLexicon();
-  const size_t maxLength = textDict->KeyMaxLength();
-  return DartsDictPtr(new DartsDict(maxLength, lexicon, doubleArray, buffer));
+  auto internal = dict->internal;
+  internal->buffer = buffer;
+  internal->binary = BinaryDict::NewFromFile(fp);
+  internal->doubleArray = doubleArray;
+  dict->lexicon = internal->binary->GetLexicon();
+  dict->maxLength = internal->binary->KeyMaxLength();
+  return dict;
 }
 
-DartsDictPtr DartsDict::NewFromDict(const Dict& dict) {
+DartsDictPtr DartsDict::NewFromDict(const Dict& thatDict) {
+  DartsDictPtr dict(new DartsDict());
+
   Darts::DoubleArray* doubleArray = new Darts::DoubleArray();
   vector<const char*> keys;
   size_t maxLength = 0;
-  const LexiconPtr& lexicon = dict.GetLexicon();
+  const LexiconPtr& lexicon = thatDict.GetLexicon();
   size_t lexiconCount = lexicon->Length();
   keys.resize(lexiconCount);
   for (size_t i = 0; i < lexiconCount; i++) {
@@ -124,11 +143,15 @@ DartsDictPtr DartsDict::NewFromDict(const Dict& dict) {
     maxLength = std::max(entry->KeyLength(), maxLength);
   }
   doubleArray->build(lexicon->Length(), &keys[0]);
-  return DartsDictPtr(new DartsDict(maxLength, lexicon, doubleArray, nullptr));
+  dict->lexicon = lexicon;
+  dict->maxLength = maxLength;
+  auto internal = dict->internal;
+  internal->doubleArray = doubleArray;
+  return dict;
 }
 
 void DartsDict::SerializeToFile(FILE* fp) const {
-  Darts::DoubleArray& dict = *(Darts::DoubleArray*)this->doubleArray;
+  Darts::DoubleArray& dict = *internal->doubleArray;
 
   fwrite(OCDHEADER, sizeof(char), strlen(OCDHEADER), fp);
 
@@ -136,6 +159,7 @@ void DartsDict::SerializeToFile(FILE* fp) const {
   fwrite(&dartsSize, sizeof(size_t), 1, fp);
   fwrite(dict.array(), sizeof(char), dartsSize, fp);
 
-  TextDictPtr textDict = TextDict::NewFromDict(*this);
-  textDict->SerializeToFile(fp);
+  auto internal = this->internal;
+  internal->binary.reset(new BinaryDict(lexicon));
+  internal->binary->SerializeToFile(fp);
 }

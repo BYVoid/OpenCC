@@ -2,6 +2,7 @@ include (GenerateExportHeader)
 
 set(
   LIBOPENCC_HEADERS
+  BinaryDict.hpp
   Common.hpp
   Config.hpp
   Conversion.hpp
@@ -26,6 +27,7 @@ set(
 
 set(
   LIBOPENCC_SOURCES
+  BinaryDict.cpp
   Config.cpp
   Conversion.cpp
   ConversionChain.cpp

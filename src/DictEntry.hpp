@@ -83,11 +83,28 @@ private:
 
 class OPENCC_EXPORT SingleValueDictEntry : public DictEntry {
 public:
-  SingleValueDictEntry(const string& _key, const string& _value)
+  virtual const char* Value() const = 0;
+
+  virtual const char* GetDefault() const {
+    return Value();
+  }
+
+  virtual size_t NumValues() const {
+    return 1;
+  }
+
+  virtual string ToString() const {
+    return string(Key()) + "\t" + Value();
+  }
+};
+
+class OPENCC_EXPORT StrSingleValueDictEntry : public SingleValueDictEntry {
+public:
+  StrSingleValueDictEntry(const string& _key, const string& _value)
       : key(_key), value(_value) {
   }
 
-  virtual ~SingleValueDictEntry() {
+  virtual ~StrSingleValueDictEntry() {
   }
 
   virtual const char* Key() const {
@@ -98,18 +115,6 @@ public:
     return value.c_str();
   }
 
-  virtual const char* GetDefault() const {
-    return value.c_str();
-  }
-
-  virtual size_t NumValues() const {
-    return 1;
-  }
-
-  virtual string ToString() const {
-    return key + "\t" + value;
-  }
-
 private:
   string key;
   string value;
@@ -117,28 +122,35 @@ private:
 
 class OPENCC_EXPORT MultiValueDictEntry : public DictEntry {
 public:
-  MultiValueDictEntry(const string& _key, const Segments& _values)
+  virtual const Segments& Values() const = 0;
+
+  virtual const char* GetDefault() const {
+    if (NumValues() > 0) {
+      return Values().At(0);
+    } else {
+      return Key();
+    }
+  }
+
+  virtual string ToString() const;
+};
+
+class OPENCC_EXPORT StrMultiValueDictEntry : public MultiValueDictEntry {
+public:
+  StrMultiValueDictEntry(const string& _key, const Segments& _values)
       : key(_key), values(_values) {
   }
 
-  virtual ~MultiValueDictEntry() {
+  virtual ~StrMultiValueDictEntry() {
   }
 
   virtual const char* Key() const {
     return key.c_str();
   }
 
-  virtual const char* GetDefault() const {
-    if (values.Length() > 0) {
-      return values.At(0);
-    } else {
-      return Key();
-    }
+  size_t NumValues() const {
+    return values.Length();
   }
-
-  virtual size_t NumValues() const;
-
-  virtual string ToString() const;
 
   const Segments& Values() const {
     return values;
@@ -149,6 +161,32 @@ private:
   Segments values;
 };
 
+class OPENCC_EXPORT PtrDictEntry : public MultiValueDictEntry {
+public:
+  PtrDictEntry(const char* _key, const Segments& _values)
+      : key(_key), values(_values) {
+  }
+
+  virtual ~PtrDictEntry() {
+  }
+
+  virtual const char* Key() const {
+    return key;
+  }
+
+  size_t NumValues() const {
+    return values.Length();
+  }
+
+  const Segments& Values() const {
+    return values;
+  }
+
+private:
+  const char* key;
+  Segments values;
+};
+
 class OPENCC_EXPORT DictEntryFactory {
 public:
   static DictEntry* New(const string& key) {
@@ -156,23 +194,22 @@ public:
   }
 
   static DictEntry* New(const string& key, const string& value) {
-    return new SingleValueDictEntry(key, value);
+    return new StrSingleValueDictEntry(key, value);
   }
 
   static DictEntry* New(const string& key, const Segments& values) {
-    return new MultiValueDictEntry(key, values);
+    return new StrMultiValueDictEntry(key, values);
   }
 
   static DictEntry* New(const DictEntry* entry) {
     if (entry->NumValues() == 0) {
-      return new NoValueDictEntry(
-          *static_cast<const NoValueDictEntry*>(entry));
+      return new NoValueDictEntry(entry->Key());
     } else if (entry->NumValues() == 1) {
-      return new SingleValueDictEntry(
-          *static_cast<const SingleValueDictEntry*>(entry));
+      const auto svEntry = static_cast<const SingleValueDictEntry*>(entry);
+      return new StrSingleValueDictEntry(svEntry->Key(), svEntry->Value());
     } else {
-      return new MultiValueDictEntry(
-          *static_cast<const MultiValueDictEntry*>(entry));
+      const auto mvEntry = static_cast<const MultiValueDictEntry*>(entry);
+      return new StrMultiValueDictEntry(mvEntry->Key(), mvEntry->Values());
     }
   }
 };

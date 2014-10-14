@@ -20,19 +20,13 @@
 
 #include "Common.hpp"
 #include "SerializableDict.hpp"
-#include "TextDict.hpp"
 
 namespace opencc {
 /**
 * Darts dictionary
 */
-class OPENCC_EXPORT DartsDict : public SerializableDict {
+class OPENCC_EXPORT DartsDict : public Dict, public SerializableDict {
 public:
-  DartsDict(const size_t _maxLength,
-            const LexiconPtr& _lexicon,
-            const void* _doubleArray,
-            const void* _buffer);
-
   virtual ~DartsDict();
 
   virtual size_t KeyMaxLength() const;
@@ -48,14 +42,18 @@ public:
   /**
   * Constructs a DartsDict from another dictionary.
   */
-  static DartsDictPtr NewFromDict(const Dict& dict);
+  static DartsDictPtr NewFromDict(const Dict& thatDict);
 
   static DartsDictPtr NewFromFile(FILE* fp);
 
 private:
-  const size_t maxLength;
-  const LexiconPtr lexicon;
-  const void* doubleArray;
-  const void* buffer;
+  DartsDict();
+
+  size_t maxLength;
+  LexiconPtr lexicon;
+
+  class DartsInternal;
+  DartsInternal* internal;
 };
+
 }

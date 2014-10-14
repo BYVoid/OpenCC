@@ -44,6 +44,7 @@ using std::vector;
 
 // Forward decalarations and alias
 namespace opencc {
+class BinaryDict;
 class Config;
 class Conversion;
 class ConversionChain;
@@ -60,6 +61,7 @@ class Segments;
 class SerializableDict;
 class SingleValueDictEntry;
 class TextDict;
+typedef std::shared_ptr<BinaryDict> BinaryDictPtr;
 typedef std::shared_ptr<Conversion> ConversionPtr;
 typedef std::shared_ptr<ConversionChain> ConversionChainPtr;
 typedef std::shared_ptr<Converter> ConverterPtr;

@@ -18,6 +18,7 @@
 
 #include <thread>
 
+#include "BinaryDict.hpp"
 #include "Config.hpp"
 #include "ConversionChain.hpp"
 #include "Converter.hpp"
@@ -40,6 +41,29 @@ void TestTextDict() {
   // Deserialization
   TextDictPtr deserialized = SerializableDict::NewFromFile<TextDict>(fileName);
   DictTestUtils::TestDict(deserialized);
+}
+
+void TestBinaryDict() {
+  TextDictPtr textDict = DictTestUtils::CreateTextDictForText();
+  BinaryDictPtr binDict(new BinaryDict(textDict->GetLexicon()));
+
+  // Serialization
+  string fileName = "dict.bin";
+  binDict->opencc::SerializableDict::SerializeToFile(fileName);
+
+  // Deserialization
+  BinaryDictPtr deserialized = SerializableDict::NewFromFile<BinaryDict>(fileName);
+  const LexiconPtr& lex1 = binDict->GetLexicon();
+  const LexiconPtr& lex2 = deserialized->GetLexicon();
+
+  AssertEquals(lex1->Length(), lex2->Length());
+  for (size_t i = 0; i < lex1->Length(); i++) {
+    AssertEquals(string(lex1->At(i)->Key()), lex2->At(i)->Key());
+    AssertEquals(lex1->At(i)->NumValues(), lex2->At(i)->NumValues());
+  }
+
+  TextDictPtr deserializedTextDict(new TextDict(lex2));
+  DictTestUtils::TestDict(deserializedTextDict);
 }
 
 void TestDartsDict() {
@@ -162,6 +186,7 @@ void TestCInterface() {
 
 int main(int argc, const char* argv[]) {
   TestUtils::RunTest("TestTextDict", TestTextDict);
+  TestUtils::RunTest("TestBinaryDict", TestBinaryDict);
   TestUtils::RunTest("TestDartsDict", TestDartsDict);
   TestUtils::RunTest("TestDictGroup", TestDictGroup);
   TestUtils::RunTest("TestSegmentation", TestSegmentation);

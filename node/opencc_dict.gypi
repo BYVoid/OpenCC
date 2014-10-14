@@ -3,6 +3,7 @@
     "target_name": "opencc_dict",
     "type": "executable",
     "sources": [
+      "../src/BinaryDict.cpp",
       "../src/DartsDict.cpp",
       "../src/Dict.cpp",
       "../src/DictConverter.cpp",

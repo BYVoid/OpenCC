@@ -3,6 +3,7 @@
     "target_name": "binding",
     "sources": [
       "../node/binding.cc",
+      "../src/BinaryDict.cpp",
       "../src/Config.cpp",
       "../src/Conversion.cpp",
       "../src/ConversionChain.cpp",

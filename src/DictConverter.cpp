@@ -18,11 +18,12 @@
 
 #include "CmdLineOutput.hpp"
 #include "DartsDict.hpp"
+#include "TextDict.hpp"
 
 using namespace opencc;
 
-SerializableDictPtr LoadDictionary(const string& format,
-                                   const string& inputFileName) {
+DictPtr LoadDictionary(const string& format,
+                       const string& inputFileName) {
   if (format == "text") {
     return SerializableDict::NewFromFile<TextDict>(inputFileName);
   } else if (format == "ocd") {
@@ -35,7 +36,7 @@ SerializableDictPtr LoadDictionary(const string& format,
 }
 
 SerializableDictPtr ConvertDictionary(const string& format,
-                                      const SerializableDictPtr dict) {
+                                      const DictPtr dict) {
   if (format == "text") {
     return TextDict::NewFromDict(*dict.get());
   } else if (format == "ocd") {
@@ -51,7 +52,7 @@ void ConvertDictionary(const string inputFileName,
                        const string outputFileName,
                        const string formatFrom,
                        const string formatTo) {
-  SerializableDictPtr dictFrom = LoadDictionary(formatFrom, inputFileName);
+  DictPtr dictFrom = LoadDictionary(formatFrom, inputFileName);
   SerializableDictPtr dictTo = ConvertDictionary(formatTo, dictFrom);
   dictTo->SerializeToFile(outputFileName);
 }

@@ -21,7 +21,7 @@
 #include "Dict.hpp"
 
 namespace opencc {
-class SerializableDict : public Dict {
+class SerializableDict {
 public:
   /**
   * Serializes the dictionary and writes in to a file.

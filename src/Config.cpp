@@ -22,6 +22,7 @@
 #include "DartsDict.hpp"
 #include "DictGroup.hpp"
 #include "MaxMatchSegmentation.hpp"
+#include "TextDict.hpp"
 
 #include "document.h"
 
@@ -69,7 +70,7 @@ public:
   }
 
   template<typename DICT>
-  SerializableDictPtr LoadDictWithPaths(const string& fileName) {
+  DictPtr LoadDictWithPaths(const string& fileName) {
     // Working directory
     std::shared_ptr<DICT> dict;
     if (SerializableDict::TryLoadFromFile<DICT>(fileName, &dict)) {

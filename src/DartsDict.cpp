@@ -27,9 +27,12 @@ static const char* OCDHEADER = "OPENCCDARTS1";
 
 class DartsDict::DartsInternal {
 public:
-  BinaryDictPtr binary = nullptr;
-  void* buffer = nullptr;
-  Darts::DoubleArray* doubleArray = nullptr;
+  BinaryDictPtr binary;
+  void* buffer;
+  Darts::DoubleArray* doubleArray;
+
+  DartsInternal() : binary(nullptr), buffer(nullptr), doubleArray(nullptr) {
+  }
 
   ~DartsInternal() {
     if (buffer != nullptr) {

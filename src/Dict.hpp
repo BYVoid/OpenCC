@@ -23,7 +23,7 @@
 
 namespace opencc {
 /**
-* Abstract class of dictionary.
+* Abstract class of dictionary
 */
 class OPENCC_EXPORT Dict {
 public:

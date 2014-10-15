@@ -23,6 +23,9 @@
 #include "Segments.hpp"
 
 namespace opencc {
+/**
+* Key-values pair entry
+*/
 class OPENCC_EXPORT DictEntry {
 public:
   virtual ~DictEntry() {

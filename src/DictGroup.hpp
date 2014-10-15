@@ -22,6 +22,9 @@
 #include "Dict.hpp"
 
 namespace opencc {
+/**
+* Group of dictionaries
+*/
 class OPENCC_EXPORT DictGroup : public Dict {
 public:
   DictGroup(const list<DictPtr>& dicts);

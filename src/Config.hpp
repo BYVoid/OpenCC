@@ -21,6 +21,9 @@
 #include "Common.hpp"
 
 namespace opencc {
+/**
+* Configuration loader
+*/
 class OPENCC_EXPORT Config {
 public:
   Config();

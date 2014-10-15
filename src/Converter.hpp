@@ -22,6 +22,9 @@
 #include "Segmentation.hpp"
 
 namespace opencc {
+/**
+* Controller of segmentation and conversion
+*/
 class OPENCC_EXPORT Converter {
 public:
   Converter(const string& _name,

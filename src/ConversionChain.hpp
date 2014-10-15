@@ -22,6 +22,10 @@
 #include "Conversion.hpp"
 
 namespace opencc {
+/**
+* Chain of conversions
+* Consists of a list of conversions. Converts input in sequence.
+*/
 class OPENCC_EXPORT ConversionChain {
 public:
   ConversionChain(const list<ConversionPtr> _conversions);

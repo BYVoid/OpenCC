@@ -24,6 +24,7 @@
 namespace opencc {
 /**
 * Abstract class of dictionary
+* @ingroup opencc_cpp_api
 */
 class OPENCC_EXPORT Dict {
 public:

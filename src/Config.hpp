@@ -23,6 +23,7 @@
 namespace opencc {
 /**
 * Configuration loader
+* @ingroup opencc_cpp_api
 */
 class OPENCC_EXPORT Config {
 public:

@@ -25,6 +25,7 @@ namespace opencc {
 /**
 * Chain of conversions
 * Consists of a list of conversions. Converts input in sequence.
+* @ingroup opencc_cpp_api
 */
 class OPENCC_EXPORT ConversionChain {
 public:

@@ -24,6 +24,7 @@
 namespace opencc {
 /**
 * Binary dictionary for faster deserialization
+* @ingroup opencc_cpp_api
 */
 class OPENCC_EXPORT BinaryDict : public SerializableDict {
 public:

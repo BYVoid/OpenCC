@@ -24,6 +24,7 @@
 namespace opencc {
 /**
 * Text dictionary
+* @ingroup opencc_cpp_api
 */
 class OPENCC_EXPORT TextDict : public Dict, public SerializableDict {
 public:

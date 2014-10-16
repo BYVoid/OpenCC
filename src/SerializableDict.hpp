@@ -21,6 +21,10 @@
 #include "Dict.hpp"
 
 namespace opencc {
+/**
+* Serializable dictionary interface
+* @ingroup opencc_cpp_api
+*/
 class SerializableDict {
 public:
   /**

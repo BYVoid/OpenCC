@@ -21,6 +21,7 @@
 namespace opencc {
 /**
 * A class that wraps type T into a nullable type.
+* @ingroup opencc_cpp_api
 */
 template<typename T>
 class Optional {

@@ -24,6 +24,7 @@
 namespace opencc {
 /**
 * Conversion interface
+* @ingroup opencc_cpp_api
 */
 class OPENCC_EXPORT Conversion {
 public:

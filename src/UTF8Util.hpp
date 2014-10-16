@@ -21,6 +21,10 @@
 #include "Common.hpp"
 
 namespace opencc {
+/**
+* UTF8 string utilities
+* @ingroup opencc_cpp_api
+*/
 class OPENCC_EXPORT UTF8Util {
 public:
   /**

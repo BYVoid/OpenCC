@@ -22,6 +22,10 @@
 #include "DictEntry.hpp"
 
 namespace opencc {
+/**
+* Storage of all entries
+* @ingroup opencc_cpp_api
+*/
 class OPENCC_EXPORT Lexicon {
 public:
   Lexicon() {

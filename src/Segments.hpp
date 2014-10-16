@@ -21,6 +21,10 @@
 #include "Common.hpp"
 
 namespace opencc {
+/**
+* Segmented text
+* @ingroup opencc_cpp_api
+*/
 class OPENCC_EXPORT Segments {
 public:
   Segments() {

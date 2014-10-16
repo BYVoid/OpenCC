@@ -25,6 +25,7 @@
 namespace opencc {
 /**
 * Key-values pair entry
+* @ingroup opencc_cpp_api
 */
 class OPENCC_EXPORT DictEntry {
 public:

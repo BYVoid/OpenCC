@@ -24,6 +24,7 @@
 namespace opencc {
 /**
 * Darts dictionary
+* @ingroup opencc_cpp_api
 */
 class OPENCC_EXPORT DartsDict : public Dict, public SerializableDict {
 public:

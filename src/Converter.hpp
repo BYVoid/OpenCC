@@ -24,6 +24,7 @@
 namespace opencc {
 /**
 * Controller of segmentation and conversion
+* @ingroup opencc_cpp_api
 */
 class OPENCC_EXPORT Converter {
 public:

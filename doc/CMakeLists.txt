@@ -1,11 +1,3 @@
-install(
-	FILES
-		opencc.1
-		opencc_dict.1
-	DESTINATION
-		${DIR_SHARE}man/man1
-)
-
 if(BUILD_DOCUMENTATION)
     find_package(Doxygen)
     if (NOT DOXYGEN_FOUND)

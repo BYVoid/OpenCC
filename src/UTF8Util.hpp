@@ -34,8 +34,9 @@ public:
 
   /**
   * Returns the length in byte for the next UTF8 character.
+  * On error returns 0.
   */
-  static size_t NextCharLength(const char* str) {
+  static size_t NextCharLengthNoException(const char* str) {
     char ch = *str;
     if ((ch & 0x80) == 0x00) {
       return 1;
@@ -50,9 +51,18 @@ public:
     } else if ((ch & 0xFE) == 0xFC) {
       return 6;
     }
-
-    // TODO Invalid UTF8 string or in the middle of a UTF8 char
     return 0;
+  }
+  
+  /**
+   * Returns the length in byte for the next UTF8 character.
+   */
+  static size_t NextCharLength(const char* str) {
+    size_t length = NextCharLengthNoException(str);
+    if (length == 0) {
+      throw InvalidUTF8(str);
+    }
+    return length;
   }
 
   /**
@@ -61,13 +71,12 @@ public:
   static size_t PrevCharLength(const char* str) {
     for (size_t i = 1; i <= 6; i++) {
       str--;
-      size_t length = NextCharLength(str);
+      size_t length = NextCharLengthNoException(str);
       if (length == i) {
         return length;
       }
     }
-
-    // TODO Invalid UTF8 string or in the middle of a UTF8 char
+    throw InvalidUTF8(str);
     return 0;
   }
 

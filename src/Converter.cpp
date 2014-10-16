@@ -25,9 +25,5 @@ using namespace opencc;
 string Converter::Convert(const string& text) const {
   const SegmentsPtr& segments = segmentation->Segment(text);
   const SegmentsPtr& converted = conversionChain->Convert(segments);
-  std::ostringstream buffer;
-  for (const auto& segment : *converted) {
-    buffer << segment;
-  }
-  return buffer.str();
+  return converted->ToString();
 }

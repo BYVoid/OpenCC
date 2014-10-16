@@ -112,6 +112,16 @@ public:
     return iterator(unmanaged, managed, indexes, indexes.size());
   }
 
+  string ToString() const {
+    // TODO implement a nested structure to reduce concatenation,
+    // like a purely functional differential list
+    std::ostringstream buffer;
+    for (const char* segment : *this) {
+      buffer << segment;
+    }
+    return buffer.str();
+  }
+  
 private:
   Segments(const Segments& that) {
   }

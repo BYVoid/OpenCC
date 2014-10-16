@@ -24,6 +24,83 @@
 #include <string>
 #include "Export.hpp"
 
+extern "C" {
+#endif
+
+/**
+* Filename of default Simplified to Traditional configuration.
+*
+* @ingroup opencc_api
+*/
+#define OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD "st2.json"
+
+/**
+* Filename of default Traditional to Simplified configuration.
+*
+* @ingroup opencc_api
+*/
+#define OPENCC_DEFAULT_CONFIG_TRAD_TO_SIMP "t2s.json"
+
+typedef void* opencc_t;
+
+/**
+* Makes an instance of opencc.
+* Leave configFileName to NULL if you do not want to load any configuration file.
+*
+* @param configFileName Location of configuration file.
+* @return            A description pointer of the newly allocated instance of
+*                    opencc. On error the return value will be (opencc_t) -1.
+* @ingroup opencc_api
+*/
+opencc_t opencc_open(const char* configFileName);
+
+/**
+* Destroys an instance of opencc.
+*
+* @param od The description pointer.
+* @return 0 on success or non-zero number on failure.
+*/
+int opencc_close(opencc_t opencc);
+
+/**
+* Converts UTF-8 string.
+* This function returns an allocated C-Style string, which stores
+* the converted string.
+* You MUST call opencc_convert_utf8_free() to release allocated memory.
+*
+* @param od     The opencc description pointer.
+* @param input  The UTF-8 encoded string.
+* @param length The maximum length in byte to convert. If length is (size_t)-1,
+*               the whole string (terminated by '\0') will be converted.
+*
+* @return       The newly allocated UTF-8 string that stores text converted,
+*               or NULL on error.
+* @ingroup opencc_api
+*/
+char* opencc_convert_utf8(opencc_t opencc, const char* input, size_t length);
+
+/**
+* Releases allocated buffer by opencc_convert_utf8.
+*
+* @param str    Pointer to the allocated string buffer by opencc_convert_utf8.
+*
+* @ingroup opencc_api
+*/
+void opencc_convert_utf8_free(char* str);
+
+/**
+* Returns the last error message.
+*
+* Note that this function is the only one which is NOT thread-safe.
+*
+* @ingroup opencc_api
+*/
+const char* opencc_error(void);
+
+#ifdef __cplusplus
+}
+#endif
+
 namespace opencc {
 class OPENCC_EXPORT SimpleConverter {
 public:
@@ -33,23 +110,13 @@ public:
 
   std::string Convert(const std::string& input) const;
 
+  std::string Convert(const char* input) const;
+
+  std::string Convert(const char* input, size_t length) const;
+
 private:
   const void* internalData;
 };
 }
-
-extern "C" {
-#endif
-
-typedef void* opencc_t;
-
-opencc_t opencc_new(const char* configFileName);
-void opencc_delete(opencc_t opencc);
-char* opencc_convert(opencc_t opencc, const char* input);
-void opencc_free_string(char* str);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

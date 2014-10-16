@@ -19,6 +19,7 @@
 #include "Config.hpp"
 #include "Converter.hpp"
 #include "opencc.h"
+#include "UTF8Util.hpp"
 
 using namespace opencc;
 
@@ -51,36 +52,62 @@ std::string SimpleConverter::Convert(const std::string& input) const {
   }
 }
 
-opencc_t opencc_new(const char* configFileName) {
-  try {
-    SimpleConverter* instance = new SimpleConverter(configFileName);
-    return instance;
-  } catch (std::runtime_error& ex) {
-    // TODO report error
-    return NULL;
+std::string SimpleConverter::Convert(const char* input) const {
+  return Convert(string(input));
+}
+
+std::string SimpleConverter::Convert(const char* input, size_t length) const {
+  if (length == static_cast<size_t>(-1)) {
+    return Convert(string(input));
+  } else {
+    return Convert(UTF8Util::FromSubstr(input, length));
   }
 }
 
-void opencc_delete(opencc_t opencc) {
-  SimpleConverter* instance = reinterpret_cast<SimpleConverter*>(opencc);
-  delete instance;
+static string cError;
+
+opencc_t opencc_open(const char* configFileName) {
+  try {
+    if (configFileName == nullptr) {
+      configFileName = OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD;
+    }
+    SimpleConverter* instance = new SimpleConverter(configFileName);
+    return instance;
+  } catch (std::runtime_error& ex) {
+    cError = ex.what();
+    return reinterpret_cast<opencc_t>(-1);
+  }
 }
 
-char* opencc_convert(opencc_t opencc, const char* input) {
+int opencc_close(opencc_t opencc) {
   try {
     SimpleConverter* instance = reinterpret_cast<SimpleConverter*>(opencc);
-    std::string converted = instance->Convert(input);
-    char* output = new char[converted.length() + 1];
+    delete instance;
+    return 0;
+  } catch (std::exception& ex) {
+    cError = ex.what();
+    return 1;
+  }
+}
 
+char* opencc_convert_utf8(opencc_t opencc, const char* input, size_t length) {
+  try {
+    SimpleConverter* instance = reinterpret_cast<SimpleConverter*>(opencc);
+    std::string converted = instance->Convert(input, length);
+    char* output = new char[converted.length() + 1];
     strncpy(output, converted.c_str(), converted.length());
     output[converted.length()] = '\0';
     return output;
   } catch (std::runtime_error& ex) {
-    // TODO report error
-    return NULL;
+    cError = ex.what();
+    return nullptr;
   }
 }
 
-void opencc_free_string(char* str) {
+void opencc_convert_utf8_free(char* str) {
   delete[] str;
+}
+
+const char* opencc_error(void) {
+  return cError.c_str();
 }

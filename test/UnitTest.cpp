@@ -174,13 +174,21 @@ void TestMultithreading() {
 }
 
 void TestCInterface() {
-  const string& text = utf8("燕燕于飞差池其羽之子于归远送于野");
-  const string& expected = utf8("燕燕于飛差池其羽之子于歸遠送於野");
-  opencc_t od = opencc_new(CONFIG_TEST_PATH.c_str());
-  char* converted = opencc_convert(od, text.c_str());
-  AssertEquals(expected, converted);
-  opencc_free_string(converted);
-  opencc_delete(od);
+  {
+    const string& text = utf8("燕燕于飞差池其羽之子于归远送于野");
+    const string& expected = utf8("燕燕于飛差池其羽之子于歸遠送於野");
+    opencc_t od = opencc_open(CONFIG_TEST_PATH.c_str());
+    char* converted = opencc_convert_utf8(od, text.c_str(), (size_t)-1);
+    AssertEquals(expected, converted);
+    opencc_convert_utf8_free(converted);
+    AssertEquals(0, opencc_close(od));
+  }
+  {
+    string path = "/opencc/no/such/file/or/directory";
+    opencc_t od = opencc_open(path.c_str());
+    AssertEquals(reinterpret_cast<opencc_t>(-1), od);
+    AssertEquals(path + " not found or not accessible.", opencc_error());
+  }
 }
 
 int main(int argc, const char* argv[]) {

@@ -1,4 +1,5 @@
 #coding: utf-8
+import sys
 
 def sort_items(input_filename, output_filename):
   input_file = open(input_filename, "r")
@@ -10,7 +11,7 @@ def sort_items(input_filename, output_filename):
     try:
       key, value = line.split("\t")
     except ValueError:
-      print line
+      print(line)
     while value[-1] == "\n" or value[-1] == "\r":
       value = value[:-1]
     dic[key] = value
@@ -19,7 +20,7 @@ def sort_items(input_filename, output_filename):
   
   output_file = open(output_filename, "w")
   
-  for key in sorted(dic.iterkeys()):
+  for key in sorted(dic.keys()):
     output_file.write(key + "\t" + dic[key] + "\n")
     
   output_file.close()
@@ -63,6 +64,6 @@ def find_target_items(input_filename, keyword):
     value_list = value.split(" ")
     for value in value_list:
       if keyword in value:
-        print line,
+        sys.stdout.write(line)
   
   input_file.close()

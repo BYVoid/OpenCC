@@ -4,8 +4,8 @@ import sys
 from common import sort_items
 
 if len(sys.argv) < 4:
-  print "Merge and sort all text dictionaries"
-  print "Usage: ", sys.argv[0], "[input1] [input2] … [inputN] [output]"
+  print("Merge and sort all text dictionaries")
+  print("Usage: ", sys.argv[0], "[input1] [input2] ... [inputN] [output]")
   exit(1)
 
 all_lines = []

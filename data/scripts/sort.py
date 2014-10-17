@@ -4,8 +4,8 @@ import sys
 from common import sort_items
 
 if len(sys.argv) < 2:
-  print "Sort the dictionary"
-  print "Usage: ", sys.argv[0], "[input] ([output])"
+  print("Sort the dictionary")
+  print("Usage: ", sys.argv[0], "[input] ([output])")
   exit(1)
 
 input = sys.argv[1]

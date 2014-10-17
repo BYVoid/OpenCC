@@ -51,43 +51,33 @@ public:
     indexes.push_back(std::make_pair(managed.size(), true));
     managed.push_back(str);
   }
-  
-  class iterator {
+
+  class iterator : public std::iterator<std::input_iterator_tag, const char*> {
   public:
-    iterator(const vector<const char*>& _unmanaged,
-             const vector<string>& _managed,
-             const vector<std::pair<size_t, bool>>& _indexes,
+    iterator(const Segments* const _segments,
              size_t _cursor)
-        : unmanaged(_unmanaged), managed(_managed),
-          indexes(_indexes), cursor(_cursor) {
+        : segments(_segments), cursor(_cursor) {
     }
-    
+
     iterator& operator++() {
       cursor++;
       return *this;
     }
-    
+
     bool operator==(const iterator& that) const {
-      return cursor == that.cursor;
+      return cursor == that.cursor && segments == that.segments;
     }
-    
+
     bool operator!=(const iterator& that) const {
       return !this->operator==(that);
     }
-    
+
     const char* operator*() const {
-      const auto& index = indexes[cursor];
-      if (index.second) {
-        return managed[index.first].c_str();
-      } else {
-        return unmanaged[index.first];
-      }
+      return segments->At(cursor);
     }
-    
+
   private:
-    const vector<const char*>& unmanaged;
-    const vector<string>& managed;
-    const vector<std::pair<size_t, bool>>& indexes;
+    const Segments* const segments;
     size_t cursor;
   };
 
@@ -105,11 +95,11 @@ public:
   }
 
   iterator begin() const {
-    return iterator(unmanaged, managed, indexes, 0);
+    return iterator(this, 0);
   }
 
   iterator end() const {
-    return iterator(unmanaged, managed, indexes, indexes.size());
+    return iterator(this, indexes.size());
   }
 
   string ToString() const {
@@ -121,7 +111,7 @@ public:
     }
     return buffer.str();
   }
-  
+
 private:
   Segments(const Segments& that) {
   }

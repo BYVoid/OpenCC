@@ -57,7 +57,7 @@ Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for c
 
 ### Build with CMake
 
-Linux/OSX:
+Linux/OSX (gcc 4.6 or clang 3.2 is required):
 
 ```
 make
@@ -78,14 +78,6 @@ cmake .. -G "Visual Studio 12" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Rele
 make
 ```
 
-## Screenshot 截圖
-
-![OpenCC Mac](http://opencc.googlecode.com/files/screenshot-gui-mac.png)
-
-![OpenCC Windows](http://opencc.googlecode.com/files/screenshot-gui.png)
-
-![OpenCC Ubuntu](http://opencc.googlecode.com/files/screenshot-gui-ubuntu.png)
-
 ### Projects using Opencc 使用OpenCC的項目
 
 * [ibus-pinyin](http://code.google.com/p/ibus/)
@@ -105,6 +97,8 @@ Apache License 2.0
 * [darts-clone](https://code.google.com/p/darts-clone/) BSD License
 * [tclap](http://tclap.sourceforge.net/) MIT License
 * [rapidjson](https://github.com/miloyip/rapidjson) MIT License
+
+All these libraries are statically linked.
 
 ## Contributors 貢獻者
 
@@ -128,3 +122,4 @@ Apache License 2.0
 * [Pellaeon Lin](https://github.com/pellaeon)
 * [stony](https://github.com/stony-shixz)
 * [steelywing](https://github.com/steelywing)
+* [吕旭东](https://github.com/lvxudong)

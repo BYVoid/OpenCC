@@ -27,10 +27,14 @@ Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for c
 
 * [Debian](http://packages.qa.debian.org/o/opencc.html)
 * [Ubuntu](https://launchpad.net/ubuntu/+source/opencc)
-* [Fedora](https://admin.fedoraproject.org/pkgdb/acls/name/opencc)
+* [Fedora](https://admin.fedoraproject.org/pkgdb/package/opencc/)
 * [Arch Linux](https://www.archlinux.org/packages/community/x86_64/opencc/)
 * [Mac OS](https://github.com/mxcl/homebrew/blob/master/Library/Formula/opencc.rb)
 * [Node.js](https://npmjs.org/package/opencc)
+
+## Download 下載
+
+https://bintray.com/byvoid/opencc/OpenCC
 
 ## Usage 使用
 

@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-.PHONY: build clean node test
+.PHONY: build clean node test xcode-build
 
 build:
 	mkdir -p build/rel
@@ -31,7 +31,7 @@ package: build
 	make -C build/rel package_source
 
 test:
-	mkdir -p build/dbg
+	mkdir -p build/dbg/root
 	(cd build/dbg; cmake \
 	-DBUILD_DOCUMENTATION:BOOL=OFF \
 	-DCMAKE_BUILD_TYPE=Debug \
@@ -48,11 +48,18 @@ node:
 node-test: node
 	npm test
 
+xcode-build:
+	mkdir -p xcode
+	(cd xcode; cmake \
+	-G "Xcode" \
+	-DBUILD_DOCUMENTATION:BOOL=OFF \
+	..; \
+	xcodebuild build)
+
 test-all: test node-test
 
 clean:
-	rm -rf build
+	rm -rf build xcode
 
 install: build
 	make -C build/rel install
-

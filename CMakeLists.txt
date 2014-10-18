@@ -30,7 +30,7 @@ set (PACKAGE_URL https://github.com/BYVoid/Opencc)
 set (PACKAGE_BUGREPORT https://github.com/BYVoid/Opencc/issues)
 set (OPENCC_VERSION_MAJOR 1)
 set (OPENCC_VERSION_MINOR 0)
-set (OPENCC_VERSION_REVISION 0)
+set (OPENCC_VERSION_REVISION 1)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
   set (version_suffix .Debug)
@@ -58,6 +58,10 @@ if (WIN32)
   set(CMAKE_SHARED_LIBRARY_PREFIX ${CMAKE_INSTALL_PREFIX})
   set(CMAKE_STATIC_LIBRARY_PREFIX ${CMAKE_INSTALL_PREFIX})
 endif (WIN32)
+
+######## Mac OS X
+
+set(CMAKE_MACOSX_RPATH 1)
 
 ######## Directory
 
@@ -121,7 +125,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   add_definitions(
     /Wall
-	/D "_CRT_SECURE_NO_WARNINGS"
+    /D "_CRT_SECURE_NO_WARNINGS"
   )
 endif()
 

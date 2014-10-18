@@ -10,3 +10,5 @@
 /opencc.xcodeproj
 /test/dict.ocd
 /test/dict.txt
+/test/dict.bin
+/xcode

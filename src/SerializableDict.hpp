@@ -25,7 +25,7 @@ namespace opencc {
 * Serializable dictionary interface
 * @ingroup opencc_cpp_api
 */
-class SerializableDict {
+class OPENCC_EXPORT SerializableDict {
 public:
   /**
   * Serializes the dictionary and writes in to a file.

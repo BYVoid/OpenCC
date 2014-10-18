@@ -113,7 +113,7 @@ public:
   }
 
 private:
-  Segments(const Segments& that) {
+  Segments(const Segments&) {
   }
 
   vector<const char*> unmanaged;

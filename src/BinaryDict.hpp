@@ -32,6 +32,9 @@ public:
       lexicon(_lexicon) {
   }
 
+  virtual ~BinaryDict() {
+  }
+
   virtual void SerializeToFile(FILE* fp) const;
 
   static BinaryDictPtr NewFromFile(FILE* fp);

@@ -77,7 +77,6 @@ public:
       }
     }
     throw InvalidUTF8(str);
-    return 0;
   }
 
   /**
@@ -180,7 +179,7 @@ public:
     bool first = true;
     for (const auto& str : strings) {
       if (!first) {
-        buffer << ' ';
+        buffer << separator;
       }
       buffer << str;
       first = false;

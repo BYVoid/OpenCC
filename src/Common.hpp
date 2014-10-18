@@ -18,6 +18,11 @@
 
 #pragma once
 
+// Microsoft Visual C++ specific
+#if defined(_MSC_VER) && (_MSC_VER >= 1020)
+#pragma warning(disable : 4251 4266 4350 4503 4512 4514 4710 4820)
+#endif
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>

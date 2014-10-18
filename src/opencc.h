@@ -58,7 +58,7 @@ typedef void* opencc_t;
 *                    opencc. On error the return value will be (opencc_t) -1.
 * @ingroup opencc_c_api
 */
-opencc_t opencc_open(const char* configFileName);
+OPENCC_EXPORT opencc_t opencc_open(const char* configFileName);
 
 /**
 * Destroys an instance of opencc.
@@ -66,7 +66,7 @@ opencc_t opencc_open(const char* configFileName);
 * @param opencc The description pointer.
 * @return 0 on success or non-zero number on failure.
 */
-int opencc_close(opencc_t opencc);
+OPENCC_EXPORT int opencc_close(opencc_t opencc);
 
 /**
 * Converts UTF-8 string.
@@ -83,7 +83,7 @@ int opencc_close(opencc_t opencc);
 *               or NULL on error.
 * @ingroup opencc_c_api
 */
-char* opencc_convert_utf8(opencc_t opencc, const char* input, size_t length);
+OPENCC_EXPORT char* opencc_convert_utf8(opencc_t opencc, const char* input, size_t length);
 
 /**
 * Releases allocated buffer by opencc_convert_utf8.
@@ -92,7 +92,7 @@ char* opencc_convert_utf8(opencc_t opencc, const char* input, size_t length);
 *
 * @ingroup opencc_c_api
 */
-void opencc_convert_utf8_free(char* str);
+OPENCC_EXPORT void opencc_convert_utf8_free(char* str);
 
 /**
 * Returns the last error message.
@@ -101,7 +101,7 @@ void opencc_convert_utf8_free(char* str);
 *
 * @ingroup opencc_c_api
 */
-const char* opencc_error(void);
+OPENCC_EXPORT const char* opencc_error(void);
 
 #ifdef __cplusplus
 }

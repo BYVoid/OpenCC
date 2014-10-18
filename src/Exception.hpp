@@ -84,8 +84,8 @@ public:
   
 class OPENCC_EXPORT InvalidUTF8 : public Exception {
 public:
-  InvalidUTF8(const std::string& message) :
-    Exception("Invalid UTF8: ") {
+  InvalidUTF8(const std::string& _message) :
+    Exception("Invalid UTF8: " + _message) {
   }
 };
 }

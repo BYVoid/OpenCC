@@ -18,8 +18,7 @@ Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for c
 
 ### Links 相關鏈接
 
-* Introduction 詳細介紹 https://code.google.com/p/opencc/wiki/Introduction
-* Development Documentation 開發文檔 http://byvoid.github.io/OpenCC/
+* Introduction 詳細介紹 https://github.com/BYVoid/OpenCC/wiki/%E7%B7%A3%E7%94%B1
 * OpenCC Online (在線轉換) http://opencc.byvoid.com/
 * 現代漢語常用簡繁一對多字義辨析表 http://ytenx.org/byohlyuk/KienxPyan
 
@@ -54,6 +53,10 @@ https://bintray.com/byvoid/opencc/OpenCC
 * `hk2s.json` Traditional Chinese (Hong Kong Standard) to Simplified Chinese 香港繁體（香港小學學習字詞表標準）到簡體
 * `s2twp.json` Simplified Chinese to Traditional Chinese (Taiwan Standard) with Taiwanese idiom 簡體到繁體（臺灣正體標準）並轉換爲臺灣常用詞彙
 * `tw2sp.json` Traditional Chinese (Taiwan Standard) to Simplified Chinese with Mainland Chinese idiom 繁體（臺灣正體標準）到簡體並轉換爲中國大陸常用詞彙
+
+## Development Documentation 開發文檔
+
+* http://byvoid.github.io/OpenCC/
 
 ## Build 編譯
 

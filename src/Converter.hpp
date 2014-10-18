@@ -36,6 +36,8 @@ public:
   }
 
   string Convert(const string& text) const;
+  
+  size_t Convert(const char* input, char* output) const;
 
   const SegmentationPtr GetSegmentation() const {
     return segmentation;

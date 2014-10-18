@@ -34,26 +34,31 @@ extern "C" {
 */
 
 /**
-* Filename of default Simplified to Traditional configuration.
+* Filename of default Simplified to Traditional configuration
 *
 * @ingroup opencc_c_api
 */
 #define OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD "st2.json"
 
 /**
-* Filename of default Traditional to Simplified configuration.
+* Filename of default Traditional to Simplified configuration
 *
 * @ingroup opencc_c_api
 */
 #define OPENCC_DEFAULT_CONFIG_TRAD_TO_SIMP "t2s.json"
 
+/**
+* Type of opencc descriptor
+*
+* @ingroup opencc_c_api
+*/
 typedef void* opencc_t;
 
 /**
-* Makes an instance of opencc.
-* Leave configFileName to NULL if you do not want to load any configuration file.
+* Makes an instance of opencc
 *
-* @param configFileName Location of configuration file.
+* @param configFileName Location of configuration file. If this is set to NULL,
+*                       OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD will be loaded.
 * @return            A description pointer of the newly allocated instance of
 *                    opencc. On error the return value will be (opencc_t) -1.
 * @ingroup opencc_c_api
@@ -61,15 +66,35 @@ typedef void* opencc_t;
 OPENCC_EXPORT opencc_t opencc_open(const char* configFileName);
 
 /**
-* Destroys an instance of opencc.
+* Destroys an instance of opencc
 *
 * @param opencc The description pointer.
 * @return 0 on success or non-zero number on failure.
+* @ingroup opencc_c_api
 */
 OPENCC_EXPORT int opencc_close(opencc_t opencc);
 
 /**
-* Converts UTF-8 string.
+* Converts UTF-8 string
+*
+* @param opencc The opencc description pointer.
+* @param input  The UTF-8 encoded string.
+* @param length The maximum length in byte to convert. If length is (size_t)-1,
+*               the whole string (terminated by '\0') will be converted.
+* @param output The buffer to store converted text. You MUST make sure this
+*               buffer has sufficient space.
+*
+* @return       The length of converted string or (size_t)-1 on error.
+*
+* @ingroup opencc_c_api
+*/
+OPENCC_EXPORT size_t opencc_convert_utf8_to_buffer(opencc_t opencc,
+                                                   const char* input,
+                                                   size_t length,
+                                                   char* output);
+
+/**
+* Converts UTF-8 string
 * This function returns an allocated C-Style string, which stores
 * the converted string.
 * You MUST call opencc_convert_utf8_free() to release allocated memory.
@@ -83,10 +108,12 @@ OPENCC_EXPORT int opencc_close(opencc_t opencc);
 *               or NULL on error.
 * @ingroup opencc_c_api
 */
-OPENCC_EXPORT char* opencc_convert_utf8(opencc_t opencc, const char* input, size_t length);
+OPENCC_EXPORT char* opencc_convert_utf8(opencc_t opencc,
+                                        const char* input,
+                                        size_t length);
 
 /**
-* Releases allocated buffer by opencc_convert_utf8.
+* Releases allocated buffer by opencc_convert_utf8
 *
 * @param str    Pointer to the allocated string buffer by opencc_convert_utf8.
 *
@@ -95,7 +122,7 @@ OPENCC_EXPORT char* opencc_convert_utf8(opencc_t opencc, const char* input, size
 OPENCC_EXPORT void opencc_convert_utf8_free(char* str);
 
 /**
-* Returns the last error message.
+* Returns the last error message
 *
 * Note that this function is the only one which is NOT thread-safe.
 *
@@ -115,20 +142,57 @@ OPENCC_EXPORT const char* opencc_error(void);
 
 namespace opencc {
 /**
-* Simple converter
+* A high level converter
+* This interface does not require C++11 to compile.
 * @ingroup opencc_simple_api
 */
 class OPENCC_EXPORT SimpleConverter {
 public:
+  /**
+  * Constructor of SimpleConverter
+  * @param configFileName File name of configuration.
+  */
   SimpleConverter(const std::string& configFileName);
 
   ~SimpleConverter();
 
+  /**
+  * Converts a text
+  * @param input Text to be converted.
+  */
   std::string Convert(const std::string& input) const;
 
+  /**
+  * Converts a text
+  * @param input A C-Style string (terminated by '\0') to be converted.
+  */
   std::string Convert(const char* input) const;
 
+  /**
+  * Converts a text
+  * @param input  A C-Style string limited by a given length to be converted.
+  * @param length Maximal length in byte of the input string.
+  */
   std::string Convert(const char* input, size_t length) const;
+  
+  /**
+  * Converts a text and writes to an allocated buffer
+  * Please make sure the buffer has sufficent space.
+  * @param input  A C-Style string (terminated by '\0') to be converted.
+  * @param output Buffer to write the converted text.
+  * @return       Length of converted text.
+  */
+  size_t Convert(const char* input, char* output) const;
+  
+  /**
+  * Converts a text and writes to an allocated buffer
+  * Please make sure the buffer has sufficent space.
+  * @param input  A C-Style string limited by a given length to be converted.
+  * @param length Maximal length in byte of the input string.
+  * @param output Buffer to write the converted text.
+  * @return       Length of converted text.
+  */
+  size_t Convert(const char* input, size_t length, char* output) const;
 
 private:
   const void* internalData;

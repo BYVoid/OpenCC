@@ -64,6 +64,26 @@ std::string SimpleConverter::Convert(const char* input, size_t length) const {
   }
 }
 
+size_t SimpleConverter::Convert(const char* input, char* output) const {
+  try {
+    const InternalData* data = (InternalData*)internalData;
+    return data->converter->Convert(input, output);
+  } catch (Exception& ex) {
+    throw std::runtime_error(ex.what());
+  }
+}
+
+size_t SimpleConverter::Convert(const char* input,
+                                size_t length,
+                                char* output) const {
+  if (length == static_cast<size_t>(-1)) {
+    return Convert(input, output);
+  } else {
+    string trimmed = UTF8Util::FromSubstr(input, length);
+    return Convert(trimmed.c_str(), output);
+  }
+}
+
 static string cError;
 
 opencc_t opencc_open(const char* configFileName) {
@@ -87,6 +107,19 @@ int opencc_close(opencc_t opencc) {
   } catch (std::exception& ex) {
     cError = ex.what();
     return 1;
+  }
+}
+
+size_t opencc_convert_utf8_to_buffer(opencc_t opencc,
+                                     const char* input,
+                                     size_t length,
+                                     char* output) {
+  try {
+    SimpleConverter* instance = reinterpret_cast<SimpleConverter*>(opencc);
+    return instance->Convert(input, length, output);
+  } catch (std::runtime_error& ex) {
+    cError = ex.what();
+    return static_cast<size_t>(-1);
   }
 }
 

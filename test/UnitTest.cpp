@@ -124,8 +124,16 @@ void TestSegmentation() {
 void TestConversion() {
   auto dict = DictTestUtils::CreateDictGroupForConversion();
   auto conversion = ConversionPtr(new Conversion(dict));
-  string converted = conversion->Convert(utf8("太后的头发干燥"));
-  AssertEquals(utf8("太后的頭髮乾燥"), converted);
+  const string& input = utf8("太后的头发干燥");
+  const string& expected = utf8("太后的頭髮乾燥");
+  {
+    string converted = conversion->Convert(input);
+    AssertEquals(expected, converted);
+  }
+  {
+    string converted = conversion->Convert(input.c_str());
+    AssertEquals(expected, converted);
+  }
 }
 
 void TestConversionChain() {
@@ -146,17 +154,28 @@ void TestConversionChain() {
 
 const string CONFIG_TEST_PATH = "config_test/config_test.json";
 
-void TestConfig() {
+void TestConfigConverter() {
   Config config;
   auto converter = config.NewFromFile(CONFIG_TEST_PATH);
-  string converted = converter->Convert(utf8("燕燕于飞差池其羽之子于归远送于野"));
-  AssertEquals(utf8("燕燕于飛差池其羽之子于歸遠送於野"), converted);
-
-  string path = "/opencc/no/such/file/or/directory";
-  try {
-    auto converter = config.NewFromFile(path);
-  } catch (FileNotFound& e) {
-    AssertEquals(path + " not found or not accessible.", e.what());
+  const string& input = utf8("燕燕于飞差池其羽之子于归远送于野");
+  const string& expected = utf8("燕燕于飛差池其羽之子于歸遠送於野");
+  {
+    string converted = converter->Convert(input);
+    AssertEquals(expected, converted);
+  }
+  {
+    char output[1024];
+    size_t length = converter->Convert(input.c_str(), output);
+    AssertEquals(expected.length(), length);
+    AssertEquals(expected, output);
+  }
+  {
+    string path = "/opencc/no/such/file/or/directory";
+    try {
+      auto converter = config.NewFromFile(path);
+    } catch (FileNotFound& e) {
+      AssertEquals(path + " not found or not accessible.", e.what());
+    }
   }
 }
 
@@ -174,13 +193,22 @@ void TestMultithreading() {
 }
 
 void TestCInterface() {
+  const string& text = utf8("燕燕于飞差池其羽之子于归远送于野");
+  const string& expected = utf8("燕燕于飛差池其羽之子于歸遠送於野");
   {
-    const string& text = utf8("燕燕于飞差池其羽之子于归远送于野");
-    const string& expected = utf8("燕燕于飛差池其羽之子于歸遠送於野");
     opencc_t od = opencc_open(CONFIG_TEST_PATH.c_str());
     char* converted = opencc_convert_utf8(od, text.c_str(), (size_t)-1);
     AssertEquals(expected, converted);
     opencc_convert_utf8_free(converted);
+    AssertEquals(0, opencc_close(od));
+  }
+  {
+    char output[1024];
+    opencc_t od = opencc_open(CONFIG_TEST_PATH.c_str());
+    size_t length = opencc_convert_utf8_to_buffer(od, text.c_str(), (size_t)-1,
+                                                  output);
+    AssertEquals(expected.length(), length);
+    AssertEquals(expected, output);
     AssertEquals(0, opencc_close(od));
   }
   {
@@ -199,7 +227,7 @@ int main(int argc, const char* argv[]) {
   TestUtils::RunTest("TestSegmentation", TestSegmentation);
   TestUtils::RunTest("TestConversion", TestConversion);
   TestUtils::RunTest("TestConversionChain", TestConversionChain);
-  TestUtils::RunTest("TestConfig", TestConfig);
+  TestUtils::RunTest("TestConfigConverter", TestConfigConverter);
   TestUtils::RunTest("TestMultithreading", TestMultithreading);
   TestUtils::RunTest("TestCInterface", TestCInterface);
 }

@@ -27,3 +27,9 @@ string Converter::Convert(const string& text) const {
   const SegmentsPtr& converted = conversionChain->Convert(segments);
   return converted->ToString();
 }
+
+size_t Converter::Convert(const char* input, char* output) const {
+  const string& converted = Convert(input);
+  strcpy(output, converted.c_str());
+  return converted.length();
+}

@@ -34,6 +34,8 @@ public:
 
   virtual const char* Key() const = 0;
 
+  virtual vector<const char*> Values() const = 0;
+
   virtual const char* GetDefault() const = 0;
 
   virtual size_t NumValues() const = 0;
@@ -69,6 +71,10 @@ public:
     return key.c_str();
   }
 
+  virtual vector<const char*> Values() const {
+    return vector<const char*>();
+  }
+
   virtual const char* GetDefault() const {
     return Key();
   }
@@ -88,6 +94,10 @@ private:
 class OPENCC_EXPORT SingleValueDictEntry : public DictEntry {
 public:
   virtual const char* Value() const = 0;
+
+  virtual vector<const char*> Values() const {
+    return vector<const char*>{Value()};
+  }
 
   virtual const char* GetDefault() const {
     return Value();
@@ -126,8 +136,6 @@ private:
 
 class OPENCC_EXPORT MultiValueDictEntry : public DictEntry {
 public:
-  virtual vector<const char*> Values() const = 0;
-
   virtual const char* GetDefault() const {
     if (NumValues() > 0) {
       return Values().at(0);

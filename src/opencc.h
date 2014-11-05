@@ -38,7 +38,7 @@ extern "C" {
 *
 * @ingroup opencc_c_api
 */
-#define OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD "st2.json"
+#define OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD "s2t.json"
 
 /**
 * Filename of default Traditional to Simplified configuration

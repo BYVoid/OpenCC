@@ -27,6 +27,10 @@
 extern "C" {
 #endif
 
+#ifndef OPENCC_EXPORT
+#define OPENCC_EXPORT
+#endif
+
 /**
 * @defgroup opencc_c_api OpenCC C API
 *

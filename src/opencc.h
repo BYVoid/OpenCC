@@ -25,6 +25,8 @@
 #include "Export.hpp"
 
 extern "C" {
+#else
+#include <stddef.h>
 #endif
 
 #ifndef OPENCC_EXPORT
@@ -136,7 +138,6 @@ OPENCC_EXPORT const char* opencc_error(void);
 
 #ifdef __cplusplus
 }
-#endif
 
 /**
 * @defgroup opencc_simple_api OpenCC C++ Simple API
@@ -202,6 +203,7 @@ private:
   const void* internalData;
 };
 }
+#endif
 
 /**
 * @defgroup opencc_cpp_api OpenCC C++ Comprehensive API

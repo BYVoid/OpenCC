@@ -63,3 +63,6 @@ clean:
 
 install: build
 	make -C build/rel install
+
+dist: release
+	make -C build/rel package_source

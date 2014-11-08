@@ -130,3 +130,4 @@ All these libraries are statically linked.
 * [stony](https://github.com/stony-shixz)
 * [steelywing](https://github.com/steelywing)
 * [吕旭东](https://github.com/lvxudong)
+* [Weng Xuetian](https://github.com/wengxt)

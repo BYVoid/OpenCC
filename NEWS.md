@@ -1,5 +1,13 @@
 # Change History of OpenCC
 
+## Version 1.0.2
+
+2014年11月8日
+
+* 修正C語言接口的編譯錯誤問題
+* 修正默認簡繁轉換文件名錯誤問題
+* `DictEntry`增加`Values()`方法
+
 ## Version 1.0.1
 
 2014年10月18日

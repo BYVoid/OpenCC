@@ -20,6 +20,7 @@ set(
   Segmentation.hpp
   Segments.hpp
   SerializableDict.hpp
+  SimpleConverter.hpp
   TextDict.hpp
   UTF8Util.hpp
   opencc.h

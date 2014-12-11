@@ -16,3 +16,4 @@ CMakeLists.txt
 /test/dict.ocd
 /test/dict.txt
 /test/dict.bin
+/node_modules

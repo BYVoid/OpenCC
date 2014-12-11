@@ -20,7 +20,8 @@
     "include_dirs": [
       "../src",
       "../deps/darts-clone",
-      "../deps/rapidjson-0.11"
+      "../deps/rapidjson-0.11",
+      "<!(node -e \"require('nan')\")"
     ]
   }]
 }

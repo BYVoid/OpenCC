@@ -25,5 +25,8 @@
   ],
   "devDependencies": {
     "mocha": "1.8.1"
+  },
+  "dependencies": {
+    "nan": "^1.4.1"
   }
 }

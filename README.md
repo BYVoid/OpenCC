@@ -131,3 +131,4 @@ All these libraries are statically linked.
 * [steelywing](https://github.com/steelywing)
 * [吕旭东](https://github.com/lvxudong)
 * [Weng Xuetian](https://github.com/wengxt)
+* [Ma Tao](https://github.com/iwater)

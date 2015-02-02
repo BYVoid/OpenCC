@@ -60,7 +60,7 @@ https://bintray.com/byvoid/opencc/OpenCC
 
 ## Build 編譯
 
-[![Build Status](https://travis-ci.org/BYVoid/OpenCC.png?branch=master)](https://travis-ci.org/BYVoid/OpenCC)
+[![Build Status](https://travis-ci.org/BYVoid/OpenCC.svg?branch=master)](https://travis-ci.org/BYVoid/OpenCC)
 
 ### Build with CMake
 

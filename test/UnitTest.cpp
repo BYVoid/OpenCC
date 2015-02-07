@@ -50,7 +50,8 @@ void TestBinaryDict() {
   binDict->opencc::SerializableDict::SerializeToFile(fileName);
 
   // Deserialization
-  BinaryDictPtr deserialized = SerializableDict::NewFromFile<BinaryDict>(fileName);
+  BinaryDictPtr deserialized =
+      SerializableDict::NewFromFile<BinaryDict>(fileName);
   const LexiconPtr& lex1 = binDict->GetLexicon();
   const LexiconPtr& lex2 = deserialized->GetLexicon();
 
@@ -74,7 +75,8 @@ void TestDartsDict() {
   dartsDict->opencc::SerializableDict::SerializeToFile(fileName);
 
   // Deserialization
-  DartsDictPtr deserialized = SerializableDict::NewFromFile<DartsDict>(fileName);
+  DartsDictPtr deserialized =
+      SerializableDict::NewFromFile<DartsDict>(fileName);
   DictTestUtils::TestDict(deserialized);
 }
 
@@ -90,10 +92,9 @@ void TestDictGroup() {
     AssertEquals(utf8("幹"), matches.at(1)->GetDefault());
   }
   {
-    DictGroupPtr dictGroup(new DictGroup(list<DictPtr>{
-        DictTestUtils::CreateDictForPhrases(),
-        DictTestUtils::CreateTaiwanPhraseDict()
-    }));
+    DictGroupPtr dictGroup(
+        new DictGroup(list<DictPtr>{DictTestUtils::CreateDictForPhrases(),
+                                    DictTestUtils::CreateTaiwanPhraseDict()}));
     {
       const auto& entry = dictGroup->Dict::MatchPrefix(utf8("鼠标"));
       AssertEquals(utf8("鼠標"), entry.Get()->GetDefault());
@@ -147,8 +148,8 @@ void TestConversionChain() {
   conversions.push_back(conversion);
   conversions.push_back(conversionVariants);
   auto conversionChain = ConversionChainPtr(new ConversionChain(conversions));
-  auto converted = conversionChain->Convert(
-      SegmentsPtr(new Segments{utf8("里面")}));
+  auto converted =
+      conversionChain->Convert(SegmentsPtr(new Segments{utf8("里面")}));
   SegmentsAssertEquals(SegmentsPtr(new Segments{utf8("裡面")}), converted);
 }
 
@@ -181,9 +182,10 @@ void TestConfigConverter() {
 
 void TestMultithreading() {
   auto routine = [](std::string name) {
-      SimpleConverter converter(name);
-      string converted = converter.Convert(utf8("燕燕于飞差池其羽之子于归远送于野"));
-      AssertEquals(utf8("燕燕于飛差池其羽之子于歸遠送於野"), converted);
+    SimpleConverter converter(name);
+    string converted =
+        converter.Convert(utf8("燕燕于飞差池其羽之子于归远送于野"));
+    AssertEquals(utf8("燕燕于飛差池其羽之子于歸遠送於野"), converted);
   };
   std::thread thread1(routine, CONFIG_TEST_PATH);
   std::thread thread2(routine, CONFIG_TEST_PATH);
@@ -205,8 +207,8 @@ void TestCInterface() {
   {
     char output[1024];
     opencc_t od = opencc_open(CONFIG_TEST_PATH.c_str());
-    size_t length = opencc_convert_utf8_to_buffer(od, text.c_str(), (size_t)-1,
-                                                  output);
+    size_t length =
+        opencc_convert_utf8_to_buffer(od, text.c_str(), (size_t)-1, output);
     AssertEquals(expected.length(), length);
     AssertEquals(expected, output);
     AssertEquals(0, opencc_close(od));

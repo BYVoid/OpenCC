@@ -33,8 +33,8 @@ void BinaryDict::SerializeToFile(FILE* fp) const {
   string keyBuffer, valueBuffer;
   vector<size_t> keyOffsets, valueOffsets;
   size_t keyTotalLength = 0, valueTotalLength = 0;
-  ConstructBuffer(keyBuffer, keyOffsets, keyTotalLength,
-                  valueBuffer, valueOffsets, valueTotalLength);
+  ConstructBuffer(keyBuffer, keyOffsets, keyTotalLength, valueBuffer,
+                  valueOffsets, valueTotalLength);
   // Number of items
   size_t numItems = lexicon->Length();
   fwrite(&numItems, sizeof(size_t), 1, fp);
@@ -79,8 +79,8 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
     throw InvalidFormat("Invalid OpenCC binary dictionary (keyTotalLength)");
   }
   dict->keyBuffer.resize(keyTotalLength);
-  unitsRead = fread(const_cast<char*>(dict->keyBuffer.c_str()),
-                    sizeof(char), keyTotalLength, fp);
+  unitsRead = fread(const_cast<char*>(dict->keyBuffer.c_str()), sizeof(char),
+                    keyTotalLength, fp);
   if (unitsRead != keyTotalLength) {
     throw InvalidFormat("Invalid OpenCC binary dictionary (keyBuffer)");
   }
@@ -92,8 +92,8 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
     throw InvalidFormat("Invalid OpenCC binary dictionary (valueTotalLength)");
   }
   dict->valueBuffer.resize(valueTotalLength);
-  unitsRead = fread(const_cast<char*>(dict->valueBuffer.c_str()),
-                    sizeof(char), valueTotalLength, fp);
+  unitsRead = fread(const_cast<char*>(dict->valueBuffer.c_str()), sizeof(char),
+                    valueTotalLength, fp);
   if (unitsRead != valueTotalLength) {
     throw InvalidFormat("Invalid OpenCC binary dictionary (valueBuffer)");
   }
@@ -131,10 +131,8 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
   return dict;
 }
 
-void BinaryDict::ConstructBuffer(string& keyBuffer,
-                                 vector<size_t>& keyOffset,
-                                 size_t& keyTotalLength,
-                                 string& valueBuffer,
+void BinaryDict::ConstructBuffer(string& keyBuffer, vector<size_t>& keyOffset,
+                                 size_t& keyTotalLength, string& valueBuffer,
                                  vector<size_t>& valueOffset,
                                  size_t& valueTotalLength) const {
   keyTotalLength = 0;

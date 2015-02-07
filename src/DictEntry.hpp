@@ -29,8 +29,7 @@ namespace opencc {
 */
 class OPENCC_EXPORT DictEntry {
 public:
-  virtual ~DictEntry() {
-  }
+  virtual ~DictEntry() {}
 
   virtual const char* Key() const = 0;
 
@@ -42,9 +41,7 @@ public:
 
   virtual string ToString() const = 0;
 
-  size_t KeyLength() const {
-    return strlen(Key());
-  }
+  size_t KeyLength() const { return strlen(Key()); }
 
   bool operator<(const DictEntry& that) const {
     return strcmp(Key(), that.Key()) < 0;
@@ -61,31 +58,19 @@ public:
 
 class OPENCC_EXPORT NoValueDictEntry : public DictEntry {
 public:
-  NoValueDictEntry(const string& _key) : key(_key) {
-  }
+  NoValueDictEntry(const string& _key) : key(_key) {}
 
-  virtual ~NoValueDictEntry() {
-  }
+  virtual ~NoValueDictEntry() {}
 
-  virtual const char* Key() const {
-    return key.c_str();
-  }
+  virtual const char* Key() const { return key.c_str(); }
 
-  virtual vector<const char*> Values() const {
-    return vector<const char*>();
-  }
+  virtual vector<const char*> Values() const { return vector<const char*>(); }
 
-  virtual const char* GetDefault() const {
-    return Key();
-  }
+  virtual const char* GetDefault() const { return Key(); }
 
-  virtual size_t NumValues() const {
-    return 0;
-  }
+  virtual size_t NumValues() const { return 0; }
 
-  virtual string ToString() const {
-    return key;
-  }
+  virtual string ToString() const { return key; }
 
 private:
   string key;
@@ -99,35 +84,23 @@ public:
     return vector<const char*>{Value()};
   }
 
-  virtual const char* GetDefault() const {
-    return Value();
-  }
+  virtual const char* GetDefault() const { return Value(); }
 
-  virtual size_t NumValues() const {
-    return 1;
-  }
+  virtual size_t NumValues() const { return 1; }
 
-  virtual string ToString() const {
-    return string(Key()) + "\t" + Value();
-  }
+  virtual string ToString() const { return string(Key()) + "\t" + Value(); }
 };
 
 class OPENCC_EXPORT StrSingleValueDictEntry : public SingleValueDictEntry {
 public:
   StrSingleValueDictEntry(const string& _key, const string& _value)
-      : key(_key), value(_value) {
-  }
+      : key(_key), value(_value) {}
 
-  virtual ~StrSingleValueDictEntry() {
-  }
+  virtual ~StrSingleValueDictEntry() {}
 
-  virtual const char* Key() const {
-    return key.c_str();
-  }
+  virtual const char* Key() const { return key.c_str(); }
 
-  virtual const char* Value() const {
-    return value.c_str();
-  }
+  virtual const char* Value() const { return value.c_str(); }
 
 private:
   string key;
@@ -150,8 +123,7 @@ public:
 class OPENCC_EXPORT StrMultiValueDictEntry : public MultiValueDictEntry {
 public:
   StrMultiValueDictEntry(const string& _key, const vector<string>& _values)
-      : key(_key), values(_values) {
-  }
+      : key(_key), values(_values) {}
 
   StrMultiValueDictEntry(const string& _key, const vector<const char*>& _values)
       : key(_key) {
@@ -161,16 +133,11 @@ public:
     }
   }
 
-  virtual ~StrMultiValueDictEntry() {
-  }
+  virtual ~StrMultiValueDictEntry() {}
 
-  virtual const char* Key() const {
-    return key.c_str();
-  }
+  virtual const char* Key() const { return key.c_str(); }
 
-  size_t NumValues() const {
-    return values.size();
-  }
+  size_t NumValues() const { return values.size(); }
 
   vector<const char*> Values() const {
     vector<const char*> values;
@@ -188,23 +155,15 @@ private:
 class OPENCC_EXPORT PtrDictEntry : public MultiValueDictEntry {
 public:
   PtrDictEntry(const char* _key, const vector<const char*>& _values)
-      : key(_key), values(_values) {
-  }
+      : key(_key), values(_values) {}
 
-  virtual ~PtrDictEntry() {
-  }
+  virtual ~PtrDictEntry() {}
 
-  virtual const char* Key() const {
-    return key;
-  }
+  virtual const char* Key() const { return key; }
 
-  size_t NumValues() const {
-    return values.size();
-  }
+  size_t NumValues() const { return values.size(); }
 
-  vector<const char*> Values() const {
-    return values;
-  }
+  vector<const char*> Values() const { return values; }
 
 private:
   const char* key;
@@ -213,9 +172,7 @@ private:
 
 class OPENCC_EXPORT DictEntryFactory {
 public:
-  static DictEntry* New(const string& key) {
-    return new NoValueDictEntry(key);
-  }
+  static DictEntry* New(const string& key) { return new NoValueDictEntry(key); }
 
   static DictEntry* New(const string& key, const string& value) {
     return new StrSingleValueDictEntry(key, value);
@@ -237,5 +194,4 @@ public:
     }
   }
 };
-
 }

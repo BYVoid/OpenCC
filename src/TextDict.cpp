@@ -42,7 +42,7 @@ static DictEntry* ParseKeyValues(const char* buff, size_t lineNum) {
   while (!UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
     buff = pbuff = UTF8Util::NextChar(pbuff);
     pbuff = UTF8Util::FindNextInline(buff, ' ');
-	length = static_cast<size_t>(pbuff - buff);
+    length = static_cast<size_t>(pbuff - buff);
     const string& value = UTF8Util::FromSubstr(buff, length);
     values.push_back(value);
   }
@@ -69,11 +69,9 @@ static LexiconPtr ParseLexiconFromFile(FILE* fp) {
 }
 
 TextDict::TextDict(const LexiconPtr& _lexicon)
-    : maxLength(GetKeyMaxLength(_lexicon)), lexicon(_lexicon) {
-}
+    : maxLength(GetKeyMaxLength(_lexicon)), lexicon(_lexicon) {}
 
-TextDict::~TextDict() {
-}
+TextDict::~TextDict() {}
 
 TextDictPtr TextDict::NewFromSortedFile(FILE* fp) {
   const LexiconPtr& lexicon = ParseLexiconFromFile(fp);
@@ -90,24 +88,21 @@ TextDictPtr TextDict::NewFromDict(const Dict& dict) {
   return TextDictPtr(new TextDict(dict.GetLexicon()));
 }
 
-size_t TextDict::KeyMaxLength() const {
-  return maxLength;
-}
+size_t TextDict::KeyMaxLength() const { return maxLength; }
 
 Optional<const DictEntry*> TextDict::Match(const char* word) const {
   NoValueDictEntry entry(word);
-  const auto& found = std::lower_bound(lexicon->begin(), lexicon->end(),
-                                       &entry, DictEntry::PtrLessThan);
-  if ((found != lexicon->end()) && (strcmp((*found)->Key(), entry.Key()) == 0)) {
+  const auto& found = std::lower_bound(lexicon->begin(), lexicon->end(), &entry,
+                                       DictEntry::PtrLessThan);
+  if ((found != lexicon->end()) &&
+      (strcmp((*found)->Key(), entry.Key()) == 0)) {
     return Optional<const DictEntry*>(*found);
   } else {
     return Optional<const DictEntry*>::Null();
   }
 }
 
-LexiconPtr TextDict::GetLexicon() const {
-  return lexicon;
-}
+LexiconPtr TextDict::GetLexicon() const { return lexicon; }
 
 void TextDict::SerializeToFile(FILE* fp) const {
   for (const auto& entry : *lexicon) {

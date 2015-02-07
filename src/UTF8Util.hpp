@@ -53,7 +53,7 @@ public:
     }
     return 0;
   }
-  
+
   /**
    * Returns the length in byte for the next UTF8 character.
    */

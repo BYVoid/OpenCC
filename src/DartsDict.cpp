@@ -31,8 +31,7 @@ public:
   void* buffer;
   Darts::DoubleArray* doubleArray;
 
-  DartsInternal() : binary(nullptr), buffer(nullptr), doubleArray(nullptr) {
-  }
+  DartsInternal() : binary(nullptr), buffer(nullptr), doubleArray(nullptr) {}
 
   ~DartsInternal() {
     if (buffer != nullptr) {
@@ -44,17 +43,11 @@ public:
   }
 };
 
-DartsDict::DartsDict() {
-  internal = new DartsInternal;
-}
+DartsDict::DartsDict() { internal = new DartsInternal; }
 
-DartsDict::~DartsDict() {
-  delete internal;
-}
+DartsDict::~DartsDict() { delete internal; }
 
-size_t DartsDict::KeyMaxLength() const {
-  return maxLength;
-}
+size_t DartsDict::KeyMaxLength() const { return maxLength; }
 
 Optional<const DictEntry*> DartsDict::Match(const char* word) const {
   Darts::DoubleArray& dict = *internal->doubleArray;
@@ -74,7 +67,8 @@ Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word) const {
   Darts::DoubleArray& dict = *internal->doubleArray;
   Darts::DoubleArray::value_type results[DEFAULT_NUM_ENTRIES];
   Darts::DoubleArray::value_type maxMatchedResult;
-  size_t numMatched = dict.commonPrefixSearch(word, results, DEFAULT_NUM_ENTRIES);
+  size_t numMatched =
+      dict.commonPrefixSearch(word, results, DEFAULT_NUM_ENTRIES);
   if (numMatched == 0) {
     return Optional<const DictEntry*>::Null();
   } else if ((numMatched > 0) && (numMatched < DEFAULT_NUM_ENTRIES)) {
@@ -94,9 +88,7 @@ Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word) const {
   }
 }
 
-LexiconPtr DartsDict::GetLexicon() const {
-  return lexicon;
-}
+LexiconPtr DartsDict::GetLexicon() const { return lexicon; }
 
 DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
   DartsDictPtr dict(new DartsDict());

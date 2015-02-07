@@ -25,10 +25,10 @@ SegmentsPtr MaxMatchSegmentation::Segment(const string& text) const {
   const char* segStart = text.c_str();
   size_t segLength = 0;
   auto clearBuffer = [&segments, &segStart, &segLength]() {
-      if (segLength > 0) {
-        segments->AddSegment(UTF8Util::FromSubstr(segStart, segLength));
-        segLength = 0;
-      }
+    if (segLength > 0) {
+      segments->AddSegment(UTF8Util::FromSubstr(segStart, segLength));
+      segLength = 0;
+    }
   };
   for (const char* pstr = text.c_str(); *pstr != '\0';) {
     const Optional<const DictEntry*>& matched = dict->MatchPrefix(pstr);

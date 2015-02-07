@@ -36,7 +36,9 @@ namespace opencc {
 class ConfigInternal {
 public:
   string configDirectory;
-  std::unordered_map<string, std::unordered_map<string, std::unordered_map<string, DictPtr>>> dictCache;
+  std::unordered_map<
+      string, std::unordered_map<string, std::unordered_map<string, DictPtr>>>
+      dictCache;
 
   const JSONValue& GetProperty(const JSONValue& doc, const char* name) {
     if (!doc.HasMember(name)) {
@@ -69,23 +71,21 @@ public:
     return obj.GetString();
   }
 
-  template<typename DICT>
-  DictPtr LoadDictWithPaths(const string& fileName) {
+  template <typename DICT> DictPtr LoadDictWithPaths(const string& fileName) {
     // Working directory
     std::shared_ptr<DICT> dict;
     if (SerializableDict::TryLoadFromFile<DICT>(fileName, &dict)) {
       return dict;
     }
     // Configuration directory
-    if ((configDirectory != "") &&
-        SerializableDict::TryLoadFromFile<DICT>(configDirectory + fileName,
-                                                &dict)) {
+    if ((configDirectory != "") && SerializableDict::TryLoadFromFile<DICT>(
+                                       configDirectory + fileName, &dict)) {
       return dict;
     }
     // Package data directory
     if ((PACKAGE_DATA_DIRECTORY != "") &&
-        SerializableDict::TryLoadFromFile<DICT>(PACKAGE_DATA_DIRECTORY + fileName,
-                                                &dict)) {
+        SerializableDict::TryLoadFromFile<DICT>(
+            PACKAGE_DATA_DIRECTORY + fileName, &dict)) {
       return dict;
     }
     throw FileNotFound(fileName);
@@ -157,7 +157,8 @@ public:
       if (doc.IsObject()) {
         ConversionPtr conversion = ParseConversion(doc);
         conversions.push_back(conversion);
-      } else {}
+      } else {
+      }
     }
     ConversionChainPtr chain(new ConversionChain(conversions));
     return chain;
@@ -184,12 +185,9 @@ public:
 };
 };
 
-Config::Config() : internal(new ConfigInternal()) {
-}
+Config::Config() : internal(new ConfigInternal()) {}
 
-Config::~Config() {
-  delete (ConfigInternal*)internal;
-}
+Config::~Config() { delete (ConfigInternal*)internal; }
 
 ConverterPtr Config::NewFromFile(const string& fileName) {
   ConfigInternal* impl = (ConfigInternal*)internal;
@@ -209,7 +207,8 @@ ConverterPtr Config::NewFromFile(const string& fileName) {
   return NewFromString(content, configDirectory);
 }
 
-ConverterPtr Config::NewFromString(const string& json, const string& configDirectory) {
+ConverterPtr Config::NewFromString(const string& json,
+                                   const string& configDirectory) {
   rapidjson::Document doc;
 
   doc.ParseInsitu<0>(const_cast<char*>(json.c_str()));
@@ -230,8 +229,8 @@ ConverterPtr Config::NewFromString(const string& json, const string& configDirec
   impl->configDirectory = configDirectory;
 
   // Required: segmentation
-  SegmentationPtr segmentation = impl->ParseSegmentation(
-      impl->GetObjectProperty(doc, "segmentation"));
+  SegmentationPtr segmentation =
+      impl->ParseSegmentation(impl->GetObjectProperty(doc, "segmentation"));
 
   // Required: conversion_chain
   ConversionChainPtr chain = impl->ParseConversionChain(

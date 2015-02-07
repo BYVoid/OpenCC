@@ -22,16 +22,12 @@
 
 using namespace opencc;
 
-DictGroup::DictGroup(const list<DictPtr>& _dicts) :
-    keyMaxLength(0), dicts(_dicts) {
-}
+DictGroup::DictGroup(const list<DictPtr>& _dicts)
+    : keyMaxLength(0), dicts(_dicts) {}
 
-DictGroup::~DictGroup() {
-}
+DictGroup::~DictGroup() {}
 
-size_t DictGroup::KeyMaxLength() const {
-  return keyMaxLength;
-}
+size_t DictGroup::KeyMaxLength() const { return keyMaxLength; }
 
 Optional<const DictEntry*> DictGroup::Match(const char* word) const {
   for (const auto& dict : dicts) {

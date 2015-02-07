@@ -87,5 +87,5 @@ const string PACKAGE_DATA_DIRECTORY = PKGDATADIR "/";
 #endif // ifndef PKGDATADIR
 
 #ifndef VERSION
-# define VERSION "1.0.*"
+#define VERSION "1.0.*"
 #endif // ifndef VERSION

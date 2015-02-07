@@ -26,8 +26,7 @@ using namespace opencc;
 struct InternalData {
   const ConverterPtr converter;
 
-  InternalData(const ConverterPtr& _converter) : converter(_converter) {
-  }
+  InternalData(const ConverterPtr& _converter) : converter(_converter) {}
 };
 
 SimpleConverter::SimpleConverter(const std::string& configFileName) {
@@ -39,9 +38,7 @@ SimpleConverter::SimpleConverter(const std::string& configFileName) {
   }
 }
 
-SimpleConverter::~SimpleConverter() {
-  delete (InternalData*)internalData;
-}
+SimpleConverter::~SimpleConverter() { delete (InternalData*)internalData; }
 
 std::string SimpleConverter::Convert(const std::string& input) const {
   try {
@@ -73,8 +70,7 @@ size_t SimpleConverter::Convert(const char* input, char* output) const {
   }
 }
 
-size_t SimpleConverter::Convert(const char* input,
-                                size_t length,
+size_t SimpleConverter::Convert(const char* input, size_t length,
                                 char* output) const {
   if (length == static_cast<size_t>(-1)) {
     return Convert(input, output);
@@ -110,10 +106,8 @@ int opencc_close(opencc_t opencc) {
   }
 }
 
-size_t opencc_convert_utf8_to_buffer(opencc_t opencc,
-                                     const char* input,
-                                     size_t length,
-                                     char* output) {
+size_t opencc_convert_utf8_to_buffer(opencc_t opencc, const char* input,
+                                     size_t length, char* output) {
   try {
     SimpleConverter* instance = reinterpret_cast<SimpleConverter*>(opencc);
     return instance->Convert(input, length, output);
@@ -137,10 +131,6 @@ char* opencc_convert_utf8(opencc_t opencc, const char* input, size_t length) {
   }
 }
 
-void opencc_convert_utf8_free(char* str) {
-  delete[] str;
-}
+void opencc_convert_utf8_free(char* str) { delete[] str; }
 
-const char* opencc_error(void) {
-  return cError.c_str();
-}
+const char* opencc_error(void) { return cError.c_str(); }

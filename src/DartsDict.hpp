@@ -56,5 +56,4 @@ private:
   class DartsInternal;
   DartsInternal* internal;
 };
-
 }

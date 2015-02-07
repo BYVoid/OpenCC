@@ -22,8 +22,7 @@
 using namespace opencc;
 
 ConversionChain::ConversionChain(const list<ConversionPtr> _conversions)
-    : conversions(_conversions) {
-}
+    : conversions(_conversions) {}
 
 SegmentsPtr ConversionChain::Convert(const SegmentsPtr& input) const {
   SegmentsPtr output = input;

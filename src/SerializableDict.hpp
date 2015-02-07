@@ -44,7 +44,7 @@ public:
     fclose(fp);
   }
 
-  template<typename DICT>
+  template <typename DICT>
   static bool TryLoadFromFile(const string& fileName,
                               std::shared_ptr<DICT>* dict) {
     FILE* fp = fopen(fileName.c_str(), "rb");
@@ -57,7 +57,7 @@ public:
     return true;
   }
 
-  template<typename DICT>
+  template <typename DICT>
   static std::shared_ptr<DICT> NewFromFile(const string& fileName) {
     std::shared_ptr<DICT> dict;
     if (!TryLoadFromFile<DICT>(fileName, &dict)) {

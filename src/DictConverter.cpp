@@ -22,8 +22,7 @@
 
 using namespace opencc;
 
-DictPtr LoadDictionary(const string& format,
-                       const string& inputFileName) {
+DictPtr LoadDictionary(const string& format, const string& inputFileName) {
   if (format == "text") {
     return SerializableDict::NewFromFile<TextDict>(inputFileName);
   } else if (format == "ocd") {
@@ -48,10 +47,8 @@ SerializableDictPtr ConvertDictionary(const string& format,
   return nullptr;
 }
 
-void ConvertDictionary(const string inputFileName,
-                       const string outputFileName,
-                       const string formatFrom,
-                       const string formatTo) {
+void ConvertDictionary(const string inputFileName, const string outputFileName,
+                       const string formatFrom, const string formatTo) {
   DictPtr dictFrom = LoadDictionary(formatFrom, inputFileName);
   SerializableDictPtr dictTo = ConvertDictionary(formatTo, dictFrom);
   dictTo->SerializeToFile(outputFileName);
@@ -59,8 +56,7 @@ void ConvertDictionary(const string inputFileName,
 
 int main(int argc, const char* argv[]) {
   try {
-    TCLAP::CmdLine cmd("Open Chinese Convert (OpenCC) Dictionary Tool",
-                       ' ',
+    TCLAP::CmdLine cmd("Open Chinese Convert (OpenCC) Dictionary Tool", ' ',
                        VERSION);
     CmdLineOutput cmdLineOutput;
     cmd.setOutput(&cmdLineOutput);
@@ -68,36 +64,24 @@ int main(int argc, const char* argv[]) {
     vector<string> dictFormats{"text", "ocd"};
     TCLAP::ValuesConstraint<string> allowedVals(dictFormats);
 
-    TCLAP::ValueArg<string> toArg("t", "to",
-                                  "Output format",
-                                  true /* required */,
-                                  "" /* default */,
-                                  &allowedVals /* type */,
-                                  cmd);
-    TCLAP::ValueArg<string> fromArg("f", "from",
-                                    "Input format",
-                                    true /* required */,
-                                    "" /* default */,
-                                    &allowedVals /* type */,
-                                    cmd);
-    TCLAP::ValueArg<string> outputArg("o", "output",
-                                      "Path to output dictionary",
-                                      true /* required */,
-                                      "" /* default */,
-                                      "file" /* type */,
-                                      cmd);
-    TCLAP::ValueArg<string> inputArg("i", "input",
-                                     "Path to input dictionary",
-                                     true /* required */,
-                                     "" /* default */,
-                                     "file" /* type */,
-                                     cmd);
+    TCLAP::ValueArg<string> toArg("t", "to", "Output format",
+                                  true /* required */, "" /* default */,
+                                  &allowedVals /* type */, cmd);
+    TCLAP::ValueArg<string> fromArg("f", "from", "Input format",
+                                    true /* required */, "" /* default */,
+                                    &allowedVals /* type */, cmd);
+    TCLAP::ValueArg<string> outputArg(
+        "o", "output", "Path to output dictionary", true /* required */,
+        "" /* default */, "file" /* type */, cmd);
+    TCLAP::ValueArg<string> inputArg("i", "input", "Path to input dictionary",
+                                     true /* required */, "" /* default */,
+                                     "file" /* type */, cmd);
     cmd.parse(argc, argv);
     ConvertDictionary(inputArg.getValue(), outputArg.getValue(),
                       fromArg.getValue(), toArg.getValue());
   } catch (TCLAP::ArgException& e) {
-    std::cerr << "error: " << e.error()
-        << " for arg " << e.argId() << std::endl;
+    std::cerr << "error: " << e.error() << " for arg " << e.argId()
+              << std::endl;
   } catch (Exception& e) {
     std::cerr << e.what() << std::endl;
   }

@@ -28,21 +28,18 @@ namespace opencc {
 */
 class OPENCC_EXPORT Conversion {
 public:
-  Conversion(DictPtr _dict) : dict(_dict) {
-  }
-  
+  Conversion(DictPtr _dict) : dict(_dict) {}
+
   // Convert single phrase
   string Convert(const string& phrase) const;
-  
+
   // Convert single phrase
   string Convert(const char* phrase) const;
 
   // Convert segmented text
   SegmentsPtr Convert(const SegmentsPtr& input) const;
 
-  const DictPtr GetDict() const {
-    return dict;
-  }
+  const DictPtr GetDict() const { return dict; }
 
 private:
   const DictPtr dict;

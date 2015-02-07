@@ -28,20 +28,15 @@ namespace opencc {
 */
 class OPENCC_EXPORT BinaryDict : public SerializableDict {
 public:
-  BinaryDict(const LexiconPtr& _lexicon) :
-      lexicon(_lexicon) {
-  }
+  BinaryDict(const LexiconPtr& _lexicon) : lexicon(_lexicon) {}
 
-  virtual ~BinaryDict() {
-  }
+  virtual ~BinaryDict() {}
 
   virtual void SerializeToFile(FILE* fp) const;
 
   static BinaryDictPtr NewFromFile(FILE* fp);
 
-  const LexiconPtr& GetLexicon() const {
-    return lexicon;
-  }
+  const LexiconPtr& GetLexicon() const { return lexicon; }
 
   size_t KeyMaxLength() const;
 
@@ -50,12 +45,9 @@ private:
   string keyBuffer;
   string valueBuffer;
 
-  void ConstructBuffer(string& keyBuffer,
-                       vector<size_t>& keyOffset,
-                       size_t& keyTotalLength,
-                       string& valueBuffer,
+  void ConstructBuffer(string& keyBuffer, vector<size_t>& keyOffset,
+                       size_t& keyTotalLength, string& valueBuffer,
                        vector<size_t>& valueOffset,
                        size_t& valueTotalLength) const;
 };
-
 }

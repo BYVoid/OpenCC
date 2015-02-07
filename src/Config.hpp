@@ -31,8 +31,7 @@ public:
 
   virtual ~Config();
 
-  ConverterPtr NewFromString(const string& json,
-                             const string& configDirectory);
+  ConverterPtr NewFromString(const string& json, const string& configDirectory);
 
   ConverterPtr NewFromFile(const string& fileName);
 

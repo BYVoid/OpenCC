@@ -33,9 +33,7 @@ public:
 
   SegmentsPtr Convert(const SegmentsPtr& input) const;
 
-  const list<ConversionPtr> GetConversions() const {
-    return conversions;
-  }
+  const list<ConversionPtr> GetConversions() const { return conversions; }
 
 private:
   const list<ConversionPtr> conversions;

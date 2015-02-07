@@ -59,7 +59,7 @@ public:
   * @param length Maximal length in byte of the input string.
   */
   std::string Convert(const char* input, size_t length) const;
-  
+
   /**
   * Converts a text and writes to an allocated buffer
   * Please make sure the buffer has sufficent space.
@@ -68,7 +68,7 @@ public:
   * @return       Length of converted text.
   */
   size_t Convert(const char* input, char* output) const;
-  
+
   /**
   * Converts a text and writes to an allocated buffer
   * Please make sure the buffer has sufficent space.

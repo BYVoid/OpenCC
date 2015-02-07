@@ -27,8 +27,7 @@ namespace opencc {
 */
 class OPENCC_EXPORT Segments {
 public:
-  Segments() {
-  }
+  Segments() {}
 
   Segments(std::initializer_list<const char*> initList) {
     for (const string& item : initList) {
@@ -54,10 +53,8 @@ public:
 
   class iterator : public std::iterator<std::input_iterator_tag, const char*> {
   public:
-    iterator(const Segments* const _segments,
-             size_t _cursor)
-        : segments(_segments), cursor(_cursor) {
-    }
+    iterator(const Segments* const _segments, size_t _cursor)
+        : segments(_segments), cursor(_cursor) {}
 
     iterator& operator++() {
       cursor++;
@@ -72,9 +69,7 @@ public:
       return !this->operator==(that);
     }
 
-    const char* operator*() const {
-      return segments->At(cursor);
-    }
+    const char* operator*() const { return segments->At(cursor); }
 
   private:
     const Segments* const segments;
@@ -90,17 +85,11 @@ public:
     }
   }
 
-  size_t Length() const {
-    return indexes.size();
-  }
+  size_t Length() const { return indexes.size(); }
 
-  iterator begin() const {
-    return iterator(this, 0);
-  }
+  iterator begin() const { return iterator(this, 0); }
 
-  iterator end() const {
-    return iterator(this, indexes.size());
-  }
+  iterator end() const { return iterator(this, indexes.size()); }
 
   string ToString() const {
     // TODO implement a nested structure to reduce concatenation,
@@ -113,8 +102,7 @@ public:
   }
 
 private:
-  Segments(const Segments&) {
-  }
+  Segments(const Segments&) {}
 
   vector<const char*> unmanaged;
   vector<string> managed;

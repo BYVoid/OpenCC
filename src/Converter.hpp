@@ -28,20 +28,16 @@ namespace opencc {
 */
 class OPENCC_EXPORT Converter {
 public:
-  Converter(const string& _name,
-            SegmentationPtr _segmentation,
-            ConversionChainPtr _conversionChain) :
-      name(_name), segmentation(_segmentation),
-      conversionChain(_conversionChain) {
-  }
+  Converter(const string& _name, SegmentationPtr _segmentation,
+            ConversionChainPtr _conversionChain)
+      : name(_name), segmentation(_segmentation),
+        conversionChain(_conversionChain) {}
 
   string Convert(const string& text) const;
-  
+
   size_t Convert(const char* input, char* output) const;
 
-  const SegmentationPtr GetSegmentation() const {
-    return segmentation;
-  }
+  const SegmentationPtr GetSegmentation() const { return segmentation; }
 
   const ConversionChainPtr GetConversionChain() const {
     return conversionChain;

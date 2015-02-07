@@ -122,36 +122,23 @@ void Convert() {
 
 int main(int argc, const char* argv[]) {
   try {
-    TCLAP::CmdLine cmd("Open Chinese Convert (OpenCC) Command Line Tool",
-                       ' ',
+    TCLAP::CmdLine cmd("Open Chinese Convert (OpenCC) Command Line Tool", ' ',
                        VERSION);
     CmdLineOutput cmdLineOutput;
     cmd.setOutput(&cmdLineOutput);
 
-    TCLAP::ValueArg<string> configArg("c", "config",
-                                      "Configuration file",
-                                      false /* required */,
-                                      "s2t.json" /* default */,
-                                      "file" /* type */,
-                                      cmd);
-    TCLAP::ValueArg<string> outputArg("o", "output",
-                                      "Write converted text to",
-                                      false /* required */,
-                                      "" /* default */,
-                                      "file" /* type */,
-                                      cmd);
-    TCLAP::ValueArg<string> inputArg("i", "input",
-                                     "Read original text from",
-                                     false /* required */,
-                                     "" /* default */,
-                                     "file" /* type */,
-                                     cmd);
-    TCLAP::ValueArg<bool> noFlushArg("", "noflush",
-                                     "Disable flush for every line",
-                                     false /* required */,
-                                     false /* default */,
-                                     "bool" /* type */,
-                                     cmd);
+    TCLAP::ValueArg<string> configArg(
+        "c", "config", "Configuration file", false /* required */,
+        "s2t.json" /* default */, "file" /* type */, cmd);
+    TCLAP::ValueArg<string> outputArg("o", "output", "Write converted text to",
+                                      false /* required */, "" /* default */,
+                                      "file" /* type */, cmd);
+    TCLAP::ValueArg<string> inputArg("i", "input", "Read original text from",
+                                     false /* required */, "" /* default */,
+                                     "file" /* type */, cmd);
+    TCLAP::ValueArg<bool> noFlushArg(
+        "", "noflush", "Disable flush for every line", false /* required */,
+        false /* default */, "bool" /* type */, cmd);
     cmd.parse(argc, argv);
     configFileName = configArg.getValue();
     noFlush = noFlushArg.getValue();
@@ -170,8 +157,8 @@ int main(int argc, const char* argv[]) {
       Convert();
     }
   } catch (TCLAP::ArgException& e) {
-    std::cerr << "error: " << e.error()
-        << " for arg " << e.argId() << std::endl;
+    std::cerr << "error: " << e.error() << " for arg " << e.argId()
+              << std::endl;
   } catch (Exception& e) {
     std::cerr << e.what() << std::endl;
   }

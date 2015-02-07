@@ -44,9 +44,7 @@ public:
 
   virtual LexiconPtr GetLexicon() const;
 
-  const list<DictPtr> GetDicts() const {
-    return dicts;
-  }
+  const list<DictPtr> GetDicts() const { return dicts; }
 
 private:
   const size_t keyMaxLength;

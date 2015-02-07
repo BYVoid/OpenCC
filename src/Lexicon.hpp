@@ -28,8 +28,7 @@ namespace opencc {
 */
 class OPENCC_EXPORT Lexicon {
 public:
-  Lexicon() {
-  }
+  Lexicon() {}
 
   ~Lexicon() {
     for (DictEntry* entry : entries) {
@@ -37,29 +36,19 @@ public:
     }
   }
 
-  void Add(DictEntry* entry) {
-    entries.push_back(entry);
-  }
+  void Add(DictEntry* entry) { entries.push_back(entry); }
 
   void Sort() {
     std::sort(entries.begin(), entries.end(), DictEntry::PtrLessThan);
   }
 
-  const DictEntry* At(size_t index) const {
-    return entries.at(index);
-  }
+  const DictEntry* At(size_t index) const { return entries.at(index); }
 
-  size_t Length() const {
-    return entries.size();
-  }
+  size_t Length() const { return entries.size(); }
 
-  vector<DictEntry*>::const_iterator begin() const {
-    return entries.begin();
-  }
+  vector<DictEntry*>::const_iterator begin() const { return entries.begin(); }
 
-  vector<DictEntry*>::const_iterator end() const {
-    return entries.end();
-  }
+  vector<DictEntry*>::const_iterator end() const { return entries.end(); }
 
 private:
   vector<DictEntry*> entries;

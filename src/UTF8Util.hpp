@@ -94,6 +94,18 @@ public:
   }
 
   /**
+   * Returns the UTF8 length of a valid UTF8 string.
+   */
+  static size_t Length(const char* str) {
+    size_t length = 0;
+    while (*str != '\0') {
+      str = NextChar(str);
+      length++;
+    }
+    return length;
+  }
+
+  /**
   * Finds a character in the same line.
   * @param str The text to be searched in.
   * @param ch  The character to find.

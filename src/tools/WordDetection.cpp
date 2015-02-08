@@ -25,7 +25,8 @@ namespace tools {
 namespace {
 
 template <typename VAL_TYPE>
-VAL_TYPE Lookup(const std::map<UTF8StringSlice, VAL_TYPE>& dict,
+VAL_TYPE Lookup(const std::unordered_map<UTF8StringSlice, VAL_TYPE,
+                                         UTF8StringSliceHasher>& dict,
                 const UTF8StringSlice& wordCandidate) {
   const auto& iterator = dict.find(wordCandidate);
   if (iterator != dict.end()) {
@@ -51,6 +52,10 @@ bool ContainsPunctuation(const UTF8StringSlice& word) {
 bool NoFilter(const UTF8StringSlice&) { return false; }
 
 } // namespace
+
+size_t UTF8StringSliceHasher::operator()(const UTF8StringSlice& text) const {
+  return std::hash<string>()(text.ToString());
+}
 
 WordDetection::WordDetection(const size_t _wordMaxLength)
     : wordMaxLength(_wordMaxLength), prefixSetLength(1), suffixSetLength(1),
@@ -121,7 +126,8 @@ void WordDetection::ExtractWordCandidates() {
 
 void WordDetection::CalculateSuffixEntropy() {
   for (size_t length = 1; length <= wordMaxLength; length++) {
-    std::map<UTF8StringSlice, size_t> suffixSet;
+    std::unordered_map<UTF8StringSlice, size_t, UTF8StringSliceHasher>
+        suffixSet;
     UTF8StringSlice lastWord("");
     const auto& updateEntropy = [this, &suffixSet, &lastWord]() {
       if (lastWord.UTF8Length() > 0) {
@@ -149,7 +155,8 @@ void WordDetection::CalculateSuffixEntropy() {
 
 void WordDetection::CalculatePrefixEntropy() {
   for (size_t length = 1; length <= wordMaxLength; length++) {
-    std::map<UTF8StringSlice, size_t> prefixSet;
+    std::unordered_map<UTF8StringSlice, size_t, UTF8StringSliceHasher>
+        prefixSet;
     UTF8StringSlice lastWord("");
     const auto& updateEntropy = [this, &prefixSet, &lastWord]() {
       if (lastWord.UTF8Length() > 0) {
@@ -233,8 +240,8 @@ WordDetection::CalculateCohesion(const UTF8StringSlice& wordCandidate) const {
   return minPMI;
 }
 
-double WordDetection::CalculateEntropy(
-    const std::map<UTF8StringSlice, size_t>& choices) const {
+double WordDetection::CalculateEntropy(const std::unordered_map<
+    UTF8StringSlice, size_t, UTF8StringSliceHasher>& choices) const {
   double totalChoices = 0;
   for (const auto& item : choices) {
     totalChoices += item.second;
@@ -267,7 +274,7 @@ using opencc::tools::WordDetection;
 using opencc::tools::ContainsPunctuation;
 
 int main(int argc, const char* argv[]) {
-  std::ifstream ifs("a.txt");
+  std::ifstream ifs("/Users/byvoid/a.txt");
   const string content((std::istreambuf_iterator<char>(ifs)),
                        (std::istreambuf_iterator<char>()));
   WordDetection wordDetection(4);

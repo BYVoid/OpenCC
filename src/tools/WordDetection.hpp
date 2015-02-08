@@ -18,11 +18,18 @@
 
 #pragma once
 
+#include <unordered_map>
+
 #include "Common.hpp"
 #include "UTF8StringSlice.hpp"
 
 namespace opencc {
 namespace tools {
+
+class UTF8StringSliceHasher {
+public:
+  size_t operator()(const UTF8StringSlice& text) const;
+};
 
 class WordDetection {
 public:
@@ -81,8 +88,8 @@ private:
 
   double CalculateCohesion(const UTF8StringSlice& wordCandidate) const;
 
-  double
-  CalculateEntropy(const std::map<UTF8StringSlice, size_t>& choices) const;
+  double CalculateEntropy(const std::unordered_map<
+      UTF8StringSlice, size_t, UTF8StringSliceHasher>& choices) const;
 
   const size_t wordMaxLength;
   const size_t prefixSetLength;
@@ -97,10 +104,13 @@ private:
   vector<UTF8StringSlice> suffixes;
   vector<UTF8StringSlice> wordCandidates;
   vector<UTF8StringSlice> words;
-  std::map<UTF8StringSlice, size_t> frequencies;
-  std::map<UTF8StringSlice, double> cohesions;
-  std::map<UTF8StringSlice, double> suffixEntropies;
-  std::map<UTF8StringSlice, double> prefixEntropies;
+  std::unordered_map<UTF8StringSlice, size_t, UTF8StringSliceHasher>
+      frequencies;
+  std::unordered_map<UTF8StringSlice, double, UTF8StringSliceHasher> cohesions;
+  std::unordered_map<UTF8StringSlice, double, UTF8StringSliceHasher>
+      suffixEntropies;
+  std::unordered_map<UTF8StringSlice, double, UTF8StringSliceHasher>
+      prefixEntropies;
 };
 
 } // namespace tools

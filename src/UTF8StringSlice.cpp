@@ -90,6 +90,44 @@ void UTF8StringSlice::MoveLeft() {
   }
 }
 
+int UTF8StringSlice::ReverseCompare(const UTF8StringSlice& that) const {
+  const char* pstr1 = str + byteLength;
+  const char* pstr2 = that.str + that.byteLength;
+  const size_t length = std::min(utf8Length, that.utf8Length);
+  for (size_t i = 0; i < length; i++) {
+    const size_t charLen1 = UTF8Util::PrevCharLength(pstr1);
+    const size_t charLen2 = UTF8Util::PrevCharLength(pstr2);
+    pstr1 -= charLen1;
+    pstr2 -= charLen2;
+    const int cmp = strncmp(pstr1, pstr2, std::min(charLen1, charLen2));
+    if (cmp < 0) {
+      return -1;
+    } else if (cmp > 0) {
+      return 1;
+    } else if (charLen1 < charLen2) {
+      return -1;
+    } else if (charLen1 > charLen2) {
+      return 1;
+    }
+  }
+  if (utf8Length < that.utf8Length) {
+    return -1;
+  } else if (utf8Length > that.utf8Length) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+size_t UTF8StringSlice::FindBytePosition(const UTF8StringSlice& pattern) const {
+  const size_t pos = ToString().find(pattern.ToString());
+  if (pos != string::npos) {
+    return pos;
+  } else {
+    return static_cast<size_t>(-1);
+  }
+}
+
 void UTF8StringSlice::CalculateByteLength() {
   const char* pstr = str;
   for (size_t i = 0; i < utf8Length; i++) {

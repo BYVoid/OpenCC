@@ -88,4 +88,21 @@ TEST_F(UTF8StringSliceTest, MoveLeft) {
   EXPECT_EQ(UTF8StringSlice(""), text);
 }
 
+TEST_F(UTF8StringSliceTest, ReverseCompare) {
+  EXPECT_EQ(0, UTF8StringSlice("").ReverseCompare(UTF8StringSlice("")));
+  EXPECT_EQ(-1, UTF8StringSlice("").ReverseCompare(UTF8StringSlice("大")));
+  EXPECT_EQ(-1, UTF8StringSlice("一").ReverseCompare(UTF8StringSlice("二")));
+  EXPECT_EQ(-1, UTF8StringSlice("z一").ReverseCompare(UTF8StringSlice("a二")));
+  EXPECT_EQ(1, UTF8StringSlice("一一").ReverseCompare(UTF8StringSlice("一")));
+}
+
+TEST_F(UTF8StringSliceTest, FindBytePosition) {
+  EXPECT_EQ(0, text.FindBytePosition(""));
+  EXPECT_EQ(0, text.FindBytePosition("天"));
+  EXPECT_EQ(9, text.FindBytePosition("，"));
+  EXPECT_EQ(static_cast<size_t>(-1), text.FindBytePosition("a"));
+  EXPECT_EQ(static_cast<size_t>(-1), text.FindBytePosition("\n"));
+  EXPECT_EQ(3, UTF8StringSlice("了。").FindBytePosition("。"));
+}
+
 } // namespace opencc

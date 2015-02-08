@@ -23,7 +23,7 @@ namespace opencc {
 
 class UTF8StringSlice {
 public:
-  explicit UTF8StringSlice(const char* _str)
+  UTF8StringSlice(const char* _str)
       : str(_str), utf8Length(UTF8Util::Length(_str)),
         byteLength(strlen(_str)) {}
 
@@ -49,6 +49,10 @@ public:
   void MoveRight();
 
   void MoveLeft();
+
+  int ReverseCompare(const UTF8StringSlice& that) const;
+
+  size_t FindBytePosition(const UTF8StringSlice& pattern) const;
 
   bool operator<(const UTF8StringSlice& that) const {
     return Compare(that) < 0;

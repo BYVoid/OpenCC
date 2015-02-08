@@ -138,30 +138,33 @@ public:
   /**
   * Returns true if the given string is longer or as long as the given length.
   */
-  static bool NotShorterThan(const char* str, size_t length) {
-    while (length > 0) {
+  static bool NotShorterThan(const char* str, size_t byteLength) {
+    while (byteLength > 0) {
       if (*str == '\0') {
         return false;
       }
-      length--;
+      byteLength--;
       str++;
     }
     return true;
   }
 
   /**
-  * Truncates a string with a maximal length.
+  * Truncates a string with a maximal length in byte.
   * No UTF8 character will be broken.
   */
-  static string TruncateUTF8(const char* str, size_t maxLength) {
+  static string TruncateUTF8(const char* str, size_t maxByteLength) {
     string wordTrunc;
-    if (NotShorterThan(str, maxLength)) {
+    if (NotShorterThan(str, maxByteLength)) {
       size_t len = 0;
       const char* pStr = str;
-      while (len < maxLength) {
-        size_t nextLen = NextCharLength(pStr);
-        pStr += nextLen;
-        len += nextLen;
+      for (;;) {
+        const size_t charLength = NextCharLength(pStr);
+        if (len + charLength > maxByteLength) {
+          break;
+        }
+        pStr += charLength;
+        len += charLength;
       }
       wordTrunc = FromSubstr(str, len);
     } else {

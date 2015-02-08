@@ -1,7 +1,7 @@
 #
 # Open Chinese Convert
 #
-# Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+# Copyright 2010-2015 BYVoid <byvoid@byvoid.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ build:
 	mkdir -p build/rel
 	(cd build/rel; cmake \
 	-DBUILD_DOCUMENTATION:BOOL=ON \
+	-DENABLE_GTEST:BOOL=OFF \
 	-DCMAKE_BUILD_TYPE=Release \
 	-DCMAKE_INSTALL_PREFIX=/usr \
 	../..)
@@ -34,6 +35,7 @@ test:
 	mkdir -p build/dbg/root
 	(cd build/dbg; cmake \
 	-DBUILD_DOCUMENTATION:BOOL=OFF \
+	-DENABLE_GTEST:BOOL=ON \
 	-DCMAKE_BUILD_TYPE=Debug \
 	-DCMAKE_INSTALL_PREFIX=`pwd`/root \
 	../..)

@@ -23,7 +23,7 @@ namespace opencc {
 
 class UTF8StringSlice {
 public:
-  UTF8StringSlice(const char* _str)
+  explicit UTF8StringSlice(const char* _str)
       : str(_str), utf8Length(UTF8Util::Length(_str)),
         byteLength(strlen(_str)) {}
 
@@ -56,6 +56,10 @@ public:
 
   bool operator<(const UTF8StringSlice& that) const {
     return Compare(that) < 0;
+  }
+
+  bool operator>(const UTF8StringSlice& that) const {
+    return Compare(that) > 0;
   }
 
   bool operator==(const UTF8StringSlice& that) const {

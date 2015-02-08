@@ -1,7 +1,7 @@
 #
 # Open Chinese Convert
 #
-# Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+# Copyright 2010-2015 BYVoid <byvoid@byvoid.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,9 +21,11 @@ cmake_minimum_required(VERSION 2.8)
 set (PACKAGE_NAME opencc)
 project (${PACKAGE_NAME} CXX)
 include (CTest)
-enable_testing()
 
+######## Options
+option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
 option(BUILD_SHARED_LIBS "Build opencc as shared library" ON)
+option(ENABLE_GTEST "Build all tests." OFF)
 
 ######## Package information
 set (PACKAGE_URL https://github.com/BYVoid/Opencc)
@@ -48,9 +50,6 @@ set(CPACK_SOURCE_IGNORE_FILES
   "/build/;/test/dict.ocd;/test/dict.txt;/test/dict.bin;/other/;/opencc.xcodeproj/;/.git/;.gitignore;~$;.pyc;${CPACK_SOURCE_IGNORE_FILES}"
 )
 include(CPack)
-
-######## Options
-option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
 
 ######## Windows
 
@@ -135,3 +134,10 @@ add_subdirectory(src)
 add_subdirectory(doc)
 add_subdirectory(data)
 add_subdirectory(test)
+
+######## Testing
+
+if (ENABLE_GTEST)
+  add_subdirectory(deps/gtest-1.7.0)
+  enable_testing()
+endif()

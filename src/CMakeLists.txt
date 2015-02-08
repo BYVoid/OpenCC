@@ -119,3 +119,10 @@ install(
     opencc_dict
   RUNTIME DESTINATION bin
 )
+
+if (ENABLE_GTEST)
+  include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+  add_executable(UTF8StringSliceTest UTF8StringSlice.cpp UTF8StringSliceTest.cpp)
+  target_link_libraries(UTF8StringSliceTest gtest gtest_main)
+  add_test(UTF8StringSliceTest UTF8StringSliceTest)
+endif()

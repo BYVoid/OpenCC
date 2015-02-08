@@ -26,10 +26,10 @@ build:
 	-DCMAKE_BUILD_TYPE=Release \
 	-DCMAKE_INSTALL_PREFIX=/usr \
 	../..)
-	make -C build/rel
+	make -C build/rel VERBOSE=${VERBOSE}
 
 package: build
-	make -C build/rel package_source
+	make -C build/rel package_source VERBOSE=${VERBOSE}
 
 test:
 	mkdir -p build/dbg/root
@@ -39,9 +39,9 @@ test:
 	-DCMAKE_BUILD_TYPE=Debug \
 	-DCMAKE_INSTALL_PREFIX=`pwd`/root \
 	../..)
-	make -C build/dbg
-	make -C build/dbg test
-	make -C build/dbg install
+	make -C build/dbg VERBOSE=${VERBOSE}
+	(cd build/dbg; ctest --verbose)
+	make -C build/dbg install VERBOSE=${VERBOSE}
 
 node:
 	node-gyp configure
@@ -64,7 +64,4 @@ clean:
 	rm -rf build xcode
 
 install: build
-	make -C build/rel install
-
-dist: release
-	make -C build/rel package_source
+	make -C build/rel install VERBOSE=${VERBOSE}

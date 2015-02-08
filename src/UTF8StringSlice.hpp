@@ -46,13 +46,9 @@ public:
 
   size_t CommonPrefixLength(const UTF8StringSlice& that) const;
 
-  UTF8StringSlice& operator++() {
-    const size_t charLen = UTF8Util::NextCharLength(str);
-    str += charLen;
-    utf8Length--;
-    byteLength -= charLen;
-    return *this;
-  }
+  void MoveRight();
+
+  void MoveLeft();
 
   bool operator<(const UTF8StringSlice& that) const {
     return Compare(that) < 0;

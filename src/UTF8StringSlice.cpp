@@ -73,6 +73,23 @@ size_t UTF8StringSlice::CommonPrefixLength(const UTF8StringSlice& that) const {
   }
 }
 
+void UTF8StringSlice::MoveRight() {
+  if (utf8Length > 0) {
+    const size_t charLen = UTF8Util::NextCharLength(str);
+    str += charLen;
+    utf8Length--;
+    byteLength -= charLen;
+  }
+}
+
+void UTF8StringSlice::MoveLeft() {
+  if (utf8Length > 0) {
+    const size_t charLen = UTF8Util::PrevCharLength(str + byteLength);
+    utf8Length--;
+    byteLength -= charLen;
+  }
+}
+
 void UTF8StringSlice::CalculateByteLength() {
   const char* pstr = str;
   for (size_t i = 0; i < utf8Length; i++) {

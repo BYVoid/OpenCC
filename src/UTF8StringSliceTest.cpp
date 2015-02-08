@@ -24,14 +24,21 @@ namespace opencc {
 class UTF8StringSliceTest : public ::testing::Test {
 protected:
   UTF8StringSliceTest()
-      : text("天行健，君子以自強不息。地勢坤，君子以厚德載物。"){};
+      : text("天行健，君子以自強不息。地勢坤，君子以厚德載物。"), empty(""){};
 
   const UTF8StringSlice text;
+  const UTF8StringSlice empty;
 };
 
-TEST_F(UTF8StringSliceTest, UTF8Length) { EXPECT_EQ(24, text.UTF8Length()); }
+TEST_F(UTF8StringSliceTest, UTF8Length) {
+  EXPECT_EQ(0, empty.UTF8Length());
+  EXPECT_EQ(24, text.UTF8Length());
+}
 
-TEST_F(UTF8StringSliceTest, ByteLength) { EXPECT_EQ(72, text.ByteLength()); }
+TEST_F(UTF8StringSliceTest, ByteLength) {
+  EXPECT_EQ(0, empty.ByteLength());
+  EXPECT_EQ(72, text.ByteLength());
+}
 
 TEST_F(UTF8StringSliceTest, Left) {
   EXPECT_EQ(UTF8StringSlice("天行健"), text.Left(3));
@@ -52,6 +59,33 @@ TEST_F(UTF8StringSliceTest, ToString) {
 TEST_F(UTF8StringSliceTest, Compare) {
   EXPECT_TRUE(text.SubString(12, 3) > UTF8StringSlice("一"));
   EXPECT_TRUE(text.SubString(12, 3) == UTF8StringSlice("地勢坤"));
+}
+
+TEST_F(UTF8StringSliceTest, MoveRight) {
+  UTF8StringSlice text = this->text;
+  text.MoveRight();
+  EXPECT_EQ(UTF8StringSlice("行健，君子以自強不息。地勢坤，君子以厚德載物。"),
+            text);
+  for (size_t i = 0; i < 23; i++) {
+    text.MoveRight();
+  }
+  EXPECT_EQ(UTF8StringSlice(""), text);
+  text.MoveRight(); // No effect, because it's already empty
+  EXPECT_EQ(UTF8StringSlice(""), text);
+}
+
+TEST_F(UTF8StringSliceTest, MoveLeft) {
+  UTF8StringSlice text = this->text;
+  text.MoveLeft();
+  EXPECT_EQ(UTF8StringSlice("天行健，君子以自強不息。地勢坤，君子以厚德載物"),
+            text);
+  for (size_t i = 0; i < 22; i++) {
+    text.MoveLeft();
+  }
+  EXPECT_EQ(UTF8StringSlice("天"), text);
+  text.MoveLeft();
+  text.MoveLeft(); // No effect, because it's already empty
+  EXPECT_EQ(UTF8StringSlice(""), text);
 }
 
 } // namespace opencc

@@ -23,8 +23,8 @@ namespace opencc {
 
 class UTF8UtilTest : public ::testing::Test {
 protected:
-  UTF8UtilTest() : length(strlen(text)){};
-  const char* text = "東菄鶇䍶𠍀倲𩜍𢘐";
+  UTF8UtilTest() : text("東菄鶇䍶𠍀倲𩜍𢘐"), length(strlen(text)){};
+  const char* text;
   const size_t length;
 };
 

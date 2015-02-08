@@ -22,41 +22,113 @@
 
 namespace opencc {
 namespace tools {
+namespace {
 
-WordDetection::WordDetection(const size_t _wordMaxLength)
-    : wordMaxLength(_wordMaxLength), totalOccurrence(0) {}
-
-void WordDetection::Detect(const string& fullText) {
-  UTF8StringSlice utf8FullText(fullText.c_str());
-  ExtractSuffixes(utf8FullText);
-  CalculateFrequency();
-  CalculateSuffixEntropy();
-  CalculateCohesions();
+template <typename VAL_TYPE>
+VAL_TYPE Lookup(const std::map<UTF8StringSlice, VAL_TYPE>& dict,
+                const UTF8StringSlice& wordCandidate) {
+  const auto& iterator = dict.find(wordCandidate);
+  if (iterator != dict.end()) {
+    return iterator->second;
+  } else {
+    assert(false);
+  }
 }
 
-void WordDetection::ExtractSuffixes(UTF8StringSlice utf8FullText) {
-  // Add all suffixes to candidates
-  for (; utf8FullText.UTF8Length() > 0; ++utf8FullText) {
+bool ContainsPunctuation(const UTF8StringSlice& word) {
+  static const vector<UTF8StringSlice> punctuations = {
+      " ",  "\n", "\r", "\t", "-",  ",",  ".",  "?",  "!", "*",
+      "　", "，", "。", "、", "；", "：", "？", "！", "…", "“",
+      "”",  "「", "」", "—",  "－", "（", "）", "《", "》"};
+  for (const auto& punctuation : punctuations) {
+    if (word.FindBytePosition(punctuation) != static_cast<size_t>(-1)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool NoFilter(const UTF8StringSlice&) { return false; }
+
+} // namespace
+
+WordDetection::WordDetection(const size_t _wordMaxLength)
+    : wordMaxLength(_wordMaxLength), prefixSetLength(1), suffixSetLength(1),
+      preCalculationFilter(NoFilter), postCalculationFilter(NoFilter),
+      totalOccurrence(0), utf8FullText("") {}
+
+void WordDetection::Detect(const string& fullText) {
+  utf8FullText = UTF8StringSlice(fullText.c_str());
+  ExtractSuffixes();
+  ExtractPrefixes();
+  CalculateFrequency();
+  ExtractWordCandidates();
+  CalculateCohesions();
+  CalculateSuffixEntropy();
+  CalculatePrefixEntropy();
+  SelectWords();
+}
+
+void WordDetection::ExtractSuffixes() {
+  for (UTF8StringSlice text = utf8FullText; text.UTF8Length() > 0;
+       text.MoveRight()) {
     size_t suffixLength =
-        std::min(wordMaxLength + suffixSetLength, utf8FullText.UTF8Length());
-    suffixes.push_back(utf8FullText.Left(suffixLength));
+        std::min(wordMaxLength + suffixSetLength, text.UTF8Length());
+    suffixes.push_back(text.Left(suffixLength));
   }
   // Sort suffixes
   std::sort(suffixes.begin(), suffixes.end());
+}
+
+void WordDetection::ExtractPrefixes() {
+  for (UTF8StringSlice text = utf8FullText; text.UTF8Length() > 0;
+       text.MoveLeft()) {
+    size_t prefixLength =
+        std::min(wordMaxLength + prefixSetLength, text.UTF8Length());
+    prefixes.push_back(text.Right(prefixLength));
+  }
+  // Sort suffixes reversely
+  std::sort(prefixes.begin(), prefixes.end(),
+            [](const UTF8StringSlice& a, const UTF8StringSlice& b) {
+    return a.ReverseCompare(b) < 0;
+  });
+}
+
+void WordDetection::CalculateFrequency() {
+  for (const auto& suffix : suffixes) {
+    for (size_t i = 1; i <= suffix.UTF8Length() && i <= wordMaxLength; i++) {
+      const UTF8StringSlice wordCandidate = suffix.Left(i);
+      frequencies[wordCandidate]++;
+      totalOccurrence++;
+    }
+  }
+  logTotalOccurrence = log(totalOccurrence);
+}
+
+void WordDetection::ExtractWordCandidates() {
+  for (const auto& item : frequencies) {
+    const UTF8StringSlice wordCandidate = item.first;
+    if (!preCalculationFilter(wordCandidate)) {
+      wordCandidates.push_back(wordCandidate);
+    }
+  }
+  // Sort by frequency
+  std::sort(wordCandidates.begin(), wordCandidates.end(),
+            [this](const UTF8StringSlice& a, const UTF8StringSlice& b) {
+    return Frequency(a) > Frequency(b);
+  });
 }
 
 void WordDetection::CalculateSuffixEntropy() {
   for (size_t length = 1; length <= wordMaxLength; length++) {
     std::map<UTF8StringSlice, size_t> suffixSet;
     UTF8StringSlice lastWord("");
-
     const auto& updateEntropy = [this, &suffixSet, &lastWord]() {
       if (lastWord.UTF8Length() > 0) {
-        suffixEntropies[lastWord] = Entropy(suffixSet);
+        suffixEntropies[lastWord] = CalculateEntropy(suffixSet);
         suffixSet.clear();
       }
     };
-
     for (const auto& suffix : suffixes) {
       if (suffix.UTF8Length() < length) {
         continue;
@@ -75,41 +147,66 @@ void WordDetection::CalculateSuffixEntropy() {
   }
 }
 
-void WordDetection::CalculateFrequency() {
-  for (const auto& suffix : suffixes) {
-    for (size_t i = 1; i <= suffix.UTF8Length() && i <= wordMaxLength; i++) {
-      const UTF8StringSlice wordCandidate = suffix.Left(i);
-      frequencies[wordCandidate]++;
-      totalOccurrence++;
+void WordDetection::CalculatePrefixEntropy() {
+  for (size_t length = 1; length <= wordMaxLength; length++) {
+    std::map<UTF8StringSlice, size_t> prefixSet;
+    UTF8StringSlice lastWord("");
+    const auto& updateEntropy = [this, &prefixSet, &lastWord]() {
+      if (lastWord.UTF8Length() > 0) {
+        prefixEntropies[lastWord] = CalculateEntropy(prefixSet);
+        prefixSet.clear();
+      }
+    };
+    for (const auto& prefix : prefixes) {
+      if (prefix.UTF8Length() < length) {
+        continue;
+      }
+      const auto& wordCandidate = prefix.Right(length);
+      if (wordCandidate != lastWord) {
+        updateEntropy();
+        lastWord = wordCandidate;
+      }
+      if (length + prefixSetLength <= prefix.UTF8Length()) {
+        const auto& wordPrefix = prefix.SubString(
+            prefix.UTF8Length() - length - prefixSetLength, prefixSetLength);
+        prefixSet[wordPrefix]++;
+      }
     }
+    updateEntropy();
   }
-  logTotalOccurrence = log(totalOccurrence);
 }
 
 void WordDetection::CalculateCohesions() {
-  for (const auto& item : frequencies) {
-    const auto& wordCandidate = item.first;
-    cohesions[wordCandidate] = Cohesion(wordCandidate);
+  for (const auto& wordCandidate : wordCandidates) {
+    cohesions[wordCandidate] = CalculateCohesion(wordCandidate);
   }
 }
 
-double WordDetection::Probability(const UTF8StringSlice& word) const {
-  const auto& frequencyIterator = frequencies.find(word);
-  if (frequencyIterator != frequencies.end()) {
-    return frequencyIterator->second / static_cast<double>(totalOccurrence);
-  } else {
-    return 0;
-  }
+double WordDetection::Cohesion(const UTF8StringSlice& word) const {
+  return Lookup(cohesions, word);
+}
+
+double WordDetection::Entropy(const UTF8StringSlice& word) const {
+  return SuffixEntropy(word) + PrefixEntropy(word);
+}
+
+double WordDetection::SuffixEntropy(const UTF8StringSlice& word) const {
+  return Lookup(suffixEntropies, word);
+}
+
+double WordDetection::PrefixEntropy(const UTF8StringSlice& word) const {
+  return Lookup(prefixEntropies, word);
+}
+
+size_t WordDetection::Frequency(const UTF8StringSlice& word) const {
+  const size_t frequency = Lookup(frequencies, word);
+  return frequency;
 }
 
 double WordDetection::LogProbability(const UTF8StringSlice& word) const {
   // log(frequency / totalOccurrence) = log(frequency) - log(totalOccurrence)
-  const auto& frequencyIterator = frequencies.find(word);
-  if (frequencyIterator != frequencies.end()) {
-    return log(frequencyIterator->second) - logTotalOccurrence;
-  } else {
-    return -INFINITY;
-  }
+  const size_t frequency = Lookup(frequencies, word);
+  return log(frequency) - logTotalOccurrence;
 }
 
 double WordDetection::PMI(const UTF8StringSlice& wordCandidate,
@@ -121,7 +218,8 @@ double WordDetection::PMI(const UTF8StringSlice& wordCandidate,
          LogProbability(part2);
 }
 
-double WordDetection::Cohesion(const UTF8StringSlice& wordCandidate) const {
+double
+WordDetection::CalculateCohesion(const UTF8StringSlice& wordCandidate) const {
   // TODO Try average value
   double minPMI = INFINITY;
   for (size_t leftLength = 1; leftLength <= wordCandidate.UTF8Length() - 1;
@@ -135,8 +233,8 @@ double WordDetection::Cohesion(const UTF8StringSlice& wordCandidate) const {
   return minPMI;
 }
 
-double
-WordDetection::Entropy(const std::map<UTF8StringSlice, size_t>& choices) const {
+double WordDetection::CalculateEntropy(
+    const std::map<UTF8StringSlice, size_t>& choices) const {
   double totalChoices = 0;
   for (const auto& item : choices) {
     totalChoices += item.second;
@@ -153,11 +251,51 @@ WordDetection::Entropy(const std::map<UTF8StringSlice, size_t>& choices) const {
   return entropy;
 }
 
+void WordDetection::SelectWords() {
+  for (const auto& word : wordCandidates) {
+    if (!postCalculationFilter(word)) {
+      words.push_back(word);
+    }
+  }
+}
+
 } // namespace tools
 } // namespace opencc
 
+using opencc::UTF8StringSlice;
+using opencc::tools::WordDetection;
+using opencc::tools::ContainsPunctuation;
+
 int main(int argc, const char* argv[]) {
-  opencc::tools::WordDetection wordDetection(3);
-  wordDetection.Detect("四是四十是十十四是十四四十是四十");
+  std::ifstream ifs("a.txt");
+  const string content((std::istreambuf_iterator<char>(ifs)),
+                       (std::istreambuf_iterator<char>()));
+  WordDetection wordDetection(4);
+  wordDetection.SetPreCalculationFilter([](const UTF8StringSlice& word) {
+    return word.UTF8Length() < 2 || ContainsPunctuation(word);
+  });
+  wordDetection.SetPostCalculationFilter(
+      [&wordDetection](const UTF8StringSlice& word) {
+        const size_t frequency = wordDetection.Frequency(word);
+        const double cohesion = wordDetection.Cohesion(word);
+        const double entropy = wordDetection.Entropy(word);
+        const double suffixEntropy = wordDetection.SuffixEntropy(word);
+        const double prefixEntropy = wordDetection.PrefixEntropy(word);
+        bool accept = cohesion >= 3.5 && entropy >= 3.3 &&
+                      prefixEntropy >= 0.5 && suffixEntropy >= 0.5;
+        return !accept;
+      });
+
+  wordDetection.Detect(content.c_str());
+  for (const auto& word : wordDetection.Words()) {
+    const size_t frequency = wordDetection.Frequency(word);
+    const double cohesion = wordDetection.Cohesion(word);
+    const double suffixEntropy = wordDetection.SuffixEntropy(word);
+    const double prefixEntropy = wordDetection.PrefixEntropy(word);
+    const double entropy = wordDetection.Entropy(word);
+    std::cout << word.ToString() << " " << frequency << " " << cohesion << " "
+              << entropy << " " << prefixEntropy << " " << suffixEntropy
+              << std::endl;
+  }
   return 0;
 }

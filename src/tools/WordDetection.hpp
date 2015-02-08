@@ -30,8 +30,40 @@ public:
 
   void Detect(const string& fullText);
 
+  void SetPreCalculationFilter(
+      const std::function<bool(const UTF8StringSlice& word)>& filter) {
+    preCalculationFilter = filter;
+  }
+
+  void SetPostCalculationFilter(
+      const std::function<bool(const UTF8StringSlice& word)>& filter) {
+    postCalculationFilter = filter;
+  }
+
+  const vector<UTF8StringSlice>& Words() const { return words; }
+
+  const vector<UTF8StringSlice>& WordCandidates() const {
+    return wordCandidates;
+  }
+
+  double Cohesion(const UTF8StringSlice& wordCandidate) const;
+
+  double Entropy(const UTF8StringSlice& wordCandidate) const;
+
+  double SuffixEntropy(const UTF8StringSlice& wordCandidate) const;
+
+  double PrefixEntropy(const UTF8StringSlice& wordCandidate) const;
+
+  size_t Frequency(const UTF8StringSlice& word) const;
+
+  double LogProbability(const UTF8StringSlice& word) const;
+
 private:
-  void ExtractSuffixes(UTF8StringSlice utf8FullText);
+  void ExtractSuffixes();
+
+  void ExtractPrefixes();
+
+  void ExtractWordCandidates();
 
   void CalculateFrequency();
 
@@ -39,27 +71,37 @@ private:
 
   void CalculateSuffixEntropy();
 
-  double Probability(const UTF8StringSlice& word) const;
+  void CalculatePrefixEntropy();
 
-  double LogProbability(const UTF8StringSlice& word) const;
+  void SelectWords();
 
   // Pointwise Mutual Information
   double PMI(const UTF8StringSlice& wordCandidate, const UTF8StringSlice& part1,
              const UTF8StringSlice& part2) const;
 
-  double Cohesion(const UTF8StringSlice& wordCandidate) const;
+  double CalculateCohesion(const UTF8StringSlice& wordCandidate) const;
 
-  double Entropy(const std::map<UTF8StringSlice, size_t>& choices) const;
+  double
+  CalculateEntropy(const std::map<UTF8StringSlice, size_t>& choices) const;
 
   const size_t wordMaxLength;
-  const size_t suffixSetLength = 1;
+  const size_t prefixSetLength;
+  const size_t suffixSetLength;
+  std::function<bool(const UTF8StringSlice& word)> preCalculationFilter;
+  std::function<bool(const UTF8StringSlice& word)> postCalculationFilter;
 
-  vector<UTF8StringSlice> prefixes, suffixes, wordCandidates;
+  UTF8StringSlice utf8FullText;
   size_t totalOccurrence;
   double logTotalOccurrence;
+  vector<UTF8StringSlice> prefixes;
+  vector<UTF8StringSlice> suffixes;
+  vector<UTF8StringSlice> wordCandidates;
+  vector<UTF8StringSlice> words;
   std::map<UTF8StringSlice, size_t> frequencies;
   std::map<UTF8StringSlice, double> cohesions;
   std::map<UTF8StringSlice, double> suffixEntropies;
+  std::map<UTF8StringSlice, double> prefixEntropies;
 };
-}
-}
+
+} // namespace tools
+} // namespace opencc

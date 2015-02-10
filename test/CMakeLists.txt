@@ -25,34 +25,18 @@ foreach (CONFIG_TEST_FILE ${CONFIG_TEST})
   configure_file(${CONFIG_TEST_FILE} ${CONFIG_TEST_TARGET_DIR} COPYONLY)
 endforeach (CONFIG_TEST_FILE)
 
-set(CONFIGURATIONS
-  s2t
-  t2s
-  s2tw
-  s2twp
-  tw2s
-  tw2sp
-  s2hk
-  hk2s
-)
-
-foreach(CONFIG ${CONFIGURATIONS})
-  add_test(
-    ${CONFIG}_convert
-    ${CMAKE_COMMAND} -E chdir ${PROJECT_BINARY_DIR}/data
-    ${PROJECT_BINARY_DIR}/src/tools/opencc
-    -i ${CMAKE_SOURCE_DIR}/test/testcases/${CONFIG}.in
-    -o ${PROJECT_BINARY_DIR}/test/${CONFIG}.out
-    -c ${CMAKE_SOURCE_DIR}/data/config/${CONFIG}.json
+if (ENABLE_GTEST)
+  add_definitions(
+    -DPROJECT_BINARY_DIR="${PROJECT_BINARY_DIR}"
+    -DCMAKE_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
   )
-  add_test(
-    ${CONFIG}_compare
-    diff
-    ${PROJECT_BINARY_DIR}/test/${CONFIG}.out
-    ${CMAKE_SOURCE_DIR}/test/testcases/${CONFIG}.ans
+  include_directories(../deps/gtest-1.7.0/include)
+  set(UNITTESTS
+    CommandLineConvertTest
   )
-  set_property(
-    TEST ${CONFIG}_compare
-    APPEND PROPERTY
-      DEPENDS ${CONFIG}_convert)
-endforeach(CONFIG)
+  foreach(UNITTEST ${UNITTESTS})
+    add_executable(${UNITTEST} ${UNITTEST}.cpp)
+    target_link_libraries(${UNITTEST} gtest gtest_main libopencc)
+    add_test(${UNITTEST} ${UNITTEST})
+  endforeach(UNITTEST)
+endif()

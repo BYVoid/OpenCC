@@ -46,7 +46,7 @@ TEST_F(PhraseExtractTest, ExtractSuffixes) {
   wordDetection.SetWordMaxLength(3);
   wordDetection.SetFullText(siShi);
   wordDetection.ExtractSuffixes();
-  EXPECT_EQ(
+  EXPECT_VECTOR_EQ(
       vector<UTF8StringSlice>({"十", "十十四是", "十四四十", "十四是十",
                                "十是十十", "十是四十", "四十", "四十是十",
                                "四十是四", "四四十是", "四是十四", "四是四十",
@@ -59,7 +59,7 @@ TEST_F(PhraseExtractTest, ExtractPrefixes) {
   wordDetection.SetWordMaxLength(3);
   wordDetection.SetFullText(siShi);
   wordDetection.ExtractPrefixes();
-  EXPECT_EQ(
+  EXPECT_VECTOR_EQ(
       vector<UTF8StringSlice>({"十是十十", "十四四十", "十是四十", "四是四十",
                                "四十是十", "十四是十", "四", "是十十四",
                                "四是十四", "是十四四", "四十是四", "四是四",
@@ -74,12 +74,12 @@ TEST_F(PhraseExtractTest, ExtractWordCandidates) {
   wordDetection.ExtractSuffixes();
   wordDetection.CalculateFrequency();
   wordDetection.ExtractWordCandidates();
-  EXPECT_EQ(vector<UTF8StringSlice>({"四", "十", "是", "四十", "是四十", "是四",
-                                     "四是", "四十是", "十四", "是十", "十是",
-                                     "是十四", "四是十", "四四十", "四是四",
-                                     "十是四", "十是十", "十四四", "四四",
-                                     "十四是", "十十四", "十十", "是十十"}),
-            wordDetection.WordCandidates());
+  EXPECT_VECTOR_EQ(
+      vector<UTF8StringSlice>(
+          {"四", "十", "是", "四十", "是四十", "是四", "四是", "四十是", "十四",
+           "是十", "十是", "是十四", "四是十", "四四十", "四是四", "十是四",
+           "十是十", "十四四", "四四", "十四是", "十十四", "十十", "是十十"}),
+      wordDetection.WordCandidates());
 }
 
 } // namespace opencc

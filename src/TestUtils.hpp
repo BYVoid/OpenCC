@@ -49,4 +49,14 @@ string ConvertToUTF8(const wchar_t* pStr) {
 #define utf8(str) string(str)
 #endif // if defined(_MSC_VER) && _MSC_VER > 1310
 
+#define EXPECT_VECTOR_EQ(expected, actual)                                     \
+  {                                                                            \
+    const auto& a1 = (expected);                                               \
+    const auto& a2 = (actual);                                                 \
+    EXPECT_EQ(a1.size(), a2.size());                                           \
+    for (size_t i = 0; i < a1.size(); i++) {                                   \
+      EXPECT_EQ(a1[i], a2[i]) << "Where i = " << i;                            \
+    }                                                                          \
+  }
+
 } // namespace opencc

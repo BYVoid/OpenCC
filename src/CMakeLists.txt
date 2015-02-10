@@ -1,5 +1,11 @@
 include (GenerateExportHeader)
 
+include_directories(../deps/darts-clone)
+include_directories(../deps/rapidjson-0.11)
+include_directories(../deps/tclap-1.2.1)
+
+# Library
+
 set(
   LIBOPENCC_HEADERS
   BinaryDict.hpp
@@ -46,14 +52,7 @@ set(
   UTF8Util.cpp
 )
 
-include_directories(../deps/darts-clone)
-include_directories(../deps/rapidjson-0.11)
-include_directories(../deps/tclap-1.2.1)
-
-add_library(
-  libopencc
-  ${LIBOPENCC_SOURCES}
-)
+add_library(libopencc ${LIBOPENCC_SOURCES})
 
 GENERATE_EXPORT_HEADER(
   libopencc
@@ -76,51 +75,20 @@ set_target_properties(
       2
 )
 
-if (CMAKE_BUILD_TYPE MATCHES Debug)
-  add_definitions(
-    -O0
-    -g3
-  )
-endif (CMAKE_BUILD_TYPE MATCHES Debug)
+# Installation
 
 install(
-  TARGETS
-    libopencc
+  TARGETS libopencc
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib/static
 )
 
 install(
-  FILES
-    ${LIBOPENCC_HEADERS}
-  DESTINATION
-    ${DIR_INCLUDE}/opencc
+  FILES ${LIBOPENCC_HEADERS}
+  DESTINATION ${DIR_INCLUDE}/opencc
 )
 
-add_executable(
-  opencc
-  CommandLine.cpp
-)
-target_link_libraries(
-  opencc
-  libopencc
-)
-
-add_executable(
-  opencc_dict
-  DictConverter.cpp
-)
-target_link_libraries(
-  opencc_dict
-  libopencc
-)
-
-install(
-  TARGETS
-    opencc
-    opencc_dict
-  RUNTIME DESTINATION bin
-)
+# Gtest
 
 if (ENABLE_GTEST)
   include_directories(../deps/gtest-1.7.0/include)
@@ -134,3 +102,7 @@ if (ENABLE_GTEST)
     add_test(${UNITTEST} ${UNITTEST})
   endforeach(UNITTEST)
 endif()
+
+# Subdir
+
+add_subdirectory(tools)

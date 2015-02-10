@@ -55,6 +55,7 @@ xcode-build:
 	(cd xcode; cmake \
 	-G "Xcode" \
 	-DBUILD_DOCUMENTATION:BOOL=OFF \
+	-DENABLE_GTEST:BOOL=ON \
 	..; \
 	xcodebuild build)
 

@@ -31,9 +31,9 @@ public:
   size_t operator()(const UTF8StringSlice& text) const;
 };
 
-class WordDetection {
+class PhraseExtract {
 public:
-  WordDetection(const size_t _wordMaxLength);
+  PhraseExtract(const size_t _wordMaxLength);
 
   void Detect(const string& fullText);
 

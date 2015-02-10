@@ -115,12 +115,18 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     -Wall
   )
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
+  if (CMAKE_BUILD_TYPE MATCHES Debug)
+    add_definitions(-O0 -g3)
+  endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   add_definitions(
     -std=c++0x
     -Wall
   )
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
+  if (CMAKE_BUILD_TYPE MATCHES Debug)
+    add_definitions(-O0 -g3)
+  endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   add_definitions(
     /Wall

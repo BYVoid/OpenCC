@@ -18,7 +18,7 @@
 
 #include <cmath>
 
-#include "WordDetection.hpp"
+#include "PhraseExtract.hpp"
 
 namespace opencc {
 namespace tools {
@@ -57,12 +57,12 @@ size_t UTF8StringSliceHasher::operator()(const UTF8StringSlice& text) const {
   return std::hash<string>()(text.ToString());
 }
 
-WordDetection::WordDetection(const size_t _wordMaxLength)
+PhraseExtract::PhraseExtract(const size_t _wordMaxLength)
     : wordMaxLength(_wordMaxLength), prefixSetLength(1), suffixSetLength(1),
       preCalculationFilter(NoFilter), postCalculationFilter(NoFilter),
       totalOccurrence(0), utf8FullText("") {}
 
-void WordDetection::Detect(const string& fullText) {
+void PhraseExtract::Detect(const string& fullText) {
   utf8FullText = UTF8StringSlice(fullText.c_str());
   ExtractSuffixes();
   ExtractPrefixes();
@@ -74,7 +74,7 @@ void WordDetection::Detect(const string& fullText) {
   SelectWords();
 }
 
-void WordDetection::ExtractSuffixes() {
+void PhraseExtract::ExtractSuffixes() {
   for (UTF8StringSlice text = utf8FullText; text.UTF8Length() > 0;
        text.MoveRight()) {
     size_t suffixLength =
@@ -85,7 +85,7 @@ void WordDetection::ExtractSuffixes() {
   std::sort(suffixes.begin(), suffixes.end());
 }
 
-void WordDetection::ExtractPrefixes() {
+void PhraseExtract::ExtractPrefixes() {
   for (UTF8StringSlice text = utf8FullText; text.UTF8Length() > 0;
        text.MoveLeft()) {
     size_t prefixLength =
@@ -99,7 +99,7 @@ void WordDetection::ExtractPrefixes() {
   });
 }
 
-void WordDetection::CalculateFrequency() {
+void PhraseExtract::CalculateFrequency() {
   for (const auto& suffix : suffixes) {
     for (size_t i = 1; i <= suffix.UTF8Length() && i <= wordMaxLength; i++) {
       const UTF8StringSlice wordCandidate = suffix.Left(i);
@@ -110,7 +110,7 @@ void WordDetection::CalculateFrequency() {
   logTotalOccurrence = log(totalOccurrence);
 }
 
-void WordDetection::ExtractWordCandidates() {
+void PhraseExtract::ExtractWordCandidates() {
   for (const auto& item : frequencies) {
     const UTF8StringSlice wordCandidate = item.first;
     if (!preCalculationFilter(wordCandidate)) {
@@ -124,7 +124,7 @@ void WordDetection::ExtractWordCandidates() {
   });
 }
 
-void WordDetection::CalculateSuffixEntropy() {
+void PhraseExtract::CalculateSuffixEntropy() {
   for (size_t length = 1; length <= wordMaxLength; length++) {
     std::unordered_map<UTF8StringSlice, size_t, UTF8StringSliceHasher>
         suffixSet;
@@ -153,7 +153,7 @@ void WordDetection::CalculateSuffixEntropy() {
   }
 }
 
-void WordDetection::CalculatePrefixEntropy() {
+void PhraseExtract::CalculatePrefixEntropy() {
   for (size_t length = 1; length <= wordMaxLength; length++) {
     std::unordered_map<UTF8StringSlice, size_t, UTF8StringSliceHasher>
         prefixSet;
@@ -183,40 +183,40 @@ void WordDetection::CalculatePrefixEntropy() {
   }
 }
 
-void WordDetection::CalculateCohesions() {
+void PhraseExtract::CalculateCohesions() {
   for (const auto& wordCandidate : wordCandidates) {
     cohesions[wordCandidate] = CalculateCohesion(wordCandidate);
   }
 }
 
-double WordDetection::Cohesion(const UTF8StringSlice& word) const {
+double PhraseExtract::Cohesion(const UTF8StringSlice& word) const {
   return Lookup(cohesions, word);
 }
 
-double WordDetection::Entropy(const UTF8StringSlice& word) const {
+double PhraseExtract::Entropy(const UTF8StringSlice& word) const {
   return SuffixEntropy(word) + PrefixEntropy(word);
 }
 
-double WordDetection::SuffixEntropy(const UTF8StringSlice& word) const {
+double PhraseExtract::SuffixEntropy(const UTF8StringSlice& word) const {
   return Lookup(suffixEntropies, word);
 }
 
-double WordDetection::PrefixEntropy(const UTF8StringSlice& word) const {
+double PhraseExtract::PrefixEntropy(const UTF8StringSlice& word) const {
   return Lookup(prefixEntropies, word);
 }
 
-size_t WordDetection::Frequency(const UTF8StringSlice& word) const {
+size_t PhraseExtract::Frequency(const UTF8StringSlice& word) const {
   const size_t frequency = Lookup(frequencies, word);
   return frequency;
 }
 
-double WordDetection::LogProbability(const UTF8StringSlice& word) const {
+double PhraseExtract::LogProbability(const UTF8StringSlice& word) const {
   // log(frequency / totalOccurrence) = log(frequency) - log(totalOccurrence)
   const size_t frequency = Lookup(frequencies, word);
   return log(frequency) - logTotalOccurrence;
 }
 
-double WordDetection::PMI(const UTF8StringSlice& wordCandidate,
+double PhraseExtract::PMI(const UTF8StringSlice& wordCandidate,
                           const UTF8StringSlice& part1,
                           const UTF8StringSlice& part2) const {
   // PMI(x, y) = log(P(x, y) / (P(x) * P(y)))
@@ -226,7 +226,7 @@ double WordDetection::PMI(const UTF8StringSlice& wordCandidate,
 }
 
 double
-WordDetection::CalculateCohesion(const UTF8StringSlice& wordCandidate) const {
+PhraseExtract::CalculateCohesion(const UTF8StringSlice& wordCandidate) const {
   // TODO Try average value
   double minPMI = INFINITY;
   for (size_t leftLength = 1; leftLength <= wordCandidate.UTF8Length() - 1;
@@ -240,7 +240,7 @@ WordDetection::CalculateCohesion(const UTF8StringSlice& wordCandidate) const {
   return minPMI;
 }
 
-double WordDetection::CalculateEntropy(const std::unordered_map<
+double PhraseExtract::CalculateEntropy(const std::unordered_map<
     UTF8StringSlice, size_t, UTF8StringSliceHasher>& choices) const {
   double totalChoices = 0;
   for (const auto& item : choices) {
@@ -258,7 +258,7 @@ double WordDetection::CalculateEntropy(const std::unordered_map<
   return entropy;
 }
 
-void WordDetection::SelectWords() {
+void PhraseExtract::SelectWords() {
   for (const auto& word : wordCandidates) {
     if (!postCalculationFilter(word)) {
       words.push_back(word);
@@ -270,14 +270,14 @@ void WordDetection::SelectWords() {
 } // namespace opencc
 
 using opencc::UTF8StringSlice;
-using opencc::tools::WordDetection;
+using opencc::tools::PhraseExtract;
 using opencc::tools::ContainsPunctuation;
 
 int main(int argc, const char* argv[]) {
   std::ifstream ifs("/Users/byvoid/a.txt");
   const string content((std::istreambuf_iterator<char>(ifs)),
                        (std::istreambuf_iterator<char>()));
-  WordDetection wordDetection(4);
+  PhraseExtract wordDetection(4);
   wordDetection.SetPreCalculationFilter([](const UTF8StringSlice& word) {
     return word.UTF8Length() < 2 || ContainsPunctuation(word);
   });

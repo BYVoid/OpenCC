@@ -24,8 +24,11 @@ namespace opencc {
 
 class ConfigTestBase : public ::testing::Test {
 protected:
-  const string CONFIG_TEST_PATH =
-      CMAKE_SOURCE_DIR "/test/config_test/config_test.json";
+  ConfigTestBase()
+      : CONFIG_TEST_PATH(CMAKE_SOURCE_DIR
+                         "/test/config_test/config_test.json") {}
+
+  const string CONFIG_TEST_PATH;
 };
 
 } // namespace opencc

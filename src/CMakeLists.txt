@@ -93,23 +93,21 @@ install(
 if (ENABLE_GTEST)
   include_directories(../deps/gtest-1.7.0/include)
   set(UNITTESTS
-    BinaryDictTest
-    ConfigTest
-    ConversionChainTest
-    ConversionTest
-    DartsDictTest
-    DictGroupTest
-    MaxMatchSegmentationTest
-    SimpleConverterTest
-    TextDictTest
-    UTF8StringSliceTest
-    UTF8UtilTest
+    BinaryDictTest.cpp
+    ConfigTest.cpp
+    ConversionChainTest.cpp
+    ConversionTest.cpp
+    DartsDictTest.cpp
+    DictGroupTest.cpp
+    MaxMatchSegmentationTest.cpp
+    SimpleConverterTest.cpp
+    TextDictTest.cpp
+    UTF8StringSliceTest.cpp
+    UTF8UtilTest.cpp
   )
-  foreach(UNITTEST ${UNITTESTS})
-    add_executable(${UNITTEST} ${UNITTEST}.cpp)
-    target_link_libraries(${UNITTEST} gtest gtest_main libopencc)
-    add_test(${UNITTEST} ${UNITTEST})
-  endforeach(UNITTEST)
+  add_executable(UnitTest ${UNITTESTS})
+  target_link_libraries(UnitTest gtest gtest_main libopencc)
+  add_test(UnitTest UnitTest)
 endif()
 
 # Subdir

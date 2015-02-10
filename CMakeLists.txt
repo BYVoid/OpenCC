@@ -134,6 +134,13 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   )
 endif()
 
+if (ENABLE_GTEST)
+  add_definitions(
+    -DPROJECT_BINARY_DIR="${PROJECT_BINARY_DIR}"
+    -DCMAKE_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+  )
+endif()
+
 ######## Subdirectories
 
 add_subdirectory(src)

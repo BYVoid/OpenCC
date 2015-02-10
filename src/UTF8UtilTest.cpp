@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "gtest/gtest.h"
+#include "TestUtils.hpp"
 #include "UTF8Util.hpp"
 
 namespace opencc {

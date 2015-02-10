@@ -93,6 +93,15 @@ install(
 if (ENABLE_GTEST)
   include_directories(../deps/gtest-1.7.0/include)
   set(UNITTESTS
+    BinaryDictTest
+    ConfigTest
+    ConversionChainTest
+    ConversionTest
+    DartsDictTest
+    DictGroupTest
+    MaxMatchSegmentationTest
+    SimpleConverterTest
+    TextDictTest
     UTF8StringSliceTest
     UTF8UtilTest
   )

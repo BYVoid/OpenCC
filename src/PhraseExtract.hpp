@@ -25,11 +25,6 @@
 
 namespace opencc {
 
-class UTF8StringSliceHasher {
-public:
-  size_t operator()(const UTF8StringSlice& text) const;
-};
-
 class PhraseExtract {
 public:
   PhraseExtract(const size_t _wordMaxLength);
@@ -88,7 +83,7 @@ private:
   double CalculateCohesion(const UTF8StringSlice& wordCandidate) const;
 
   double CalculateEntropy(const std::unordered_map<
-      UTF8StringSlice, size_t, UTF8StringSliceHasher>& choices) const;
+      UTF8StringSlice, size_t, UTF8StringSlice::Hasher>& choices) const;
 
   const size_t wordMaxLength;
   const size_t prefixSetLength;
@@ -103,12 +98,13 @@ private:
   vector<UTF8StringSlice> suffixes;
   vector<UTF8StringSlice> wordCandidates;
   vector<UTF8StringSlice> words;
-  std::unordered_map<UTF8StringSlice, size_t, UTF8StringSliceHasher>
+  std::unordered_map<UTF8StringSlice, size_t, UTF8StringSlice::Hasher>
       frequencies;
-  std::unordered_map<UTF8StringSlice, double, UTF8StringSliceHasher> cohesions;
-  std::unordered_map<UTF8StringSlice, double, UTF8StringSliceHasher>
+  std::unordered_map<UTF8StringSlice, double, UTF8StringSlice::Hasher>
+      cohesions;
+  std::unordered_map<UTF8StringSlice, double, UTF8StringSlice::Hasher>
       suffixEntropies;
-  std::unordered_map<UTF8StringSlice, double, UTF8StringSliceHasher>
+  std::unordered_map<UTF8StringSlice, double, UTF8StringSlice::Hasher>
       prefixEntropies;
 };
 

@@ -136,4 +136,8 @@ void UTF8StringSlice::CalculateByteLength() {
   byteLength = pstr - str;
 }
 
+size_t UTF8StringSlice::Hasher::operator()(const UTF8StringSlice& text) const {
+  return std::hash<string>()(text.ToString());
+}
+
 } // namespace opencc

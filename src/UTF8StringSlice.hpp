@@ -71,6 +71,11 @@ public:
     return !this->operator==(that);
   }
 
+  class Hasher {
+  public:
+    size_t operator()(const UTF8StringSlice& text) const;
+  };
+
 private:
   inline int Compare(const UTF8StringSlice& that) const {
     int cmp = strncmp(str, that.str, std::min(byteLength, that.byteLength));

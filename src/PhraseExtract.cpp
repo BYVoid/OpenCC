@@ -25,7 +25,7 @@ namespace internal {
 
 template <typename VAL_TYPE>
 VAL_TYPE Lookup(const std::unordered_map<UTF8StringSlice, VAL_TYPE,
-                                         UTF8StringSliceHasher>& dict,
+                                         UTF8StringSlice::Hasher>& dict,
                 const UTF8StringSlice& wordCandidate) {
   const auto& iterator = dict.find(wordCandidate);
   if (iterator != dict.end()) {
@@ -53,10 +53,6 @@ bool NoFilter(const UTF8StringSlice&) { return false; }
 } // namespace internal
 
 using namespace internal;
-
-size_t UTF8StringSliceHasher::operator()(const UTF8StringSlice& text) const {
-  return std::hash<string>()(text.ToString());
-}
 
 PhraseExtract::PhraseExtract(const size_t _wordMaxLength)
     : wordMaxLength(_wordMaxLength), prefixSetLength(1), suffixSetLength(1),
@@ -130,7 +126,7 @@ void PhraseExtract::ExtractWordCandidates() {
 
 void PhraseExtract::CalculateSuffixEntropy() {
   for (size_t length = 1; length <= wordMaxLength; length++) {
-    std::unordered_map<UTF8StringSlice, size_t, UTF8StringSliceHasher>
+    std::unordered_map<UTF8StringSlice, size_t, UTF8StringSlice::Hasher>
         suffixSet;
     UTF8StringSlice lastWord("");
     const auto& updateEntropy = [this, &suffixSet, &lastWord]() {
@@ -159,7 +155,7 @@ void PhraseExtract::CalculateSuffixEntropy() {
 
 void PhraseExtract::CalculatePrefixEntropy() {
   for (size_t length = 1; length <= wordMaxLength; length++) {
-    std::unordered_map<UTF8StringSlice, size_t, UTF8StringSliceHasher>
+    std::unordered_map<UTF8StringSlice, size_t, UTF8StringSlice::Hasher>
         prefixSet;
     UTF8StringSlice lastWord("");
     const auto& updateEntropy = [this, &prefixSet, &lastWord]() {
@@ -245,7 +241,7 @@ PhraseExtract::CalculateCohesion(const UTF8StringSlice& wordCandidate) const {
 }
 
 double PhraseExtract::CalculateEntropy(const std::unordered_map<
-    UTF8StringSlice, size_t, UTF8StringSliceHasher>& choices) const {
+    UTF8StringSlice, size_t, UTF8StringSlice::Hasher>& choices) const {
   double totalChoices = 0;
   for (const auto& item : choices) {
     totalChoices += item.second;

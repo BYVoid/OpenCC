@@ -31,6 +31,7 @@
 #endif // ifdef _MSC_VER
 
 namespace opencc {
+
 class OPENCC_EXPORT Exception : public std::exception {
 public:
   Exception() {}
@@ -78,4 +79,10 @@ public:
   InvalidUTF8(const std::string& _message)
       : Exception("Invalid UTF8: " + _message) {}
 };
-}
+
+class OPENCC_EXPORT ShouldNotBeHere : public Exception {
+public:
+  ShouldNotBeHere() : Exception("ShouldNotBeHere! This must be a bug.") {}
+};
+
+} // namespace opencc

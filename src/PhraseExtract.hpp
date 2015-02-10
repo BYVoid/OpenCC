@@ -29,8 +29,6 @@ class PhraseExtract {
 public:
   PhraseExtract();
 
-  void Detect(const string& fullText);
-
   void SetFullText(const string& fullText) {
     utf8FullText = UTF8StringSlice(fullText.c_str());
   }
@@ -47,13 +45,13 @@ public:
     suffixSetLength = _suffixSetLength;
   }
 
-  void SetPreCalculationFilter(
-      const std::function<bool(const UTF8StringSlice& word)>& filter) {
+  void SetPreCalculationFilter(const std::function<
+      bool(const PhraseExtract&, const UTF8StringSlice&)>& filter) {
     preCalculationFilter = filter;
   }
 
-  void SetPostCalculationFilter(
-      const std::function<bool(const UTF8StringSlice& word)>& filter) {
+  void SetPostCalculationFilter(const std::function<
+      bool(const PhraseExtract&, const UTF8StringSlice&)>& filter) {
     postCalculationFilter = filter;
   }
 
@@ -106,8 +104,10 @@ private:
   size_t wordMaxLength;
   size_t prefixSetLength;
   size_t suffixSetLength;
-  std::function<bool(const UTF8StringSlice& word)> preCalculationFilter;
-  std::function<bool(const UTF8StringSlice& word)> postCalculationFilter;
+  std::function<bool(const PhraseExtract&, const UTF8StringSlice&)>
+      preCalculationFilter;
+  std::function<bool(const PhraseExtract&, const UTF8StringSlice&)>
+      postCalculationFilter;
 
   bool prefixesExtracted;
   bool suffixesExtracted;

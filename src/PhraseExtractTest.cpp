@@ -85,6 +85,13 @@ TEST_F(PhraseExtractTest, CalculateFrequency) {
   EXPECT_EQ(2, phraseExtract.Frequency("是四十"));
   EXPECT_EQ(2, phraseExtract.Frequency("是四"));
   EXPECT_EQ(2, phraseExtract.Frequency("四是"));
+  EXPECT_THROW(phraseExtract.Frequency("non-existing"), ShouldNotBeHere);
+  EXPECT_DOUBLE_EQ(-2.0149030205422647, phraseExtract.LogProbability("四"));
+  EXPECT_DOUBLE_EQ(-2.0149030205422647, phraseExtract.LogProbability("十"));
+  EXPECT_DOUBLE_EQ(-2.4203681286504288, phraseExtract.LogProbability("是"));
+  EXPECT_DOUBLE_EQ(-2.7080502011022096, phraseExtract.LogProbability("四十"));
+  EXPECT_DOUBLE_EQ(-3.8066624897703196, phraseExtract.LogProbability("是十十"));
+  EXPECT_THROW(phraseExtract.LogProbability("non-existing"), ShouldNotBeHere);
 }
 
 TEST_F(PhraseExtractTest, ExtractWordCandidates) {
@@ -98,6 +105,65 @@ TEST_F(PhraseExtractTest, ExtractWordCandidates) {
                                      "十是十", "十是四", "四四", "四四十",
                                      "四是十", "四是四", "是十十", "是十四"}),
             phraseExtract.WordCandidates());
+}
+
+TEST_F(PhraseExtractTest, CalculateCohesions) {
+  phraseExtract.Reset();
+  phraseExtract.SetWordMaxLength(3);
+  phraseExtract.SetFullText(siShi);
+  phraseExtract.CalculateCohesions();
+  EXPECT_DOUBLE_EQ(INFINITY, phraseExtract.Cohesion("四"));
+  EXPECT_DOUBLE_EQ(1.3217558399823193, phraseExtract.Cohesion("四十"));
+  EXPECT_DOUBLE_EQ(0.91629073187415511, phraseExtract.Cohesion("十四"));
+  EXPECT_DOUBLE_EQ(1.3217558399823193, phraseExtract.Cohesion("十是"));
+  EXPECT_DOUBLE_EQ(1.3217558399823193, phraseExtract.Cohesion("四是四"));
+  EXPECT_DOUBLE_EQ(1.3217558399823193, phraseExtract.Cohesion("十是十"));
+  EXPECT_THROW(phraseExtract.Cohesion("non-existing"), ShouldNotBeHere);
+}
+
+TEST_F(PhraseExtractTest, CalculateSuffixEntropy) {
+  phraseExtract.Reset();
+  phraseExtract.SetWordMaxLength(3);
+  phraseExtract.SetFullText(siShi);
+  phraseExtract.CalculateSuffixEntropy();
+  EXPECT_DOUBLE_EQ(1.0549201679861442, phraseExtract.SuffixEntropy("十"));
+  EXPECT_DOUBLE_EQ(1.0114042647073518, phraseExtract.SuffixEntropy("四"));
+  EXPECT_DOUBLE_EQ(0.69314718055994529, phraseExtract.SuffixEntropy("十四"));
+  EXPECT_DOUBLE_EQ(0.69314718055994529, phraseExtract.SuffixEntropy("十是"));
+  EXPECT_DOUBLE_EQ(0, phraseExtract.SuffixEntropy("四十"));
+  EXPECT_DOUBLE_EQ(0, phraseExtract.SuffixEntropy("四是四"));
+  EXPECT_DOUBLE_EQ(0, phraseExtract.SuffixEntropy("十是十"));
+  EXPECT_THROW(phraseExtract.SuffixEntropy("non-existing"), ShouldNotBeHere);
+}
+
+TEST_F(PhraseExtractTest, CalculatePrefixEntropy) {
+  phraseExtract.Reset();
+  phraseExtract.SetWordMaxLength(3);
+  phraseExtract.SetFullText(siShi);
+  phraseExtract.CalculatePrefixEntropy();
+  EXPECT_DOUBLE_EQ(1.0114042647073516, phraseExtract.PrefixEntropy("十"));
+  EXPECT_DOUBLE_EQ(1.0549201679861442, phraseExtract.PrefixEntropy("四"));
+  EXPECT_DOUBLE_EQ(0.69314718055994529, phraseExtract.PrefixEntropy("十四"));
+  EXPECT_DOUBLE_EQ(0, phraseExtract.PrefixEntropy("十是"));
+  EXPECT_DOUBLE_EQ(0.63651416829481278, phraseExtract.PrefixEntropy("四十"));
+  EXPECT_DOUBLE_EQ(0, phraseExtract.PrefixEntropy("四是四"));
+  EXPECT_DOUBLE_EQ(0, phraseExtract.PrefixEntropy("十是十"));
+  EXPECT_THROW(phraseExtract.PrefixEntropy("non-existing"), ShouldNotBeHere);
+}
+
+TEST_F(PhraseExtractTest, SelectWords) {
+  phraseExtract.Reset();
+  phraseExtract.SetWordMaxLength(3);
+  phraseExtract.SetFullText(siShi);
+  phraseExtract.SetPostCalculationFilter(
+      [](const PhraseExtract& phraseExtract, const UTF8StringSlice& word) {
+        return phraseExtract.Frequency(word) == 1;
+      });
+  phraseExtract.SelectWords();
+  EXPECT_EQ(
+      vector<UTF8StringSlice>({"十", "四", "是", "四十", "十四", "十是",
+                               "四十是", "四是", "是十", "是四", "是四十"}),
+      phraseExtract.Words());
 }
 
 } // namespace opencc

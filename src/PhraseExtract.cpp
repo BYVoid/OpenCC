@@ -31,7 +31,7 @@ VAL_TYPE Lookup(const std::unordered_map<UTF8StringSlice, VAL_TYPE,
   if (iterator != dict.end()) {
     return iterator->second;
   } else {
-    assert(false);
+    throw ShouldNotBeHere();
   }
 }
 
@@ -48,7 +48,17 @@ bool ContainsPunctuation(const UTF8StringSlice& word) {
   return false;
 }
 
-bool NoFilter(const UTF8StringSlice&) { return false; }
+bool DefaultPreCalculationFilter(const PhraseExtract&, const UTF8StringSlice&) {
+  return false;
+}
+
+bool DefaultPostCalculationFilter(const PhraseExtract& phraseExtract,
+                                  const UTF8StringSlice& word) {
+  const double cohesion = phraseExtract.Cohesion(word);
+  const double entropy = phraseExtract.Entropy(word);
+  bool accept = cohesion >= 0 && entropy >= 0;
+  return !accept;
+}
 
 } // namespace internal
 
@@ -56,20 +66,9 @@ using namespace internal;
 
 PhraseExtract::PhraseExtract()
     : wordMaxLength(2), prefixSetLength(1), suffixSetLength(1),
-      preCalculationFilter(NoFilter), postCalculationFilter(NoFilter),
-      utf8FullText("") {}
-
-void PhraseExtract::Detect(const string& fullText) {
+      preCalculationFilter(DefaultPreCalculationFilter),
+      postCalculationFilter(DefaultPostCalculationFilter), utf8FullText("") {
   Reset();
-  SetFullText(fullText);
-  ExtractSuffixes();
-  ExtractPrefixes();
-  CalculateFrequency();
-  ExtractWordCandidates();
-  CalculateCohesions();
-  CalculateSuffixEntropy();
-  CalculatePrefixEntropy();
-  SelectWords();
 }
 
 void PhraseExtract::Reset() {
@@ -92,6 +91,8 @@ void PhraseExtract::Reset() {
   suffixEntropies.clear();
   prefixEntropies.clear();
   utf8FullText = UTF8StringSlice("");
+  preCalculationFilter = DefaultPreCalculationFilter;
+  postCalculationFilter = DefaultPostCalculationFilter;
 }
 
 void PhraseExtract::ExtractSuffixes() {
@@ -145,7 +146,7 @@ void PhraseExtract::ExtractWordCandidates() {
     if (ContainsPunctuation(wordCandidate)) {
       continue;
     }
-    if (!preCalculationFilter(wordCandidate)) {
+    if (!preCalculationFilter(*this, wordCandidate)) {
       wordCandidates.push_back(wordCandidate);
     }
   }
@@ -324,6 +325,9 @@ void PhraseExtract::SelectWords() {
   if (!wordCandidatesExtracted) {
     ExtractWordCandidates();
   }
+  if (!cohesionsCalculated) {
+    CalculateCohesions();
+  }
   if (!prefixEntropiesCalculated) {
     CalculatePrefixEntropy();
   }
@@ -331,7 +335,7 @@ void PhraseExtract::SelectWords() {
     CalculateSuffixEntropy();
   }
   for (const auto& word : wordCandidates) {
-    if (!postCalculationFilter(word)) {
+    if (!postCalculationFilter(*this, word)) {
       words.push_back(word);
     }
   }

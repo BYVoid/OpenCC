@@ -25,31 +25,33 @@ int main(int argc, const char* argv[]) {
   std::ifstream ifs("/Users/byvoid/a.txt");
   const string content((std::istreambuf_iterator<char>(ifs)),
                        (std::istreambuf_iterator<char>()));
-  PhraseExtract wordDetection;
-  wordDetection.SetWordMaxLength(2);
-  wordDetection.SetPrefixSetLength(1);
-  wordDetection.SetSuffixSetLength(1);
-  wordDetection.SetPreCalculationFilter(
-      [](const UTF8StringSlice& word) { return word.UTF8Length() < 2; });
-  wordDetection.SetPostCalculationFilter(
-      [&wordDetection](const UTF8StringSlice& word) {
-        const size_t frequency = wordDetection.Frequency(word);
-        const double cohesion = wordDetection.Cohesion(word);
-        const double entropy = wordDetection.Entropy(word);
-        const double suffixEntropy = wordDetection.SuffixEntropy(word);
-        const double prefixEntropy = wordDetection.PrefixEntropy(word);
-        bool accept = cohesion >= 3.5 && entropy >= 3.3 &&
-                      prefixEntropy >= 0.5 && suffixEntropy >= 0.5;
-        return !accept;
+  PhraseExtract phraseExtract;
+  phraseExtract.SetWordMaxLength(2);
+  phraseExtract.SetPrefixSetLength(1);
+  phraseExtract.SetSuffixSetLength(1);
+  phraseExtract.SetPreCalculationFilter(
+      [](const PhraseExtract& phraseExtract, const UTF8StringSlice& word) {
+        return word.UTF8Length() < 2;
       });
+  phraseExtract.SetPostCalculationFilter([&phraseExtract](
+      const PhraseExtract& phraseExtract, const UTF8StringSlice& word) {
+    const double cohesion = phraseExtract.Cohesion(word);
+    const double entropy = phraseExtract.Entropy(word);
+    const double suffixEntropy = phraseExtract.SuffixEntropy(word);
+    const double prefixEntropy = phraseExtract.PrefixEntropy(word);
+    bool accept = cohesion >= 3.5 && entropy >= 3.3 && prefixEntropy >= 0.5 &&
+                  suffixEntropy >= 0.5;
+    return !accept;
+  });
 
-  wordDetection.Detect(content.c_str());
-  for (const auto& word : wordDetection.Words()) {
-    const size_t frequency = wordDetection.Frequency(word);
-    const double cohesion = wordDetection.Cohesion(word);
-    const double suffixEntropy = wordDetection.SuffixEntropy(word);
-    const double prefixEntropy = wordDetection.PrefixEntropy(word);
-    const double entropy = wordDetection.Entropy(word);
+  phraseExtract.SetFullText(content);
+  phraseExtract.SelectWords();
+  for (const auto& word : phraseExtract.Words()) {
+    const size_t frequency = phraseExtract.Frequency(word);
+    const double cohesion = phraseExtract.Cohesion(word);
+    const double suffixEntropy = phraseExtract.SuffixEntropy(word);
+    const double prefixEntropy = phraseExtract.PrefixEntropy(word);
+    const double entropy = phraseExtract.Entropy(word);
     std::cout << word.ToString() << " " << frequency << " " << cohesion << " "
               << entropy << " " << prefixEntropy << " " << suffixEntropy
               << std::endl;

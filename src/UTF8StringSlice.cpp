@@ -140,4 +140,8 @@ size_t UTF8StringSlice::Hasher::operator()(const UTF8StringSlice& text) const {
   return std::hash<string>()(text.ToString());
 }
 
+std::ostream& operator<<(::std::ostream& os, const UTF8StringSlice& str) {
+  return os << str.ToString();
+}
+
 } // namespace opencc

@@ -98,4 +98,6 @@ private:
   size_t byteLength;
 };
 
+std::ostream& operator<<(::std::ostream& os, const UTF8StringSlice& str);
+
 } // namespace opencc

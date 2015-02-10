@@ -24,7 +24,6 @@
 #include "UTF8StringSlice.hpp"
 
 namespace opencc {
-namespace tools {
 
 class UTF8StringSliceHasher {
 public:
@@ -113,5 +112,4 @@ private:
       prefixEntropies;
 };
 
-} // namespace tools
 } // namespace opencc

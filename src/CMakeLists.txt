@@ -23,6 +23,7 @@ set(
   Lexicon.hpp
   MaxMatchSegmentation.hpp
   Optional.hpp
+  PhraseExtract.hpp
   Segmentation.hpp
   Segments.hpp
   SerializableDict.hpp
@@ -45,6 +46,7 @@ set(
   DictEntry.cpp
   DictGroup.cpp
   MaxMatchSegmentation.cpp
+  PhraseExtract.cpp
   SimpleConverter.cpp
   Segmentation.cpp
   TextDict.cpp

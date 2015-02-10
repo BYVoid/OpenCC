@@ -73,6 +73,14 @@ void PhraseExtract::Detect(const string& fullText) {
 }
 
 void PhraseExtract::Reset() {
+  prefixesExtracted = false;
+  suffixesExtracted = false;
+  frequenciesCalculated = false;
+  wordCandidatesExtracted = false;
+  cohesionsCalculated = false;
+  prefixEntropiesCalculated = false;
+  suffixEntropiesCalculated = false;
+  wordsSelected = false;
   totalOccurrence = 0;
   logTotalOccurrence = 0;
   prefixes.clear();
@@ -95,6 +103,7 @@ void PhraseExtract::ExtractSuffixes() {
   }
   // Sort suffixes
   std::sort(suffixes.begin(), suffixes.end());
+  suffixesExtracted = true;
 }
 
 void PhraseExtract::ExtractPrefixes() {
@@ -109,9 +118,13 @@ void PhraseExtract::ExtractPrefixes() {
             [](const UTF8StringSlice& a, const UTF8StringSlice& b) {
     return a.ReverseCompare(b) < 0;
   });
+  prefixesExtracted = true;
 }
 
 void PhraseExtract::CalculateFrequency() {
+  if (!suffixesExtracted) {
+    ExtractSuffixes();
+  }
   for (const auto& suffix : suffixes) {
     for (size_t i = 1; i <= suffix.UTF8Length() && i <= wordMaxLength; i++) {
       const UTF8StringSlice wordCandidate = suffix.Left(i);
@@ -120,9 +133,13 @@ void PhraseExtract::CalculateFrequency() {
     }
   }
   logTotalOccurrence = log(totalOccurrence);
+  frequenciesCalculated = true;
 }
 
 void PhraseExtract::ExtractWordCandidates() {
+  if (!frequenciesCalculated) {
+    CalculateFrequency();
+  }
   for (const auto& item : frequencies) {
     const UTF8StringSlice wordCandidate = item.first;
     if (ContainsPunctuation(wordCandidate)) {
@@ -135,11 +152,26 @@ void PhraseExtract::ExtractWordCandidates() {
   // Sort by frequency
   std::sort(wordCandidates.begin(), wordCandidates.end(),
             [this](const UTF8StringSlice& a, const UTF8StringSlice& b) {
-    return Frequency(a) > Frequency(b);
+    const size_t freqA = Frequency(a);
+    const size_t freqB = Frequency(b);
+    if (freqA > freqB) {
+      return true;
+    } else if (freqA < freqB) {
+      return false;
+    } else {
+      return a < b;
+    }
   });
+  wordCandidatesExtracted = true;
 }
 
 void PhraseExtract::CalculateSuffixEntropy() {
+  if (!suffixesExtracted) {
+    ExtractSuffixes();
+  }
+  if (!frequenciesCalculated) {
+    CalculateFrequency();
+  }
   for (size_t length = 1; length <= wordMaxLength; length++) {
     std::unordered_map<UTF8StringSlice, size_t, UTF8StringSlice::Hasher>
         suffixSet;
@@ -166,9 +198,16 @@ void PhraseExtract::CalculateSuffixEntropy() {
     }
     updateEntropy();
   }
+  suffixEntropiesCalculated = true;
 }
 
 void PhraseExtract::CalculatePrefixEntropy() {
+  if (!prefixEntropiesCalculated) {
+    ExtractPrefixes();
+  }
+  if (!frequenciesCalculated) {
+    CalculateFrequency();
+  }
   for (size_t length = 1; length <= wordMaxLength; length++) {
     std::unordered_map<UTF8StringSlice, size_t, UTF8StringSlice::Hasher>
         prefixSet;
@@ -196,12 +235,20 @@ void PhraseExtract::CalculatePrefixEntropy() {
     }
     updateEntropy();
   }
+  prefixEntropiesCalculated = true;
 }
 
 void PhraseExtract::CalculateCohesions() {
+  if (!wordCandidatesExtracted) {
+    ExtractWordCandidates();
+  }
+  if (!frequenciesCalculated) {
+    CalculateFrequency();
+  }
   for (const auto& wordCandidate : wordCandidates) {
     cohesions[wordCandidate] = CalculateCohesion(wordCandidate);
   }
+  cohesionsCalculated = true;
 }
 
 double PhraseExtract::Cohesion(const UTF8StringSlice& word) const {
@@ -274,11 +321,21 @@ double PhraseExtract::CalculateEntropy(const std::unordered_map<
 }
 
 void PhraseExtract::SelectWords() {
+  if (!wordCandidatesExtracted) {
+    ExtractWordCandidates();
+  }
+  if (!prefixEntropiesCalculated) {
+    CalculatePrefixEntropy();
+  }
+  if (!suffixEntropiesCalculated) {
+    CalculateSuffixEntropy();
+  }
   for (const auto& word : wordCandidates) {
     if (!postCalculationFilter(word)) {
       words.push_back(word);
     }
   }
+  wordsSelected = true;
 }
 
 } // namespace opencc

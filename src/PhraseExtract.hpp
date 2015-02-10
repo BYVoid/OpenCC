@@ -74,6 +74,7 @@ public:
   size_t Frequency(const UTF8StringSlice& word) const;
 
   double LogProbability(const UTF8StringSlice& word) const;
+
   void Reset();
 
   void ExtractSuffixes();
@@ -107,6 +108,15 @@ private:
   size_t suffixSetLength;
   std::function<bool(const UTF8StringSlice& word)> preCalculationFilter;
   std::function<bool(const UTF8StringSlice& word)> postCalculationFilter;
+
+  bool prefixesExtracted;
+  bool suffixesExtracted;
+  bool frequenciesCalculated;
+  bool wordCandidatesExtracted;
+  bool cohesionsCalculated;
+  bool prefixEntropiesCalculated;
+  bool suffixEntropiesCalculated;
+  bool wordsSelected;
 
   UTF8StringSlice utf8FullText;
   size_t totalOccurrence;

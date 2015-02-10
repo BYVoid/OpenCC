@@ -40,7 +40,7 @@ foreach(CONFIG ${CONFIGURATIONS})
   add_test(
     ${CONFIG}_convert
     ${CMAKE_COMMAND} -E chdir ${PROJECT_BINARY_DIR}/data
-    ${PROJECT_BINARY_DIR}/src/opencc
+    ${PROJECT_BINARY_DIR}/src/tools/opencc
     -i ${CMAKE_SOURCE_DIR}/test/testcases/${CONFIG}.in
     -o ${PROJECT_BINARY_DIR}/test/${CONFIG}.out
     -c ${CMAKE_SOURCE_DIR}/data/config/${CONFIG}.json

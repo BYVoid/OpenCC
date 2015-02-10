@@ -102,6 +102,7 @@ if (ENABLE_GTEST)
     DartsDictTest.cpp
     DictGroupTest.cpp
     MaxMatchSegmentationTest.cpp
+    PhraseExtractTest.cpp
     SimpleConverterTest.cpp
     TextDictTest.cpp
     UTF8StringSliceTest.cpp

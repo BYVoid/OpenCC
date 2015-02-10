@@ -25,7 +25,10 @@ int main(int argc, const char* argv[]) {
   std::ifstream ifs("/Users/byvoid/a.txt");
   const string content((std::istreambuf_iterator<char>(ifs)),
                        (std::istreambuf_iterator<char>()));
-  PhraseExtract wordDetection(4);
+  PhraseExtract wordDetection;
+  wordDetection.SetWordMaxLength(2);
+  wordDetection.SetPrefixSetLength(1);
+  wordDetection.SetSuffixSetLength(1);
   wordDetection.SetPreCalculationFilter(
       [](const UTF8StringSlice& word) { return word.UTF8Length() < 2; });
   wordDetection.SetPostCalculationFilter(

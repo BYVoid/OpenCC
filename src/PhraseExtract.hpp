@@ -27,9 +27,25 @@ namespace opencc {
 
 class PhraseExtract {
 public:
-  PhraseExtract(const size_t _wordMaxLength);
+  PhraseExtract();
 
   void Detect(const string& fullText);
+
+  void SetFullText(const string& fullText) {
+    utf8FullText = UTF8StringSlice(fullText.c_str());
+  }
+
+  void SetWordMaxLength(const size_t _wordMaxLength) {
+    wordMaxLength = _wordMaxLength;
+  }
+
+  void SetPrefixSetLength(const size_t _prefixSetLength) {
+    prefixSetLength = _prefixSetLength;
+  }
+
+  void SetSuffixSetLength(const size_t _suffixSetLength) {
+    suffixSetLength = _suffixSetLength;
+  }
 
   void SetPreCalculationFilter(
       const std::function<bool(const UTF8StringSlice& word)>& filter) {
@@ -58,8 +74,8 @@ public:
   size_t Frequency(const UTF8StringSlice& word) const;
 
   double LogProbability(const UTF8StringSlice& word) const;
+  void Reset();
 
-private:
   void ExtractSuffixes();
 
   void ExtractPrefixes();
@@ -76,6 +92,7 @@ private:
 
   void SelectWords();
 
+private:
   // Pointwise Mutual Information
   double PMI(const UTF8StringSlice& wordCandidate, const UTF8StringSlice& part1,
              const UTF8StringSlice& part2) const;
@@ -85,9 +102,9 @@ private:
   double CalculateEntropy(const std::unordered_map<
       UTF8StringSlice, size_t, UTF8StringSlice::Hasher>& choices) const;
 
-  const size_t wordMaxLength;
-  const size_t prefixSetLength;
-  const size_t suffixSetLength;
+  size_t wordMaxLength;
+  size_t prefixSetLength;
+  size_t suffixSetLength;
   std::function<bool(const UTF8StringSlice& word)> preCalculationFilter;
   std::function<bool(const UTF8StringSlice& word)> postCalculationFilter;
 
@@ -106,6 +123,8 @@ private:
       suffixEntropies;
   std::unordered_map<UTF8StringSlice, double, UTF8StringSlice::Hasher>
       prefixEntropies;
+
+  friend class PhraseExtractTest;
 };
 
 } // namespace opencc

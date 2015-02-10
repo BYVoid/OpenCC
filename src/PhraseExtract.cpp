@@ -54,13 +54,14 @@ bool NoFilter(const UTF8StringSlice&) { return false; }
 
 using namespace internal;
 
-PhraseExtract::PhraseExtract(const size_t _wordMaxLength)
-    : wordMaxLength(_wordMaxLength), prefixSetLength(1), suffixSetLength(1),
+PhraseExtract::PhraseExtract()
+    : wordMaxLength(2), prefixSetLength(1), suffixSetLength(1),
       preCalculationFilter(NoFilter), postCalculationFilter(NoFilter),
-      totalOccurrence(0), utf8FullText("") {}
+      utf8FullText("") {}
 
 void PhraseExtract::Detect(const string& fullText) {
-  utf8FullText = UTF8StringSlice(fullText.c_str());
+  Reset();
+  SetFullText(fullText);
   ExtractSuffixes();
   ExtractPrefixes();
   CalculateFrequency();
@@ -69,6 +70,20 @@ void PhraseExtract::Detect(const string& fullText) {
   CalculateSuffixEntropy();
   CalculatePrefixEntropy();
   SelectWords();
+}
+
+void PhraseExtract::Reset() {
+  totalOccurrence = 0;
+  logTotalOccurrence = 0;
+  prefixes.clear();
+  suffixes.clear();
+  wordCandidates.clear();
+  words.clear();
+  frequencies.clear();
+  cohesions.clear();
+  suffixEntropies.clear();
+  prefixEntropies.clear();
+  utf8FullText = UTF8StringSlice("");
 }
 
 void PhraseExtract::ExtractSuffixes() {

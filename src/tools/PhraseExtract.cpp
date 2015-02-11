@@ -16,15 +16,22 @@
  * limitations under the License.
  */
 
+#include "CmdLineOutput.hpp"
 #include "PhraseExtract.hpp"
 
+using opencc::Exception;
 using opencc::UTF8StringSlice;
 using opencc::PhraseExtract;
 
-int main(int argc, const char* argv[]) {
-  std::ifstream ifs("/Users/byvoid/a.txt");
-  const string content((std::istreambuf_iterator<char>(ifs)),
-                       (std::istreambuf_iterator<char>()));
+void Extract(const vector<string>& inputFiles, const string& outputFile) {
+  std::ostringstream buffer;
+  for (const auto& inputFile : inputFiles) {
+    std::ifstream ifs(inputFile);
+    const string contents((std::istreambuf_iterator<char>(ifs)),
+                          (std::istreambuf_iterator<char>()));
+    buffer << contents;
+  }
+  const string& text = buffer.str();
   PhraseExtract phraseExtract;
   phraseExtract.SetWordMaxLength(2);
   phraseExtract.SetPrefixSetLength(1);
@@ -33,28 +40,51 @@ int main(int argc, const char* argv[]) {
       [](const PhraseExtract& phraseExtract, const UTF8StringSlice& word) {
         return word.UTF8Length() < 2;
       });
-  phraseExtract.SetPostCalculationFilter([&phraseExtract](
-      const PhraseExtract& phraseExtract, const UTF8StringSlice& word) {
-    const double cohesion = phraseExtract.Cohesion(word);
-    const double entropy = phraseExtract.Entropy(word);
-    const double suffixEntropy = phraseExtract.SuffixEntropy(word);
-    const double prefixEntropy = phraseExtract.PrefixEntropy(word);
-    bool accept = cohesion >= 3.5 && entropy >= 3.3 && prefixEntropy >= 0.5 &&
-                  suffixEntropy >= 0.5;
-    return !accept;
-  });
+  phraseExtract.SetPostCalculationFilter(
+      [](const PhraseExtract& phraseExtract, const UTF8StringSlice& word) {
+        const double cohesion = phraseExtract.Cohesion(word);
+        const double entropy = phraseExtract.Entropy(word);
+        const double suffixEntropy = phraseExtract.SuffixEntropy(word);
+        const double prefixEntropy = phraseExtract.PrefixEntropy(word);
+        bool accept = cohesion >= 3.5 && entropy >= 3.3 &&
+                      prefixEntropy >= 0.5 && suffixEntropy >= 0.5;
+        return !accept;
+      });
 
-  phraseExtract.SetFullText(content);
+  phraseExtract.SetFullText(text);
   phraseExtract.SelectWords();
+  std::ofstream ofs(outputFile);
   for (const auto& word : phraseExtract.Words()) {
     const size_t frequency = phraseExtract.Frequency(word);
     const double cohesion = phraseExtract.Cohesion(word);
     const double suffixEntropy = phraseExtract.SuffixEntropy(word);
     const double prefixEntropy = phraseExtract.PrefixEntropy(word);
     const double entropy = phraseExtract.Entropy(word);
-    std::cout << word.ToString() << " " << frequency << " " << cohesion << " "
-              << entropy << " " << prefixEntropy << " " << suffixEntropy
+    ofs << word.ToString() << " " << frequency << " " << cohesion << " "
+        << entropy << " " << prefixEntropy << " " << suffixEntropy << std::endl;
+  }
+  ofs.close();
+}
+
+int main(int argc, const char* argv[]) {
+  try {
+    TCLAP::CmdLine cmd("Open Chinese Convert (OpenCC) Phrase Extractor", ' ',
+                       VERSION);
+    CmdLineOutput cmdLineOutput;
+    cmd.setOutput(&cmdLineOutput);
+    TCLAP::UnlabeledMultiArg<string> fileNames("fileName", "Input files",
+                                               true /* required */, "files");
+    cmd.add(fileNames);
+    TCLAP::ValueArg<string> outputArg("o", "output", "Output file",
+                                      true /* required */, "" /* default */,
+                                      "file" /* type */, cmd);
+    cmd.parse(argc, argv);
+    Extract(fileNames.getValue(), outputArg.getValue());
+  } catch (TCLAP::ArgException& e) {
+    std::cerr << "error: " << e.error() << " for arg " << e.argId()
               << std::endl;
+  } catch (Exception& e) {
+    std::cerr << e.what() << std::endl;
   }
   return 0;
 }

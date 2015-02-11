@@ -120,9 +120,11 @@ int UTF8StringSlice::ReverseCompare(const UTF8StringSlice& that) const {
 }
 
 size_t UTF8StringSlice::FindBytePosition(const UTF8StringSlice& pattern) const {
-  const size_t pos = ToString().find(pattern.ToString());
-  if (pos != string::npos) {
-    return pos;
+  const void* ptr = memmem(str, byteLength, pattern.str, pattern.byteLength);
+  if (ptr != nullptr) {
+    return reinterpret_cast<const char*>(ptr) - str;
+  } else if (pattern.byteLength == 0) {
+    return 0;
   } else {
     return static_cast<size_t>(-1);
   }

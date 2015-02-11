@@ -25,7 +25,7 @@ class PhraseExtractTest : public ::testing::Test {
 protected:
   PhraseExtractTest()
       : siShi(utf8("四是四十是十十四是十四四十是四十")),
-        tianGan(utf8("甲乙丙丁戊己庚辛壬癸")) {}
+        punctuation(utf8("一.二.三")) {}
 
   const vector<UTF8StringSlice>& Suffixes() const {
     return phraseExtract.suffixes;
@@ -38,7 +38,7 @@ protected:
   PhraseExtract phraseExtract;
 
   const string siShi;
-  const string tianGan;
+  const string punctuation;
 };
 
 TEST_F(PhraseExtractTest, ExtractSuffixes) {
@@ -153,6 +153,15 @@ TEST_F(PhraseExtractTest, SelectWords) {
       vector<UTF8StringSlice>({"十", "四", "是", "四十", "十四", "十是",
                                "四十是", "四是", "是十", "是四", "是四十"}),
       phraseExtract.Words());
+}
+
+TEST_F(PhraseExtractTest, Punctuation) {
+  phraseExtract.Reset();
+  phraseExtract.SetWordMaxLength(2);
+  phraseExtract.SetFullText(punctuation);
+  phraseExtract.ExtractPrefixes();
+  EXPECT_EQ(vector<UTF8StringSlice>({"一.", ".二.", "一", "二.三", "一.二"}),
+            Prefixes());
 }
 
 } // namespace opencc

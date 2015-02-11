@@ -69,4 +69,10 @@ TEST_F(UTF8UtilTest, TruncateUTF8) {
   EXPECT_EQ(text, UTF8Util::TruncateUTF8(text, length + 1));
 }
 
+TEST_F(UTF8UtilTest, GetByteMap) {
+  vector<size_t> byteMap;
+  UTF8Util::GetByteMap(text, 6, &byteMap);
+  EXPECT_EQ(vector<size_t>({0, 3, 6, 9, 12, 16}), byteMap);
+}
+
 } // namespace opencc

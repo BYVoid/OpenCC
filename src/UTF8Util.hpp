@@ -212,5 +212,17 @@ public:
     }
     return buffer.str();
   }
+
+  static void GetByteMap(const char* str, const size_t utf8Length,
+                         vector<size_t>* byteMap) {
+    if (byteMap->size() < utf8Length) {
+      byteMap->resize(utf8Length);
+    }
+    const char* pstr = str;
+    for (size_t i = 0; i < utf8Length; i++) {
+      (*byteMap)[i] = pstr - str;
+      pstr = NextChar(pstr);
+    }
+  }
 };
 }

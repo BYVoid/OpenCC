@@ -138,8 +138,35 @@ void UTF8StringSlice::CalculateByteLength() {
   byteLength = pstr - str;
 }
 
+namespace {
+
+inline size_t FNVHash(const UTF8StringSlice& text, const size_t FNV_prime,
+                      const size_t FNV_offset_basis) {
+  size_t hash = FNV_offset_basis;
+  for (const char* pstr = text.CString();
+       pstr < text.CString() + text.ByteLength(); pstr++) {
+    hash ^= *pstr;
+    hash *= FNV_prime;
+  }
+  return hash;
+}
+
+template <int> size_t FNVHash(const UTF8StringSlice& text);
+
+template <> size_t FNVHash<4>(const UTF8StringSlice& text) {
+  return FNVHash(text, 16777619UL, 2166136261UL);
+}
+
+template <> size_t FNVHash<8>(const UTF8StringSlice& text) {
+  return FNVHash(text, 1099511628211UL, 14695981039346656037UL);
+}
+
+} // namespace
+
 size_t UTF8StringSlice::Hasher::operator()(const UTF8StringSlice& text) const {
-  return std::hash<string>()(text.ToString());
+  (void)FNVHash<4>; // Supress warning
+  (void)FNVHash<8>; // Supress warning
+  return FNVHash<sizeof(size_t)>(text);
 }
 
 std::ostream& operator<<(::std::ostream& os, const UTF8StringSlice& str) {

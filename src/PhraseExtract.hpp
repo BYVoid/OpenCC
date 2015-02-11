@@ -29,6 +29,8 @@ class PhraseExtract {
 public:
   PhraseExtract();
 
+  virtual ~PhraseExtract();
+
   void SetFullText(const string& fullText) {
     utf8FullText = UTF8StringSlice(fullText.c_str());
   }
@@ -61,6 +63,15 @@ public:
     return wordCandidates;
   }
 
+  struct Signals {
+    size_t frequency;
+    double cohesion;
+    double suffixEntropy;
+    double prefixEntropy;
+  };
+
+  const Signals& Signal(const UTF8StringSlice& wordCandidate) const;
+
   double Cohesion(const UTF8StringSlice& wordCandidate) const;
 
   double Entropy(const UTF8StringSlice& wordCandidate) const;
@@ -92,6 +103,8 @@ public:
   void SelectWords();
 
 private:
+  class DictType;
+
   // Pointwise Mutual Information
   double PMI(const UTF8StringSlice& wordCandidate, const UTF8StringSlice& part1,
              const UTF8StringSlice& part2) const;
@@ -125,14 +138,7 @@ private:
   vector<UTF8StringSlice> suffixes;
   vector<UTF8StringSlice> wordCandidates;
   vector<UTF8StringSlice> words;
-  std::unordered_map<UTF8StringSlice, size_t, UTF8StringSlice::Hasher>
-      frequencies;
-  std::unordered_map<UTF8StringSlice, double, UTF8StringSlice::Hasher>
-      cohesions;
-  std::unordered_map<UTF8StringSlice, double, UTF8StringSlice::Hasher>
-      suffixEntropies;
-  std::unordered_map<UTF8StringSlice, double, UTF8StringSlice::Hasher>
-      prefixEntropies;
+  DictType* signals;
 
   friend class PhraseExtractTest;
 };

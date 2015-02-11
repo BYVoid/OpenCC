@@ -35,11 +35,6 @@ protected:
     return phraseExtract.prefixes;
   }
 
-  const std::unordered_map<UTF8StringSlice, size_t, UTF8StringSlice::Hasher>&
-  Frequencies() const {
-    return phraseExtract.frequencies;
-  }
-
   PhraseExtract phraseExtract;
 
   const string siShi;
@@ -77,7 +72,6 @@ TEST_F(PhraseExtractTest, CalculateFrequency) {
   phraseExtract.SetWordMaxLength(3);
   phraseExtract.SetFullText(siShi);
   phraseExtract.CalculateFrequency();
-  EXPECT_EQ(23, Frequencies().size());
   EXPECT_EQ(6, phraseExtract.Frequency("四"));
   EXPECT_EQ(6, phraseExtract.Frequency("十"));
   EXPECT_EQ(4, phraseExtract.Frequency("是"));
@@ -85,13 +79,11 @@ TEST_F(PhraseExtractTest, CalculateFrequency) {
   EXPECT_EQ(2, phraseExtract.Frequency("是四十"));
   EXPECT_EQ(2, phraseExtract.Frequency("是四"));
   EXPECT_EQ(2, phraseExtract.Frequency("四是"));
-  EXPECT_THROW(phraseExtract.Frequency("non-existing"), ShouldNotBeHere);
   EXPECT_DOUBLE_EQ(-2.0149030205422647, phraseExtract.LogProbability("四"));
   EXPECT_DOUBLE_EQ(-2.0149030205422647, phraseExtract.LogProbability("十"));
   EXPECT_DOUBLE_EQ(-2.4203681286504288, phraseExtract.LogProbability("是"));
   EXPECT_DOUBLE_EQ(-2.7080502011022096, phraseExtract.LogProbability("四十"));
   EXPECT_DOUBLE_EQ(-3.8066624897703196, phraseExtract.LogProbability("是十十"));
-  EXPECT_THROW(phraseExtract.LogProbability("non-existing"), ShouldNotBeHere);
 }
 
 TEST_F(PhraseExtractTest, ExtractWordCandidates) {
@@ -118,7 +110,6 @@ TEST_F(PhraseExtractTest, CalculateCohesions) {
   EXPECT_DOUBLE_EQ(1.3217558399823193, phraseExtract.Cohesion("十是"));
   EXPECT_DOUBLE_EQ(1.3217558399823193, phraseExtract.Cohesion("四是四"));
   EXPECT_DOUBLE_EQ(1.3217558399823193, phraseExtract.Cohesion("十是十"));
-  EXPECT_THROW(phraseExtract.Cohesion("non-existing"), ShouldNotBeHere);
 }
 
 TEST_F(PhraseExtractTest, CalculateSuffixEntropy) {
@@ -133,7 +124,6 @@ TEST_F(PhraseExtractTest, CalculateSuffixEntropy) {
   EXPECT_DOUBLE_EQ(0, phraseExtract.SuffixEntropy("四十"));
   EXPECT_DOUBLE_EQ(0, phraseExtract.SuffixEntropy("四是四"));
   EXPECT_DOUBLE_EQ(0, phraseExtract.SuffixEntropy("十是十"));
-  EXPECT_THROW(phraseExtract.SuffixEntropy("non-existing"), ShouldNotBeHere);
 }
 
 TEST_F(PhraseExtractTest, CalculatePrefixEntropy) {
@@ -148,7 +138,6 @@ TEST_F(PhraseExtractTest, CalculatePrefixEntropy) {
   EXPECT_DOUBLE_EQ(0.63651416829481278, phraseExtract.PrefixEntropy("四十"));
   EXPECT_DOUBLE_EQ(0, phraseExtract.PrefixEntropy("四是四"));
   EXPECT_DOUBLE_EQ(0, phraseExtract.PrefixEntropy("十是十"));
-  EXPECT_THROW(phraseExtract.PrefixEntropy("non-existing"), ShouldNotBeHere);
 }
 
 TEST_F(PhraseExtractTest, SelectWords) {

@@ -23,18 +23,6 @@
 namespace opencc {
 namespace internal {
 
-template <typename VAL_TYPE>
-VAL_TYPE Lookup(const std::unordered_map<UTF8StringSlice, VAL_TYPE,
-                                         UTF8StringSlice::Hasher>& dict,
-                const UTF8StringSlice& wordCandidate) {
-  const auto& iterator = dict.find(wordCandidate);
-  if (iterator != dict.end()) {
-    return iterator->second;
-  } else {
-    throw ShouldNotBeHere();
-  }
-}
-
 bool ContainsPunctuation(const UTF8StringSlice& word) {
   static const vector<UTF8StringSlice> punctuations = {
       " ",  "\n", "\r", "\t", "-",  ",",  ".",  "?",  "!", "*",
@@ -62,14 +50,44 @@ bool DefaultPostCalculationFilter(const PhraseExtract& phraseExtract,
 
 } // namespace internal
 
+class PhraseExtract::DictType {
+public:
+  PhraseExtract::Signals& Get(const UTF8StringSlice& key) {
+    return dict.at(key);
+  }
+
+  PhraseExtract::Signals& AddKey(const UTF8StringSlice& key) {
+    return dict[key];
+  }
+
+  void Clear() { dict.clear(); }
+
+  vector<UTF8StringSlice> Keys() const {
+    vector<UTF8StringSlice> keys;
+    for (const auto& item : dict) {
+      keys.push_back(item.first);
+    }
+    return keys;
+  }
+
+  void Build() {}
+
+private:
+  std::unordered_map<UTF8StringSlice, PhraseExtract::Signals,
+                     UTF8StringSlice::Hasher> dict;
+};
+
 using namespace internal;
 
 PhraseExtract::PhraseExtract()
     : wordMaxLength(2), prefixSetLength(1), suffixSetLength(1),
       preCalculationFilter(DefaultPreCalculationFilter),
-      postCalculationFilter(DefaultPostCalculationFilter), utf8FullText("") {
+      postCalculationFilter(DefaultPostCalculationFilter), utf8FullText(""),
+      signals(new DictType) {
   Reset();
 }
+
+PhraseExtract::~PhraseExtract() { delete signals; }
 
 void PhraseExtract::Reset() {
   prefixesExtracted = false;
@@ -86,10 +104,7 @@ void PhraseExtract::Reset() {
   suffixes.clear();
   wordCandidates.clear();
   words.clear();
-  frequencies.clear();
-  cohesions.clear();
-  suffixEntropies.clear();
-  prefixEntropies.clear();
+  signals->Clear();
   utf8FullText = UTF8StringSlice("");
   preCalculationFilter = DefaultPreCalculationFilter;
   postCalculationFilter = DefaultPostCalculationFilter;
@@ -129,7 +144,7 @@ void PhraseExtract::CalculateFrequency() {
   for (const auto& suffix : suffixes) {
     for (size_t i = 1; i <= suffix.UTF8Length() && i <= wordMaxLength; i++) {
       const UTF8StringSlice wordCandidate = suffix.Left(i);
-      frequencies[wordCandidate]++;
+      signals->AddKey(wordCandidate).frequency++;
       totalOccurrence++;
     }
   }
@@ -141,8 +156,7 @@ void PhraseExtract::ExtractWordCandidates() {
   if (!frequenciesCalculated) {
     CalculateFrequency();
   }
-  for (const auto& item : frequencies) {
-    const UTF8StringSlice wordCandidate = item.first;
+  for (const auto& wordCandidate : signals->Keys()) {
     if (ContainsPunctuation(wordCandidate)) {
       continue;
     }
@@ -179,7 +193,7 @@ void PhraseExtract::CalculateSuffixEntropy() {
     UTF8StringSlice lastWord("");
     const auto& updateEntropy = [this, &suffixSet, &lastWord]() {
       if (lastWord.UTF8Length() > 0) {
-        suffixEntropies[lastWord] = CalculateEntropy(suffixSet);
+        signals->Get(lastWord).suffixEntropy = CalculateEntropy(suffixSet);
         suffixSet.clear();
       }
     };
@@ -203,7 +217,7 @@ void PhraseExtract::CalculateSuffixEntropy() {
 }
 
 void PhraseExtract::CalculatePrefixEntropy() {
-  if (!prefixEntropiesCalculated) {
+  if (!prefixesExtracted) {
     ExtractPrefixes();
   }
   if (!frequenciesCalculated) {
@@ -215,7 +229,7 @@ void PhraseExtract::CalculatePrefixEntropy() {
     UTF8StringSlice lastWord("");
     const auto& updateEntropy = [this, &prefixSet, &lastWord]() {
       if (lastWord.UTF8Length() > 0) {
-        prefixEntropies[lastWord] = CalculateEntropy(prefixSet);
+        signals->Get(lastWord).prefixEntropy = CalculateEntropy(prefixSet);
         prefixSet.clear();
       }
     };
@@ -247,13 +261,18 @@ void PhraseExtract::CalculateCohesions() {
     CalculateFrequency();
   }
   for (const auto& wordCandidate : wordCandidates) {
-    cohesions[wordCandidate] = CalculateCohesion(wordCandidate);
+    signals->Get(wordCandidate).cohesion = CalculateCohesion(wordCandidate);
   }
   cohesionsCalculated = true;
 }
 
+const PhraseExtract::Signals&
+PhraseExtract::Signal(const UTF8StringSlice& wordCandidate) const {
+  return signals->Get(wordCandidate);
+}
+
 double PhraseExtract::Cohesion(const UTF8StringSlice& word) const {
-  return Lookup(cohesions, word);
+  return Signal(word).cohesion;
 }
 
 double PhraseExtract::Entropy(const UTF8StringSlice& word) const {
@@ -261,21 +280,21 @@ double PhraseExtract::Entropy(const UTF8StringSlice& word) const {
 }
 
 double PhraseExtract::SuffixEntropy(const UTF8StringSlice& word) const {
-  return Lookup(suffixEntropies, word);
+  return Signal(word).suffixEntropy;
 }
 
 double PhraseExtract::PrefixEntropy(const UTF8StringSlice& word) const {
-  return Lookup(prefixEntropies, word);
+  return Signal(word).prefixEntropy;
 }
 
 size_t PhraseExtract::Frequency(const UTF8StringSlice& word) const {
-  const size_t frequency = Lookup(frequencies, word);
+  const size_t frequency = Signal(word).frequency;
   return frequency;
 }
 
 double PhraseExtract::LogProbability(const UTF8StringSlice& word) const {
   // log(frequency / totalOccurrence) = log(frequency) - log(totalOccurrence)
-  const size_t frequency = Lookup(frequencies, word);
+  const size_t frequency = Frequency(word);
   return log(frequency) - logTotalOccurrence;
 }
 

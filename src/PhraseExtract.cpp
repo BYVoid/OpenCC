@@ -17,6 +17,8 @@
  */
 
 #include <cmath>
+#include <unordered_map>
+#include "darts.h"
 
 #include "PhraseExtract.hpp"
 
@@ -52,29 +54,64 @@ bool DefaultPostCalculationFilter(const PhraseExtract& phraseExtract,
 
 class PhraseExtract::DictType {
 public:
+  typedef PhraseExtract::Signals ValueType;
+  typedef std::pair<UTF8StringSlice, ValueType> ItemType;
+
   PhraseExtract::Signals& Get(const UTF8StringSlice& key) {
-    return dict.at(key);
+    Darts::DoubleArray::result_pair_type result;
+    daTrie.exactMatchSearch(key.CString(), result, key.ByteLength());
+    if (result.value != -1) {
+      return items[result.value].second;
+    } else {
+      throw ShouldNotBeHere();
+    }
   }
 
   PhraseExtract::Signals& AddKey(const UTF8StringSlice& key) {
     return dict[key];
   }
 
-  void Clear() { dict.clear(); }
-
-  vector<UTF8StringSlice> Keys() const {
-    vector<UTF8StringSlice> keys;
-    for (const auto& item : dict) {
-      keys.push_back(item.first);
-    }
-    return keys;
+  void Clear() {
+    dict.clear();
+    daTrie.clear();
   }
 
-  void Build() {}
+  const vector<ItemType>& Items() const { return items; }
+
+  void Build() {
+    BuildKeys();
+    BuildDaTrie();
+  }
 
 private:
+  void BuildKeys() {
+    items.reserve(dict.size());
+    for (const auto& item : dict) {
+      items.push_back(item);
+    }
+    dict.clear();
+    std::sort(
+        items.begin(), items.end(),
+        [](const ItemType& a, const ItemType& b) { return a.first < b.first; });
+  }
+
+  void BuildDaTrie() {
+    const char** keyNames = new const char* [items.size()];
+    size_t* keyLengths = new size_t[items.size()];
+    for (size_t i = 0; i < items.size(); i++) {
+      const auto& key = items[i].first;
+      keyNames[i] = key.CString();
+      keyLengths[i] = key.ByteLength();
+    }
+    daTrie.build(items.size(), keyNames, keyLengths);
+    delete[] keyNames;
+    delete[] keyLengths;
+  }
+
   std::unordered_map<UTF8StringSlice, PhraseExtract::Signals,
                      UTF8StringSlice::Hasher> dict;
+  vector<ItemType> items;
+  Darts::DoubleArray daTrie;
 };
 
 using namespace internal;
@@ -149,6 +186,7 @@ void PhraseExtract::CalculateFrequency() {
     }
   }
   logTotalOccurrence = log(totalOccurrence);
+  signals->Build();
   frequenciesCalculated = true;
 }
 
@@ -156,7 +194,8 @@ void PhraseExtract::ExtractWordCandidates() {
   if (!frequenciesCalculated) {
     CalculateFrequency();
   }
-  for (const auto& wordCandidate : signals->Keys()) {
+  for (const auto& item : signals->Items()) {
+    const auto& wordCandidate = item.first;
     if (ContainsPunctuation(wordCandidate)) {
       continue;
     }

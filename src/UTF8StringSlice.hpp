@@ -44,6 +44,8 @@ public:
 
   string ToString() const { return string(str, str + byteLength); }
 
+  const char* CString() const { return str; }
+
   size_t CommonPrefixLength(const UTF8StringSlice& that) const;
 
   void MoveRight();

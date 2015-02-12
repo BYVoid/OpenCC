@@ -23,6 +23,7 @@
 #include "PhraseExtract.hpp"
 
 namespace opencc {
+
 namespace internal {
 
 bool ContainsPunctuation(const UTF8StringSlice& word) {
@@ -31,7 +32,8 @@ bool ContainsPunctuation(const UTF8StringSlice& word) {
       "　", "，", "。", "、", "；", "：", "？", "！", "…", "“",
       "”",  "「", "」", "—",  "－", "（", "）", "《", "》"};
   for (const auto& punctuation : punctuations) {
-    if (word.FindBytePosition(punctuation) != static_cast<size_t>(-1)) {
+    if (word.FindBytePosition(punctuation) !=
+        static_cast<UTF8StringSlice::LengthType>(-1)) {
       return true;
     }
   }
@@ -158,8 +160,9 @@ void PhraseExtract::ExtractSuffixes() {
                    (wordMaxLength + suffixSetLength));
   for (UTF8StringSlice text = utf8FullText; text.UTF8Length() > 0;
        text.MoveRight()) {
-    size_t suffixLength =
-        std::min(wordMaxLength + suffixSetLength, text.UTF8Length());
+    const LengthType suffixLength =
+        std::min(static_cast<LengthType>(wordMaxLength + suffixSetLength),
+                 text.UTF8Length());
     suffixes.push_back(text.Left(suffixLength));
   }
   suffixes.shrink_to_fit();
@@ -173,8 +176,9 @@ void PhraseExtract::ExtractPrefixes() {
                    (wordMaxLength + prefixSetLength));
   for (UTF8StringSlice text = utf8FullText; text.UTF8Length() > 0;
        text.MoveLeft()) {
-    size_t prefixLength =
-        std::min(wordMaxLength + prefixSetLength, text.UTF8Length());
+    const LengthType prefixLength =
+        std::min(static_cast<LengthType>(wordMaxLength + prefixSetLength),
+                 text.UTF8Length());
     prefixes.push_back(text.Right(prefixLength));
   }
   prefixes.shrink_to_fit();
@@ -242,7 +246,7 @@ void PhraseExtract::CalculateSuffixEntropy() {
   if (!frequenciesCalculated) {
     CalculateFrequency();
   }
-  for (size_t length = wordMinLength; length <= wordMaxLength; length++) {
+  for (LengthType length = wordMinLength; length <= wordMaxLength; length++) {
     std::unordered_map<UTF8StringSlice, size_t, UTF8StringSlice::Hasher>
         suffixSet;
     UTF8StringSlice lastWord("");
@@ -278,7 +282,7 @@ void PhraseExtract::CalculatePrefixEntropy() {
   if (!frequenciesCalculated) {
     CalculateFrequency();
   }
-  for (size_t length = wordMinLength; length <= wordMaxLength; length++) {
+  for (LengthType length = wordMinLength; length <= wordMaxLength; length++) {
     std::unordered_map<UTF8StringSlice, size_t, UTF8StringSlice::Hasher>
         prefixSet;
     UTF8StringSlice lastWord("");
@@ -366,7 +370,7 @@ double
 PhraseExtract::CalculateCohesion(const UTF8StringSlice& wordCandidate) const {
   // TODO Try average value
   double minPMI = INFINITY;
-  for (size_t leftLength = 1; leftLength <= wordCandidate.UTF8Length() - 1;
+  for (LengthType leftLength = 1; leftLength <= wordCandidate.UTF8Length() - 1;
        leftLength++) {
     const auto& leftPart = wordCandidate.Left(leftLength);
     const auto& rightPart =

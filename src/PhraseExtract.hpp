@@ -27,6 +27,8 @@ namespace opencc {
 
 class PhraseExtract {
 public:
+  typedef UTF8StringSlice::LengthType LengthType;
+
   PhraseExtract();
 
   virtual ~PhraseExtract();
@@ -55,19 +57,19 @@ public:
 
   void SetFullText(const UTF8StringSlice& fullText) { utf8FullText = fullText; }
 
-  void SetWordMinLength(const size_t _wordMinLength) {
+  void SetWordMinLength(const LengthType _wordMinLength) {
     wordMinLength = _wordMinLength;
   }
 
-  void SetWordMaxLength(const size_t _wordMaxLength) {
+  void SetWordMaxLength(const LengthType _wordMaxLength) {
     wordMaxLength = _wordMaxLength;
   }
 
-  void SetPrefixSetLength(const size_t _prefixSetLength) {
+  void SetPrefixSetLength(const LengthType _prefixSetLength) {
     prefixSetLength = _prefixSetLength;
   }
 
-  void SetSuffixSetLength(const size_t _suffixSetLength) {
+  void SetSuffixSetLength(const LengthType _suffixSetLength) {
     suffixSetLength = _suffixSetLength;
   }
 
@@ -142,10 +144,10 @@ private:
   double CalculateEntropy(const std::unordered_map<
       UTF8StringSlice, size_t, UTF8StringSlice::Hasher>& choices) const;
 
-  size_t wordMinLength;
-  size_t wordMaxLength;
-  size_t prefixSetLength;
-  size_t suffixSetLength;
+  LengthType wordMinLength;
+  LengthType wordMaxLength;
+  LengthType prefixSetLength;
+  LengthType suffixSetLength;
   std::function<bool(const PhraseExtract&, const UTF8StringSlice&)>
       preCalculationFilter;
   std::function<bool(const PhraseExtract&, const UTF8StringSlice&)>

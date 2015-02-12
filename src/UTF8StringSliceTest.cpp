@@ -100,8 +100,10 @@ TEST_F(UTF8StringSliceTest, FindBytePosition) {
   EXPECT_EQ(0, text.FindBytePosition(""));
   EXPECT_EQ(0, text.FindBytePosition("天"));
   EXPECT_EQ(9, text.FindBytePosition("，"));
-  EXPECT_EQ(static_cast<size_t>(-1), text.FindBytePosition("a"));
-  EXPECT_EQ(static_cast<size_t>(-1), text.FindBytePosition("\n"));
+  EXPECT_EQ(static_cast<UTF8StringSlice::LengthType>(-1),
+            text.FindBytePosition("a"));
+  EXPECT_EQ(static_cast<UTF8StringSlice::LengthType>(-1),
+            text.FindBytePosition("\n"));
   EXPECT_EQ(3, UTF8StringSlice("了。").FindBytePosition("。"));
 }
 

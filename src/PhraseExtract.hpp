@@ -34,10 +34,13 @@ public:
   void Extract(const string& text) {
     SetFullText(text);
     ExtractSuffixes();
-    ExtractPrefixes();
     CalculateFrequency();
     CalculateSuffixEntropy();
+    ReleaseSuffixes();
+    ExtractPrefixes();
     CalculatePrefixEntropy();
+    ReleasePrefixes();
+    ExtractWordCandidates();
     CalculateCohesions();
     SelectWords();
   }
@@ -77,6 +80,10 @@ public:
       bool(const PhraseExtract&, const UTF8StringSlice&)>& filter) {
     postCalculationFilter = filter;
   }
+
+  void ReleaseSuffixes() { vector<UTF8StringSlice>().swap(suffixes); }
+
+  void ReleasePrefixes() { vector<UTF8StringSlice>().swap(prefixes); }
 
   const vector<UTF8StringSlice>& Words() const { return words; }
 

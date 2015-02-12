@@ -73,7 +73,7 @@ public:
   }
 
   void Clear() {
-    dict.clear();
+    ClearDict();
     daTrie.clear();
   }
 
@@ -90,10 +90,15 @@ private:
     for (const auto& item : dict) {
       items.push_back(item);
     }
-    dict.clear();
+    ClearDict();
     std::sort(
         items.begin(), items.end(),
         [](const ItemType& a, const ItemType& b) { return a.first < b.first; });
+  }
+
+  void ClearDict() {
+    std::unordered_map<UTF8StringSlice, PhraseExtract::Signals,
+                       UTF8StringSlice::Hasher>().swap(dict);
   }
 
   void BuildDaTrie() {
@@ -138,8 +143,8 @@ void PhraseExtract::Reset() {
   wordsSelected = false;
   totalOccurrence = 0;
   logTotalOccurrence = 0;
-  prefixes.clear();
-  suffixes.clear();
+  ReleasePrefixes();
+  ReleaseSuffixes();
   wordCandidates.clear();
   words.clear();
   signals->Clear();
@@ -149,24 +154,30 @@ void PhraseExtract::Reset() {
 }
 
 void PhraseExtract::ExtractSuffixes() {
+  suffixes.reserve(utf8FullText.UTF8Length() / 2 *
+                   (wordMaxLength + suffixSetLength));
   for (UTF8StringSlice text = utf8FullText; text.UTF8Length() > 0;
        text.MoveRight()) {
     size_t suffixLength =
         std::min(wordMaxLength + suffixSetLength, text.UTF8Length());
     suffixes.push_back(text.Left(suffixLength));
   }
+  suffixes.shrink_to_fit();
   // Sort suffixes
   std::sort(suffixes.begin(), suffixes.end());
   suffixesExtracted = true;
 }
 
 void PhraseExtract::ExtractPrefixes() {
+  prefixes.reserve(utf8FullText.UTF8Length() / 2 *
+                   (wordMaxLength + prefixSetLength));
   for (UTF8StringSlice text = utf8FullText; text.UTF8Length() > 0;
        text.MoveLeft()) {
     size_t prefixLength =
         std::min(wordMaxLength + prefixSetLength, text.UTF8Length());
     prefixes.push_back(text.Right(prefixLength));
   }
+  prefixes.shrink_to_fit();
   // Sort suffixes reversely
   std::sort(prefixes.begin(), prefixes.end(),
             [](const UTF8StringSlice& a, const UTF8StringSlice& b) {

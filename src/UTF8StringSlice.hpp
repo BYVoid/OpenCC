@@ -55,8 +55,14 @@ public:
       : str(_str), utf8Length(UTF8Util::Length(_str)),
         byteLength(strlen(_str)) {}
 
-  UTF8StringSliceBase(const char* _str, LengthType _utf8Length)
+  UTF8StringSliceBase(const char* _str, const LengthType _utf8Length)
       : str(_str), utf8Length(_utf8Length) {
+    CalculateByteLength();
+  }
+
+  UTF8StringSliceBase(const char* _str, const LengthType _utf8Length,
+                      const LengthType _byteLength)
+      : str(_str), utf8Length(_utf8Length), byteLength(_byteLength) {
     CalculateByteLength();
   }
 

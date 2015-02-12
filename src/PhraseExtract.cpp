@@ -26,26 +26,28 @@ namespace opencc {
 
 namespace internal {
 
-bool ContainsPunctuation(const UTF8StringSlice& word) {
-  static const vector<UTF8StringSlice> punctuations = {
+bool ContainsPunctuation(const PhraseExtract::UTF8StringSlice8Bit& word) {
+  static const vector<PhraseExtract::UTF8StringSlice8Bit> punctuations = {
       " ",  "\n", "\r", "\t", "-",  ",",  ".",  "?",  "!", "*",
       "　", "，", "。", "、", "；", "：", "？", "！", "…", "“",
       "”",  "「", "」", "—",  "－", "（", "）", "《", "》"};
   for (const auto& punctuation : punctuations) {
     if (word.FindBytePosition(punctuation) !=
-        static_cast<UTF8StringSlice::LengthType>(-1)) {
+        static_cast<PhraseExtract::UTF8StringSlice8Bit::LengthType>(-1)) {
       return true;
     }
   }
   return false;
 }
 
-bool DefaultPreCalculationFilter(const PhraseExtract&, const UTF8StringSlice&) {
+bool DefaultPreCalculationFilter(const PhraseExtract&,
+                                 const PhraseExtract::UTF8StringSlice8Bit&) {
   return false;
 }
 
-bool DefaultPostCalculationFilter(const PhraseExtract& phraseExtract,
-                                  const UTF8StringSlice& word) {
+bool
+DefaultPostCalculationFilter(const PhraseExtract& phraseExtract,
+                             const PhraseExtract::UTF8StringSlice8Bit& word) {
   const PhraseExtract::Signals& signals = phraseExtract.Signal(word);
   const double entropy = signals.prefixEntropy + signals.suffixEntropy;
   bool accept = signals.cohesion >= 3.5 && entropy >= 3.3 &&
@@ -58,9 +60,9 @@ bool DefaultPostCalculationFilter(const PhraseExtract& phraseExtract,
 class PhraseExtract::DictType {
 public:
   typedef PhraseExtract::Signals ValueType;
-  typedef std::pair<UTF8StringSlice, ValueType> ItemType;
+  typedef std::pair<UTF8StringSlice8Bit, ValueType> ItemType;
 
-  PhraseExtract::Signals& Get(const UTF8StringSlice& key) {
+  PhraseExtract::Signals& Get(const UTF8StringSlice8Bit& key) {
     Darts::DoubleArray::result_pair_type result;
     daTrie.exactMatchSearch(key.CString(), result, key.ByteLength());
     if (result.value != -1) {
@@ -70,7 +72,7 @@ public:
     }
   }
 
-  PhraseExtract::Signals& AddKey(const UTF8StringSlice& key) {
+  PhraseExtract::Signals& AddKey(const UTF8StringSlice8Bit& key) {
     return dict[key];
   }
 
@@ -99,8 +101,8 @@ private:
   }
 
   void ClearDict() {
-    std::unordered_map<UTF8StringSlice, PhraseExtract::Signals,
-                       UTF8StringSlice::Hasher>().swap(dict);
+    std::unordered_map<UTF8StringSlice8Bit, PhraseExtract::Signals,
+                       UTF8StringSlice8Bit::Hasher>().swap(dict);
   }
 
   void BuildDaTrie() {
@@ -116,8 +118,8 @@ private:
     delete[] keyLengths;
   }
 
-  std::unordered_map<UTF8StringSlice, PhraseExtract::Signals,
-                     UTF8StringSlice::Hasher> dict;
+  std::unordered_map<UTF8StringSlice8Bit, PhraseExtract::Signals,
+                     UTF8StringSlice8Bit::Hasher> dict;
   vector<ItemType> items;
   Darts::DoubleArray daTrie;
 };
@@ -163,7 +165,9 @@ void PhraseExtract::ExtractSuffixes() {
     const LengthType suffixLength =
         std::min(static_cast<LengthType>(wordMaxLength + suffixSetLength),
                  text.UTF8Length());
-    suffixes.push_back(text.Left(suffixLength));
+    const UTF8StringSlice& slice = text.Left(suffixLength);
+    suffixes.push_back(UTF8StringSlice8Bit(slice.CString(), slice.UTF8Length(),
+                                           slice.ByteLength()));
   }
   suffixes.shrink_to_fit();
   // Sort suffixes
@@ -179,12 +183,14 @@ void PhraseExtract::ExtractPrefixes() {
     const LengthType prefixLength =
         std::min(static_cast<LengthType>(wordMaxLength + prefixSetLength),
                  text.UTF8Length());
-    prefixes.push_back(text.Right(prefixLength));
+    const UTF8StringSlice& slice = text.Right(prefixLength);
+    prefixes.push_back(UTF8StringSlice8Bit(slice.CString(), slice.UTF8Length(),
+                                           slice.ByteLength()));
   }
   prefixes.shrink_to_fit();
   // Sort suffixes reversely
   std::sort(prefixes.begin(), prefixes.end(),
-            [](const UTF8StringSlice& a, const UTF8StringSlice& b) {
+            [](const UTF8StringSlice8Bit& a, const UTF8StringSlice8Bit& b) {
     return a.ReverseCompare(b) < 0;
   });
   prefixesExtracted = true;
@@ -196,7 +202,7 @@ void PhraseExtract::CalculateFrequency() {
   }
   for (const auto& suffix : suffixes) {
     for (size_t i = 1; i <= suffix.UTF8Length() && i <= wordMaxLength; i++) {
-      const UTF8StringSlice wordCandidate = suffix.Left(i);
+      const UTF8StringSlice8Bit wordCandidate = suffix.Left(i);
       signals->AddKey(wordCandidate).frequency++;
       totalOccurrence++;
     }
@@ -225,7 +231,7 @@ void PhraseExtract::ExtractWordCandidates() {
   }
   // Sort by frequency
   std::sort(wordCandidates.begin(), wordCandidates.end(),
-            [this](const UTF8StringSlice& a, const UTF8StringSlice& b) {
+            [this](const UTF8StringSlice8Bit& a, const UTF8StringSlice8Bit& b) {
     const size_t freqA = Frequency(a);
     const size_t freqB = Frequency(b);
     if (freqA > freqB) {
@@ -247,9 +253,9 @@ void PhraseExtract::CalculateSuffixEntropy() {
     CalculateFrequency();
   }
   for (LengthType length = wordMinLength; length <= wordMaxLength; length++) {
-    std::unordered_map<UTF8StringSlice, size_t, UTF8StringSlice::Hasher>
+    std::unordered_map<UTF8StringSlice8Bit, size_t, UTF8StringSlice8Bit::Hasher>
         suffixSet;
-    UTF8StringSlice lastWord("");
+    UTF8StringSlice8Bit lastWord("");
     const auto& updateEntropy = [this, &suffixSet, &lastWord]() {
       if (lastWord.UTF8Length() > 0) {
         signals->Get(lastWord).suffixEntropy = CalculateEntropy(suffixSet);
@@ -283,9 +289,9 @@ void PhraseExtract::CalculatePrefixEntropy() {
     CalculateFrequency();
   }
   for (LengthType length = wordMinLength; length <= wordMaxLength; length++) {
-    std::unordered_map<UTF8StringSlice, size_t, UTF8StringSlice::Hasher>
+    std::unordered_map<UTF8StringSlice8Bit, size_t, UTF8StringSlice8Bit::Hasher>
         prefixSet;
-    UTF8StringSlice lastWord("");
+    UTF8StringSlice8Bit lastWord("");
     const auto& updateEntropy = [this, &prefixSet, &lastWord]() {
       if (lastWord.UTF8Length() > 0) {
         signals->Get(lastWord).prefixEntropy = CalculateEntropy(prefixSet);
@@ -326,48 +332,48 @@ void PhraseExtract::CalculateCohesions() {
 }
 
 const PhraseExtract::Signals&
-PhraseExtract::Signal(const UTF8StringSlice& wordCandidate) const {
+PhraseExtract::Signal(const UTF8StringSlice8Bit& wordCandidate) const {
   return signals->Get(wordCandidate);
 }
 
-double PhraseExtract::Cohesion(const UTF8StringSlice& word) const {
+double PhraseExtract::Cohesion(const UTF8StringSlice8Bit& word) const {
   return Signal(word).cohesion;
 }
 
-double PhraseExtract::Entropy(const UTF8StringSlice& word) const {
+double PhraseExtract::Entropy(const UTF8StringSlice8Bit& word) const {
   return SuffixEntropy(word) + PrefixEntropy(word);
 }
 
-double PhraseExtract::SuffixEntropy(const UTF8StringSlice& word) const {
+double PhraseExtract::SuffixEntropy(const UTF8StringSlice8Bit& word) const {
   return Signal(word).suffixEntropy;
 }
 
-double PhraseExtract::PrefixEntropy(const UTF8StringSlice& word) const {
+double PhraseExtract::PrefixEntropy(const UTF8StringSlice8Bit& word) const {
   return Signal(word).prefixEntropy;
 }
 
-size_t PhraseExtract::Frequency(const UTF8StringSlice& word) const {
+size_t PhraseExtract::Frequency(const UTF8StringSlice8Bit& word) const {
   const size_t frequency = Signal(word).frequency;
   return frequency;
 }
 
-double PhraseExtract::LogProbability(const UTF8StringSlice& word) const {
+double PhraseExtract::LogProbability(const UTF8StringSlice8Bit& word) const {
   // log(frequency / totalOccurrence) = log(frequency) - log(totalOccurrence)
   const size_t frequency = Frequency(word);
   return log(frequency) - logTotalOccurrence;
 }
 
-double PhraseExtract::PMI(const UTF8StringSlice& wordCandidate,
-                          const UTF8StringSlice& part1,
-                          const UTF8StringSlice& part2) const {
+double PhraseExtract::PMI(const UTF8StringSlice8Bit& wordCandidate,
+                          const UTF8StringSlice8Bit& part1,
+                          const UTF8StringSlice8Bit& part2) const {
   // PMI(x, y) = log(P(x, y) / (P(x) * P(y)))
   //           = log(P(x, y)) - log(P(x)) - log(P(y))
   return LogProbability(wordCandidate) - LogProbability(part1) -
          LogProbability(part2);
 }
 
-double
-PhraseExtract::CalculateCohesion(const UTF8StringSlice& wordCandidate) const {
+double PhraseExtract::CalculateCohesion(
+    const UTF8StringSlice8Bit& wordCandidate) const {
   // TODO Try average value
   double minPMI = INFINITY;
   for (LengthType leftLength = 1; leftLength <= wordCandidate.UTF8Length() - 1;
@@ -382,7 +388,7 @@ PhraseExtract::CalculateCohesion(const UTF8StringSlice& wordCandidate) const {
 }
 
 double PhraseExtract::CalculateEntropy(const std::unordered_map<
-    UTF8StringSlice, size_t, UTF8StringSlice::Hasher>& choices) const {
+    UTF8StringSlice8Bit, size_t, UTF8StringSlice8Bit::Hasher>& choices) const {
   double totalChoices = 0;
   for (const auto& item : choices) {
     totalChoices += item.second;

@@ -29,6 +29,8 @@ class PhraseExtract {
 public:
   typedef UTF8StringSlice::LengthType LengthType;
 
+  typedef UTF8StringSliceBase<unsigned char> UTF8StringSlice8Bit;
+
   PhraseExtract();
 
   virtual ~PhraseExtract();
@@ -74,22 +76,22 @@ public:
   }
 
   void SetPreCalculationFilter(const std::function<
-      bool(const PhraseExtract&, const UTF8StringSlice&)>& filter) {
+      bool(const PhraseExtract&, const UTF8StringSlice8Bit&)>& filter) {
     preCalculationFilter = filter;
   }
 
   void SetPostCalculationFilter(const std::function<
-      bool(const PhraseExtract&, const UTF8StringSlice&)>& filter) {
+      bool(const PhraseExtract&, const UTF8StringSlice8Bit&)>& filter) {
     postCalculationFilter = filter;
   }
 
-  void ReleaseSuffixes() { vector<UTF8StringSlice>().swap(suffixes); }
+  void ReleaseSuffixes() { vector<UTF8StringSlice8Bit>().swap(suffixes); }
 
-  void ReleasePrefixes() { vector<UTF8StringSlice>().swap(prefixes); }
+  void ReleasePrefixes() { vector<UTF8StringSlice8Bit>().swap(prefixes); }
 
-  const vector<UTF8StringSlice>& Words() const { return words; }
+  const vector<UTF8StringSlice8Bit>& Words() const { return words; }
 
-  const vector<UTF8StringSlice>& WordCandidates() const {
+  const vector<UTF8StringSlice8Bit>& WordCandidates() const {
     return wordCandidates;
   }
 
@@ -100,19 +102,19 @@ public:
     double prefixEntropy;
   };
 
-  const Signals& Signal(const UTF8StringSlice& wordCandidate) const;
+  const Signals& Signal(const UTF8StringSlice8Bit& wordCandidate) const;
 
-  double Cohesion(const UTF8StringSlice& wordCandidate) const;
+  double Cohesion(const UTF8StringSlice8Bit& wordCandidate) const;
 
-  double Entropy(const UTF8StringSlice& wordCandidate) const;
+  double Entropy(const UTF8StringSlice8Bit& wordCandidate) const;
 
-  double SuffixEntropy(const UTF8StringSlice& wordCandidate) const;
+  double SuffixEntropy(const UTF8StringSlice8Bit& wordCandidate) const;
 
-  double PrefixEntropy(const UTF8StringSlice& wordCandidate) const;
+  double PrefixEntropy(const UTF8StringSlice8Bit& wordCandidate) const;
 
-  size_t Frequency(const UTF8StringSlice& word) const;
+  size_t Frequency(const UTF8StringSlice8Bit& word) const;
 
-  double LogProbability(const UTF8StringSlice& word) const;
+  double LogProbability(const UTF8StringSlice8Bit& word) const;
 
   void Reset();
 
@@ -136,21 +138,22 @@ private:
   class DictType;
 
   // Pointwise Mutual Information
-  double PMI(const UTF8StringSlice& wordCandidate, const UTF8StringSlice& part1,
-             const UTF8StringSlice& part2) const;
+  double PMI(const UTF8StringSlice8Bit& wordCandidate,
+             const UTF8StringSlice8Bit& part1,
+             const UTF8StringSlice8Bit& part2) const;
 
-  double CalculateCohesion(const UTF8StringSlice& wordCandidate) const;
+  double CalculateCohesion(const UTF8StringSlice8Bit& wordCandidate) const;
 
   double CalculateEntropy(const std::unordered_map<
-      UTF8StringSlice, size_t, UTF8StringSlice::Hasher>& choices) const;
+      UTF8StringSlice8Bit, size_t, UTF8StringSlice8Bit::Hasher>& choices) const;
 
   LengthType wordMinLength;
   LengthType wordMaxLength;
   LengthType prefixSetLength;
   LengthType suffixSetLength;
-  std::function<bool(const PhraseExtract&, const UTF8StringSlice&)>
+  std::function<bool(const PhraseExtract&, const UTF8StringSlice8Bit&)>
       preCalculationFilter;
-  std::function<bool(const PhraseExtract&, const UTF8StringSlice&)>
+  std::function<bool(const PhraseExtract&, const UTF8StringSlice8Bit&)>
       postCalculationFilter;
 
   bool prefixesExtracted;
@@ -165,10 +168,10 @@ private:
   UTF8StringSlice utf8FullText;
   size_t totalOccurrence;
   double logTotalOccurrence;
-  vector<UTF8StringSlice> prefixes;
-  vector<UTF8StringSlice> suffixes;
-  vector<UTF8StringSlice> wordCandidates;
-  vector<UTF8StringSlice> words;
+  vector<UTF8StringSlice8Bit> prefixes;
+  vector<UTF8StringSlice8Bit> suffixes;
+  vector<UTF8StringSlice8Bit> wordCandidates;
+  vector<UTF8StringSlice8Bit> words;
   DictType* signals;
 
   friend class PhraseExtractTest;

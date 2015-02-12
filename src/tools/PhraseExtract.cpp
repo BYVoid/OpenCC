@@ -36,38 +36,14 @@ void Extract(const vector<string>& inputFiles, const string& outputFile) {
   extractor.SetWordMaxLength(2);
   extractor.SetPrefixSetLength(1);
   extractor.SetSuffixSetLength(1);
-  extractor.SetPreCalculationFilter(
-      [](const PhraseExtract& extractor, const UTF8StringSlice& word) {
-        return word.UTF8Length() < 2;
-      });
-  extractor.SetPostCalculationFilter(
-      [](const PhraseExtract& extractor, const UTF8StringSlice& word) {
-        const double cohesion = extractor.Cohesion(word);
-        const double entropy = extractor.Entropy(word);
-        const double suffixEntropy = extractor.SuffixEntropy(word);
-        const double prefixEntropy = extractor.PrefixEntropy(word);
-        bool accept = cohesion >= 3.5 && entropy >= 3.3 &&
-                      prefixEntropy >= 0.5 && suffixEntropy >= 0.5;
-        return !accept;
-      });
-
-  extractor.SetFullText(text);
-  extractor.ExtractSuffixes();
-  extractor.ExtractPrefixes();
-  extractor.CalculateFrequency();
-  extractor.CalculateSuffixEntropy();
-  extractor.CalculatePrefixEntropy();
-  extractor.CalculateCohesions();
-  extractor.SelectWords();
+  extractor.Extract(text);
   std::ofstream ofs(outputFile);
   for (const auto& word : extractor.Words()) {
-    const size_t frequency = extractor.Frequency(word);
-    const double cohesion = extractor.Cohesion(word);
-    const double suffixEntropy = extractor.SuffixEntropy(word);
-    const double prefixEntropy = extractor.PrefixEntropy(word);
-    const double entropy = extractor.Entropy(word);
-    ofs << word.ToString() << " " << frequency << " " << cohesion << " "
-        << entropy << " " << prefixEntropy << " " << suffixEntropy << std::endl;
+    const PhraseExtract::Signals& signals = extractor.Signal(word);
+    const double entropy = signals.prefixEntropy + signals.suffixEntropy;
+    ofs << word << " " << signals.frequency << " " << signals.cohesion << " "
+        << entropy << " " << signals.prefixEntropy << " "
+        << signals.suffixEntropy << std::endl;
   }
   ofs.close();
 }

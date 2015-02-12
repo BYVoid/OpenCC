@@ -43,6 +43,7 @@ protected:
 
 TEST_F(PhraseExtractTest, ExtractSuffixes) {
   phraseExtract.Reset();
+  phraseExtract.SetWordMinLength(1);
   phraseExtract.SetWordMaxLength(3);
   phraseExtract.SetFullText(siShi);
   phraseExtract.ExtractSuffixes();
@@ -56,6 +57,7 @@ TEST_F(PhraseExtractTest, ExtractSuffixes) {
 
 TEST_F(PhraseExtractTest, ExtractPrefixes) {
   phraseExtract.Reset();
+  phraseExtract.SetWordMinLength(1);
   phraseExtract.SetWordMaxLength(3);
   phraseExtract.SetFullText(siShi);
   phraseExtract.ExtractPrefixes();
@@ -69,6 +71,7 @@ TEST_F(PhraseExtractTest, ExtractPrefixes) {
 
 TEST_F(PhraseExtractTest, CalculateFrequency) {
   phraseExtract.Reset();
+  phraseExtract.SetWordMinLength(1);
   phraseExtract.SetWordMaxLength(3);
   phraseExtract.SetFullText(siShi);
   phraseExtract.CalculateFrequency();
@@ -88,6 +91,7 @@ TEST_F(PhraseExtractTest, CalculateFrequency) {
 
 TEST_F(PhraseExtractTest, ExtractWordCandidates) {
   phraseExtract.Reset();
+  phraseExtract.SetWordMinLength(1);
   phraseExtract.SetWordMaxLength(3);
   phraseExtract.SetFullText(siShi);
   phraseExtract.ExtractWordCandidates();
@@ -101,6 +105,7 @@ TEST_F(PhraseExtractTest, ExtractWordCandidates) {
 
 TEST_F(PhraseExtractTest, CalculateCohesions) {
   phraseExtract.Reset();
+  phraseExtract.SetWordMinLength(1);
   phraseExtract.SetWordMaxLength(3);
   phraseExtract.SetFullText(siShi);
   phraseExtract.CalculateCohesions();
@@ -114,6 +119,7 @@ TEST_F(PhraseExtractTest, CalculateCohesions) {
 
 TEST_F(PhraseExtractTest, CalculateSuffixEntropy) {
   phraseExtract.Reset();
+  phraseExtract.SetWordMinLength(1);
   phraseExtract.SetWordMaxLength(3);
   phraseExtract.SetFullText(siShi);
   phraseExtract.CalculateSuffixEntropy();
@@ -128,6 +134,7 @@ TEST_F(PhraseExtractTest, CalculateSuffixEntropy) {
 
 TEST_F(PhraseExtractTest, CalculatePrefixEntropy) {
   phraseExtract.Reset();
+  phraseExtract.SetWordMinLength(1);
   phraseExtract.SetWordMaxLength(3);
   phraseExtract.SetFullText(siShi);
   phraseExtract.CalculatePrefixEntropy();
@@ -142,6 +149,7 @@ TEST_F(PhraseExtractTest, CalculatePrefixEntropy) {
 
 TEST_F(PhraseExtractTest, SelectWords) {
   phraseExtract.Reset();
+  phraseExtract.SetWordMinLength(1);
   phraseExtract.SetWordMaxLength(3);
   phraseExtract.SetFullText(siShi);
   phraseExtract.SetPostCalculationFilter(
@@ -157,6 +165,7 @@ TEST_F(PhraseExtractTest, SelectWords) {
 
 TEST_F(PhraseExtractTest, Punctuation) {
   phraseExtract.Reset();
+  phraseExtract.SetWordMinLength(1);
   phraseExtract.SetWordMaxLength(2);
   phraseExtract.SetFullText(punctuation);
   phraseExtract.ExtractPrefixes();

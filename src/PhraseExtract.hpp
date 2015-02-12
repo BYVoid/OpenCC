@@ -31,8 +31,29 @@ public:
 
   virtual ~PhraseExtract();
 
+  void Extract(const string& text) {
+    SetFullText(text);
+    ExtractSuffixes();
+    ExtractPrefixes();
+    CalculateFrequency();
+    CalculateSuffixEntropy();
+    CalculatePrefixEntropy();
+    CalculateCohesions();
+    SelectWords();
+  }
+
   void SetFullText(const string& fullText) {
     utf8FullText = UTF8StringSlice(fullText.c_str());
+  }
+
+  void SetFullText(const char* fullText) {
+    utf8FullText = UTF8StringSlice(fullText);
+  }
+
+  void SetFullText(const UTF8StringSlice& fullText) { utf8FullText = fullText; }
+
+  void SetWordMinLength(const size_t _wordMinLength) {
+    wordMinLength = _wordMinLength;
   }
 
   void SetWordMaxLength(const size_t _wordMaxLength) {
@@ -114,6 +135,7 @@ private:
   double CalculateEntropy(const std::unordered_map<
       UTF8StringSlice, size_t, UTF8StringSlice::Hasher>& choices) const;
 
+  size_t wordMinLength;
   size_t wordMaxLength;
   size_t prefixSetLength;
   size_t suffixSetLength;

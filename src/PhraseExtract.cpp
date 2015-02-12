@@ -245,6 +245,48 @@ void PhraseExtract::ExtractWordCandidates() {
   wordCandidatesExtracted = true;
 }
 
+typedef std::unordered_map<PhraseExtract::UTF8StringSlice8Bit, size_t,
+                           PhraseExtract::UTF8StringSlice8Bit::Hasher>
+    AdjacentSetType;
+
+template <bool SUFFIX>
+void CalculatePrefixSuffixEntropy(
+    const vector<PhraseExtract::UTF8StringSlice8Bit>& presuffixes,
+    const PhraseExtract::LengthType setLength,
+    const PhraseExtract::LengthType wordMinLength,
+    const PhraseExtract::LengthType wordMaxLength,
+    const std::function<void(const PhraseExtract::UTF8StringSlice8Bit& word,
+                             AdjacentSetType& adjacentSet)>& updateEntropy) {
+  AdjacentSetType adjacentSet;
+  for (PhraseExtract::LengthType length = wordMinLength;
+       length <= wordMaxLength; length++) {
+    adjacentSet.clear();
+    PhraseExtract::UTF8StringSlice8Bit lastWord("");
+    for (const auto& presuffix : presuffixes) {
+      if (presuffix.UTF8Length() < length) {
+        continue;
+      }
+      const auto& wordCandidate =
+          SUFFIX ? presuffix.Left(length) : presuffix.Right(length);
+      if (wordCandidate != lastWord) {
+        updateEntropy(lastWord, adjacentSet);
+        lastWord = wordCandidate;
+      }
+      if (length + setLength <= presuffix.UTF8Length()) {
+        if (SUFFIX) {
+          const auto& wordSuffix = presuffix.SubString(length, setLength);
+          adjacentSet[wordSuffix]++;
+        } else {
+          const auto& wordPrefix = presuffix.SubString(
+              presuffix.UTF8Length() - length - setLength, setLength);
+          adjacentSet[wordPrefix]++;
+        }
+      }
+    }
+    updateEntropy(lastWord, adjacentSet);
+  }
+}
+
 void PhraseExtract::CalculateSuffixEntropy() {
   if (!suffixesExtracted) {
     ExtractSuffixes();
@@ -252,32 +294,15 @@ void PhraseExtract::CalculateSuffixEntropy() {
   if (!frequenciesCalculated) {
     CalculateFrequency();
   }
-  for (LengthType length = wordMinLength; length <= wordMaxLength; length++) {
-    std::unordered_map<UTF8StringSlice8Bit, size_t, UTF8StringSlice8Bit::Hasher>
-        suffixSet;
-    UTF8StringSlice8Bit lastWord("");
-    const auto& updateEntropy = [this, &suffixSet, &lastWord]() {
-      if (lastWord.UTF8Length() > 0) {
-        signals->Get(lastWord).suffixEntropy = CalculateEntropy(suffixSet);
-        suffixSet.clear();
-      }
-    };
-    for (const auto& suffix : suffixes) {
-      if (suffix.UTF8Length() < length) {
-        continue;
-      }
-      const auto& wordCandidate = suffix.Left(length);
-      if (wordCandidate != lastWord) {
-        updateEntropy();
-        lastWord = wordCandidate;
-      }
-      if (length + suffixSetLength <= suffix.UTF8Length()) {
-        const auto& wordSuffix = suffix.SubString(length, suffixSetLength);
-        suffixSet[wordSuffix]++;
-      }
-    }
-    updateEntropy();
-  }
+  CalculatePrefixSuffixEntropy<true>(
+      suffixes, suffixSetLength, wordMinLength, wordMaxLength,
+      [this](const PhraseExtract::UTF8StringSlice8Bit& word,
+             AdjacentSetType& adjacentSet) {
+        if (word.UTF8Length() > 0) {
+          signals->Get(word).suffixEntropy = CalculateEntropy(adjacentSet);
+          adjacentSet.clear();
+        }
+      });
   suffixEntropiesCalculated = true;
 }
 
@@ -288,33 +313,15 @@ void PhraseExtract::CalculatePrefixEntropy() {
   if (!frequenciesCalculated) {
     CalculateFrequency();
   }
-  for (LengthType length = wordMinLength; length <= wordMaxLength; length++) {
-    std::unordered_map<UTF8StringSlice8Bit, size_t, UTF8StringSlice8Bit::Hasher>
-        prefixSet;
-    UTF8StringSlice8Bit lastWord("");
-    const auto& updateEntropy = [this, &prefixSet, &lastWord]() {
-      if (lastWord.UTF8Length() > 0) {
-        signals->Get(lastWord).prefixEntropy = CalculateEntropy(prefixSet);
-        prefixSet.clear();
-      }
-    };
-    for (const auto& prefix : prefixes) {
-      if (prefix.UTF8Length() < length) {
-        continue;
-      }
-      const auto& wordCandidate = prefix.Right(length);
-      if (wordCandidate != lastWord) {
-        updateEntropy();
-        lastWord = wordCandidate;
-      }
-      if (length + prefixSetLength <= prefix.UTF8Length()) {
-        const auto& wordPrefix = prefix.SubString(
-            prefix.UTF8Length() - length - prefixSetLength, prefixSetLength);
-        prefixSet[wordPrefix]++;
-      }
-    }
-    updateEntropy();
-  }
+  CalculatePrefixSuffixEntropy<false>(
+      prefixes, prefixSetLength, wordMinLength, wordMaxLength,
+      [this](const PhraseExtract::UTF8StringSlice8Bit& word,
+             AdjacentSetType& adjacentSet) {
+        if (word.UTF8Length() > 0) {
+          signals->Get(word).prefixEntropy = CalculateEntropy(adjacentSet);
+          adjacentSet.clear();
+        }
+      });
   prefixEntropiesCalculated = true;
 }
 

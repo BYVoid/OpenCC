@@ -38,12 +38,12 @@ public:
   */
   static size_t NextCharLengthNoException(const char* str) {
     char ch = *str;
-    if ((ch & 0x80) == 0x00) {
+    if ((ch & 0xF0) == 0xE0) {
+      return 3;
+    } else if ((ch & 0x80) == 0x00) {
       return 1;
     } else if ((ch & 0xE0) == 0xC0) {
       return 2;
-    } else if ((ch & 0xF0) == 0xE0) {
-      return 3;
     } else if ((ch & 0xF8) == 0xF0) {
       return 4;
     } else if ((ch & 0xFC) == 0xF8) {
@@ -69,9 +69,26 @@ public:
   * Returns the length in byte for the previous UTF8 character.
   */
   static size_t PrevCharLength(const char* str) {
-    for (size_t i = 1; i <= 6; i++) {
-      str--;
-      size_t length = NextCharLengthNoException(str);
+    {
+      const size_t length = NextCharLengthNoException(str - 3);
+      if (length == 3) {
+        return length;
+      }
+    }
+    {
+      const size_t length = NextCharLengthNoException(str - 1);
+      if (length == 1) {
+        return length;
+      }
+    }
+    {
+      const size_t length = NextCharLengthNoException(str - 2);
+      if (length == 2) {
+        return length;
+      }
+    }
+    for (size_t i = 4; i <= 6; i++) {
+      const size_t length = NextCharLengthNoException(str - i);
       if (length == i) {
         return length;
       }

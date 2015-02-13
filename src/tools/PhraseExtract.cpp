@@ -41,9 +41,10 @@ void Extract(const vector<string>& inputFiles, const string& outputFile) {
   for (const auto& word : extractor.Words()) {
     const PhraseExtract::Signals& signals = extractor.Signal(word);
     const double entropy = signals.prefixEntropy + signals.suffixEntropy;
-    ofs << word << " " << signals.frequency << " " << signals.cohesion << " "
-        << entropy << " " << signals.prefixEntropy << " "
-        << signals.suffixEntropy << std::endl;
+    const double logProbablity = extractor.LogProbability(word);
+    ofs << word << " " << signals.frequency << " " << logProbablity << " "
+        << signals.cohesion << " " << entropy << " " << signals.prefixEntropy
+        << " " << signals.suffixEntropy << std::endl;
   }
   ofs.close();
 }

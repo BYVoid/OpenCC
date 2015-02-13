@@ -75,6 +75,7 @@ public:
     suffixSetLength = _suffixSetLength;
   }
 
+  // PreCalculationFilter is called after frequencies statistics.
   void SetPreCalculationFilter(const std::function<
       bool(const PhraseExtract&, const UTF8StringSlice8Bit&)>& filter) {
     preCalculationFilter = filter;
@@ -114,6 +115,8 @@ public:
 
   size_t Frequency(const UTF8StringSlice8Bit& word) const;
 
+  double Probability(const UTF8StringSlice8Bit& word) const;
+
   double LogProbability(const UTF8StringSlice8Bit& word) const;
 
   void Reset();
@@ -133,6 +136,14 @@ public:
   void CalculatePrefixEntropy();
 
   void SelectWords();
+
+  static bool
+  DefaultPreCalculationFilter(const PhraseExtract&,
+                              const PhraseExtract::UTF8StringSlice8Bit&);
+
+  static bool
+  DefaultPostCalculationFilter(const PhraseExtract&,
+                               const PhraseExtract::UTF8StringSlice8Bit&);
 
 private:
   class DictType;

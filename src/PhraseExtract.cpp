@@ -28,9 +28,9 @@ namespace internal {
 
 bool ContainsPunctuation(const PhraseExtract::UTF8StringSlice8Bit& word) {
   static const vector<PhraseExtract::UTF8StringSlice8Bit> punctuations = {
-      " ",  "\n", "\r", "\t", "-",  ",",  ".",  "?",  "!", "*",
-      "　", "，", "。", "、", "；", "：", "？", "！", "…", "“",
-      "”",  "「", "」", "—",  "－", "（", "）", "《", "》"};
+      " ",  "\n", "\r", "\t", "-",  ",",  ".",  "?",  "!",  "*", "　",
+      "，", "。", "、", "；", "：", "？", "！", "…",  "“",  "”", "「",
+      "」", "—",  "－", "（", "）", "《", "》", "．", "／", "＼"};
   for (const auto& punctuation : punctuations) {
     if (word.FindBytePosition(punctuation) !=
         static_cast<PhraseExtract::UTF8StringSlice8Bit::LengthType>(-1)) {
@@ -38,21 +38,6 @@ bool ContainsPunctuation(const PhraseExtract::UTF8StringSlice8Bit& word) {
     }
   }
   return false;
-}
-
-bool DefaultPreCalculationFilter(const PhraseExtract&,
-                                 const PhraseExtract::UTF8StringSlice8Bit&) {
-  return false;
-}
-
-bool
-DefaultPostCalculationFilter(const PhraseExtract& phraseExtract,
-                             const PhraseExtract::UTF8StringSlice8Bit& word) {
-  const PhraseExtract::Signals& signals = phraseExtract.Signal(word);
-  const double entropy = signals.prefixEntropy + signals.suffixEntropy;
-  bool accept = signals.cohesion >= 3.5 && entropy >= 3.3 &&
-                signals.prefixEntropy >= 0.5 && signals.suffixEntropy >= 0.5;
-  return !accept;
 }
 
 } // namespace internal
@@ -125,6 +110,26 @@ private:
 };
 
 using namespace internal;
+
+bool PhraseExtract::DefaultPreCalculationFilter(
+    const PhraseExtract&, const PhraseExtract::UTF8StringSlice8Bit&) {
+  return false;
+}
+
+bool PhraseExtract::DefaultPostCalculationFilter(
+    const PhraseExtract& phraseExtract,
+    const PhraseExtract::UTF8StringSlice8Bit& word) {
+  const PhraseExtract::Signals& signals = phraseExtract.Signal(word);
+  const double logProbability = phraseExtract.LogProbability(word);
+  const double cohesionScore = signals.cohesion - logProbability * 0.5;
+  const double entropyScore =
+      sqrt((signals.prefixEntropy) * (signals.suffixEntropy + 1)) -
+      logProbability * 0.85;
+  bool accept = cohesionScore > 9 && entropyScore > 11 &&
+                signals.prefixEntropy > 0.5 && signals.suffixEntropy > 0 &&
+                signals.prefixEntropy + signals.suffixEntropy > 3;
+  return !accept;
+}
 
 PhraseExtract::PhraseExtract()
     : wordMinLength(2), wordMaxLength(2), prefixSetLength(1),
@@ -362,6 +367,11 @@ double PhraseExtract::PrefixEntropy(const UTF8StringSlice8Bit& word) const {
 size_t PhraseExtract::Frequency(const UTF8StringSlice8Bit& word) const {
   const size_t frequency = Signal(word).frequency;
   return frequency;
+}
+
+double PhraseExtract::Probability(const UTF8StringSlice8Bit& word) const {
+  const size_t frequency = Frequency(word);
+  return static_cast<double>(frequency) / totalOccurrence;
 }
 
 double PhraseExtract::LogProbability(const UTF8StringSlice8Bit& word) const {

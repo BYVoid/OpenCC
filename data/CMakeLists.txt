@@ -141,8 +141,10 @@ set(CONFIG_FILES
   config/s2twp.json
   config/tw2s.json
   config/tw2sp.json
+  config/t2tw.json
   config/s2hk.json
   config/hk2s.json
+  config/t2hk.json
 )
 
 install(

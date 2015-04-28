@@ -134,6 +134,12 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   )
 endif()
 
+if (NOT BUILD_SHARED_LIBS)
+  add_definitions(
+    -DOpencc_BUILT_AS_STATIC
+  )
+endif (NOT BUILD_SHARED_LIBS)
+
 if (ENABLE_GTEST)
   add_definitions(
     -DPROJECT_BINARY_DIR="${PROJECT_BINARY_DIR}"

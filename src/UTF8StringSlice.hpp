@@ -174,14 +174,8 @@ public:
   }
 
   LengthType FindBytePosition(const UTF8StringSliceBase& pattern) const {
-    const void* ptr = memmem(str, byteLength, pattern.str, pattern.byteLength);
-    if (ptr != nullptr) {
-      return reinterpret_cast<const char*>(ptr) - str;
-    } else if (pattern.byteLength == 0) {
-      return 0;
-    } else {
-      return static_cast<size_t>(-1);
-    }
+    return static_cast<LengthType>(
+        ToString().find(pattern.str, 0, pattern.byteLength));
   }
 
   bool operator<(const UTF8StringSliceBase& that) const {

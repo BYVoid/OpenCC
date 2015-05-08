@@ -1,6 +1,7 @@
 language: cpp
 compiler:
   - gcc
+sudo: required
 before_install:
   - sudo add-apt-repository -y ppa:chris-lea/node.js
   - sudo apt-get update

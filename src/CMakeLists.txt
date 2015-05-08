@@ -81,8 +81,8 @@ set_target_properties(
 
 install(
   TARGETS libopencc
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib/static
+  LIBRARY DESTINATION ${DIR_LIBRARY}
+  ARCHIVE DESTINATION ${DIR_LIBRARY}
 )
 
 install(

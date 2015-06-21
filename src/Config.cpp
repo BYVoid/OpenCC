@@ -179,6 +179,11 @@ public:
       if (ifs.is_open()) {
         return prefixedFileName;
       }
+      prefixedFileName += ".json";
+      ifs.open(prefixedFileName.c_str());
+      if (ifs.is_open()) {
+        return prefixedFileName;
+      }
     }
     throw FileNotFound(fileName);
   }

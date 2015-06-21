@@ -45,12 +45,17 @@ FILE* GetOutputStream() {
 void ConvertLineByLine() {
   std::istream& inputStream = std::cin;
   FILE* fout = GetOutputStream();
+  bool isFirstLine = true;
   while (!inputStream.eof()) {
+    if (!isFirstLine) {
+      fputs("\n", fout);
+    } else {
+      isFirstLine = false;
+    }
     string line;
     std::getline(inputStream, line);
     const string& converted = converter->Convert(line);
     fputs(converted.c_str(), fout);
-    fputs("\n", fout);
     if (!noFlush) {
       // Flush every line if the output stream is stdout.
       fflush(fout);

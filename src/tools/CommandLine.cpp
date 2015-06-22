@@ -64,7 +64,7 @@ void ConvertLineByLine() {
   fclose(fout);
 }
 
-void Convert() {
+void Convert(string inputFileName) {
   const int BUFFER_SIZE = 1024 * 1024;
   static bool bufferInitialized = false;
   static string buffer;
@@ -81,9 +81,21 @@ void Convert() {
     bufferSizeAvailble = BUFFER_SIZE;
   }
 
-  FILE* fin = fopen(inputFileName.Get().c_str(), "r");
+  bool needToRemove = false;
+  if (!outputFileName.IsNull() && inputFileName == outputFileName.Get()) {
+    // Special case: input == output
+    const string tempFileName = std::tmpnam(nullptr);
+    std::ifstream src(inputFileName, std::ios::binary);
+    std::ofstream dst(tempFileName, std::ios::binary);
+    dst << src.rdbuf();
+    dst.close();
+    inputFileName = tempFileName;
+    needToRemove = true;
+  }
+
+  FILE* fin = fopen(inputFileName.c_str(), "r");
   if (!fin) {
-    throw FileNotFound(inputFileName.Get());
+    throw FileNotFound(inputFileName);
   }
   FILE* fout = GetOutputStream();
   while (!feof(fin)) {
@@ -123,6 +135,10 @@ void Convert() {
     }
   }
   fclose(fout);
+  if (needToRemove) {
+    // Remove temporary file.
+    std::remove(inputFileName.c_str());
+  }
 }
 
 int main(int argc, const char* argv[]) {
@@ -135,12 +151,12 @@ int main(int argc, const char* argv[]) {
     TCLAP::ValueArg<string> configArg(
         "c", "config", "Configuration file", false /* required */,
         "s2t.json" /* default */, "file" /* type */, cmd);
-    TCLAP::ValueArg<string> outputArg("o", "output", "Write converted text to",
-                                      false /* required */, "" /* default */,
-                                      "file" /* type */, cmd);
-    TCLAP::ValueArg<string> inputArg("i", "input", "Read original text from",
-                                     false /* required */, "" /* default */,
-                                     "file" /* type */, cmd);
+    TCLAP::ValueArg<string> outputArg(
+        "o", "output", "Write converted text to <file>.", false /* required */,
+        "" /* default */, "file" /* type */, cmd);
+    TCLAP::ValueArg<string> inputArg(
+        "i", "input", "Read original text from <file>.", false /* required */,
+        "" /* default */, "file" /* type */, cmd);
     TCLAP::ValueArg<bool> noFlushArg(
         "", "noflush", "Disable flush for every line", false /* required */,
         false /* default */, "bool" /* type */, cmd);
@@ -159,7 +175,7 @@ int main(int argc, const char* argv[]) {
     if (lineByLine) {
       ConvertLineByLine();
     } else {
-      Convert();
+      Convert(inputFileName.Get());
     }
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error() << " for arg " << e.argId()

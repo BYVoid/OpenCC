@@ -24,9 +24,9 @@
     "Traditional Chinese"
   ],
   "devDependencies": {
-    "mocha": "1.8.1"
+    "mocha": "2.2.5"
   },
   "dependencies": {
-    "nan": "^1.6.2"
+    "nan": "^2.0.0"
   }
 }

@@ -1,6 +1,6 @@
 # Open Chinese Convert 開放中文轉換
 
-## Introduction 介紹
+## Introduction 
 
 Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for conversion between Traditional Chinese and Simplified Chinese, supporting character-level conversion, phrase-level conversion, variant conversion and regional idioms among Mainland China, Taiwan and Hong kong.
 

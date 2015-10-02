@@ -66,11 +66,18 @@ https://bintray.com/byvoid/opencc/OpenCC
 
 ### Build with CMake
 
-Linux/OSX (gcc 4.6 or clang 3.2 is required):
+Linux (gcc 4.6 is required):
 
 ```
 make
 sudo make install
+```
+
+Mac OS X (clang 3.2 is required):
+
+```
+make PREFIX=/usr/local
+sudo make PREFIX=/usr/local install
 ```
 
 Windows MSYS:

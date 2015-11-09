@@ -104,6 +104,7 @@ make
 * [BYVBlog](https://github.com/byvoid/byvblog)
 * [豆瓣同城微信](http://weixinqiao.com/douban-event/)
 * [alfred-chinese-converter](https://github.com/amowu/alfred-chinese-converter)
+* [GoldenDict](https://github.com/goldendict/goldendict)
 
 ## License 許可協議
 

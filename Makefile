@@ -16,6 +16,8 @@
 # limitations under the License.
 #
 
+PREFIX = /usr
+
 .PHONY: build clean node test xcode-build
 
 build:
@@ -24,12 +26,13 @@ build:
 	-DBUILD_DOCUMENTATION:BOOL=ON \
 	-DENABLE_GTEST:BOOL=OFF \
 	-DCMAKE_BUILD_TYPE=Release \
-	-DCMAKE_INSTALL_PREFIX=/usr \
+	-DCMAKE_INSTALL_PREFIX=${PREFIX} \
 	../..)
-	make -C build/rel VERBOSE=${VERBOSE}
+	make -C build/rel VERBOSE=${VERBOSE} PREFIX=${PREFIX}
 
 package: build
 	make -C build/rel package_source VERBOSE=${VERBOSE}
+	make -C build/rel package_source VERBOSE=${VERBOSE} PREFIX=${PREFIX}
 
 test:
 	mkdir -p build/dbg/root
@@ -65,4 +68,4 @@ clean:
 	rm -rf build xcode
 
 install: build
-	make -C build/rel install VERBOSE=${VERBOSE}
+	make -C build/rel install VERBOSE=${VERBOSE} PREFIX=${PREFIX}

@@ -1,18 +1,14 @@
 #include <iostream>
-#include <node.h>
-#include <v8.h>
 #include <nan.h>
 
 #include "Config.hpp"
 #include "Converter.hpp"
 
-using namespace v8;
 using namespace opencc;
-using namespace Nan;
 
-string ToUtf8String(const Local<String>& str) {
-  v8::String::Utf8Value utf8(str);
-  return std::string(*utf8);
+string ToUtf8String(const v8::Local<v8::Value>& val) {
+  Nan::Utf8String utf8(val);
+  return string(*utf8);
 }
 
 class OpenccBinding : public Nan::ObjectWrap {
@@ -43,12 +39,11 @@ class OpenccBinding : public Nan::ObjectWrap {
   }
 
   static NAN_METHOD(New) {
-    Nan::HandleScope scope;
     OpenccBinding* instance;
 
     try {
       if (info.Length() >= 1 && info[0]->IsString()) {
-        string configFile = ToUtf8String(info[0]->ToString());
+        string configFile = ToUtf8String(info[0]);
         instance = new OpenccBinding(configFile);
       } else {
         instance = new OpenccBinding("s2t.json");
@@ -63,7 +58,6 @@ class OpenccBinding : public Nan::ObjectWrap {
   }
 
   static NAN_METHOD(Convert) {
-    Nan::HandleScope scope;
     if (info.Length() < 2 || !info[0]->IsString() || !info[1]->IsFunction()) {
       Nan::ThrowTypeError("Wrong arguments");
       return;
@@ -71,7 +65,7 @@ class OpenccBinding : public Nan::ObjectWrap {
 
     ConvertRequest* conv_data = new ConvertRequest;
     conv_data->instance = Nan::ObjectWrap::Unwrap<OpenccBinding>(info.This());
-    conv_data->input = ToUtf8String(info[0]->ToString());
+    conv_data->input = ToUtf8String(info[0]);
     conv_data->callback = new Nan::Callback(info[1].As<v8::Function>());
     conv_data->ex = Optional<opencc::Exception>::Null();
     uv_work_t* req = new uv_work_t;
@@ -94,13 +88,13 @@ class OpenccBinding : public Nan::ObjectWrap {
   static void AfterConvert(uv_work_t* req) {
     Nan::HandleScope scope;
     ConvertRequest* conv_data = static_cast<ConvertRequest*>(req->data);
-    Local<Value> err = Nan::Undefined();
-    Local<String> converted = Nan::New<v8::String>(conv_data->output.c_str()).ToLocalChecked();
+    v8::Local<v8::Value> err = Nan::Undefined();
+    v8::Local<v8::String> converted = Nan::New(conv_data->output.c_str()).ToLocalChecked();
     if (!conv_data->ex.IsNull()) {
-      err = Nan::New<v8::String>(conv_data->ex.Get().what()).ToLocalChecked();
+      err = Nan::New(conv_data->ex.Get().what()).ToLocalChecked();
     }
     const unsigned argc = 2;
-    Local<Value> argv[argc] = {
+    v8::Local<v8::Value> argv[argc] = {
       err,
       converted
     };
@@ -110,7 +104,6 @@ class OpenccBinding : public Nan::ObjectWrap {
   }
 
   static NAN_METHOD(ConvertSync) {
-    Nan::HandleScope scope;
     if (info.Length() < 1 || !info[0]->IsString()) {
       Nan::ThrowTypeError("Wrong arguments");
       return;
@@ -118,7 +111,7 @@ class OpenccBinding : public Nan::ObjectWrap {
 
     OpenccBinding* instance = Nan::ObjectWrap::Unwrap<OpenccBinding>(info.This());
 
-    string input = ToUtf8String(info[0]->ToString());
+    string input = ToUtf8String(info[0]);
     string output;
     try {
       output = instance->Convert(input);
@@ -127,21 +120,21 @@ class OpenccBinding : public Nan::ObjectWrap {
       return;
     }
 
-    Local<String> converted = Nan::New<v8::String>(output.c_str()).ToLocalChecked();
+    v8::Local<v8::String> converted = Nan::New(output.c_str()).ToLocalChecked();
     info.GetReturnValue().Set(converted);
   }
 
   static NAN_MODULE_INIT(Init) {
-    Nan::HandleScope scope;
     // Prepare constructor template
-    Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(OpenccBinding::New);
-    tpl->SetClassName(Nan::New<v8::String>("Opencc").ToLocalChecked());
+    v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(OpenccBinding::New);
+    tpl->SetClassName(Nan::New("Opencc").ToLocalChecked());
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
     // Prototype
     Nan::SetPrototypeMethod(tpl, "convert", Convert);
     Nan::SetPrototypeMethod(tpl, "convertSync", ConvertSync);
     // Constructor
-    Nan::Set(target, Nan::New<v8::String>("Opencc").ToLocalChecked(), tpl->GetFunction());
+    v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
+    Nan::Set(target, Nan::New("Opencc").ToLocalChecked(), cons);
   }
 };
 

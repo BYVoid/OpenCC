@@ -94,7 +94,11 @@ cmake .. -G "Visual Studio 12" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Rele
 make
 ```
 
-### Projects using Opencc 使用OpenCC的項目
+### iOS
+
+See https://github.com/gelosie/OpenCC/tree/master/iOS
+
+## Projects using Opencc 使用OpenCC的項目
 
 * [ibus-pinyin](http://code.google.com/p/ibus/)
 * [fcitx](http://code.google.com/p/fcitx/)

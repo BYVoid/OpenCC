@@ -168,19 +168,19 @@ public:
     std::ifstream ifs;
 
     // Working directory
-    ifs.open(fileName.c_str());
+    ifs.open(UTF8Util::GetPlatformString(fileName).c_str());
     if (ifs.is_open()) {
       return fileName;
     }
     // Package data directory
     if (PACKAGE_DATA_DIRECTORY != "") {
       string prefixedFileName = PACKAGE_DATA_DIRECTORY + fileName;
-      ifs.open(prefixedFileName.c_str());
+      ifs.open(UTF8Util::GetPlatformString(prefixedFileName).c_str());
       if (ifs.is_open()) {
         return prefixedFileName;
       }
       prefixedFileName += ".json";
-      ifs.open(prefixedFileName.c_str());
+      ifs.open(UTF8Util::GetPlatformString(prefixedFileName).c_str());
       if (ifs.is_open()) {
         return prefixedFileName;
       }
@@ -197,7 +197,7 @@ Config::~Config() { delete (ConfigInternal*)internal; }
 ConverterPtr Config::NewFromFile(const string& fileName) {
   ConfigInternal* impl = (ConfigInternal*)internal;
   string prefixedFileName = impl->FindConfigFile(fileName);
-  std::ifstream ifs(prefixedFileName);
+  std::ifstream ifs(UTF8Util::GetPlatformString(prefixedFileName));
   string content(std::istreambuf_iterator<char>(ifs),
                  (std::istreambuf_iterator<char>()));
 

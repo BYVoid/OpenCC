@@ -16,6 +16,12 @@
  * limitations under the License.
  */
 
+#ifdef _MSC_VER
+#define NOMINMAX
+#include <Windows.h>
+#undef NOMINMAX
+#endif // _MSC_VER
+
 #include "Config.hpp"
 #include "Converter.hpp"
 #include "opencc.h"
@@ -82,7 +88,7 @@ size_t SimpleConverter::Convert(const char* input, size_t length,
 
 static string cError;
 
-opencc_t opencc_open(const char* configFileName) {
+opencc_t opencc_open_internal(const char* configFileName) {
   try {
     if (configFileName == nullptr) {
       configFileName = OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD;
@@ -94,6 +100,37 @@ opencc_t opencc_open(const char* configFileName) {
     return reinterpret_cast<opencc_t>(-1);
   }
 }
+
+#ifdef _MSC_VER
+opencc_t opencc_open_w(const wchar_t* configFileName) {
+  try {
+    if (configFileName == nullptr) {
+      return opencc_open_internal(nullptr);
+    }
+    std::string utf8fn = UTF8Util::U16ToU8(configFileName);
+    return opencc_open_internal(utf8fn.c_str());
+  } catch (std::runtime_error& ex) {
+    cError = ex.what();
+    return reinterpret_cast<opencc_t>(-1);
+  }
+}
+opencc_t opencc_open(const char* configFileName) {
+  if (configFileName == nullptr) {
+    return opencc_open_internal(nullptr);
+  }
+  std::wstring wFileName;
+  int convcnt = MultiByteToWideChar(CP_ACP, 0, configFileName, -1, NULL, 0);
+  if (convcnt > 0) {
+    wFileName.resize(convcnt);
+    MultiByteToWideChar(CP_ACP, 0, configFileName, -1, &wFileName[0], convcnt);
+  }
+  return opencc_open_w(wFileName.c_str());
+}
+#else
+opencc_t opencc_open(const char* configFileName) {
+  return opencc_open_internal(configFileName);
+}
+#endif
 
 int opencc_close(opencc_t opencc) {
   try {

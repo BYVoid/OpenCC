@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <unordered_map>
+
 #include "Config.hpp"
 #include "ConversionChain.hpp"
 #include "Converter.hpp"
@@ -25,8 +27,6 @@
 #include "TextDict.hpp"
 
 #include "document.h"
-
-#include <unordered_map>
 
 using namespace opencc;
 

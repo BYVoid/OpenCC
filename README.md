@@ -13,7 +13,7 @@ Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for c
 * 嚴格審校一簡對多繁詞條，原則爲「能分則不合」。
 * 支持中國大陸、臺灣、香港異體字和地區習慣用詞轉換，如「裏」「裡」、「鼠標」「滑鼠」。
 * 詞庫和函數庫完全分離，可以自由修改、導入、擴展。
-* 支持C、C++、Python、PHP、Java、Ruby、Node.js。
+* 支持C、C++、Python、PHP、Java、Ruby、Node.js and Android。
 * 兼容Windows、Linux、Mac平臺。
 
 ### Links 相關鏈接
@@ -97,6 +97,10 @@ make
 ### iOS
 
 See https://github.com/gelosie/OpenCC/tree/master/iOS
+
+### Android
+
+See [android-opencc](https://github.com/qichuan/android-opencc)
 
 ## Projects using Opencc 使用OpenCC的項目
 

@@ -71,6 +71,18 @@ typedef void* opencc_t;
 * @ingroup opencc_c_api
 */
 OPENCC_EXPORT opencc_t opencc_open(const char* configFileName);
+#ifdef _MSC_VER
+/**
+* Makes an instance of opencc (wide char / Unicode)
+*
+* @param configFileName Location of configuration file. If this is set to NULL,
+*                       OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD will be loaded.
+* @return            A description pointer of the newly allocated instance of
+*                    opencc. On error the return value will be (opencc_t) -1.
+* @ingroup opencc_c_api
+*/
+OPENCC_EXPORT opencc_t opencc_open_w(const wchar_t* configFileName);
+#endif /* _MSC_VER */
 
 /**
 * Destroys an instance of opencc

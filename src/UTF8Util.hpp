@@ -18,6 +18,12 @@
 
 #pragma once
 
+#ifdef _MSC_VER
+#define NOMINMAX
+#include <Windows.h>
+#undef NOMINMAX
+#endif // _MSC_VER
+
 #include "Common.hpp"
 
 namespace opencc {
@@ -241,5 +247,38 @@ public:
       pstr = NextChar(pstr);
     }
   }
+
+#ifdef _MSC_VER
+  static std::wstring GetPlatformString(const std::string& str) {
+    return U8ToU16(str);
+  }
+#else
+  static std::string GetPlatformString(const std::string& str) {
+    return str;
+  }
+#endif // _MSC_VER
+
+
+#ifdef _MSC_VER
+  static std::string U16ToU8(const std::wstring& wstr) {
+    std::string ret;
+    int convcnt = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.length(), NULL, 0, NULL, NULL);
+    if (convcnt > 0) {
+      ret.resize(convcnt);
+      WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.length(), &ret[0], convcnt, NULL, NULL);
+    }
+    return ret;
+  }
+
+  static std::wstring U8ToU16(const std::string& str) {
+    std::wstring ret;
+    int convcnt = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), NULL, 0);
+    if (convcnt > 0) {
+      ret.resize(convcnt);
+      MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), &ret[0], convcnt);
+    }
+    return ret;
+  }
+#endif // _MSC_VER
 };
 }

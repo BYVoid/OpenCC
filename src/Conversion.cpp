@@ -1,7 +1,7 @@
-/**
+/*
  * Open Chinese Convert
  *
- * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,26 +17,35 @@
  */
 
 #include "Conversion.hpp"
+#include "Dict.hpp"
 
-using namespace Opencc;
+using namespace opencc;
 
-Conversion::Conversion(SegmentationPtr segmentator) {
-  this->segmentator = segmentator;
-}
-
-StringVectorPtr Conversion::Segment(const string& text) {
-  StringVectorPtr segments(new StringVector);
-  for (auto entry : *segmentator->Segment(text)) {
-    segments->push_back(entry->key);
-  }
-  return segments;
-}
-
-string Conversion::Convert(const string& text) {
-  auto segments = segmentator->Segment(text);
+string Conversion::Convert(const char* phrase) const {
   std::ostringstream buffer;
-  for (auto segment : *segments) {
-    buffer << segment->GetDefault();
+  for (const char* pstr = phrase; *pstr != '\0';) {
+    Optional<const DictEntry*> matched = dict->MatchPrefix(pstr);
+    size_t matchedLength;
+    if (matched.IsNull()) {
+      matchedLength = UTF8Util::NextCharLength(pstr);
+      buffer << UTF8Util::FromSubstr(pstr, matchedLength);
+    } else {
+      matchedLength = matched.Get()->KeyLength();
+      buffer << matched.Get()->GetDefault();
+    }
+    pstr += matchedLength;
   }
   return buffer.str();
+}
+
+string Conversion::Convert(const string& phrase) const {
+  return Convert(phrase.c_str());
+}
+
+SegmentsPtr Conversion::Convert(const SegmentsPtr& input) const {
+  SegmentsPtr output(new Segments);
+  for (const char* segment : *input) {
+    output->AddSegment(Convert(segment));
+  }
+  return output;
 }

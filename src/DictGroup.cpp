@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,77 +17,72 @@
  */
 
 #include "DictGroup.hpp"
+#include "Lexicon.hpp"
 #include "TextDict.hpp"
 
-using namespace Opencc;
+using namespace opencc;
 
-DictGroup::DictGroup() {
-  keyMaxLength = 0;
-}
+DictGroup::DictGroup(const list<DictPtr>& _dicts)
+    : keyMaxLength(0), dicts(_dicts) {}
 
-DictGroup::~DictGroup() {
-}
+DictGroup::~DictGroup() {}
 
-void DictGroup::AddDict(DictPtr dict) {
-  dicts.push_back(dict);
-  keyMaxLength = std::max(dict->KeyMaxLength(), keyMaxLength);
-}
+size_t DictGroup::KeyMaxLength() const { return keyMaxLength; }
 
-size_t DictGroup::KeyMaxLength() const {
-  return keyMaxLength;
-}
-
-Optional<DictEntryPtr> DictGroup::Match(const char* word) {
-  for (auto dict : dicts) {
-    Optional<DictEntryPtr> prefix = dict->Match(word);
+Optional<const DictEntry*> DictGroup::Match(const char* word) const {
+  for (const auto& dict : dicts) {
+    const Optional<const DictEntry*>& prefix = dict->Match(word);
     if (!prefix.IsNull()) {
       return prefix;
     }
   }
-  return Optional<DictEntryPtr>();
+  return Optional<const DictEntry*>::Null();
 }
 
-Optional<DictEntryPtr> DictGroup::MatchPrefix(const char* word) {
-  for (auto dict : dicts) {
-    Optional<DictEntryPtr> prefix = dict->MatchPrefix(word);
+Optional<const DictEntry*> DictGroup::MatchPrefix(const char* word) const {
+  for (const auto& dict : dicts) {
+    const Optional<const DictEntry*>& prefix = dict->MatchPrefix(word);
     if (!prefix.IsNull()) {
       return prefix;
     }
   }
-  return Optional<DictEntryPtr>();
+  return Optional<const DictEntry*>::Null();
 }
 
-DictEntryPtrVectorPtr DictGroup::MatchAllPrefixes(const char* word) {
-  std::map<size_t, DictEntryPtr> matched;
-  for (auto dict : dicts) {
-    auto entries = dict->MatchAllPrefixes(word);
-    for (DictEntryPtr entry : *entries) {
-      size_t len = entry->key.length();
+vector<const DictEntry*> DictGroup::MatchAllPrefixes(const char* word) const {
+  std::map<size_t, const DictEntry*> matched;
+  // Match all prefixes from all dictionaries
+  for (const auto& dict : dicts) {
+    const vector<const DictEntry*>& entries = dict->MatchAllPrefixes(word);
+    for (const auto& entry : entries) {
+      size_t len = entry->KeyLength();
+      // If the current length has already result, skip
       if (matched.find(len) == matched.end()) {
         matched[len] = entry;
       }
     }
   }
-  DictEntryPtrVectorPtr matchedEntries(new DictEntryPtrVector);
-  for (auto entry : matched) {
-    matchedEntries->push_back(entry.second);
+  vector<const DictEntry*> matchedEntries;
+  for (auto i = matched.rbegin(); i != matched.rend(); i++) {
+    matchedEntries.push_back(i->second);
   }
-  std::reverse(matchedEntries->begin(), matchedEntries->end());
   return matchedEntries;
 }
 
-DictEntryPtrVectorPtr DictGroup::GetLexicon() {
-  DictEntryPtrVectorPtr allLexicon(new DictEntryPtrVector);
-  for (auto dict : dicts) {
-    auto lexicon = dict->GetLexicon();
-    std::copy(lexicon->begin(), lexicon->end(), std::back_inserter(*allLexicon));
+LexiconPtr DictGroup::GetLexicon() const {
+  LexiconPtr allLexicon(new Lexicon);
+  for (const auto& dict : dicts) {
+    const auto& lexicon = dict->GetLexicon();
+    for (const auto& item : *lexicon) {
+      allLexicon->Add(DictEntryFactory::New(item));
+    }
   }
-  std::sort(allLexicon->begin(), allLexicon->end(), DictEntry::PtrCmp);
+  allLexicon->Sort();
+  // Fixme deduplicate
   return allLexicon;
 }
 
-void DictGroup::LoadFromDict(Dict* dictionary) {
-  TextDictPtr dict(new TextDict);
-  dict->LoadFromDict(dictionary);
-  AddDict(dict);
+DictGroupPtr DictGroup::NewFromDict(const Dict& dict) {
+  TextDictPtr newDict = TextDict::NewFromDict(dict);
+  return DictGroupPtr(new DictGroup(list<DictPtr>{newDict}));
 }

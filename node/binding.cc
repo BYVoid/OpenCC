@@ -1,153 +1,141 @@
 #include <iostream>
-#include <node.h>
-#include <v8.h>
+#include <nan.h>
 
 #include "Config.hpp"
-#include "ConversionChain.hpp"
+#include "Converter.hpp"
 
-using namespace v8;
-using namespace Opencc;
+using namespace opencc;
 
-string ToUtf8String(const Local<String>& str) {
-  v8::String::Utf8Value utf8(str);
-  return std::string(*utf8);
+string ToUtf8String(const v8::Local<v8::Value>& val) {
+  Nan::Utf8String utf8(val);
+  return string(*utf8);
 }
 
-class OpenccBinding : public node::ObjectWrap {
+class OpenccBinding : public Nan::ObjectWrap {
   struct ConvertRequest {
     OpenccBinding* instance;
     string input;
     string output;
-    Persistent<Function> callback;
-    Optional<Opencc::Exception> ex;
+    Nan::Callback *callback;
+    Optional<opencc::Exception> ex;
+
+    ConvertRequest()
+        : instance(nullptr), ex(Optional<opencc::Exception>::Null()) {
+    }
   };
 
   Config config_;
-  ConversionChainPtr conversionChain_;
+  const ConverterPtr converter_;
  public:
-  explicit OpenccBinding(const string configFileName) {
-    config_.LoadFile(configFileName);
-    conversionChain_ = config_.GetConversionChain();
-  }
+  explicit OpenccBinding(const string configFileName)
+    : config_(),
+      converter_(config_.NewFromFile(configFileName)) {}
 
   virtual ~OpenccBinding() {
   }
-  
+
   string Convert(const string& input) {
-    return conversionChain_->Convert(input);
+    return converter_->Convert(input);
   }
 
-  static Handle<Value> New(const Arguments& args) {
-    HandleScope scope;
+  static NAN_METHOD(New) {
     OpenccBinding* instance;
 
     try {
-      if (args.Length() >= 1 && args[0]->IsString()) {
-        string configFile = ToUtf8String(args[0]->ToString());
+      if (info.Length() >= 1 && info[0]->IsString()) {
+        string configFile = ToUtf8String(info[0]);
         instance = new OpenccBinding(configFile);
       } else {
         instance = new OpenccBinding("s2t.json");
       }
-    } catch (Opencc::Exception& e) {
-      ThrowException(v8::Exception::Error(
-          String::New(e.what())));
-      return scope.Close(Undefined());
+    } catch (opencc::Exception& e) {
+      Nan::ThrowError(e.what());
+      return;
     }
 
-    instance->Wrap(args.This());
-    return args.This();
+    instance->Wrap(info.This());
+    info.GetReturnValue().Set(info.This());
   }
 
-  static Handle<Value> Convert(const Arguments& args) {
-    HandleScope scope;
-    if (args.Length() < 2 || !args[0]->IsString() || !args[1]->IsFunction()) {
-      ThrowException(v8::Exception::TypeError(String::New("Wrong arguments")));
-      return scope.Close(Undefined());
+  static NAN_METHOD(Convert) {
+    if (info.Length() < 2 || !info[0]->IsString() || !info[1]->IsFunction()) {
+      Nan::ThrowTypeError("Wrong arguments");
+      return;
     }
 
     ConvertRequest* conv_data = new ConvertRequest;
-    conv_data->instance = ObjectWrap::Unwrap<OpenccBinding>(args.This());
-    conv_data->input = ToUtf8String(args[0]->ToString());
-    conv_data->callback = Persistent<Function>::New(Local<Function>::Cast(args[1]));
-    conv_data->ex = Optional<Opencc::Exception>();
+    conv_data->instance = Nan::ObjectWrap::Unwrap<OpenccBinding>(info.This());
+    conv_data->input = ToUtf8String(info[0]);
+    conv_data->callback = new Nan::Callback(info[1].As<v8::Function>());
+    conv_data->ex = Optional<opencc::Exception>::Null();
     uv_work_t* req = new uv_work_t;
     req->data = conv_data;
     uv_queue_work(uv_default_loop(), req, DoConvert, (uv_after_work_cb)AfterConvert);
 
-    return Undefined();
+    return;
   }
-  
+
   static void DoConvert(uv_work_t* req) {
     ConvertRequest* conv_data = static_cast<ConvertRequest*>(req->data);
     OpenccBinding* instance = conv_data->instance;
     try {
       conv_data->output = instance->Convert(conv_data->input);
-    } catch (Opencc::Exception& e) {
-      conv_data->ex = Optional<Opencc::Exception>(e);
+    } catch (opencc::Exception& e) {
+      conv_data->ex = Optional<opencc::Exception>(e);
     }
   }
 
   static void AfterConvert(uv_work_t* req) {
-    HandleScope scope;
+    Nan::HandleScope scope;
     ConvertRequest* conv_data = static_cast<ConvertRequest*>(req->data);
-    Local<Value> err = Local<Value>::New(Undefined());
-    Local<String> converted = String::New(conv_data->output.c_str());
+    v8::Local<v8::Value> err = Nan::Undefined();
+    v8::Local<v8::String> converted = Nan::New(conv_data->output.c_str()).ToLocalChecked();
     if (!conv_data->ex.IsNull()) {
-      err = String::New(conv_data->ex.Get().what());
+      err = Nan::New(conv_data->ex.Get().what()).ToLocalChecked();
     }
     const unsigned argc = 2;
-    Local<Value> argv[argc] = {
+    v8::Local<v8::Value> argv[argc] = {
       err,
-      Local<Value>::New(converted)
+      converted
     };
-    conv_data->callback->Call(Context::GetCurrent()->Global(), argc, argv);
-    conv_data->callback.Dispose();
+    conv_data->callback->Call(argc, argv);
     delete conv_data;
     delete req;
   }
 
-  static Handle<Value> ConvertSync(const Arguments& args) {
-    HandleScope scope;
-    if (args.Length() < 1 || !args[0]->IsString()) {
-      ThrowException(v8::Exception::TypeError(String::New("Wrong arguments")));
-      return scope.Close(Undefined());
+  static NAN_METHOD(ConvertSync) {
+    if (info.Length() < 1 || !info[0]->IsString()) {
+      Nan::ThrowTypeError("Wrong arguments");
+      return;
     }
 
-    OpenccBinding* instance = ObjectWrap::Unwrap<OpenccBinding>(args.This());
+    OpenccBinding* instance = Nan::ObjectWrap::Unwrap<OpenccBinding>(info.This());
 
-    string input = ToUtf8String(args[0]->ToString());
+    string input = ToUtf8String(info[0]);
     string output;
     try {
       output = instance->Convert(input);
-    } catch (Opencc::Exception& e) {
-      ThrowException(v8::Exception::Error(
-          String::New(e.what())));
-      return scope.Close(Undefined());
+    } catch (opencc::Exception& e) {
+      Nan::ThrowError(e.what());
+      return;
     }
 
-    Local<String> converted = String::New(output.c_str());
-    return scope.Close(converted);
+    v8::Local<v8::String> converted = Nan::New(output.c_str()).ToLocalChecked();
+    info.GetReturnValue().Set(converted);
   }
 
-  static void init(Handle<Object> target) {
+  static NAN_MODULE_INIT(Init) {
     // Prepare constructor template
-    Local<FunctionTemplate> tpl = FunctionTemplate::New(OpenccBinding::New);
-    tpl->SetClassName(String::NewSymbol("Opencc"));
+    v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(OpenccBinding::New);
+    tpl->SetClassName(Nan::New("Opencc").ToLocalChecked());
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
     // Prototype
-    tpl->PrototypeTemplate()->Set(String::NewSymbol("convert"),
-        FunctionTemplate::New(Convert)->GetFunction());
-    tpl->PrototypeTemplate()->Set(String::NewSymbol("convertSync"),
-        FunctionTemplate::New(ConvertSync)->GetFunction());
+    Nan::SetPrototypeMethod(tpl, "convert", Convert);
+    Nan::SetPrototypeMethod(tpl, "convertSync", ConvertSync);
     // Constructor
-    Persistent<Function> constructor = Persistent<Function>::New(
-        tpl->GetFunction());
-    target->Set(String::NewSymbol("Opencc"), constructor);
+    v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
+    Nan::Set(target, Nan::New("Opencc").ToLocalChecked(), cons);
   }
 };
 
-void init(Handle<Object> target) {
-  OpenccBinding::init(target);
-}
-
-NODE_MODULE(binding, init);
+NODE_MODULE(binding, OpenccBinding::Init);

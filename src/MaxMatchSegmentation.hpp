@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,22 @@
 #include "DictGroup.hpp"
 #include "Segmentation.hpp"
 
-namespace Opencc {
-  class OPENCC_EXPORT MaxMatchSegmentation : public Segmentation {
-  public:
-    MaxMatchSegmentation(DictPtr dict);
-    virtual DictEntryPtrVectorPtr Segment(const string& text);
-  private:
-    DictPtr dict;
-  };
+namespace opencc {
+/**
+* Implementation of maximal match segmentation
+* @ingroup opencc_cpp_api
+*/
+class OPENCC_EXPORT MaxMatchSegmentation : public Segmentation {
+public:
+  MaxMatchSegmentation(const DictPtr _dict) : dict(_dict) {}
+
+  virtual ~MaxMatchSegmentation() {}
+
+  virtual SegmentsPtr Segment(const string& text) const;
+
+  const DictPtr GetDict() const { return dict; }
+
+private:
+  const DictPtr dict;
+};
 }

@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,105 +16,96 @@
  * limitations under the License.
  */
 
-#include "UTF8Util.hpp"
+#include "Lexicon.hpp"
 #include "TextDict.hpp"
 
-using namespace Opencc;
+using namespace opencc;
 
-DictEntryPtr ParseKeyValues(const char* buff) {
-  size_t length;
-  const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
-  if (UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
-    throw InvalidFormat("Invalid text dictionary");
+static size_t GetKeyMaxLength(const LexiconPtr& lexicon) {
+  size_t maxLength = 0;
+  for (const auto& entry : *lexicon) {
+    size_t keyLength = entry->KeyLength();
+    maxLength = std::max(keyLength, maxLength);
   }
-  length = pbuff - buff;
-  DictEntryPtr entry(new DictEntry(UTF8Util::FromSubstr(buff, length)));
-  while (!UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
-    buff = pbuff = UTF8Util::NextChar(pbuff);
-    pbuff = UTF8Util::FindNextInline(buff, ' ');
-    length = pbuff - buff;
-    string value = UTF8Util::FromSubstr(buff, length);
-    entry->values.push_back(value);
-  }
-  return entry;
-}
-
-TextDict::TextDict() : lexicon(new DictEntryPtrVector) {
-  sorted = true;
-  maxLength = 0;
-}
-
-TextDict::~TextDict() {
-}
-
-void TextDict::LoadFromFile(FILE* fp) {
-  const int ENTRY_BUFF_SIZE = 4096;
-  char buff[ENTRY_BUFF_SIZE];
-  UTF8Util::SkipUtf8Bom(fp);
-  while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
-    DictEntryPtr entry = ParseKeyValues(buff);
-    AddKeyValue(entry);
-  }
-  SortLexicon();
-}
-
-void TextDict::LoadFromDict(Dict* dictionary) {
-  lexicon = dictionary->GetLexicon();
-  maxLength = dictionary->KeyMaxLength();
-  sorted = true;
-}
-
-void TextDict::AddKeyValue(DictEntry entry) {
-  AddKeyValue(DictEntryPtr(new DictEntry(entry)));
-}
-
-void TextDict::AddKeyValue(DictEntryPtr entry) {
-  lexicon->push_back(entry);
-  size_t keyLength = entry->key.length();
-  maxLength = std::max(keyLength, maxLength);
-  sorted = false;
-}
-
-void TextDict::SortLexicon() {
-  if (!sorted) {
-    std::sort(lexicon->begin(), lexicon->end(), DictEntry::PtrCmp);
-    sorted = true;
-  }
-}
-
-size_t TextDict::KeyMaxLength() const {
   return maxLength;
 }
 
-Optional<DictEntryPtr> TextDict::Match(const char* word) {
-  SortLexicon();
-  DictEntryPtr entry(new DictEntry(word));
-  auto found = std::lower_bound(lexicon->begin(), lexicon->end(), entry, DictEntry::PtrCmp);
-  if (found != lexicon->end() && (*found)->key == entry->key) {
-    return Optional<DictEntryPtr>(*found);
+static DictEntry* ParseKeyValues(const char* buff, size_t lineNum) {
+  size_t length;
+  const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
+  if (UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
+    throw InvalidTextDictionary("Tabular not found " + string(buff), lineNum);
+  }
+  length = static_cast<size_t>(pbuff - buff);
+  string key = UTF8Util::FromSubstr(buff, length);
+  vector<string> values;
+  while (!UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
+    buff = pbuff = UTF8Util::NextChar(pbuff);
+    pbuff = UTF8Util::FindNextInline(buff, ' ');
+    length = static_cast<size_t>(pbuff - buff);
+    const string& value = UTF8Util::FromSubstr(buff, length);
+    values.push_back(value);
+  }
+  if (values.size() == 0) {
+    throw InvalidTextDictionary("No value in an item", lineNum);
+  } else if (values.size() == 1) {
+    return DictEntryFactory::New(key, values.at(0));
   } else {
-    return Optional<DictEntryPtr>();
+    return DictEntryFactory::New(key, values);
   }
 }
 
-DictEntryPtrVectorPtr TextDict::GetLexicon() {
-  SortLexicon();
+static LexiconPtr ParseLexiconFromFile(FILE* fp) {
+  const int ENTRY_BUFF_SIZE = 4096;
+  char buff[ENTRY_BUFF_SIZE];
+  LexiconPtr lexicon(new Lexicon);
+  UTF8Util::SkipUtf8Bom(fp);
+  size_t lineNum = 1;
+  while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
+    lexicon->Add(ParseKeyValues(buff, lineNum));
+    lineNum++;
+  }
   return lexicon;
 }
 
-void TextDict::SerializeToFile(FILE* fp) {
-  SortLexicon();
-  // TODO escape space
-  for (auto entry : *lexicon) {
-    fprintf(fp, "%s\t", entry->key.c_str());
-    size_t i = 0;
-    for (auto& value : entry->values) {
-      fprintf(fp, "%s", value.c_str());
-      if (i < entry->values.size() - 1) {
-        fprintf(fp, " ");
-      }
-      i++;
-    }
-    fprintf(fp, "\n");
+TextDict::TextDict(const LexiconPtr& _lexicon)
+    : maxLength(GetKeyMaxLength(_lexicon)), lexicon(_lexicon) {}
+
+TextDict::~TextDict() {}
+
+TextDictPtr TextDict::NewFromSortedFile(FILE* fp) {
+  const LexiconPtr& lexicon = ParseLexiconFromFile(fp);
+  return TextDictPtr(new TextDict(lexicon));
+}
+
+TextDictPtr TextDict::NewFromFile(FILE* fp) {
+  const LexiconPtr& lexicon = ParseLexiconFromFile(fp);
+  lexicon->Sort();
+  return TextDictPtr(new TextDict(lexicon));
+}
+
+TextDictPtr TextDict::NewFromDict(const Dict& dict) {
+  return TextDictPtr(new TextDict(dict.GetLexicon()));
+}
+
+size_t TextDict::KeyMaxLength() const { return maxLength; }
+
+Optional<const DictEntry*> TextDict::Match(const char* word) const {
+  NoValueDictEntry entry(word);
+  const auto& found = std::lower_bound(lexicon->begin(), lexicon->end(), &entry,
+                                       DictEntry::PtrLessThan);
+  if ((found != lexicon->end()) &&
+      (strcmp((*found)->Key(), entry.Key()) == 0)) {
+    return Optional<const DictEntry*>(*found);
+  } else {
+    return Optional<const DictEntry*>::Null();
+  }
+}
+
+LexiconPtr TextDict::GetLexicon() const { return lexicon; }
+
+void TextDict::SerializeToFile(FILE* fp) const {
+  for (const auto& entry : *lexicon) {
+    fprintf(fp, "%s\n", entry->ToString().c_str());
   }
 }

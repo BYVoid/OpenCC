@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,25 +18,23 @@
 
 #include "UTF8Util.hpp"
 
-using namespace Opencc;
+using namespace opencc;
 
 void UTF8Util::SkipUtf8Bom(FILE* fp) {
   /* UTF-8 BOM is EF BB BF */
   if (fp == NULL) {
     return;
   }
-  
   /* If we are not at beginning of file, return */
   if (ftell(fp) != 0) {
     return;
   }
-  
+
   /* Try to read first 3 bytes */
   int bom[3];
   int n;
   for (n = 0; n <= 2 && (bom[n] = getc(fp)) != EOF; n++) {
   }
-  
   /* If we can only read <3 bytes, push them back */
   /* Or if first 3 bytes is not BOM, push them back */
   if ((n < 3) || (bom[0] != 0xEF) || (bom[1] != 0xBB) || (bom[2] != 0xBF)) {
@@ -44,6 +42,6 @@ void UTF8Util::SkipUtf8Bom(FILE* fp) {
       ungetc(bom[n], fp);
     }
   }
-  
+
   /* Otherwise, BOM is already skipped */
 }

@@ -1,6 +1,13 @@
 language: cpp
 compiler:
   - gcc
+sudo: required
 before_install:
+  - sudo add-apt-repository -y ppa:chris-lea/node.js
+  - sudo apt-get update
+  - sudo apt-get install nodejs -y
   - sudo apt-get install doxygen -y
-script: ./release.sh
+  - sudo npm install -g mocha
+  - sudo npm install -g node-gyp
+  - sudo npm install
+script: make test VERBOSE=1 && make package VERBOSE=1 && make node-test

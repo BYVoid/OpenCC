@@ -13,13 +13,12 @@ Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for c
 * 嚴格審校一簡對多繁詞條，原則爲「能分則不合」。
 * 支持中國大陸、臺灣、香港異體字和地區習慣用詞轉換，如「裏」「裡」、「鼠標」「滑鼠」。
 * 詞庫和函數庫完全分離，可以自由修改、導入、擴展。
-* 支持C、C++、Python、PHP、Java、Ruby、Node.js。
+* 支持C、C++、Python、PHP、Java、Ruby、Node.js and Android。
 * 兼容Windows、Linux、Mac平臺。
 
 ### Links 相關鏈接
 
-* Introduction 詳細介紹 https://code.google.com/p/opencc/wiki/Introduction
-* Development Documentation 開發文檔 http://byvoid.github.io/OpenCC/
+* Introduction 詳細介紹 https://github.com/BYVoid/OpenCC/wiki/%E7%B7%A3%E7%94%B1
 * OpenCC Online (在線轉換) http://opencc.byvoid.com/
 * 現代漢語常用簡繁一對多字義辨析表 http://ytenx.org/byohlyuk/KienxPyan
 
@@ -27,10 +26,14 @@ Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for c
 
 * [Debian](http://packages.qa.debian.org/o/opencc.html)
 * [Ubuntu](https://launchpad.net/ubuntu/+source/opencc)
-* [Fedora](https://admin.fedoraproject.org/pkgdb/acls/name/opencc)
+* [Fedora](https://admin.fedoraproject.org/pkgdb/package/opencc/)
 * [Arch Linux](https://www.archlinux.org/packages/community/x86_64/opencc/)
 * [Mac OS](https://github.com/mxcl/homebrew/blob/master/Library/Formula/opencc.rb)
 * [Node.js](https://npmjs.org/package/opencc)
+
+## Download 下載
+
+https://bintray.com/byvoid/opencc/OpenCC
 
 ## Usage 使用
 
@@ -44,48 +47,62 @@ Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for c
 
 * `s2t.json` Simplified Chinese to Traditional Chinese 簡體到繁體
 * `t2s.json` Traditional Chinese to Simplified Chinese 繁體到簡體
-* `s2tw.json` Simplified Chinese to Traditional Chinese (Taiwan Standard) 簡體到繁體（臺灣正體標準）
-* `tw2s.json` Traditional Chinese (Taiwan Standard) to Simplified Chinese 繁體（臺灣正體標準）到簡體
+* `s2tw.json` Simplified Chinese to Traditional Chinese (Taiwan Standard) 簡體到臺灣正體
+* `tw2s.json` Traditional Chinese (Taiwan Standard) to Simplified Chinese 臺灣正體到簡體
+* `s2hk.json` Simplified Chinese to Traditional Chinese (Hong Kong Standard) 簡體到香港繁體（香港小學學習字詞表標準）
+* `hk2s.json` Traditional Chinese (Hong Kong Standard) to Simplified Chinese 香港繁體（香港小學學習字詞表標準）到簡體
 * `s2twp.json` Simplified Chinese to Traditional Chinese (Taiwan Standard) with Taiwanese idiom 簡體到繁體（臺灣正體標準）並轉換爲臺灣常用詞彙
 * `tw2sp.json` Traditional Chinese (Taiwan Standard) to Simplified Chinese with Mainland Chinese idiom 繁體（臺灣正體標準）到簡體並轉換爲中國大陸常用詞彙
+* `t2tw.json` Traditional Chinese (OpenCC Standard) to Taiwan Standard 繁體（OpenCC 標準）到臺灣正體
+* `t2hk.json` Traditional Chinese (OpenCC Standard) to Hong Kong Standard 繁體（OpenCC 標準）到香港繁體（香港小學學習字詞表標準）
+
+## Development Documentation 開發文檔
+
+* http://byvoid.github.io/OpenCC/
 
 ## Build 編譯
 
-[![Build Status](https://travis-ci.org/BYVoid/OpenCC.png?branch=master)](https://travis-ci.org/BYVoid/OpenCC)
+[![Build Status](https://travis-ci.org/BYVoid/OpenCC.svg?branch=master)](https://travis-ci.org/BYVoid/OpenCC)
 
 ### Build with CMake
 
+Linux (gcc 4.6 is required):
+
 ```
-mkdir build
-cd build
-cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -D ENABLE_GETTEXT:BOOL=ON ..
 make
 sudo make install
+```
+
+Mac OS X (clang 3.2 is required):
+
+```
+make PREFIX=/usr/local
+sudo make PREFIX=/usr/local install
 ```
 
 Windows MSYS:
 
 ```
-cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT:BOOL=OFF
+cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Release
 make
 ```
 
 Windows Visual Studio (2013 or higher required):
 
 ```
-cmake .. -G "Visual Studio 12" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Release -DENABLE_GETTEXT:BOOL=OFF
+cmake .. -G "Visual Studio 12" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Release
 make
 ```
 
-## Screenshot 截圖
+### iOS
 
-![OpenCC Mac](http://opencc.googlecode.com/files/screenshot-gui-mac.png)
+See https://github.com/gelosie/OpenCC/tree/master/iOS
 
-![OpenCC Windows](http://opencc.googlecode.com/files/screenshot-gui.png)
+### Android
 
-![OpenCC Ubuntu](http://opencc.googlecode.com/files/screenshot-gui-ubuntu.png)
+See [android-opencc](https://github.com/qichuan/android-opencc)
 
-### Projects using Opencc 使用OpenCC的項目
+## Projects using Opencc 使用OpenCC的項目
 
 * [ibus-pinyin](http://code.google.com/p/ibus/)
 * [fcitx](http://code.google.com/p/fcitx/)
@@ -94,6 +111,20 @@ make
 * [ibus-libpinyin](https://github.com/libpinyin/ibus-libpinyin)
 * [BYVBlog](https://github.com/byvoid/byvblog)
 * [豆瓣同城微信](http://weixinqiao.com/douban-event/)
+* [alfred-chinese-converter](https://github.com/amowu/alfred-chinese-converter)
+* [GoldenDict](https://github.com/goldendict/goldendict)
+
+## License 許可協議
+
+Apache License 2.0
+
+## Third Party Library 第三方庫
+
+* [darts-clone](https://code.google.com/p/darts-clone/) BSD License
+* [tclap](http://tclap.sourceforge.net/) MIT License
+* [rapidjson](https://github.com/miloyip/rapidjson) MIT License
+
+All these libraries are statically linked.
 
 ## Contributors 貢獻者
 
@@ -116,3 +147,7 @@ make
 * [Steven Yao](https://github.com/stevenyao)
 * [Pellaeon Lin](https://github.com/pellaeon)
 * [stony](https://github.com/stony-shixz)
+* [steelywing](https://github.com/steelywing)
+* [吕旭东](https://github.com/lvxudong)
+* [Weng Xuetian](https://github.com/wengxt)
+* [Ma Tao](https://github.com/iwater)

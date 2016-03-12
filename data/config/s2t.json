@@ -1,7 +1,13 @@
 {
   "name": "Simplified Chinese to Traditional Chinese",
-  "conversion_chain": [{
+  "segmentation": {
     "type": "mmseg",
+    "dict": {
+      "type": "ocd",
+      "file": "STPhrases.ocd"
+    }
+  },
+  "conversion_chain": [{
     "dict": {
       "type": "group",
       "dicts": [{

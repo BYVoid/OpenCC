@@ -1,27 +1,3 @@
-install(
-	FILES
-		opencc.1
-		opencc_dict.1
-	DESTINATION
-		${DIR_SHARE}man/man1
-)
-
-install(
-	FILES
-		opencc.zh_CN.1
-		opencc_dict.zh_CN.1
-	DESTINATION
-		${DIR_SHARE}man/zh_CN/man1
-)
-
-install(
-        FILES
-                opencc.zh_TW.1
-                opencc_dict.zh_TW.1
-        DESTINATION
-                ${DIR_SHARE}man/zh_TW/man1
-)
-
 if(BUILD_DOCUMENTATION)
     find_package(Doxygen)
     if (NOT DOXYGEN_FOUND)

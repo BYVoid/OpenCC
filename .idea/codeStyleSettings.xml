@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectCodeStyleSettingsManager">
+    <option name="PER_PROJECT_SETTINGS">
+      <value>
+        <Objective-C>
+          <option name="INDENT_NAMESPACE_MEMBERS" value="0" />
+          <option name="FUNCTION_PARAMETERS_WRAP" value="5" />
+          <option name="FUNCTION_PARAMETERS_ALIGN_MULTILINE" value="true" />
+          <option name="FUNCTION_CALL_ARGUMENTS_WRAP" value="5" />
+          <option name="FUNCTION_CALL_ARGUMENTS_ALIGN_MULTILINE" value="true" />
+          <option name="SPACE_BEFORE_POINTER_IN_DECLARATION" value="false" />
+          <option name="SPACE_AFTER_POINTER_IN_DECLARATION" value="true" />
+          <option name="SPACE_BEFORE_REFERENCE_IN_DECLARATION" value="false" />
+          <option name="SPACE_AFTER_REFERENCE_IN_DECLARATION" value="true" />
+        </Objective-C>
+        <Objective-C-extensions>
+          <option name="GENERATE_INSTANCE_VARIABLES_FOR_PROPERTIES" value="ASK" />
+          <option name="RELEASE_STYLE" value="IVAR" />
+          <file>
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Import" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Macro" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Typedef" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Struct" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Enum" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="ClassPredef" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Constant" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Global" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="FunctionPredecl" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Function" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Class" />
+          </file>
+          <class>
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Property" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="Synthesize" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="InitMethod" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="StaticMethod" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="InstanceMethod" />
+            <option name="com.jetbrains.objc.util.OCDeclarationKind" value="DeallocMethod" />
+          </class>
+        </Objective-C-extensions>
+        <codeStyleSettings language="ObjectiveC">
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+          <option name="BLANK_LINES_AROUND_CLASS" value="0" />
+          <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
+          <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="true" />
+          <option name="SPACE_AFTER_TYPE_CAST" value="false" />
+          <option name="BINARY_OPERATION_WRAP" value="1" />
+          <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+          <option name="ASSIGNMENT_WRAP" value="1" />
+          <indentOptions>
+            <option name="INDENT_SIZE" value="2" />
+            <option name="CONTINUATION_INDENT_SIZE" value="4" />
+            <option name="TAB_SIZE" value="2" />
+          </indentOptions>
+        </codeStyleSettings>
+      </value>
+    </option>
+    <option name="USE_PER_PROJECT_SETTINGS" value="true" />
+    <option name="PREFERRED_PROJECT_CODE_STYLE" value="Default (1)" />
+  </component>
+</project>
+

@@ -1,7 +1,7 @@
-/**
+/*
  * Open Chinese Convert
  *
- * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,27 @@
 #include "Common.hpp"
 #include "Segmentation.hpp"
 
-namespace Opencc {
-  class OPENCC_EXPORT Conversion {
-  public:
-    Conversion(SegmentationPtr segmentator);
-    StringVectorPtr Segment(const string& text);
-    string Convert(const string& text);
-  private:
-    SegmentationPtr segmentator;
-  };
+namespace opencc {
+/**
+* Conversion interface
+* @ingroup opencc_cpp_api
+*/
+class OPENCC_EXPORT Conversion {
+public:
+  Conversion(DictPtr _dict) : dict(_dict) {}
+
+  // Convert single phrase
+  string Convert(const string& phrase) const;
+
+  // Convert single phrase
+  string Convert(const char* phrase) const;
+
+  // Convert segmented text
+  SegmentsPtr Convert(const SegmentsPtr& input) const;
+
+  const DictPtr GetDict() const { return dict; }
+
+private:
+  const DictPtr dict;
+};
 }

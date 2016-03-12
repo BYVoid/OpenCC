@@ -1,8 +1,8 @@
 set(OPENCC_DICT_BIN opencc_dict)
-set(DICT_MERGE_BIN python ${CMAKE_SOURCE_DIR}/data/scripts/merge.py)
-set(DICT_REVERSE_BIN python ${CMAKE_SOURCE_DIR}/data/scripts/reverse.py)
-set(DICT_DIR ${CMAKE_SOURCE_DIR}/data/dictionary)
-set(DICT_GENERATED_DIR ${CMAKE_BINARY_DIR}/data)
+set(DICT_MERGE_BIN python ${CMAKE_CURRENT_SOURCE_DIR}/scripts/merge.py)
+set(DICT_REVERSE_BIN python ${CMAKE_CURRENT_SOURCE_DIR}/scripts/reverse.py)
+set(DICT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dictionary)
+set(DICT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 set(
   DICTS_RAW
@@ -13,6 +13,9 @@ set(
   TWVariants
   TWVariantsRevPhrases
   JPVariants
+  HKVariants
+  HKVariantsPhrases
+  HKVariantsRevPhrases
 )
 
 set(
@@ -20,6 +23,7 @@ set(
   TWPhrases
   TWPhrasesRev
   TWVariantsRev
+  HKVariantsRev
 )
 
 set(DICTS ${DICTS_RAW} ${DICTS_GENERATED})
@@ -70,6 +74,15 @@ set(
 set(
   DICT_TWPhrasesRev_GENERATING_COMMAND
   ${DICT_REVERSE_BIN} ${DICT_TWPhrasesRev_GENERATING_INPUT} TWPhrasesRev.txt
+)
+
+set(
+  DICT_HKVariantsRev_GENERATING_INPUT
+  ${DICT_DIR}/HKVariants.txt
+)
+set(
+  DICT_HKVariantsRev_GENERATING_COMMAND
+  ${DICT_REVERSE_BIN} ${DICT_HKVariantsRev_GENERATING_INPUT} HKVariantsRev.txt
 )
 
 foreach(DICT ${DICTS_GENERATED})
@@ -127,6 +140,11 @@ set(CONFIG_FILES
   config/s2tw.json
   config/s2twp.json
   config/tw2s.json
+  config/tw2sp.json
+  config/t2tw.json
+  config/s2hk.json
+  config/hk2s.json
+  config/t2hk.json
 )
 
 install(

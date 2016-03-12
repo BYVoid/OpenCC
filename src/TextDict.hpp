@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,26 +21,40 @@
 #include "Common.hpp"
 #include "SerializableDict.hpp"
 
-namespace Opencc {
-  class OPENCC_EXPORT TextDict : public SerializableDict {
-  public:
-    TextDict();
-    virtual ~TextDict();
-    virtual size_t KeyMaxLength() const;
-    virtual Optional<DictEntryPtr> Match(const char* word);
-    virtual DictEntryPtrVectorPtr GetLexicon();
-    virtual void LoadFromFile(FILE* fp);
-    virtual void SerializeToFile(FILE* fp);
-    virtual void LoadFromDict(Dict* dictionary);
-    
-    void AddKeyValue(DictEntry entry);
-    void AddKeyValue(DictEntryPtr entry);
+namespace opencc {
+/**
+* Text dictionary
+* @ingroup opencc_cpp_api
+*/
+class OPENCC_EXPORT TextDict : public Dict, public SerializableDict {
+public:
+  /**
+  * Constructor of TextDict.
+  * _lexicon must be sorted.
+  */
+  TextDict(const LexiconPtr& _lexicon);
 
-  private:
-    void SortLexicon();
+  virtual ~TextDict();
 
-    bool sorted;
-    size_t maxLength;
-    DictEntryPtrVectorPtr lexicon;
-  };
+  virtual size_t KeyMaxLength() const;
+
+  virtual Optional<const DictEntry*> Match(const char* word) const;
+
+  virtual LexiconPtr GetLexicon() const;
+
+  virtual void SerializeToFile(FILE* fp) const;
+
+  /**
+  * Constructs a TextDict from another dictionary.
+  */
+  static TextDictPtr NewFromDict(const Dict& dict);
+
+  static TextDictPtr NewFromFile(FILE* fp);
+
+  static TextDictPtr NewFromSortedFile(FILE* fp);
+
+private:
+  const size_t maxLength;
+  const LexiconPtr lexicon;
+};
 }

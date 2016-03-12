@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,22 @@
 #pragma once
 
 #if defined(Opencc_BUILT_AS_STATIC) || !defined(_WIN32)
-#  define OPENCC_EXPORT
-#  define OPENCC_NO_EXPORT
-#else
-#  ifndef OPENCC_EXPORT
-#    ifdef libopencc_EXPORTS
-  /* We are building this library */
-#      define OPENCC_EXPORT __declspec(dllexport)
-#    else
-  /* We are using this library */
-#      define OPENCC_EXPORT __declspec(dllimport)
-#    endif
-#  endif
+#define OPENCC_EXPORT
+#define OPENCC_NO_EXPORT
+#else // if defined(Opencc_BUILT_AS_STATIC) || !defined(_WIN32)
+#ifndef OPENCC_EXPORT
+#ifdef libopencc_EXPORTS
 
-#  ifndef OPENCC_NO_EXPORT
-#    define OPENCC_NO_EXPORT 
-#  endif
-#endif
+/* We are building this library */
+#define OPENCC_EXPORT __declspec(dllexport)
+#else // ifdef libopencc_EXPORTS
+
+/* We are using this library */
+#define OPENCC_EXPORT __declspec(dllimport)
+#endif // ifdef libopencc_EXPORTS
+#endif // ifndef OPENCC_EXPORT
+
+#ifndef OPENCC_NO_EXPORT
+#define OPENCC_NO_EXPORT
+#endif // ifndef OPENCC_NO_EXPORT
+#endif // if defined(Opencc_BUILT_AS_STATIC) || !defined(_WIN32)

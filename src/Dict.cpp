@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,34 +17,35 @@
  */
 
 #include "Dict.hpp"
-#include "UTF8Util.hpp"
 
-using namespace Opencc;
+using namespace opencc;
 
-Optional<DictEntryPtr> Dict::MatchPrefix(const char* word) {
+Optional<const DictEntry*> Dict::MatchPrefix(const char* word) const {
   string wordTrunc = UTF8Util::TruncateUTF8(word, KeyMaxLength());
   const char* wordTruncPtr = wordTrunc.c_str() + wordTrunc.length();
-  for (long len = wordTrunc.length(); len > 0; len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
-    wordTrunc.resize(len);
+  for (long len = static_cast<long>(wordTrunc.length()); len > 0;) {
+    wordTrunc.resize(static_cast<size_t>(len));
     wordTruncPtr = wordTrunc.c_str() + len;
-    Optional<DictEntryPtr> result = Match(wordTrunc.c_str());
+    const Optional<const DictEntry*>& result = Match(wordTrunc.c_str());
     if (!result.IsNull()) {
       return result;
     }
+    len -= UTF8Util::PrevCharLength(wordTruncPtr);
   }
-  return Optional<DictEntryPtr>();
+  return Optional<const DictEntry*>::Null();
 }
 
-DictEntryPtrVectorPtr Dict::MatchAllPrefixes(const char* word) {
-  DictEntryPtrVectorPtr matchedLengths(new DictEntryPtrVector);
+vector<const DictEntry*> Dict::MatchAllPrefixes(const char* word) const {
+  vector<const DictEntry*> matchedLengths;
   string wordTrunc = UTF8Util::TruncateUTF8(word, KeyMaxLength());
   const char* wordTruncPtr = wordTrunc.c_str() + wordTrunc.length();
-  for (long len = wordTrunc.length(); len > 0; len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
-    wordTrunc.resize(len);
+  for (long len = static_cast<long>(wordTrunc.length()); len > 0;
+       len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
+    wordTrunc.resize(static_cast<size_t>(len));
     wordTruncPtr = wordTrunc.c_str() + len;
-    Optional<DictEntryPtr> result = Match(wordTrunc.c_str());
+    const Optional<const DictEntry*>& result = Match(wordTrunc.c_str());
     if (!result.IsNull()) {
-      matchedLengths->push_back(result.Get());
+      matchedLengths.push_back(result.Get());
     }
   }
   return matchedLengths;

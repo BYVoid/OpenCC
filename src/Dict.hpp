@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,61 @@
 #include "Common.hpp"
 #include "DictEntry.hpp"
 
-namespace Opencc {
-  class OPENCC_EXPORT Dict {
-  public:
-    virtual size_t KeyMaxLength() const = 0;
-    virtual Optional<DictEntryPtr> Match(const char* word) = 0;
-    virtual Optional<DictEntryPtr> MatchPrefix(const char* word);
-    virtual DictEntryPtrVectorPtr MatchAllPrefixes(const char* word);
-    virtual DictEntryPtrVectorPtr GetLexicon() = 0;
-    virtual void LoadFromDict(Dict* dictionary) = 0;
-  };
+namespace opencc {
+/**
+* Abstract class of dictionary
+* @ingroup opencc_cpp_api
+*/
+class OPENCC_EXPORT Dict {
+public:
+  /**
+  * Matches a word exactly and returns the DictEntry or Optional::Null().
+  */
+  virtual Optional<const DictEntry*> Match(const char* word) const = 0;
+
+  /**
+  * Matches a word exactly and returns the DictEntry or Optional::Null().
+  */
+  Optional<const DictEntry*> Match(const string& word) const {
+    return Match(word.c_str());
+  }
+
+  /**
+  * Matches the longest matched prefix of a word.
+  * For example given a dictionary having "a", "an", "b", "ba", "ban", "bana",
+  * the longest prefix of "banana" matched is "bana".
+  */
+  virtual Optional<const DictEntry*> MatchPrefix(const char* word) const;
+
+  /**
+  * Matches the longest matched prefix of a word.
+  */
+  Optional<const DictEntry*> MatchPrefix(const string& word) const {
+    return MatchPrefix(word.c_str());
+  }
+
+  /**
+  * Returns all matched prefixes of a word, sorted by the length (desc).
+  * For example given a dictionary having "a", "an", "b", "ba", "ban", "bana",
+  * all the matched prefixes of "banana" are "bana", "ban", "ba", "b".
+  */
+  virtual vector<const DictEntry*> MatchAllPrefixes(const char* word) const;
+
+  /**
+  * Returns all matched prefixes of a word, sorted by the length (desc).
+  */
+  vector<const DictEntry*> MatchAllPrefixes(const string& word) const {
+    return MatchAllPrefixes(word.c_str());
+  }
+
+  /**
+  * Returns the length of the longest key in the dictionary.
+  */
+  virtual size_t KeyMaxLength() const = 0;
+
+  /**
+  * Returns all entries in the dictionary.
+  */
+  virtual LexiconPtr GetLexicon() const = 0;
+};
 }

@@ -1,7 +1,7 @@
-/**
+/*
  * Open Chinese Convert
  *
- * Copyright 2010-2013 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,22 @@
 
 #include "Common.hpp"
 
-namespace Opencc {
-  class OPENCC_EXPORT Config {
-  public:
-    Config();
-    Config(const string fileName);
-    void LoadString(const string json);
-    void LoadFile(const string fileName);
-    ConversionChainPtr GetConversionChain() const;
-  private:
-    string configDirectory;
-    string name;
-    ConversionChainPtr chain;
-  };
+namespace opencc {
+/**
+* Configuration loader
+* @ingroup opencc_cpp_api
+*/
+class OPENCC_EXPORT Config {
+public:
+  Config();
+
+  virtual ~Config();
+
+  ConverterPtr NewFromString(const string& json, const string& configDirectory);
+
+  ConverterPtr NewFromFile(const string& fileName);
+
+private:
+  void* internal;
+};
 }

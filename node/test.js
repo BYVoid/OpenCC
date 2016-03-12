@@ -9,6 +9,8 @@ var configs = [
   't2s',
   'tw2s',
   'tw2sp',
+  's2hk',
+  'hk2s',
 ];
 
 var testSync = function (config, done) {
@@ -19,7 +21,7 @@ var testSync = function (config, done) {
   var text = fs.readFileSync(inputName, 'utf-8');
   var converted = opencc.convertSync(text);
   var answer = fs.readFileSync(outputName, 'utf-8');
-  assert.equal(converted + '\n', answer);
+  assert.equal(converted, answer);
   done();
 };
 
@@ -34,7 +36,7 @@ var testAsync = function (config, done) {
       if (err) return done(err);
       fs.readFile(outputName, 'utf-8', function (err, answer) {
         if (err) return done(err);
-        assert.equal(converted + '\n', answer);
+        assert.equal(converted, answer);
         done();
       });
     });

@@ -3,8 +3,11 @@
 .project
 .cproject
 /build
-/debug
-/release
 /other
 /doc/html
 /opencc.xcodeproj
+/test/dict.ocd
+/test/dict.txt
+/test/dict.bin
+/xcode
+/node_modules

@@ -1,0 +1,33 @@
+{
+  "name": "Traditional Chinese (Hong Kong standard) to Simplified Chinese",
+  "segmentation": {
+    "type": "mmseg",
+    "dict": {
+      "type": "ocd",
+      "file": "TSPhrases.ocd"
+    }
+  },
+  "conversion_chain": [{
+    "dict": {
+      "type": "group",
+      "dicts": [{
+        "type": "ocd",
+        "file": "HKVariantsRevPhrases.ocd"
+      }, {
+        "type": "ocd",
+        "file": "HKVariantsRev.ocd"
+      }] 
+    }
+  }, {
+    "dict": {
+      "type": "group",
+      "dicts": [{
+        "type": "ocd",
+        "file": "TSPhrases.ocd"
+      }, {
+        "type": "ocd",
+        "file": "TSCharacters.ocd"
+      }]
+    }
+  }]
+}

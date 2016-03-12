@@ -4,9 +4,9 @@
     "type": "none",
     "variables": {
       "cmd": "<(PRODUCT_DIR)/opencc_dict",
-      "dict_merge": "data/scripts/merge.py",
-      "dict_reverse": "data/scripts/reverse.py",
-      "input_prefix": "data/dictionary/",
+      "dict_merge": "<(module_root_dir)/data/scripts/merge.py",
+      "dict_reverse": "<(module_root_dir)/data/scripts/reverse.py",
+      "input_prefix": "<(module_root_dir)/data/dictionary/",
       "output_prefix": "<(PRODUCT_DIR)/"
     },
     "actions": [{
@@ -16,7 +16,7 @@
       },
       "inputs": ["<(cmd)", "<(input)"],
       "outputs": ["<(output_prefix)STCharacters.ocd"],
-      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from", "text", "--to", "ocd"]
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from text", "--to ocd"]
     }, {
       "action_name": "STPhrases",
       "variables": {
@@ -24,7 +24,7 @@
       },
       "inputs": ["<(cmd)", "<(input)"],
       "outputs": ["<(output_prefix)STPhrases.ocd"],
-      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from", "text", "--to", "ocd"]
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from text", "--to ocd"]
     }, {
       "action_name": "TSCharacters",
       "variables": {
@@ -32,7 +32,7 @@
       },
       "inputs": ["<(cmd)", "<(input)"],
       "outputs": ["<(output_prefix)TSCharacters.ocd"],
-      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from", "text", "--to", "ocd"]
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from text", "--to ocd"]
     }, {
       "action_name": "TSPhrases",
       "variables": {
@@ -40,7 +40,7 @@
       },
       "inputs": ["<(cmd)", "<(input)"],
       "outputs": ["<(output_prefix)TSPhrases.ocd"],
-      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from", "text", "--to", "ocd"]
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from text", "--to ocd"]
     }, {
       "action_name": "TWVariants",
       "variables": {
@@ -48,7 +48,7 @@
       },
       "inputs": ["<(cmd)", "<(input)"],
       "outputs": ["<(output_prefix)TWVariants.ocd"],
-      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from", "text", "--to", "ocd"]
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from text", "--to ocd"]
     }, {
       "action_name": "TWVariantsRevPhrases",
       "variables": {
@@ -56,7 +56,7 @@
       },
       "inputs": ["<(cmd)", "<(input)"],
       "outputs": ["<(output_prefix)TWVariantsRevPhrases.ocd"],
-      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from", "text", "--to", "ocd"]
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from text", "--to ocd"]
     }, {
       "action_name": "JPVariants",
       "variables": {
@@ -64,12 +64,12 @@
       },
       "inputs": ["<(cmd)", "<(input)"],
       "outputs": ["<(output_prefix)JPVariants.ocd"],
-      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from", "text", "--to", "ocd"]
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from text", "--to ocd"]
     }, {
       "action_name": "TWPhrases.txt",
       "inputs": ["<(cmd)"],
       "outputs": ["<(output_prefix)TWPhrases.txt"],
-      "action": ["<(dict_merge)", "<(input_prefix)TWPhrasesIT.txt", "<(input_prefix)TWPhrasesName.txt", "<(input_prefix)TWPhrasesOther.txt", "<@(_outputs)"]
+      "action": ["python", "<(dict_merge)", "<(input_prefix)TWPhrasesIT.txt", "<(input_prefix)TWPhrasesName.txt", "<(input_prefix)TWPhrasesOther.txt", "<@(_outputs)"]
     }, {
       "action_name": "TWVariantsRev.txt",
       "variables": {
@@ -77,7 +77,7 @@
       },
       "inputs": ["<(cmd)", "<(input)"],
       "outputs": ["<(output_prefix)TWVariantsRev.txt"],
-      "action": ["<(dict_reverse)", "<(input)", "<@(_outputs)"]
+      "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "TWPhrasesRev.txt",
       "variables": {
@@ -85,7 +85,7 @@
       },
       "inputs": ["<(cmd)", "<(input)"],
       "outputs": ["<(output_prefix)TWPhrasesRev.txt"],
-      "action": ["<(dict_reverse)", "<(input)", "<@(_outputs)"]
+      "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "TWPhrases",
       "variables": {
@@ -93,7 +93,7 @@
       },
       "inputs": ["<(cmd)", "<(input)"],
       "outputs": ["<(output_prefix)TWPhrases.ocd"],
-      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from", "text", "--to", "ocd"]
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from text", "--to ocd"]
     }, {
       "action_name": "TWVariantsRev",
       "variables": {
@@ -101,7 +101,7 @@
       },
       "inputs": ["<(cmd)", "<(input)"],
       "outputs": ["<(output_prefix)TWVariantsRev.ocd"],
-      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from", "text", "--to", "ocd"]
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from text", "--to ocd"]
     }, {
       "action_name": "TWPhrasesRev",
       "variables": {
@@ -109,7 +109,47 @@
       },
       "inputs": ["<(cmd)", "<(input)"],
       "outputs": ["<(output_prefix)TWPhrasesRev.ocd"],
-      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from", "text", "--to", "ocd"]
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from text", "--to ocd"]
+    }, {
+      "action_name": "HKVariants",
+      "variables": {
+        "input": "<(input_prefix)HKVariants.txt",
+      },
+      "inputs": ["<(cmd)", "<(input)"],
+      "outputs": ["<(output_prefix)HKVariants.ocd"],
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from text", "--to ocd"]
+    }, {
+      "action_name": "HKVariantsPhrases",
+      "variables": {
+        "input": "<(input_prefix)HKVariantsPhrases.txt",
+      },
+      "inputs": ["<(cmd)", "<(input)"],
+      "outputs": ["<(output_prefix)HKVariantsPhrases.ocd"],
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from text", "--to ocd"]
+    }, {
+      "action_name": "HKVariantsRevPhrases",
+      "variables": {
+        "input": "<(input_prefix)HKVariantsRevPhrases.txt",
+      },
+      "inputs": ["<(cmd)", "<(input)"],
+      "outputs": ["<(output_prefix)HKVariantsRevPhrases.ocd"],
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from text", "--to ocd"]
+    }, {
+      "action_name": "HKVariantsRev.txt",
+      "variables": {
+        "input": "<(input_prefix)HKVariants.txt",
+      },
+      "inputs": ["<(cmd)", "<(input)"],
+      "outputs": ["<(output_prefix)HKVariantsRev.txt"],
+      "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "HKVariantsRev",
+      "variables": {
+        "input": "<(output_prefix)HKVariantsRev.txt",
+      },
+      "inputs": ["<(cmd)", "<(input)"],
+      "outputs": ["<(output_prefix)HKVariantsRev.ocd"],
+      "action": ["<(cmd)", "-i", "<(input)", "-o", "<@(_outputs)", "--from text", "--to ocd"]
     }],
     "dependencies": [
       "opencc_dict"

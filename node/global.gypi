@@ -1,6 +1,6 @@
 {
   "variables": {
-    "opencc_version": "1.0.0"
+    "opencc_version": "1.0.3"
   },
   "target_defaults": {
     "defines": [
@@ -21,7 +21,10 @@
           'OTHER_CPLUSPLUSFLAGS': ["-std=c++11", "-stdlib=libc++"],
           'OTHER_LDFLAGS': ["-stdlib=libc++"]
         }
-      }]
+      }],
+	  ["OS=='win'", {
+        "defines": ["Opencc_BUILT_AS_STATIC"]
+	  }]
     ]
   }
 }

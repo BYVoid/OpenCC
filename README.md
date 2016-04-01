@@ -1,5 +1,8 @@
 # Open Chinese Convert 開放中文轉換
 
+[ ![Download](https://api.bintray.com/packages/byvoid/opencc/OpenCC/images/download.svg) ](https://bintray.com/byvoid/opencc/OpenCC/_latestVersion)
+[![Build Status](https://travis-ci.org/BYVoid/OpenCC.svg?branch=master)](https://travis-ci.org/BYVoid/OpenCC)
+
 ## Introduction 介紹
 
 Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for conversion between Traditional Chinese and Simplified Chinese, supporting character-level conversion, phrase-level conversion, variant conversion and regional idioms among Mainland China, Taiwan and Hong kong.
@@ -61,8 +64,6 @@ https://bintray.com/byvoid/opencc/OpenCC
 * http://byvoid.github.io/OpenCC/
 
 ## Build 編譯
-
-[![Build Status](https://travis-ci.org/BYVoid/OpenCC.svg?branch=master)](https://travis-ci.org/BYVoid/OpenCC)
 
 ### Build with CMake
 

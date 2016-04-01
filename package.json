@@ -1,6 +1,6 @@
 {
   "name": "opencc",
-  "version": "1.0.3-1",
+  "version": "1.0.4",
   "description": "Conversion between Traditional and Simplified Chinese",
   "author": "BYVoid <byvoid@byvoid.com>",
   "license": "Apache",

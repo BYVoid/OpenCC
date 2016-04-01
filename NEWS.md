@@ -1,5 +1,14 @@
 # Change History of OpenCC
 
+## Version 1.0.4
+
+2016年4月1日
+
+* 使編譯時的腳本兼容Python 3。
+* 修正Visual C++ 2015的編譯問題。
+* 增補臺灣、香港地區用字用詞轉換。
+* 更新nan以修正Node.js擴展編譯兼容性問題。
+
 ## Version 1.0.3
 
 2015年7月22日

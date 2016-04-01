@@ -126,6 +126,10 @@ Apache License 2.0
 
 All these libraries are statically linked.
 
+## Change History 版本歷史
+
+https://github.com/BYVoid/OpenCC/blob/master/NEWS.md
+
 ## Contributors 貢獻者
 
 * [BYVoid](http://www.byvoid.com/)
@@ -151,3 +155,15 @@ All these libraries are statically linked.
 * [吕旭东](https://github.com/lvxudong)
 * [Weng Xuetian](https://github.com/wengxt)
 * [Ma Tao](https://github.com/iwater)
+* [Heinz Wiesinger](https://github.com/pprkut)
+* [J.W](https://github.com/jakwings)
+* [Amo Wu](https://github.com/amowu)
+* [Mark Tsai](https://github.com/mxgit1090)
+* [Zhe Wang](https://github.com/0x1997)
+* [sgqy](https://github.com/sgqy)
+* [Qichuan (Sean) ZHANG](https://github.com/qichuan)
+* [Flandre Scarlet](https://github.com/XadillaX)
+* [宋辰文](https://github.com/songchenwen)
+* [iwater](https://github.com/iwater)
+
+Please update this list you have contributed OpenCC.

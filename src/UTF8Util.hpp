@@ -243,7 +243,7 @@ public:
     }
     const char* pstr = str;
     for (size_t i = 0; i < utf8Length; i++) {
-      (*byteMap)[i] = pstr - str;
+      (*byteMap)[i] = static_cast<size_t>(pstr - str);
       pstr = NextChar(pstr);
     }
   }
@@ -262,20 +262,20 @@ public:
 #ifdef _MSC_VER
   static std::string U16ToU8(const std::wstring& wstr) {
     std::string ret;
-    int convcnt = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.length(), NULL, 0, NULL, NULL);
+    int convcnt = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), static_cast<int>(wstr.length()), NULL, 0, NULL, NULL);
     if (convcnt > 0) {
-      ret.resize(convcnt);
-      WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.length(), &ret[0], convcnt, NULL, NULL);
+      ret.resize(static_cast<size_t>(convcnt));
+      WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), static_cast<int>(wstr.length()), &ret[0], convcnt, NULL, NULL);
     }
     return ret;
   }
 
   static std::wstring U8ToU16(const std::string& str) {
     std::wstring ret;
-    int convcnt = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), NULL, 0);
+    int convcnt = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.length()), NULL, 0);
     if (convcnt > 0) {
-      ret.resize(convcnt);
-      MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), &ret[0], convcnt);
+      ret.resize(static_cast<size_t>(convcnt));
+      MultiByteToWideChar(CP_UTF8, 0, str.c_str(), static_cast<int>(str.length()), &ret[0], convcnt);
     }
     return ret;
   }

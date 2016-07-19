@@ -3,7 +3,9 @@
 
 ## Documentations 文檔
 
-* [1.0.2 (最新)](1.0.2/index.html)
+* [1.0.4 (最新)](1.0.4/index.html)
+* [1.0.3](1.0.3/index.html)
+* [1.0.2](1.0.2/index.html)
 * [1.0.1](1.0.1/index.html)
 * [0.4.3](0.4.3/index.html)
 

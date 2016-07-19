@@ -25,7 +25,7 @@
 
 namespace opencc {
 
-class PhraseExtract {
+class OPENCC_EXPORT PhraseExtract {
 public:
   typedef UTF8StringSlice::LengthType LengthType;
 

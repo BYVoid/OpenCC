@@ -40,10 +40,12 @@ inline size_t FNVHash<4>(const char* text, const size_t byteLength) {
   return FNVHash(text, byteLength, 16777619UL, 2166136261UL);
 }
 
+#if SIZE_MAX == 0xffffffffffffffff
 template <>
 inline size_t FNVHash<8>(const char* text, const size_t byteLength) {
   return FNVHash(text, byteLength, 1099511628211UL, 14695981039346656037UL);
 }
+#endif
 
 } // namespace internal
 

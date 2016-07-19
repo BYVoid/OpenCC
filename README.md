@@ -84,15 +84,15 @@ sudo make PREFIX=/usr/local install
 Windows MSYS:
 
 ```
-cmake .. -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Release
-make
+cmake -H. -Bbuild -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX="path/to/install"
+cmake --build build --config Release --target install
 ```
 
 Windows Visual Studio (2013 or higher required):
 
 ```
-cmake .. -G "Visual Studio 12" -DCMAKE_INSTALL_PREFIX="" -DCMAKE_BUILD_TYPE=Release
-make
+cmake -H. -Bbuild -G"Visual Studio 12" -DCMAKE_INSTALL_PREFIX="path/to/install"
+cmake --build build --config Release --target install
 ```
 
 ### iOS

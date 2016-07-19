@@ -110,6 +110,8 @@ foreach(DICT ${DICTS})
     COMMENT
       "Building ${DICT}.ocd"
     COMMAND
+      ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:libopencc>" "$<TARGET_FILE_DIR:${OPENCC_DICT_BIN}>"
+    COMMAND
       ${OPENCC_DICT_BIN}
         --input ${DICT_${DICT}_INPUT}
         --output ${DICT}.ocd

@@ -54,7 +54,8 @@ set(
   UTF8Util.cpp
 )
 
-add_library(libopencc ${LIBOPENCC_SOURCES})
+add_library(libopencc ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
+source_group(libopencc FILES ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
 
 GENERATE_EXPORT_HEADER(
   libopencc

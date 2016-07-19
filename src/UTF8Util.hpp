@@ -262,20 +262,22 @@ public:
 #ifdef _MSC_VER
   static std::string U16ToU8(const std::wstring& wstr) {
     std::string ret;
-    int convcnt = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.length(), NULL, 0, NULL, NULL);
+    int length = static_cast<int>(wstr.length());
+    int convcnt = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), length, NULL, 0, NULL, NULL);
     if (convcnt > 0) {
       ret.resize(convcnt);
-      WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), wstr.length(), &ret[0], convcnt, NULL, NULL);
+      WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), length, &ret[0], convcnt, NULL, NULL);
     }
     return ret;
   }
 
   static std::wstring U8ToU16(const std::string& str) {
     std::wstring ret;
-    int convcnt = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), NULL, 0);
+    int length = static_cast<int>(str.length());
+    int convcnt = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), length, NULL, 0);
     if (convcnt > 0) {
       ret.resize(convcnt);
-      MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), &ret[0], convcnt);
+      MultiByteToWideChar(CP_UTF8, 0, str.c_str(), length, &ret[0], convcnt);
     }
     return ret;
   }

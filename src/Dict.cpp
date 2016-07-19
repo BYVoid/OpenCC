@@ -30,7 +30,7 @@ Optional<const DictEntry*> Dict::MatchPrefix(const char* word) const {
     if (!result.IsNull()) {
       return result;
     }
-    len -= UTF8Util::PrevCharLength(wordTruncPtr);
+    len -= static_cast<long>(UTF8Util::PrevCharLength(wordTruncPtr));
   }
   return Optional<const DictEntry*>::Null();
 }
@@ -40,7 +40,7 @@ vector<const DictEntry*> Dict::MatchAllPrefixes(const char* word) const {
   string wordTrunc = UTF8Util::TruncateUTF8(word, KeyMaxLength());
   const char* wordTruncPtr = wordTrunc.c_str() + wordTrunc.length();
   for (long len = static_cast<long>(wordTrunc.length()); len > 0;
-       len -= UTF8Util::PrevCharLength(wordTruncPtr)) {
+       len -= static_cast<long>(UTF8Util::PrevCharLength(wordTruncPtr))) {
     wordTrunc.resize(static_cast<size_t>(len));
     wordTruncPtr = wordTrunc.c_str() + len;
     const Optional<const DictEntry*>& result = Match(wordTrunc.c_str());

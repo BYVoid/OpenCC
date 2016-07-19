@@ -130,7 +130,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   add_definitions(
-    /Wall
+    /W4
     /D "_CRT_SECURE_NO_WARNINGS"
   )
 endif()

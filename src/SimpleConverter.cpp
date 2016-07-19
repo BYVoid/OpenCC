@@ -133,18 +133,9 @@ opencc_t opencc_open(const char* configFileName) {
 #endif
 
 int opencc_close(opencc_t opencc) {
-  try {
-    SimpleConverter* instance = reinterpret_cast<SimpleConverter*>(opencc);
-    delete instance;
-    return 0;
-  } catch (std::exception& ex) {
-    cError = ex.what();
-    return 1;
-  }
-  catch (Exception& ex) {
-      cError = ex.what();
-      return 1;
-  }
+  SimpleConverter* instance = reinterpret_cast<SimpleConverter*>(opencc);
+  delete instance;
+  return 0;
 }
 
 size_t opencc_convert_utf8_to_buffer(opencc_t opencc, const char* input,

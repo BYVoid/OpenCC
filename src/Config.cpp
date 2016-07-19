@@ -94,7 +94,7 @@ public:
   DictPtr ParseDict(const JSONValue& doc) {
     // Required: type
     string type = GetStringProperty(doc, "type");
-    DictPtr dict;
+
     if (type == "group") {
       list<DictPtr> dicts;
       const JSONValue& docs = GetArrayProperty(doc, "dicts");
@@ -114,6 +114,7 @@ public:
       if (cache != nullptr) {
         return cache;
       }
+      DictPtr dict;
       if (type == "text") {
         dict = LoadDictWithPaths<TextDict>(fileName);
       } else if (type == "ocd") {

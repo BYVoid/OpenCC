@@ -141,6 +141,10 @@ int opencc_close(opencc_t opencc) {
     cError = ex.what();
     return 1;
   }
+  catch (Exception& ex) {
+      cError = ex.what();
+      return 1;
+  }
 }
 
 size_t opencc_convert_utf8_to_buffer(opencc_t opencc, const char* input,

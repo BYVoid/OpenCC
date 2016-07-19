@@ -32,7 +32,7 @@
 
 namespace opencc {
 
-class OPENCC_EXPORT Exception : public std::exception {
+class OPENCC_EXPORT Exception {
 public:
   Exception() {}
 

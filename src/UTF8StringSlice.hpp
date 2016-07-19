@@ -54,8 +54,8 @@ public:
   typedef LENGTH_TYPE LengthType;
 
   UTF8StringSliceBase(const char* _str)
-      : str(_str), utf8Length(UTF8Util::Length(_str)),
-        byteLength(strlen(_str)) {}
+      : str(_str), utf8Length(static_cast<LengthType>(UTF8Util::Length(_str))),
+        byteLength(static_cast<LengthType>(strlen(_str))) {}
 
   UTF8StringSliceBase(const char* _str, const LengthType _utf8Length)
       : str(_str), utf8Length(_utf8Length) {
@@ -225,7 +225,7 @@ private:
     for (size_t i = 0; i < utf8Length; i++) {
       pstr = UTF8Util::NextChar(pstr);
     }
-    byteLength = pstr - str;
+    byteLength = static_cast<LengthType>(pstr - str);
   }
 
   const char* str;

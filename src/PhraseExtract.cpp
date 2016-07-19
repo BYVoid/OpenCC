@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Open Chinese Convert
  *
  * Copyright 2015 BYVoid <byvoid@byvoid.com>
@@ -171,8 +171,9 @@ void PhraseExtract::ExtractSuffixes() {
         std::min(static_cast<LengthType>(wordMaxLength + suffixSetLength),
                  text.UTF8Length());
     const UTF8StringSlice& slice = text.Left(suffixLength);
-    suffixes.push_back(UTF8StringSlice8Bit(slice.CString(), slice.UTF8Length(),
-                                           slice.ByteLength()));
+    suffixes.push_back(UTF8StringSlice8Bit(slice.CString(), 
+        static_cast<UTF8StringSlice8Bit::LengthType>(slice.UTF8Length()),
+        static_cast<UTF8StringSlice8Bit::LengthType>(slice.ByteLength())));
   }
   suffixes.shrink_to_fit();
   // Sort suffixes
@@ -189,8 +190,10 @@ void PhraseExtract::ExtractPrefixes() {
         std::min(static_cast<LengthType>(wordMaxLength + prefixSetLength),
                  text.UTF8Length());
     const UTF8StringSlice& slice = text.Right(prefixLength);
-    prefixes.push_back(UTF8StringSlice8Bit(slice.CString(), slice.UTF8Length(),
-                                           slice.ByteLength()));
+    prefixes.push_back(UTF8StringSlice8Bit(slice.CString(),
+        static_cast<UTF8StringSlice8Bit::LengthType>(slice.UTF8Length()),
+        static_cast<UTF8StringSlice8Bit::LengthType>(slice.ByteLength())));
+
   }
   prefixes.shrink_to_fit();
   // Sort suffixes reversely
@@ -206,7 +209,7 @@ void PhraseExtract::CalculateFrequency() {
     ExtractSuffixes();
   }
   for (const auto& suffix : suffixes) {
-    for (size_t i = 1; i <= suffix.UTF8Length() && i <= wordMaxLength; i++) {
+    for (UTF8StringSlice8Bit::LengthType i = 1; i <= suffix.UTF8Length() && i <= wordMaxLength; i++) {
       const UTF8StringSlice8Bit wordCandidate = suffix.Left(i);
       signals->AddKey(wordCandidate).frequency++;
       totalOccurrence++;
@@ -263,6 +266,7 @@ void CalculatePrefixSuffixEntropy(
     const std::function<void(const PhraseExtract::UTF8StringSlice8Bit& word,
                              AdjacentSetType& adjacentSet)>& updateEntropy) {
   AdjacentSetType adjacentSet;
+  auto setLength8Bit = static_cast<PhraseExtract::UTF8StringSlice8Bit::LengthType>(setLength);
   for (PhraseExtract::LengthType length = wordMinLength;
        length <= wordMaxLength; length++) {
     adjacentSet.clear();
@@ -271,19 +275,20 @@ void CalculatePrefixSuffixEntropy(
       if (presuffix.UTF8Length() < length) {
         continue;
       }
+      auto length8Bit = static_cast<PhraseExtract::UTF8StringSlice8Bit::LengthType>(length);
       const auto& wordCandidate =
-          SUFFIX ? presuffix.Left(length) : presuffix.Right(length);
+          SUFFIX ? presuffix.Left(length8Bit) : presuffix.Right(length8Bit);
       if (wordCandidate != lastWord) {
         updateEntropy(lastWord, adjacentSet);
         lastWord = wordCandidate;
       }
       if (length + setLength <= presuffix.UTF8Length()) {
         if (SUFFIX) {
-          const auto& wordSuffix = presuffix.SubString(length, setLength);
+          const auto& wordSuffix = presuffix.SubString(length8Bit, setLength8Bit);
           adjacentSet[wordSuffix]++;
         } else {
           const auto& wordPrefix = presuffix.SubString(
-              presuffix.UTF8Length() - length - setLength, setLength);
+              presuffix.UTF8Length() - length8Bit - setLength8Bit, setLength8Bit);
           adjacentSet[wordPrefix]++;
         }
       }
@@ -393,7 +398,7 @@ double PhraseExtract::CalculateCohesion(
     const UTF8StringSlice8Bit& wordCandidate) const {
   // TODO Try average value
   double minPMI = INFINITY;
-  for (LengthType leftLength = 1; leftLength <= wordCandidate.UTF8Length() - 1;
+  for (UTF8StringSlice8Bit::LengthType leftLength = 1; leftLength <= wordCandidate.UTF8Length() - 1;
        leftLength++) {
     const auto& leftPart = wordCandidate.Left(leftLength);
     const auto& rightPart =

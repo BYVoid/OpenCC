@@ -30,10 +30,10 @@ size_t BinaryDict::KeyMaxLength() const {
 }
 
 void BinaryDict::SerializeToFile(FILE* fp) const {
-  string keyBuffer, valueBuffer;
+  string keyBuf, valueBuf;
   vector<size_t> keyOffsets, valueOffsets;
   size_t keyTotalLength = 0, valueTotalLength = 0;
-  ConstructBuffer(keyBuffer, keyOffsets, keyTotalLength, valueBuffer,
+  ConstructBuffer(keyBuf, keyOffsets, keyTotalLength, valueBuf,
                   valueOffsets, valueTotalLength);
   // Number of items
   size_t numItems = lexicon->Length();
@@ -41,9 +41,9 @@ void BinaryDict::SerializeToFile(FILE* fp) const {
 
   // Data
   fwrite(&keyTotalLength, sizeof(size_t), 1, fp);
-  fwrite(keyBuffer.c_str(), sizeof(char), keyTotalLength, fp);
+  fwrite(keyBuf.c_str(), sizeof(char), keyTotalLength, fp);
   fwrite(&valueTotalLength, sizeof(size_t), 1, fp);
-  fwrite(valueBuffer.c_str(), sizeof(char), valueTotalLength, fp);
+  fwrite(valueBuf.c_str(), sizeof(char), valueTotalLength, fp);
 
   size_t keyCursor = 0, valueCursor = 0;
   for (const DictEntry* entry : *lexicon) {
@@ -131,8 +131,8 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
   return dict;
 }
 
-void BinaryDict::ConstructBuffer(string& keyBuffer, vector<size_t>& keyOffset,
-                                 size_t& keyTotalLength, string& valueBuffer,
+void BinaryDict::ConstructBuffer(string& keyBuf, vector<size_t>& keyOffset,
+                                 size_t& keyTotalLength, string& valueBuf,
                                  vector<size_t>& valueOffset,
                                  size_t& valueTotalLength) const {
   keyTotalLength = 0;
@@ -152,28 +152,28 @@ void BinaryDict::ConstructBuffer(string& keyBuffer, vector<size_t>& keyOffset,
     }
   }
   // Write keys and values to buffers
-  keyBuffer.resize(keyTotalLength, '\0');
-  valueBuffer.resize(valueTotalLength, '\0');
-  char* pKeyBuffer = const_cast<char*>(keyBuffer.c_str());
-  char* pValueBuffer = const_cast<char*>(valueBuffer.c_str());
+  keyBuf.resize(keyTotalLength, '\0');
+  valueBuf.resize(valueTotalLength, '\0');
+  char* pKeyBuffer = const_cast<char*>(keyBuf.c_str());
+  char* pValueBuffer = const_cast<char*>(valueBuf.c_str());
   for (const DictEntry* entry : *lexicon) {
     strcpy(pKeyBuffer, entry->Key());
-    keyOffset.push_back(pKeyBuffer - keyBuffer.c_str());
+    keyOffset.push_back(pKeyBuffer - keyBuf.c_str());
     pKeyBuffer += entry->KeyLength() + 1;
     if (entry->NumValues() == 1) {
       const auto* svEntry = static_cast<const SingleValueDictEntry*>(entry);
       strcpy(pValueBuffer, svEntry->Value());
-      valueOffset.push_back(pValueBuffer - valueBuffer.c_str());
+      valueOffset.push_back(pValueBuffer - valueBuf.c_str());
       pValueBuffer += strlen(svEntry->Value()) + 1;
     } else {
       const auto* mvEntry = static_cast<const MultiValueDictEntry*>(entry);
       for (const auto& value : mvEntry->Values()) {
         strcpy(pValueBuffer, value);
-        valueOffset.push_back(pValueBuffer - valueBuffer.c_str());
+        valueOffset.push_back(pValueBuffer - valueBuf.c_str());
         pValueBuffer += strlen(value) + 1;
       }
     }
   }
-  assert(keyBuffer.c_str() + keyTotalLength == pKeyBuffer);
-  assert(valueBuffer.c_str() + valueTotalLength == pValueBuffer);
+  assert(keyBuf.c_str() + keyTotalLength == pKeyBuffer);
+  assert(valueBuf.c_str() + valueTotalLength == pValueBuffer);
 }

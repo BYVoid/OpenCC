@@ -154,7 +154,6 @@ void DartsDict::SerializeToFile(FILE* fp) const {
   fwrite(&dartsSize, sizeof(size_t), 1, fp);
   fwrite(dict.array(), sizeof(char), dartsSize, fp);
 
-  auto internal = this->internal;
   internal->binary.reset(new BinaryDict(lexicon));
   internal->binary->SerializeToFile(fp);
 }

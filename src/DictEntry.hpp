@@ -140,11 +140,11 @@ public:
   size_t NumValues() const { return values.size(); }
 
   vector<const char*> Values() const {
-    vector<const char*> values;
+    vector<const char*> retsult;
     for (const string& value : this->values) {
-      values.push_back(value.c_str());
+      retsult.push_back(value.c_str());
     }
-    return values;
+    return retsult;
   }
 
 private:

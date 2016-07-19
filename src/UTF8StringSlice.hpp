@@ -70,36 +70,36 @@ public:
 
   LengthType ByteLength() const { return byteLength; }
 
-  UTF8StringSliceBase Left(const LengthType utf8Length) const {
-    if (utf8Length == UTF8Length()) {
+  UTF8StringSliceBase Left(const LengthType numberOfCharacters) const {
+    if (numberOfCharacters == UTF8Length()) {
       return *this;
     } else {
-      return UTF8StringSliceBase(str, utf8Length);
+      return UTF8StringSliceBase(str, numberOfCharacters);
     }
   }
 
-  UTF8StringSliceBase Right(const LengthType utf8Length) const {
-    if (utf8Length == UTF8Length()) {
+  UTF8StringSliceBase Right(const LengthType numberOfCharacters) const {
+    if (numberOfCharacters == UTF8Length()) {
       return *this;
     } else {
       const char* pstr = str + byteLength;
-      for (size_t i = 0; i < utf8Length; i++) {
+      for (size_t i = 0; i < numberOfCharacters; i++) {
         pstr = UTF8Util::PrevChar(pstr);
       }
-      return UTF8StringSliceBase(pstr, utf8Length);
+      return UTF8StringSliceBase(pstr, numberOfCharacters);
     }
   }
 
   UTF8StringSliceBase SubString(const LengthType offset,
-                                const LengthType utf8Length) const {
+                                const LengthType numberOfCharacters) const {
     if (offset == 0) {
-      return Left(utf8Length);
+      return Left(numberOfCharacters);
     } else {
       const char* pstr = str;
       for (size_t i = 0; i < offset; i++) {
         pstr = UTF8Util::NextChar(pstr);
       }
-      return UTF8StringSliceBase(pstr, utf8Length);
+      return UTF8StringSliceBase(pstr, numberOfCharacters);
     }
   }
 

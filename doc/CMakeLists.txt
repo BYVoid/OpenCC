@@ -29,7 +29,7 @@ if(BUILD_DOCUMENTATION)
     	DIRECTORY
     		${CMAKE_BINARY_DIR}/doc/html
     	DESTINATION
-    		${DIR_SHARE_OPENCC}doc
+    		${DIR_SHARE_OPENCC}/doc
     )
 
     set_directory_properties(

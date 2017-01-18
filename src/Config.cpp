@@ -232,7 +232,10 @@ ConverterPtr Config::NewFromString(const string& json,
   }
 
   ConfigInternal* impl = (ConfigInternal*)internal;
-  impl->configDirectory = configDirectory;
+  if (configDirectory.back() == '/' || configDirectory.back() == '\\')
+    impl->configDirectory = configDirectory;
+  else
+    impl->configDirectory = configDirectory + '/';
 
   // Required: segmentation
   SegmentationPtr segmentation =

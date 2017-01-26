@@ -57,4 +57,14 @@ TEST_F(ConfigTest, NonexistingPath) {
   }
 }
 
+TEST_F(ConfigTest, NewFromStringWitoutTrailingSlash) {
+  std::ifstream ifs(CONFIG_TEST_PATH);
+  string content(std::istreambuf_iterator<char>(ifs),
+                 (std::istreambuf_iterator<char>()));
+  string pathWithoutTrailingSlash = CMAKE_SOURCE_DIR "/test/config_test";
+
+  const ConverterPtr converter = config.NewFromString(
+      content, pathWithoutTrailingSlash);
+}
+
 } // namespace opencc

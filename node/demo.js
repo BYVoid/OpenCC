@@ -41,3 +41,8 @@ console.log(converted);
 opencc.convert("汉字", (err, converted) => {
   console.log(err, converted);
 });
+
+// Async API with Promise
+opencc.convertPromise("汉字").then(converted => {
+  console.log(converted);
+});

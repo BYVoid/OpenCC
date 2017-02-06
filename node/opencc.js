@@ -106,3 +106,22 @@ OpenCC.prototype.convert = function (input, callback) {
 OpenCC.prototype.convertSync = function (input) {
   return this.handler.convertSync(input.toString());
 };
+
+/**
+ * Converts input text asynchronously and returns a Promise.
+ *
+ * @fn Promise convertPromise(string input)
+ * @memberof OpenCC
+ * @param input Input text.
+ * @return The Promise that will yield the converted text.
+ * @ingroup node_api
+ */
+OpenCC.prototype.convertPromise = function (input) {
+  const self = this;
+  return new Promise(function(resolve, reject) {
+    self.handler.convert(input.toString(), function(err, text) {
+      if (err) reject(err);
+      else resolve(text);
+    });
+  });
+};

@@ -1,9 +1,9 @@
 {
   "name": "opencc",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Conversion between Traditional and Simplified Chinese",
   "author": "BYVoid <byvoid@byvoid.com>",
-  "license": "Apache",
+  "license": "Apache-2.0",
   "main": "node/opencc.js",
   "scripts": {
     "test": "mocha -R spec node/test.js"
@@ -27,6 +27,6 @@
     "mocha": "2.2.5"
   },
   "dependencies": {
-    "nan": "^2.2.0"
+    "nan": "^2.5.1"
   }
 }

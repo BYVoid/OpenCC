@@ -1,5 +1,16 @@
 # Change History of OpenCC
 
+## Version 1.0.5
+
+2017年2月6日
+
+* 修正Windows下CMake和Visual Studio的問題。
+* 修正FNV Hash的32位編譯警告。
+* 增加若干臺灣常用詞彙轉換和異體字轉換。
+* 增加和修正若干轉換問題。
+* 加快Node模塊編譯速度。
+* 增加Node模塊的詞典轉換接口和Promise接口。
+
 ## Version 1.0.4
 
 2016年4月1日

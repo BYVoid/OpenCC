@@ -166,5 +166,10 @@ https://github.com/BYVoid/OpenCC/blob/master/NEWS.md
 * [Flandre Scarlet](https://github.com/XadillaX)
 * [宋辰文](https://github.com/songchenwen)
 * [iwater](https://github.com/iwater)
+* [Xpol Wan](https://github.com/xpol)
+* [Weihang Lo](https://github.com/weihanglo)
+* [Cychih](https://github.com/pi314)
+* [kyleskimo](https://github.com/kyleskimo)
+* [Ryuan Choi](https://github.com/bunhere)
 
 Please update this list you have contributed OpenCC.

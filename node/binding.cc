@@ -3,6 +3,23 @@
 
 #include "Config.hpp"
 #include "Converter.hpp"
+#include "DictConverter.hpp"
+
+// For faster build
+#include "BinaryDict.cpp"
+#include "Config.cpp"
+#include "Conversion.cpp"
+#include "ConversionChain.cpp"
+#include "Converter.cpp"
+#include "DartsDict.cpp"
+#include "Dict.cpp"
+#include "DictConverter.cpp"
+#include "DictEntry.cpp"
+#include "DictGroup.cpp"
+#include "MaxMatchSegmentation.cpp"
+#include "Segmentation.cpp"
+#include "TextDict.cpp"
+#include "UTF8Util.cpp"
 
 using namespace opencc;
 
@@ -38,12 +55,16 @@ class OpenccBinding : public Nan::ObjectWrap {
     return converter_->Convert(input);
   }
 
+  static NAN_METHOD(Version) {
+    info.GetReturnValue().Set(Nan::New<v8::String>(VERSION).ToLocalChecked());
+  }
+
   static NAN_METHOD(New) {
     OpenccBinding* instance;
 
     try {
       if (info.Length() >= 1 && info[0]->IsString()) {
-        string configFile = ToUtf8String(info[0]);
+        const string configFile = ToUtf8String(info[0]);
         instance = new OpenccBinding(configFile);
       } else {
         instance = new OpenccBinding("s2t.json");
@@ -111,7 +132,7 @@ class OpenccBinding : public Nan::ObjectWrap {
 
     OpenccBinding* instance = Nan::ObjectWrap::Unwrap<OpenccBinding>(info.This());
 
-    string input = ToUtf8String(info[0]);
+    const string input = ToUtf8String(info[0]);
     string output;
     try {
       output = instance->Convert(input);
@@ -124,11 +145,31 @@ class OpenccBinding : public Nan::ObjectWrap {
     info.GetReturnValue().Set(converted);
   }
 
+  static NAN_METHOD(GenerateDict) {
+    if (info.Length() < 4 || !info[0]->IsString() || !info[1]->IsString()
+       || !info[2]->IsString() || !info[3]->IsString()) {
+      Nan::ThrowTypeError("Wrong arguments");
+      return;
+    }
+    const string inputFileName = ToUtf8String(info[0]);
+    const string outputFileName = ToUtf8String(info[1]);
+    const string formatFrom = ToUtf8String(info[2]);
+    const string formatTo = ToUtf8String(info[3]);
+    try {
+      opencc::ConvertDictionary(inputFileName, outputFileName, formatFrom, formatTo);
+    } catch (opencc::Exception& e) {
+      Nan::ThrowError(e.what());
+    }
+  }
+
   static NAN_MODULE_INIT(Init) {
     // Prepare constructor template
     v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(OpenccBinding::New);
     tpl->SetClassName(Nan::New("Opencc").ToLocalChecked());
     tpl->InstanceTemplate()->SetInternalFieldCount(1);
+    // Methods
+    Nan::SetMethod(tpl, "version", Version);
+    Nan::SetMethod(tpl, "generateDict", GenerateDict);
     // Prototype
     Nan::SetPrototypeMethod(tpl, "convert", Convert);
     Nan::SetPrototypeMethod(tpl, "convertSync", ConvertSync);

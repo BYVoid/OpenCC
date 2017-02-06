@@ -55,6 +55,33 @@ var OpenCC = module.exports = function (config) {
 };
 
 /**
+ * The version of OpenCC library.
+ *
+ * @fn OpenCC.version
+ * @memberof OpenCC
+ * @ingroup node_api
+ */
+OpenCC.version = binding.Opencc.version();
+
+/**
+ * Generates dictionary from another format.
+ *
+ * @fn string generateDict(string inputFileName, string outputFileName, string formatFrom, string formatTo)
+ * @memberof OpenCC
+ * @param inputFileName Input dictionary filename.
+ * @param outputFileName Output dictionary filename.
+ * @param formatFrom Input dictionary format.
+ * @param formatTo Input dictionary format.
+ * @return Converted text.
+ * @ingroup node_api
+ */
+OpenCC.generateDict = function(inputFileName, outputFileName,
+    formatFrom, formatTo) {
+  return binding.Opencc.generateDict(inputFileName, outputFileName,
+    formatFrom, formatTo); 
+}
+
+/**
  * Converts input text.
  *
  * @fn void convert(string input, function callback)

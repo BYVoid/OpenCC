@@ -26,16 +26,18 @@
  */
 
 // In your project you should replace './opencc' with 'opencc'
-var OpenCC = require('./opencc');
+const OpenCC = require('./opencc');
+
+console.log('OpenCC version', OpenCC.version);
 
 // Load the default Simplified to Traditional config
-var opencc = new OpenCC('s2t.json');
+const opencc = new OpenCC('s2t.json');
 
 // Sync API
-var converted = opencc.convertSync("汉字");
+const converted = opencc.convertSync("汉字");
 console.log(converted);
 
 // Async API
-opencc.convert("汉字", function (err, converted) {
-  console.log(converted);
+opencc.convert("汉字", (err, converted) => {
+  console.log(err, converted);
 });

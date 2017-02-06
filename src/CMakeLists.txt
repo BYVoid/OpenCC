@@ -16,6 +16,7 @@ set(
   Converter.hpp
   DartsDict.hpp
   Dict.hpp
+  DictConverter.hpp
   DictEntry.hpp
   DictGroup.hpp
   Exception.hpp
@@ -43,6 +44,7 @@ set(
   Converter.cpp
   DartsDict.cpp
   Dict.cpp
+  DictConverter.cpp
   DictEntry.cpp
   DictGroup.cpp
   MaxMatchSegmentation.cpp

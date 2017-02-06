@@ -17,42 +17,9 @@
  */
 
 #include "CmdLineOutput.hpp"
-#include "DartsDict.hpp"
-#include "TextDict.hpp"
+#include "DictConverter.hpp"
 
 using namespace opencc;
-
-DictPtr LoadDictionary(const string& format, const string& inputFileName) {
-  if (format == "text") {
-    return SerializableDict::NewFromFile<TextDict>(inputFileName);
-  } else if (format == "ocd") {
-    return SerializableDict::NewFromFile<DartsDict>(inputFileName);
-  } else {
-    fprintf(stderr, "Unknown dictionary format: %s\n", format.c_str());
-    exit(2);
-  }
-  return nullptr;
-}
-
-SerializableDictPtr ConvertDictionary(const string& format,
-                                      const DictPtr dict) {
-  if (format == "text") {
-    return TextDict::NewFromDict(*dict.get());
-  } else if (format == "ocd") {
-    return DartsDict::NewFromDict(*dict.get());
-  } else {
-    fprintf(stderr, "Unknown dictionary format: %s\n", format.c_str());
-    exit(2);
-  }
-  return nullptr;
-}
-
-void ConvertDictionary(const string inputFileName, const string outputFileName,
-                       const string formatFrom, const string formatTo) {
-  DictPtr dictFrom = LoadDictionary(formatFrom, inputFileName);
-  SerializableDictPtr dictTo = ConvertDictionary(formatTo, dictFrom);
-  dictTo->SerializeToFile(outputFileName);
-}
 
 int main(int argc, const char* argv[]) {
   try {

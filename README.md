@@ -99,6 +99,8 @@ cmake --build build --config Release --target install
 
 See https://github.com/gelosie/OpenCC/tree/master/iOS
 
+Or [SwiftyOpenCC](https://github.com/XQS6LB3A/SwiftyOpenCC)
+
 ### Android
 
 See [android-opencc](https://github.com/qichuan/android-opencc)

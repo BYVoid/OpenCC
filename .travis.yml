@@ -1,13 +1,43 @@
-language: cpp
-compiler:
-  - gcc
-sudo: required
+language: node_js
+node_js:
+  - "stable"
+  - "6"
+  - "4"
+  - "0.12"
+  - "0.10"
+  - "iojs"
+
+compiler: gcc
+sudo: false
+
+os:
+  - linux
+  - osx
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - doxygen
+      - gcc-4.8
+      - g++-4.8
+
 before_install:
-  - sudo add-apt-repository -y ppa:chris-lea/node.js
-  - sudo apt-get update
-  - sudo apt-get install nodejs -y
-  - sudo apt-get install doxygen -y
-  - sudo npm install -g mocha
-  - sudo npm install -g node-gyp
-  - sudo npm install
-script: make test VERBOSE=1 && make package VERBOSE=1 && make node-test
+  - npm config set python `which python`
+  - if [ $TRAVIS_OS_NAME == "linux" ]; then
+      export CC="gcc-4.8";
+      export CXX="g++-4.8";
+      export LINK="gcc-4.8";
+      export LINKXX="g++-4.8";
+    fi
+
+# Install scripts. (runs after repo cloning)
+install:
+  - npm install
+
+# Post-install test scripts.
+script:
+  - npm run test
+  - npm run package
+  - npm run deploy

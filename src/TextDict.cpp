@@ -25,7 +25,7 @@ static size_t GetKeyMaxLength(const LexiconPtr& lexicon) {
   size_t maxLength = 0;
   for (const auto& entry : *lexicon) {
     size_t keyLength = entry->KeyLength();
-    maxLength = std::max(keyLength, maxLength);
+    maxLength = (std::max)(keyLength, maxLength);
   }
   return maxLength;
 }

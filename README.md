@@ -1,7 +1,8 @@
 # Open Chinese Convert 開放中文轉換
 
 [ ![Download](https://api.bintray.com/packages/byvoid/opencc/OpenCC/images/download.svg) ](https://bintray.com/byvoid/opencc/OpenCC/_latestVersion)
-[![Build Status](https://travis-ci.org/BYVoid/OpenCC.svg?branch=master)](https://travis-ci.org/BYVoid/OpenCC)
+[![Travis](https://img.shields.io/travis/BYVoid/OpenCC.svg)](https://travis-ci.org/BYVoid/OpenCC)
+[![AppVeyor](https://img.shields.io/appveyor/ci/BYVoid/OpenCC.svg)](https://ci.appveyor.com/project/BYVoid/OpenCC)
 
 ## Introduction 介紹
 

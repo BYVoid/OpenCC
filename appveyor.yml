@@ -1,0 +1,28 @@
+# Test against this version of Node.js
+environment:
+  matrix:
+    # node.js
+    - CI_NODE_VERSION: "stable"
+    - CI_NODE_VERSION: "6"
+platform:
+  - x64
+  - x86
+
+# scripts that run after cloning repository
+install:
+  # Get the latest stable version of Node.js or io.js
+  - ps: Install-Product node $env:CI_NODE_VERSION $env:platform
+  # install modules
+  - npm install
+
+# to run your custom scripts instead of automatic tests
+test_script:
+  - npm run test
+
+# to run your custom scripts instead of provider deployments
+deploy_script:
+  - npm run package
+  - npm run deploy
+
+# Don't actually build.
+build: off

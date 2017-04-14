@@ -24,7 +24,7 @@ using namespace opencc;
 size_t BinaryDict::KeyMaxLength() const {
   size_t maxLength = 0;
   for (const DictEntry* entry : *lexicon) {
-    maxLength = std::max(maxLength, entry->KeyLength());
+    maxLength = (std::max)(maxLength, entry->KeyLength());
   }
   return maxLength;
 }

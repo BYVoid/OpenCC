@@ -135,7 +135,7 @@ DartsDictPtr DartsDict::NewFromDict(const Dict& thatDict) {
   for (size_t i = 0; i < lexiconCount; i++) {
     const DictEntry* entry = lexicon->At(i);
     keys[i] = entry->Key();
-    maxLength = std::max(entry->KeyLength(), maxLength);
+    maxLength = (std::max)(entry->KeyLength(), maxLength);
   }
   doubleArray->build(lexicon->Length(), &keys[0]);
   dict->lexicon = lexicon;

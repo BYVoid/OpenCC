@@ -6,7 +6,17 @@
   "license": "Apache-2.0",
   "main": "node/opencc.js",
   "scripts": {
-    "test": "mocha -R spec node/test.js"
+    "pretest": "node-pre-gyp rebuild",
+    "test": "mocha -R spec node/test.js",
+    "package": "node-pre-gyp package",
+    "deploy": "node-pre-gyp-github publish --release || echo github publish failed!",
+    "install": "node-pre-gyp install --fallback-to-build"
+  },
+  "binary": {
+    "module_name": "binding",
+    "module_path": "./build/Release/",
+    "host": "https://github.com/BYVoid/OpenCC/releases/download/",
+    "remote_path": "{version}"
   },
   "repository": {
     "type": "git",
@@ -24,9 +34,11 @@
     "Traditional Chinese"
   ],
   "devDependencies": {
-    "mocha": "2.2.5"
+    "mocha": "2.2.5",
+    "node-pre-gyp-github": "^1.3.1"
   },
   "dependencies": {
-    "nan": "^2.5.1"
+    "nan": "^2.5.1",
+    "node-pre-gyp": "^0.6.34"
   }
 }

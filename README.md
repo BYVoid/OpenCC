@@ -108,8 +108,8 @@ See [android-opencc](https://github.com/qichuan/android-opencc)
 
 ## Projects using Opencc 使用OpenCC的項目
 
-* [ibus-pinyin](http://code.google.com/p/ibus/)
-* [fcitx](http://code.google.com/p/fcitx/)
+* [ibus-pinyin](https://github.com/ibus/ibus-pinyin)
+* [fcitx](https://github.com/fcitx/fcitx)
 * [rimeime](http://code.google.com/p/rimeime/)
 * [libgooglepinyin](http://code.google.com/p/libgooglepinyin/)
 * [ibus-libpinyin](https://github.com/libpinyin/ibus-libpinyin)

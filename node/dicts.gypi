@@ -152,7 +152,7 @@
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }],
     "dependencies": [
-      "binding"
+      "opencc"
     ]
   }]
 }

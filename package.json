@@ -13,7 +13,7 @@
     "install": "node-pre-gyp install --fallback-to-build"
   },
   "binary": {
-    "module_name": "binding",
+    "module_name": "opencc",
     "module_path": "./build/Release/",
     "host": "https://github.com/BYVoid/OpenCC/releases/download/",
     "remote_path": "{version}"

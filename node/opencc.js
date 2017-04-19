@@ -27,7 +27,7 @@
  */
 
 var path = require('path');
-var binding = require('../build/Release/binding');
+var binding = require('../build/Release/opencc');
 
 var assetsPath = path.resolve(__dirname, '../build/Release');
 var getConfigPath = function (config) {

@@ -27,7 +27,7 @@
  */
 
 var path = require('path');
-var bindingPath = require.resolve('../build/Release/opencc');
+var bindingPath = require('node-pre-gyp').find(require.resolve('../package.json'));
 var binding = require(bindingPath);
 
 var assetsPath = path.dirname(bindingPath);

@@ -11,7 +11,6 @@ addons:
 
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export CXX=g++-4.8; fi
-  - export JOBS=max
 
 os:
   - osx
@@ -23,3 +22,12 @@ node_js:
   - "5"
   - "4"
   - "0.12"
+
+install:
+  - npm -g i npm@latest
+  - npm i --ignore-scripts
+  - npm run rebuild
+
+scripts:
+  - npm test
+  - npm run deploy

@@ -4,10 +4,10 @@ skip_tags: true
 
 environment:
   matrix:
-    - nodejs_version: "4"
-    - nodejs_version: "5"
-    - nodejs_version: "6"
     - nodejs_version: "7"
+    - nodejs_version: "6"
+    - nodejs_version: "5"
+    - nodejs_version: "4"
 
 platform:
   - x86
@@ -16,13 +16,11 @@ platform:
 install:
   - ps: Install-Product node $env:nodejs_version $env:platform
   - npm -g i npm@latest
-  - set PATH=%APPDATA%\npm;%APPVEYOR_BUILD_FOLDER%\node_modules\.bin;%PATH%
   - npm i --ignore-scripts
-  - for /f %%i in ('node -v') do set exact_nodejs_version=%%i
-  - prebuild -b %exact_nodejs_version% --strip
+  - npm run rebuild
 
 test_script:
   - npm test
 
 on_success:
-  - for %%i in (prebuilds\*) do appveyor PushArtifact %%i
+  - npm run deploy

@@ -1,28 +1,29 @@
-# Test against this version of Node.js
+version: "{build}"
+build: off
+skip_tags: true
+
 environment:
   matrix:
-    # node.js
-    - CI_NODE_VERSION: "stable"
-    - CI_NODE_VERSION: "6"
+    - nodejs_version: "0.12"
+    - nodejs_version: "4"
+    - nodejs_version: "5"
+    - nodejs_version: "6"
+    - nodejs_version: "7"
+
 platform:
-  - x64
   - x86
+  - x64
 
-# scripts that run after cloning repository
 install:
-  # Get the latest stable version of Node.js or io.js
-  - ps: Install-Product node $env:CI_NODE_VERSION $env:platform
-  # install modules
-  - npm install
+  - ps: Install-Product node $env:nodejs_version $env:platform
+  - npm -g i npm@latest
+  - set PATH=%APPDATA%\npm;%APPVEYOR_BUILD_FOLDER%\node_modules\.bin;%PATH%
+  - npm i --ignore-scripts
+  - for /f %%i in ('node -v') do set exact_nodejs_version=%%i
+  - prebuild -b %exact_nodejs_version% --strip
 
-# to run your custom scripts instead of automatic tests
 test_script:
-  - npm run test
+  - npm test
 
-# to run your custom scripts instead of provider deployments
-deploy_script:
-  - npm run package
-  - npm run deploy
-
-# Don't actually build.
-build: off
+on_success:
+  - for %%i in (prebuilds\*) do appveyor PushArtifact %%i

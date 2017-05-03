@@ -7,6 +7,7 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
+      - doxygen
       - g++-4.8
 
 before_install:

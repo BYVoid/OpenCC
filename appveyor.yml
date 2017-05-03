@@ -17,7 +17,7 @@ install:
   - ps: Install-Product node $env:nodejs_version $env:platform
   - npm -g i npm@latest
   - npm i --ignore-scripts
-  - npm run rebuild
+  - npm run rebuild || npm run install
 
 test_script:
   - npm test

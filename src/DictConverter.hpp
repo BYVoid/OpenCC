@@ -25,6 +25,6 @@ namespace opencc {
 * Converts a dictionary from a format to another.
 * @ingroup opencc_cpp_api
 */
-void ConvertDictionary(const string inputFileName, const string outputFileName,
+OPENCC_EXPORT void ConvertDictionary(const string inputFileName, const string outputFileName,
                        const string formatFrom, const string formatTo);
 }

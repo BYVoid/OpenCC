@@ -20,6 +20,8 @@ platform:
 install:
   # install Node.js
   - ps: Install-Product node $env:nodejs_version $env:platform
+  # Get the latest stable version of npm
+  - npm -g i npm@latest
   # install modules
   - npm install --build-from-source
 

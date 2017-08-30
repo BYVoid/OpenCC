@@ -2,6 +2,18 @@ sudo: false
 
 language: node_js
 
+node_js:
+  - stable
+  - 7
+  - 6
+  - 5
+  - 4
+  - 0
+
+os:
+  - linux
+  - osx
+
 addons:
   apt:
     sources:
@@ -13,24 +25,12 @@ addons:
 env:
   - CXX=g++-4.8
 
-os:
-  - osx
-  - linux
-
-node_js:
-  - stable
-  - 7
-  - 6
-  - 5
-  - 4
-  - 0
-
 # Install scripts. (runs after repo cloning)
 install:
   # install modules
   - npm install --build-from-source
 
 # Post-install test scripts.
-scripts:
+script:
   - npm test
   - npm run deploy

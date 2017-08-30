@@ -11,7 +11,7 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - doxygen
-      - g++
+      - g++-4.8
 
 os:
   - osx
@@ -23,9 +23,10 @@ node_js:
   - 6
   - 5
   - 4
+  - 0
 
 install:
-  - npm -g i npm@latest
+  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
   - npm i --build-from-source
 
 scripts:

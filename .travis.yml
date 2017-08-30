@@ -34,5 +34,6 @@ script:
       make test VERBOSE=1
       make package VERBOSE=1
     fi
+
   - npm test
   - npm run deploy

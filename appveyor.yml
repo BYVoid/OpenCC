@@ -20,10 +20,8 @@ platform:
 install:
   # install Node.js
   - ps: Install-Product node $env:nodejs_version $env:platform
-  # Get the latest stable version of npm
-  - npm -g i npm@latest
   # install modules
-  - npm install --build-from-source || node_modules/.bin/node-pre-gyp rebuild
+  - npm install --build-from-source
 
 # to run your custom scripts instead of automatic tests
 test_script:

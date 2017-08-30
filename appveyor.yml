@@ -1,6 +1,7 @@
 version: "{build}"
-build: off
+skip_branch_with_pr: true
 skip_tags: true
+build: off
 
 environment:
   matrix:
@@ -24,4 +25,3 @@ test_script:
 
 on_success:
   - npm run deploy
-  

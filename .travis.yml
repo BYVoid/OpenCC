@@ -30,5 +30,9 @@ install:
 
 # Post-install test scripts.
 script:
+  - if [ $TRAVIS_OS_NAME == "linux" ] && [ $TRAVIS_NODE_VERSION == "stable" ]; then
+      make test VERBOSE=1
+      make package VERBOSE=1
+    fi
   - npm test
   - npm run deploy

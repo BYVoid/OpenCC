@@ -10,6 +10,9 @@ addons:
       - doxygen
       - g++-4.8
 
+env:
+  - CXX=g++-4.8
+
 os:
   - osx
   - linux
@@ -22,10 +25,12 @@ node_js:
   - 4
   - 0
 
+# Install scripts. (runs after repo cloning)
 install:
-  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
-  - npm i --build-from-source
+  # install modules
+  - npm install --build-from-source
 
+# Post-install test scripts.
 scripts:
   - npm test
   - npm run deploy

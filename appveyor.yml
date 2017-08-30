@@ -15,13 +15,17 @@ platform:
   - x64
   - x86
 
+# scripts that run after cloning repository
 install:
+  # install Node.js
   - ps: Install-Product node $env:nodejs_version $env:platform
-  - npm -g i npm@latest
-  - npm i --build-from-source
+  # install modules
+  - npm install --build-from-source
 
+# to run your custom scripts instead of automatic tests
 test_script:
   - npm test
 
+# to run your custom scripts instead of provider deployments
 deploy_script:
   - npm run deploy

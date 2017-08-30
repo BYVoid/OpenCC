@@ -6,10 +6,9 @@
   "license": "Apache-2.0",
   "main": "node/opencc.js",
   "scripts": {
-    "install": "node-pre-gyp install --fallback-to-build || node-gyp rebuild",
-    "rebuild": "node-pre-gyp rebuild",
     "test": "mocha -R spec node/test.js",
-    "deploy": "node-pre-gyp package && (node-pre-gyp-github publish --release || echo github publish failed!)"
+    "deploy": "node-pre-gyp package && (node-pre-gyp-github publish --release || exit 0)",
+    "install": "node-pre-gyp install --fallback-to-build"
   },
   "binary": {
     "module_name": "opencc",

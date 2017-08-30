@@ -12,8 +12,8 @@ environment:
     - nodejs_version: 4
 
 platform:
-  - x86
   - x64
+  - x86
 
 install:
   - ps: Install-Product node $env:nodejs_version $env:platform
@@ -23,5 +23,5 @@ install:
 test_script:
   - npm test
 
-on_success:
+deploy_script:
   - npm run deploy

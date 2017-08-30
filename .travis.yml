@@ -18,11 +18,11 @@ os:
   - linux
 
 node_js:
-  - "7"
-  - "6"
-  - "5"
-  - "4"
-  - "0.12"
+  - stable
+  - 7
+  - 6
+  - 5
+  - 4
 
 install:
   - npm -g i npm@latest

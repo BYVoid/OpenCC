@@ -1,7 +1,6 @@
 version: "{build}"
 skip_branch_with_pr: true
 skip_tags: true
-max_jobs: 80
 build: off
 
 environment:
@@ -10,13 +9,12 @@ environment:
     - nodejs_version: 7
     - nodejs_version: 6
     - nodejs_version: 5
-    - nodejs_version: 4
 
 platform:
   - x64
   - x86
 
-# scripts that run after cloning repository
+# Install scripts. (runs after repo cloning)
 install:
   # install Node.js
   - ps: Install-Product node $env:nodejs_version $env:platform

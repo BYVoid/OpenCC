@@ -1,6 +1,7 @@
 version: "{build}"
 skip_branch_with_pr: true
 skip_tags: true
+max_jobs: 80
 build: off
 
 environment:

@@ -2,9 +2,6 @@ sudo: false
 
 language: node_js
 
-env:
-  - CXX=g++
-
 addons:
   apt:
     sources:

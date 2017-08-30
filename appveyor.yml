@@ -4,10 +4,11 @@ skip_tags: true
 
 environment:
   matrix:
-    - nodejs_version: "7"
-    - nodejs_version: "6"
-    - nodejs_version: "5"
-    - nodejs_version: "4"
+    - nodejs_version: stable
+    - nodejs_version: 7
+    - nodejs_version: 6
+    - nodejs_version: 5
+    - nodejs_version: 4
 
 platform:
   - x86
@@ -24,3 +25,4 @@ test_script:
 
 on_success:
   - npm run deploy
+  

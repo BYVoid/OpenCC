@@ -22,11 +22,12 @@
 
 /**
  * @defgroup node_api Node.js API
- * 
+ *
  * Node.js language binding
  */
 
 var path = require('path');
+var Promise = require('any-promise');
 var bindingPath = require('node-pre-gyp').find(require.resolve('../package.json'));
 var binding = require(bindingPath);
 
@@ -76,11 +77,7 @@ OpenCC.version = binding.Opencc.version();
  * @return Converted text.
  * @ingroup node_api
  */
-OpenCC.generateDict = function(inputFileName, outputFileName,
-    formatFrom, formatTo) {
-  return binding.Opencc.generateDict(inputFileName, outputFileName,
-    formatFrom, formatTo); 
-}
+OpenCC.generateDict = binding.Opencc.generateDict.bind(binding.Opencc)
 
 /**
  * Converts input text.
@@ -89,10 +86,25 @@ OpenCC.generateDict = function(inputFileName, outputFileName,
  * @memberof OpenCC
  * @param input Input text.
  * @param callback Callback function(err, convertedText).
+ * @return The Promise that will yield the converted text.
  * @ingroup node_api
  */
 OpenCC.prototype.convert = function (input, callback) {
-  return this.handler.convert(input.toString(), callback);
+  input = input.toString()
+  var handler = this.handler
+  if (callback) {
+    return handler.convert(input, callback);
+  } else {
+    return new Promise(function(resolve, reject) {
+      handler.convert(input, function(err, text) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(text);
+        }
+      });
+    });
+  }
 };
 
 /**
@@ -106,23 +118,4 @@ OpenCC.prototype.convert = function (input, callback) {
  */
 OpenCC.prototype.convertSync = function (input) {
   return this.handler.convertSync(input.toString());
-};
-
-/**
- * Converts input text asynchronously and returns a Promise.
- *
- * @fn Promise convertPromise(string input)
- * @memberof OpenCC
- * @param input Input text.
- * @return The Promise that will yield the converted text.
- * @ingroup node_api
- */
-OpenCC.prototype.convertPromise = function (input) {
-  const self = this;
-  return new Promise(function(resolve, reject) {
-    self.handler.convert(input.toString(), function(err, text) {
-      if (err) reject(err);
-      else resolve(text);
-    });
-  });
 };

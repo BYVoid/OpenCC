@@ -1,5 +1,6 @@
 var assert = require('assert');
-var fs = require('fs');
+var fs = require('fs-extra');
+var Promise = require('any-promise');
 var OpenCC = require('./opencc');
 
 var configs = [
@@ -43,6 +44,21 @@ var testAsync = function (config, done) {
   });
 };
 
+var testPromise = function (config) {
+  var inputName = 'test/testcases/' + config + '.in';
+  var outputName = 'test/testcases/' + config + '.ans';
+  var configName = config + '.json';
+  var opencc = new OpenCC(configName);
+  return fs.readFile(inputName, 'utf-8').then(function(text) {
+    return Promise.all([
+      opencc.convert(text),
+      fs.readFile(outputName, 'utf-8'),
+    ])
+  }).then(function(result) {
+    assert.equal(result[0], result[1]);
+  });
+};
+
 describe('Sync API', function () {
   configs.forEach(function (config) {
     it(config, function (done) {
@@ -55,6 +71,14 @@ describe('Async API', function () {
   configs.forEach(function (config) {
     it(config, function (done) {
       testAsync(config, done);
+    });
+  });
+});
+
+describe('Promise API', function () {
+  configs.forEach(function (config) {
+    it(config, function () {
+      return testPromise(config);
     });
   });
 });

@@ -22,11 +22,9 @@ addons:
       - doxygen
       - g++-4.8
 
-env:
-  - CXX=g++-4.8
-
 # Install scripts. (runs after repo cloning)
 install:
+  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
   # install modules
   - npm install --build-from-source
 

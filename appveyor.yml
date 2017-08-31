@@ -21,13 +21,20 @@ install:
   # Get the latest stable version of npm
   - npm -g i npm@latest
   # install modules
-  - npm install --build-from-source
+  - appveyor-retry call npm install --build-from-source
 
 # to run your custom scripts instead of automatic tests
 test_script:
   - IF %nodejs_version%==stable cmake -H. -Bbuild -G"Visual Studio 12" -DCMAKE_INSTALL_PREFIX="path/to/install"
   - IF %nodejs_version%==stable cmake --build build --config Release --target install
   - npm test
+
+artifacts:
+
+  # pushing a single file
+  - path: build
+    name: OpenCC
+    type: zip
 
 # to run your custom scripts instead of provider deployments
 deploy_script:

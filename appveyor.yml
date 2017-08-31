@@ -25,14 +25,13 @@ install:
 
 # to run your custom scripts instead of automatic tests
 test_script:
-  - IF %nodejs_version%==stable cmake -H. -Bbuild -G"Visual Studio 12" -DCMAKE_INSTALL_PREFIX="path/to/install"
+  - IF %nodejs_version%==stable cmake -H. -Bbuild -G"Visual Studio 12"
   - IF %nodejs_version%==stable cmake --build build --config Release --target install
   - npm test
 
+# pushing entire folder as a zip archive
 artifacts:
-
-  # pushing a single file
-  - path: build
+  - path: build/src/tools/Release
     name: OpenCC
     type: zip
 

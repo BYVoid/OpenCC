@@ -27,9 +27,10 @@
  */
 
 var path = require('path');
-var binding = require('../build/Release/binding');
+var bindingPath = require('node-pre-gyp').find(require.resolve('../package.json'));
+var binding = require(bindingPath);
 
-var assetsPath = path.resolve(__dirname, '../build/Release');
+var assetsPath = path.dirname(bindingPath);
 var getConfigPath = function (config) {
   var configPath = config;
   if (config[0] !== '/' && config[1] !== ':') {

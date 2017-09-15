@@ -1,14 +1,14 @@
-language: node_js
-node_js:
-  - "stable"
-  - "6"
-  - "4"
-  - "0.12"
-  - "0.10"
-  - "iojs"
-
-compiler: gcc
 sudo: false
+
+language: node_js
+
+node_js:
+  - stable
+  - 7
+  - 6
+  - 5
+  - 4
+  - 0
 
 os:
   - linux
@@ -20,24 +20,20 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - doxygen
-      - gcc-4.8
       - g++-4.8
-
-before_install:
-  - npm config set python `which python`
-  - if [ $TRAVIS_OS_NAME == "linux" ]; then
-      export CC="gcc-4.8";
-      export CXX="g++-4.8";
-      export LINK="gcc-4.8";
-      export LINKXX="g++-4.8";
-    fi
 
 # Install scripts. (runs after repo cloning)
 install:
-  - npm install
+  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
+  # install modules
+  - npm install --build-from-source
 
 # Post-install test scripts.
 script:
-  - npm run test
-  - npm run package
+  - if [ $TRAVIS_OS_NAME == "linux" ] && [ $TRAVIS_NODE_VERSION == "stable" ]; then
+      make test VERBOSE=1;
+      make package VERBOSE=1;
+    fi
+
+  - npm test
   - npm run deploy

@@ -1,8 +1,8 @@
 {
   "targets": [{
-    "target_name": "binding",
+    "target_name": "opencc",
     "sources": [
-      "../node/binding.cc",
+      "../node/opencc.cc",
     ],
     "include_dirs": [
       "../src",

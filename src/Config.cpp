@@ -18,6 +18,8 @@
 
 #include <unordered_map>
 
+#include "document.h"
+
 #include "Config.hpp"
 #include "ConversionChain.hpp"
 #include "Converter.hpp"
@@ -26,7 +28,7 @@
 #include "MaxMatchSegmentation.hpp"
 #include "TextDict.hpp"
 
-#include "document.h"
+
 
 using namespace opencc;
 

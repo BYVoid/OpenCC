@@ -75,25 +75,7 @@ public:
   * Returns the length in byte for the previous UTF8 character.
   */
   static size_t PrevCharLength(const char* str) {
-    {
-      const size_t length = NextCharLengthNoException(str - 3);
-      if (length == 3) {
-        return length;
-      }
-    }
-    {
-      const size_t length = NextCharLengthNoException(str - 1);
-      if (length == 1) {
-        return length;
-      }
-    }
-    {
-      const size_t length = NextCharLengthNoException(str - 2);
-      if (length == 2) {
-        return length;
-      }
-    }
-    for (size_t i = 4; i <= 6; i++) {
+    for (size_t i = 1; i <= 6; i++) {
       const size_t length = NextCharLengthNoException(str - i);
       if (length == i) {
         return length;

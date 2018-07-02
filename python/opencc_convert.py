@@ -92,13 +92,18 @@ if __name__ == '__main__':
         file_in = open(args.file, 'r', encoding='utf-8')
         string_in = file_in.read()
     
-    t0 = time.time()
+    # t0 = time.time()
     config = load_config(args.config) 
-    t1 = time.time()
+    # t1 = time.time()
     string_out = convert(config, string_in)
-    t2 = time.time()
-    f_out = open(args.out, 'w+', encoding='utf-8',newline='\n' )
-    f_out.write(string_out)
-    print(t1-t0, t2-t1)
-    # Test config data structure 'python opencc_convert.py --config s2twp.json 繮'
+    # t2 = time.time()
+    if args.string:
+        print(string_out)
+    if args.file and args.out:
+        f_out = open(args.out, 'w+', encoding='utf-8',newline='\n' )
+        f_out.write(string_out)
+    if args.file:
+        print(string_out)
+    # print(t1-t0, t2-t1)
+
 

@@ -1,7 +1,24 @@
 #!/usr/bin/env python
 #coding: utf-8
+# Open Chinese Convert
+#
+# Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-dict_path='..\\data\\dictionary\\'
+import os
+this_dir, this_filename = os.path.split(__file__)
+dict_path=os.path.join(this_dir, 'data\\dictionary\\')
 
 def load_dict(dict_type):
     # only Txt format is supported
@@ -17,7 +34,7 @@ def load_dict(dict_type):
     return dict_ret
 
 import json
-config_path='..\\data\\config\\'
+config_path=os.path.join(this_dir, 'data\\config\\')
 
 def load_config(config_file):
     f = open(config_path+config_file, 'r', encoding='utf-8')
@@ -90,6 +107,7 @@ if __name__ == '__main__':
         string_in = args.string
     if args.file:
         file_in = open(args.file, 'r', encoding='utf-8')
+        file_in.close()
         string_in = file_in.read()
     
     # t0 = time.time()
@@ -102,6 +120,7 @@ if __name__ == '__main__':
     if args.file and args.out:
         f_out = open(args.out, 'w+', encoding='utf-8',newline='\n' )
         f_out.write(string_out)
+        f_out.close()
     if args.file:
         print(string_out)
     # print(t1-t0, t2-t1)

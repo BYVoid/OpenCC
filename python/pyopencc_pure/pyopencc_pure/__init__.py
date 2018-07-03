@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+#coding: utf-8
 # Open Chinese Convert
 #
 # Copyright 2010-2014 BYVoid <byvoid@byvoid.com>

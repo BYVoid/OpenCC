@@ -9,6 +9,7 @@ A pure python based on Open Chinese Convert. You can use it without opencc binar
 ### command-line
 
 The config file is need, with json format. The input text is converted and result is print out.
+
 `python -m  pyopencc_pure --config s2t.json  简体中文`
 
 If the input and output file are provided, the converted result is not print out.
@@ -18,7 +19,7 @@ If the input and output file are provided, the converted result is not print out
 ### use package
 
 ```
->>> import pyopencc_pure`
+>>> import pyopencc_pure
 >>> config = pyopencc_pure.load_config('s2t.json')
 >>> pyopencc_pure.convert(config, '简体中文')
 '簡體中文'

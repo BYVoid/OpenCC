@@ -92,37 +92,3 @@ def convert(config, string):
             table = chain['dict']['table']
             string = replace(string, table)
     return string
-
-import time
-import sys
-if __name__ == '__main__':
-    import argparse
-    parser = argparse.ArgumentParser(description='load config')
-    parser.add_argument('--config', help='config file name')
-    parser.add_argument('--string', help='input text')
-    parser.add_argument('--file', help='input file')
-    parser.add_argument('--out', help='output file')
-    args = parser.parse_args()
-    if args.string:
-        string_in = args.string
-    if args.file:
-        file_in = open(args.file, 'r', encoding='utf-8')
-        file_in.close()
-        string_in = file_in.read()
-    
-    # t0 = time.time()
-    config = load_config(args.config) 
-    # t1 = time.time()
-    string_out = convert(config, string_in)
-    # t2 = time.time()
-    if args.string:
-        print(string_out)
-    if args.file and args.out:
-        f_out = open(args.out, 'w+', encoding='utf-8',newline='\n' )
-        f_out.write(string_out)
-        f_out.close()
-    if args.file:
-        print(string_out)
-    # print(t1-t0, t2-t1)
-
-

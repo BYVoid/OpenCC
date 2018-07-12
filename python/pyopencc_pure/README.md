@@ -28,4 +28,14 @@ If the input and output file are provided, the converted result is not print out
 
 requirements: `pip install wheel`
 
-`python setup.py sdist bdist_wheel`
+```
+cd pyopencc_pure
+python setup.py sdist bdist_wheel
+```
+
+## test
+
+```
+cd pyopencc_pure
+python .\test_opencc.py
+```

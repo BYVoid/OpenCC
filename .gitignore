@@ -11,3 +11,4 @@
 /test/dict.bin
 /xcode
 /node_modules
+test/testcases/*.out

@@ -74,7 +74,29 @@ def replace(string, table):
     string_out = ''
     last_end = 0
     if segs:
-        for seg in segs:
+        num_segs = len(segs)
+        for index in range(num_segs):
+            num_segs = len(segs)
+            
+            if index >= num_segs:
+                break
+            seg = segs[index]
+            if last_end > seg.start():
+                continue
+            # check overlapping
+            if index+1 >= num_segs:
+                overlapping = False
+            elif seg.end() > segs[index+1].start():
+                overlapping = True
+            else:
+                overlapping = False
+
+            # length comparing
+            if overlapping:
+                if (seg.end() - seg.start()) <(segs[index+1].end() - segs[index+1].start()):
+                    continue
+                else:
+                    del segs[index+1]
             string_out = string_out + string[last_end:seg.start()] + table[seg.group()]
             last_end = seg.end()
         string_out = string_out + string[last_end:]
@@ -85,9 +107,11 @@ def replace(string, table):
 def convert(config, string):
     for chain in config['conversion_chain']:
         if chain['dict']['type'] == 'group':
+            all_dict =dict()
             for dict_i in chain['dict']['dicts']:
                 table = dict_i['table']
-                string = replace(string, table) 
+                all_dict.update(table)
+            string = replace(string, all_dict) 
         elif chain['dict']['type'] == 'ocd':
             table = chain['dict']['table']
             string = replace(string, table)

@@ -106,6 +106,10 @@ Or [SwiftyOpenCC](https://github.com/XQS6LB3A/SwiftyOpenCC)
 
 See [android-opencc](https://github.com/qichuan/android-opencc)
 
+### Browser
+
+See [wasm-opencc](https://github.com/oyyd/wasm-opencc)
+
 ## Projects using Opencc 使用OpenCC的項目
 
 * [ibus-pinyin](https://github.com/ibus/ibus-pinyin)

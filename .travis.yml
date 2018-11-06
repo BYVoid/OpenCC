@@ -4,8 +4,10 @@ language: node_js
 
 node_js:
   - stable
+  - 8
   - 7
   - 6
+  - 4
 
 os:
   - linux

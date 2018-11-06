@@ -6,9 +6,6 @@ node_js:
   - stable
   - 7
   - 6
-  - 5
-  - 4
-  - 0
 
 os:
   - linux

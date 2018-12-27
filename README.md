@@ -110,7 +110,7 @@ See [android-opencc](https://github.com/qichuan/android-opencc)
 
 * [ibus-pinyin](https://github.com/ibus/ibus-pinyin)
 * [fcitx](https://github.com/fcitx/fcitx)
-* [rimeime](http://code.google.com/p/rimeime/)
+* [rimeime](https://rime.im/)
 * [libgooglepinyin](http://code.google.com/p/libgooglepinyin/)
 * [ibus-libpinyin](https://github.com/libpinyin/ibus-libpinyin)
 * [BYVBlog](https://github.com/byvoid/byvblog)

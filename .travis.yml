@@ -37,4 +37,6 @@ script:
     fi
 
   - npm test
+
+after_success:
   - npm run deploy

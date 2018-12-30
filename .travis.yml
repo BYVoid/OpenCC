@@ -2,6 +2,7 @@ language: node_js
 
 cache:
   npm: true
+  ccache: true
 
 node_js:
   - stable
@@ -31,6 +32,7 @@ install:
 
 # Post-install test scripts.
 script:
+  - export PATH="/usr/lib/ccache/:$PATH"
   - if [ $TRAVIS_OS_NAME == "linux" ] && [ $TRAVIS_NODE_VERSION == "stable" ]; then
       make test VERBOSE=1;
       make package VERBOSE=1;

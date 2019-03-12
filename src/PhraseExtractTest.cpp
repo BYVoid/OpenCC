@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <cmath>
+
 #include "PhraseExtract.hpp"
 #include "TestUtils.hpp"
 

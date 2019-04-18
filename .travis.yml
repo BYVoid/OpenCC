@@ -1,6 +1,8 @@
-sudo: false
-
 language: node_js
+
+cache:
+  npm: true
+  ccache: true
 
 node_js:
   - stable
@@ -22,16 +24,19 @@ addons:
 
 # Install scripts. (runs after repo cloning)
 install:
-  - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
+  - if [ $TRAVIS_OS_NAME == "linux" ]; then export CXX=g++-4.8; fi
   # install modules
   - npm install --build-from-source
 
 # Post-install test scripts.
 script:
+  - export PATH="/usr/lib/ccache/:$PATH"
   - if [ $TRAVIS_OS_NAME == "linux" ] && [ $TRAVIS_NODE_VERSION == "stable" ]; then
       make test VERBOSE=1;
       make package VERBOSE=1;
     fi
 
   - npm test
+
+after_success:
   - npm run deploy

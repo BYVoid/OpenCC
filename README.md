@@ -114,7 +114,6 @@ See [android-opencc](https://github.com/qichuan/android-opencc)
 * [libgooglepinyin](http://code.google.com/p/libgooglepinyin/)
 * [ibus-libpinyin](https://github.com/libpinyin/ibus-libpinyin)
 * [BYVBlog](https://github.com/byvoid/byvblog)
-* [豆瓣同城微信](http://weixinqiao.com/douban-event/)
 * [alfred-chinese-converter](https://github.com/amowu/alfred-chinese-converter)
 * [GoldenDict](https://github.com/goldendict/goldendict)
 

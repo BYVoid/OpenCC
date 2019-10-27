@@ -23,7 +23,7 @@ Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for c
 ### Links 相關鏈接
 
 * Introduction 詳細介紹 https://github.com/BYVoid/OpenCC/wiki/%E7%B7%A3%E7%94%B1
-* OpenCC Online (在線轉換) http://opencc.byvoid.com/
+* OpenCC Online (在線轉換) https://opencc.byvoid.com/
 * 現代漢語常用簡繁一對多字義辨析表 http://ytenx.org/byohlyuk/KienxPyan
 
 ## Installation 安裝

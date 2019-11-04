@@ -173,5 +173,6 @@ https://github.com/BYVoid/OpenCC/blob/master/NEWS.md
 * [Cychih](https://github.com/pi314)
 * [kyleskimo](https://github.com/kyleskimo)
 * [Ryuan Choi](https://github.com/bunhere)
-
+* [Tony Able](https://github.com/TonyAble)
+* [Xiao Liang](https://github.com/yxliang01)
 Please update this list you have contributed OpenCC.

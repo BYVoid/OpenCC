@@ -147,6 +147,7 @@ https://github.com/BYVoid/OpenCC/blob/master/NEWS.md
 * [Paul Meng](http://home.mno2.org/)
 * [Lawrence Lau](https://github.com/ktslwy)
 * [瑾昀](https://github.com/kunki)
+* [內木一郎](https://github.com/SyaoranHinata)
 * [Marguerite Su](https://www.marguerite.su/)
 * [Brian White](http://mscdex.net)
 * [Qijiang Fan](https://fqj.me/)

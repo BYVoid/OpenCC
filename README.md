@@ -23,14 +23,14 @@ Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for c
 ### Links 相關鏈接
 
 * Introduction 詳細介紹 https://github.com/BYVoid/OpenCC/wiki/%E7%B7%A3%E7%94%B1
-* OpenCC Online (在線轉換) http://opencc.byvoid.com/
+* OpenCC Online (在線轉換) https://opencc.byvoid.com/
 * 現代漢語常用簡繁一對多字義辨析表 http://ytenx.org/byohlyuk/KienxPyan
 
 ## Installation 安裝
 
 * [Debian](http://packages.qa.debian.org/o/opencc.html)
 * [Ubuntu](https://launchpad.net/ubuntu/+source/opencc)
-* [Fedora](https://admin.fedoraproject.org/pkgdb/package/opencc/)
+* [Fedora](https://apps.fedoraproject.org/packages/opencc/)
 * [Arch Linux](https://www.archlinux.org/packages/community/x86_64/opencc/)
 * [Mac OS](https://github.com/Homebrew/homebrew-core/blob/master/Formula/opencc.rb)
 * [Node.js](https://npmjs.org/package/opencc)
@@ -110,11 +110,10 @@ See [android-opencc](https://github.com/qichuan/android-opencc)
 
 * [ibus-pinyin](https://github.com/ibus/ibus-pinyin)
 * [fcitx](https://github.com/fcitx/fcitx)
-* [rimeime](http://code.google.com/p/rimeime/)
+* [rimeime](https://rime.im/)
 * [libgooglepinyin](http://code.google.com/p/libgooglepinyin/)
 * [ibus-libpinyin](https://github.com/libpinyin/ibus-libpinyin)
 * [BYVBlog](https://github.com/byvoid/byvblog)
-* [豆瓣同城微信](http://weixinqiao.com/douban-event/)
 * [alfred-chinese-converter](https://github.com/amowu/alfred-chinese-converter)
 * [GoldenDict](https://github.com/goldendict/goldendict)
 
@@ -148,6 +147,7 @@ https://github.com/BYVoid/OpenCC/blob/master/NEWS.md
 * [Paul Meng](http://home.mno2.org/)
 * [Lawrence Lau](https://github.com/ktslwy)
 * [瑾昀](https://github.com/kunki)
+* [內木一郎](https://github.com/SyaoranHinata)
 * [Marguerite Su](https://www.marguerite.su/)
 * [Brian White](http://mscdex.net)
 * [Qijiang Fan](https://fqj.me/)
@@ -174,5 +174,7 @@ https://github.com/BYVoid/OpenCC/blob/master/NEWS.md
 * [Cychih](https://github.com/pi314)
 * [kyleskimo](https://github.com/kyleskimo)
 * [Ryuan Choi](https://github.com/bunhere)
+* [Tony Able](https://github.com/TonyAble)
+* [Xiao Liang](https://github.com/yxliang01)
 
 Please update this list you have contributed OpenCC.

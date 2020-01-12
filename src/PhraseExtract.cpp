@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Open Chinese Convert
  *
  * Copyright 2015 BYVoid <byvoid@byvoid.com>

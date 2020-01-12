@@ -1,0 +1,16 @@
+{
+  "name": "Traditional Chinese Characters to Japanese Kanji",
+  "segmentation": {
+    "type": "mmseg",
+    "dict": {
+      "type": "text",
+      "file": "JPVariants.txt"
+    }
+  },
+  "conversion_chain": [{
+    "dict": {
+      "type": "text",
+      "file": "JPVariants.txt"
+    }
+  }]
+}

@@ -11,11 +11,11 @@
     "dict": {
       "type": "group",
       "dicts": [{
-        "type": "txt",
-        "file": "HKVariantsPhrases.txt"
+        "type": "ocd",
+        "file": "HKVariantsPhrases.ocd"
       }, {
-        "type": "txt",
-        "file": "HKVariants.txt"
+        "type": "ocd",
+        "file": "HKVariants.ocd"
       }]
     }
   }]

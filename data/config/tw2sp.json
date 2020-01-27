@@ -12,16 +12,14 @@
       "type": "group",
       "dicts": [{
         "type": "ocd",
+        "file": "TWPhrasesRev.ocd"
+      }, {
+        "type": "ocd",
         "file": "TWVariantsRevPhrases.ocd"
       }, {
         "type": "ocd",
         "file": "TWVariantsRev.ocd"
       }] 
-    }
-  }, {
-    "dict": {
-      "type": "ocd",
-      "file": "TWPhrasesRev.ocd"
     }
   }, {
     "dict": {

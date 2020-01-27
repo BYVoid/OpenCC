@@ -1,6 +1,8 @@
+find_package(PythonInterp REQUIRED)
+
 set(OPENCC_DICT_BIN opencc_dict)
-set(DICT_MERGE_BIN python ${CMAKE_CURRENT_SOURCE_DIR}/scripts/merge.py)
-set(DICT_REVERSE_BIN python ${CMAKE_CURRENT_SOURCE_DIR}/scripts/reverse.py)
+set(DICT_MERGE_BIN "${PYTHON_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/merge.py")
+set(DICT_REVERSE_BIN "${PYTHON_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/reverse.py")
 set(DICT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dictionary)
 set(DICT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR})
 

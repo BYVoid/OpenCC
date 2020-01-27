@@ -1,0 +1,16 @@
+{
+  "name": "Traditional Chinese Characters to Japanese Kanji",
+  "segmentation": {
+    "type": "mmseg",
+    "dict": {
+      "type": "ocd",
+      "file": "JPVariants.ocd"
+    }
+  },
+  "conversion_chain": [{
+    "dict": {
+      "type": "ocd",
+      "file": "JPVariants.ocd"
+    }
+  }]
+}

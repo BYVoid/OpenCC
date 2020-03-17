@@ -4,7 +4,7 @@
     "type": "mmseg",
     "dict": {
       "type": "ocd",
-      "file": "HKVariants.ocd"
+      "file": "HKVariantsPhrases.ocd"
     }
   },
   "conversion_chain": [{

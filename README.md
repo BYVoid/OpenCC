@@ -10,6 +10,10 @@ Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for c
 
 中文簡繁轉換開源項目，支持詞彙級別的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港）。
 
+## Discussion 討論
+
+Telegram: https://t.me/open_chinese_convert
+
 ### Features 特點
 
 * 嚴格區分「一簡對多繁」和「一簡對多異」。

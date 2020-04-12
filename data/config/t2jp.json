@@ -1,5 +1,5 @@
 {
-  "name": "Traditional Chinese Characters to Japanese Kanji",
+  "name": "Traditional Chinese Characters (Kyūjitai) to New Japanese Kanji (Shinjitai)",
   "segmentation": {
     "type": "mmseg",
     "dict": {

@@ -13,6 +13,7 @@ const configs = [
   'tw2sp',
   's2hk',
   'hk2s',
+  't2jp',
 ];
 
 const testSync = function (config, done) {

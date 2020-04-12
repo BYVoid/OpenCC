@@ -149,6 +149,7 @@ set(CONFIG_FILES
   config/s2hk.json
   config/hk2s.json
   config/t2hk.json
+  config/t2jp.json
 )
 
 install(

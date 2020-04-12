@@ -166,6 +166,22 @@
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)JPVariantsRev.ocd"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "JPShinjitaiCharacters",
+      "variables": {
+        "input": "<(input_prefix)JPShinjitaiCharacters.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)JPShinjitaiCharacters.ocd"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "JPShinjitaiPhrases",
+      "variables": {
+        "input": "<(input_prefix)JPShinjitaiPhrases.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)JPShinjitaiPhrases.ocd"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }],
     "dependencies": [
       "opencc"

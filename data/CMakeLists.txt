@@ -14,10 +14,12 @@ set(
   TSPhrases
   TWVariants
   TWVariantsRevPhrases
-  JPVariants
   HKVariants
   HKVariantsPhrases
   HKVariantsRevPhrases
+  JPVariants
+  JPShinjitaiCharacters
+  JPShinjitaiPhrases
 )
 
 set(

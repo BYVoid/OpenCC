@@ -6,7 +6,7 @@
 
 ## Introduction 介紹
 
-Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for conversion between Traditional Chinese and Simplified Chinese, supporting character-level conversion, phrase-level conversion, variant conversion and regional idioms among Mainland China, Taiwan and Hong kong.
+Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for conversion between Traditional Chinese and Simplified Chinese, supporting character-level conversion, phrase-level conversion, variant conversion and regional idioms among Mainland China, Taiwan and Hong Kong.
 
 中文簡繁轉換開源項目，支持詞彙級別的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港、日本新字體）。
 
@@ -123,7 +123,7 @@ Or [SwiftyOpenCC](https://github.com/XQS6LB3A/SwiftyOpenCC)
 
 See [android-opencc](https://github.com/qichuan/android-opencc)
 
-## Projects using Opencc 使用OpenCC的項目
+## Projects using OpenCC 使用 OpenCC 的項目
 
 * [ibus-pinyin](https://github.com/ibus/ibus-pinyin)
 * [fcitx](https://github.com/fcitx/fcitx)

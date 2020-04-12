@@ -8,7 +8,7 @@
 
 Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for conversion between Traditional Chinese and Simplified Chinese, supporting character-level conversion, phrase-level conversion, variant conversion and regional idioms among Mainland China, Taiwan and Hong kong.
 
-中文簡繁轉換開源項目，支持詞彙級別的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港）。
+中文簡繁轉換開源項目，支持詞彙級別的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港、日本新字體）。
 
 ## Discussion 討論
 
@@ -49,6 +49,18 @@ https://bintray.com/byvoid/opencc/OpenCC
 
 `opencc --help`
 
+### Node.js
+
+```js
+const OpenCC = require('opencc');
+const opencc = new OpenCC('s2t.json');
+opencc.convertPromise("汉字").then(converted => {
+  console.log(converted);  // 漢字
+});
+```
+
+See `[demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js)`.
+
 ### Configurations 配置文件
 
 #### 預設配置文件
@@ -63,6 +75,7 @@ https://bintray.com/byvoid/opencc/OpenCC
 * `tw2sp.json` Traditional Chinese (Taiwan Standard) to Simplified Chinese with Mainland Chinese idiom 繁體（臺灣正體標準）到簡體並轉換爲中國大陸常用詞彙
 * `t2tw.json` Traditional Chinese (OpenCC Standard) to Taiwan Standard 繁體（OpenCC 標準）到臺灣正體
 * `t2hk.json` Traditional Chinese (OpenCC Standard) to Hong Kong Standard 繁體（OpenCC 標準）到香港繁體（香港小學學習字詞表標準）
+* `t2jp.json` Traditional Chinese Characters (Kyūjitai) to New Japanese Kanji (Shinjitai) 繁體（OpenCC 標準，舊字體）到日文新字體
 
 ## Development Documentation 開發文檔
 
@@ -74,39 +87,39 @@ https://bintray.com/byvoid/opencc/OpenCC
 
 Linux (gcc 4.6 is required):
 
-```
+```bash
 make
 sudo make install
 ```
 
 Mac OS X (clang 3.2 is required):
 
-```
+```bash
 make PREFIX=/usr/local
 sudo make PREFIX=/usr/local install
 ```
 
 Windows MSYS:
 
-```
+```bash
 cmake -H. -Bbuild -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX="path/to/install"
 cmake --build build --config Release --target install
 ```
 
 Windows Visual Studio (2013 or higher required):
 
-```
+```bash
 cmake -H. -Bbuild -G"Visual Studio 12" -DCMAKE_INSTALL_PREFIX="path/to/install"
 cmake --build build --config Release --target install
 ```
 
-### iOS
+### iOS (Unofficial)
 
 See https://github.com/gelosie/OpenCC/tree/master/iOS
 
 Or [SwiftyOpenCC](https://github.com/XQS6LB3A/SwiftyOpenCC)
 
-### Android
+### Android (Unofficial)
 
 See [android-opencc](https://github.com/qichuan/android-opencc)
 

@@ -10,6 +10,9 @@
     "deploy": "node-pre-gyp package && (node-pre-gyp-github publish --release || exit 0)",
     "install": "node-pre-gyp install --fallback-to-build || node-pre-gyp rebuild"
   },
+  "engines": {
+    "node": ">= 8.0.0"
+  },
   "binary": {
     "module_name": "opencc",
     "module_path": "./build/Release/",

@@ -59,7 +59,7 @@ opencc.convertPromise("汉字").then(converted => {
 });
 ```
 
-See `[demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js)`.
+See [demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js).
 
 ### Configurations 配置文件
 

@@ -119,7 +119,8 @@ class OpenccBinding : public Nan::ObjectWrap {
       err,
       converted
     };
-    conv_data->callback->Call(argc, argv);
+    Nan::AsyncResource resource("opencc:convert-async-cb");
+    conv_data->callback->Call(argc, argv, &resource);
     delete conv_data;
     delete req;
   }

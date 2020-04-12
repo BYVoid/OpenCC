@@ -26,6 +26,7 @@ set(
   TWPhrasesRev
   TWVariantsRev
   HKVariantsRev
+  JPVariantsRev
 )
 
 set(DICTS ${DICTS_RAW} ${DICTS_GENERATED})
@@ -85,6 +86,15 @@ set(
 set(
   DICT_HKVariantsRev_GENERATING_COMMAND
   ${DICT_REVERSE_BIN} ${DICT_HKVariantsRev_GENERATING_INPUT} HKVariantsRev.txt
+)
+
+set(
+  DICT_JPVariantsRev_GENERATING_INPUT
+  ${DICT_DIR}/JPVariants.txt
+)
+set(
+  DICT_JPVariantsRev_GENERATING_COMMAND
+  ${DICT_REVERSE_BIN} ${DICT_JPVariantsRev_GENERATING_INPUT} JPVariantsRev.txt
 )
 
 foreach(DICT ${DICTS_GENERATED})
@@ -150,6 +160,7 @@ set(CONFIG_FILES
   config/hk2s.json
   config/t2hk.json
   config/t2jp.json
+  config/jp2t.json
 )
 
 install(

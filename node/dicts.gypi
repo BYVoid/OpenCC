@@ -150,6 +150,22 @@
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)HKVariantsRev.ocd"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "JPVariantsRev.txt",
+      "variables": {
+        "input": "<(input_prefix)JPVariants.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)JPVariantsRev.txt"],
+      "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "JPVariantsRev",
+      "variables": {
+        "input": "<(output_prefix)JPVariantsRev.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)JPVariantsRev.ocd"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }],
     "dependencies": [
       "opencc"

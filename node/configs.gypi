@@ -16,6 +16,7 @@
         "../data/config/hk2s.json",
         "../data/config/t2hk.json",
         "../data/config/t2jp.json",
+        "../data/config/jp2t.json",
       ]
     }]
   }]

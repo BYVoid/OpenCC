@@ -14,6 +14,7 @@ const configs = [
   's2hk',
   'hk2s',
   't2jp',
+  'jp2t',
 ];
 
 const testSync = function (config, done) {

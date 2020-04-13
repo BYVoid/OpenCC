@@ -5,9 +5,11 @@
 
 ## Introduction 介紹
 
-Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for conversion between Traditional Chinese and Simplified Chinese, supporting character-level conversion, phrase-level conversion, variant conversion and regional idioms among Mainland China, Taiwan and Hong Kong.
+![OpenCC](https://opencc.byvoid.com/img/opencc.png)
 
-中文簡繁轉換開源項目，支持詞彙級別的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港、日本新字體）。
+Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for conversions between Traditional Chinese, Simplified Chinese and Japanese Kanji (Shinjitai). It supports character-level and phrase-level conversion, character variant conversion and regional idioms among Mainland China, Taiwan and Hong Kong. This is not translation tool between Mandarin and Cantonese, etc.
+
+中文簡繁轉換開源項目，支持詞彙級別的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港、日本新字體）。不提供普通話與粵語的轉換。
 
 Discussion (Telegram): https://t.me/open_chinese_convert
 
@@ -30,6 +32,12 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 * [Node.js (npm)](https://npmjs.org/package/opencc)
 
 ## Usage 使用
+
+### Online demo 線上轉換展示
+
+Warning: **This is NOT an API.** You will be banned if you make calls programmatically.
+
+https://opencc.byvoid.com/
 
 ### Command Line
 
@@ -137,7 +145,6 @@ https://github.com/BYVoid/OpenCC/blob/master/NEWS.md
 ### Links 相關鏈接
 
 * Introduction 詳細介紹 https://github.com/BYVoid/OpenCC/wiki/%E7%B7%A3%E7%94%B1
-* OpenCC Online (在線轉換) https://opencc.byvoid.com/
 * 現代漢語常用簡繁一對多字義辨析表 http://ytenx.org/byohlyuk/KienxPyan
 
 ## Contributors 貢獻者

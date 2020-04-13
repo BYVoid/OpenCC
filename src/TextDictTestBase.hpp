@@ -82,7 +82,25 @@ protected:
 
   void TestDict(const DictPtr dict) const {
     TestMatch(dict);
+    TestMatchPrefix(dict);
+    TestMatchAllPrefixes(dict);
+  }
 
+  void TestMatch(const DictPtr& dict) const {
+    Optional<const DictEntry*> entry = Optional<const DictEntry*>::Null();
+    entry = dict->Match("BYVoid");
+    EXPECT_TRUE(!entry.IsNull());
+    EXPECT_EQ(utf8("BYVoid"), entry.Get()->Key());
+    EXPECT_EQ(utf8("byv"), entry.Get()->GetDefault());
+
+    entry = dict->Match("");
+    EXPECT_TRUE(entry.IsNull());
+
+    entry = dict->Match("xxx");
+    EXPECT_TRUE(entry.IsNull());
+  }
+
+  void TestMatchPrefix(const DictPtr& dict) const {
     Optional<const DictEntry*> entry = Optional<const DictEntry*>::Null();
     entry = dict->MatchPrefix("BYVoid");
     EXPECT_TRUE(!entry.IsNull());
@@ -104,7 +122,9 @@ protected:
 
     entry = dict->MatchPrefix("");
     EXPECT_TRUE(entry.IsNull());
+  }
 
+  void TestMatchAllPrefixes(const DictPtr& dict) const {
     const vector<const DictEntry*> matches =
         dict->MatchAllPrefixes(utf8("清華大學計算機系"));
     EXPECT_EQ(3, matches.size());
@@ -114,20 +134,6 @@ protected:
     EXPECT_EQ(utf8("Tsinghua"), matches.at(1)->GetDefault());
     EXPECT_EQ(utf8("清"), matches.at(2)->Key());
     EXPECT_EQ(utf8("Tsing"), matches.at(2)->GetDefault());
-  }
-
-  void TestMatch(const DictPtr dict) const {
-    Optional<const DictEntry*> entry = Optional<const DictEntry*>::Null();
-    entry = dict->Match("BYVoid");
-    EXPECT_TRUE(!entry.IsNull());
-    EXPECT_EQ(utf8("BYVoid"), entry.Get()->Key());
-    EXPECT_EQ(utf8("byv"), entry.Get()->GetDefault());
-
-    entry = dict->Match("");
-    EXPECT_TRUE(entry.IsNull());
-
-    entry = dict->Match("xxx");
-    EXPECT_TRUE(entry.IsNull());
   }
 
   const TextDictPtr textDict;

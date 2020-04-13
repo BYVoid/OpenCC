@@ -36,6 +36,8 @@ public:
 
   virtual Optional<const DictEntry*> MatchPrefix(const char* word) const;
 
+  virtual vector<const DictEntry*> MatchAllPrefixes(const char* word) const;
+
   virtual LexiconPtr GetLexicon() const;
 
   virtual void SerializeToFile(FILE* fp) const;

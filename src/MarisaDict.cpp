@@ -32,7 +32,7 @@ public:
   BinaryDictPtr binary;
   std::unique_ptr<marisa::Trie> marisa;
 
-  MarisaInternal() : binary(nullptr), marisa(nullptr) {}
+  MarisaInternal() : binary(nullptr), marisa(new marisa::Trie()) {}
 };
 
 MarisaDict::MarisaDict() : internal(new MarisaInternal()) {}
@@ -63,6 +63,21 @@ Optional<const DictEntry*> MarisaDict::MatchPrefix(const char* word) const {
   }
 }
 
+vector<const DictEntry*> MarisaDict::MatchAllPrefixes(const char* word) const {
+  const marisa::Trie& trie = *internal->marisa;
+  marisa::Agent agent;
+  agent.set_query(word);
+  vector<const DictEntry*> matches;
+  while (trie.common_prefix_search(agent)) {
+    matches.push_back(lexicon->At(agent.key().id()));
+  }
+  std::sort(matches.begin(), matches.end(),
+            [](const DictEntry* a, const DictEntry* b) {
+              return a->KeyLength() > b->KeyLength();
+            });
+  return matches;
+}
+
 LexiconPtr MarisaDict::GetLexicon() const { return lexicon; }
 
 MarisaDictPtr MarisaDict::NewFromFile(FILE* fp) {
@@ -76,7 +91,6 @@ MarisaDictPtr MarisaDict::NewFromFile(FILE* fp) {
   free(buffer);
   // Read Marisa Trie
   MarisaDictPtr dict(new MarisaDict());
-  dict->internal->marisa.reset(new marisa::Trie());
   marisa::fread(fp, dict->internal->marisa.get());
   // Read values
   dict->internal->binary = BinaryDict::NewFromFile(fp);
@@ -99,7 +113,6 @@ MarisaDictPtr MarisaDict::NewFromDict(const Dict& thatDict) {
   }
   // Build Marisa Trie
   MarisaDictPtr dict(new MarisaDict());
-  dict->internal->marisa.reset(new marisa::Trie());
   dict->internal->marisa->build(keyset);
   // Extract lexicon from built Marisa Trie, in order to get the order of keys.
   marisa::Agent agent;

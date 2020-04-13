@@ -1,6 +1,7 @@
 include (GenerateExportHeader)
 
 include_directories(../deps/darts-clone)
+include_directories(../deps/marisa-0.2.5/include)
 include_directories(../deps/rapidjson-0.11)
 include_directories(../deps/tclap-1.2.1)
 
@@ -22,6 +23,7 @@ set(
   Exception.hpp
   Export.hpp
   Lexicon.hpp
+  MarisaDict.hpp
   MaxMatchSegmentation.hpp
   Optional.hpp
   PhraseExtract.hpp
@@ -47,6 +49,7 @@ set(
   DictConverter.cpp
   DictEntry.cpp
   DictGroup.cpp
+  MarisaDict.cpp
   MaxMatchSegmentation.cpp
   PhraseExtract.cpp
   SimpleConverter.cpp
@@ -58,6 +61,7 @@ set(
 
 add_library(libopencc ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
 source_group(libopencc FILES ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
+target_link_libraries(libopencc libmarisa)
 
 GENERATE_EXPORT_HEADER(
   libopencc
@@ -98,23 +102,27 @@ install(
 
 if (ENABLE_GTEST)
   include_directories(../deps/gtest-1.7.0/include)
+
   set(UNITTESTS
-    BinaryDictTest.cpp
-    ConfigTest.cpp
-    ConversionChainTest.cpp
-    ConversionTest.cpp
-    DartsDictTest.cpp
-    DictGroupTest.cpp
-    MaxMatchSegmentationTest.cpp
-    PhraseExtractTest.cpp
-    SimpleConverterTest.cpp
-    TextDictTest.cpp
-    UTF8StringSliceTest.cpp
-    UTF8UtilTest.cpp
+    BinaryDictTest
+    ConfigTest
+    ConversionChainTest
+    ConversionTest
+    DartsDictTest
+    DictGroupTest
+    MarisaDictTest
+    MaxMatchSegmentationTest
+    PhraseExtractTest
+    SimpleConverterTest
+    TextDictTest
+    UTF8StringSliceTest
+    UTF8UtilTest
   )
-  add_executable(UnitTest ${UNITTESTS})
-  target_link_libraries(UnitTest gtest gtest_main libopencc)
-  add_test(UnitTest UnitTest)
+  foreach(TESTCASE ${UNITTESTS})
+    add_executable(${TESTCASE} ${TESTCASE}.cpp)
+    target_link_libraries(${TESTCASE} gtest gtest_main libopencc)
+    add_test(${TESTCASE} ${TESTCASE})
+  endforeach()
 endif()
 
 # Subdir

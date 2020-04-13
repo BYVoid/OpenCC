@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "Lexicon.hpp"
 #include "TextDict.hpp"
+#include "Lexicon.hpp"
 
 using namespace opencc;
 
@@ -91,12 +91,12 @@ TextDictPtr TextDict::NewFromDict(const Dict& dict) {
 size_t TextDict::KeyMaxLength() const { return maxLength; }
 
 Optional<const DictEntry*> TextDict::Match(const char* word) const {
-  NoValueDictEntry entry(word);
-  const auto& found = std::lower_bound(lexicon->begin(), lexicon->end(), &entry,
-                                       DictEntry::PtrLessThan);
+  std::unique_ptr<DictEntry> entry(new NoValueDictEntry(word));
+  const auto& found = std::lower_bound(lexicon->begin(), lexicon->end(), entry,
+                                       DictEntry::UPtrLessThan);
   if ((found != lexicon->end()) &&
-      (strcmp((*found)->Key(), entry.Key()) == 0)) {
-    return Optional<const DictEntry*>(*found);
+      (strcmp((*found)->Key(), entry->Key()) == 0)) {
+    return Optional<const DictEntry*>(found->get());
   } else {
     return Optional<const DictEntry*>::Null();
   }

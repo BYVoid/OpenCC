@@ -55,10 +55,6 @@ public:
                            const std::unique_ptr<DictEntry>& b) {
     return *a < *b;
   }
-
-  static bool PtrLongerThan(const DictEntry* a, const DictEntry* b) {
-    return a->KeyLength() > b->KeyLength();
-  }
 };
 
 class OPENCC_EXPORT NoValueDictEntry : public DictEntry {

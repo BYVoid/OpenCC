@@ -102,6 +102,9 @@ protected:
     entry = dict->MatchPrefix("Unknown");
     EXPECT_TRUE(entry.IsNull());
 
+    entry = dict->MatchPrefix("");
+    EXPECT_TRUE(entry.IsNull());
+
     const vector<const DictEntry*> matches =
         dict->MatchAllPrefixes(utf8("清華大學計算機系"));
     EXPECT_EQ(3, matches.size());
@@ -119,6 +122,12 @@ protected:
     EXPECT_TRUE(!entry.IsNull());
     EXPECT_EQ(utf8("BYVoid"), entry.Get()->Key());
     EXPECT_EQ(utf8("byv"), entry.Get()->GetDefault());
+
+    entry = dict->Match("");
+    EXPECT_TRUE(entry.IsNull());
+
+    entry = dict->Match("xxx");
+    EXPECT_TRUE(entry.IsNull());
   }
 
   const TextDictPtr textDict;

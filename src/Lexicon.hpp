@@ -29,12 +29,23 @@ namespace opencc {
 class OPENCC_EXPORT Lexicon {
 public:
   Lexicon() {}
+  Lexicon(vector<std::unique_ptr<DictEntry>> entries_)
+      : entries(std::move(entries_)) {}
 
   // Lexicon will take the ownership of the entry.
   void Add(DictEntry* entry) { entries.emplace_back(entry); }
 
+  void Add(std::unique_ptr<DictEntry> entry) {
+    entries.push_back(std::move(entry));
+  }
+
   void Sort() {
     std::sort(entries.begin(), entries.end(), DictEntry::UPtrLessThan);
+  }
+
+  bool IsSorted() {
+    return std::is_sorted(entries.begin(), entries.end(),
+                          DictEntry::UPtrLessThan);
   }
 
   const DictEntry* At(size_t index) const { return entries.at(index).get(); }

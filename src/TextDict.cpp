@@ -69,7 +69,9 @@ static LexiconPtr ParseLexiconFromFile(FILE* fp) {
 }
 
 TextDict::TextDict(const LexiconPtr& _lexicon)
-    : maxLength(GetKeyMaxLength(_lexicon)), lexicon(_lexicon) {}
+    : maxLength(GetKeyMaxLength(_lexicon)), lexicon(_lexicon) {
+  assert(lexicon->IsSorted());
+}
 
 TextDict::~TextDict() {}
 

@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 BYVoid <byvoid@byvoid.com>
+ * Copyright 2020 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,32 @@
  * limitations under the License.
  */
 
-#include "DartsDict.hpp"
+#include "MarisaDict.hpp"
 #include "TextDictTestBase.hpp"
 
 namespace opencc {
 
-class DartsDictTest : public TextDictTestBase {
+class MarisaDictTest : public TextDictTestBase {
 protected:
-  DartsDictTest()
-      : dartsDict(DartsDict::NewFromDict(*textDict.get())),
-        fileName("dict.ocd"){};
+  MarisaDictTest()
+      : dict(MarisaDict::NewFromDict(*textDict)), fileName("dict.ocd2"){};
 
-  const DartsDictPtr dartsDict;
+  const MarisaDictPtr dict;
   const string fileName;
 };
 
-TEST_F(DartsDictTest, DictTest) { TestDict(dartsDict); }
+TEST_F(MarisaDictTest, DictTest) { TestDict(dict); }
 
-TEST_F(DartsDictTest, Serialization) {
-  dartsDict->opencc::SerializableDict::SerializeToFile(fileName);
+TEST_F(MarisaDictTest, Serialization) {
+  dict->opencc::SerializableDict::SerializeToFile(fileName);
 }
 
-TEST_F(DartsDictTest, Deserialization) {
-  const DartsDictPtr& deserialized =
-      SerializableDict::NewFromFile<DartsDict>(fileName);
+TEST_F(MarisaDictTest, Deserialization) {
+  const MarisaDictPtr& deserialized =
+      SerializableDict::NewFromFile<MarisaDict>(fileName);
   TestDict(deserialized);
 
-  const LexiconPtr& lex1 = dartsDict->GetLexicon();
+  const LexiconPtr& lex1 = dict->GetLexicon();
   const LexiconPtr& lex2 = deserialized->GetLexicon();
 
   // Compare every entry
@@ -51,9 +50,6 @@ TEST_F(DartsDictTest, Deserialization) {
     EXPECT_EQ(string(lex1->At(i)->Key()), lex2->At(i)->Key());
     EXPECT_EQ(lex1->At(i)->NumValues(), lex2->At(i)->NumValues());
   }
-
-  const TextDictPtr deserializedTextDict(new TextDict(lex2));
-  TestDict(deserializedTextDict);
 }
 
 } // namespace opencc

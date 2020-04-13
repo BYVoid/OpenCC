@@ -60,6 +60,7 @@ class Dict;
 class DictEntry;
 class DictGroup;
 class Lexicon;
+class MarisaDict;
 class MultiValueDictEntry;
 class NoValueDictEntry;
 class Segmentation;
@@ -75,15 +76,16 @@ typedef std::shared_ptr<DartsDict> DartsDictPtr;
 typedef std::shared_ptr<Dict> DictPtr;
 typedef std::shared_ptr<DictGroup> DictGroupPtr;
 typedef std::shared_ptr<Lexicon> LexiconPtr;
+typedef std::shared_ptr<MarisaDict> MarisaDictPtr;
 typedef std::shared_ptr<Segmentation> SegmentationPtr;
 typedef std::shared_ptr<Segments> SegmentsPtr;
 typedef std::shared_ptr<SerializableDict> SerializableDictPtr;
 typedef std::shared_ptr<TextDict> TextDictPtr;
-}
+} // namespace opencc
 
 #ifndef PKGDATADIR
 const string PACKAGE_DATA_DIRECTORY = "";
-#else // ifndef PKGDATADIR
+#else  // ifndef PKGDATADIR
 const string PACKAGE_DATA_DIRECTORY = PKGDATADIR "/";
 #endif // ifndef PKGDATADIR
 

@@ -55,7 +55,7 @@ opencc.convertPromise("汉字").then(converted => {
 
 See [demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js).
 
-### C++
+### C++ Document 文檔
 
 http://byvoid.github.io/OpenCC/
 

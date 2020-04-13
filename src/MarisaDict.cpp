@@ -56,10 +56,16 @@ Optional<const DictEntry*> MarisaDict::MatchPrefix(const char* word) const {
   const marisa::Trie& trie = *internal->marisa;
   marisa::Agent agent;
   agent.set_query(word);
-  if (trie.common_prefix_search(agent)) {
-    return Optional<const DictEntry*>(lexicon->At(agent.key().id()));
-  } else {
+  vector<const DictEntry*> matches;
+  while (trie.common_prefix_search(agent)) {
+    matches.push_back(lexicon->At(agent.key().id()));
+  }
+  if (matches.size() == 0) {
     return Optional<const DictEntry*>::Null();
+  } else {
+    std::nth_element(matches.begin(), matches.begin(), matches.end(),
+                     DictEntry::PtrLongerThan);
+    return Optional<const DictEntry*>(matches.front());
   }
 }
 
@@ -71,10 +77,7 @@ vector<const DictEntry*> MarisaDict::MatchAllPrefixes(const char* word) const {
   while (trie.common_prefix_search(agent)) {
     matches.push_back(lexicon->At(agent.key().id()));
   }
-  std::sort(matches.begin(), matches.end(),
-            [](const DictEntry* a, const DictEntry* b) {
-              return a->KeyLength() > b->KeyLength();
-            });
+  std::sort(matches.begin(), matches.end(), DictEntry::PtrLongerThan);
   return matches;
 }
 

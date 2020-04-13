@@ -23,6 +23,7 @@
 #include "Converter.hpp"
 #include "DartsDict.hpp"
 #include "DictGroup.hpp"
+#include "MarisaDict.hpp"
 #include "MaxMatchSegmentation.hpp"
 #include "TextDict.hpp"
 
@@ -119,6 +120,8 @@ public:
         dict = LoadDictWithPaths<TextDict>(fileName);
       } else if (type == "ocd") {
         dict = LoadDictWithPaths<DartsDict>(fileName);
+      } else if (type == "ocd2") {
+        dict = LoadDictWithPaths<MarisaDict>(fileName);
       } else {
         throw InvalidFormat("Unknown dictionary type: " + type);
       }
@@ -189,7 +192,7 @@ public:
     throw FileNotFound(fileName);
   }
 };
-};
+}; // namespace opencc
 
 Config::Config() : internal(new ConfigInternal()) {}
 

@@ -1,6 +1,5 @@
 # Open Chinese Convert 開放中文轉換
 
-[ ![Download](https://api.bintray.com/packages/byvoid/opencc/OpenCC/images/download.svg) ](https://bintray.com/byvoid/opencc/OpenCC/_latestVersion)
 [![Travis](https://img.shields.io/travis/BYVoid/OpenCC.svg)](https://travis-ci.org/BYVoid/OpenCC)
 [![AppVeyor](https://img.shields.io/appveyor/ci/Carbo/OpenCC.svg)](https://ci.appveyor.com/project/Carbo/OpenCC)
 
@@ -10,9 +9,7 @@ Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for c
 
 中文簡繁轉換開源項目，支持詞彙級別的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港、日本新字體）。
 
-## Discussion 討論
-
-Telegram: https://t.me/open_chinese_convert
+Discussion (Telegram): https://t.me/open_chinese_convert
 
 ### Features 特點
 
@@ -21,31 +18,20 @@ Telegram: https://t.me/open_chinese_convert
 * 嚴格審校一簡對多繁詞條，原則爲「能分則不合」。
 * 支持中國大陸、臺灣、香港異體字和地區習慣用詞轉換，如「裏」「裡」、「鼠標」「滑鼠」。
 * 詞庫和函數庫完全分離，可以自由修改、導入、擴展。
-* 支持 C、C++、Python、PHP、Java、Ruby、Node.js、Android。
-* 兼容 Windows、Linux、Mac 平臺。
-
-### Links 相關鏈接
-
-* Introduction 詳細介紹 https://github.com/BYVoid/OpenCC/wiki/%E7%B7%A3%E7%94%B1
-* OpenCC Online (在線轉換) https://opencc.byvoid.com/
-* 現代漢語常用簡繁一對多字義辨析表 http://ytenx.org/byohlyuk/KienxPyan
 
 ## Installation 安裝
 
+* [Source code](https://github.com/BYVoid/OpenCC/releases)
 * [Debian](http://packages.qa.debian.org/o/opencc.html)
 * [Ubuntu](https://launchpad.net/ubuntu/+source/opencc)
 * [Fedora](https://apps.fedoraproject.org/packages/opencc/)
 * [Arch Linux](https://www.archlinux.org/packages/community/x86_64/opencc/)
-* [Mac OS](https://github.com/Homebrew/homebrew-core/blob/master/Formula/opencc.rb)
-* [Node.js](https://npmjs.org/package/opencc)
-
-## Download 下載
-
-https://bintray.com/byvoid/opencc/OpenCC
+* [Mac OS (Homebrew)](https://github.com/Homebrew/homebrew-core/blob/master/Formula/opencc.rb)
+* [Node.js (npm)](https://npmjs.org/package/opencc)
 
 ## Usage 使用
 
-### Command Line 命令行
+### Command Line
 
 `opencc --help`
 
@@ -60,6 +46,19 @@ opencc.convertPromise("汉字").then(converted => {
 ```
 
 See [demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js).
+
+### C++
+
+http://byvoid.github.io/OpenCC/
+
+### Others (Unofficial)
+
+* Swift (iOS): [SwiftyOpenCC](https://github.com/XQS6LB3A/SwiftyOpenCC)
+* Java: [opencc4j](https://github.com/houbb/opencc4j)
+* Android: [android-opencc](https://github.com/qichuan/android-opencc)
+* PHP: [opencc4php](https://github.com/nauxliu/opencc4php)
+* Python (Reimplementation): [opencc-python](https://github.com/yichen0831/opencc-python)
+* Python (C++ binding): [opencc-python](https://github.com/lepture/opencc-python)
 
 ### Configurations 配置文件
 
@@ -76,10 +75,6 @@ See [demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js).
 * `t2tw.json` Traditional Chinese (OpenCC Standard) to Taiwan Standard 繁體（OpenCC 標準）到臺灣正體
 * `t2hk.json` Traditional Chinese (OpenCC Standard) to Hong Kong Standard 繁體（OpenCC 標準）到香港繁體（香港小學學習字詞表標準）
 * `t2jp.json` Traditional Chinese Characters (Kyūjitai) to New Japanese Kanji (Shinjitai) 繁體（OpenCC 標準，舊字體）到日文新字體
-
-## Development Documentation 開發文檔
-
-* http://byvoid.github.io/OpenCC/
 
 ## Build 編譯
 
@@ -113,16 +108,6 @@ cmake -H. -Bbuild -G"Visual Studio 12" -DCMAKE_INSTALL_PREFIX="path/to/install"
 cmake --build build --config Release --target install
 ```
 
-### iOS (Unofficial)
-
-See https://github.com/gelosie/OpenCC/tree/master/iOS
-
-Or [SwiftyOpenCC](https://github.com/XQS6LB3A/SwiftyOpenCC)
-
-### Android (Unofficial)
-
-See [android-opencc](https://github.com/qichuan/android-opencc)
-
 ## Projects using OpenCC 使用 OpenCC 的項目
 
 * [ibus-pinyin](https://github.com/ibus/ibus-pinyin)
@@ -130,7 +115,6 @@ See [android-opencc](https://github.com/qichuan/android-opencc)
 * [rimeime](https://rime.im/)
 * [libgooglepinyin](http://code.google.com/p/libgooglepinyin/)
 * [ibus-libpinyin](https://github.com/libpinyin/ibus-libpinyin)
-* [BYVBlog](https://github.com/byvoid/byvblog)
 * [alfred-chinese-converter](https://github.com/amowu/alfred-chinese-converter)
 * [GoldenDict](https://github.com/goldendict/goldendict)
 
@@ -149,6 +133,12 @@ All these libraries are statically linked.
 ## Change History 版本歷史
 
 https://github.com/BYVoid/OpenCC/blob/master/NEWS.md
+
+### Links 相關鏈接
+
+* Introduction 詳細介紹 https://github.com/BYVoid/OpenCC/wiki/%E7%B7%A3%E7%94%B1
+* OpenCC Online (在線轉換) https://opencc.byvoid.com/
+* 現代漢語常用簡繁一對多字義辨析表 http://ytenx.org/byohlyuk/KienxPyan
 
 ## Contributors 貢獻者
 

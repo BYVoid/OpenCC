@@ -1,0 +1,8 @@
+var searchData=
+[
+  ['match_33',['Match',['../classopencc_1_1_darts_dict.html#a0cc8224628cdbc0d0d1f65c42b86f093',1,'opencc::DartsDict::Match()'],['../classopencc_1_1_dict.html#ad3ab0df0d1fdf857c3440737aaae87a1',1,'opencc::Dict::Match(const char *word) const =0'],['../classopencc_1_1_dict.html#a9123a609f2ef5dffd80813a348556543',1,'opencc::Dict::Match(const string &amp;word) const'],['../classopencc_1_1_dict_group.html#a4c77a877ca6f862d2ba147090f43855b',1,'opencc::DictGroup::Match()'],['../classopencc_1_1_text_dict.html#a747e790b6113ee7fef4056c78b13508d',1,'opencc::TextDict::Match()']]],
+  ['matchallprefixes_34',['MatchAllPrefixes',['../classopencc_1_1_dict.html#ac5aac59a15993d0102a75fd8d1a4f3f3',1,'opencc::Dict::MatchAllPrefixes(const char *word) const'],['../classopencc_1_1_dict.html#acfe0aca4a9ef68e40fbbadb8a1c823ae',1,'opencc::Dict::MatchAllPrefixes(const string &amp;word) const'],['../classopencc_1_1_dict_group.html#a1258697531b842c24c52671418e904ac',1,'opencc::DictGroup::MatchAllPrefixes()']]],
+  ['matchprefix_35',['MatchPrefix',['../classopencc_1_1_darts_dict.html#acfd39402d385fbeeec941d63629e0929',1,'opencc::DartsDict::MatchPrefix()'],['../classopencc_1_1_dict.html#a4ff53f0a1218228953e8ecb42d111326',1,'opencc::Dict::MatchPrefix(const char *word) const'],['../classopencc_1_1_dict.html#a64fe5e90622d00261eb5a99269ea4522',1,'opencc::Dict::MatchPrefix(const string &amp;word) const'],['../classopencc_1_1_dict_group.html#a6143688a56a6f238e95441666555aa02',1,'opencc::DictGroup::MatchPrefix()']]],
+  ['maxmatchsegmentation_36',['MaxMatchSegmentation',['../classopencc_1_1_max_match_segmentation.html',1,'opencc']]],
+  ['multivaluedictentry_37',['MultiValueDictEntry',['../classopencc_1_1_multi_value_dict_entry.html',1,'opencc']]]
+];

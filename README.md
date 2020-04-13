@@ -133,7 +133,8 @@ Apache License 2.0
 
 ## Third Party Library 第三方庫
 
-* [darts-clone](https://code.google.com/p/darts-clone/) BSD License
+* [darts-clone](https://github.com/s-yata/darts-clone) BSD License
+* [marisa-trie](https://github.com/s-yata/marisa-trie) BSD License
 * [tclap](http://tclap.sourceforge.net/) MIT License
 * [rapidjson](https://github.com/miloyip/rapidjson) MIT License
 

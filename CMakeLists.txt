@@ -153,6 +153,7 @@ endif()
 
 ######## Subdirectories
 
+add_subdirectory(deps/marisa-0.2.5)
 add_subdirectory(src)
 add_subdirectory(doc)
 add_subdirectory(data)

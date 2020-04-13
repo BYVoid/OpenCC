@@ -48,7 +48,7 @@ TEST_F(DartsDictTest, Deserialization) {
   // Compare every entry
   EXPECT_EQ(lex1->Length(), lex2->Length());
   for (size_t i = 0; i < lex1->Length(); i++) {
-    EXPECT_EQ(string(lex1->At(i)->Key()), lex2->At(i)->Key());
+    EXPECT_EQ(lex1->At(i)->Key(), lex2->At(i)->Key());
     EXPECT_EQ(lex1->At(i)->NumValues(), lex2->At(i)->NumValues());
   }
 

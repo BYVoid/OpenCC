@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2020 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@ void BinaryDict::SerializeToFile(FILE* fp) const {
   string keyBuf, valueBuf;
   vector<size_t> keyOffsets, valueOffsets;
   size_t keyTotalLength = 0, valueTotalLength = 0;
-  ConstructBuffer(keyBuf, keyOffsets, keyTotalLength, valueBuf,
-                  valueOffsets, valueTotalLength);
+  ConstructBuffer(keyBuf, keyOffsets, keyTotalLength, valueBuf, valueOffsets,
+                  valueTotalLength);
   // Number of items
   size_t numItems = lexicon->Length();
   fwrite(&numItems, sizeof(size_t), 1, fp);
@@ -112,9 +112,9 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
     if (unitsRead != 1) {
       throw InvalidFormat("Invalid OpenCC binary dictionary (keyOffset)");
     }
-    const char* key = dict->keyBuffer.c_str() + keyOffset;
+    std::string key = dict->keyBuffer.c_str() + keyOffset;
     // Value offset
-    vector<const char*> values;
+    vector<std::string> values;
     for (size_t j = 0; j < numValues; j++) {
       size_t valueOffset;
       unitsRead = fread(&valueOffset, sizeof(size_t), 1, fp);
@@ -124,7 +124,7 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
       const char* value = dict->valueBuffer.c_str() + valueOffset;
       values.push_back(value);
     }
-    PtrDictEntry* entry = new PtrDictEntry(key, values);
+    DictEntry* entry = DictEntryFactory::New(key, values);
     dict->lexicon->Add(entry);
   }
 
@@ -142,12 +142,14 @@ void BinaryDict::ConstructBuffer(string& keyBuf, vector<size_t>& keyOffset,
     keyTotalLength += entry->KeyLength() + 1;
     assert(entry->NumValues() != 0);
     if (entry->NumValues() == 1) {
-      const auto* svEntry = static_cast<const SingleValueDictEntry*>(entry.get());
-      valueTotalLength += strlen(svEntry->Value()) + 1;
+      const auto* svEntry =
+          static_cast<const SingleValueDictEntry*>(entry.get());
+      valueTotalLength += svEntry->Value().length() + 1;
     } else {
-      const auto* mvEntry = static_cast<const MultiValueDictEntry*>(entry.get());
+      const auto* mvEntry =
+          static_cast<const MultiValueDictEntry*>(entry.get());
       for (const auto& value : mvEntry->Values()) {
-        valueTotalLength += strlen(value) + 1;
+        valueTotalLength += value.length() + 1;
       }
     }
   }
@@ -157,20 +159,22 @@ void BinaryDict::ConstructBuffer(string& keyBuf, vector<size_t>& keyOffset,
   char* pKeyBuffer = const_cast<char*>(keyBuf.c_str());
   char* pValueBuffer = const_cast<char*>(valueBuf.c_str());
   for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
-    strcpy(pKeyBuffer, entry->Key());
+    strcpy(pKeyBuffer, entry->Key().c_str());
     keyOffset.push_back(pKeyBuffer - keyBuf.c_str());
     pKeyBuffer += entry->KeyLength() + 1;
     if (entry->NumValues() == 1) {
-      const auto* svEntry = static_cast<const SingleValueDictEntry*>(entry.get());
-      strcpy(pValueBuffer, svEntry->Value());
+      const auto* svEntry =
+          static_cast<const SingleValueDictEntry*>(entry.get());
+      strcpy(pValueBuffer, svEntry->Value().c_str());
       valueOffset.push_back(pValueBuffer - valueBuf.c_str());
-      pValueBuffer += strlen(svEntry->Value()) + 1;
+      pValueBuffer += svEntry->Value().length() + 1;
     } else {
-      const auto* mvEntry = static_cast<const MultiValueDictEntry*>(entry.get());
+      const auto* mvEntry =
+          static_cast<const MultiValueDictEntry*>(entry.get());
       for (const auto& value : mvEntry->Values()) {
-        strcpy(pValueBuffer, value);
+        strcpy(pValueBuffer, value.c_str());
         valueOffset.push_back(pValueBuffer - valueBuf.c_str());
-        pValueBuffer += strlen(value) + 1;
+        pValueBuffer += value.length() + 1;
       }
     }
   }

@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 BYVoid <byvoid@byvoid.com>
+ * Copyright 2015-2020 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ TEST_F(BinaryDictTest, Deserialization) {
   // Compare every entry
   EXPECT_EQ(lex1->Length(), lex2->Length());
   for (size_t i = 0; i < lex1->Length(); i++) {
-    EXPECT_EQ(string(lex1->At(i)->Key()), lex2->At(i)->Key());
+    EXPECT_EQ(lex1->At(i)->Key(), lex2->At(i)->Key());
     EXPECT_EQ(lex1->At(i)->NumValues(), lex2->At(i)->NumValues());
   }
 

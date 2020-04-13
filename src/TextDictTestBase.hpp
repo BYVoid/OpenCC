@@ -19,8 +19,8 @@
 #pragma once
 
 #include "Lexicon.hpp"
-#include "TextDict.hpp"
 #include "TestUtils.hpp"
+#include "TextDict.hpp"
 
 namespace opencc {
 
@@ -81,7 +81,10 @@ protected:
   }
 
   void TestDict(const DictPtr dict) const {
-    Optional<const DictEntry*> entry = dict->MatchPrefix("BYVoid");
+    TestMatch(dict);
+
+    Optional<const DictEntry*> entry = Optional<const DictEntry*>::Null();
+    entry = dict->MatchPrefix("BYVoid");
     EXPECT_TRUE(!entry.IsNull());
     EXPECT_EQ(utf8("BYVoid"), entry.Get()->Key());
     EXPECT_EQ(utf8("byv"), entry.Get()->GetDefault());
@@ -108,6 +111,14 @@ protected:
     EXPECT_EQ(utf8("Tsinghua"), matches.at(1)->GetDefault());
     EXPECT_EQ(utf8("清"), matches.at(2)->Key());
     EXPECT_EQ(utf8("Tsing"), matches.at(2)->GetDefault());
+  }
+
+  void TestMatch(const DictPtr dict) const {
+    Optional<const DictEntry*> entry = Optional<const DictEntry*>::Null();
+    entry = dict->Match("BYVoid");
+    EXPECT_TRUE(!entry.IsNull());
+    EXPECT_EQ(utf8("BYVoid"), entry.Get()->Key());
+    EXPECT_EQ(utf8("byv"), entry.Get()->GetDefault());
   }
 
   const TextDictPtr textDict;

@@ -19,14 +19,14 @@
 #pragma once
 
 #include "Common.hpp"
-#include "UTF8Util.hpp"
 #include "Segments.hpp"
+#include "UTF8Util.hpp"
 
 namespace opencc {
 /**
-* Key-values pair entry
-* @ingroup opencc_cpp_api
-*/
+ * Key-values pair entry
+ * @ingroup opencc_cpp_api
+ */
 class OPENCC_EXPORT DictEntry {
 public:
   virtual ~DictEntry() {}
@@ -51,7 +51,8 @@ public:
     return strcmp(Key(), that.Key()) == 0;
   }
 
-  static bool PtrLessThan(const DictEntry* a, const DictEntry* b) {
+  static bool UPtrLessThan(const std::unique_ptr<DictEntry>& a,
+                           const std::unique_ptr<DictEntry>& b) {
     return *a < *b;
   }
 };
@@ -194,4 +195,4 @@ public:
     }
   }
 };
-}
+} // namespace opencc

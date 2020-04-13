@@ -23,34 +23,33 @@
 
 namespace opencc {
 /**
-* Storage of all entries
-* @ingroup opencc_cpp_api
-*/
+ * Storage of all entries
+ * @ingroup opencc_cpp_api
+ */
 class OPENCC_EXPORT Lexicon {
 public:
   Lexicon() {}
 
-  ~Lexicon() {
-    for (DictEntry* entry : entries) {
-      delete entry;
-    }
-  }
-
-  void Add(DictEntry* entry) { entries.push_back(entry); }
+  // Lexicon will take the ownership of the entry.
+  void Add(DictEntry* entry) { entries.emplace_back(entry); }
 
   void Sort() {
-    std::sort(entries.begin(), entries.end(), DictEntry::PtrLessThan);
+    std::sort(entries.begin(), entries.end(), DictEntry::UPtrLessThan);
   }
 
-  const DictEntry* At(size_t index) const { return entries.at(index); }
+  const DictEntry* At(size_t index) const { return entries.at(index).get(); }
 
   size_t Length() const { return entries.size(); }
 
-  vector<DictEntry*>::const_iterator begin() const { return entries.begin(); }
+  vector<std::unique_ptr<DictEntry>>::const_iterator begin() const {
+    return entries.begin();
+  }
 
-  vector<DictEntry*>::const_iterator end() const { return entries.end(); }
+  vector<std::unique_ptr<DictEntry>>::const_iterator end() const {
+    return entries.end();
+  }
 
 private:
-  vector<DictEntry*> entries;
+  vector<std::unique_ptr<DictEntry>> entries;
 };
-}
+} // namespace opencc

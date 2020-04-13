@@ -73,8 +73,8 @@ LexiconPtr DictGroup::GetLexicon() const {
   LexiconPtr allLexicon(new Lexicon);
   for (const auto& dict : dicts) {
     const auto& lexicon = dict->GetLexicon();
-    for (const auto& item : *lexicon) {
-      allLexicon->Add(DictEntryFactory::New(item));
+    for (const std::unique_ptr<DictEntry>& item : *lexicon) {
+      allLexicon->Add(DictEntryFactory::New(item.get()));
     }
   }
   allLexicon->Sort();

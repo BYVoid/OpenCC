@@ -23,7 +23,7 @@ using namespace opencc;
 
 size_t BinaryDict::KeyMaxLength() const {
   size_t maxLength = 0;
-  for (const DictEntry* entry : *lexicon) {
+  for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
     maxLength = (std::max)(maxLength, entry->KeyLength());
   }
   return maxLength;
@@ -46,7 +46,7 @@ void BinaryDict::SerializeToFile(FILE* fp) const {
   fwrite(valueBuf.c_str(), sizeof(char), valueTotalLength, fp);
 
   size_t keyCursor = 0, valueCursor = 0;
-  for (const DictEntry* entry : *lexicon) {
+  for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
     // Number of values
     size_t numValues = entry->NumValues();
     fwrite(&numValues, sizeof(size_t), 1, fp);
@@ -138,14 +138,14 @@ void BinaryDict::ConstructBuffer(string& keyBuf, vector<size_t>& keyOffset,
   keyTotalLength = 0;
   valueTotalLength = 0;
   // Calculate total length
-  for (const DictEntry* entry : *lexicon) {
+  for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
     keyTotalLength += entry->KeyLength() + 1;
     assert(entry->NumValues() != 0);
     if (entry->NumValues() == 1) {
-      const auto* svEntry = static_cast<const SingleValueDictEntry*>(entry);
+      const auto* svEntry = static_cast<const SingleValueDictEntry*>(entry.get());
       valueTotalLength += strlen(svEntry->Value()) + 1;
     } else {
-      const auto* mvEntry = static_cast<const MultiValueDictEntry*>(entry);
+      const auto* mvEntry = static_cast<const MultiValueDictEntry*>(entry.get());
       for (const auto& value : mvEntry->Values()) {
         valueTotalLength += strlen(value) + 1;
       }
@@ -156,17 +156,17 @@ void BinaryDict::ConstructBuffer(string& keyBuf, vector<size_t>& keyOffset,
   valueBuf.resize(valueTotalLength, '\0');
   char* pKeyBuffer = const_cast<char*>(keyBuf.c_str());
   char* pValueBuffer = const_cast<char*>(valueBuf.c_str());
-  for (const DictEntry* entry : *lexicon) {
+  for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
     strcpy(pKeyBuffer, entry->Key());
     keyOffset.push_back(pKeyBuffer - keyBuf.c_str());
     pKeyBuffer += entry->KeyLength() + 1;
     if (entry->NumValues() == 1) {
-      const auto* svEntry = static_cast<const SingleValueDictEntry*>(entry);
+      const auto* svEntry = static_cast<const SingleValueDictEntry*>(entry.get());
       strcpy(pValueBuffer, svEntry->Value());
       valueOffset.push_back(pValueBuffer - valueBuf.c_str());
       pValueBuffer += strlen(svEntry->Value()) + 1;
     } else {
-      const auto* mvEntry = static_cast<const MultiValueDictEntry*>(entry);
+      const auto* mvEntry = static_cast<const MultiValueDictEntry*>(entry.get());
       for (const auto& value : mvEntry->Values()) {
         strcpy(pValueBuffer, value);
         valueOffset.push_back(pValueBuffer - valueBuf.c_str());

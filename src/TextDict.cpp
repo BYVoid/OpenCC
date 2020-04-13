@@ -96,8 +96,7 @@ Optional<const DictEntry*> TextDict::Match(const char* word) const {
   std::unique_ptr<DictEntry> entry(new NoValueDictEntry(word));
   const auto& found = std::lower_bound(lexicon->begin(), lexicon->end(), entry,
                                        DictEntry::UPtrLessThan);
-  if ((found != lexicon->end()) &&
-      (strcmp((*found)->Key(), entry->Key()) == 0)) {
+  if ((found != lexicon->end()) && ((*found)->Key() == entry->Key())) {
     return Optional<const DictEntry*>(found->get());
   } else {
     return Optional<const DictEntry*>::Null();

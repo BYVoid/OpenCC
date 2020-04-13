@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2020 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-#include "BinaryDict.hpp"
 #include "DartsDict.hpp"
-#include "darts.h"
+#include "BinaryDict.hpp"
 #include "Lexicon.hpp"
+#include "darts.h"
 
 using namespace opencc;
 
@@ -127,17 +127,20 @@ DartsDictPtr DartsDict::NewFromDict(const Dict& thatDict) {
   DartsDictPtr dict(new DartsDict());
 
   Darts::DoubleArray* doubleArray = new Darts::DoubleArray();
-  vector<const char*> keys;
+  std::vector<std::string> keys;
+  std::vector<const char*> keys_cstr;
   size_t maxLength = 0;
   const LexiconPtr& lexicon = thatDict.GetLexicon();
   size_t lexiconCount = lexicon->Length();
   keys.resize(lexiconCount);
+  keys_cstr.resize(lexiconCount);
   for (size_t i = 0; i < lexiconCount; i++) {
     const DictEntry* entry = lexicon->At(i);
     keys[i] = entry->Key();
+    keys_cstr[i] = keys[i].c_str();
     maxLength = (std::max)(entry->KeyLength(), maxLength);
   }
-  doubleArray->build(lexicon->Length(), &keys[0]);
+  doubleArray->build(lexicon->Length(), &keys_cstr[0]);
   dict->lexicon = lexicon;
   dict->maxLength = maxLength;
   auto internal = dict->internal;

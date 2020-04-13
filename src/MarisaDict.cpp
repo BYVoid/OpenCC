@@ -108,7 +108,7 @@ MarisaDictPtr MarisaDict::NewFromDict(const Dict& thatDict) {
   std::unordered_map<std::string, std::unique_ptr<DictEntry>> key_value_map;
   for (size_t i = 0; i < thatLexicon->Length(); i++) {
     const DictEntry* entry = thatLexicon->At(i);
-    keyset.push_back(entry->Key());
+    keyset.push_back(entry->Key().c_str());
     key_value_map[entry->Key()].reset(DictEntryFactory::New(entry));
     maxLength = (std::max)(entry->KeyLength(), maxLength);
   }

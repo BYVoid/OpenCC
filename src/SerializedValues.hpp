@@ -45,7 +45,7 @@ private:
   string keyBuffer;
   string valueBuffer;
 
-  void ConstructBuffer(string* valueBuffer, vector<uint32_t>* valueOffset,
+  void ConstructBuffer(string* valueBuffer, vector<uint16_t>* valueBytes,
                        uint32_t* valueTotalLength) const;
 };
 } // namespace opencc

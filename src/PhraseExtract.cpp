@@ -1,7 +1,7 @@
 ﻿/*
  * Open Chinese Convert
  *
- * Copyright 2015 BYVoid <byvoid@byvoid.com>
+ * Copyright 2015-2020 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,7 @@
 #include <cmath>
 #include <unordered_map>
 
-// TODO drop the dependency to darts.h
-#include "darts.h"
+#include "marisa/trie.h"
 
 #include "PhraseExtract.hpp"
 
@@ -50,13 +49,14 @@ public:
   typedef std::pair<UTF8StringSlice8Bit, ValueType> ItemType;
 
   PhraseExtract::Signals& Get(const UTF8StringSlice8Bit& key) {
-    Darts::DoubleArray::result_pair_type result;
-    daTrie.exactMatchSearch(key.CString(), result, key.ByteLength());
-    if (result.value != -1) {
-      return items[result.value].second;
-    } else {
-      throw ShouldNotBeHere();
+    marisa::Agent agent;
+    agent.set_query(key.CString(), key.ByteLength());
+    if (marisa_trie.lookup(agent)) {
+      int item_id = marisa_id_item_map[agent.key().id()];
+      return items[item_id].second;
     }
+
+    throw ShouldNotBeHere();
   }
 
   PhraseExtract::Signals& AddKey(const UTF8StringSlice8Bit& key) {
@@ -65,14 +65,14 @@ public:
 
   void Clear() {
     ClearDict();
-    daTrie.clear();
+    marisa_trie.clear();
   }
 
   const vector<ItemType>& Items() const { return items; }
 
   void Build() {
     BuildKeys();
-    BuildDaTrie();
+    BuildTrie();
   }
 
 private:
@@ -89,26 +89,40 @@ private:
 
   void ClearDict() {
     std::unordered_map<UTF8StringSlice8Bit, PhraseExtract::Signals,
-                       UTF8StringSlice8Bit::Hasher>().swap(dict);
+                       UTF8StringSlice8Bit::Hasher>()
+        .swap(dict);
   }
 
-  void BuildDaTrie() {
-    const char** keyNames = new const char* [items.size()];
-    size_t* keyLengths = new size_t[items.size()];
+  void BuildTrie() {
+    std::unordered_map<std::string, int> key_item_id_map;
+    marisa::Keyset keyset;
     for (size_t i = 0; i < items.size(); i++) {
       const auto& key = items[i].first;
-      keyNames[i] = key.CString();
-      keyLengths[i] = key.ByteLength();
+      key_item_id_map[key.ToString()] = i;
+      keyset.push_back(key.CString(), key.ByteLength());
     }
-    daTrie.build(items.size(), keyNames, keyLengths);
-    delete[] keyNames;
-    delete[] keyLengths;
+    marisa_trie.build(keyset);
+    marisa::Agent agent;
+    agent.set_query("");
+    marisa_id_item_map.resize(items.size());
+    while (marisa_trie.predictive_search(agent)) {
+      size_t marisa_id = agent.key().id();
+      const std::string key(agent.key().ptr(), agent.key().length());
+      const auto it = key_item_id_map.find(key);
+      if (it == key_item_id_map.end()) {
+        throw ShouldNotBeHere();
+      }
+      int item_id = it->second;
+      marisa_id_item_map[marisa_id] = item_id;
+    }
   }
 
   std::unordered_map<UTF8StringSlice8Bit, PhraseExtract::Signals,
-                     UTF8StringSlice8Bit::Hasher> dict;
+                     UTF8StringSlice8Bit::Hasher>
+      dict;
   vector<ItemType> items;
-  Darts::DoubleArray daTrie;
+  marisa::Trie marisa_trie;
+  std::vector<int> marisa_id_item_map;
 };
 
 using namespace internal;
@@ -173,7 +187,8 @@ void PhraseExtract::ExtractSuffixes() {
         std::min(static_cast<LengthType>(wordMaxLength + suffixSetLength),
                  text.UTF8Length());
     const UTF8StringSlice& slice = text.Left(suffixLength);
-    suffixes.push_back(UTF8StringSlice8Bit(slice.CString(), 
+    suffixes.push_back(UTF8StringSlice8Bit(
+        slice.CString(),
         static_cast<UTF8StringSlice8Bit::LengthType>(slice.UTF8Length()),
         static_cast<UTF8StringSlice8Bit::LengthType>(slice.ByteLength())));
   }
@@ -192,17 +207,17 @@ void PhraseExtract::ExtractPrefixes() {
         std::min(static_cast<LengthType>(wordMaxLength + prefixSetLength),
                  text.UTF8Length());
     const UTF8StringSlice& slice = text.Right(prefixLength);
-    prefixes.push_back(UTF8StringSlice8Bit(slice.CString(),
+    prefixes.push_back(UTF8StringSlice8Bit(
+        slice.CString(),
         static_cast<UTF8StringSlice8Bit::LengthType>(slice.UTF8Length()),
         static_cast<UTF8StringSlice8Bit::LengthType>(slice.ByteLength())));
-
   }
   prefixes.shrink_to_fit();
   // Sort suffixes reversely
   std::sort(prefixes.begin(), prefixes.end(),
             [](const UTF8StringSlice8Bit& a, const UTF8StringSlice8Bit& b) {
-    return a.ReverseCompare(b) < 0;
-  });
+              return a.ReverseCompare(b) < 0;
+            });
   prefixesExtracted = true;
 }
 
@@ -211,7 +226,8 @@ void PhraseExtract::CalculateFrequency() {
     ExtractSuffixes();
   }
   for (const auto& suffix : suffixes) {
-    for (UTF8StringSlice8Bit::LengthType i = 1; i <= suffix.UTF8Length() && i <= wordMaxLength; i++) {
+    for (UTF8StringSlice8Bit::LengthType i = 1;
+         i <= suffix.UTF8Length() && i <= wordMaxLength; i++) {
       const UTF8StringSlice8Bit wordCandidate = suffix.Left(i);
       signals->AddKey(wordCandidate).frequency++;
       totalOccurrence++;
@@ -242,16 +258,16 @@ void PhraseExtract::ExtractWordCandidates() {
   // Sort by frequency
   std::sort(wordCandidates.begin(), wordCandidates.end(),
             [this](const UTF8StringSlice8Bit& a, const UTF8StringSlice8Bit& b) {
-    const size_t freqA = Frequency(a);
-    const size_t freqB = Frequency(b);
-    if (freqA > freqB) {
-      return true;
-    } else if (freqA < freqB) {
-      return false;
-    } else {
-      return a < b;
-    }
-  });
+              const size_t freqA = Frequency(a);
+              const size_t freqB = Frequency(b);
+              if (freqA > freqB) {
+                return true;
+              } else if (freqA < freqB) {
+                return false;
+              } else {
+                return a < b;
+              }
+            });
   wordCandidatesExtracted = true;
 }
 
@@ -268,7 +284,8 @@ void CalculatePrefixSuffixEntropy(
     const std::function<void(const PhraseExtract::UTF8StringSlice8Bit& word,
                              AdjacentSetType& adjacentSet)>& updateEntropy) {
   AdjacentSetType adjacentSet;
-  auto setLength8Bit = static_cast<PhraseExtract::UTF8StringSlice8Bit::LengthType>(setLength);
+  auto setLength8Bit =
+      static_cast<PhraseExtract::UTF8StringSlice8Bit::LengthType>(setLength);
   for (PhraseExtract::LengthType length = wordMinLength;
        length <= wordMaxLength; length++) {
     adjacentSet.clear();
@@ -277,7 +294,8 @@ void CalculatePrefixSuffixEntropy(
       if (presuffix.UTF8Length() < length) {
         continue;
       }
-      auto length8Bit = static_cast<PhraseExtract::UTF8StringSlice8Bit::LengthType>(length);
+      auto length8Bit =
+          static_cast<PhraseExtract::UTF8StringSlice8Bit::LengthType>(length);
       const auto& wordCandidate =
           SUFFIX ? presuffix.Left(length8Bit) : presuffix.Right(length8Bit);
       if (wordCandidate != lastWord) {
@@ -286,11 +304,13 @@ void CalculatePrefixSuffixEntropy(
       }
       if (length + setLength <= presuffix.UTF8Length()) {
         if (SUFFIX) {
-          const auto& wordSuffix = presuffix.SubString(length8Bit, setLength8Bit);
+          const auto& wordSuffix =
+              presuffix.SubString(length8Bit, setLength8Bit);
           adjacentSet[wordSuffix]++;
         } else {
           const auto& wordPrefix = presuffix.SubString(
-              presuffix.UTF8Length() - length8Bit - setLength8Bit, setLength8Bit);
+              presuffix.UTF8Length() - length8Bit - setLength8Bit,
+              setLength8Bit);
           adjacentSet[wordPrefix]++;
         }
       }
@@ -400,8 +420,8 @@ double PhraseExtract::CalculateCohesion(
     const UTF8StringSlice8Bit& wordCandidate) const {
   // TODO Try average value
   double minPMI = INFINITY;
-  for (UTF8StringSlice8Bit::LengthType leftLength = 1; leftLength <= wordCandidate.UTF8Length() - 1;
-       leftLength++) {
+  for (UTF8StringSlice8Bit::LengthType leftLength = 1;
+       leftLength <= wordCandidate.UTF8Length() - 1; leftLength++) {
     const auto& leftPart = wordCandidate.Left(leftLength);
     const auto& rightPart =
         wordCandidate.Right(wordCandidate.UTF8Length() - leftLength);
@@ -411,8 +431,9 @@ double PhraseExtract::CalculateCohesion(
   return minPMI;
 }
 
-double PhraseExtract::CalculateEntropy(const std::unordered_map<
-    UTF8StringSlice8Bit, size_t, UTF8StringSlice8Bit::Hasher>& choices) const {
+double PhraseExtract::CalculateEntropy(
+    const std::unordered_map<UTF8StringSlice8Bit, size_t,
+                             UTF8StringSlice8Bit::Hasher>& choices) const {
   double totalChoices = 0;
   for (const auto& item : choices) {
     totalChoices += item.second;

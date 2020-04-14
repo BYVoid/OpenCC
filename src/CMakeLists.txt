@@ -1,6 +1,4 @@
 include (GenerateExportHeader)
-
-include_directories(../deps/darts-clone)
 include_directories(../deps/marisa-0.2.5/include)
 include_directories(../deps/rapidjson-0.11)
 include_directories(../deps/tclap-1.2.1)
@@ -76,6 +74,7 @@ set(UNITTESTS
 )
 
 if (ENABLE_DARTS)
+  include_directories(../deps/darts-clone)
   set(
     LIBOPENCC_HEADERS
     ${LIBOPENCC_HEADERS}

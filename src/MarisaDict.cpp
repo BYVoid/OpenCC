@@ -19,20 +19,21 @@
 #include "marisa.h"
 #include <unordered_map>
 
-#include "BinaryDict.hpp"
 #include "Lexicon.hpp"
 #include "MarisaDict.hpp"
+#include "SerializedValues.hpp"
 
 using namespace opencc;
 
+namespace {
 static const char* OCD2_HEADER = "OPENCC_MARISA_0.2.5";
+}
 
 class MarisaDict::MarisaInternal {
 public:
-  BinaryDictPtr binary;
   std::unique_ptr<marisa::Trie> marisa;
 
-  MarisaInternal() : binary(nullptr), marisa(new marisa::Trie()) {}
+  MarisaInternal() : marisa(new marisa::Trie()) {}
 };
 
 MarisaDict::MarisaDict() : internal(new MarisaInternal()) {}
@@ -93,10 +94,26 @@ MarisaDictPtr MarisaDict::NewFromFile(FILE* fp) {
   // Read Marisa Trie
   MarisaDictPtr dict(new MarisaDict());
   marisa::fread(fp, dict->internal->marisa.get());
+  std::shared_ptr<SerializedValues> serialized_values =
+      SerializedValues::NewFromFile(fp);
+  LexiconPtr values_lexicon = serialized_values->GetLexicon();
+  // Extract lexicon from built Marisa Trie, in order to get the order of keys.
+  marisa::Agent agent;
+  agent.set_query("");
+  vector<std::unique_ptr<DictEntry>> entries;
+  entries.resize(values_lexicon->Length());
+  size_t maxLength = 0;
+  while (dict->internal->marisa->predictive_search(agent)) {
+    const std::string key(agent.key().ptr(), agent.key().length());
+    size_t id = agent.key().id();
+    maxLength = (std::max)(key.length(), maxLength);
+    std::unique_ptr<DictEntry> entry(
+        DictEntryFactory::New(key, values_lexicon->At(id)->Values()));
+    entries[id] = std::move(entry);
+  }
   // Read values
-  dict->internal->binary = BinaryDict::NewFromFile(fp);
-  dict->lexicon = dict->internal->binary->GetLexicon();
-  dict->maxLength = dict->internal->binary->KeyMaxLength();
+  dict->lexicon.reset(new Lexicon(std::move(entries)));
+  dict->maxLength = maxLength;
   return dict;
 }
 
@@ -134,6 +151,7 @@ MarisaDictPtr MarisaDict::NewFromDict(const Dict& thatDict) {
 void MarisaDict::SerializeToFile(FILE* fp) const {
   fwrite(OCD2_HEADER, sizeof(char), strlen(OCD2_HEADER), fp);
   marisa::fwrite(fp, *internal->marisa);
-  internal->binary.reset(new BinaryDict(lexicon));
-  internal->binary->SerializeToFile(fp);
+  std::unique_ptr<SerializedValues> serialized_values(
+      new SerializedValues(lexicon));
+  serialized_values->SerializeToFile(fp);
 }

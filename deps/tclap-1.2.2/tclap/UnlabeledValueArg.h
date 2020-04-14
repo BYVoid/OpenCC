@@ -5,7 +5,7 @@
  * 
  *  Copyright (c) 2003, Michael E. Smoot .
  *  Copyright (c) 2004, Michael E. Smoot, Daniel Aarno.
- *  All rights reverved.
+ *  All rights reserved.
  * 
  *  See the file COPYING in the top directory of this distribution for
  *  more information.
@@ -44,7 +44,7 @@ class UnlabeledValueArg : public ValueArg<T>
 {
 
 	// If compiler has two stage name lookup (as gcc >= 3.4 does)
-	// this is requried to prevent undef. symbols
+	// this is required to prevent undef. symbols
 	using ValueArg<T>::_ignoreable;
 	using ValueArg<T>::_hasBlanks;
 	using ValueArg<T>::_extractValue;
@@ -74,7 +74,7 @@ class UnlabeledValueArg : public ValueArg<T>
 		 * ignored if the '--' flag is set.  This defaults to false (cannot
 		 * be ignored) and should  generally stay that way unless you have 
 		 * some special need for certain arguments to be ignored.
-		 * \param v - Optional Vistor.  You should leave this blank unless
+		 * \param v - Optional Visitor.  You should leave this blank unless
 		 * you have a very good reason.
 		 */
 		UnlabeledValueArg( const std::string& name, 
@@ -104,7 +104,7 @@ class UnlabeledValueArg : public ValueArg<T>
 		 * ignored if the '--' flag is set.  This defaults to false (cannot
 		 * be ignored) and should  generally stay that way unless you have 
 		 * some special need for certain arguments to be ignored.
-		 * \param v - Optional Vistor.  You should leave this blank unless
+		 * \param v - Optional Visitor.  You should leave this blank unless
 		 * you have a very good reason.
 		 */
 		UnlabeledValueArg( const std::string& name, 
@@ -132,7 +132,7 @@ class UnlabeledValueArg : public ValueArg<T>
 		 * ignored if the '--' flag is set.  This defaults to false (cannot
 		 * be ignored) and should  generally stay that way unless you have 
 		 * some special need for certain arguments to be ignored.
-		 * \param v - Optional Vistor.  You should leave this blank unless
+		 * \param v - Optional Visitor.  You should leave this blank unless
 		 * you have a very good reason.
 		 */
 		UnlabeledValueArg( const std::string& name, 
@@ -161,7 +161,7 @@ class UnlabeledValueArg : public ValueArg<T>
 		 * ignored if the '--' flag is set.  This defaults to false (cannot
 		 * be ignored) and should  generally stay that way unless you have 
 		 * some special need for certain arguments to be ignored.
-		 * \param v - Optional Vistor.  You should leave this blank unless
+		 * \param v - Optional Visitor.  You should leave this blank unless
 		 * you have a very good reason.
 		 */
 		UnlabeledValueArg( const std::string& name, 
@@ -177,7 +177,7 @@ class UnlabeledValueArg : public ValueArg<T>
 		 * Handles the processing of the argument.
 		 * This re-implements the Arg version of this method to set the
 		 * _value of the argument appropriately.  Handling specific to
-		 * unlabled arguments.
+		 * unlabeled arguments.
 		 * \param i - Pointer the the current argument in the list.
 		 * \param args - Mutable list of strings. 
 		 */
@@ -207,7 +207,7 @@ class UnlabeledValueArg : public ValueArg<T>
 };
 
 /**
- * Constructor implemenation.
+ * Constructor implementation.
  */
 template<class T>
 UnlabeledValueArg<T>::UnlabeledValueArg(const std::string& name, 
@@ -242,7 +242,7 @@ UnlabeledValueArg<T>::UnlabeledValueArg(const std::string& name,
 }
 
 /**
- * Constructor implemenation.
+ * Constructor implementation.
  */
 template<class T>
 UnlabeledValueArg<T>::UnlabeledValueArg(const std::string& name, 

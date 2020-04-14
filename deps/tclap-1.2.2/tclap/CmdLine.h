@@ -6,7 +6,7 @@
  *
  *  Copyright (c) 2003, Michael E. Smoot .
  *  Copyright (c) 2004, Michael E. Smoot, Daniel Aarno.
- *  All rights reverved.
+ *  All rights reserved.
  *
  *  See the file COPYING in the top directory of this distribution for
  *  more information.
@@ -119,7 +119,7 @@ class CmdLine : public CmdLineInterface
 
 		/**
 		 * A list of Visitors to be explicitly deleted when the destructor
-		 * is called.  At the moment, these are the Vistors created for the
+		 * is called.  At the moment, these are the Visitors created for the
 		 * default Args.
 		 */
 		std::list<Visitor*> _visitorDeleteOnExitList;

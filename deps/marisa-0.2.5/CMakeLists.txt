@@ -14,6 +14,6 @@ set(
   lib/marisa/keyset.cc
 )
 
-add_library(libmarisa STATIC ${LIBMARISA_SOURCES})
-set_target_properties(libmarisa PROPERTIES POSITION_INDEPENDENT_CODE ON)
-source_group(libmarisa FILES ${LIBMARISA_SOURCES})
+add_library(marisa STATIC ${LIBMARISA_SOURCES})
+set_target_properties(marisa PROPERTIES POSITION_INDEPENDENT_CODE ON)
+source_group(marisa FILES ${LIBMARISA_SOURCES})

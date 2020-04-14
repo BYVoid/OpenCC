@@ -27,6 +27,7 @@ option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentati
 option(BUILD_SHARED_LIBS "Build opencc as shared library" ON)
 option(ENABLE_GTEST "Build all tests." OFF)
 option(ENABLE_DARTS "Build DartsDict (ocd format)." ON)
+option(BUILD_BUNDLED_LIBMARISA "" ON)
 
 ######## Package information
 set (PACKAGE_URL https://github.com/BYVoid/Opencc)
@@ -158,9 +159,23 @@ if (ENABLE_DARTS)
   )
 endif()
 
+
+######## Dependencies
+
+if(BUILD_BUNDLED_LIBMARISA)
+  message(STATUS "Use bundled marisa library.")
+  add_subdirectory(deps/marisa-0.2.5)
+else()
+  find_library(LIBMARISA NAMES marisa)
+  if (LIBMARISA)
+    message(STATUS "libmarisa found: ${LIBMARISA}")
+  else()
+    message(FATAL_ERROR "libmarisa not found.")
+  endif()
+endif()
+
 ######## Subdirectories
 
-add_subdirectory(deps/marisa-0.2.5)
 add_subdirectory(src)
 add_subdirectory(doc)
 add_subdirectory(data)

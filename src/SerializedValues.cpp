@@ -45,9 +45,9 @@ size_t SerializedValues::KeyMaxLength() const { return 0; }
 
 void SerializedValues::SerializeToFile(FILE* fp) const {
   string valueBuf;
-  vector<uint32_t> valueOffsets;
+  vector<uint16_t> valueBytes;
   uint32_t valueTotalLength = 0;
-  ConstructBuffer(&valueBuf, &valueOffsets, &valueTotalLength);
+  ConstructBuffer(&valueBuf, &valueBytes, &valueTotalLength);
   // Number of items
   uint32_t numItems = static_cast<uint32_t>(lexicon->Length());
   WriteInteger(fp, numItems);
@@ -63,8 +63,8 @@ void SerializedValues::SerializeToFile(FILE* fp) const {
     WriteInteger(fp, numValues);
     // Values offset
     for (uint16_t i = 0; i < numValues; i++) {
-      uint32_t valueOffset = valueOffsets[valueCursor++];
-      WriteInteger(fp, valueOffset);
+      uint16_t numValueBytes = valueBytes[valueCursor++];
+      WriteInteger(fp, numValueBytes);
     }
   }
 }
@@ -86,14 +86,16 @@ std::shared_ptr<SerializedValues> SerializedValues::NewFromFile(FILE* fp) {
   }
 
   // Offsets
+  const char* pValueBuffer = dict->valueBuffer.c_str();
   for (uint32_t i = 0; i < numItems; i++) {
     // Number of values
     uint16_t numValues = ReadInteger<uint16_t>(fp);
     // Value offset
     vector<std::string> values;
     for (uint16_t j = 0; j < numValues; j++) {
-      uint32_t valueOffset = ReadInteger<uint32_t>(fp);
-      const char* value = dict->valueBuffer.c_str() + valueOffset;
+      const char* value = pValueBuffer;
+      uint16_t numValueBytes = ReadInteger<uint16_t>(fp);
+      pValueBuffer += numValueBytes;
       values.push_back(value);
     }
     DictEntry* entry = DictEntryFactory::New("", values);
@@ -104,42 +106,24 @@ std::shared_ptr<SerializedValues> SerializedValues::NewFromFile(FILE* fp) {
 }
 
 void SerializedValues::ConstructBuffer(string* valueBuffer,
-                                       vector<uint32_t>* valueOffset,
+                                       vector<uint16_t>* valueBytes,
                                        uint32_t* valueTotalLength) const {
   *valueTotalLength = 0;
   // Calculate total length.
   for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
     assert(entry->NumValues() != 0);
-    if (entry->NumValues() == 1) {
-      const auto* svEntry =
-          static_cast<const SingleValueDictEntry*>(entry.get());
-      *valueTotalLength += svEntry->Value().length() + 1;
-    } else {
-      const auto* mvEntry =
-          static_cast<const MultiValueDictEntry*>(entry.get());
-      for (const auto& value : mvEntry->Values()) {
-        *valueTotalLength += value.length() + 1;
-      }
+    for (const auto& value : entry->Values()) {
+      *valueTotalLength += value.length() + 1;
     }
   }
   // Write values to the buffer.
   valueBuffer->resize(*valueTotalLength, '\0');
   char* pValueBuffer = const_cast<char*>(valueBuffer->c_str());
   for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
-    if (entry->NumValues() == 1) {
-      const auto* svEntry =
-          static_cast<const SingleValueDictEntry*>(entry.get());
-      strcpy(pValueBuffer, svEntry->Value().c_str());
-      valueOffset->push_back(pValueBuffer - valueBuffer->c_str());
-      pValueBuffer += svEntry->Value().length() + 1;
-    } else {
-      const auto* mvEntry =
-          static_cast<const MultiValueDictEntry*>(entry.get());
-      for (const auto& value : mvEntry->Values()) {
-        strcpy(pValueBuffer, value.c_str());
-        valueOffset->push_back(pValueBuffer - valueBuffer->c_str());
-        pValueBuffer += value.length() + 1;
-      }
+    for (const auto& value : entry->Values()) {
+      strcpy(pValueBuffer, value.c_str());
+      valueBytes->push_back(value.length() + 1);
+      pValueBuffer += value.length() + 1;
     }
   }
   assert(valueBuffer->c_str() + *valueTotalLength == pValueBuffer);

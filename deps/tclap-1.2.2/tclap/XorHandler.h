@@ -5,7 +5,7 @@
  * 
  *  Copyright (c) 2003, Michael E. Smoot .
  *  Copyright (c) 2004, Michael E. Smoot, Daniel Aarno.
- *  All rights reverved.
+ *  All rights reserved.
  * 
  *  See the file COPYING in the top directory of this distribution for
  *  more information.
@@ -52,7 +52,7 @@ class XorHandler
 		XorHandler( ) : _orList(std::vector< std::vector<Arg*> >()) {}
 
 		/**
-		 * Add a list of Arg*'s that will be orred together.
+		 * Add a list of Arg*'s that will be xor'd together.
 		 * \param ors - list of Arg* that will be xor'd.
 		 */
 		void add( std::vector<Arg*>& ors );

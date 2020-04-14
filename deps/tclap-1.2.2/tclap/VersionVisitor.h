@@ -5,7 +5,7 @@
  *  file:  VersionVisitor.h
  * 
  *  Copyright (c) 2003, Michael E. Smoot .
- *  All rights reverved.
+ *  All rights reserved.
  * 
  *  See the file COPYING in the top directory of this distribution for
  *  more information.
@@ -31,7 +31,7 @@
 namespace TCLAP {
 
 /**
- * A Vistor that will call the version method of the given CmdLineOutput
+ * A Visitor that will call the version method of the given CmdLineOutput
  * for the specified CmdLine object and then exit.
  */
 class VersionVisitor: public Visitor

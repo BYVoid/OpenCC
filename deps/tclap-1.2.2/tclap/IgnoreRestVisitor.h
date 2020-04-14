@@ -4,7 +4,7 @@
  *  file:  IgnoreRestVisitor.h
  * 
  *  Copyright (c) 2003, Michael E. Smoot .
- *  All rights reverved.
+ *  All rights reserved.
  * 
  *  See the file COPYING in the top directory of this distribution for
  *  more information.
@@ -29,7 +29,7 @@
 namespace TCLAP {
 
 /**
- * A Vistor that tells the CmdLine to begin ignoring arguments after
+ * A Visitor that tells the CmdLine to begin ignoring arguments after
  * this one is parsed.
  */
 class IgnoreRestVisitor: public Visitor

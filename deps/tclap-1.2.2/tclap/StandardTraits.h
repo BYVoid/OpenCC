@@ -5,7 +5,7 @@
  *  file:  StandardTraits.h
  *
  *  Copyright (c) 2007, Daniel Aarno, Michael E. Smoot .
- *  All rights reverved.
+ *  All rights reserved.
  *
  *  See the file COPYING in the top directory of this distribution for
  *  more information.

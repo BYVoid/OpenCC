@@ -5,7 +5,7 @@
  *  file:  ArgTraits.h
  *
  *  Copyright (c) 2007, Daniel Aarno, Michael E. Smoot .
- *  All rights reverved.
+ *  All rights reserved.
  *
  *  See the file COPYING in the top directory of this distribution for
  *  more information.
@@ -42,7 +42,7 @@ struct ValueLike {
 
 /**
  * A string like argument value type is a value that can be set using
- * operator=(string). Usefull if the value type contains spaces which
+ * operator=(string). Useful if the value type contains spaces which
  * will be broken up into individual tokens by operator>>.
  */
 struct StringLike {
@@ -82,6 +82,7 @@ struct ArgTraits {
     //typedef ValueLike ValueCategory;
 };
 
+} // namespace
+
 #endif
 
-} // namespace

@@ -24,7 +24,7 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 ## Installation 安裝
 
 * [Source code](https://github.com/BYVoid/OpenCC/releases)
-* [Debian](http://packages.qa.debian.org/o/opencc.html)
+* [Debian](https://tracker.debian.org/pkg/opencc)
 * [Ubuntu](https://launchpad.net/ubuntu/+source/opencc)
 * [Fedora](https://apps.fedoraproject.org/packages/opencc/)
 * [Arch Linux](https://www.archlinux.org/packages/community/x86_64/opencc/)

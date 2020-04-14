@@ -21,32 +21,50 @@
 
 using namespace opencc;
 
-size_t SerializedValues::KeyMaxLength() const {
-  return 0;
+namespace {
+
+template <typename INT_TYPE> INT_TYPE ReadInteger(FILE* fp) {
+  INT_TYPE num;
+  size_t unitsRead = fread(&num, sizeof(INT_TYPE), 1, fp);
+  if (unitsRead != 1) {
+    throw InvalidFormat("Invalid OpenCC binary dictionary.");
+  }
+  return num;
 }
+
+template <typename INT_TYPE> void WriteInteger(FILE* fp, INT_TYPE num) {
+  size_t unitsWritten = fwrite(&num, sizeof(INT_TYPE), 1, fp);
+  if (unitsWritten != 1) {
+    throw InvalidFormat("Cannot write binary dictionary.");
+  }
+}
+
+} // namespace
+
+size_t SerializedValues::KeyMaxLength() const { return 0; }
 
 void SerializedValues::SerializeToFile(FILE* fp) const {
   string valueBuf;
-  vector<size_t> valueOffsets;
-  size_t valueTotalLength = 0;
-  ConstructBuffer(valueBuf, valueOffsets, valueTotalLength);
+  vector<uint32_t> valueOffsets;
+  uint32_t valueTotalLength = 0;
+  ConstructBuffer(&valueBuf, &valueOffsets, &valueTotalLength);
   // Number of items
-  size_t numItems = lexicon->Length();
-  fwrite(&numItems, sizeof(size_t), 1, fp);
+  uint32_t numItems = static_cast<uint32_t>(lexicon->Length());
+  WriteInteger(fp, numItems);
 
   // Data
-  fwrite(&valueTotalLength, sizeof(size_t), 1, fp);
+  WriteInteger(fp, valueTotalLength);
   fwrite(valueBuf.c_str(), sizeof(char), valueTotalLength, fp);
 
   size_t valueCursor = 0;
   for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
     // Number of values
-    size_t numValues = entry->NumValues();
-    fwrite(&numValues, sizeof(size_t), 1, fp);
+    uint16_t numValues = static_cast<uint16_t>(entry->NumValues());
+    WriteInteger(fp, numValues);
     // Values offset
-    for (size_t i = 0; i < numValues; i++) {
-      size_t valueOffset = valueOffsets[valueCursor++];
-      fwrite(&valueOffset, sizeof(size_t), 1, fp);
+    for (uint16_t i = 0; i < numValues; i++) {
+      uint32_t valueOffset = valueOffsets[valueCursor++];
+      WriteInteger(fp, valueOffset);
     }
   }
 }
@@ -56,41 +74,25 @@ std::shared_ptr<SerializedValues> SerializedValues::NewFromFile(FILE* fp) {
       new SerializedValues(LexiconPtr(new Lexicon)));
 
   // Number of items
-  size_t numItems;
-  size_t unitsRead = fread(&numItems, sizeof(size_t), 1, fp);
-  if (unitsRead != 1) {
-    throw InvalidFormat("Invalid OpenCC binary dictionary (numItems)");
-  }
+  uint32_t numItems = ReadInteger<uint32_t>(fp);
 
   // Values
-  size_t valueTotalLength;
-  unitsRead = fread(&valueTotalLength, sizeof(size_t), 1, fp);
-  if (unitsRead != 1) {
-    throw InvalidFormat("Invalid OpenCC binary dictionary (valueTotalLength)");
-  }
+  uint32_t valueTotalLength = ReadInteger<uint32_t>(fp);
   dict->valueBuffer.resize(valueTotalLength);
-  unitsRead = fread(const_cast<char*>(dict->valueBuffer.c_str()), sizeof(char),
-                    valueTotalLength, fp);
+  size_t unitsRead = fread(const_cast<char*>(dict->valueBuffer.c_str()),
+                           sizeof(char), valueTotalLength, fp);
   if (unitsRead != valueTotalLength) {
     throw InvalidFormat("Invalid OpenCC binary dictionary (valueBuffer)");
   }
 
   // Offsets
-  for (size_t i = 0; i < numItems; i++) {
+  for (uint32_t i = 0; i < numItems; i++) {
     // Number of values
-    size_t numValues;
-    unitsRead = fread(&numValues, sizeof(size_t), 1, fp);
-    if (unitsRead != 1) {
-      throw InvalidFormat("Invalid OpenCC binary dictionary (numValues)");
-    }
+    uint16_t numValues = ReadInteger<uint16_t>(fp);
     // Value offset
     vector<std::string> values;
-    for (size_t j = 0; j < numValues; j++) {
-      size_t valueOffset;
-      unitsRead = fread(&valueOffset, sizeof(size_t), 1, fp);
-      if (unitsRead != 1) {
-        throw InvalidFormat("Invalid OpenCC binary dictionary (valueOffset)");
-      }
+    for (uint16_t j = 0; j < numValues; j++) {
+      uint32_t valueOffset = ReadInteger<uint32_t>(fp);
       const char* value = dict->valueBuffer.c_str() + valueOffset;
       values.push_back(value);
     }
@@ -101,44 +103,44 @@ std::shared_ptr<SerializedValues> SerializedValues::NewFromFile(FILE* fp) {
   return dict;
 }
 
-void SerializedValues::ConstructBuffer(string& valueBuf,
-                                       vector<size_t>& valueOffset,
-                                       size_t& valueTotalLength) const {
-  valueTotalLength = 0;
+void SerializedValues::ConstructBuffer(string* valueBuffer,
+                                       vector<uint32_t>* valueOffset,
+                                       uint32_t* valueTotalLength) const {
+  *valueTotalLength = 0;
   // Calculate total length.
   for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
     assert(entry->NumValues() != 0);
     if (entry->NumValues() == 1) {
       const auto* svEntry =
           static_cast<const SingleValueDictEntry*>(entry.get());
-      valueTotalLength += svEntry->Value().length() + 1;
+      *valueTotalLength += svEntry->Value().length() + 1;
     } else {
       const auto* mvEntry =
           static_cast<const MultiValueDictEntry*>(entry.get());
       for (const auto& value : mvEntry->Values()) {
-        valueTotalLength += value.length() + 1;
+        *valueTotalLength += value.length() + 1;
       }
     }
   }
   // Write values to the buffer.
-  valueBuf.resize(valueTotalLength, '\0');
-  char* pValueBuffer = const_cast<char*>(valueBuf.c_str());
+  valueBuffer->resize(*valueTotalLength, '\0');
+  char* pValueBuffer = const_cast<char*>(valueBuffer->c_str());
   for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
     if (entry->NumValues() == 1) {
       const auto* svEntry =
           static_cast<const SingleValueDictEntry*>(entry.get());
       strcpy(pValueBuffer, svEntry->Value().c_str());
-      valueOffset.push_back(pValueBuffer - valueBuf.c_str());
+      valueOffset->push_back(pValueBuffer - valueBuffer->c_str());
       pValueBuffer += svEntry->Value().length() + 1;
     } else {
       const auto* mvEntry =
           static_cast<const MultiValueDictEntry*>(entry.get());
       for (const auto& value : mvEntry->Values()) {
         strcpy(pValueBuffer, value.c_str());
-        valueOffset.push_back(pValueBuffer - valueBuf.c_str());
+        valueOffset->push_back(pValueBuffer - valueBuffer->c_str());
         pValueBuffer += value.length() + 1;
       }
     }
   }
-  assert(valueBuf.c_str() + valueTotalLength == pValueBuffer);
+  assert(valueBuffer->c_str() + *valueTotalLength == pValueBuffer);
 }

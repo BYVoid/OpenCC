@@ -31,6 +31,8 @@ public:
   Lexicon() {}
   Lexicon(vector<std::unique_ptr<DictEntry>> entries_)
       : entries(std::move(entries_)) {}
+  Lexicon(const Lexicon&) = delete;
+  Lexicon& operator=(const Lexicon&) = delete;
 
   // Lexicon will take the ownership of the entry.
   void Add(DictEntry* entry) { entries.emplace_back(entry); }

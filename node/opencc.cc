@@ -19,6 +19,7 @@
 #include "MarisaDict.cpp"
 #include "MaxMatchSegmentation.cpp"
 #include "Segmentation.cpp"
+#include "SerializedValues.cpp"
 #include "TextDict.cpp"
 #include "UTF8Util.cpp"
 

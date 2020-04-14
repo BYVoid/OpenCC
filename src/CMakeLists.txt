@@ -30,6 +30,7 @@ set(
   Segmentation.hpp
   Segments.hpp
   SerializableDict.hpp
+  SerializedValues.hpp
   SimpleConverter.hpp
   TextDict.hpp
   UTF8StringSlice.hpp
@@ -52,6 +53,7 @@ set(
   MarisaDict.cpp
   MaxMatchSegmentation.cpp
   PhraseExtract.cpp
+  SerializedValues.cpp
   SimpleConverter.cpp
   Segmentation.cpp
   TextDict.cpp
@@ -114,6 +116,7 @@ if (ENABLE_GTEST)
     MarisaDictTest
     MaxMatchSegmentationTest
     PhraseExtractTest
+    SerializedValuesTest
     SimpleConverterTest
     TextDictTest
     UTF8StringSliceTest

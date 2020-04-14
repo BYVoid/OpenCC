@@ -60,6 +60,7 @@ set(
 )
 
 add_library(libopencc ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
+set_target_properties(libopencc PROPERTIES POSITION_INDEPENDENT_CODE ON)
 source_group(libopencc FILES ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
 target_link_libraries(libopencc libmarisa)
 

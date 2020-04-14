@@ -15,4 +15,5 @@ set(
 )
 
 add_library(libmarisa STATIC ${LIBMARISA_SOURCES})
-source_group(libmarisa ${LIBMARISA_SOURCES})
+set_target_properties(libmarisa PROPERTIES POSITION_INDEPENDENT_CODE ON)
+source_group(libmarisa FILES ${LIBMARISA_SOURCES})

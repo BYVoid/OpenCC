@@ -1,6 +1,6 @@
 include (GenerateExportHeader)
 include_directories(../deps/marisa-0.2.5/include)
-include_directories(../deps/rapidjson-0.11)
+include_directories(../deps/rapidjson-1.1.0)
 include_directories(../deps/tclap-1.2.1)
 
 # Library

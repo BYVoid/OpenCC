@@ -26,6 +26,7 @@ include (CTest)
 option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
 option(BUILD_SHARED_LIBS "Build opencc as shared library" ON)
 option(ENABLE_GTEST "Build all tests." OFF)
+option(ENABLE_DARTS "Build DartsDict (ocd format)." ON)
 
 ######## Package information
 set (PACKAGE_URL https://github.com/BYVoid/Opencc)
@@ -148,6 +149,12 @@ if (ENABLE_GTEST)
   add_definitions(
     -DPROJECT_BINARY_DIR="${PROJECT_BINARY_DIR}"
     -DCMAKE_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+  )
+endif()
+
+if (ENABLE_DARTS)
+  add_definitions(
+    -DENABLE_DARTS
   )
 endif()
 

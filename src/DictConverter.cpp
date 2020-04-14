@@ -17,9 +17,12 @@
  */
 
 #include "DictConverter.hpp"
-#include "DartsDict.hpp"
 #include "MarisaDict.hpp"
 #include "TextDict.hpp"
+
+#ifdef ENABLE_DARTS
+#include "DartsDict.hpp"
+#endif
 
 using namespace opencc;
 
@@ -27,13 +30,14 @@ DictPtr LoadDictionary(const string& format, const string& inputFileName) {
   if (format == "text") {
     return SerializableDict::NewFromFile<TextDict>(inputFileName);
   } else if (format == "ocd") {
+#ifdef ENABLE_DARTS
     return SerializableDict::NewFromFile<DartsDict>(inputFileName);
+#endif
   } else if (format == "ocd2") {
     return SerializableDict::NewFromFile<MarisaDict>(inputFileName);
-  } else {
-    fprintf(stderr, "Unknown dictionary format: %s\n", format.c_str());
-    exit(2);
   }
+  fprintf(stderr, "Unknown dictionary format: %s\n", format.c_str());
+  exit(2);
   return nullptr;
 }
 
@@ -41,13 +45,14 @@ SerializableDictPtr ConvertDict(const string& format, const DictPtr dict) {
   if (format == "text") {
     return TextDict::NewFromDict(*dict.get());
   } else if (format == "ocd") {
+#ifdef ENABLE_DARTS
     return DartsDict::NewFromDict(*dict.get());
+#endif
   } else if (format == "ocd2") {
     return MarisaDict::NewFromDict(*dict.get());
-  } else {
-    fprintf(stderr, "Unknown dictionary format: %s\n", format.c_str());
-    exit(2);
   }
+  fprintf(stderr, "Unknown dictionary format: %s\n", format.c_str());
+  exit(2);
   return nullptr;
 }
 

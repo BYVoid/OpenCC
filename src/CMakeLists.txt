@@ -15,7 +15,6 @@ set(
   Conversion.hpp
   ConversionChain.hpp
   Converter.hpp
-  DartsDict.hpp
   Dict.hpp
   DictConverter.hpp
   DictEntry.hpp
@@ -45,7 +44,6 @@ set(
   Conversion.cpp
   ConversionChain.cpp
   Converter.cpp
-  DartsDict.cpp
   Dict.cpp
   DictConverter.cpp
   DictEntry.cpp
@@ -60,6 +58,40 @@ set(
   UTF8StringSlice.cpp
   UTF8Util.cpp
 )
+
+set(UNITTESTS
+  BinaryDictTest
+  ConfigTest
+  ConversionChainTest
+  ConversionTest
+  DictGroupTest
+  MarisaDictTest
+  MaxMatchSegmentationTest
+  PhraseExtractTest
+  SerializedValuesTest
+  SimpleConverterTest
+  TextDictTest
+  UTF8StringSliceTest
+  UTF8UtilTest
+)
+
+if (ENABLE_DARTS)
+  set(
+    LIBOPENCC_HEADERS
+    ${LIBOPENCC_HEADERS}
+    DartsDict.hpp
+  )
+  set(
+    LIBOPENCC_SOURCES
+    ${LIBOPENCC_SOURCES}
+    DartsDict.cpp
+  )
+  set(
+    UNITTESTS
+    ${UNITTESTS}
+    DartsDictTest
+  )
+endif()
 
 add_library(libopencc ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
 set_target_properties(libopencc PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -106,22 +138,6 @@ install(
 if (ENABLE_GTEST)
   include_directories(../deps/gtest-1.7.0/include)
 
-  set(UNITTESTS
-    BinaryDictTest
-    ConfigTest
-    ConversionChainTest
-    ConversionTest
-    DartsDictTest
-    DictGroupTest
-    MarisaDictTest
-    MaxMatchSegmentationTest
-    PhraseExtractTest
-    SerializedValuesTest
-    SimpleConverterTest
-    TextDictTest
-    UTF8StringSliceTest
-    UTF8UtilTest
-  )
   foreach(TESTCASE ${UNITTESTS})
     add_executable(${TESTCASE} ${TESTCASE}.cpp)
     target_link_libraries(${TESTCASE} gtest gtest_main libopencc)

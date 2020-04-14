@@ -55,7 +55,6 @@ class Config;
 class Conversion;
 class ConversionChain;
 class Converter;
-class DartsDict;
 class Dict;
 class DictEntry;
 class DictGroup;
@@ -72,7 +71,6 @@ typedef std::shared_ptr<BinaryDict> BinaryDictPtr;
 typedef std::shared_ptr<Conversion> ConversionPtr;
 typedef std::shared_ptr<ConversionChain> ConversionChainPtr;
 typedef std::shared_ptr<Converter> ConverterPtr;
-typedef std::shared_ptr<DartsDict> DartsDictPtr;
 typedef std::shared_ptr<Dict> DictPtr;
 typedef std::shared_ptr<DictGroup> DictGroupPtr;
 typedef std::shared_ptr<Lexicon> LexiconPtr;
@@ -81,6 +79,12 @@ typedef std::shared_ptr<Segmentation> SegmentationPtr;
 typedef std::shared_ptr<Segments> SegmentsPtr;
 typedef std::shared_ptr<SerializableDict> SerializableDictPtr;
 typedef std::shared_ptr<TextDict> TextDictPtr;
+
+#ifdef ENABLE_DARTS
+class DartsDict;
+typedef std::shared_ptr<DartsDict> DartsDictPtr;
+#endif
+
 } // namespace opencc
 
 #ifndef PKGDATADIR
@@ -92,3 +96,6 @@ const string PACKAGE_DATA_DIRECTORY = PKGDATADIR "/";
 #ifndef VERSION
 #define VERSION "1.0.*"
 #endif // ifndef VERSION
+
+// The following definitions are provided by CMake
+// #define ENABLE_DARTS

@@ -42,8 +42,6 @@ public:
 
 private:
   LexiconPtr lexicon;
-  string keyBuffer;
-  string valueBuffer;
 
   void ConstructBuffer(string* valueBuffer, vector<uint16_t>* valueBytes,
                        uint32_t* valueTotalLength) const;

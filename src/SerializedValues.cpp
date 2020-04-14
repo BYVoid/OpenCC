@@ -78,15 +78,16 @@ std::shared_ptr<SerializedValues> SerializedValues::NewFromFile(FILE* fp) {
 
   // Values
   uint32_t valueTotalLength = ReadInteger<uint32_t>(fp);
-  dict->valueBuffer.resize(valueTotalLength);
-  size_t unitsRead = fread(const_cast<char*>(dict->valueBuffer.c_str()),
-                           sizeof(char), valueTotalLength, fp);
+  string valueBuffer;
+  valueBuffer.resize(valueTotalLength);
+  size_t unitsRead = fread(const_cast<char*>(valueBuffer.c_str()), sizeof(char),
+                           valueTotalLength, fp);
   if (unitsRead != valueTotalLength) {
     throw InvalidFormat("Invalid OpenCC binary dictionary (valueBuffer)");
   }
 
   // Offsets
-  const char* pValueBuffer = dict->valueBuffer.c_str();
+  const char* pValueBuffer = valueBuffer.c_str();
   for (uint32_t i = 0; i < numItems; i++) {
     // Number of values
     uint16_t numValues = ReadInteger<uint16_t>(fp);
@@ -122,7 +123,7 @@ void SerializedValues::ConstructBuffer(string* valueBuffer,
   for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
     for (const auto& value : entry->Values()) {
       strcpy(pValueBuffer, value.c_str());
-      valueBytes->push_back(value.length() + 1);
+      valueBytes->push_back(static_cast<uint16_t>(value.length() + 1));
       pValueBuffer += value.length() + 1;
     }
   }

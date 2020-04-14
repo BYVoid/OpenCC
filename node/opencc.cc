@@ -6,7 +6,6 @@
 #include "DictConverter.hpp"
 
 // For faster build
-#include "BinaryDict.cpp"
 #include "Config.cpp"
 #include "Conversion.cpp"
 #include "ConversionChain.cpp"

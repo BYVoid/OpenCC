@@ -7,7 +7,6 @@ include_directories(../deps/tclap-1.2.1)
 
 set(
   LIBOPENCC_HEADERS
-  BinaryDict.hpp
   Common.hpp
   Config.hpp
   Conversion.hpp
@@ -37,7 +36,6 @@ set(
 
 set(
   LIBOPENCC_SOURCES
-  BinaryDict.cpp
   Config.cpp
   Conversion.cpp
   ConversionChain.cpp
@@ -58,7 +56,6 @@ set(
 )
 
 set(UNITTESTS
-  BinaryDictTest
   ConfigTest
   ConversionChainTest
   ConversionTest
@@ -78,16 +75,19 @@ if (ENABLE_DARTS)
   set(
     LIBOPENCC_HEADERS
     ${LIBOPENCC_HEADERS}
+    BinaryDict.hpp
     DartsDict.hpp
   )
   set(
     LIBOPENCC_SOURCES
     ${LIBOPENCC_SOURCES}
+    BinaryDict.cpp
     DartsDict.cpp
   )
   set(
     UNITTESTS
     ${UNITTESTS}
+    BinaryDictTest
     DartsDictTest
   )
 endif()

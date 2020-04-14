@@ -169,6 +169,6 @@ add_subdirectory(test)
 ######## Testing
 
 if (ENABLE_GTEST)
-  add_subdirectory(deps/gtest-1.7.0)
+  add_subdirectory(deps/gtest-1.11.0)
   enable_testing()
 endif()

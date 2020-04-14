@@ -137,6 +137,7 @@ Apache License 2.0
 * [marisa-trie](https://github.com/s-yata/marisa-trie) BSD License
 * [tclap](http://tclap.sourceforge.net/) MIT License
 * [rapidjson](https://github.com/Tencent/rapidjson) MIT License
+* [Google Test](https://github.com/google/googletest) BSD License
 
 All these libraries are statically linked.
 

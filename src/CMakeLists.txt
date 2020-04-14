@@ -135,8 +135,6 @@ install(
 # Gtest
 
 if (ENABLE_GTEST)
-  include_directories(../deps/gtest-1.7.0/include)
-
   foreach(TESTCASE ${UNITTESTS})
     add_executable(${TESTCASE} ${TESTCASE}.cpp)
     target_link_libraries(${TESTCASE} gtest gtest_main libopencc)

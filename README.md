@@ -41,7 +41,9 @@ https://opencc.byvoid.com/
 
 ### Command Line
 
-`opencc --help`
+* `opencc --help`
+* `opencc_dict --help`
+* `opencc_phrase_extract --help`
 
 ### Node.js
 
@@ -57,7 +59,7 @@ See [demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js).
 
 ### C++ Document 文檔
 
-http://byvoid.github.io/OpenCC/
+https://byvoid.github.io/OpenCC/
 
 ### Others (Unofficial)
 

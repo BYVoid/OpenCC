@@ -67,6 +67,7 @@ http://byvoid.github.io/OpenCC/
 * PHP: [opencc4php](https://github.com/nauxliu/opencc4php)
 * Python (Reimplementation): [opencc-python](https://github.com/yichen0831/opencc-python)
 * Python (C++ binding): [opencc-python](https://github.com/lepture/opencc-python)
+* WebAssembly: [wasm-opencc](https://github.com/oyyd/wasm-opencc)
 
 ### Configurations 配置文件
 

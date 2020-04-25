@@ -115,7 +115,7 @@ add_definitions(
   -DPACKAGE_NAME="${PACKAGE_NAME}"
 )
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   add_definitions(
     -std=c++11
     -Wall

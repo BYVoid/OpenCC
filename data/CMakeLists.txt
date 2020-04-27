@@ -15,7 +15,6 @@ set(
   TWVariants
   TWVariantsRevPhrases
   HKVariants
-  HKVariantsPhrases
   HKVariantsRevPhrases
   JPVariants
   JPShinjitaiCharacters

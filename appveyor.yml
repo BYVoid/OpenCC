@@ -14,7 +14,7 @@ build_script:
   - cmake --build build --config Release --target install
 
 after_build:
-  - 7z a OpenCC build/bin build/include build/lib build/share
+  - 7z a OpenCC.zip build/bin build/include build/lib build/share
 
 artifacts:
   - path: OpenCC.zip

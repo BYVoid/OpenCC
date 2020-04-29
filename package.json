@@ -21,11 +21,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/BYVoid/OpenCC.git"
+    "url": "git+https://github.com/BYVoid/OpenCC.git"
   },
   "bugs": {
-    "url": "https://github.com/BYVoid/Opencc/issues"
+    "url": "https://github.com/BYVoid/OpenCC/issues"
   },
+  "homepage": "https://github.com/BYVoid/OpenCC#readme",
   "keywords": [
     "opencc",
     "Chinese",

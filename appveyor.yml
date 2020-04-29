@@ -4,38 +4,43 @@ skip_tags: true
 build: off
 
 os:
-- Visual Studio 2019
-- Visual Studio 2017
+  - Visual Studio 2019
+  - Visual Studio 2017
 
 environment:
   matrix:
-  - nodejs_version: stable
-  - nodejs_version: 13
-  - nodejs_version: 10
-  - nodejs_version: 8
-  - nodejs_version: none
+    - nodejs_version: stable
+    - nodejs_version: 13
+    - nodejs_version: 10
+    - nodejs_version: 8
+    - nodejs_version: none
 
 platform:
-- x64
-- x86
+  - x64
+  - x86
 
 for:
 - matrix:
     except:
-    - nodejs_version: none
+      - nodejs_version: none
   install:
-  - ps: Install-Product node $env:nodejs_version $env:platform
-  - npm -g i npm@latest
+    - ps: Install-Product node $env:nodejs_version $env:platform
+    - npm -g i npm@latest
   build_script:
-  - appveyor-retry call npm install --build-from-source
+    - appveyor-retry call npm install --build-from-source
+  test_script:
+    - npm test
+  deploy_script:
+    - npm run deploy
+
 - matrix:
     only:
-    - nodejs_version: none
+      - nodejs_version: none
   build_script:
-  - cmake -S. -Bbuild -DCMAKE_INSTALL_PREFIX:PATH=.
-  - cmake --build build --config Release --target install
+    - cmake -S. -Bbuild -DCMAKE_INSTALL_PREFIX:PATH=.
+    - cmake --build build --config Release --target install
   after_build:
-  - 7z a OpenCC.zip build/bin build/include build/lib build/share
+    - 7z a OpenCC.zip build/bin build/include build/lib build/share
   artifacts:
   - path: OpenCC.zip
     name: OpenCC

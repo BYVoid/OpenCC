@@ -3,9 +3,10 @@ skip_branch_with_pr: true
 skip_tags: true
 build: off
 
-os:
-  - Visual Studio 2019
-  - Visual Studio 2017
+cache:
+  - '%APPDATA%\npm-cache'
+
+os: Visual Studio 2019
 
 environment:
   matrix:

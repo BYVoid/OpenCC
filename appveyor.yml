@@ -19,17 +19,17 @@ platform:
 # Install scripts. (runs after repo cloning)
 install:
   # install Node.js
-  - ps: Install-Product node $env:nodejs_version $env:platform
+  #- ps: Install-Product node $env:nodejs_version $env:platform
   # Get the latest stable version of npm
-  - npm -g i npm@latest
+  #- npm -g i npm@latest
   # install modules
-  - appveyor-retry call npm install --build-from-source
+  #- appveyor-retry call npm install --build-from-source
 
 # to run your custom scripts instead of automatic tests
 test_script:
-  - IF %nodejs_version%==stable cmake -H. -Bbuild -G"Visual Studio 16 2019" -DCMAKE_INSTALL_PREFIX:PATH=Install
-  - IF %nodejs_version%==stable cmake --build build --config Release --target install
-  - npm test
+  - cmake -H. -Bbuild -G"Visual Studio 16 2019" -DCMAKE_INSTALL_PREFIX:PATH=Install
+  - cmake --build build --config Release --target install
+  #- npm test
 
 # pushing entire folder as a zip archive
 artifacts:

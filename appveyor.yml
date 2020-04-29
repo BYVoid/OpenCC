@@ -33,7 +33,7 @@ test_script:
 
 # pushing entire folder as a zip archive
 artifacts:
-  - path: Install
+  - path: build/Install/Install
     name: OpenCC
     type: zip
 

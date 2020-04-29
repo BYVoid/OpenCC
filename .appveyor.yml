@@ -7,10 +7,13 @@ os: Visual Studio 2019
 
 environment:
   matrix:
+    # Build Node.js
     - nodejs_version: stable
     - nodejs_version: 13
     - nodejs_version: 10
     - nodejs_version: 8
+
+    # Build plain C++
     - nodejs_version: none
 
 platform:

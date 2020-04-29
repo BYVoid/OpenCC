@@ -10,10 +10,10 @@ os: Visual Studio 2019
 
 environment:
   matrix:
-    - nodejs_version: stable
-    - nodejs_version: 13
-    - nodejs_version: 10
-    - nodejs_version: 8
+  #  - nodejs_version: stable
+  #  - nodejs_version: 13
+  #  - nodejs_version: 10
+  #  - nodejs_version: 8
     - nodejs_version: none
 
 platform:

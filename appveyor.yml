@@ -7,13 +7,13 @@ os: Visual Studio 2019
 
 platform:
   - x64
-  - x86
+  #- x86
 
 build_script:
-  - cmake -H. -Bbuild -G"Visual Studio 16 2019" -DCMAKE_INSTALL_PREFIX:PATH=.
+  - cmake -S. -Bbuild -DCMAKE_INSTALL_PREFIX:PATH=.
   - cmake --build build --config Release --target install
 
 artifacts:
-  - path: build/Install
+  - path: build/{bin,include,lib,share}
     name: OpenCC
     type: zip

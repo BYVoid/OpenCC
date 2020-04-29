@@ -3,7 +3,7 @@ skip_branch_with_pr: true
 skip_tags: true
 build: off
 
-os: Windows Server 2019
+os: Visual Studio 2019
 
 environment:
   matrix:

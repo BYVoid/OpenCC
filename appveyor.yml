@@ -5,38 +5,15 @@ build: off
 
 os: Visual Studio 2019
 
-environment:
-  matrix:
-    - nodejs_version: stable
-    #- nodejs_version: 13
-    #- nodejs_version: 10
-    #- nodejs_version: 8
-
 platform:
   - x64
-  #- x86
+  - x86
 
-# Install scripts. (runs after repo cloning)
-install:
-  # install Node.js
-  #- ps: Install-Product node $env:nodejs_version $env:platform
-  # Get the latest stable version of npm
-  #- npm -g i npm@latest
-  # install modules
-  #- appveyor-retry call npm install --build-from-source
-
-# to run your custom scripts instead of automatic tests
-test_script:
-  - cmake -H. -Bbuild -G"Visual Studio 16 2019" -DCMAKE_INSTALL_PREFIX:PATH=Install
+build_script:
+  - cmake -H. -Bbuild -G"Visual Studio 16 2019" -DCMAKE_INSTALL_PREFIX:PATH=.
   - cmake --build build --config Release --target install
-  #- npm test
 
-# pushing entire folder as a zip archive
 artifacts:
-  - path: build/Install/Install
+  - path: build/Install
     name: OpenCC
     type: zip
-
-# to run your custom scripts instead of provider deployments
-deploy_script:
-  - npm run deploy

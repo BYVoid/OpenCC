@@ -1,20 +1,17 @@
 include (GenerateExportHeader)
-
-include_directories(../deps/darts-clone)
-include_directories(../deps/rapidjson-0.11)
-include_directories(../deps/tclap-1.2.1)
+include_directories(../deps/marisa-0.2.5/include)
+include_directories(../deps/rapidjson-1.1.0)
+include_directories(../deps/tclap-1.2.2)
 
 # Library
 
 set(
   LIBOPENCC_HEADERS
-  BinaryDict.hpp
   Common.hpp
   Config.hpp
   Conversion.hpp
   ConversionChain.hpp
   Converter.hpp
-  DartsDict.hpp
   Dict.hpp
   DictConverter.hpp
   DictEntry.hpp
@@ -22,12 +19,14 @@ set(
   Exception.hpp
   Export.hpp
   Lexicon.hpp
+  MarisaDict.hpp
   MaxMatchSegmentation.hpp
   Optional.hpp
   PhraseExtract.hpp
   Segmentation.hpp
   Segments.hpp
   SerializableDict.hpp
+  SerializedValues.hpp
   SimpleConverter.hpp
   TextDict.hpp
   UTF8StringSlice.hpp
@@ -37,18 +36,18 @@ set(
 
 set(
   LIBOPENCC_SOURCES
-  BinaryDict.cpp
   Config.cpp
   Conversion.cpp
   ConversionChain.cpp
   Converter.cpp
-  DartsDict.cpp
   Dict.cpp
   DictConverter.cpp
   DictEntry.cpp
   DictGroup.cpp
+  MarisaDict.cpp
   MaxMatchSegmentation.cpp
   PhraseExtract.cpp
+  SerializedValues.cpp
   SimpleConverter.cpp
   Segmentation.cpp
   TextDict.cpp
@@ -56,8 +55,47 @@ set(
   UTF8Util.cpp
 )
 
+set(UNITTESTS
+  ConfigTest
+  ConversionChainTest
+  ConversionTest
+  DictGroupTest
+  MarisaDictTest
+  MaxMatchSegmentationTest
+  PhraseExtractTest
+  SerializedValuesTest
+  SimpleConverterTest
+  TextDictTest
+  UTF8StringSliceTest
+  UTF8UtilTest
+)
+
+if (ENABLE_DARTS)
+  include_directories(../deps/darts-clone)
+  set(
+    LIBOPENCC_HEADERS
+    ${LIBOPENCC_HEADERS}
+    BinaryDict.hpp
+    DartsDict.hpp
+  )
+  set(
+    LIBOPENCC_SOURCES
+    ${LIBOPENCC_SOURCES}
+    BinaryDict.cpp
+    DartsDict.cpp
+  )
+  set(
+    UNITTESTS
+    ${UNITTESTS}
+    BinaryDictTest
+    DartsDictTest
+  )
+endif()
+
 add_library(libopencc ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
+set_target_properties(libopencc PROPERTIES POSITION_INDEPENDENT_CODE ON)
 source_group(libopencc FILES ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
+target_link_libraries(libopencc marisa)
 
 GENERATE_EXPORT_HEADER(
   libopencc
@@ -97,24 +135,11 @@ install(
 # Gtest
 
 if (ENABLE_GTEST)
-  include_directories(../deps/gtest-1.7.0/include)
-  set(UNITTESTS
-    BinaryDictTest.cpp
-    ConfigTest.cpp
-    ConversionChainTest.cpp
-    ConversionTest.cpp
-    DartsDictTest.cpp
-    DictGroupTest.cpp
-    MaxMatchSegmentationTest.cpp
-    PhraseExtractTest.cpp
-    SimpleConverterTest.cpp
-    TextDictTest.cpp
-    UTF8StringSliceTest.cpp
-    UTF8UtilTest.cpp
-  )
-  add_executable(UnitTest ${UNITTESTS})
-  target_link_libraries(UnitTest gtest gtest_main libopencc)
-  add_test(UnitTest UnitTest)
+  foreach(TESTCASE ${UNITTESTS})
+    add_executable(${TESTCASE} ${TESTCASE}.cpp)
+    target_link_libraries(${TESTCASE} gtest gtest_main libopencc)
+    add_test(${TESTCASE} ${TESTCASE})
+  endforeach()
 endif()
 
 # Subdir

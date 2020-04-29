@@ -2,6 +2,7 @@
 *.tgz
 .project
 .cproject
+/.vscode
 /build
 /other
 /doc/html

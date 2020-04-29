@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2017 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2020 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,13 @@
  * limitations under the License.
  */
 
-#include "DartsDict.hpp"
 #include "DictConverter.hpp"
+#include "MarisaDict.hpp"
 #include "TextDict.hpp"
+
+#ifdef ENABLE_DARTS
+#include "DartsDict.hpp"
+#endif
 
 using namespace opencc;
 
@@ -26,24 +30,29 @@ DictPtr LoadDictionary(const string& format, const string& inputFileName) {
   if (format == "text") {
     return SerializableDict::NewFromFile<TextDict>(inputFileName);
   } else if (format == "ocd") {
+#ifdef ENABLE_DARTS
     return SerializableDict::NewFromFile<DartsDict>(inputFileName);
-  } else {
-    fprintf(stderr, "Unknown dictionary format: %s\n", format.c_str());
-    exit(2);
+#endif
+  } else if (format == "ocd2") {
+    return SerializableDict::NewFromFile<MarisaDict>(inputFileName);
   }
+  fprintf(stderr, "Unknown dictionary format: %s\n", format.c_str());
+  exit(2);
   return nullptr;
 }
 
-SerializableDictPtr ConvertDict(const string& format,
-                                      const DictPtr dict) {
+SerializableDictPtr ConvertDict(const string& format, const DictPtr dict) {
   if (format == "text") {
     return TextDict::NewFromDict(*dict.get());
   } else if (format == "ocd") {
+#ifdef ENABLE_DARTS
     return DartsDict::NewFromDict(*dict.get());
-  } else {
-    fprintf(stderr, "Unknown dictionary format: %s\n", format.c_str());
-    exit(2);
+#endif
+  } else if (format == "ocd2") {
+    return MarisaDict::NewFromDict(*dict.get());
   }
+  fprintf(stderr, "Unknown dictionary format: %s\n", format.c_str());
+  exit(2);
   return nullptr;
 }
 
@@ -54,4 +63,4 @@ void ConvertDictionary(const string inputFileName, const string outputFileName,
   SerializableDictPtr dictTo = ConvertDict(formatTo, dictFrom);
   dictTo->SerializeToFile(outputFileName);
 }
-}
+} // namespace opencc

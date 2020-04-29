@@ -1,14 +1,17 @@
 # Open Chinese Convert 開放中文轉換
 
-[ ![Download](https://api.bintray.com/packages/byvoid/opencc/OpenCC/images/download.svg) ](https://bintray.com/byvoid/opencc/OpenCC/_latestVersion)
 [![Travis](https://img.shields.io/travis/BYVoid/OpenCC.svg)](https://travis-ci.org/BYVoid/OpenCC)
 [![AppVeyor](https://img.shields.io/appveyor/ci/Carbo/OpenCC.svg)](https://ci.appveyor.com/project/Carbo/OpenCC)
 
 ## Introduction 介紹
 
-Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for conversion between Traditional Chinese and Simplified Chinese, supporting character-level conversion, phrase-level conversion, variant conversion and regional idioms among Mainland China, Taiwan and Hong kong.
+![OpenCC](https://opencc.byvoid.com/img/opencc.png)
 
-中文簡繁轉換開源項目，支持詞彙級別的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港）。
+Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for conversions between Traditional Chinese, Simplified Chinese and Japanese Kanji (Shinjitai). It supports character-level and phrase-level conversion, character variant conversion and regional idioms among Mainland China, Taiwan and Hong Kong. This is not translation tool between Mandarin and Cantonese, etc.
+
+中文簡繁轉換開源項目，支持詞彙級別的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港、日本新字體）。不提供普通話與粵語的轉換。
+
+Discussion (Telegram): https://t.me/open_chinese_convert
 
 ### Features 特點
 
@@ -17,33 +20,56 @@ Open Chinese Convert (OpenCC, 開放中文轉換) is an opensource project for c
 * 嚴格審校一簡對多繁詞條，原則爲「能分則不合」。
 * 支持中國大陸、臺灣、香港異體字和地區習慣用詞轉換，如「裏」「裡」、「鼠標」「滑鼠」。
 * 詞庫和函數庫完全分離，可以自由修改、導入、擴展。
-* 支持C、C++、Python、PHP、Java、Ruby、Node.js and Android。
-* 兼容Windows、Linux、Mac平臺。
-
-### Links 相關鏈接
-
-* Introduction 詳細介紹 https://github.com/BYVoid/OpenCC/wiki/%E7%B7%A3%E7%94%B1
-* OpenCC Online (在線轉換) https://opencc.byvoid.com/
-* 現代漢語常用簡繁一對多字義辨析表 http://ytenx.org/byohlyuk/KienxPyan
 
 ## Installation 安裝
 
-* [Debian](http://packages.qa.debian.org/o/opencc.html)
+* [Source code](https://github.com/BYVoid/OpenCC/releases)
+* [Debian](https://tracker.debian.org/pkg/opencc)
 * [Ubuntu](https://launchpad.net/ubuntu/+source/opencc)
 * [Fedora](https://apps.fedoraproject.org/packages/opencc/)
 * [Arch Linux](https://www.archlinux.org/packages/community/x86_64/opencc/)
-* [Mac OS](https://github.com/Homebrew/homebrew-core/blob/master/Formula/opencc.rb)
-* [Node.js](https://npmjs.org/package/opencc)
-
-## Download 下載
-
-https://bintray.com/byvoid/opencc/OpenCC
+* [Mac OS (Homebrew)](https://github.com/Homebrew/homebrew-core/blob/master/Formula/opencc.rb)
+* [Node.js (npm)](https://npmjs.org/package/opencc)
 
 ## Usage 使用
 
-### Command Line 命令行
+### Online demo 線上轉換展示
 
-`opencc --help`
+Warning: **This is NOT an API.** You will be banned if you make calls programmatically.
+
+https://opencc.byvoid.com/
+
+### Command Line
+
+* `opencc --help`
+* `opencc_dict --help`
+* `opencc_phrase_extract --help`
+
+### Node.js
+
+```js
+const OpenCC = require('opencc');
+const opencc = new OpenCC('s2t.json');
+opencc.convertPromise("汉字").then(converted => {
+  console.log(converted);  // 漢字
+});
+```
+
+See [demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js).
+
+### C++ Document 文檔
+
+https://byvoid.github.io/OpenCC/
+
+### Others (Unofficial)
+
+* Swift (iOS): [SwiftyOpenCC](https://github.com/XQS6LB3A/SwiftyOpenCC)
+* Java: [opencc4j](https://github.com/houbb/opencc4j)
+* Android: [android-opencc](https://github.com/qichuan/android-opencc)
+* PHP: [opencc4php](https://github.com/nauxliu/opencc4php)
+* Python (Reimplementation): [opencc-python](https://github.com/yichen0831/opencc-python)
+* Python (C++ binding): [opencc-python](https://github.com/lepture/opencc-python)
+* WebAssembly: [wasm-opencc](https://github.com/oyyd/wasm-opencc)
 
 ### Configurations 配置文件
 
@@ -59,10 +85,8 @@ https://bintray.com/byvoid/opencc/OpenCC
 * `tw2sp.json` Traditional Chinese (Taiwan Standard) to Simplified Chinese with Mainland Chinese idiom 繁體（臺灣正體標準）到簡體並轉換爲中國大陸常用詞彙
 * `t2tw.json` Traditional Chinese (OpenCC Standard) to Taiwan Standard 繁體（OpenCC 標準）到臺灣正體
 * `t2hk.json` Traditional Chinese (OpenCC Standard) to Hong Kong Standard 繁體（OpenCC 標準）到香港繁體（香港小學學習字詞表標準）
-
-## Development Documentation 開發文檔
-
-* http://byvoid.github.io/OpenCC/
+* `t2jp.json` Traditional Chinese Characters (Kyūjitai) to New Japanese Kanji (Shinjitai) 繁體（OpenCC 標準，舊字體）到日文新字體
+* `jp2t.json` New Japanese Kanji (Shinjitai) to Traditional Chinese Characters (Kyūjitai) 日文新字體到繁體（OpenCC 標準，舊字體）
 
 ## Build 編譯
 
@@ -70,50 +94,39 @@ https://bintray.com/byvoid/opencc/OpenCC
 
 Linux (gcc 4.6 is required):
 
-```
+```bash
 make
 sudo make install
 ```
 
 Mac OS X (clang 3.2 is required):
 
-```
+```bash
 make PREFIX=/usr/local
 sudo make PREFIX=/usr/local install
 ```
 
 Windows MSYS:
 
-```
+```bash
 cmake -H. -Bbuild -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX="path/to/install"
 cmake --build build --config Release --target install
 ```
 
 Windows Visual Studio (2013 or higher required):
 
-```
+```bash
 cmake -H. -Bbuild -G"Visual Studio 12" -DCMAKE_INSTALL_PREFIX="path/to/install"
 cmake --build build --config Release --target install
 ```
 
-### iOS
-
-See https://github.com/gelosie/OpenCC/tree/master/iOS
-
-Or [SwiftyOpenCC](https://github.com/XQS6LB3A/SwiftyOpenCC)
-
-### Android
-
-See [android-opencc](https://github.com/qichuan/android-opencc)
-
-## Projects using Opencc 使用OpenCC的項目
+## Projects using OpenCC 使用 OpenCC 的項目
 
 * [ibus-pinyin](https://github.com/ibus/ibus-pinyin)
 * [fcitx](https://github.com/fcitx/fcitx)
 * [rimeime](https://rime.im/)
 * [libgooglepinyin](http://code.google.com/p/libgooglepinyin/)
 * [ibus-libpinyin](https://github.com/libpinyin/ibus-libpinyin)
-* [BYVBlog](https://github.com/byvoid/byvblog)
 * [alfred-chinese-converter](https://github.com/amowu/alfred-chinese-converter)
 * [GoldenDict](https://github.com/goldendict/goldendict)
 
@@ -123,15 +136,22 @@ Apache License 2.0
 
 ## Third Party Library 第三方庫
 
-* [darts-clone](https://code.google.com/p/darts-clone/) BSD License
+* [darts-clone](https://github.com/s-yata/darts-clone) BSD License
+* [marisa-trie](https://github.com/s-yata/marisa-trie) BSD License
 * [tclap](http://tclap.sourceforge.net/) MIT License
-* [rapidjson](https://github.com/miloyip/rapidjson) MIT License
+* [rapidjson](https://github.com/Tencent/rapidjson) MIT License
+* [Google Test](https://github.com/google/googletest) BSD License
 
 All these libraries are statically linked.
 
 ## Change History 版本歷史
 
 https://github.com/BYVoid/OpenCC/blob/master/NEWS.md
+
+### Links 相關鏈接
+
+* Introduction 詳細介紹 https://github.com/BYVoid/OpenCC/wiki/%E7%B7%A3%E7%94%B1
+* 現代漢語常用簡繁一對多字義辨析表 http://ytenx.org/byohlyuk/KienxPyan
 
 ## Contributors 貢獻者
 

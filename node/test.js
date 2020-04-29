@@ -1,8 +1,10 @@
-var assert = require('assert');
-var fs = require('fs');
-var OpenCC = require('./opencc');
+const assert = require('assert');
+const fs = require('fs');
+const util = require('util');
 
-var configs = [
+const OpenCC = require('./opencc');
+
+const configs = [
   's2t',
   's2tw',
   's2twp',
@@ -11,25 +13,27 @@ var configs = [
   'tw2sp',
   's2hk',
   'hk2s',
+  't2jp',
+  'jp2t',
 ];
 
-var testSync = function (config, done) {
-  var inputName = 'test/testcases/' + config + '.in';
-  var outputName = 'test/testcases/' + config + '.ans';
-  var configName = config + '.json';
-  var opencc = new OpenCC(configName);
-  var text = fs.readFileSync(inputName, 'utf-8');
-  var converted = opencc.convertSync(text);
-  var answer = fs.readFileSync(outputName, 'utf-8');
+const testSync = function (config, done) {
+  const inputName = 'test/testcases/' + config + '.in';
+  const outputName = 'test/testcases/' + config + '.ans';
+  const configName = config + '.json';
+  const opencc = new OpenCC(configName);
+  const text = fs.readFileSync(inputName, 'utf-8');
+  const converted = opencc.convertSync(text);
+  const answer = fs.readFileSync(outputName, 'utf-8');
   assert.equal(converted, answer);
   done();
 };
 
-var testAsync = function (config, done) {
-  var inputName = 'test/testcases/' + config + '.in';
-  var outputName = 'test/testcases/' + config + '.ans';
-  var configName = config + '.json';
-  var opencc = new OpenCC(configName);
+const testAsync = function (config, done) {
+  const inputName = 'test/testcases/' + config + '.in';
+  const outputName = 'test/testcases/' + config + '.ans';
+  const configName = config + '.json';
+  const opencc = new OpenCC(configName);
   fs.readFile(inputName, 'utf-8', function (err, text) {
     if (err) return done(err);
     opencc.convert(text, function (err, converted) {
@@ -41,6 +45,19 @@ var testAsync = function (config, done) {
       });
     });
   });
+};
+
+async function testAsyncPromise(config) {
+  const inputName = 'test/testcases/' + config + '.in';
+  const outputName = 'test/testcases/' + config + '.ans';
+  const configName = config + '.json';
+  const opencc = new OpenCC(configName);
+
+  const text = await util.promisify(fs.readFile)(inputName, 'utf-8');
+  const converted = await opencc.convertPromise(text);
+  const answer = await util.promisify(fs.readFile)(outputName, 'utf-8');
+
+  assert.equal(converted, answer);
 };
 
 describe('Sync API', function () {
@@ -55,6 +72,14 @@ describe('Async API', function () {
   configs.forEach(function (config) {
     it(config, function (done) {
       testAsync(config, done);
+    });
+  });
+});
+
+describe('Async Promise API', function () {
+  configs.forEach(function (config) {
+    it(config, function (done) {
+      testAsyncPromise(config).then(done);
     });
   });
 });

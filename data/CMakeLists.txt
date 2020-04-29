@@ -14,10 +14,12 @@ set(
   TSPhrases
   TWVariants
   TWVariantsRevPhrases
-  JPVariants
   HKVariants
   HKVariantsPhrases
   HKVariantsRevPhrases
+  JPVariants
+  JPShinjitaiCharacters
+  JPShinjitaiPhrases
 )
 
 set(
@@ -26,12 +28,13 @@ set(
   TWPhrasesRev
   TWVariantsRev
   HKVariantsRev
+  JPVariantsRev
 )
 
 set(DICTS ${DICTS_RAW} ${DICTS_GENERATED})
 
 foreach(DICT ${DICTS})
-  set(DICT_TARGETS ${DICT_TARGETS} ${DICT}.ocd)
+  set(DICT_TARGETS ${DICT_TARGETS} ${DICT}.ocd2)
 endforeach(DICT)
 
 add_custom_target(
@@ -87,6 +90,15 @@ set(
   ${DICT_REVERSE_BIN} ${DICT_HKVariantsRev_GENERATING_INPUT} HKVariantsRev.txt
 )
 
+set(
+  DICT_JPVariantsRev_GENERATING_INPUT
+  ${DICT_DIR}/JPVariants.txt
+)
+set(
+  DICT_JPVariantsRev_GENERATING_COMMAND
+  ${DICT_REVERSE_BIN} ${DICT_JPVariantsRev_GENERATING_INPUT} JPVariantsRev.txt
+)
+
 foreach(DICT ${DICTS_GENERATED})
   add_custom_command(
     OUTPUT
@@ -108,17 +120,17 @@ endforeach(DICT)
 foreach(DICT ${DICTS})
   add_custom_command(
     OUTPUT
-      ${DICT}.ocd
+      ${DICT}.ocd2
     COMMENT
-      "Building ${DICT}.ocd"
+      "Building ${DICT}.ocd2"
     COMMAND
       ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:libopencc>" "$<TARGET_FILE_DIR:${OPENCC_DICT_BIN}>"
     COMMAND
       ${OPENCC_DICT_BIN}
         --input ${DICT_${DICT}_INPUT}
-        --output ${DICT}.ocd
+        --output ${DICT}.ocd2
         --from text
-        --to ocd
+        --to ocd2
     DEPENDS
       ${OPENCC_DICT_BIN}
       ${DICT_${DICT}_INPUT}
@@ -126,7 +138,7 @@ foreach(DICT ${DICTS})
 
   install(
     FILES
-      ${DICT_GENERATED_DIR}/${DICT}.ocd
+      ${DICT_GENERATED_DIR}/${DICT}.ocd2
     DESTINATION
       ${DIR_SHARE_OPENCC}
   )
@@ -134,7 +146,7 @@ foreach(DICT ${DICTS})
   set_directory_properties(
     PROPERTIES
       ADDITIONAL_MAKE_CLEAN_FILES
-        "${DICT_GENERATED_DIR}/${DICT}.ocd"
+        "${DICT_GENERATED_DIR}/${DICT}.ocd2"
   )
 endforeach(DICT)
 
@@ -149,6 +161,8 @@ set(CONFIG_FILES
   config/s2hk.json
   config/hk2s.json
   config/t2hk.json
+  config/t2jp.json
+  config/jp2t.json
 )
 
 install(

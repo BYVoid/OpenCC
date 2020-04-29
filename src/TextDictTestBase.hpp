@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 BYVoid <byvoid@byvoid.com>
+ * Copyright 2015-2020 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 #pragma once
 
 #include "Lexicon.hpp"
-#include "TextDict.hpp"
 #include "TestUtils.hpp"
+#include "TextDict.hpp"
 
 namespace opencc {
 
@@ -81,10 +81,36 @@ protected:
   }
 
   void TestDict(const DictPtr dict) const {
-    Optional<const DictEntry*> entry = dict->MatchPrefix("BYVoid");
+    TestMatch(dict);
+    TestMatchPrefix(dict);
+    TestMatchAllPrefixes(dict);
+  }
+
+  void TestMatch(const DictPtr& dict) const {
+    Optional<const DictEntry*> entry = Optional<const DictEntry*>::Null();
+    entry = dict->Match("BYVoid");
     EXPECT_TRUE(!entry.IsNull());
     EXPECT_EQ(utf8("BYVoid"), entry.Get()->Key());
     EXPECT_EQ(utf8("byv"), entry.Get()->GetDefault());
+
+    entry = dict->Match("");
+    EXPECT_TRUE(entry.IsNull());
+
+    entry = dict->Match("xxx");
+    EXPECT_TRUE(entry.IsNull());
+  }
+
+  void TestMatchPrefix(const DictPtr& dict) const {
+    Optional<const DictEntry*> entry = Optional<const DictEntry*>::Null();
+    entry = dict->MatchPrefix("BYVoid");
+    EXPECT_TRUE(!entry.IsNull());
+    EXPECT_EQ(utf8("BYVoid"), entry.Get()->Key());
+    EXPECT_EQ(utf8("byv"), entry.Get()->GetDefault());
+
+    entry = dict->MatchPrefix("清華大學");
+    EXPECT_TRUE(!entry.IsNull());
+    EXPECT_EQ(utf8("清華大學"), entry.Get()->Key());
+    EXPECT_EQ(utf8("TsinghuaUniversity"), entry.Get()->GetDefault());
 
     entry = dict->MatchPrefix("BYVoid123");
     EXPECT_TRUE(!entry.IsNull());
@@ -99,6 +125,11 @@ protected:
     entry = dict->MatchPrefix("Unknown");
     EXPECT_TRUE(entry.IsNull());
 
+    entry = dict->MatchPrefix("");
+    EXPECT_TRUE(entry.IsNull());
+  }
+
+  void TestMatchAllPrefixes(const DictPtr& dict) const {
     const vector<const DictEntry*> matches =
         dict->MatchAllPrefixes(utf8("清華大學計算機系"));
     EXPECT_EQ(3, matches.size());

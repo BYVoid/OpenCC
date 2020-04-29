@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "gtest/gtest.h"
 #include "Common.hpp"
+#include "gtest/gtest.h"
 
 namespace opencc {
 
@@ -96,6 +96,7 @@ TEST_P(ConfigurationTest, Convert) {
 
 INSTANTIATE_TEST_CASE_P(CommandLine, ConfigurationTest,
                         ::testing::Values("s2t", "t2s", "s2tw", "s2twp", "tw2s",
-                                          "tw2sp", "s2hk", "hk2s"));
+                                          "tw2sp", "s2hk", "hk2s", "t2jp",
+                                          "jp2t"));
 
 } // namespace opencc

@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "Lexicon.hpp"
 #include "TextDict.hpp"
+#include "Lexicon.hpp"
 
 using namespace opencc;
 
@@ -69,7 +69,9 @@ static LexiconPtr ParseLexiconFromFile(FILE* fp) {
 }
 
 TextDict::TextDict(const LexiconPtr& _lexicon)
-    : maxLength(GetKeyMaxLength(_lexicon)), lexicon(_lexicon) {}
+    : maxLength(GetKeyMaxLength(_lexicon)), lexicon(_lexicon) {
+  assert(lexicon->IsSorted());
+}
 
 TextDict::~TextDict() {}
 
@@ -91,12 +93,11 @@ TextDictPtr TextDict::NewFromDict(const Dict& dict) {
 size_t TextDict::KeyMaxLength() const { return maxLength; }
 
 Optional<const DictEntry*> TextDict::Match(const char* word) const {
-  NoValueDictEntry entry(word);
-  const auto& found = std::lower_bound(lexicon->begin(), lexicon->end(), &entry,
-                                       DictEntry::PtrLessThan);
-  if ((found != lexicon->end()) &&
-      (strcmp((*found)->Key(), entry.Key()) == 0)) {
-    return Optional<const DictEntry*>(*found);
+  std::unique_ptr<DictEntry> entry(new NoValueDictEntry(word));
+  const auto& found = std::lower_bound(lexicon->begin(), lexicon->end(), entry,
+                                       DictEntry::UPtrLessThan);
+  if ((found != lexicon->end()) && ((*found)->Key() == entry->Key())) {
+    return Optional<const DictEntry*>(found->get());
   } else {
     return Optional<const DictEntry*>::Null();
   }

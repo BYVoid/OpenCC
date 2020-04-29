@@ -1,7 +1,7 @@
 #
 # Open Chinese Convert
 #
-# Copyright 2010-2015 BYVoid <byvoid@byvoid.com>
+# Copyright 2010-2020 BYVoid <byvoid@byvoid.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,13 +26,15 @@ include (CTest)
 option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
 option(BUILD_SHARED_LIBS "Build opencc as shared library" ON)
 option(ENABLE_GTEST "Build all tests." OFF)
+option(ENABLE_DARTS "Build DartsDict (ocd format)." ON)
+option(BUILD_BUNDLED_LIBMARISA "" ON)
 
 ######## Package information
 set (PACKAGE_URL https://github.com/BYVoid/Opencc)
 set (PACKAGE_BUGREPORT https://github.com/BYVoid/Opencc/issues)
 set (OPENCC_VERSION_MAJOR 1)
 set (OPENCC_VERSION_MINOR 0)
-set (OPENCC_VERSION_REVISION 5)
+set (OPENCC_VERSION_REVISION 6)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
   set (version_suffix .Debug)
@@ -113,7 +115,7 @@ add_definitions(
   -DPACKAGE_NAME="${PACKAGE_NAME}"
 )
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   add_definitions(
     -std=c++11
     -Wall
@@ -151,6 +153,27 @@ if (ENABLE_GTEST)
   )
 endif()
 
+if (ENABLE_DARTS)
+  add_definitions(
+    -DENABLE_DARTS
+  )
+endif()
+
+
+######## Dependencies
+
+if(BUILD_BUNDLED_LIBMARISA)
+  message(STATUS "Use bundled marisa library.")
+  add_subdirectory(deps/marisa-0.2.5)
+else()
+  find_library(LIBMARISA NAMES marisa)
+  if (LIBMARISA)
+    message(STATUS "libmarisa found: ${LIBMARISA}")
+  else()
+    message(FATAL_ERROR "libmarisa not found.")
+  endif()
+endif()
+
 ######## Subdirectories
 
 add_subdirectory(src)
@@ -161,6 +184,6 @@ add_subdirectory(test)
 ######## Testing
 
 if (ENABLE_GTEST)
-  add_subdirectory(deps/gtest-1.7.0)
+  add_subdirectory(deps/gtest-1.11.0)
   enable_testing()
 endif()

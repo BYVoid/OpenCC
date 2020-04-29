@@ -28,7 +28,7 @@ int main(int argc, const char* argv[]) {
     CmdLineOutput cmdLineOutput;
     cmd.setOutput(&cmdLineOutput);
 
-    vector<string> dictFormats{"text", "ocd"};
+    vector<string> dictFormats{"text", "ocd2", "ocd"};
     TCLAP::ValuesConstraint<string> allowedVals(dictFormats);
 
     TCLAP::ValueArg<string> toArg("t", "to", "Output format",

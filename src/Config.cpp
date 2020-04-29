@@ -18,21 +18,26 @@
 
 #include <unordered_map>
 
+#include "document.h"
+
 #include "Config.hpp"
 #include "ConversionChain.hpp"
 #include "Converter.hpp"
-#include "DartsDict.hpp"
 #include "DictGroup.hpp"
+#include "MarisaDict.hpp"
 #include "MaxMatchSegmentation.hpp"
 #include "TextDict.hpp"
 
-#include "document.h"
-
-using namespace opencc;
+#ifdef ENABLE_DARTS
+#include "DartsDict.hpp"
+#endif
 
 typedef rapidjson::GenericValue<rapidjson::UTF8<char>> JSONValue;
 
 namespace opencc {
+
+namespace {
+
 class ConfigInternal {
 public:
   string configDirectory;
@@ -91,6 +96,22 @@ public:
     throw FileNotFound(fileName);
   }
 
+  DictPtr LoadDictFromFile(const string& type, const string& fileName) {
+    if (type == "text") {
+      return LoadDictWithPaths<TextDict>(fileName);
+    }
+#ifdef ENABLE_DARTS
+    if (type == "ocd") {
+      return LoadDictWithPaths<DartsDict>(fileName);
+    }
+#endif
+    if (type == "ocd2") {
+      return LoadDictWithPaths<MarisaDict>(fileName);
+    }
+    throw InvalidFormat("Unknown dictionary type: " + type);
+    return nullptr;
+  }
+
   DictPtr ParseDict(const JSONValue& doc) {
     // Required: type
     string type = GetStringProperty(doc, "type");
@@ -114,14 +135,8 @@ public:
       if (cache != nullptr) {
         return cache;
       }
-      DictPtr dict;
-      if (type == "text") {
-        dict = LoadDictWithPaths<TextDict>(fileName);
-      } else if (type == "ocd") {
-        dict = LoadDictWithPaths<DartsDict>(fileName);
-      } else {
-        throw InvalidFormat("Unknown dictionary type: " + type);
-      }
+      DictPtr dict = LoadDictFromFile(type, fileName);
+
       // Update Cache
       cache = dict;
       return dict;
@@ -189,7 +204,7 @@ public:
     throw FileNotFound(fileName);
   }
 };
-};
+} // namespace
 
 Config::Config() : internal(new ConfigInternal()) {}
 
@@ -246,3 +261,5 @@ ConverterPtr Config::NewFromString(const string& json,
       impl->GetArrayProperty(doc, "conversion_chain"));
   return ConverterPtr(new Converter(name, segmentation, chain));
 }
+
+}; // namespace opencc

@@ -26,13 +26,13 @@
  * Node.js language binding
  */
 
-var path = require('path');
-var bindingPath = require('node-pre-gyp').find(require.resolve('../package.json'));
-var binding = require(bindingPath);
+const path = require('path');
+const bindingPath = require('node-pre-gyp').find(require.resolve('../package.json'));
+const binding = require(bindingPath);
 
-var assetsPath = path.dirname(bindingPath);
-var getConfigPath = function (config) {
-  var configPath = config;
+const assetsPath = path.dirname(bindingPath);
+const getConfigPath = function (config) {
+  let configPath = config;
   if (config[0] !== '/' && config[1] !== ':') {
     // Resolve relative path
     configPath = path.join(assetsPath, config);
@@ -47,7 +47,7 @@ var getConfigPath = function (config) {
  * @constructor
  * @ingroup node_api
  */
-var OpenCC = module.exports = function (config) {
+const OpenCC = module.exports = function (config) {
   if (!config) {
     config = 's2t.json';
   }
@@ -76,10 +76,10 @@ OpenCC.version = binding.Opencc.version();
  * @return Converted text.
  * @ingroup node_api
  */
-OpenCC.generateDict = function(inputFileName, outputFileName,
-    formatFrom, formatTo) {
+OpenCC.generateDict = function (inputFileName, outputFileName,
+  formatFrom, formatTo) {
   return binding.Opencc.generateDict(inputFileName, outputFileName,
-    formatFrom, formatTo); 
+    formatFrom, formatTo);
 }
 
 /**
@@ -119,8 +119,8 @@ OpenCC.prototype.convertSync = function (input) {
  */
 OpenCC.prototype.convertPromise = function (input) {
   const self = this;
-  return new Promise(function(resolve, reject) {
-    self.handler.convert(input.toString(), function(err, text) {
+  return new Promise(function (resolve, reject) {
+    self.handler.convert(input.toString(), function (err, text) {
       if (err) reject(err);
       else resolve(text);
     });

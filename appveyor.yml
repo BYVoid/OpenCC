@@ -27,7 +27,7 @@ install:
 
 # to run your custom scripts instead of automatic tests
 test_script:
-  - IF %nodejs_version%==stable cmake -H. -Bbuild -G"Visual Studio 2019" -DCMAKE_INSTALL_PREFIX:PATH="../opencc-release"
+  - IF %nodejs_version%==stable cmake -H. -Bbuild -G"Visual Studio 16 2019" -DCMAKE_INSTALL_PREFIX:PATH="../opencc-release"
   - IF %nodejs_version%==stable cmake --build build --config Release --target install
   - npm test
 

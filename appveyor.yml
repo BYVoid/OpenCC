@@ -27,13 +27,13 @@ install:
 
 # to run your custom scripts instead of automatic tests
 test_script:
-  - IF %nodejs_version%==stable cmake -H. -Bbuild -G"Visual Studio 16 2019" -DCMAKE_INSTALL_PREFIX:PATH="../opencc-release"
+  - IF %nodejs_version%==stable cmake -H. -Bbuild -G"Visual Studio 16 2019" -DCMAKE_INSTALL_PREFIX:PATH=Install
   - IF %nodejs_version%==stable cmake --build build --config Release --target install
   - npm test
 
 # pushing entire folder as a zip archive
 artifacts:
-  - path: "../opencc-release"
+  - path: Install
     name: OpenCC
     type: zip
 

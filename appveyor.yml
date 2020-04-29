@@ -3,17 +3,14 @@ skip_branch_with_pr: true
 skip_tags: true
 build: off
 
-cache:
-  - '%APPDATA%\npm-cache'
-
 os: Visual Studio 2019
 
 environment:
   matrix:
-  #  - nodejs_version: stable
-  #  - nodejs_version: 13
-  #  - nodejs_version: 10
-  #  - nodejs_version: 8
+    - nodejs_version: stable
+    - nodejs_version: 13
+    - nodejs_version: 10
+    - nodejs_version: 8
     - nodejs_version: none
 
 platform:
@@ -38,7 +35,7 @@ for:
   build_script:
     - SET arch=%platform%
     - IF "%platform%"=="x86" SET arch=Win32
-    - echo %arch%
+
     - cmake -A%arch% -S. -Bbuild -DCMAKE_INSTALL_PREFIX:PATH=.
     - cmake --build build --config Release --target install
   after_build:

@@ -31,8 +31,6 @@ for:
     - appveyor-retry call npm install --build-from-source
   test_script:
     - npm test
-  deploy_script:
-    - npm run deploy
 
 - matrix:
     only:

@@ -36,7 +36,10 @@ for:
     only:
       - nodejs_version: none
   build_script:
-    - cmake -S. -Bbuild -DCMAKE_INSTALL_PREFIX:PATH=.
+    - SET arch=%platform%
+    - IF "%platform%"=="x86" SET arch=Win32
+    - echo %arch%
+    - cmake -A%arch% -S. -Bbuild -DCMAKE_INSTALL_PREFIX:PATH=.
     - cmake --build build --config Release --target install
   after_build:
     - 7z a OpenCC.zip build/bin build/include build/lib build/share

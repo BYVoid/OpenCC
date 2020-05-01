@@ -23,9 +23,6 @@
       "type": "group",
       "dicts": [{
         "type": "ocd2",
-        "file": "HKVariantsPhrases.ocd2"
-      }, {
-        "type": "ocd2",
         "file": "HKVariants.ocd2"
       }] 
     }

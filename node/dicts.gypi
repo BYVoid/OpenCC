@@ -119,14 +119,6 @@
       "outputs": ["<(output_prefix)HKVariants.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
-      "action_name": "HKVariantsPhrases",
-      "variables": {
-        "input": "<(input_prefix)HKVariantsPhrases.txt",
-      },
-      "inputs": ["<(input)"],
-      "outputs": ["<(output_prefix)HKVariantsPhrases.ocd2"],
-      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
-    }, {
       "action_name": "HKVariantsRevPhrases",
       "variables": {
         "input": "<(input_prefix)HKVariantsRevPhrases.txt",

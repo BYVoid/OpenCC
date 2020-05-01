@@ -13,6 +13,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Install doxygen
+      run: sudo apt-get install doxygen
     - name: make build
       run: make build
     - name: make test

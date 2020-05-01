@@ -23,13 +23,7 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 
 ## Installation 安裝
 
-* [Source code](https://github.com/BYVoid/OpenCC/releases)
-* [Debian](https://tracker.debian.org/pkg/opencc)
-* [Ubuntu](https://launchpad.net/ubuntu/+source/opencc)
-* [Fedora](https://apps.fedoraproject.org/packages/opencc/)
-* [Arch Linux](https://www.archlinux.org/packages/community/x86_64/opencc/)
-* [Mac OS (Homebrew)](https://github.com/Homebrew/homebrew-core/blob/master/Formula/opencc.rb)
-* [Node.js (npm)](https://npmjs.org/package/opencc)
+See [Download](https://github.com/BYVoid/OpenCC/wiki/Download).
 
 ## Usage 使用
 

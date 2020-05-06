@@ -62,6 +62,18 @@ xcode-build:
 	..; \
 	xcodebuild build)
 
+python-build:
+	cd python; python setup.py build
+
+python-install:
+	cd python; python setup.py install
+
+python-develop:
+	cd python; python setup.py develop
+
+python-test: python-build
+	cd python; python setup.py test
+
 test-all: test node-test
 
 clean:

@@ -74,7 +74,6 @@ class PyTestCommand(setuptools.command.test.test):
 setuptools.setup(
     name='opencc',
     version='0.0.1',
-    python_requires='>=3.5',
     packages=['opencc'],
     package_data={'opencc': [
         'clib/include/opencc/*',

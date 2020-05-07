@@ -89,7 +89,7 @@ python-develop:
 python-test: python-build
 	cd python; python setup.py test
 
-test-all: test node-test
+test-all: test node-test python-test
 
 format:
 	find "src" "node" -iname "*.hpp" -o -iname "*.cpp" -o -iname "*.cc" \

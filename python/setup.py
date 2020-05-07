@@ -51,9 +51,9 @@ def _build_libopencc():
 
     print('building libopencc')
     assert subprocess.call('command -v make', shell=True) == 0, \
-        'Requires make'
+        'Build requires `make`'
     assert subprocess.call('command -v cmake', shell=True) == 0, \
-        'Requires cmake'
+        'Build requires `cmake`'
     # Probably also needs to check for cpp-compilier
 
     errno = subprocess.call((

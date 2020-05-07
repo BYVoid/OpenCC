@@ -24,7 +24,7 @@ _version_pattern = re.compile(r'OPENCC_VERSION_(MAJOR|MINOR|REVISION) (\d+)')
 _version_file = os.path.join('opencc', 'version.py')
 
 
-def _get_version_info():
+def get_version_info():
     version_info = ['1', '0', '0']
     with open(_cmake_file, 'rb') as f:
         for l in f:
@@ -40,12 +40,39 @@ def _get_version_info():
     return '.'.join(version_info)
 
 
-def _write_version_file(version_info):
+def write_version_file(version_info):
     with open(_version_file, 'w') as f:
         f.write('__version__ = "{}"'.format(version_info))
 
 
-def _build_libopencc():
+def get_author_info():
+    author_file = os.path.join(_opencc_rootdir, 'AUTHORS')
+    if not os.path.isfile(author_file):
+        return 'BYVoid', 'byvoid.kcp@gmail.com'
+
+    authors = []
+    emails = []
+    author_pattern = re.compile(r'(.+) <(.+)>')
+    with open(author_file, 'rb') as f:
+        for line in f:
+            match = author_pattern.search(line.decode('utf-8'))
+            if not match:
+                continue
+            authors.append(match.group(1))
+            emails.append(match.group(2))
+
+    if len(authors) == 0:
+        return 'BYVoid', 'byvoid.kcp@gmail.com'
+
+    return ', '.join(authors), ', '.join(emails)
+
+
+def get_long_description():
+    with open(os.path.join(_opencc_rootdir, 'README.md'), 'rb') as f:
+        return f.read().decode('utf-8')
+
+
+def build_libopencc():
     if os.path.isfile(_libopenccfile):
         return  # Skip building binary file
 
@@ -78,19 +105,19 @@ def _build_libopencc():
 
 class BuildPyCommand(setuptools.command.build_py.build_py):
     def run(self):
-        _build_libopencc()
+        build_libopencc()
         super().run()
 
 
 class InstallCommand(setuptools.command.install.install):
     def run(self):
-        _build_libopencc()
+        build_libopencc()
         super().run()
 
 
 class DevelopCommand(setuptools.command.develop.develop):
     def run(self):
-        _build_libopencc()
+        build_libopencc()
         super().run()
 
 
@@ -101,12 +128,21 @@ class PyTestCommand(setuptools.command.test.test):
         sys.exit(errno)
 
 
-version_info = _get_version_info()
-_write_version_file(version_info)
+version_info = get_version_info()
+write_version_file(version_info)
+
+author_info = get_author_info()
 
 setuptools.setup(
     name='opencc',
     version=version_info,
+    author=author_info[0],
+    author_email=author_info[1],
+    description=" Conversion between Traditional and Simplified Chinese",
+    long_description=get_long_description(),
+    long_description_content_type="text/markdown",
+    url="https://github.com/BYVoid/OpenCC",
+
     packages=['opencc'],
     package_data={'opencc': [
         'clib/include/opencc/*',
@@ -119,6 +155,24 @@ setuptools.setup(
         'develop': DevelopCommand,
         'test': PyTestCommand,
     },
+
     tests_require=['pytest'],
     test_suite='tests',
+
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
+        'License :: OSI Approved :: Apache Software License',
+        'Topic :: Scientific/Engineering',
+        'Topic :: Software Development',
+        'Topic :: Software Development :: Libraries',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Software Development :: Localization',
+    ],
+    license='Apache License 2.0',
+    keywords='opencc convert chinese'
 )

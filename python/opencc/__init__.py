@@ -10,6 +10,11 @@ import sys
 from ctypes import CDLL, c_char_p, c_size_t, c_void_p, cast
 from ctypes.util import find_library
 
+try:
+    from opencc.version import __version__  # noqa
+except ImportError:
+    pass
+
 if sys.version_info[0] == 3:
     text_type = str
 else:

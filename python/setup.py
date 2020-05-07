@@ -21,6 +21,30 @@ assert os.path.isfile(_cmake_file)
 _build_dir = build_dir = os.path.join(_opencc_rootdir, 'build', 'python')
 _libopenccfile = os.path.join(_clib_dir, 'lib', 'libopencc.so')
 
+_version_pattern = re.compile(r'OPENCC_VERSION_(MAJOR|MINOR|REVISION) (\d+)')
+_version_file = os.path.join(_this_dir, 'opencc', 'version.py')
+
+
+def _get_version_info():
+    version_info = ['1', '0', '0']
+    with open(_cmake_file, 'rb') as f:
+        for l in f:
+            match = _version_pattern.search(l.decode('utf-8'))
+            if not match:
+                continue
+            if match.group(1) == 'MAJOR':
+                version_info[0] = match.group(2)
+            elif match.group(1) == 'MINOR':
+                version_info[1] = match.group(2)
+            elif match.group(1) == 'REVISION':
+                version_info[2] = match.group(2)
+    return '.'.join(version_info)
+
+
+def _write_version_file(version_info):
+    with open(_version_file, 'w') as f:
+        f.write('__version__ = "{}"'.format(version_info))
+
 
 def _build_libopencc():
     if os.path.isfile(_libopenccfile):
@@ -78,9 +102,12 @@ class PyTestCommand(setuptools.command.test.test):
         sys.exit(errno)
 
 
+version_info = _get_version_info()
+_write_version_file(version_info)
+
 setuptools.setup(
     name='opencc',
-    version='0.0.1',
+    version=version_info,
     packages=['opencc'],
     package_data={'opencc': [
         'clib/include/opencc/*',

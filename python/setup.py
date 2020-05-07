@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+
+import re
 import os
 import sys
 import subprocess
@@ -12,13 +15,17 @@ _this_dir = os.path.dirname(os.path.abspath(__file__))
 _clib_dir = os.path.abspath(os.path.join(_this_dir, 'opencc', 'clib'))
 _opencc_rootdir = os.path.abspath(os.path.join(_this_dir, '..'))
 
-assert os.path.isfile(os.path.join(_opencc_rootdir, 'CMakeLists.txt'))
+_cmake_file = os.path.join(_opencc_rootdir, 'CMakeLists.txt')
+assert os.path.isfile(_cmake_file)
 
 _build_dir = build_dir = os.path.join(_opencc_rootdir, 'build', 'python')
 _libopenccfile = os.path.join(_clib_dir, 'lib', 'libopencc.so')
 
 
 def _build_libopencc():
+    if os.path.isfile(_libopenccfile):
+        return  # Skip building binary file
+
     print('building libopencc')
     assert subprocess.call('command -v make', shell=True) == 0, \
         'Requires make'

@@ -11,9 +11,8 @@ import setuptools.command.install
 import setuptools.command.develop
 import setuptools.command.test
 
-_this_dir = os.path.dirname(os.path.abspath(__file__))
-_clib_dir = os.path.abspath(os.path.join(_this_dir, 'opencc', 'clib'))
-_opencc_rootdir = os.path.abspath(os.path.join(_this_dir, '..'))
+_clib_dir = os.path.join('opencc', 'clib')
+_opencc_rootdir = '..'
 
 _cmake_file = os.path.join(_opencc_rootdir, 'CMakeLists.txt')
 assert os.path.isfile(_cmake_file)
@@ -22,7 +21,7 @@ _build_dir = build_dir = os.path.join(_opencc_rootdir, 'build', 'python')
 _libopenccfile = os.path.join(_clib_dir, 'lib', 'libopencc.so')
 
 _version_pattern = re.compile(r'OPENCC_VERSION_(MAJOR|MINOR|REVISION) (\d+)')
-_version_file = os.path.join(_this_dir, 'opencc', 'version.py')
+_version_file = os.path.join('opencc', 'version.py')
 
 
 def _get_version_info():
@@ -55,19 +54,19 @@ def _build_libopencc():
         'Requires make'
     assert subprocess.call('command -v cmake', shell=True) == 0, \
         'Requires cmake'
-    # Probably also needs to check for c-compilier
+    # Probably also needs to check for cpp-compilier
 
     errno = subprocess.call((
         'mkdir -p {build_dir};'
-        'cd {build_dir};'
         'cmake '
+        '-B {build_dir} '
         '-DBUILD_DOCUMENTATION:BOOL=OFF '
         '-DENABLE_GTEST:BOOL=OFF '
         '-DCMAKE_BUILD_TYPE=Release '
         '-DCMAKE_INSTALL_PREFIX={clib_dir} '
-        '../..;'
-        'make -j;'
-        'make install;'
+        '..;'
+        'make -C {build_dir} -j;'
+        'make -C {build_dir} install;'
     ).format(
         build_dir=_build_dir,
         clib_dir=_clib_dir

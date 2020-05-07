@@ -74,7 +74,7 @@ python-develop:
 python-test: python-build
 	cd python; python setup.py test
 
-test-all: test node-test
+test-all: test node-test python-test
 
 clean:
 	rm -rf build xcode

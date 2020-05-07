@@ -39,8 +39,7 @@ libopencc.opencc_close.argtypes = [c_void_p]
 
 _opencc_share_dir = os.path.join(_thisdir, 'clib', 'share', 'opencc')
 CONFIGS = [
-    os.path.splitext(f)[0]
-    for f in os.listdir(_opencc_share_dir)
+    f for f in os.listdir(_opencc_share_dir)
     if f.endswith('.json')
 ]
 
@@ -48,6 +47,15 @@ CONFIGS = [
 class OpenCC(object):
 
     def __init__(self, config='t2s.json'):
+        if not os.path.isfile(config):
+            if not config.endswith('.json'):
+                config += '.json'
+            if config not in CONFIGS:
+                raise ValueError((
+                    '{} is not a valid config. '
+                    'Valid configs: {}'
+                ).format(config, CONFIGS))
+            config = os.path.join(_opencc_share_dir, config)
         self._od = libopencc.opencc_open(c_char_p(config.encode('utf-8')))
 
     def convert(self, text):

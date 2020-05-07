@@ -28,8 +28,6 @@ def test_conversion():
         config = os.path.basename(pref)
         anspath = '{}.{}'.format(pref, 'ans')
         assert os.path.isfile(anspath)
-        assert config in opencc.CONFIGS, \
-            'Expecting CONFIGS to contain {}'.format(config)
 
         with open(inpath, 'rb') as f:
             intexts = [l.strip().decode('utf-8') for l in f]

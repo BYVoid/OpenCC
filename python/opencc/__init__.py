@@ -6,6 +6,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import os
+import platform
 import sys
 from ctypes import CDLL, c_char_p, c_size_t, c_void_p, cast
 from ctypes.util import find_library
@@ -26,7 +27,14 @@ _libcfile = find_library('c') or 'libc.so.6'
 libc = CDLL(_libcfile, use_errno=True)
 
 _thisdir = os.path.dirname(os.path.abspath(__file__))
-_libopenccfile = os.path.join(_thisdir, 'clib', 'lib', 'libopencc.so.2')
+_system = platform.system()
+if _system == 'Darwin':
+    _libopenccfilename = 'libopencc.2.dylib'
+elif _system == 'Linux':
+    _libopenccfilename = 'libopencc.so.2'
+elif _system == 'Windows':
+    raise NotImplementedError('Not tested for {}'.format(_system))
+_libopenccfile = os.path.join(_thisdir, 'clib', 'lib', _libopenccfilename)
 assert os.path.isfile(_libopenccfile), 'Build package library first'
 libopencc = CDLL(_libopenccfile, use_errno=True)
 

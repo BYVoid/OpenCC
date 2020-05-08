@@ -24,7 +24,7 @@ if _system == 'Darwin':
     _libopenccfilename = 'libopencc.2.dylib'
 elif _system == 'Linux':
     _libopenccfilename = 'libopencc.so.2'
-elif _system == 'Windows':
+else:
     raise NotImplementedError('Not tested for {}'.format(_system))
 _libopenccfile = os.path.join(_clib_dir, 'lib', _libopenccfilename)
 

@@ -32,7 +32,7 @@ if _system == 'Darwin':
     _libopenccfilename = 'libopencc.2.dylib'
 elif _system == 'Linux':
     _libopenccfilename = 'libopencc.so.2'
-elif _system == 'Windows':
+else:
     raise NotImplementedError('Not tested for {}'.format(_system))
 _libopenccfile = os.path.join(_thisdir, 'clib', 'lib', _libopenccfilename)
 assert os.path.isfile(_libopenccfile), 'Build package library first'

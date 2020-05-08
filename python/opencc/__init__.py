@@ -25,6 +25,7 @@ __all__ = ['CONFIGS', 'convert', 'OpenCC']
 
 _libcfile = find_library('c') or 'libc.so.6'
 libc = CDLL(_libcfile, use_errno=True)
+libc.free.argtypes = [c_void_p]
 
 _thisdir = os.path.dirname(os.path.abspath(__file__))
 _system = platform.system()
@@ -35,26 +36,27 @@ elif _system == 'Linux':
 else:
     raise NotImplementedError('Not tested for {}'.format(_system))
 _libopenccfile = os.path.join(_thisdir, 'clib', 'lib', _libopenccfilename)
-assert os.path.isfile(_libopenccfile), 'Build package library first'
-libopencc = CDLL(_libopenccfile, use_errno=True)
 
-libc.free.argtypes = [c_void_p]
-
-libopencc.opencc_open.restype = c_void_p
-libopencc.opencc_convert_utf8.argtypes = [c_void_p, c_char_p, c_size_t]
-libopencc.opencc_convert_utf8.restype = c_void_p
-libopencc.opencc_close.argtypes = [c_void_p]
+libopencc = None
+if os.path.isfile(_libopenccfile):
+    libopencc = CDLL(_libopenccfile, use_errno=True)
+    libopencc.opencc_open.restype = c_void_p
+    libopencc.opencc_convert_utf8.argtypes = [c_void_p, c_char_p, c_size_t]
+    libopencc.opencc_convert_utf8.restype = c_void_p
+    libopencc.opencc_close.argtypes = [c_void_p]
 
 _opencc_share_dir = os.path.join(_thisdir, 'clib', 'share', 'opencc')
-CONFIGS = [
-    f for f in os.listdir(_opencc_share_dir)
-    if f.endswith('.json')
-]
+CONFIGS = []
+if os.path.isdir(_opencc_share_dir):
+    CONFIGS = [f for f in os.listdir(_opencc_share_dir) if f.endswith('.json')]
 
 
 class OpenCC(object):
 
     def __init__(self, config='t2s.json'):
+        assert libopencc is not None, \
+            'Build package library first'
+
         if not config.endswith('.json'):
             config += '.json'
 

@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import os
-import platform
 import re
 import subprocess
 import sys
@@ -12,6 +11,8 @@ import setuptools.command.develop
 import setuptools.command.install
 import setuptools.command.test
 
+from opencc import _libopenccfile
+
 _clib_dir = os.path.join('opencc', 'clib')
 _opencc_rootdir = '..'
 
@@ -19,14 +20,6 @@ _cmake_file = os.path.join(_opencc_rootdir, 'CMakeLists.txt')
 assert os.path.isfile(_cmake_file)
 
 _build_dir = build_dir = os.path.join(_opencc_rootdir, 'build', 'python')
-_system = platform.system()
-if _system == 'Darwin':
-    _libopenccfilename = 'libopencc.2.dylib'
-elif _system == 'Linux':
-    _libopenccfilename = 'libopencc.so.2'
-else:
-    raise NotImplementedError('Not tested for {}'.format(_system))
-_libopenccfile = os.path.join(_clib_dir, 'lib', _libopenccfilename)
 
 _version_pattern = re.compile(r'OPENCC_VERSION_(MAJOR|MINOR|REVISION) (\d+)')
 _version_file = os.path.join('opencc', 'version.py')

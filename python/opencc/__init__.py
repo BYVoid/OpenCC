@@ -47,15 +47,15 @@ CONFIGS = [
 class OpenCC(object):
 
     def __init__(self, config='t2s.json'):
+        if not config.endswith('.json'):
+            config += '.json'
+
         if not os.path.isfile(config):
-            if not config.endswith('.json'):
-                config += '.json'
-            if config not in CONFIGS:
-                raise ValueError((
-                    '{} is not a valid config. '
-                    'Valid configs: {}'
-                ).format(config, CONFIGS))
             config = os.path.join(_opencc_share_dir, config)
+
+        if not os.path.isfile(config):
+            raise ValueError('Could not find file at {}'.format(config))
+
         self._od = libopencc.opencc_open(c_char_p(config.encode('utf-8')))
 
     def convert(self, text):

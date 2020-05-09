@@ -51,7 +51,7 @@ BENCHMARK_CAPTURE(BM_Initialization, jp2t, "jp2t");
 
 static void BM_Convert(benchmark::State& state) {
   const std::string config_name = "s2t";
-  const std::string text = utf8("燕燕于飞差池其羽之子于归远送于野");
+  const std::string text = ReadText("zuozhuan.txt");
   const std::unique_ptr<SimpleConverter> converter(Initialize(config_name));
   for (auto _ : state) {
     Convert(converter.get(), text);

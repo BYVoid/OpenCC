@@ -54,7 +54,7 @@ Optional<const DictEntry*> DartsDict::Match(const char* word,
   Darts::DoubleArray& dict = *internal->doubleArray;
   Darts::DoubleArray::result_pair_type result;
 
-  dict.exactMatchSearch(word, result, std::min(maxLength, len));
+  dict.exactMatchSearch(word, result, (std::min)(maxLength, len));
   if (result.value != -1) {
     return Optional<const DictEntry*>(
         lexicon->At(static_cast<size_t>(result.value)));
@@ -70,7 +70,7 @@ Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word,
   Darts::DoubleArray::value_type results[DEFAULT_NUM_ENTRIES];
   Darts::DoubleArray::value_type maxMatchedResult;
   size_t numMatched = dict.commonPrefixSearch(
-      word, results, DEFAULT_NUM_ENTRIES, std::min(maxLength, len));
+      word, results, DEFAULT_NUM_ENTRIES, (std::min)(maxLength, len));
   if (numMatched == 0) {
     return Optional<const DictEntry*>::Null();
   } else if ((numMatched > 0) && (numMatched < DEFAULT_NUM_ENTRIES)) {
@@ -79,7 +79,7 @@ Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word,
     Darts::DoubleArray::value_type* rematchedResults =
         new Darts::DoubleArray::value_type[numMatched];
     numMatched = dict.commonPrefixSearch(word, rematchedResults, numMatched,
-                                         std::min(maxLength, len));
+                                         (std::min)(maxLength, len));
     maxMatchedResult = rematchedResults[numMatched - 1];
     delete[] rematchedResults;
   }

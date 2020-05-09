@@ -184,8 +184,8 @@ void PhraseExtract::ExtractSuffixes() {
   for (UTF8StringSlice text = utf8FullText; text.UTF8Length() > 0;
        text.MoveRight()) {
     const LengthType suffixLength =
-        std::min(static_cast<LengthType>(wordMaxLength + suffixSetLength),
-                 text.UTF8Length());
+        (std::min)(static_cast<LengthType>(wordMaxLength + suffixSetLength),
+                   text.UTF8Length());
     const UTF8StringSlice& slice = text.Left(suffixLength);
     suffixes.push_back(UTF8StringSlice8Bit(
         slice.CString(),
@@ -204,8 +204,8 @@ void PhraseExtract::ExtractPrefixes() {
   for (UTF8StringSlice text = utf8FullText; text.UTF8Length() > 0;
        text.MoveLeft()) {
     const LengthType prefixLength =
-        std::min(static_cast<LengthType>(wordMaxLength + prefixSetLength),
-                 text.UTF8Length());
+        (std::min)(static_cast<LengthType>(wordMaxLength + prefixSetLength),
+                   text.UTF8Length());
     const UTF8StringSlice& slice = text.Right(prefixLength);
     prefixes.push_back(UTF8StringSlice8Bit(
         slice.CString(),
@@ -426,7 +426,7 @@ double PhraseExtract::CalculateCohesion(
     const auto& rightPart =
         wordCandidate.Right(wordCandidate.UTF8Length() - leftLength);
     double pmi = PMI(wordCandidate, leftPart, rightPart);
-    minPMI = std::min(pmi, minPMI);
+    minPMI = (std::min)(pmi, minPMI);
   }
   return minPMI;
 }

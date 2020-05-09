@@ -36,11 +36,13 @@ public:
 
   virtual size_t KeyMaxLength() const;
 
-  virtual Optional<const DictEntry*> Match(const char* word) const;
+  virtual Optional<const DictEntry*> Match(const char* word, size_t len) const;
 
-  virtual Optional<const DictEntry*> MatchPrefix(const char* word) const;
+  virtual Optional<const DictEntry*> MatchPrefix(const char* word,
+                                                 size_t len) const;
 
-  virtual vector<const DictEntry*> MatchAllPrefixes(const char* word) const;
+  virtual vector<const DictEntry*> MatchAllPrefixes(const char* word,
+                                                    size_t len) const;
 
   virtual LexiconPtr GetLexicon() const;
 

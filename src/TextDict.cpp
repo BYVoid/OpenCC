@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2020 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ TextDictPtr TextDict::NewFromDict(const Dict& dict) {
 
 size_t TextDict::KeyMaxLength() const { return maxLength; }
 
-Optional<const DictEntry*> TextDict::Match(const char* word) const {
+Optional<const DictEntry*> TextDict::Match(const char* word, size_t len) const {
   std::unique_ptr<DictEntry> entry(new NoValueDictEntry(word));
   const auto& found = std::lower_bound(lexicon->begin(), lexicon->end(), entry,
                                        DictEntry::UPtrLessThan);

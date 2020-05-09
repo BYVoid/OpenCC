@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2020 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public:
 
   virtual size_t KeyMaxLength() const;
 
-  virtual Optional<const DictEntry*> Match(const char* word) const;
+  virtual Optional<const DictEntry*> Match(const char* word, size_t len) const;
 
   virtual LexiconPtr GetLexicon() const;
 

@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2020 BYVoid <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,14 @@ public:
   /**
    * Matches a word exactly and returns the DictEntry or Optional::Null().
    */
-  virtual Optional<const DictEntry*> Match(const char* word) const = 0;
+  virtual Optional<const DictEntry*> Match(const char* word,
+                                           size_t len) const = 0;
 
   /**
    * Matches a word exactly and returns the DictEntry or Optional::Null().
    */
   Optional<const DictEntry*> Match(const string& word) const {
-    return Match(word.c_str());
+    return Match(word.c_str(), word.length());
   }
 
   /**
@@ -45,13 +46,14 @@ public:
    * For example given a dictionary having "a", "an", "b", "ba", "ban", "bana",
    * the longest prefix of "banana" matched is "bana".
    */
-  virtual Optional<const DictEntry*> MatchPrefix(const char* word) const;
+  virtual Optional<const DictEntry*> MatchPrefix(const char* word,
+                                                 size_t len) const;
 
   /**
    * Matches the longest matched prefix of a word.
    */
   Optional<const DictEntry*> MatchPrefix(const string& word) const {
-    return MatchPrefix(word.c_str());
+    return MatchPrefix(word.c_str(), word.length());
   }
 
   /**
@@ -59,13 +61,14 @@ public:
    * For example given a dictionary having "a", "an", "b", "ba", "ban", "bana",
    * all the matched prefixes of "banana" are "bana", "ban", "ba", "b".
    */
-  virtual vector<const DictEntry*> MatchAllPrefixes(const char* word) const;
+  virtual vector<const DictEntry*> MatchAllPrefixes(const char* word,
+                                                    size_t len) const;
 
   /**
    * Returns all matched prefixes of a word, sorted by the length (desc).
    */
   vector<const DictEntry*> MatchAllPrefixes(const string& word) const {
-    return MatchAllPrefixes(word.c_str());
+    return MatchAllPrefixes(word.c_str(), word.length());
   }
 
   /**

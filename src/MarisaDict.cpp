@@ -42,10 +42,11 @@ MarisaDict::~MarisaDict() {}
 
 size_t MarisaDict::KeyMaxLength() const { return maxLength; }
 
-Optional<const DictEntry*> MarisaDict::Match(const char* word) const {
+Optional<const DictEntry*> MarisaDict::Match(const char* word,
+                                             size_t len) const {
   const marisa::Trie& trie = *internal->marisa;
   marisa::Agent agent;
-  agent.set_query(word);
+  agent.set_query(word, std::min(maxLength, len));
   if (trie.lookup(agent)) {
     return Optional<const DictEntry*>(lexicon->At(agent.key().id()));
   } else {
@@ -53,10 +54,11 @@ Optional<const DictEntry*> MarisaDict::Match(const char* word) const {
   }
 }
 
-Optional<const DictEntry*> MarisaDict::MatchPrefix(const char* word) const {
+Optional<const DictEntry*> MarisaDict::MatchPrefix(const char* word,
+                                                   size_t len) const {
   const marisa::Trie& trie = *internal->marisa;
   marisa::Agent agent;
-  agent.set_query(word, maxLength);
+  agent.set_query(word, std::min(maxLength, len));
   const DictEntry* match = nullptr;
   while (trie.common_prefix_search(agent)) {
     match = lexicon->At(agent.key().id());
@@ -68,10 +70,11 @@ Optional<const DictEntry*> MarisaDict::MatchPrefix(const char* word) const {
   }
 }
 
-vector<const DictEntry*> MarisaDict::MatchAllPrefixes(const char* word) const {
+vector<const DictEntry*> MarisaDict::MatchAllPrefixes(const char* word,
+                                                      size_t len) const {
   const marisa::Trie& trie = *internal->marisa;
   marisa::Agent agent;
-  agent.set_query(word);
+  agent.set_query(word, std::min(maxLength, len));
   vector<const DictEntry*> matches;
   while (trie.common_prefix_search(agent)) {
     matches.push_back(lexicon->At(agent.key().id()));

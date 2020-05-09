@@ -30,8 +30,9 @@ SegmentsPtr MaxMatchSegmentation::Segment(const string& text) const {
       segLength = 0;
     }
   };
+  size_t length = text.length();
   for (const char* pstr = text.c_str(); *pstr != '\0';) {
-    const Optional<const DictEntry*>& matched = dict->MatchPrefix(pstr);
+    const Optional<const DictEntry*>& matched = dict->MatchPrefix(pstr, length);
     size_t matchedLength;
     if (matched.IsNull()) {
       matchedLength = UTF8Util::NextCharLength(pstr);
@@ -43,6 +44,7 @@ SegmentsPtr MaxMatchSegmentation::Segment(const string& text) const {
       segStart = pstr + matchedLength;
     }
     pstr += matchedLength;
+    length -= matchedLength;
   }
   clearBuffer();
   return segments;

@@ -20,6 +20,7 @@
 
 #include "Lexicon.hpp"
 #include "TestUtils.hpp"
+#include "TestUtilsUTF8.hpp"
 #include "TextDict.hpp"
 
 namespace opencc {

@@ -142,6 +142,12 @@ if (ENABLE_GTEST)
   endforeach()
 endif()
 
+# Benchmark
+
+if (ENABLE_BENCHMARK)
+  add_subdirectory(benchmark)
+endif()
+
 # Subdir
 
 add_subdirectory(tools)

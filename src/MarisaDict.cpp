@@ -56,7 +56,7 @@ Optional<const DictEntry*> MarisaDict::Match(const char* word) const {
 Optional<const DictEntry*> MarisaDict::MatchPrefix(const char* word) const {
   const marisa::Trie& trie = *internal->marisa;
   marisa::Agent agent;
-  agent.set_query(word);
+  agent.set_query(word, maxLength);
   const DictEntry* match = nullptr;
   while (trie.common_prefix_search(agent)) {
     match = lexicon->At(agent.key().id());

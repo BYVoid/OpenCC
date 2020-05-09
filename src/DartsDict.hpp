@@ -23,9 +23,9 @@
 
 namespace opencc {
 /**
-* Darts dictionary
-* @ingroup opencc_cpp_api
-*/
+ * Darts dictionary
+ * @ingroup opencc_cpp_api
+ */
 class OPENCC_EXPORT DartsDict : public Dict, public SerializableDict {
 public:
   virtual ~DartsDict();
@@ -41,8 +41,8 @@ public:
   virtual void SerializeToFile(FILE* fp) const;
 
   /**
-  * Constructs a DartsDict from another dictionary.
-  */
+   * Constructs a DartsDict from another dictionary.
+   */
   static DartsDictPtr NewFromDict(const Dict& thatDict);
 
   static DartsDictPtr NewFromFile(FILE* fp);
@@ -56,4 +56,4 @@ private:
   class DartsInternal;
   DartsInternal* internal;
 };
-}
+} // namespace opencc

@@ -17,8 +17,8 @@
  */
 
 #include "Config.hpp"
-#include "Converter.hpp"
 #include "ConfigTestBase.hpp"
+#include "Converter.hpp"
 
 namespace opencc {
 
@@ -63,8 +63,8 @@ TEST_F(ConfigTest, NewFromStringWitoutTrailingSlash) {
                  (std::istreambuf_iterator<char>()));
   string pathWithoutTrailingSlash = CMAKE_SOURCE_DIR "/test/config_test";
 
-  const ConverterPtr converter = config.NewFromString(
-      content, pathWithoutTrailingSlash);
+  const ConverterPtr converter =
+      config.NewFromString(content, pathWithoutTrailingSlash);
 }
 
 } // namespace opencc

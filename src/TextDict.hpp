@@ -23,15 +23,15 @@
 
 namespace opencc {
 /**
-* Text dictionary
-* @ingroup opencc_cpp_api
-*/
+ * Text dictionary
+ * @ingroup opencc_cpp_api
+ */
 class OPENCC_EXPORT TextDict : public Dict, public SerializableDict {
 public:
   /**
-  * Constructor of TextDict.
-  * _lexicon must be sorted.
-  */
+   * Constructor of TextDict.
+   * _lexicon must be sorted.
+   */
   TextDict(const LexiconPtr& _lexicon);
 
   virtual ~TextDict();
@@ -45,8 +45,8 @@ public:
   virtual void SerializeToFile(FILE* fp) const;
 
   /**
-  * Constructs a TextDict from another dictionary.
-  */
+   * Constructs a TextDict from another dictionary.
+   */
   static TextDictPtr NewFromDict(const Dict& dict);
 
   static TextDictPtr NewFromFile(FILE* fp);
@@ -57,4 +57,4 @@ private:
   const size_t maxLength;
   const LexiconPtr lexicon;
 };
-}
+} // namespace opencc

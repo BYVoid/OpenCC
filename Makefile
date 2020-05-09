@@ -1,7 +1,7 @@
 #
 # Open Chinese Convert
 #
-# Copyright 2010-2015 BYVoid <byvoid@byvoid.com>
+# Copyright 2010-2020 BYVoid <byvoid@byvoid.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,6 +63,11 @@ xcode-build:
 	xcodebuild build)
 
 test-all: test node-test
+
+format:
+	find "src" "node" -iname "*.hpp" -o -iname "*.cpp" -o -iname "*.cc" \
+	-o -iname "*.c" -o -iname "*.h" \
+	| xargs clang-format -i
 
 clean:
 	rm -rf build xcode

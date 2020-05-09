@@ -22,19 +22,19 @@
 
 namespace opencc {
 /**
-* Serializable dictionary interface
-* @ingroup opencc_cpp_api
-*/
+ * Serializable dictionary interface
+ * @ingroup opencc_cpp_api
+ */
 class OPENCC_EXPORT SerializableDict {
 public:
   /**
-  * Serializes the dictionary and writes in to a file.
-  */
+   * Serializes the dictionary and writes in to a file.
+   */
   virtual void SerializeToFile(FILE* fp) const = 0;
 
   /**
-  * Serializes the dictionary and writes in to a file.
-  */
+   * Serializes the dictionary and writes in to a file.
+   */
   virtual void SerializeToFile(const string& fileName) const {
     FILE* fp = fopen(fileName.c_str(), "wb");
     if (fp == NULL) {
@@ -47,14 +47,14 @@ public:
   template <typename DICT>
   static bool TryLoadFromFile(const string& fileName,
                               std::shared_ptr<DICT>* dict) {
-      FILE* fp =
+    FILE* fp =
 #ifdef _MSC_VER
-          // well, the 'GetPlatformString' shall return a 'wstring'
-          _wfopen(UTF8Util::GetPlatformString(fileName).c_str(), L"rb")
+        // well, the 'GetPlatformString' shall return a 'wstring'
+        _wfopen(UTF8Util::GetPlatformString(fileName).c_str(), L"rb")
 #else
-          fopen(UTF8Util::GetPlatformString(fileName).c_str(), "rb")
+        fopen(UTF8Util::GetPlatformString(fileName).c_str(), "rb")
 #endif // _MSC_VER
-          ;
+        ;
 
     if (fp == NULL) {
       return false;
@@ -74,4 +74,4 @@ public:
     return dict;
   }
 };
-}
+} // namespace opencc

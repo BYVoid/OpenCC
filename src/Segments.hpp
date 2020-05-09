@@ -22,9 +22,9 @@
 
 namespace opencc {
 /**
-* Segmented text
-* @ingroup opencc_cpp_api
-*/
+ * Segmented text
+ * @ingroup opencc_cpp_api
+ */
 class OPENCC_EXPORT Segments {
 public:
   Segments() {}
@@ -109,4 +109,4 @@ private:
   // index, managed
   vector<std::pair<size_t, bool>> indexes;
 };
-}
+} // namespace opencc

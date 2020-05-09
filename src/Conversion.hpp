@@ -23,9 +23,9 @@
 
 namespace opencc {
 /**
-* Conversion interface
-* @ingroup opencc_cpp_api
-*/
+ * Conversion interface
+ * @ingroup opencc_cpp_api
+ */
 class OPENCC_EXPORT Conversion {
 public:
   Conversion(DictPtr _dict) : dict(_dict) {}
@@ -44,4 +44,4 @@ public:
 private:
   const DictPtr dict;
 };
-}
+} // namespace opencc

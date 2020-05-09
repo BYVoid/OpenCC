@@ -20,6 +20,7 @@
 
 #include "ConfigTestBase.hpp"
 #include "SimpleConverter.hpp"
+#include "TestUtilsUTF8.hpp"
 #include "opencc.h"
 
 namespace opencc {

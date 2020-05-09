@@ -26,6 +26,7 @@ include (CTest)
 option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
 option(BUILD_SHARED_LIBS "Build opencc as shared library" ON)
 option(ENABLE_GTEST "Build all tests." OFF)
+option(ENABLE_BENCHMARK "Build benchmark tests." OFF)
 option(ENABLE_DARTS "Build DartsDict (ocd format)." ON)
 option(BUILD_BUNDLED_LIBMARISA "" ON)
 
@@ -153,6 +154,13 @@ if (ENABLE_GTEST)
   )
 endif()
 
+if (ENABLE_BENCHMARK)
+  add_definitions(
+    -DPROJECT_BINARY_DIR="${PROJECT_BINARY_DIR}"
+    -DCMAKE_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+  )
+endif()
+
 if (ENABLE_DARTS)
   add_definitions(
     -DENABLE_DARTS
@@ -185,5 +193,11 @@ add_subdirectory(test)
 
 if (ENABLE_GTEST)
   add_subdirectory(deps/gtest-1.11.0)
+  enable_testing()
+endif()
+
+if (ENABLE_BENCHMARK)
+  set(BENCHMARK_ENABLE_TESTING OFF)
+  add_subdirectory(deps/google-benchmark)
   enable_testing()
 endif()

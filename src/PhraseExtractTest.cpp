@@ -20,6 +20,7 @@
 
 #include "PhraseExtract.hpp"
 #include "TestUtils.hpp"
+#include "TestUtilsUTF8.hpp"
 
 namespace opencc {
 

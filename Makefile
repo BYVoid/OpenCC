@@ -25,6 +25,7 @@ build:
 	(cd build/rel; cmake \
 	-DBUILD_DOCUMENTATION:BOOL=ON \
 	-DENABLE_GTEST:BOOL=OFF \
+	-DENABLE_BENCHMARK:BOOL=OFF \
 	-DCMAKE_BUILD_TYPE=Release \
 	-DCMAKE_INSTALL_PREFIX=${PREFIX} \
 	../..)
@@ -39,12 +40,25 @@ test:
 	(cd build/dbg; cmake \
 	-DBUILD_DOCUMENTATION:BOOL=OFF \
 	-DENABLE_GTEST:BOOL=ON \
+	-DENABLE_BENCHMARK:BOOL=OFF \
 	-DCMAKE_BUILD_TYPE=Debug \
 	-DCMAKE_INSTALL_PREFIX=`pwd`/root \
 	../..)
 	make -C build/dbg VERBOSE=${VERBOSE}
 	(cd build/dbg; ctest --verbose)
 	make -C build/dbg install VERBOSE=${VERBOSE}
+
+benchmark:
+	mkdir -p build/perf
+	(cd build/perf; cmake \
+	-DBUILD_DOCUMENTATION:BOOL=OFF \
+	-DENABLE_GTEST:BOOL=OFF \
+	-DENABLE_BENCHMARK:BOOL=ON \
+	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+	-DCMAKE_INSTALL_PREFIX=`pwd`/root \
+	../..)
+	make -C build/perf VERBOSE=${VERBOSE} PREFIX=${PREFIX}
+	(cd build/perf; ctest --verbose)
 
 node:
 	node-gyp configure
@@ -59,6 +73,7 @@ xcode-build:
 	-G "Xcode" \
 	-DBUILD_DOCUMENTATION:BOOL=OFF \
 	-DENABLE_GTEST:BOOL=ON \
+	-ENABLE_BENCHMARK:BOOL=ON \
 	..; \
 	xcodebuild build)
 

@@ -1,6 +1,7 @@
 #include <benchmark/benchmark.h>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <streambuf>
 #include <unistd.h>
 

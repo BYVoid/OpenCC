@@ -86,32 +86,49 @@ https://byvoid.github.io/OpenCC/
 
 ### Build with CMake
 
-Linux (gcc 4.6 is required):
+Linux (g++ 4.6 is required) and Mac OS X (clang 3.2 is required):
 
 ```bash
 make
-sudo make install
 ```
 
-Mac OS X (clang 3.2 is required):
+Windows Visual Studio:
 
 ```bash
-make PREFIX=/usr/local
-sudo make PREFIX=/usr/local install
-```
-
-Windows MSYS:
-
-```bash
-cmake -H. -Bbuild -G "MSYS Makefiles" -DCMAKE_INSTALL_PREFIX="path/to/install"
+cmake -S. -Bbuild -DCMAKE_INSTALL_PREFIX:PATH=.
 cmake --build build --config Release --target install
 ```
 
-Windows Visual Studio (2013 or higher required):
+### Test 測試
 
-```bash
-cmake -H. -Bbuild -G"Visual Studio 12" -DCMAKE_INSTALL_PREFIX="path/to/install"
-cmake --build build --config Release --target install
+```
+make test
+```
+
+### Benchmark 基準測試
+
+```
+make benchmark
+```
+
+Example results (from Travis CI):
+
+```
+1: ------------------------------------------------------------------
+1: Benchmark                        Time             CPU   Iterations
+1: ------------------------------------------------------------------
+1: BM_Initialization/s2t     27325410 ns     27337754 ns           26
+1: BM_Initialization/t2s      1427929 ns      1428890 ns          492
+1: BM_Initialization/s2tw    26888809 ns     26900500 ns           26
+1: BM_Initialization/s2twp   27286513 ns     27297972 ns           25
+1: BM_Initialization/tw2s     1442091 ns      1442939 ns          475
+1: BM_Initialization/tw2sp    1737702 ns      1738815 ns          398
+1: BM_Initialization/s2hk    27070874 ns     27081523 ns           26
+1: BM_Initialization/hk2s     1515165 ns      1516135 ns          466
+1: BM_Initialization/t2jp      147005 ns       146864 ns         4850
+1: BM_Initialization/jp2t      246554 ns       246479 ns         2859
+1: BM_Convert                     531 ms          531 ms            1
+1/1 Test #1: performance ......................   Passed   11.52 sec
 ```
 
 ## Projects using OpenCC 使用 OpenCC 的項目
@@ -140,7 +157,7 @@ All these libraries are statically linked.
 
 ## Change History 版本歷史
 
-https://github.com/BYVoid/OpenCC/blob/master/NEWS.md
+* [NEWS](https://github.com/BYVoid/OpenCC/blob/master/NEWS.md)
 
 ### Links 相關鏈接
 

@@ -73,7 +73,7 @@ xcode-build:
 	-G "Xcode" \
 	-DBUILD_DOCUMENTATION:BOOL=OFF \
 	-DENABLE_GTEST:BOOL=ON \
-	-ENABLE_BENCHMARK:BOOL=ON \
+	-DENABLE_BENCHMARK:BOOL=ON \
 	..; \
 	xcodebuild build)
 

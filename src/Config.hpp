@@ -22,9 +22,9 @@
 
 namespace opencc {
 /**
-* Configuration loader
-* @ingroup opencc_cpp_api
-*/
+ * Configuration loader
+ * @ingroup opencc_cpp_api
+ */
 class OPENCC_EXPORT Config {
 public:
   Config();
@@ -38,4 +38,4 @@ public:
 private:
   void* internal;
 };
-}
+} // namespace opencc

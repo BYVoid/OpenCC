@@ -24,9 +24,9 @@
 
 namespace opencc {
 /**
-* Implementation of maximal match segmentation
-* @ingroup opencc_cpp_api
-*/
+ * Implementation of maximal match segmentation
+ * @ingroup opencc_cpp_api
+ */
 class OPENCC_EXPORT MaxMatchSegmentation : public Segmentation {
 public:
   MaxMatchSegmentation(const DictPtr _dict) : dict(_dict) {}
@@ -40,4 +40,4 @@ public:
 private:
   const DictPtr dict;
 };
-}
+} // namespace opencc

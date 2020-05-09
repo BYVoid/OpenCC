@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "ConversionChain.hpp"
 #include "Converter.hpp"
+#include "ConversionChain.hpp"
 #include "Segments.hpp"
 
 using namespace opencc;

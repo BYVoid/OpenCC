@@ -23,9 +23,9 @@
 
 namespace opencc {
 /**
-* Group of dictionaries
-* @ingroup opencc_cpp_api
-*/
+ * Group of dictionaries
+ * @ingroup opencc_cpp_api
+ */
 class OPENCC_EXPORT DictGroup : public Dict {
 public:
   DictGroup(const list<DictPtr>& dicts);
@@ -50,4 +50,4 @@ private:
   const size_t keyMaxLength;
   const list<DictPtr> dicts;
 };
-}
+} // namespace opencc

@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "TestUtils.hpp"
 #include "UTF8Util.hpp"
+#include "TestUtils.hpp"
 
 namespace opencc {
 

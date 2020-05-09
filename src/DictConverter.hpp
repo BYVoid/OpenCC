@@ -22,9 +22,11 @@
 
 namespace opencc {
 /**
-* Converts a dictionary from a format to another.
-* @ingroup opencc_cpp_api
-*/
-OPENCC_EXPORT void ConvertDictionary(const string inputFileName, const string outputFileName,
-                       const string formatFrom, const string formatTo);
-}
+ * Converts a dictionary from a format to another.
+ * @ingroup opencc_cpp_api
+ */
+OPENCC_EXPORT void ConvertDictionary(const string inputFileName,
+                                     const string outputFileName,
+                                     const string formatFrom,
+                                     const string formatTo);
+} // namespace opencc

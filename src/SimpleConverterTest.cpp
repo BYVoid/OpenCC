@@ -18,9 +18,9 @@
 
 #include <thread>
 
-#include "opencc.h"
 #include "ConfigTestBase.hpp"
 #include "SimpleConverter.hpp"
+#include "opencc.h"
 
 namespace opencc {
 
@@ -39,8 +39,9 @@ protected:
 TEST_F(SimpleConverterTest, Convert) { TestConverter(CONFIG_TEST_PATH); }
 
 TEST_F(SimpleConverterTest, Multithreading) {
-  const auto& routine =
-      [this](const std::string& config) { TestConverter(config); };
+  const auto& routine = [this](const std::string& config) {
+    TestConverter(config);
+  };
   std::thread thread1(routine, CONFIG_TEST_PATH);
   std::thread thread2(routine, CONFIG_TEST_PATH);
   routine(CONFIG_TEST_PATH);

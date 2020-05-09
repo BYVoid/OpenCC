@@ -23,9 +23,9 @@
 
 namespace opencc {
 /**
-* Binary dictionary for faster deserialization
-* @ingroup opencc_cpp_api
-*/
+ * Binary dictionary for faster deserialization
+ * @ingroup opencc_cpp_api
+ */
 class OPENCC_EXPORT BinaryDict : public SerializableDict {
 public:
   BinaryDict(const LexiconPtr& _lexicon) : lexicon(_lexicon) {}
@@ -50,4 +50,4 @@ private:
                        vector<size_t>& valueOffset,
                        size_t& valueTotalLength) const;
 };
-}
+} // namespace opencc

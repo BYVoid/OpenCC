@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "CmdLineOutput.hpp"
 #include "DictConverter.hpp"
+#include "CmdLineOutput.hpp"
 
 using namespace opencc;
 

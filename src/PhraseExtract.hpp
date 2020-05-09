@@ -76,13 +76,15 @@ public:
   }
 
   // PreCalculationFilter is called after frequencies statistics.
-  void SetPreCalculationFilter(const std::function<
-      bool(const PhraseExtract&, const UTF8StringSlice8Bit&)>& filter) {
+  void SetPreCalculationFilter(
+      const std::function<bool(const PhraseExtract&,
+                               const UTF8StringSlice8Bit&)>& filter) {
     preCalculationFilter = filter;
   }
 
-  void SetPostCalculationFilter(const std::function<
-      bool(const PhraseExtract&, const UTF8StringSlice8Bit&)>& filter) {
+  void SetPostCalculationFilter(
+      const std::function<bool(const PhraseExtract&,
+                               const UTF8StringSlice8Bit&)>& filter) {
     postCalculationFilter = filter;
   }
 
@@ -155,8 +157,9 @@ private:
 
   double CalculateCohesion(const UTF8StringSlice8Bit& wordCandidate) const;
 
-  double CalculateEntropy(const std::unordered_map<
-      UTF8StringSlice8Bit, size_t, UTF8StringSlice8Bit::Hasher>& choices) const;
+  double CalculateEntropy(
+      const std::unordered_map<UTF8StringSlice8Bit, size_t,
+                               UTF8StringSlice8Bit::Hasher>& choices) const;
 
   LengthType wordMinLength;
   LengthType wordMaxLength;

@@ -23,9 +23,9 @@
 
 namespace opencc {
 /**
-* Controller of segmentation and conversion
-* @ingroup opencc_cpp_api
-*/
+ * Controller of segmentation and conversion
+ * @ingroup opencc_cpp_api
+ */
 class OPENCC_EXPORT Converter {
 public:
   Converter(const string& _name, SegmentationPtr _segmentation,
@@ -48,4 +48,4 @@ private:
   const SegmentationPtr segmentation;
   const ConversionChainPtr conversionChain;
 };
-}
+} // namespace opencc

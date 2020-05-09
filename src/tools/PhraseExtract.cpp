@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-#include "CmdLineOutput.hpp"
 #include "PhraseExtract.hpp"
+#include "CmdLineOutput.hpp"
 
 using opencc::Exception;
-using opencc::UTF8StringSlice;
 using opencc::PhraseExtract;
+using opencc::UTF8StringSlice;
 
 void Extract(const vector<string>& inputFiles, const string& outputFile) {
   std::ostringstream buffer;

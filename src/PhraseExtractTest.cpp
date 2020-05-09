@@ -99,12 +99,12 @@ TEST_F(PhraseExtractTest, ExtractWordCandidates) {
   phraseExtract.SetWordMaxLength(3);
   phraseExtract.SetFullText(siShi);
   phraseExtract.ExtractWordCandidates();
-  EXPECT_EQ(
-      vector<UTF8StringSlice8Bit>(
-          {"十", "四", "是", "四十", "十四", "十是", "四十是", "四是", "是十",
-           "是四", "是四十", "十十", "十十四", "十四四", "十四是", "十是十",
-           "十是四", "四四", "四四十", "四是十", "四是四", "是十十", "是十四"}),
-      phraseExtract.WordCandidates());
+  EXPECT_EQ(vector<UTF8StringSlice8Bit>(
+                {"十",     "四",     "是",     "四十",   "十四",   "十是",
+                 "四十是", "四是",   "是十",   "是四",   "是四十", "十十",
+                 "十十四", "十四四", "十四是", "十是十", "十是四", "四四",
+                 "四四十", "四是十", "四是四", "是十十", "是十四"}),
+            phraseExtract.WordCandidates());
 }
 
 TEST_F(PhraseExtractTest, CalculateCohesions) {

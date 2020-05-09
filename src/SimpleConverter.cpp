@@ -24,8 +24,8 @@
 
 #include "Config.hpp"
 #include "Converter.hpp"
-#include "opencc.h"
 #include "UTF8Util.hpp"
+#include "opencc.h"
 
 using namespace opencc;
 

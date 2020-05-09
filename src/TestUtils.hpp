@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <string>
 #include "gtest/gtest.h"
+#include <string>
 
 namespace opencc {
 

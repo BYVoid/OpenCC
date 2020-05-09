@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "DictGroupTestBase.hpp"
 #include "MaxMatchSegmentation.hpp"
+#include "DictGroupTestBase.hpp"
 
 namespace opencc {
 

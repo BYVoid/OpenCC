@@ -83,8 +83,3 @@ class OpenCC(object):
 
     def __del__(self):
         libopencc.opencc_close(self._od)
-
-
-def convert(text, config='t2s.json'):
-    cc = OpenCC(config)
-    return cc.convert(text)

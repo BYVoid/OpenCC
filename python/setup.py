@@ -43,7 +43,7 @@ def get_version_info():
 
 def write_version_file(version_info):
     with open(_version_file, 'w') as f:
-        f.write('__version__ = "{}"'.format(version_info))
+        f.write('__version__ = "{}"\n'.format(version_info))
 
 
 def get_author_info():

@@ -49,7 +49,7 @@ def write_version_file(version_info):
 def get_author_info():
     author_file = os.path.join(_opencc_rootdir, 'AUTHORS')
     if not os.path.isfile(author_file):
-        return 'BYVoid', 'byvoid.kcp@gmail.com'
+        return 'BYVoid', 'byvoid@byvoid.com'
 
     authors = []
     emails = []
@@ -63,7 +63,7 @@ def get_author_info():
             emails.append(match.group(2))
 
     if len(authors) == 0:
-        return 'BYVoid', 'byvoid.kcp@gmail.com'
+        return 'BYVoid', 'byvoid@byvoid.com'
 
     return ', '.join(authors), ', '.join(emails)
 
@@ -104,22 +104,22 @@ def build_libopencc():
     assert os.path.isfile(_libopenccfile)
 
 
-class BuildPyCommand(setuptools.command.build_py.build_py):
+class BuildPyCommand(setuptools.command.build_py.build_py, object):
     def run(self):
         build_libopencc()
-        super().run()
+        super(BuildPyCommand, self).run()
 
 
-class InstallCommand(setuptools.command.install.install):
+class InstallCommand(setuptools.command.install.install, object):
     def run(self):
         build_libopencc()
-        super().run()
+        super(InstallCommand, self).run()
 
 
-class DevelopCommand(setuptools.command.develop.develop):
+class DevelopCommand(setuptools.command.develop.develop, object):
     def run(self):
         build_libopencc()
-        super().run()
+        super(DevelopCommand, self).run()
 
 
 class PyTestCommand(setuptools.command.test.test):
@@ -145,7 +145,7 @@ setuptools.setup(
     url="https://github.com/BYVoid/OpenCC",
 
     packages=['opencc'],
-    package_data={'opencc': [
+    package_data={str('opencc'): [
         'clib/include/opencc/*',
         'clib/lib/libopencc.*',
         'clib/share/opencc/*',

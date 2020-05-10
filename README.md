@@ -2,6 +2,7 @@
 
 [![Travis](https://img.shields.io/travis/BYVoid/OpenCC.svg)](https://travis-ci.org/BYVoid/OpenCC)
 [![AppVeyor](https://img.shields.io/appveyor/ci/Carbo/OpenCC.svg)](https://ci.appveyor.com/project/Carbo/OpenCC)
+[![Python package](https://github.com/BYVoid/OpenCC/workflows/Python%20package/badge.svg?branch=master)](https://github.com/BYVoid/OpenCC/actions?query=workflow%3A%22Python+package%22)
 
 ## Introduction 介紹
 

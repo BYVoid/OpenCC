@@ -26,6 +26,7 @@ def test_conversion():
     for inpath in glob(os.path.join(_test_assets_dir, '*.in')):
         pref = os.path.splitext(inpath)[0]
         config = os.path.basename(pref)
+        converter = opencc.OpenCC(config)
         anspath = '{}.{}'.format(pref, 'ans')
         assert os.path.isfile(anspath)
 
@@ -36,5 +37,5 @@ def test_conversion():
         assert len(intexts) == len(anstexts)
 
         for text, ans in zip(intexts, anstexts):
-            assert opencc.convert(text, config) == ans, \
+            assert converter.convert(text) == ans, \
                 'Failed to convert {} for {} -> {}'.format(pref, text, ans)

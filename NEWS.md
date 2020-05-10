@@ -1,5 +1,16 @@
 # Change History of OpenCC
 
+## Version 1.1.0
+
+2020年5月10日
+
+* 新辭典格式`ocd2`，基於Marisa Trie 0.2.5。辭典大小大幅減少。`STPhrases.ocd`從4.3MB減少到`STPhrases.ocd2`的924KB。
+* 升級依賴的rapidjson版本到1.1.0，tclap到1.2.2，gtest到1.11.0。
+* 更改「涌/湧」的默認轉換，修正多個詞組轉換。
+* 提供Windows的預編譯版本下載（AppVeyor）。
+* 增加基準測試結果。
+* 提供Python接口。
+
 ## Version 1.0.6
 
 2020年4月13日

@@ -13,7 +13,10 @@ CMakeLists.txt
 /opencc.pc.in
 /doc/html
 /opencc.xcodeproj
+/python
+/test/benchmark
 /test/dict.ocd
 /test/dict.txt
 /test/dict.bin
 /node_modules
+/xcode

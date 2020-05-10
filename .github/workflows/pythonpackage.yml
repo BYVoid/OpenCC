@@ -6,12 +6,14 @@ on:
   pull_request:
     branches: [ master ]
 
+defaults:
+  run:
+    working-directory: ./python
+
 jobs:
   build:
 
     runs-on: ubuntu-latest
-    env:
-      working-directory: ./python
     strategy:
       matrix:
         python-version: [3.5, 3.6, 3.7, 3.8]

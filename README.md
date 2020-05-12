@@ -34,13 +34,9 @@ Warning: **This is NOT an API.** You will be banned if you make calls programmat
 
 https://opencc.byvoid.com/
 
-### Command Line
-
-* `opencc --help`
-* `opencc_dict --help`
-* `opencc_phrase_extract --help`
-
 ### Node.js
+
+[npm](https://www.npmjs.com/opencc) `npm i install opencc`
 
 ```js
 const OpenCC = require('opencc');
@@ -52,9 +48,35 @@ opencc.convertPromise("汉字").then(converted => {
 
 See [demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js).
 
-### C++ Document 文檔
+### Python
 
-https://byvoid.github.io/OpenCC/
+[PyPI](https://pypi.org/project/opencc-py/) `pip3 install opencc-py`
+
+```python
+import opencc
+converter = opencc.OpenCC('s2t.json')
+converter.convert('汉字')  //漢字
+```
+
+### C++
+
+```c++
+#include "opencc.h"
+
+int main() {
+  const SimpleConverter converter("s2t.json");
+  converter.Convert("汉字");  //漢字
+  return 0;
+}
+```
+
+Document 文檔: https://byvoid.github.io/OpenCC/
+
+### Command Line
+
+* `opencc --help`
+* `opencc_dict --help`
+* `opencc_phrase_extract --help`
 
 ### Others (Unofficial)
 
@@ -62,8 +84,6 @@ https://byvoid.github.io/OpenCC/
 * Java: [opencc4j](https://github.com/houbb/opencc4j)
 * Android: [android-opencc](https://github.com/qichuan/android-opencc)
 * PHP: [opencc4php](https://github.com/nauxliu/opencc4php)
-* Python (Reimplementation): [opencc-python](https://github.com/yichen0831/opencc-python)
-* Python (C++ binding): [opencc-python](https://github.com/lepture/opencc-python)
 * WebAssembly: [wasm-opencc](https://github.com/oyyd/wasm-opencc)
 
 ### Configurations 配置文件

@@ -50,7 +50,7 @@ See [demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js).
 
 ### Python
 
-[PyPI](https://pypi.org/project/opencc-py/) `pip3 install opencc-py`
+[PyPI](https://pypi.org/project/OpenCC/) `pip3 install opencc`
 
 ```python
 import opencc

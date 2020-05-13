@@ -83,9 +83,6 @@ python-build:
 python-install:
 	cd python; python setup.py install
 
-python-develop:
-	cd python; python setup.py develop
-
 python-test: python-build
 	cd python; python setup.py test
 
@@ -97,7 +94,7 @@ format:
 	| xargs clang-format -i
 
 clean:
-	rm -rf build xcode
+	rm -rf build xcode python/opencc/clib
 
 install: build
 	make -C build/rel install VERBOSE=${VERBOSE} PREFIX=${PREFIX}

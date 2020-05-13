@@ -3,12 +3,15 @@ from __future__ import unicode_literals
 import os
 import re
 import subprocess
+import sys
+import warnings
 
 import setuptools
 import setuptools.command.build_py
 import setuptools.command.develop
 import setuptools.command.install
 import setuptools.command.test
+import wheel.bdist_wheel
 
 from opencc import _libopenccfile
 
@@ -109,6 +112,37 @@ class BuildPyCommand(setuptools.command.build_py.build_py, object):
         super(BuildPyCommand, self).run()
 
 
+class BDistWheelCommand(wheel.bdist_wheel.bdist_wheel):
+    """Custom bdsit_wheel command that will change
+    default plat-name based on PEP 425 and PEP 513
+    """
+
+    @staticmethod
+    def _determine_platform_tag():
+        if sys.platform == 'win32':
+            if 'amd64' in sys.version.lower():
+                return 'win-amd64'
+            return sys.platform
+
+        if sys.platform == 'darwin':
+            uname = os.uname()
+            return 'macosx-10.9-{}'.format(uname.machine)
+
+        if os.name == 'posix':
+            uname = os.uname()
+            return 'manylinux1-{}'.format(uname.machine)
+
+        warnings.warn(
+            'Windows macos and linux are all not detected, '
+            'Proper distribution name cannot be determined.')
+        from distutils.util import get_platform
+        return get_platform()
+
+    def initialize_options(self):
+        super(BDistWheelCommand, self).initialize_options()
+        self.plat_name = self._determine_platform_tag()
+
+
 version_info = get_version_info()
 write_version_file(version_info)
 
@@ -130,7 +164,10 @@ setuptools.setup(
         'clib/lib/libopencc.*',
         'clib/share/opencc/*',
     ]},
-    cmdclass={'build_py': BuildPyCommand},
+    cmdclass={
+        'build_py': BuildPyCommand,
+        'bdist_wheel': BDistWheelCommand
+    },
 
     tests_require=['pytest'],
     test_suite='tests',

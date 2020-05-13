@@ -80,7 +80,7 @@ xcode-build:
 python-build:
 	cd python; python setup.py build
 
-python-install:
+python-install: python-build
 	cd python; python setup.py install
 
 python-test: python-build

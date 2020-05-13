@@ -40,7 +40,10 @@ def get_version_info():
                 version_info[1] = match.group(2)
             elif match.group(1) == 'REVISION':
                 version_info[2] = match.group(2)
-    return '.'.join(version_info)
+    version = '.'.join(version_info)
+    # Remove the next line in the next version.
+    version += '-1'
+    return version
 
 
 def write_version_file(version_info):

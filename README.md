@@ -50,12 +50,12 @@ See [demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js).
 
 ### Python
 
-[PyPI](https://pypi.org/project/OpenCC/) `pip3 install opencc`
+[PyPI](https://pypi.org/project/OpenCC/) `pip install opencc` (Windows, Linux, Mac)
 
 ```python
 import opencc
 converter = opencc.OpenCC('s2t.json')
-converter.convert('汉字')  //漢字
+converter.convert('汉字')  # 漢字
 ```
 
 ### C++
@@ -65,7 +65,7 @@ converter.convert('汉字')  //漢字
 
 int main() {
   const SimpleConverter converter("s2t.json");
-  converter.Convert("汉字");  //漢字
+  converter.Convert("汉字");  // 漢字
   return 0;
 }
 ```

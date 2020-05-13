@@ -79,30 +79,61 @@ def build_libopencc():
     if os.path.isfile(_libopenccfile):
         return  # Skip building binary file
 
-    print('building libopencc')
-    assert subprocess.call('command -v make', shell=True) == 0, \
-        'Build requires `make`'
-    assert subprocess.call('command -v cmake', shell=True) == 0, \
-        'Build requires `cmake`'
-    # Probably also needs to check for cpp-compilier
+    print('building libopencc into %s' % _build_dir)
 
-    errno = subprocess.call((
-        'mkdir -p {build_dir};'
-        'cmake '
-        '-B {build_dir} '
-        '-DBUILD_DOCUMENTATION:BOOL=OFF '
-        '-DENABLE_GTEST:BOOL=OFF '
-        '-DCMAKE_BUILD_TYPE=Release '
-        '-DCMAKE_INSTALL_PREFIX={clib_dir} '
-        '..;'
-        'make -C {build_dir} -j;'
-        'make -C {build_dir} install;'
-    ).format(
-        build_dir=_build_dir,
-        clib_dir=_clib_dir
-    ), shell=True)
+    def build_on_windows():
+        subprocess.call('md %s' % _build_dir, shell=True)
+        cmd = (
+            'cmake '
+            '-B {build_dir} '
+            '-DBUILD_DOCUMENTATION:BOOL=OFF '
+            '-DENABLE_GTEST:BOOL=OFF '
+            '-DCMAKE_BUILD_TYPE=Release '
+            '-DCMAKE_INSTALL_PREFIX={clib_dir} '
+            '..'
+        ).format(
+            build_dir=_build_dir,
+            clib_dir=_clib_dir
+        )
+        errno = subprocess.call(cmd, shell=True)
+        assert errno == 0, 'Configure failed'
+        cmd = (
+            'cmake --build {build_dir} --config Release --target install'
+        ).format(
+            build_dir=_build_dir
+        )
+        errno = subprocess.call(cmd, shell=True)
+        assert errno == 0, 'Build failed'
+    
+    def build_on_posix():
+        assert subprocess.call('command -v make', shell=True) == 0, \
+            'Build requires `make`'
+        assert subprocess.call('command -v cmake', shell=True) == 0, \
+            'Build requires `cmake`'
+        # Probably also needs to check for cpp-compilier
 
-    assert errno == 0, 'Build failed'
+        errno = subprocess.call((
+            'mkdir -p {build_dir};'
+            'cmake '
+            '-B {build_dir} '
+            '-DBUILD_DOCUMENTATION:BOOL=OFF '
+            '-DENABLE_GTEST:BOOL=OFF '
+            '-DCMAKE_BUILD_TYPE=Release '
+            '-DCMAKE_INSTALL_PREFIX={clib_dir} '
+            '..;'
+            'make -C {build_dir} -j;'
+            'make -C {build_dir} install;'
+        ).format(
+            build_dir=_build_dir,
+            clib_dir=_clib_dir
+        ), shell=True)
+
+        assert errno == 0, 'Build failed'
+
+    if sys.platform == 'win32':
+        build_on_windows()
+    else:
+        build_on_posix()
     assert os.path.isfile(_libopenccfile)
 
 
@@ -160,6 +191,7 @@ setuptools.setup(
 
     packages=['opencc'],
     package_data={str('opencc'): [
+        'clib/bin/*.dll',
         'clib/include/opencc/*',
         'clib/lib/libopencc.*',
         'clib/share/opencc/*',

@@ -84,7 +84,7 @@ python-install: python-build
 	cd python; python setup.py install
 
 python-test: python-build
-	cd python; python setup.py test
+	cd python; pytest .
 
 test-all: test node-test python-test
 

@@ -112,7 +112,7 @@ class BuildPyCommand(setuptools.command.build_py.build_py, object):
         super(BuildPyCommand, self).run()
 
 
-class BDistWheelCommand(wheel.bdist_wheel.bdist_wheel):
+class BDistWheelCommand(wheel.bdist_wheel.bdist_wheel, object):
     """Custom bdsit_wheel command that will change
     default plat-name based on PEP 425 and PEP 513
     """

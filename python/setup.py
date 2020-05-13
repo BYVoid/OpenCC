@@ -135,7 +135,7 @@ write_version_file(version_info)
 author_info = get_author_info()
 
 setuptools.setup(
-    name='opencc-py',
+    name='OpenCC',
     version=version_info,
     author=author_info[0],
     author_email=author_info[1],

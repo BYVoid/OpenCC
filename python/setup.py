@@ -125,12 +125,11 @@ class BDistWheelCommand(wheel.bdist_wheel.bdist_wheel, object):
             return sys.platform
 
         if sys.platform == 'darwin':
-            uname = os.uname()
-            _, _, _, _, machine = uname
+            _, _, _, _, machine = os.uname()
             return 'macosx-10.9-{}'.format(machine)
 
         if os.name == 'posix':
-            _, _, _, _, machine = uname
+            _, _, _, _, machine = os.uname()
             return 'manylinux1-{}'.format(machine)
 
         warnings.warn(

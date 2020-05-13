@@ -101,6 +101,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-# Generated files
-opencc/version.py

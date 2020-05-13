@@ -9,7 +9,6 @@ import os
 import platform
 import sys
 from ctypes import CDLL, c_char_p, c_size_t, c_void_p, cast
-from ctypes.util import find_library
 
 try:
     from opencc.version import __version__  # noqa
@@ -23,9 +22,6 @@ else:
 
 __all__ = ['CONFIGS', 'convert', 'OpenCC']
 
-_libcfile = find_library('c') or 'libc.so.6'
-libc = CDLL(_libcfile, use_errno=True)
-libc.free.argtypes = [c_void_p]
 
 _thisdir = os.path.dirname(os.path.abspath(__file__))
 _system = platform.system()
@@ -33,9 +29,15 @@ if _system == 'Darwin':
     _libopenccfilename = 'libopencc.2.dylib'
 elif _system == 'Linux':
     _libopenccfilename = 'libopencc.so.2'
+elif _system == 'Windows':
+    _libopenccfilename = 'opencc.dll'
 else:
     raise NotImplementedError('Not tested for {}'.format(_system))
-_libopenccfile = os.path.join(_thisdir, 'clib', 'lib', _libopenccfilename)
+
+if _system == 'Windows':
+    _libopenccfile = os.path.join(_thisdir, 'clib', 'bin', _libopenccfilename)
+else:
+    _libopenccfile = os.path.join(_thisdir, 'clib', 'lib', _libopenccfilename)
 
 libopencc = None
 if os.path.isfile(_libopenccfile):
@@ -43,6 +45,8 @@ if os.path.isfile(_libopenccfile):
     libopencc.opencc_open.restype = c_void_p
     libopencc.opencc_convert_utf8.argtypes = [c_void_p, c_char_p, c_size_t]
     libopencc.opencc_convert_utf8.restype = c_void_p
+    libopencc.opencc_convert_utf8_free.argtypes = [c_char_p]
+    libopencc.opencc_convert_utf8_free.restype = c_void_p
     libopencc.opencc_close.argtypes = [c_void_p]
 
 _opencc_share_dir = os.path.join(_thisdir, 'clib', 'share', 'opencc')
@@ -78,7 +82,7 @@ class OpenCC(object):
             raise Exception('OpenCC Convert Error')
         retv_c = cast(retv_i, c_char_p)
         value = retv_c.value
-        libc.free(retv_c)
+        libopencc.opencc_convert_utf8_free(retv_c)
         return value.decode('utf-8')
 
     def __del__(self):

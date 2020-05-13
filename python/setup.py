@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import os
 import re
 import subprocess
-import sys
 
 import setuptools
 import setuptools.command.build_py
@@ -110,25 +109,6 @@ class BuildPyCommand(setuptools.command.build_py.build_py, object):
         super(BuildPyCommand, self).run()
 
 
-class InstallCommand(setuptools.command.install.install, object):
-    def run(self):
-        build_libopencc()
-        super(InstallCommand, self).run()
-
-
-class DevelopCommand(setuptools.command.develop.develop, object):
-    def run(self):
-        build_libopencc()
-        super(DevelopCommand, self).run()
-
-
-class PyTestCommand(setuptools.command.test.test):
-    def run_tests(self):
-        import pytest
-        errno = pytest.main([])
-        sys.exit(errno)
-
-
 version_info = get_version_info()
 write_version_file(version_info)
 
@@ -150,12 +130,7 @@ setuptools.setup(
         'clib/lib/libopencc.*',
         'clib/share/opencc/*',
     ]},
-    cmdclass={
-        'build_py': BuildPyCommand,
-        'install': InstallCommand,
-        'develop': DevelopCommand,
-        'test': PyTestCommand,
-    },
+    cmdclass={'build_py': BuildPyCommand},
 
     tests_require=['pytest'],
     test_suite='tests',

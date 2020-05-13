@@ -126,11 +126,12 @@ class BDistWheelCommand(wheel.bdist_wheel.bdist_wheel, object):
 
         if sys.platform == 'darwin':
             uname = os.uname()
-            return 'macosx-10.9-{}'.format(uname.machine)
+            _, _, _, _, machine = uname
+            return 'macosx-10.9-{}'.format(machine)
 
         if os.name == 'posix':
-            uname = os.uname()
-            return 'manylinux1-{}'.format(uname.machine)
+            _, _, _, _, machine = uname
+            return 'manylinux1-{}'.format(machine)
 
         warnings.warn(
             'Windows macos and linux are all not detected, '

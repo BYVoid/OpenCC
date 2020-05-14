@@ -12,3 +12,5 @@
 /test/dict.bin
 /xcode
 /node_modules
+/dist
+/*.egg-info

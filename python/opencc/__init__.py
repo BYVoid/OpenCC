@@ -1,8 +1,9 @@
 from __future__ import absolute_import, unicode_literals
 
 import os
-import platform
 import sys
+
+from opencc.clib import opencc_clib
 
 __all__ = ['OpenCC', 'CONFIGS']
 
@@ -30,22 +31,6 @@ def _append_path_to_env(name, path):
     else:
         value += ':' + path
     os.environ[name] = value
-
-
-def _import_opencc_clib():
-    _system = platform.system()
-    if _system == 'Darwin':  # Mac OS X
-        _append_path_to_env('DYLD_LIBRARY_PATH', _opencc_lib_dir)
-    elif _system == 'Linux':
-        _append_path_to_env('LD_LIBRARY_PATH', _opencc_lib_dir)
-    else:
-        raise NotImplementedError('Not tested for {}'.format(_system))
-
-    from opencc.clib import opencc_clib
-    return opencc_clib
-
-
-opencc_clib = _import_opencc_clib()
 
 
 class OpenCC(opencc_clib._OpenCC):

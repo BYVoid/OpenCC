@@ -17,16 +17,17 @@ _build_dir = os.path.join(_this_dir, 'build', 'python')
 
 _cmake_file = os.path.join(_this_dir, 'CMakeLists.txt')
 _author_file = os.path.join(_this_dir, 'AUTHORS')
+_readme_file = os.path.join(_this_dir, 'README.md')
 _version_file = os.path.join(_this_dir, 'python', 'opencc', 'version.py')
-
-_version_pattern = re.compile(r'OPENCC_VERSION_(MAJOR|MINOR|REVISION) (\d+)')
 
 
 def get_version_info():
     version_info = ['1', '0', '0']
+    version_pattern = re.compile(
+        r'OPENCC_VERSION_(MAJOR|MINOR|REVISION) (\d+)')
     with open(_cmake_file, 'rb') as f:
         for l in f:
-            match = _version_pattern.search(l.decode('utf-8'))
+            match = version_pattern.search(l.decode('utf-8'))
             if not match:
                 continue
             if match.group(1) == 'MAJOR':
@@ -47,14 +48,13 @@ def write_version_file(version_info):
 
 
 def get_author_info():
-    author_file = os.path.join(_opencc_rootdir, 'AUTHORS')
-    if not os.path.isfile(author_file):
+    if not os.path.isfile(_author_file):
         return 'BYVoid', 'byvoid@byvoid.com'
 
     authors = []
     emails = []
     author_pattern = re.compile(r'(.+) <(.+)>')
-    with open(author_file, 'rb') as f:
+    with open(_author_file, 'rb') as f:
         for line in f:
             match = author_pattern.search(line.decode('utf-8'))
             if not match:
@@ -69,7 +69,7 @@ def get_author_info():
 
 
 def get_long_description():
-    with open(os.path.join(_opencc_rootdir, 'README.md'), 'rb') as f:
+    with open(_readme_file, 'rb') as f:
         return f.read().decode('utf-8')
 
 

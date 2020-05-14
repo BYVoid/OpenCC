@@ -4,8 +4,9 @@ import os
 import sys
 
 from opencc.clib import opencc_clib
+from opencc.version import __version__
 
-__all__ = ['OpenCC', 'CONFIGS']
+__all__ = ['OpenCC', 'CONFIGS', '__version__']
 
 _thisdir = os.path.dirname(os.path.abspath(__file__))
 _opencc_lib_dir = os.path.join(_thisdir, 'clib', 'lib')
@@ -35,7 +36,7 @@ def _append_path_to_env(name, path):
 
 class OpenCC(opencc_clib._OpenCC):
 
-    def __init__(self, config):
+    def __init__(self, config='t2s'):
         if not config.endswith('.json'):
             config += '.json'
         if not os.path.isfile(config):

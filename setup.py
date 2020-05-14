@@ -20,6 +20,14 @@ _author_file = os.path.join(_this_dir, 'AUTHORS')
 _readme_file = os.path.join(_this_dir, 'README.md')
 _version_file = os.path.join(_this_dir, 'python', 'opencc', 'version.py')
 
+try:
+    sys.path.append(os.path.join(_this_dir, 'python'))
+
+    import opencc  # noqa
+    _libopencc_built = True
+except ImportError:
+    _libopencc_built = False
+
 
 def get_version_info():
     version_info = ['1', '0', '0']
@@ -74,7 +82,7 @@ def get_long_description():
 
 
 def build_libopencc():
-    if os.path.isfile(_libopenccfile):
+    if _libopencc_built:
         return  # Skip building binary file
 
     print('building libopencc into %s' % _build_dir)
@@ -132,7 +140,6 @@ def build_libopencc():
         build_on_windows()
     else:
         build_on_posix()
-    assert os.path.isfile(_libopenccfile)
 
 
 class BuildPyCommand(setuptools.command.build_py.build_py, object):

@@ -5,6 +5,7 @@
   "author": "BYVoid <byvoid@byvoid.com>",
   "license": "Apache-2.0",
   "main": "node/opencc.js",
+  "types": "node/opencc.d.ts",
   "scripts": {
     "test": "mocha -R spec node/test.js",
     "deploy": "node-pre-gyp package && (node-pre-gyp-github publish --release || exit 0)",

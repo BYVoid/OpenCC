@@ -55,6 +55,9 @@ const OpenCC = module.exports = function (config) {
   this.handler = new binding.Opencc(config);
 };
 
+// This is to support both CommonJS and ES module.
+OpenCC.OpenCC = OpenCC;
+
 /**
  * The version of OpenCC library.
  *
@@ -73,7 +76,6 @@ OpenCC.version = binding.Opencc.version();
  * @param outputFileName Output dictionary filename.
  * @param formatFrom Input dictionary format.
  * @param formatTo Input dictionary format.
- * @return Converted text.
  * @ingroup node_api
  */
 OpenCC.generateDict = function (inputFileName, outputFileName,

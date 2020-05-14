@@ -82,87 +82,53 @@ def build_libopencc():
 
     print('building libopencc into %s' % _build_dir)
 
-    def build_on_windows():
+    is_windows = sys.platform == 'win32'
+
+    # Directories
+    if is_windows:
         subprocess.call('md {}'.format(_build_dir), shell=True)
         subprocess.call('md {}'.format(_clib_dir), shell=True)
-
-        cmd = """
-            cmake -B {build_dir}
-            -DBUILD_DOCUMENTATION:BOOL=OFF \
-            -DBUILD_SHARED_LIBS:BOOL=OFF \
-            -DENABLE_GTEST:BOOL=OFF \
-            -DENABLE_BENCHMARK:BOOL=OFF \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DBUILD_PYTHON:BOOL=ON \
-            -DCMAKE_INSTALL_PREFIX={clib_dir} \
-            -DCMAKE_LIBRARY_OUTPUT_DIRECTORY={clib_dir} \
-            -DPYTHON_EXECUTABLE={python_executable} \
-            .
-        """.format(
-            build_dir=_build_dir,
-            clib_dir=_clib_dir,
-            python_executable=sys.executable,
-        )
-        errno = subprocess.call(cmd, shell=True)
-        assert errno == 0, 'Configure failed'
-
-        cmd = """
-            cmake --build {build_dir} \
-                --config Release \
-                --target install
-        """.format(build_dir=_build_dir)
-        errno = subprocess.call(cmd, shell=True)
-        assert errno == 0, 'Build failed'
-
-        # Empty __init__.py file has to be created
-        # to make opencc.clib a module
-        with open('{}/__init__.py'.format(_clib_dir), 'w'):
-            pass
-
-    def build_on_posix():
-        errno = subprocess.call('command -v cmake', shell=True)
-        assert errno == 0, 'Building opencc requires `cmake`'
-
+    else:
         subprocess.call('mkdir -p {}'.format(_build_dir), shell=True)
         subprocess.call('mkdir -p {}'.format(_clib_dir), shell=True)
 
-        cmd = """
-            cmake -B {build_dir} \
-            -DBUILD_DOCUMENTATION:BOOL=OFF \
-            -DENABLE_GTEST:BOOL=OFF \
-            -DENABLE_BENCHMARK:BOOL=OFF \
-            -DBUILD_SHARED_LIBS:BOOL=OFF \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_INSTALL_PREFIX={clib_dir} \
-            -DCMAKE_LIBRARY_OUTPUT_DIRECTORY={clib_dir} \
-            -DBUILD_PYTHON:BOOL=ON \
-            -DPYTHON_EXECUTABLE={python_executable} \
-            .
-        """.format(
-            build_dir=_build_dir,
-            clib_dir=_clib_dir,
-            python_executable=sys.executable,
-        )
-        errno = subprocess.call(cmd, shell=True)
-        assert errno == 0, 'Configure failed'
+    # Configure
+    cmake_args = [
+        '-DBUILD_DOCUMENTATION:BOOL=OFF',
+        '-DBUILD_SHARED_LIBS:BOOL=OFF',
+        '-DENABLE_GTEST:BOOL=OFF',
+        '-DENABLE_BENCHMARK:BOOL=OFF',
+        '-DBUILD_PYTHON:BOOL=ON',
+        '-DCMAKE_INSTALL_PREFIX={}'.format(_clib_dir),
+        '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}'.format(_clib_dir),
+        '-DPYTHON_EXECUTABLE={}'.format(sys.executable),
+    ]
 
-        cmd = """
-            cmake --build {build_dir} \
-                --config Release \
-                --target install
-        """.format(build_dir=_build_dir)
-        errno = subprocess.call(cmd, shell=True)
-        assert errno == 0, 'Build failed'
-
-        # Empty __init__.py file has to be created
-        # to make opencc.clib a module
-        with open('{}/__init__.py'.format(_clib_dir), 'w'):
-            pass
-
-    if sys.platform == 'win32':
-        build_on_windows()
+    if is_windows:
+        cmake_args += \
+            ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE={}'.format(_clib_dir)]
+        if sys.maxsize > 2**32:
+            cmake_args += ['-A', 'x64']
     else:
-        build_on_posix()
+        cmake_args += ['-DCMAKE_BUILD_TYPE=Release']
+
+    cmd = ['cmake', '-B', _build_dir] + cmake_args
+    errno = subprocess.call(cmd)
+    assert errno == 0, 'Configure failed'
+
+    # Build
+    cmd = [
+        'cmake', '--build', _build_dir,
+        '--config', 'Release',
+        '--target', 'install'
+    ]
+    errno = subprocess.call(cmd)
+    assert errno == 0, 'Build failed'
+
+    # Empty __init__.py file has to be created
+    # to make opencc.clib a module
+    with open('{}/__init__.py'.format(_clib_dir), 'w'):
+        pass
 
 
 class OpenCCExtension(setuptools.Extension, object):

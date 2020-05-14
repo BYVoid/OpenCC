@@ -48,6 +48,8 @@ if os.path.isfile(_libopenccfile):
     libopencc.opencc_convert_utf8_free.argtypes = [c_char_p]
     libopencc.opencc_convert_utf8_free.restype = c_void_p
     libopencc.opencc_close.argtypes = [c_void_p]
+    libopencc.opencc_error.argtypes = []
+    libopencc.opencc_error.restype = c_char_p
 
 _opencc_share_dir = os.path.join(_thisdir, 'clib', 'share', 'opencc')
 CONFIGS = []
@@ -70,7 +72,12 @@ class OpenCC(object):
         if not os.path.isfile(config):
             raise ValueError('Could not find file at {}'.format(config))
 
-        self._od = libopencc.opencc_open(c_char_p(config.encode('utf-8')))
+        od = libopencc.opencc_open(c_char_p(config.encode('utf-8')))
+        if cast(od, c_void_p) == -1:
+            error = libopencc.opencc_error()
+            raise Exception(error.value)
+
+        self._od = od
 
     def convert(self, text):
         if isinstance(text, text_type):
@@ -79,11 +86,14 @@ class OpenCC(object):
 
         retv_i = libopencc.opencc_convert_utf8(self._od, text, len(text))
         if retv_i == -1:
-            raise Exception('OpenCC Convert Error')
+            error = libopencc.opencc_error()
+            raise Exception(error.value)
+
         retv_c = cast(retv_i, c_char_p)
         value = retv_c.value
         libopencc.opencc_convert_utf8_free(retv_c)
         return value.decode('utf-8')
 
     def __del__(self):
-        libopencc.opencc_close(self._od)
+        if hasattr(self, '_od'):
+            libopencc.opencc_close(self._od)

@@ -5,10 +5,7 @@ import sys
 import warnings
 
 import setuptools
-import setuptools.command.build_py
-import setuptools.command.develop
-import setuptools.command.install
-import setuptools.command.test
+import setuptools.command.build_ext
 import wheel.bdist_wheel
 
 _this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -45,8 +42,6 @@ def get_version_info():
             elif match.group(1) == 'REVISION':
                 version_info[2] = match.group(2)
     version = '.'.join(version_info)
-    # Remove the next line in the next version.
-    version += '-1'
     return version
 
 
@@ -88,53 +83,81 @@ def build_libopencc():
     print('building libopencc into %s' % _build_dir)
 
     def build_on_windows():
-        subprocess.call('md %s' % _build_dir, shell=True)
-        cmd = (
-            'cmake '
-            '-B {build_dir} '
-            '-DBUILD_DOCUMENTATION:BOOL=OFF '
-            '-DENABLE_GTEST:BOOL=OFF '
-            '-DCMAKE_BUILD_TYPE=Release '
-            '-DCMAKE_INSTALL_PREFIX={clib_dir} '
-            '..'
-        ).format(
+        subprocess.call('md {}'.format(_build_dir), shell=True)
+        subprocess.call('md {}'.format(_clib_dir), shell=True)
+
+        cmd = """
+            cmake -B {build_dir}
+            -DBUILD_DOCUMENTATION:BOOL=OFF \
+            -DBUILD_SHARED_LIBS:BOOL=OFF \
+            -DENABLE_GTEST:BOOL=OFF \
+            -DENABLE_BENCHMARK:BOOL=OFF \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_PYTHON:BOOL=ON \
+            -DCMAKE_INSTALL_PREFIX={clib_dir} \
+            -DCMAKE_LIBRARY_OUTPUT_DIRECTORY={clib_dir} \
+            -DPYTHON_EXECUTABLE={python_executable} \
+            .
+        """.format(
             build_dir=_build_dir,
-            clib_dir=_clib_dir
+            clib_dir=_clib_dir,
+            python_executable=sys.executable,
         )
         errno = subprocess.call(cmd, shell=True)
         assert errno == 0, 'Configure failed'
-        cmd = (
-            'cmake --build {build_dir} --config Release --target install'
-        ).format(
-            build_dir=_build_dir
-        )
+
+        cmd = """
+            cmake --build {build_dir} \
+                --config Release \
+                --target install
+        """.format(build_dir=_build_dir)
         errno = subprocess.call(cmd, shell=True)
         assert errno == 0, 'Build failed'
 
+        # Empty __init__.py file has to be created
+        # to make opencc.clib a module
+        with open('{}/__init__.py'.format(_clib_dir), 'w'):
+            pass
+
     def build_on_posix():
-        assert subprocess.call('command -v make', shell=True) == 0, \
-            'Build requires `make`'
-        assert subprocess.call('command -v cmake', shell=True) == 0, \
-            'Build requires `cmake`'
-        # Probably also needs to check for cpp-compilier
+        errno = subprocess.call('command -v cmake', shell=True)
+        assert errno == 0, 'Building opencc requires `cmake`'
 
-        errno = subprocess.call((
-            'mkdir -p {build_dir};'
-            'cmake '
-            '-B {build_dir} '
-            '-DBUILD_DOCUMENTATION:BOOL=OFF '
-            '-DENABLE_GTEST:BOOL=OFF '
-            '-DCMAKE_BUILD_TYPE=Release '
-            '-DCMAKE_INSTALL_PREFIX={clib_dir} '
-            '..;'
-            'make -C {build_dir} -j;'
-            'make -C {build_dir} install;'
-        ).format(
+        subprocess.call('mkdir -p {}'.format(_build_dir), shell=True)
+        subprocess.call('mkdir -p {}'.format(_clib_dir), shell=True)
+
+        cmd = """
+            cmake -B {build_dir} \
+            -DBUILD_DOCUMENTATION:BOOL=OFF \
+            -DENABLE_GTEST:BOOL=OFF \
+            -DENABLE_BENCHMARK:BOOL=OFF \
+            -DBUILD_SHARED_LIBS:BOOL=OFF \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX={clib_dir} \
+            -DCMAKE_LIBRARY_OUTPUT_DIRECTORY={clib_dir} \
+            -DBUILD_PYTHON:BOOL=ON \
+            -DPYTHON_EXECUTABLE={python_executable} \
+            .
+        """.format(
             build_dir=_build_dir,
-            clib_dir=_clib_dir
-        ), shell=True)
+            clib_dir=_clib_dir,
+            python_executable=sys.executable,
+        )
+        errno = subprocess.call(cmd, shell=True)
+        assert errno == 0, 'Configure failed'
 
+        cmd = """
+            cmake --build {build_dir} \
+                --config Release \
+                --target install
+        """.format(build_dir=_build_dir)
+        errno = subprocess.call(cmd, shell=True)
         assert errno == 0, 'Build failed'
+
+        # Empty __init__.py file has to be created
+        # to make opencc.clib a module
+        with open('{}/__init__.py'.format(_clib_dir), 'w'):
+            pass
 
     if sys.platform == 'win32':
         build_on_windows()
@@ -142,10 +165,16 @@ def build_libopencc():
         build_on_posix()
 
 
-class BuildPyCommand(setuptools.command.build_py.build_py, object):
-    def run(self):
-        build_libopencc()
-        super(BuildPyCommand, self).run()
+class OpenCCExtension(setuptools.Extension, object):
+    def __init__(self, name, sourcedir=''):
+        setuptools.Extension.__init__(self, name, sources=[])
+        self.sourcedir = os.path.abspath(sourcedir)
+
+
+class BuildExtCommand(setuptools.command.build_ext.build_ext, object):
+    def build_extension(self, ext):
+        if isinstance(ext, OpenCCExtension):
+            build_libopencc()
 
 
 class BDistWheelCommand(wheel.bdist_wheel.bdist_wheel, object):
@@ -179,10 +208,12 @@ class BDistWheelCommand(wheel.bdist_wheel.bdist_wheel, object):
         self.plat_name = self._determine_platform_tag()
 
 
-version_info = get_version_info()
-write_version_file(version_info)
+packages = ['opencc', 'opencc.clib']
 
+version_info = get_version_info()
 author_info = get_author_info()
+
+write_version_file(version_info)
 
 setuptools.setup(
     name='OpenCC',
@@ -194,15 +225,16 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/BYVoid/OpenCC",
 
-    packages=['opencc'],
+    packages=packages,
+    package_dir={'opencc': 'python/opencc'},
     package_data={str('opencc'): [
+        'clib/bin/*.so',
         'clib/bin/*.dll',
-        'clib/include/opencc/*',
-        'clib/lib/libopencc.*',
         'clib/share/opencc/*',
     ]},
+    ext_modules=[OpenCCExtension('opencc.clib.opencc_clib', 'python')],
     cmdclass={
-        'build_py': BuildPyCommand,
+        'build_ext': BuildExtCommand,
         'bdist_wheel': BDistWheelCommand
     },
 

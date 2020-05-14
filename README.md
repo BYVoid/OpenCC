@@ -38,15 +38,26 @@ https://opencc.byvoid.com/
 
 [npm](https://www.npmjs.com/opencc) `npm i install opencc`
 
+#### JavaScript
 ```js
 const OpenCC = require('opencc');
-const opencc = new OpenCC('s2t.json');
-opencc.convertPromise("汉字").then(converted => {
+const converter = new OpenCC('s2t.json');
+converter.convertPromise("汉字").then(converted => {
   console.log(converted);  // 漢字
 });
 ```
 
-See [demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js).
+#### TypeScript
+```ts
+import { OpenCC } from 'opencc';
+async function main() {
+  const converter: OpenCC = new OpenCC('s2t.json');
+  const result: string = await converter.convertPromise('汉字');
+  console.log(result);
+}
+```
+
+See [demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js) and [ts-demo.ts](https://github.com/BYVoid/OpenCC/blob/master/node/ts-demo.ts).
 
 ### Python
 

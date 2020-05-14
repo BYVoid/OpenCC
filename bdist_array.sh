@@ -31,7 +31,7 @@ source $1
 ######## Build array
 
 function clean_build_files() {
-	rm -rf build xcode python/opencc/clib *.egg-info
+	rm -rf build xcode python/opencc/clib *.egg-info dist/*.egg
 }
 
 VERSIONS="2.7 3.5 3.6 3.7 3.8"
@@ -42,21 +42,26 @@ for VER in ${VERSIONS}; do
 	echo "Building for python==$VER"
 	ENV_NAME=opencc-$VER
 
+	# Clean up existing builds
 	cd $ROOT_DIR
 	clean_build_files
+
+	# Create and initialize new environment
+	cd $ROOT_DIR
 	conda create -y -n $ENV_NAME "python=$VER"
 	conda activate $ENV_NAME
 	pip install --no-cache-dir setuptools wheel pytest
-	clean_build_files
 
+	# Build, install, and test
 	cd $ROOT_DIR
-	python setup.py build_ext
-
+	python setup.py build_ext install
 	cd $ROOT_DIR/python
 	pytest .
 
+	# Package and clean up
 	cd $ROOT_DIR
 	python setup.py bdist_wheel
+	clean_build_files
 
 	conda deactivate
 

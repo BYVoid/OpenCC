@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import os
 import re
 import subprocess
@@ -13,18 +11,15 @@ import setuptools.command.install
 import setuptools.command.test
 import wheel.bdist_wheel
 
-from opencc import _libopenccfile
+_this_dir = os.path.dirname(os.path.abspath(__file__))
+_clib_dir = os.path.join(_this_dir, 'python', 'opencc', 'clib')
+_build_dir = os.path.join(_this_dir, 'build', 'python')
 
-_clib_dir = os.path.join('opencc', 'clib')
-_opencc_rootdir = '..'
-
-_cmake_file = os.path.join(_opencc_rootdir, 'CMakeLists.txt')
-assert os.path.isfile(_cmake_file)
-
-_build_dir = build_dir = os.path.join(_opencc_rootdir, 'build', 'python')
+_cmake_file = os.path.join(_this_dir, 'CMakeLists.txt')
+_author_file = os.path.join(_this_dir, 'AUTHORS')
+_version_file = os.path.join(_this_dir, 'python', 'opencc', 'version.py')
 
 _version_pattern = re.compile(r'OPENCC_VERSION_(MAJOR|MINOR|REVISION) (\d+)')
-_version_file = os.path.join('opencc', 'version.py')
 
 
 def get_version_info():
@@ -107,7 +102,7 @@ def build_libopencc():
         )
         errno = subprocess.call(cmd, shell=True)
         assert errno == 0, 'Build failed'
-    
+
     def build_on_posix():
         assert subprocess.call('command -v make', shell=True) == 0, \
             'Build requires `make`'

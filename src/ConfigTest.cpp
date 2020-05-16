@@ -19,6 +19,7 @@
 #include "Config.hpp"
 #include "ConfigTestBase.hpp"
 #include "Converter.hpp"
+#include "Exception.hpp"
 #include "TestUtilsUTF8.hpp"
 
 namespace opencc {

@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <fstream>
+#include <list>
 #include <unordered_map>
 
 #include "document.h"

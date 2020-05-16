@@ -23,22 +23,10 @@
 #pragma warning(disable : 4251 4266 4350 4503 4512 4514 4710 4820)
 #endif
 
-#include <algorithm>
-#include <fstream>
-#include <functional>
-#include <iostream>
-#include <list>
-#include <map>
+#include <cstddef>
 #include <memory>
-#include <sstream>
 #include <string>
 #include <vector>
-
-#include <cassert>
-#include <cstddef>
-#include <cstdio>
-#include <cstring>
-#include <ctime>
 
 #include "Export.hpp"
 #include "Optional.hpp"

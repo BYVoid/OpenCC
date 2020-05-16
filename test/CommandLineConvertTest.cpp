@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <fstream>
+
 #include "Common.hpp"
 #include "gtest/gtest.h"
 

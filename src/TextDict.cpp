@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-#include "TextDict.hpp"
+#include <cassert>
+
 #include "Lexicon.hpp"
+#include "TextDict.hpp"
 
 using namespace opencc;
 

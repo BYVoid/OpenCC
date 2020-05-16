@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-#include "SerializedValues.hpp"
+#include <cassert>
+
 #include "Lexicon.hpp"
+#include "SerializedValues.hpp"
 
 using namespace opencc;
 

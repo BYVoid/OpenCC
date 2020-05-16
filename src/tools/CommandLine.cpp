@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <fstream>
+
 #include "CmdLineOutput.hpp"
 #include "Config.hpp"
 #include "Converter.hpp"

@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <fstream>
+
 #include "Config.hpp"
 #include "ConfigTestBase.hpp"
 #include "Converter.hpp"

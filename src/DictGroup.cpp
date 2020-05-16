@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <map>
+
 #include "DictGroup.hpp"
 #include "Lexicon.hpp"
 #include "TextDict.hpp"

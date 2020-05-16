@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <list>
+
 #include "Common.hpp"
 #include "Conversion.hpp"
 

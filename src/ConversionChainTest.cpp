@@ -35,7 +35,7 @@ protected:
     const size_t length = expected->Length();
     EXPECT_TRUE(length == actual->Length());
     for (size_t i = 0; i < length; i++) {
-      EXPECT_EQ(string(expected->At(i)), string(actual->At(i)));
+      EXPECT_EQ(std::string(expected->At(i)), std::string(actual->At(i)));
     }
   }
 
@@ -48,7 +48,7 @@ TEST_F(ConversionChainTest, Convert) {
   const DictPtr& dictVariants = CreateDictForTaiwanVariants();
   const ConversionPtr& conversionVariants =
       ConversionPtr(new Conversion(dictVariants));
-  const list<ConversionPtr> conversions{conversion, conversionVariants};
+  const std::list<ConversionPtr> conversions{conversion, conversionVariants};
   const ConversionChainPtr& conversionChain =
       ConversionChainPtr(new ConversionChain(conversions));
   const SegmentsPtr& converted =

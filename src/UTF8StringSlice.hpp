@@ -105,7 +105,7 @@ public:
     }
   }
 
-  string ToString() const { return string(str, str + byteLength); }
+  std::string ToString() const { return std::string(str, str + byteLength); }
 
   const char* CString() const { return str; }
 

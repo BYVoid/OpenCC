@@ -31,9 +31,10 @@ public:
 
   virtual ~Config();
 
-  ConverterPtr NewFromString(const string& json, const string& configDirectory);
+  ConverterPtr NewFromString(const std::string& json,
+                             const std::string& configDirectory);
 
-  ConverterPtr NewFromFile(const string& fileName);
+  ConverterPtr NewFromFile(const std::string& fileName);
 
 private:
   void* internal;

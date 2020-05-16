@@ -26,7 +26,8 @@
 
 using namespace opencc;
 
-DictPtr LoadDictionary(const string& format, const string& inputFileName) {
+DictPtr LoadDictionary(const std::string& format,
+                       const std::string& inputFileName) {
   if (format == "text") {
     return SerializableDict::NewFromFile<TextDict>(inputFileName);
   } else if (format == "ocd") {
@@ -41,7 +42,7 @@ DictPtr LoadDictionary(const string& format, const string& inputFileName) {
   return nullptr;
 }
 
-SerializableDictPtr ConvertDict(const string& format, const DictPtr dict) {
+SerializableDictPtr ConvertDict(const std::string& format, const DictPtr dict) {
   if (format == "text") {
     return TextDict::NewFromDict(*dict.get());
   } else if (format == "ocd") {
@@ -57,8 +58,10 @@ SerializableDictPtr ConvertDict(const string& format, const DictPtr dict) {
 }
 
 namespace opencc {
-void ConvertDictionary(const string inputFileName, const string outputFileName,
-                       const string formatFrom, const string formatTo) {
+void ConvertDictionary(const std::string inputFileName,
+                       const std::string outputFileName,
+                       const std::string formatFrom,
+                       const std::string formatTo) {
   DictPtr dictFrom = LoadDictionary(formatFrom, inputFileName);
   SerializableDictPtr dictTo = ConvertDict(formatTo, dictFrom);
   dictTo->SerializeToFile(outputFileName);

@@ -37,7 +37,7 @@ public:
   /**
    * Matches a word exactly and returns the DictEntry or Optional::Null().
    */
-  Optional<const DictEntry*> Match(const string& word) const {
+  Optional<const DictEntry*> Match(const std::string& word) const {
     return Match(word.c_str(), word.length());
   }
 
@@ -52,7 +52,7 @@ public:
   /**
    * Matches the longest matched prefix of a word.
    */
-  Optional<const DictEntry*> MatchPrefix(const string& word) const {
+  Optional<const DictEntry*> MatchPrefix(const std::string& word) const {
     return MatchPrefix(word.c_str(), word.length());
   }
 
@@ -61,13 +61,14 @@ public:
    * For example given a dictionary having "a", "an", "b", "ba", "ban", "bana",
    * all the matched prefixes of "banana" are "bana", "ban", "ba", "b".
    */
-  virtual vector<const DictEntry*> MatchAllPrefixes(const char* word,
-                                                    size_t len) const;
+  virtual std::vector<const DictEntry*> MatchAllPrefixes(const char* word,
+                                                         size_t len) const;
 
   /**
    * Returns all matched prefixes of a word, sorted by the length (desc).
    */
-  vector<const DictEntry*> MatchAllPrefixes(const string& word) const {
+  std::vector<const DictEntry*>
+  MatchAllPrefixes(const std::string& word) const {
     return MatchAllPrefixes(word.c_str(), word.length());
   }
 

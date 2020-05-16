@@ -29,13 +29,13 @@ namespace opencc {
  */
 class OPENCC_EXPORT ConversionChain {
 public:
-  ConversionChain(const list<ConversionPtr> _conversions);
+  ConversionChain(const std::list<ConversionPtr> _conversions);
 
   SegmentsPtr Convert(const SegmentsPtr& input) const;
 
-  const list<ConversionPtr> GetConversions() const { return conversions; }
+  const std::list<ConversionPtr> GetConversions() const { return conversions; }
 
 private:
-  const list<ConversionPtr> conversions;
+  const std::list<ConversionPtr> conversions;
 };
 } // namespace opencc

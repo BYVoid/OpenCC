@@ -33,7 +33,7 @@ public:
 
   virtual ~MaxMatchSegmentation() {}
 
-  virtual SegmentsPtr Segment(const string& text) const;
+  virtual SegmentsPtr Segment(const std::string& text) const;
 
   const DictPtr GetDict() const { return dict; }
 

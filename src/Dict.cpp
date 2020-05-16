@@ -22,7 +22,7 @@ using namespace opencc;
 
 Optional<const DictEntry*> Dict::MatchPrefix(const char* word,
                                              size_t len) const {
-  string wordTrunc = UTF8Util::TruncateUTF8(word, KeyMaxLength());
+  std::string wordTrunc = UTF8Util::TruncateUTF8(word, KeyMaxLength());
   const char* wordTruncPtr = wordTrunc.c_str() + wordTrunc.length();
   for (long len = static_cast<long>(wordTrunc.length()); len > 0;) {
     wordTrunc.resize(static_cast<size_t>(len));
@@ -36,10 +36,10 @@ Optional<const DictEntry*> Dict::MatchPrefix(const char* word,
   return Optional<const DictEntry*>::Null();
 }
 
-vector<const DictEntry*> Dict::MatchAllPrefixes(const char* word,
-                                                size_t len) const {
-  vector<const DictEntry*> matchedLengths;
-  string wordTrunc = UTF8Util::TruncateUTF8(word, KeyMaxLength());
+std::vector<const DictEntry*> Dict::MatchAllPrefixes(const char* word,
+                                                     size_t len) const {
+  std::vector<const DictEntry*> matchedLengths;
+  std::string wordTrunc = UTF8Util::TruncateUTF8(word, KeyMaxLength());
   const char* wordTruncPtr = wordTrunc.c_str() + wordTrunc.length();
   for (long len = static_cast<long>(wordTrunc.length()); len > 0;
        len -= static_cast<long>(UTF8Util::PrevCharLength(wordTruncPtr))) {

@@ -42,12 +42,12 @@ public:
 
 private:
   LexiconPtr lexicon;
-  string keyBuffer;
-  string valueBuffer;
+  std::string keyBuffer;
+  std::string valueBuffer;
 
-  void ConstructBuffer(string& keyBuffer, vector<size_t>& keyOffset,
-                       size_t& keyTotalLength, string& valueBuffer,
-                       vector<size_t>& valueOffset,
+  void ConstructBuffer(std::string& keyBuffer, std::vector<size_t>& keyOffset,
+                       size_t& keyTotalLength, std::string& valueBuffer,
+                       std::vector<size_t>& valueOffset,
                        size_t& valueTotalLength) const;
 };
 } // namespace opencc

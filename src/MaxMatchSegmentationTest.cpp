@@ -37,10 +37,10 @@ protected:
 TEST_F(MaxMatchSegmentationTest, Segment) {
   const auto& segments = segmenter->Segment(utf8("太后的头发干燥"));
   EXPECT_EQ(4, segments->Length());
-  EXPECT_EQ(utf8("太后"), string(segments->At(0)));
-  EXPECT_EQ(utf8("的"), string(segments->At(1)));
-  EXPECT_EQ(utf8("头发"), string(segments->At(2)));
-  EXPECT_EQ(utf8("干燥"), string(segments->At(3)));
+  EXPECT_EQ(utf8("太后"), std::string(segments->At(0)));
+  EXPECT_EQ(utf8("的"), std::string(segments->At(1)));
+  EXPECT_EQ(utf8("头发"), std::string(segments->At(2)));
+  EXPECT_EQ(utf8("干燥"), std::string(segments->At(3)));
 }
 
 } // namespace opencc

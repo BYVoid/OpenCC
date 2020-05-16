@@ -28,7 +28,7 @@ protected:
         fileName("dict.ocd"){};
 
   const DartsDictPtr dartsDict;
-  const string fileName;
+  const std::string fileName;
 };
 
 TEST_F(DartsDictTest, DictTest) { TestDict(dartsDict); }

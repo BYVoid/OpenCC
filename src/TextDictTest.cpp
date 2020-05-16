@@ -24,7 +24,7 @@ class TextDictTest : public TextDictTestBase {
 protected:
   TextDictTest() : fileName("dict.txt"){};
 
-  const string fileName;
+  const std::string fileName;
 };
 
 TEST_F(TextDictTest, DictTest) { TestDict(textDict); }

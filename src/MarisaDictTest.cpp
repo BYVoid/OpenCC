@@ -27,7 +27,7 @@ protected:
       : dict(MarisaDict::NewFromDict(*textDict)), fileName("dict.ocd2"){};
 
   const MarisaDictPtr dict;
-  const string fileName;
+  const std::string fileName;
 };
 
 TEST_F(MarisaDictTest, DictTest) { TestDict(dict); }

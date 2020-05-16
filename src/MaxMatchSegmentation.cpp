@@ -20,7 +20,7 @@
 
 using namespace opencc;
 
-SegmentsPtr MaxMatchSegmentation::Segment(const string& text) const {
+SegmentsPtr MaxMatchSegmentation::Segment(const std::string& text) const {
   SegmentsPtr segments(new Segments);
   const char* segStart = text.c_str();
   size_t segLength = 0;

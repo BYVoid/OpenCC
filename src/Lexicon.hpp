@@ -29,7 +29,7 @@ namespace opencc {
 class OPENCC_EXPORT Lexicon {
 public:
   Lexicon() {}
-  Lexicon(vector<std::unique_ptr<DictEntry>> entries_)
+  Lexicon(std::vector<std::unique_ptr<DictEntry>> entries_)
       : entries(std::move(entries_)) {}
   Lexicon(const Lexicon&) = delete;
   Lexicon& operator=(const Lexicon&) = delete;
@@ -54,15 +54,15 @@ public:
 
   size_t Length() const { return entries.size(); }
 
-  vector<std::unique_ptr<DictEntry>>::const_iterator begin() const {
+  std::vector<std::unique_ptr<DictEntry>>::const_iterator begin() const {
     return entries.begin();
   }
 
-  vector<std::unique_ptr<DictEntry>>::const_iterator end() const {
+  std::vector<std::unique_ptr<DictEntry>>::const_iterator end() const {
     return entries.end();
   }
 
 private:
-  vector<std::unique_ptr<DictEntry>> entries;
+  std::vector<std::unique_ptr<DictEntry>> entries;
 };
 } // namespace opencc

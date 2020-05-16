@@ -27,7 +27,7 @@ protected:
       : binDict(new BinaryDict(textDict->GetLexicon())), fileName("dict.bin"){};
 
   const BinaryDictPtr binDict;
-  const string fileName;
+  const std::string fileName;
 };
 
 TEST_F(BinaryDictTest, Serialization) {

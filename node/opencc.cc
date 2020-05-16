@@ -23,16 +23,16 @@
 
 using namespace opencc;
 
-string ToUtf8String(const v8::Local<v8::Value>& val) {
+std::string ToUtf8String(const v8::Local<v8::Value>& val) {
   Nan::Utf8String utf8(val);
-  return string(*utf8);
+  return std::string(*utf8);
 }
 
 class OpenccBinding : public Nan::ObjectWrap {
   struct ConvertRequest {
     OpenccBinding* instance;
-    string input;
-    string output;
+    std::string input;
+    std::string output;
     Nan::Callback* callback;
     Optional<opencc::Exception> ex;
 
@@ -44,12 +44,14 @@ class OpenccBinding : public Nan::ObjectWrap {
   const ConverterPtr converter_;
 
 public:
-  explicit OpenccBinding(const string configFileName)
+  explicit OpenccBinding(const std::string configFileName)
       : config_(), converter_(config_.NewFromFile(configFileName)) {}
 
   virtual ~OpenccBinding() {}
 
-  string Convert(const string& input) { return converter_->Convert(input); }
+  std::string Convert(const std::string& input) {
+    return converter_->Convert(input);
+  }
 
   static NAN_METHOD(Version) {
     info.GetReturnValue().Set(Nan::New<v8::String>(VERSION).ToLocalChecked());
@@ -60,7 +62,7 @@ public:
 
     try {
       if (info.Length() >= 1 && info[0]->IsString()) {
-        const string configFile = ToUtf8String(info[0]);
+        const std::string configFile = ToUtf8String(info[0]);
         instance = new OpenccBinding(configFile);
       } else {
         instance = new OpenccBinding("s2t.json");
@@ -129,8 +131,8 @@ public:
     OpenccBinding* instance =
         Nan::ObjectWrap::Unwrap<OpenccBinding>(info.This());
 
-    const string input = ToUtf8String(info[0]);
-    string output;
+    const std::string input = ToUtf8String(info[0]);
+    std::string output;
     try {
       output = instance->Convert(input);
     } catch (opencc::Exception& e) {
@@ -148,10 +150,10 @@ public:
       Nan::ThrowTypeError("Wrong arguments");
       return;
     }
-    const string inputFileName = ToUtf8String(info[0]);
-    const string outputFileName = ToUtf8String(info[1]);
-    const string formatFrom = ToUtf8String(info[2]);
-    const string formatTo = ToUtf8String(info[3]);
+    const std::string inputFileName = ToUtf8String(info[0]);
+    const std::string outputFileName = ToUtf8String(info[1]);
+    const std::string formatFrom = ToUtf8String(info[2]);
+    const std::string formatTo = ToUtf8String(info[3]);
     try {
       opencc::ConvertDictionary(inputFileName, outputFileName, formatFrom,
                                 formatTo);

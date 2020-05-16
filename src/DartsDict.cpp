@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+#include <algorithm>
 #include <cstring>
 
 #include "BinaryDict.hpp"

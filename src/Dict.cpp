@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <algorithm>
+
 #include "Dict.hpp"
 
 using namespace opencc;

@@ -14,6 +14,7 @@
 #include "DictConverter.cpp"
 #include "DictEntry.cpp"
 #include "DictGroup.cpp"
+#include "Lexicon.cpp"
 #include "MarisaDict.cpp"
 #include "MaxMatchSegmentation.cpp"
 #include "Segmentation.cpp"

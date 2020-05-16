@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include <algorithm>
-
 #include "Common.hpp"
 #include "DictEntry.hpp"
 
@@ -43,14 +41,9 @@ public:
     entries.push_back(std::move(entry));
   }
 
-  void Sort() {
-    std::sort(entries.begin(), entries.end(), DictEntry::UPtrLessThan);
-  }
+  void Sort();
 
-  bool IsSorted() {
-    return std::is_sorted(entries.begin(), entries.end(),
-                          DictEntry::UPtrLessThan);
-  }
+  bool IsSorted();
 
   const DictEntry* At(size_t index) const { return entries.at(index).get(); }
 

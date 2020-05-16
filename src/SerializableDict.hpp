@@ -49,7 +49,7 @@ public:
                               std::shared_ptr<DICT>* dict) {
     FILE* fp =
 #ifdef _MSC_VER
-        // well, the 'GetPlatformString' shall return a 'wstd::string'
+        // well, the 'GetPlatformString' shall return a 'wstring'
         _wfopen(UTF8Util::GetPlatformString(fileName).c_str(), L"rb")
 #else
         fopen(UTF8Util::GetPlatformString(fileName).c_str(), "rb")

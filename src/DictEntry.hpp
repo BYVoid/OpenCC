@@ -156,11 +156,9 @@ public:
     if (entry->NumValues() == 0) {
       return new NoValueDictEntry(entry->Key());
     } else if (entry->NumValues() == 1) {
-      const auto svEntry = static_cast<const SingleValueDictEntry*>(entry);
-      return new StrSingleValueDictEntry(svEntry->Key(), svEntry->Value());
+      return new StrSingleValueDictEntry(entry->Key(), entry->Values().front());
     } else {
-      const auto mvEntry = static_cast<const MultiValueDictEntry*>(entry);
-      return new StrMultiValueDictEntry(mvEntry->Key(), mvEntry->Values());
+      return new StrMultiValueDictEntry(entry->Key(), entry->Values());
     }
   }
 };

@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <cstring>
+
 #include "Common.hpp"
 #include "UTF8Util.hpp"
 

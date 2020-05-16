@@ -24,6 +24,8 @@
 #undef NOMINMAX
 #endif // _MSC_VER
 
+#include <cstring>
+
 #include "Common.hpp"
 #include "Exception.hpp"
 

@@ -17,6 +17,7 @@
  */
 
 #include <cassert>
+#include <cstring>
 
 #include "BinaryDict.hpp"
 #include "Lexicon.hpp"

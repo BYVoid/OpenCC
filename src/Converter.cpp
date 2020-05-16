@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-#include "Converter.hpp"
+#include <cstring>
+
 #include "ConversionChain.hpp"
+#include "Converter.hpp"
 #include "Segments.hpp"
 
 using namespace opencc;

@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <algorithm>
+
 #include "Common.hpp"
 #include "DictEntry.hpp"
 

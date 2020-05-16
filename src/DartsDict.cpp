@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-#include "DartsDict.hpp"
+#include <cstring>
+
 #include "BinaryDict.hpp"
+#include "DartsDict.hpp"
 #include "Lexicon.hpp"
 #include "darts.h"
 

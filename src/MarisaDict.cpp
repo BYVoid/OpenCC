@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-#include "marisa.h"
+#include <cstring>
 #include <unordered_map>
+
+#include "marisa.h"
 
 #include "Lexicon.hpp"
 #include "MarisaDict.hpp"

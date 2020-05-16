@@ -25,6 +25,7 @@
 #endif // _MSC_VER
 
 #include "Common.hpp"
+#include "Exception.hpp"
 
 namespace opencc {
 /**

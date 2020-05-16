@@ -40,7 +40,6 @@
 #include <cstring>
 #include <ctime>
 
-#include "Exception.hpp"
 #include "Export.hpp"
 #include "Optional.hpp"
 

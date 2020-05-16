@@ -18,6 +18,7 @@
 
 #include "DictConverter.hpp"
 #include "CmdLineOutput.hpp"
+#include "Exception.hpp"
 
 using namespace opencc;
 

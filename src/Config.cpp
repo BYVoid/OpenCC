@@ -24,6 +24,7 @@
 #include "ConversionChain.hpp"
 #include "Converter.hpp"
 #include "DictGroup.hpp"
+#include "Exception.hpp"
 #include "MarisaDict.hpp"
 #include "MaxMatchSegmentation.hpp"
 #include "TextDict.hpp"

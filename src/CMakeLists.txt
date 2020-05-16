@@ -44,6 +44,7 @@ set(
   DictConverter.cpp
   DictEntry.cpp
   DictGroup.cpp
+  Lexicon.cpp
   MarisaDict.cpp
   MaxMatchSegmentation.cpp
   PhraseExtract.cpp

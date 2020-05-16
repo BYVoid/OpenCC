@@ -89,7 +89,7 @@ python-test: python-build
 test-all: test node-test python-test
 
 format:
-	find "src" "node" -iname "*.hpp" -o -iname "*.cpp" -o -iname "*.cc" \
+	find "src" "node" "test" -iname "*.hpp" -o -iname "*.cpp" -o -iname "*.cc" \
 	-o -iname "*.c" -o -iname "*.h" \
 	| xargs clang-format -i
 

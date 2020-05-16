@@ -44,10 +44,6 @@
 #include "Export.hpp"
 #include "Optional.hpp"
 
-using std::list;
-using std::string;
-using std::vector;
-
 // Forward decalarations and alias
 namespace opencc {
 class Config;
@@ -88,9 +84,9 @@ typedef std::shared_ptr<DartsDict> DartsDictPtr;
 } // namespace opencc
 
 #ifndef PKGDATADIR
-const string PACKAGE_DATA_DIRECTORY = "";
+const std::string PACKAGE_DATA_DIRECTORY = "";
 #else  // ifndef PKGDATADIR
-const string PACKAGE_DATA_DIRECTORY = PKGDATADIR "/";
+const std::string PACKAGE_DATA_DIRECTORY = PKGDATADIR "/";
 #endif // ifndef PKGDATADIR
 
 #ifndef VERSION

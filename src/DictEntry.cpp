@@ -20,7 +20,7 @@
 
 using namespace opencc;
 
-string MultiValueDictEntry::ToString() const {
+std::string MultiValueDictEntry::ToString() const {
   // TODO escape space
   size_t i = 0;
   size_t length = Values().size();

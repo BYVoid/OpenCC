@@ -21,7 +21,7 @@
 
 using namespace opencc;
 
-string Conversion::Convert(const char* phrase) const {
+std::string Conversion::Convert(const char* phrase) const {
   std::ostringstream buffer;
   for (const char* pstr = phrase; *pstr != '\0';) {
     Optional<const DictEntry*> matched = dict->MatchPrefix(pstr);
@@ -38,7 +38,7 @@ string Conversion::Convert(const char* phrase) const {
   return buffer.str();
 }
 
-string Conversion::Convert(const string& phrase) const {
+std::string Conversion::Convert(const std::string& phrase) const {
   return Convert(phrase.c_str());
 }
 

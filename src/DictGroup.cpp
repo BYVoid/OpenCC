@@ -22,7 +22,7 @@
 
 using namespace opencc;
 
-DictGroup::DictGroup(const list<DictPtr>& _dicts)
+DictGroup::DictGroup(const std::list<DictPtr>& _dicts)
     : keyMaxLength(0), dicts(_dicts) {}
 
 DictGroup::~DictGroup() {}
@@ -51,12 +51,13 @@ Optional<const DictEntry*> DictGroup::MatchPrefix(const char* word,
   return Optional<const DictEntry*>::Null();
 }
 
-vector<const DictEntry*> DictGroup::MatchAllPrefixes(const char* word,
-                                                     size_t len) const {
+std::vector<const DictEntry*> DictGroup::MatchAllPrefixes(const char* word,
+                                                          size_t len) const {
   std::map<size_t, const DictEntry*> matched;
   // Match all prefixes from all dictionaries
   for (const auto& dict : dicts) {
-    const vector<const DictEntry*>& entries = dict->MatchAllPrefixes(word, len);
+    const std::vector<const DictEntry*>& entries =
+        dict->MatchAllPrefixes(word, len);
     for (const auto& entry : entries) {
       size_t len = entry->KeyLength();
       // If the current length has already result, skip
@@ -65,7 +66,7 @@ vector<const DictEntry*> DictGroup::MatchAllPrefixes(const char* word,
       }
     }
   }
-  vector<const DictEntry*> matchedEntries;
+  std::vector<const DictEntry*> matchedEntries;
   for (auto i = matched.rbegin(); i != matched.rend(); i++) {
     matchedEntries.push_back(i->second);
   }
@@ -87,5 +88,5 @@ LexiconPtr DictGroup::GetLexicon() const {
 
 DictGroupPtr DictGroup::NewFromDict(const Dict& dict) {
   TextDictPtr newDict = TextDict::NewFromDict(dict);
-  return DictGroupPtr(new DictGroup(list<DictPtr>{newDict}));
+  return DictGroupPtr(new DictGroup(std::list<DictPtr>{newDict}));
 }

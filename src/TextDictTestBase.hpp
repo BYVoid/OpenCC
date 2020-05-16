@@ -43,14 +43,15 @@ protected:
 
   DictPtr CreateDictForCharacters() const {
     LexiconPtr lexicon(new Lexicon);
-    lexicon->Add(DictEntryFactory::New(utf8("后"),
-                                       vector<string>{utf8("后"), utf8("後")}));
-    lexicon->Add(DictEntryFactory::New(utf8("发"),
-                                       vector<string>{utf8("發"), utf8("髮")}));
     lexicon->Add(DictEntryFactory::New(
-        utf8("干"), vector<string>{utf8("幹"), utf8("乾"), utf8("干")}));
-    lexicon->Add(DictEntryFactory::New(utf8("里"),
-                                       vector<string>{utf8("裏"), utf8("里")}));
+        utf8("后"), std::vector<std::string>{utf8("后"), utf8("後")}));
+    lexicon->Add(DictEntryFactory::New(
+        utf8("发"), std::vector<std::string>{utf8("發"), utf8("髮")}));
+    lexicon->Add(DictEntryFactory::New(
+        utf8("干"),
+        std::vector<std::string>{utf8("幹"), utf8("乾"), utf8("干")}));
+    lexicon->Add(DictEntryFactory::New(
+        utf8("里"), std::vector<std::string>{utf8("裏"), utf8("里")}));
     lexicon->Sort();
     return TextDictPtr(new TextDict(lexicon));
   }
@@ -131,7 +132,7 @@ protected:
   }
 
   void TestMatchAllPrefixes(const DictPtr& dict) const {
-    const vector<const DictEntry*> matches =
+    const std::vector<const DictEntry*> matches =
         dict->MatchAllPrefixes(utf8("清華大學計算機系"));
     EXPECT_EQ(3, matches.size());
     EXPECT_EQ(utf8("清華大學"), matches.at(0)->Key());

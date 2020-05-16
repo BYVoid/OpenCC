@@ -37,8 +37,8 @@ public:
   virtual Optional<const DictEntry*> MatchPrefix(const char* word,
                                                  size_t len) const;
 
-  virtual vector<const DictEntry*> MatchAllPrefixes(const char* word,
-                                                    size_t len) const;
+  virtual std::vector<const DictEntry*> MatchAllPrefixes(const char* word,
+                                                         size_t len) const;
 
   virtual LexiconPtr GetLexicon() const;
 

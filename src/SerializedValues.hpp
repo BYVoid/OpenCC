@@ -43,7 +43,8 @@ public:
 private:
   LexiconPtr lexicon;
 
-  void ConstructBuffer(string* valueBuffer, vector<uint16_t>* valueBytes,
+  void ConstructBuffer(std::string* valueBuffer,
+                       std::vector<uint16_t>* valueBytes,
                        uint32_t* valueTotalLength) const;
 };
 } // namespace opencc

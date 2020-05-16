@@ -51,21 +51,22 @@ public:
 
   /**
    * Converts a text
-   * @param input A C-Style string (terminated by '\0') to be converted.
+   * @param input A C-Style std::string (terminated by '\0') to be converted.
    */
   std::string Convert(const char* input) const;
 
   /**
    * Converts a text
-   * @param input  A C-Style string limited by a given length to be converted.
-   * @param length Maximal length in byte of the input string.
+   * @param input  A C-Style std::string limited by a given length to be
+   * converted.
+   * @param length Maximal length in byte of the input std::string.
    */
   std::string Convert(const char* input, size_t length) const;
 
   /**
    * Converts a text and writes to an allocated buffer
    * Please make sure the buffer has sufficent space.
-   * @param input  A C-Style string (terminated by '\0') to be converted.
+   * @param input  A C-Style std::string (terminated by '\0') to be converted.
    * @param output Buffer to write the converted text.
    * @return       Length of converted text.
    */
@@ -74,8 +75,9 @@ public:
   /**
    * Converts a text and writes to an allocated buffer
    * Please make sure the buffer has sufficent space.
-   * @param input  A C-Style string limited by a given length to be converted.
-   * @param length Maximal length in byte of the input string.
+   * @param input  A C-Style std::string limited by a given length to be
+   * converted.
+   * @param length Maximal length in byte of the input std::string.
    * @param output Buffer to write the converted text.
    * @return       Length of converted text.
    */

@@ -29,7 +29,7 @@ protected:
     DictPtr phrasesDict = CreateDictForPhrases();
     DictPtr charactersDict = CreateDictForCharacters();
     DictGroupPtr dictGroup(
-        new DictGroup(list<DictPtr>{phrasesDict, charactersDict}));
+        new DictGroup(std::list<DictPtr>{phrasesDict, charactersDict}));
     return dictGroup;
   }
 };

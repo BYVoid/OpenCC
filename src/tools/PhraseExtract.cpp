@@ -23,15 +23,16 @@ using opencc::Exception;
 using opencc::PhraseExtract;
 using opencc::UTF8StringSlice;
 
-void Extract(const vector<string>& inputFiles, const string& outputFile) {
+void Extract(const std::vector<std::string>& inputFiles,
+             const std::string& outputFile) {
   std::ostringstream buffer;
   for (const auto& inputFile : inputFiles) {
     std::ifstream ifs(inputFile);
-    const string contents((std::istreambuf_iterator<char>(ifs)),
-                          (std::istreambuf_iterator<char>()));
+    const std::string contents((std::istreambuf_iterator<char>(ifs)),
+                               (std::istreambuf_iterator<char>()));
     buffer << contents;
   }
-  const string& text = buffer.str();
+  const std::string& text = buffer.str();
   PhraseExtract extractor;
   extractor.SetWordMaxLength(2);
   extractor.SetPrefixSetLength(1);
@@ -55,12 +56,12 @@ int main(int argc, const char* argv[]) {
                        VERSION);
     CmdLineOutput cmdLineOutput;
     cmd.setOutput(&cmdLineOutput);
-    TCLAP::UnlabeledMultiArg<string> fileNames("fileName", "Input files",
-                                               true /* required */, "files");
+    TCLAP::UnlabeledMultiArg<std::string> fileNames(
+        "fileName", "Input files", true /* required */, "files");
     cmd.add(fileNames);
-    TCLAP::ValueArg<string> outputArg("o", "output", "Output file",
-                                      true /* required */, "" /* default */,
-                                      "file" /* type */, cmd);
+    TCLAP::ValueArg<std::string> outputArg(
+        "o", "output", "Output file", true /* required */, "" /* default */,
+        "file" /* type */, cmd);
     cmd.parse(argc, argv);
     Extract(fileNames.getValue(), outputArg.getValue());
   } catch (TCLAP::ArgException& e) {

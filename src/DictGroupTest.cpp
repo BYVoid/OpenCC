@@ -38,7 +38,7 @@ TEST_F(DictGroupTest, SimpleGroupTest) {
 
 TEST_F(DictGroupTest, TaiwanPhraseGroupTest) {
   const DictGroupPtr dictGroup(new DictGroup(
-      list<DictPtr>{CreateDictForPhrases(), CreateTaiwanPhraseDict()}));
+      std::list<DictPtr>{CreateDictForPhrases(), CreateTaiwanPhraseDict()}));
   {
     const auto& entry = dictGroup->Dict::MatchPrefix(utf8("鼠标"));
     EXPECT_EQ(utf8("鼠標"), entry.Get()->GetDefault());

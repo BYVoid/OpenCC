@@ -35,7 +35,7 @@ public:
   /**
    * Serializes the dictionary and writes in to a file.
    */
-  virtual void SerializeToFile(const string& fileName) const {
+  virtual void SerializeToFile(const std::string& fileName) const {
     FILE* fp = fopen(fileName.c_str(), "wb");
     if (fp == NULL) {
       throw FileNotWritable(fileName);
@@ -45,11 +45,11 @@ public:
   }
 
   template <typename DICT>
-  static bool TryLoadFromFile(const string& fileName,
+  static bool TryLoadFromFile(const std::string& fileName,
                               std::shared_ptr<DICT>* dict) {
     FILE* fp =
 #ifdef _MSC_VER
-        // well, the 'GetPlatformString' shall return a 'wstring'
+        // well, the 'GetPlatformString' shall return a 'wstd::string'
         _wfopen(UTF8Util::GetPlatformString(fileName).c_str(), L"rb")
 #else
         fopen(UTF8Util::GetPlatformString(fileName).c_str(), "rb")
@@ -66,7 +66,7 @@ public:
   }
 
   template <typename DICT>
-  static std::shared_ptr<DICT> NewFromFile(const string& fileName) {
+  static std::shared_ptr<DICT> NewFromFile(const std::string& fileName) {
     std::shared_ptr<DICT> dict;
     if (!TryLoadFromFile<DICT>(fileName, &dict)) {
       throw FileNotFound(fileName);

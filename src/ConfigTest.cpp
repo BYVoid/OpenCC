@@ -33,12 +33,12 @@ protected:
 
   Config config;
   ConverterPtr converter;
-  const string input;
-  const string expected;
+  const std::string input;
+  const std::string expected;
 };
 
 TEST_F(ConfigTest, Convert) {
-  const string& converted = converter->Convert(input);
+  const std::string& converted = converter->Convert(input);
   EXPECT_EQ(expected, converted);
 }
 
@@ -50,7 +50,7 @@ TEST_F(ConfigTest, ConvertBuffer) {
 }
 
 TEST_F(ConfigTest, NonexistingPath) {
-  const string path = "/opencc/no/such/file/or/directory";
+  const std::string path = "/opencc/no/such/file/or/directory";
   try {
     const ConverterPtr converter = config.NewFromFile(path);
   } catch (FileNotFound& e) {
@@ -60,9 +60,9 @@ TEST_F(ConfigTest, NonexistingPath) {
 
 TEST_F(ConfigTest, NewFromStringWitoutTrailingSlash) {
   std::ifstream ifs(CONFIG_TEST_PATH);
-  string content(std::istreambuf_iterator<char>(ifs),
-                 (std::istreambuf_iterator<char>()));
-  string pathWithoutTrailingSlash = CMAKE_SOURCE_DIR "/test/config_test";
+  std::string content(std::istreambuf_iterator<char>(ifs),
+                      (std::istreambuf_iterator<char>()));
+  std::string pathWithoutTrailingSlash = CMAKE_SOURCE_DIR "/test/config_test";
 
   const ConverterPtr converter =
       config.NewFromString(content, pathWithoutTrailingSlash);

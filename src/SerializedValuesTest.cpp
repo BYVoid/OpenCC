@@ -28,7 +28,7 @@ protected:
         fileName("dict.bin"){};
 
   const std::shared_ptr<SerializedValues> binDict;
-  const string fileName;
+  const std::string fileName;
 };
 
 TEST_F(SerializedValuesTest, Serialization) {

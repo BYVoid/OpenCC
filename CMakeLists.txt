@@ -65,7 +65,6 @@ include(CPack)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(CMAKE_MACOSX_RPATH 1)
-    add_definitions(-mmacosx-version-min=10.9)
 endif()
 
 ######## Directory

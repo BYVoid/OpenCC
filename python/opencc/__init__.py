@@ -26,9 +26,9 @@ __all__ = ['CONFIGS', 'convert', 'OpenCC']
 _thisdir = os.path.dirname(os.path.abspath(__file__))
 _system = platform.system()
 if _system == 'Darwin':
-    _libopenccfilename = 'libopencc.2.dylib'
+    _libopenccfilename = 'libopencc.1.1.dylib'
 elif _system == 'Linux':
-    _libopenccfilename = 'libopencc.so.2'
+    _libopenccfilename = 'libopencc.so.1.1'
 elif _system == 'Windows':
     _libopenccfilename = 'opencc.dll'
 else:

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+#include <algorithm>
 #include <cassert>
 
 #include "Lexicon.hpp"

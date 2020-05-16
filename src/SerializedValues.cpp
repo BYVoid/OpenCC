@@ -17,6 +17,7 @@
  */
 
 #include <cassert>
+#include <cstring>
 
 #include "Lexicon.hpp"
 #include "SerializedValues.hpp"

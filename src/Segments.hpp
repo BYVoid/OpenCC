@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <sstream>
+
 #include "Common.hpp"
 
 namespace opencc {

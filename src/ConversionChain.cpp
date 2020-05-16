@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <list>
+
 #include "ConversionChain.hpp"
 #include "Segments.hpp"
 

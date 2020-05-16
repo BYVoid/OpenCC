@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 
-#include "PhraseExtract.hpp"
+#include <fstream>
+
 #include "CmdLineOutput.hpp"
+#include "PhraseExtract.hpp"
 
 using opencc::Exception;
 using opencc::PhraseExtract;

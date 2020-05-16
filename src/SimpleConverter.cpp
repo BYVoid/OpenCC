@@ -118,7 +118,7 @@ opencc_t opencc_open(const char* configFileName) {
   if (configFileName == nullptr) {
     return opencc_open_internal(nullptr);
   }
-  std::wstd::string wFileName;
+  std::wstring wFileName;
   int convcnt = MultiByteToWideChar(CP_ACP, 0, configFileName, -1, NULL, 0);
   if (convcnt > 0) {
     wFileName.resize(convcnt);

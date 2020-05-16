@@ -254,7 +254,7 @@ public:
   }
 
 #ifdef _MSC_VER
-  static std::wstd::string GetPlatformString(const std::string& str) {
+  static std::wstring GetPlatformString(const std::string& str) {
     return U8ToU16(str);
   }
 #else
@@ -262,7 +262,7 @@ public:
 #endif // _MSC_VER
 
 #ifdef _MSC_VER
-  static std::string U16ToU8(const std::wstd::string& wstr) {
+  static std::string U16ToU8(const std::wstring& wstr) {
     std::string ret;
     int length = static_cast<int>(wstr.length());
     int convcnt = WideCharToMultiByte(CP_UTF8, 0, wstr.c_str(), length, NULL, 0,
@@ -275,8 +275,8 @@ public:
     return ret;
   }
 
-  static std::wstd::string U8ToU16(const std::string& str) {
-    std::wstd::string ret;
+  static std::wstring U8ToU16(const std::string& str) {
+    std::wstring ret;
     int length = static_cast<int>(str.length());
     int convcnt = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), length, NULL, 0);
     if (convcnt > 0) {

@@ -113,6 +113,8 @@ Document 文檔: https://byvoid.github.io/OpenCC/
 * `t2hk.json` Traditional Chinese (OpenCC Standard) to Hong Kong Standard 繁體（OpenCC 標準）到香港繁體（香港小學學習字詞表標準）
 * `t2jp.json` Traditional Chinese Characters (Kyūjitai) to New Japanese Kanji (Shinjitai) 繁體（OpenCC 標準，舊字體）到日文新字體
 * `jp2t.json` New Japanese Kanji (Shinjitai) to Traditional Chinese Characters (Kyūjitai) 日文新字體到繁體（OpenCC 標準，舊字體）
+* `hk2t.json` Traditional Chinese (Hong Kong standard) to Traditional Chinese 香港繁體（香港小學學習字詞表標準）到繁體（OpenCC 標準）
+* `tw2t.json` Traditional Chinese (Taiwan standard) to Traditional Chinese 臺灣正體到繁體（OpenCC 標準）
 
 ## Build 編譯
 

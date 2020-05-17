@@ -150,18 +150,20 @@ foreach(DICT ${DICTS})
 endforeach(DICT)
 
 set(CONFIG_FILES
+  config/hk2s.json
+  config/hk2t.json
+  config/jp2t.json
+  config/s2hk.json
   config/s2t.json
-  config/t2s.json
   config/s2tw.json
   config/s2twp.json
-  config/tw2s.json
-  config/tw2sp.json
-  config/t2tw.json
-  config/s2hk.json
-  config/hk2s.json
   config/t2hk.json
   config/t2jp.json
-  config/jp2t.json
+  config/t2s.json
+  config/t2tw.json
+  config/tw2s.json
+  config/tw2sp.json
+  config/tw2t.json
 )
 
 install(

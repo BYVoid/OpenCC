@@ -107,7 +107,7 @@ def build_libopencc():
         )
         errno = subprocess.call(cmd, shell=True)
         assert errno == 0, 'Build failed'
-    
+
     def build_on_posix():
         assert subprocess.call('command -v make', shell=True) == 0, \
             'Build requires `make`'
@@ -222,5 +222,5 @@ setuptools.setup(
         'Topic :: Software Development :: Localization',
     ],
     license='Apache License 2.0',
-    keywords='opencc convert chinese'
+    keywords=['opencc', 'convert', 'chinese']
 )

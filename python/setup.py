@@ -8,9 +8,6 @@ import warnings
 
 import setuptools
 import setuptools.command.build_py
-import setuptools.command.develop
-import setuptools.command.install
-import setuptools.command.test
 import wheel.bdist_wheel
 
 from opencc import _libopenccfile
@@ -203,9 +200,6 @@ setuptools.setup(
         'build_py': BuildPyCommand,
         'bdist_wheel': BDistWheelCommand
     },
-
-    tests_require=['pytest'],
-    test_suite='tests',
 
     classifiers=[
         'Development Status :: 5 - Production/Stable',

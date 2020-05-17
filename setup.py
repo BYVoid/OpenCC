@@ -18,7 +18,7 @@ _readme_file = os.path.join(_this_dir, 'README.md')
 _version_file = os.path.join(_this_dir, 'python', 'opencc', 'version.py')
 
 try:
-    sys.path.append(os.path.join(_this_dir, 'python'))
+    sys.path.insert(0, os.path.join(_this_dir, 'python'))
 
     import opencc  # noqa
     _libopencc_built = True

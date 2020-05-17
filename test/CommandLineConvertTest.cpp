@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 BYVoid <byvoid@byvoid.com>
+ * Copyright 2015 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <fstream>
 
 #include "Common.hpp"
 #include "gtest/gtest.h"
@@ -35,11 +37,11 @@ protected:
 
   virtual void TearDown() { ASSERT_EQ(0, chdir(originalWorkingDirectory)); }
 
-  string GetFileContents(const string& fileName) const {
+  std::string GetFileContents(const std::string& fileName) const {
     std::ifstream fs(fileName);
     EXPECT_TRUE(fs.is_open());
-    const string content((std::istreambuf_iterator<char>(fs)),
-                         (std::istreambuf_iterator<char>()));
+    const std::string content((std::istreambuf_iterator<char>(fs)),
+                              (std::istreambuf_iterator<char>()));
     fs.close();
     return content;
   }
@@ -66,17 +68,17 @@ protected:
     return CMAKE_SOURCE_DIR "/data/config/";
   }
 
-  string OutputFile(const char* config) const {
-    return string(OutputDirectory()) + config + ".out";
+  std::string OutputFile(const char* config) const {
+    return std::string(OutputDirectory()) + config + ".out";
   }
 
-  string AnswerFile(const char* config) const {
-    return string(AnswerDirectory()) + config + ".ans";
+  std::string AnswerFile(const char* config) const {
+    return std::string(AnswerDirectory()) + config + ".ans";
   }
 
-  string TestCommand(const char* config) const {
-    return OpenccCommand() + string("") + " -i " + InputDirectory() + config +
-           ".in" + " -o " + OutputFile(config) + " -c " +
+  std::string TestCommand(const char* config) const {
+    return OpenccCommand() + std::string("") + " -i " + InputDirectory() +
+           config + ".in" + " -o " + OutputFile(config) + " -c " +
            ConfigurationDirectory() + config + ".json";
   }
 
@@ -89,8 +91,8 @@ class ConfigurationTest : public CommandLineConvertTest,
 TEST_P(ConfigurationTest, Convert) {
   const char* config = GetParam();
   ASSERT_EQ(0, system(TestCommand(config).c_str()));
-  const string& output = GetFileContents(OutputFile(config));
-  const string& answer = GetFileContents(AnswerFile(config));
+  const std::string& output = GetFileContents(OutputFile(config));
+  const std::string& answer = GetFileContents(AnswerFile(config));
   ASSERT_EQ(answer, output);
 }
 

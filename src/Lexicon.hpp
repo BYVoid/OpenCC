@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ namespace opencc {
 class OPENCC_EXPORT Lexicon {
 public:
   Lexicon() {}
-  Lexicon(vector<std::unique_ptr<DictEntry>> entries_)
+  Lexicon(std::vector<std::unique_ptr<DictEntry>> entries_)
       : entries(std::move(entries_)) {}
   Lexicon(const Lexicon&) = delete;
   Lexicon& operator=(const Lexicon&) = delete;
@@ -41,28 +41,23 @@ public:
     entries.push_back(std::move(entry));
   }
 
-  void Sort() {
-    std::sort(entries.begin(), entries.end(), DictEntry::UPtrLessThan);
-  }
+  void Sort();
 
-  bool IsSorted() {
-    return std::is_sorted(entries.begin(), entries.end(),
-                          DictEntry::UPtrLessThan);
-  }
+  bool IsSorted();
 
   const DictEntry* At(size_t index) const { return entries.at(index).get(); }
 
   size_t Length() const { return entries.size(); }
 
-  vector<std::unique_ptr<DictEntry>>::const_iterator begin() const {
+  std::vector<std::unique_ptr<DictEntry>>::const_iterator begin() const {
     return entries.begin();
   }
 
-  vector<std::unique_ptr<DictEntry>>::const_iterator end() const {
+  std::vector<std::unique_ptr<DictEntry>>::const_iterator end() const {
     return entries.end();
   }
 
 private:
-  vector<std::unique_ptr<DictEntry>> entries;
+  std::vector<std::unique_ptr<DictEntry>> entries;
 };
 } // namespace opencc

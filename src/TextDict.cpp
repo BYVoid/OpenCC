@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2020 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2020 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,11 @@
  * limitations under the License.
  */
 
-#include "TextDict.hpp"
+#include <algorithm>
+#include <cassert>
+
 #include "Lexicon.hpp"
+#include "TextDict.hpp"
 
 using namespace opencc;
 
@@ -34,16 +37,17 @@ static DictEntry* ParseKeyValues(const char* buff, size_t lineNum) {
   size_t length;
   const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
   if (UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
-    throw InvalidTextDictionary("Tabular not found " + string(buff), lineNum);
+    throw InvalidTextDictionary("Tabular not found " + std::string(buff),
+                                lineNum);
   }
   length = static_cast<size_t>(pbuff - buff);
-  string key = UTF8Util::FromSubstr(buff, length);
-  vector<string> values;
+  std::string key = UTF8Util::FromSubstr(buff, length);
+  std::vector<std::string> values;
   while (!UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
     buff = pbuff = UTF8Util::NextChar(pbuff);
     pbuff = UTF8Util::FindNextInline(buff, ' ');
     length = static_cast<size_t>(pbuff - buff);
-    const string& value = UTF8Util::FromSubstr(buff, length);
+    const std::string& value = UTF8Util::FromSubstr(buff, length);
     values.push_back(value);
   }
   if (values.size() == 0) {

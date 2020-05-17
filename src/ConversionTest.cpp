@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 BYVoid <byvoid@byvoid.com>
+ * Copyright 2015 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,17 +33,17 @@ protected:
 
   DictPtr dict;
   ConversionPtr conversion;
-  const string input;
-  const string expected;
+  const std::string input;
+  const std::string expected;
 };
 
 TEST_F(ConversionTest, ConvertString) {
-  const string converted = conversion->Convert(input);
+  const std::string converted = conversion->Convert(input);
   EXPECT_EQ(expected, converted);
 }
 
 TEST_F(ConversionTest, ConvertCString) {
-  const string converted = conversion->Convert(input.c_str());
+  const std::string converted = conversion->Convert(input.c_str());
   EXPECT_EQ(expected, converted);
 }
 

@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 BYVoid <byvoid@byvoid.com>
+ * Copyright 2015 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ protected:
       : CONFIG_TEST_PATH(CMAKE_SOURCE_DIR
                          "/test/config_test/config_test.json") {}
 
-  const string CONFIG_TEST_PATH;
+  const std::string CONFIG_TEST_PATH;
 };
 
 } // namespace opencc

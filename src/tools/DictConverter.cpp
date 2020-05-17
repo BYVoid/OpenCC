@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 #include "DictConverter.hpp"
 #include "CmdLineOutput.hpp"
+#include "Exception.hpp"
 
 using namespace opencc;
 
@@ -28,21 +29,21 @@ int main(int argc, const char* argv[]) {
     CmdLineOutput cmdLineOutput;
     cmd.setOutput(&cmdLineOutput);
 
-    vector<string> dictFormats{"text", "ocd2", "ocd"};
-    TCLAP::ValuesConstraint<string> allowedVals(dictFormats);
+    std::vector<std::string> dictFormats{"text", "ocd2", "ocd"};
+    TCLAP::ValuesConstraint<std::string> allowedVals(dictFormats);
 
-    TCLAP::ValueArg<string> toArg("t", "to", "Output format",
-                                  true /* required */, "" /* default */,
-                                  &allowedVals /* type */, cmd);
-    TCLAP::ValueArg<string> fromArg("f", "from", "Input format",
-                                    true /* required */, "" /* default */,
-                                    &allowedVals /* type */, cmd);
-    TCLAP::ValueArg<string> outputArg(
+    TCLAP::ValueArg<std::string> toArg("t", "to", "Output format",
+                                       true /* required */, "" /* default */,
+                                       &allowedVals /* type */, cmd);
+    TCLAP::ValueArg<std::string> fromArg("f", "from", "Input format",
+                                         true /* required */, "" /* default */,
+                                         &allowedVals /* type */, cmd);
+    TCLAP::ValueArg<std::string> outputArg(
         "o", "output", "Path to output dictionary", true /* required */,
         "" /* default */, "file" /* type */, cmd);
-    TCLAP::ValueArg<string> inputArg("i", "input", "Path to input dictionary",
-                                     true /* required */, "" /* default */,
-                                     "file" /* type */, cmd);
+    TCLAP::ValueArg<std::string> inputArg(
+        "i", "input", "Path to input dictionary", true /* required */,
+        "" /* default */, "file" /* type */, cmd);
     cmd.parse(argc, argv);
     ConvertDictionary(inputArg.getValue(), outputArg.getValue(),
                       fromArg.getValue(), toArg.getValue());

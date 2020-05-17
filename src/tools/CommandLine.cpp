@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <fstream>
+
 #include "CmdLineOutput.hpp"
 #include "Config.hpp"
 #include "Converter.hpp"
@@ -23,9 +25,9 @@
 
 using namespace opencc;
 
-Optional<string> inputFileName = Optional<string>::Null();
-Optional<string> outputFileName = Optional<string>::Null();
-string configFileName;
+Optional<std::string> inputFileName = Optional<std::string>::Null();
+Optional<std::string> outputFileName = Optional<std::string>::Null();
+std::string configFileName;
 bool noFlush;
 Config config;
 ConverterPtr converter;
@@ -52,9 +54,9 @@ void ConvertLineByLine() {
     } else {
       isFirstLine = false;
     }
-    string line;
+    std::string line;
     std::getline(inputStream, line);
-    const string& converted = converter->Convert(line);
+    const std::string& converted = converter->Convert(line);
     fputs(converted.c_str(), fout);
     if (!noFlush) {
       // Flush every line if the output stream is stdout.
@@ -64,10 +66,10 @@ void ConvertLineByLine() {
   fclose(fout);
 }
 
-void Convert(string inputFileName) {
+void Convert(std::string inputFileName) {
   const int BUFFER_SIZE = 1024 * 1024;
   static bool bufferInitialized = false;
-  static string buffer;
+  static std::string buffer;
   static char* bufferBegin;
   static const char* bufferEnd;
   static char* bufferPtr;
@@ -84,7 +86,7 @@ void Convert(string inputFileName) {
   bool needToRemove = false;
   if (!outputFileName.IsNull() && inputFileName == outputFileName.Get()) {
     // Special case: input == output
-    const string tempFileName = std::tmpnam(nullptr);
+    const std::string tempFileName = std::tmpnam(nullptr);
     std::ifstream src(inputFileName, std::ios::binary);
     std::ofstream dst(tempFileName, std::ios::binary);
     dst << src.rdbuf();
@@ -102,7 +104,7 @@ void Convert(string inputFileName) {
     size_t length = fread(bufferPtr, sizeof(char), bufferSizeAvailble, fin);
     bufferPtr[length] = '\0';
     size_t remainingLength = 0;
-    string remainingTemp;
+    std::string remainingTemp;
     if (length == bufferSizeAvailble) {
       // fread may breaks UTF8 character
       // Find the end of last character
@@ -121,7 +123,7 @@ void Convert(string inputFileName) {
       }
     }
     // Perform conversion
-    const string& converted = converter->Convert(buffer);
+    const std::string& converted = converter->Convert(buffer);
     fputs(converted.c_str(), fout);
     if (!noFlush) {
       // Flush every line if the output stream is stdout.
@@ -148,13 +150,13 @@ int main(int argc, const char* argv[]) {
     CmdLineOutput cmdLineOutput;
     cmd.setOutput(&cmdLineOutput);
 
-    TCLAP::ValueArg<string> configArg(
+    TCLAP::ValueArg<std::string> configArg(
         "c", "config", "Configuration file", false /* required */,
         "s2t.json" /* default */, "file" /* type */, cmd);
-    TCLAP::ValueArg<string> outputArg(
+    TCLAP::ValueArg<std::string> outputArg(
         "o", "output", "Write converted text to <file>.", false /* required */,
         "" /* default */, "file" /* type */, cmd);
-    TCLAP::ValueArg<string> inputArg(
+    TCLAP::ValueArg<std::string> inputArg(
         "i", "input", "Read original text from <file>.", false /* required */,
         "" /* default */, "file" /* type */, cmd);
     TCLAP::ValueArg<bool> noFlushArg(
@@ -164,10 +166,10 @@ int main(int argc, const char* argv[]) {
     configFileName = configArg.getValue();
     noFlush = noFlushArg.getValue();
     if (inputArg.isSet()) {
-      inputFileName = Optional<string>(inputArg.getValue());
+      inputFileName = Optional<std::string>(inputArg.getValue());
     }
     if (outputArg.isSet()) {
-      outputFileName = Optional<string>(outputArg.getValue());
+      outputFileName = Optional<std::string>(outputArg.getValue());
       noFlush = true;
     }
     converter = config.NewFromFile(configFileName);

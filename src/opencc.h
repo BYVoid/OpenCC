@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,16 +94,16 @@ OPENCC_EXPORT opencc_t opencc_open_w(const wchar_t* configFileName);
 OPENCC_EXPORT int opencc_close(opencc_t opencc);
 
 /**
- * Converts UTF-8 string
+ * Converts UTF-8 std::string
  *
  * @param opencc The opencc description pointer.
- * @param input  The UTF-8 encoded string.
+ * @param input  The UTF-8 encoded std::string.
  * @param length The maximum length in byte to convert. If length is (size_t)-1,
- *               the whole string (terminated by '\0') will be converted.
+ *               the whole std::string (terminated by '\0') will be converted.
  * @param output The buffer to store converted text. You MUST make sure this
  *               buffer has sufficient space.
  *
- * @return       The length of converted string or (size_t)-1 on error.
+ * @return       The length of converted std::string or (size_t)-1 on error.
  *
  * @ingroup opencc_c_api
  */
@@ -112,18 +112,18 @@ OPENCC_EXPORT size_t opencc_convert_utf8_to_buffer(opencc_t opencc,
                                                    size_t length, char* output);
 
 /**
- * Converts UTF-8 string
- * This function returns an allocated C-Style string, which stores
- * the converted string.
+ * Converts UTF-8 std::string
+ * This function returns an allocated C-Style std::string, which stores
+ * the converted std::string.
  * You MUST call opencc_convert_utf8_free() to release allocated memory.
  *
  * @param opencc The opencc description pointer.
- * @param input  The UTF-8 encoded string.
+ * @param input  The UTF-8 encoded std::string.
  * @param length The maximum length in byte to convert. If length is (size_t)-1,
- *               the whole string (terminated by '\0') will be converted.
+ *               the whole std::string (terminated by '\0') will be converted.
  *
- * @return       The newly allocated UTF-8 string that stores text converted,
- *               or NULL on error.
+ * @return       The newly allocated UTF-8 std::string that stores text
+ * converted, or NULL on error.
  * @ingroup opencc_c_api
  */
 OPENCC_EXPORT char* opencc_convert_utf8(opencc_t opencc, const char* input,
@@ -132,7 +132,8 @@ OPENCC_EXPORT char* opencc_convert_utf8(opencc_t opencc, const char* input,
 /**
  * Releases allocated buffer by opencc_convert_utf8
  *
- * @param str    Pointer to the allocated string buffer by opencc_convert_utf8.
+ * @param str    Pointer to the allocated std::string buffer by
+ * opencc_convert_utf8.
  *
  * @ingroup opencc_c_api
  */

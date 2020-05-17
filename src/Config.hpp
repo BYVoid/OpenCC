@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,10 @@ public:
 
   virtual ~Config();
 
-  ConverterPtr NewFromString(const string& json, const string& configDirectory);
+  ConverterPtr NewFromString(const std::string& json,
+                             const std::string& configDirectory);
 
-  ConverterPtr NewFromFile(const string& fileName);
+  ConverterPtr NewFromFile(const std::string& fileName);
 
 private:
   void* internal;

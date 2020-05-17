@@ -1,7 +1,7 @@
 #
 # Open Chinese Convert
 #
-# Copyright 2010-2020 BYVoid <byvoid@byvoid.com>
+# Copyright 2010-2020 Carbo Kuo <byvoid@byvoid.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -66,7 +66,6 @@ include(CPack)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(CMAKE_MACOSX_RPATH 1)
-    add_definitions(-mmacosx-version-min=10.9)
 endif()
 
 ######## Directory

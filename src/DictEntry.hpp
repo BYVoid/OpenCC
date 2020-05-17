@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2020 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2020 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,13 +33,13 @@ public:
 
   virtual std::string Key() const = 0;
 
-  virtual vector<std::string> Values() const = 0;
+  virtual std::vector<std::string> Values() const = 0;
 
   virtual std::string GetDefault() const = 0;
 
   virtual size_t NumValues() const = 0;
 
-  virtual string ToString() const = 0;
+  virtual std::string ToString() const = 0;
 
   size_t KeyLength() const { return Key().length(); }
 
@@ -55,42 +55,46 @@ public:
 
 class OPENCC_EXPORT NoValueDictEntry : public DictEntry {
 public:
-  NoValueDictEntry(const string& _key) : key(_key) {}
+  NoValueDictEntry(const std::string& _key) : key(_key) {}
 
   virtual ~NoValueDictEntry() {}
 
   virtual std::string Key() const { return key; }
 
-  virtual vector<std::string> Values() const { return vector<std::string>(); }
+  virtual std::vector<std::string> Values() const {
+    return std::vector<std::string>();
+  }
 
   virtual std::string GetDefault() const { return key; }
 
   virtual size_t NumValues() const { return 0; }
 
-  virtual string ToString() const { return key; }
+  virtual std::string ToString() const { return key; }
 
 private:
-  string key;
+  std::string key;
 };
 
 class OPENCC_EXPORT SingleValueDictEntry : public DictEntry {
 public:
   virtual std::string Value() const = 0;
 
-  virtual vector<std::string> Values() const {
-    return vector<std::string>{Value()};
+  virtual std::vector<std::string> Values() const {
+    return std::vector<std::string>{Value()};
   }
 
   virtual std::string GetDefault() const { return Value(); }
 
   virtual size_t NumValues() const { return 1; }
 
-  virtual string ToString() const { return string(Key()) + "\t" + Value(); }
+  virtual std::string ToString() const {
+    return std::string(Key()) + "\t" + Value();
+  }
 };
 
 class OPENCC_EXPORT StrSingleValueDictEntry : public SingleValueDictEntry {
 public:
-  StrSingleValueDictEntry(const string& _key, const string& _value)
+  StrSingleValueDictEntry(const std::string& _key, const std::string& _value)
       : key(_key), value(_value) {}
 
   virtual ~StrSingleValueDictEntry() {}
@@ -100,8 +104,8 @@ public:
   virtual std::string Value() const { return value; }
 
 private:
-  string key;
-  string value;
+  std::string key;
+  std::string value;
 };
 
 class OPENCC_EXPORT MultiValueDictEntry : public DictEntry {
@@ -114,12 +118,13 @@ public:
     }
   }
 
-  virtual string ToString() const;
+  virtual std::string ToString() const;
 };
 
 class OPENCC_EXPORT StrMultiValueDictEntry : public MultiValueDictEntry {
 public:
-  StrMultiValueDictEntry(const string& _key, const vector<std::string>& _values)
+  StrMultiValueDictEntry(const std::string& _key,
+                         const std::vector<std::string>& _values)
       : key(_key), values(_values) {}
 
   virtual ~StrMultiValueDictEntry() {}
@@ -128,22 +133,25 @@ public:
 
   size_t NumValues() const { return values.size(); }
 
-  vector<std::string> Values() const { return values; }
+  std::vector<std::string> Values() const { return values; }
 
 private:
-  string key;
-  vector<string> values;
+  std::string key;
+  std::vector<std::string> values;
 };
 
 class OPENCC_EXPORT DictEntryFactory {
 public:
-  static DictEntry* New(const string& key) { return new NoValueDictEntry(key); }
+  static DictEntry* New(const std::string& key) {
+    return new NoValueDictEntry(key);
+  }
 
-  static DictEntry* New(const string& key, const string& value) {
+  static DictEntry* New(const std::string& key, const std::string& value) {
     return new StrSingleValueDictEntry(key, value);
   }
 
-  static DictEntry* New(const string& key, const vector<string>& values) {
+  static DictEntry* New(const std::string& key,
+                        const std::vector<std::string>& values) {
     if (values.size() == 0) {
       return New(key);
     } else if (values.size() == 1) {
@@ -156,11 +164,9 @@ public:
     if (entry->NumValues() == 0) {
       return new NoValueDictEntry(entry->Key());
     } else if (entry->NumValues() == 1) {
-      const auto svEntry = static_cast<const SingleValueDictEntry*>(entry);
-      return new StrSingleValueDictEntry(svEntry->Key(), svEntry->Value());
+      return new StrSingleValueDictEntry(entry->Key(), entry->Values().front());
     } else {
-      const auto mvEntry = static_cast<const MultiValueDictEntry*>(entry);
-      return new StrMultiValueDictEntry(mvEntry->Key(), mvEntry->Values());
+      return new StrMultiValueDictEntry(entry->Key(), entry->Values());
     }
   }
 };

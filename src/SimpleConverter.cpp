@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,12 +56,12 @@ std::string SimpleConverter::Convert(const std::string& input) const {
 }
 
 std::string SimpleConverter::Convert(const char* input) const {
-  return Convert(string(input));
+  return Convert(std::string(input));
 }
 
 std::string SimpleConverter::Convert(const char* input, size_t length) const {
   if (length == static_cast<size_t>(-1)) {
-    return Convert(string(input));
+    return Convert(std::string(input));
   } else {
     return Convert(UTF8Util::FromSubstr(input, length));
   }
@@ -81,12 +81,12 @@ size_t SimpleConverter::Convert(const char* input, size_t length,
   if (length == static_cast<size_t>(-1)) {
     return Convert(input, output);
   } else {
-    string trimmed = UTF8Util::FromSubstr(input, length);
+    std::string trimmed = UTF8Util::FromSubstr(input, length);
     return Convert(trimmed.c_str(), output);
   }
 }
 
-static string cError;
+static std::string cError;
 
 opencc_t opencc_open_internal(const char* configFileName) {
   try {

@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,18 @@
  * limitations under the License.
  */
 
+#include <algorithm>
+
 #include "Dict.hpp"
 
 using namespace opencc;
 
 Optional<const DictEntry*> Dict::MatchPrefix(const char* word,
-                                             size_t len) const {
-  string wordTrunc = UTF8Util::TruncateUTF8(word, KeyMaxLength());
-  const char* wordTruncPtr = wordTrunc.c_str() + wordTrunc.length();
-  for (long len = static_cast<long>(wordTrunc.length()); len > 0;) {
+                                             size_t wordLen) const {
+  long len = static_cast<long>((std::min)(KeyMaxLength(), wordLen));
+  std::string wordTrunc = UTF8Util::TruncateUTF8(word, len);
+  const char* wordTruncPtr = wordTrunc.c_str() + len;
+  for (; len > 0;) {
     wordTrunc.resize(static_cast<size_t>(len));
     wordTruncPtr = wordTrunc.c_str() + len;
     const Optional<const DictEntry*>& result = Match(wordTrunc.c_str());
@@ -36,12 +39,13 @@ Optional<const DictEntry*> Dict::MatchPrefix(const char* word,
   return Optional<const DictEntry*>::Null();
 }
 
-vector<const DictEntry*> Dict::MatchAllPrefixes(const char* word,
-                                                size_t len) const {
-  vector<const DictEntry*> matchedLengths;
-  string wordTrunc = UTF8Util::TruncateUTF8(word, KeyMaxLength());
-  const char* wordTruncPtr = wordTrunc.c_str() + wordTrunc.length();
-  for (long len = static_cast<long>(wordTrunc.length()); len > 0;
+std::vector<const DictEntry*> Dict::MatchAllPrefixes(const char* word,
+                                                     size_t wordLen) const {
+  std::vector<const DictEntry*> matchedLengths;
+  long len = static_cast<long>((std::min)(KeyMaxLength(), wordLen));
+  std::string wordTrunc = UTF8Util::TruncateUTF8(word, len);
+  const char* wordTruncPtr = wordTrunc.c_str() + len;
+  for (; len > 0;
        len -= static_cast<long>(UTF8Util::PrevCharLength(wordTruncPtr))) {
     wordTrunc.resize(static_cast<size_t>(len));
     wordTruncPtr = wordTrunc.c_str() + len;

@@ -5,16 +5,18 @@ const util = require('util');
 const OpenCC = require('./opencc');
 
 const configs = [
+  'hk2s',
+  'hk2t',
+  'jp2t',
+  's2hk',
   's2t',
   's2tw',
   's2twp',
+  't2jp',
   't2s',
   'tw2s',
   'tw2sp',
-  's2hk',
-  'hk2s',
-  't2jp',
-  'jp2t',
+  'tw2t',
 ];
 
 const testSync = function (config, done) {

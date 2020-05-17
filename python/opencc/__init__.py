@@ -9,7 +9,6 @@ from opencc.version import __version__
 __all__ = ['OpenCC', 'CONFIGS', '__version__']
 
 _thisdir = os.path.dirname(os.path.abspath(__file__))
-_opencc_lib_dir = os.path.join(_thisdir, 'clib', 'lib')
 _opencc_share_dir = os.path.join(_thisdir, 'clib', 'share', 'opencc')
 
 if sys.version_info.major == 2:

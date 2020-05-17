@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 BYVoid <byvoid@byvoid.com>
+ * Copyright 2015 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ class TextDictTest : public TextDictTestBase {
 protected:
   TextDictTest() : fileName("dict.txt"){};
 
-  const string fileName;
+  const std::string fileName;
 };
 
 TEST_F(TextDictTest, DictTest) { TestDict(textDict); }

@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <list>
+
 #include "Common.hpp"
 #include "Conversion.hpp"
 
@@ -29,13 +31,13 @@ namespace opencc {
  */
 class OPENCC_EXPORT ConversionChain {
 public:
-  ConversionChain(const list<ConversionPtr> _conversions);
+  ConversionChain(const std::list<ConversionPtr> _conversions);
 
   SegmentsPtr Convert(const SegmentsPtr& input) const;
 
-  const list<ConversionPtr> GetConversions() const { return conversions; }
+  const std::list<ConversionPtr> GetConversions() const { return conversions; }
 
 private:
-  const list<ConversionPtr> conversions;
+  const std::list<ConversionPtr> conversions;
 };
 } // namespace opencc

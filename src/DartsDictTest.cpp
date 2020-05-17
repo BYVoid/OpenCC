@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 BYVoid <byvoid@byvoid.com>
+ * Copyright 2015 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ protected:
         fileName("dict.ocd"){};
 
   const DartsDictPtr dartsDict;
-  const string fileName;
+  const std::string fileName;
 };
 
 TEST_F(DartsDictTest, DictTest) { TestDict(dartsDict); }

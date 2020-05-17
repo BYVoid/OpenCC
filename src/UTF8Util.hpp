@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2013 BYVoid <byvoid@byvoid.com>
+ * Copyright 2013 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,14 @@
 #undef NOMINMAX
 #endif // _MSC_VER
 
+#include <cstring>
+
 #include "Common.hpp"
+#include "Exception.hpp"
 
 namespace opencc {
 /**
- * UTF8 string utilities
+ * UTF8 std::string utilities
  * @ingroup opencc_cpp_api
  */
 class OPENCC_EXPORT UTF8Util {
@@ -117,7 +120,7 @@ public:
   }
 
   /**
-   * Returns the UTF8 length of a valid UTF8 string.
+   * Returns the UTF8 length of a valid UTF8 std::string.
    */
   static size_t Length(const char* str) {
     size_t length = 0;
@@ -149,17 +152,18 @@ public:
   }
 
   /**
-   * Copies a substring with given length to a new std::string.
+   * Copies a substd::string with given length to a new std::string.
    */
-  static string FromSubstr(const char* str, size_t length) {
-    string newStr;
+  static std::string FromSubstr(const char* str, size_t length) {
+    std::string newStr;
     newStr.resize(length);
     strncpy(const_cast<char*>(newStr.c_str()), str, length);
     return newStr;
   }
 
   /**
-   * Returns true if the given string is longer or as long as the given length.
+   * Returns true if the given std::string is longer or as long as the given
+   * length.
    */
   static bool NotShorterThan(const char* str, size_t byteLength) {
     while (byteLength > 0) {
@@ -173,11 +177,11 @@ public:
   }
 
   /**
-   * Truncates a string with a maximal length in byte.
+   * Truncates a std::string with a maximal length in byte.
    * No UTF8 character will be broken.
    */
-  static string TruncateUTF8(const char* str, size_t maxByteLength) {
-    string wordTrunc;
+  static std::string TruncateUTF8(const char* str, size_t maxByteLength) {
+    std::string wordTrunc;
     if (NotShorterThan(str, maxByteLength)) {
       size_t len = 0;
       const char* pStr = str;
@@ -197,22 +201,23 @@ public:
   }
 
   /**
-   * Replaces all patterns in a string in place.
+   * Replaces all patterns in a std::string in place.
    */
-  static void ReplaceAll(string& str, const char* from, const char* to) {
-    string::size_type pos = 0;
-    string::size_type fromLen = strlen(from);
-    string::size_type toLen = strlen(to);
-    while ((pos = str.find(from, pos)) != string::npos) {
+  static void ReplaceAll(std::string& str, const char* from, const char* to) {
+    std::string::size_type pos = 0;
+    std::string::size_type fromLen = strlen(from);
+    std::string::size_type toLen = strlen(to);
+    while ((pos = str.find(from, pos)) != std::string::npos) {
       str.replace(pos, fromLen, to);
       pos += toLen;
     }
   }
 
   /**
-   * Joins a string vector in to a string with a separator.
+   * Joins a std::string vector in to a std::string with a separator.
    */
-  static string Join(const vector<string>& strings, const string& separator) {
+  static std::string Join(const std::vector<std::string>& strings,
+                          const std::string& separator) {
     std::ostringstream buffer;
     bool first = true;
     for (const auto& str : strings) {
@@ -226,9 +231,9 @@ public:
   }
 
   /**
-   * Joins a string vector in to a string.
+   * Joins a std::string vector in to a std::string.
    */
-  static string Join(const vector<string>& strings) {
+  static std::string Join(const std::vector<std::string>& strings) {
     std::ostringstream buffer;
     for (const auto& str : strings) {
       buffer << str;
@@ -237,7 +242,7 @@ public:
   }
 
   static void GetByteMap(const char* str, const size_t utf8Length,
-                         vector<size_t>* byteMap) {
+                         std::vector<size_t>* byteMap) {
     if (byteMap->size() < utf8Length) {
       byteMap->resize(utf8Length);
     }

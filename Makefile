@@ -1,7 +1,7 @@
 #
 # Open Chinese Convert
 #
-# Copyright 2010-2020 BYVoid <byvoid@byvoid.com>
+# Copyright 2010-2020 Carbo Kuo <byvoid@byvoid.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ python-test: python-build
 test-all: test node-test python-test
 
 format:
-	find "src" "node" -iname "*.hpp" -o -iname "*.cpp" -o -iname "*.cc" \
+	find "src" "node" "test" -iname "*.hpp" -o -iname "*.cpp" -o -iname "*.cc" \
 	-o -iname "*.c" -o -iname "*.h" \
 	| xargs clang-format -i
 

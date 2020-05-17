@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2020 BYVoid <byvoid@byvoid.com>
+ * Copyright 2020 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,11 @@
  * limitations under the License.
  */
 
-#include "SerializedValues.hpp"
+#include <cassert>
+#include <cstring>
+
 #include "Lexicon.hpp"
+#include "SerializedValues.hpp"
 
 using namespace opencc;
 
@@ -44,8 +47,8 @@ template <typename INT_TYPE> void WriteInteger(FILE* fp, INT_TYPE num) {
 size_t SerializedValues::KeyMaxLength() const { return 0; }
 
 void SerializedValues::SerializeToFile(FILE* fp) const {
-  string valueBuf;
-  vector<uint16_t> valueBytes;
+  std::string valueBuf;
+  std::vector<uint16_t> valueBytes;
   uint32_t valueTotalLength = 0;
   ConstructBuffer(&valueBuf, &valueBytes, &valueTotalLength);
   // Number of items
@@ -78,7 +81,7 @@ std::shared_ptr<SerializedValues> SerializedValues::NewFromFile(FILE* fp) {
 
   // Values
   uint32_t valueTotalLength = ReadInteger<uint32_t>(fp);
-  string valueBuffer;
+  std::string valueBuffer;
   valueBuffer.resize(valueTotalLength);
   size_t unitsRead = fread(const_cast<char*>(valueBuffer.c_str()), sizeof(char),
                            valueTotalLength, fp);
@@ -92,7 +95,7 @@ std::shared_ptr<SerializedValues> SerializedValues::NewFromFile(FILE* fp) {
     // Number of values
     uint16_t numValues = ReadInteger<uint16_t>(fp);
     // Value offset
-    vector<std::string> values;
+    std::vector<std::string> values;
     for (uint16_t j = 0; j < numValues; j++) {
       const char* value = pValueBuffer;
       uint16_t numValueBytes = ReadInteger<uint16_t>(fp);
@@ -106,8 +109,8 @@ std::shared_ptr<SerializedValues> SerializedValues::NewFromFile(FILE* fp) {
   return dict;
 }
 
-void SerializedValues::ConstructBuffer(string* valueBuffer,
-                                       vector<uint16_t>* valueBytes,
+void SerializedValues::ConstructBuffer(std::string* valueBuffer,
+                                       std::vector<uint16_t>* valueBytes,
                                        uint32_t* valueTotalLength) const {
   *valueTotalLength = 0;
   // Calculate total length.

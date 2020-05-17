@@ -44,6 +44,7 @@ set(
   DictConverter.cpp
   DictEntry.cpp
   DictGroup.cpp
+  Lexicon.cpp
   MarisaDict.cpp
   MaxMatchSegmentation.cpp
   PhraseExtract.cpp
@@ -113,9 +114,9 @@ set_target_properties(
     OUTPUT_NAME
       opencc
     VERSION
-      1.0.0
+      1.1.0
     SOVERSION
-      2
+      1.1
 )
 
 # Installation

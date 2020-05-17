@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <fstream>
+#include <list>
 #include <unordered_map>
 
 #include "document.h"
@@ -24,6 +26,7 @@
 #include "ConversionChain.hpp"
 #include "Converter.hpp"
 #include "DictGroup.hpp"
+#include "Exception.hpp"
 #include "MarisaDict.hpp"
 #include "MaxMatchSegmentation.hpp"
 #include "TextDict.hpp"
@@ -40,14 +43,15 @@ namespace {
 
 class ConfigInternal {
 public:
-  string configDirectory;
+  std::string configDirectory;
   std::unordered_map<
-      string, std::unordered_map<string, std::unordered_map<string, DictPtr>>>
+      std::string,
+      std::unordered_map<std::string, std::unordered_map<std::string, DictPtr>>>
       dictCache;
 
   const JSONValue& GetProperty(const JSONValue& doc, const char* name) {
     if (!doc.HasMember(name)) {
-      throw InvalidFormat("Required property not found: " + string(name));
+      throw InvalidFormat("Required property not found: " + std::string(name));
     }
     return doc[name];
   }
@@ -55,7 +59,7 @@ public:
   const JSONValue& GetObjectProperty(const JSONValue& doc, const char* name) {
     const JSONValue& obj = GetProperty(doc, name);
     if (!obj.IsObject()) {
-      throw InvalidFormat("Property must be an object: " + string(name));
+      throw InvalidFormat("Property must be an object: " + std::string(name));
     }
     return obj;
   }
@@ -63,7 +67,7 @@ public:
   const JSONValue& GetArrayProperty(const JSONValue& doc, const char* name) {
     const JSONValue& obj = GetProperty(doc, name);
     if (!obj.IsArray()) {
-      throw InvalidFormat("Property must be an array: " + string(name));
+      throw InvalidFormat("Property must be an array: " + std::string(name));
     }
     return obj;
   }
@@ -71,12 +75,14 @@ public:
   const char* GetStringProperty(const JSONValue& doc, const char* name) {
     const JSONValue& obj = GetProperty(doc, name);
     if (!obj.IsString()) {
-      throw InvalidFormat("Property must be a string: " + string(name));
+      throw InvalidFormat("Property must be a std::string: " +
+                          std::string(name));
     }
     return obj.GetString();
   }
 
-  template <typename DICT> DictPtr LoadDictWithPaths(const string& fileName) {
+  template <typename DICT>
+  DictPtr LoadDictWithPaths(const std::string& fileName) {
     // Working directory
     std::shared_ptr<DICT> dict;
     if (SerializableDict::TryLoadFromFile<DICT>(fileName, &dict)) {
@@ -96,7 +102,8 @@ public:
     throw FileNotFound(fileName);
   }
 
-  DictPtr LoadDictFromFile(const string& type, const string& fileName) {
+  DictPtr LoadDictFromFile(const std::string& type,
+                           const std::string& fileName) {
     if (type == "text") {
       return LoadDictWithPaths<TextDict>(fileName);
     }
@@ -114,10 +121,10 @@ public:
 
   DictPtr ParseDict(const JSONValue& doc) {
     // Required: type
-    string type = GetStringProperty(doc, "type");
+    std::string type = GetStringProperty(doc, "type");
 
     if (type == "group") {
-      list<DictPtr> dicts;
+      std::list<DictPtr> dicts;
       const JSONValue& docs = GetArrayProperty(doc, "dicts");
       for (rapidjson::SizeType i = 0; i < docs.Size(); i++) {
         if (docs[i].IsObject()) {
@@ -129,7 +136,7 @@ public:
       }
       return DictGroupPtr(new DictGroup(dicts));
     } else {
-      string fileName = GetStringProperty(doc, "file");
+      std::string fileName = GetStringProperty(doc, "file");
       // Read from cache
       DictPtr& cache = dictCache[type][configDirectory][fileName];
       if (cache != nullptr) {
@@ -147,7 +154,7 @@ public:
     SegmentationPtr segmentation;
 
     // Required: type
-    string type = GetStringProperty(doc, "type");
+    std::string type = GetStringProperty(doc, "type");
     if (type == "mmseg") {
       // Required: dict
       DictPtr dict = ParseDict(GetObjectProperty(doc, "dict"));
@@ -167,7 +174,7 @@ public:
   }
 
   ConversionChainPtr ParseConversionChain(const JSONValue& docs) {
-    list<ConversionPtr> conversions;
+    std::list<ConversionPtr> conversions;
     for (rapidjson::SizeType i = 0; i < docs.Size(); i++) {
       const JSONValue& doc = docs[i];
       if (doc.IsObject()) {
@@ -180,7 +187,7 @@ public:
     return chain;
   }
 
-  string FindConfigFile(string fileName) {
+  std::string FindConfigFile(std::string fileName) {
     std::ifstream ifs;
 
     // Working directory
@@ -190,7 +197,7 @@ public:
     }
     // Package data directory
     if (PACKAGE_DATA_DIRECTORY != "") {
-      string prefixedFileName = PACKAGE_DATA_DIRECTORY + fileName;
+      std::string prefixedFileName = PACKAGE_DATA_DIRECTORY + fileName;
       ifs.open(UTF8Util::GetPlatformString(prefixedFileName).c_str());
       if (ifs.is_open()) {
         return prefixedFileName;
@@ -210,26 +217,26 @@ Config::Config() : internal(new ConfigInternal()) {}
 
 Config::~Config() { delete (ConfigInternal*)internal; }
 
-ConverterPtr Config::NewFromFile(const string& fileName) {
+ConverterPtr Config::NewFromFile(const std::string& fileName) {
   ConfigInternal* impl = (ConfigInternal*)internal;
-  string prefixedFileName = impl->FindConfigFile(fileName);
+  std::string prefixedFileName = impl->FindConfigFile(fileName);
   std::ifstream ifs(UTF8Util::GetPlatformString(prefixedFileName));
-  string content(std::istreambuf_iterator<char>(ifs),
-                 (std::istreambuf_iterator<char>()));
+  std::string content(std::istreambuf_iterator<char>(ifs),
+                      (std::istreambuf_iterator<char>()));
 
 #if defined(_WIN32) || defined(_WIN64)
   UTF8Util::ReplaceAll(prefixedFileName, "\\", "/");
 #endif // if defined(_WIN32) || defined(_WIN64)
   size_t slashPos = prefixedFileName.rfind("/");
-  string configDirectory = "";
-  if (slashPos != string::npos) {
+  std::string configDirectory = "";
+  if (slashPos != std::string::npos) {
     configDirectory = prefixedFileName.substr(0, slashPos) + "/";
   }
   return NewFromString(content, configDirectory);
 }
 
-ConverterPtr Config::NewFromString(const string& json,
-                                   const string& configDirectory) {
+ConverterPtr Config::NewFromString(const std::string& json,
+                                   const std::string& configDirectory) {
   rapidjson::Document doc;
 
   doc.ParseInsitu<0>(const_cast<char*>(json.c_str()));
@@ -241,7 +248,7 @@ ConverterPtr Config::NewFromString(const string& json,
   }
 
   // Optional: name
-  string name;
+  std::string name;
   if (doc.HasMember("name") && doc["name"].IsString()) {
     name = doc["name"].GetString();
   }

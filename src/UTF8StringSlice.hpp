@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 BYVoid <byvoid@byvoid.com>
+ * Copyright 2015 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <cstring>
 
 #include "Common.hpp"
 #include "UTF8Util.hpp"
@@ -105,7 +107,7 @@ public:
     }
   }
 
-  string ToString() const { return string(str, str + byteLength); }
+  std::string ToString() const { return std::string(str, str + byteLength); }
 
   const char* CString() const { return str; }
 

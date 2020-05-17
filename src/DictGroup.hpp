@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <list>
+
 #include "Common.hpp"
 #include "Dict.hpp"
 
@@ -28,7 +30,7 @@ namespace opencc {
  */
 class OPENCC_EXPORT DictGroup : public Dict {
 public:
-  DictGroup(const list<DictPtr>& dicts);
+  DictGroup(const std::list<DictPtr>& dicts);
 
   static DictGroupPtr NewFromDict(const Dict& dict);
 
@@ -41,15 +43,15 @@ public:
   virtual Optional<const DictEntry*> MatchPrefix(const char* word,
                                                  size_t len) const;
 
-  virtual vector<const DictEntry*> MatchAllPrefixes(const char* word,
-                                                    size_t len) const;
+  virtual std::vector<const DictEntry*> MatchAllPrefixes(const char* word,
+                                                         size_t len) const;
 
   virtual LexiconPtr GetLexicon() const;
 
-  const list<DictPtr> GetDicts() const { return dicts; }
+  const std::list<DictPtr> GetDicts() const { return dicts; }
 
 private:
   const size_t keyMaxLength;
-  const list<DictPtr> dicts;
+  const std::list<DictPtr> dicts;
 };
 } // namespace opencc

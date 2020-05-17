@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2020 BYVoid <byvoid@byvoid.com>
+ * Copyright 2020 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,11 @@
  * limitations under the License.
  */
 
-#include "marisa.h"
+#include <algorithm>
+#include <cstring>
 #include <unordered_map>
+
+#include "marisa.h"
 
 #include "Lexicon.hpp"
 #include "MarisaDict.hpp"
@@ -70,12 +73,12 @@ Optional<const DictEntry*> MarisaDict::MatchPrefix(const char* word,
   }
 }
 
-vector<const DictEntry*> MarisaDict::MatchAllPrefixes(const char* word,
-                                                      size_t len) const {
+std::vector<const DictEntry*> MarisaDict::MatchAllPrefixes(const char* word,
+                                                           size_t len) const {
   const marisa::Trie& trie = *internal->marisa;
   marisa::Agent agent;
   agent.set_query(word, (std::min)(maxLength, len));
-  vector<const DictEntry*> matches;
+  std::vector<const DictEntry*> matches;
   while (trie.common_prefix_search(agent)) {
     matches.push_back(lexicon->At(agent.key().id()));
   }
@@ -103,7 +106,7 @@ MarisaDictPtr MarisaDict::NewFromFile(FILE* fp) {
   // Extract lexicon from built Marisa Trie, in order to get the order of keys.
   marisa::Agent agent;
   agent.set_query("");
-  vector<std::unique_ptr<DictEntry>> entries;
+  std::vector<std::unique_ptr<DictEntry>> entries;
   entries.resize(values_lexicon->Length());
   size_t maxLength = 0;
   while (dict->internal->marisa->predictive_search(agent)) {
@@ -138,7 +141,7 @@ MarisaDictPtr MarisaDict::NewFromDict(const Dict& thatDict) {
   // Extract lexicon from built Marisa Trie, in order to get the order of keys.
   marisa::Agent agent;
   agent.set_query("");
-  vector<std::unique_ptr<DictEntry>> entries;
+  std::vector<std::unique_ptr<DictEntry>> entries;
   entries.resize(thatLexicon->Length());
   while (dict->internal->marisa->predictive_search(agent)) {
     std::string key(agent.key().ptr(), agent.key().length());

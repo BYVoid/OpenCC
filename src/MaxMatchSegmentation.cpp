@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 using namespace opencc;
 
-SegmentsPtr MaxMatchSegmentation::Segment(const string& text) const {
+SegmentsPtr MaxMatchSegmentation::Segment(const std::string& text) const {
   SegmentsPtr segments(new Segments);
   const char* segStart = text.c_str();
   size_t segLength = 0;

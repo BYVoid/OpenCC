@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,30 +23,13 @@
 #pragma warning(disable : 4251 4266 4350 4503 4512 4514 4710 4820)
 #endif
 
-#include <algorithm>
-#include <fstream>
-#include <functional>
-#include <iostream>
-#include <list>
-#include <map>
+#include <cstddef>
 #include <memory>
-#include <sstream>
 #include <string>
 #include <vector>
 
-#include <cassert>
-#include <cstddef>
-#include <cstdio>
-#include <cstring>
-#include <ctime>
-
-#include "Exception.hpp"
 #include "Export.hpp"
 #include "Optional.hpp"
-
-using std::list;
-using std::string;
-using std::vector;
 
 // Forward decalarations and alias
 namespace opencc {
@@ -88,9 +71,9 @@ typedef std::shared_ptr<DartsDict> DartsDictPtr;
 } // namespace opencc
 
 #ifndef PKGDATADIR
-const string PACKAGE_DATA_DIRECTORY = "";
+const std::string PACKAGE_DATA_DIRECTORY = "";
 #else  // ifndef PKGDATADIR
-const string PACKAGE_DATA_DIRECTORY = PKGDATADIR "/";
+const std::string PACKAGE_DATA_DIRECTORY = PKGDATADIR "/";
 #endif // ifndef PKGDATADIR
 
 #ifndef VERSION

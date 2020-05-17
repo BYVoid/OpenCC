@@ -1,7 +1,7 @@
 ﻿/*
  * Open Chinese Convert
  *
- * Copyright 2015-2020 BYVoid <byvoid@byvoid.com>
+ * Copyright 2015-2020 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+#include <algorithm>
 #include <cmath>
 #include <unordered_map>
 
@@ -28,7 +29,7 @@ namespace opencc {
 namespace internal {
 
 bool ContainsPunctuation(const PhraseExtract::UTF8StringSlice8Bit& word) {
-  static const vector<PhraseExtract::UTF8StringSlice8Bit> punctuations = {
+  static const std::vector<PhraseExtract::UTF8StringSlice8Bit> punctuations = {
       " ",  "\n", "\r", "\t", "-",  ",",  ".",  "?",  "!",  "*", "　",
       "，", "。", "、", "；", "：", "？", "！", "…",  "“",  "”", "「",
       "」", "—",  "－", "（", "）", "《", "》", "．", "／", "＼"};
@@ -68,7 +69,7 @@ public:
     marisa_trie.clear();
   }
 
-  const vector<ItemType>& Items() const { return items; }
+  const std::vector<ItemType>& Items() const { return items; }
 
   void Build() {
     BuildKeys();
@@ -120,7 +121,7 @@ private:
   std::unordered_map<UTF8StringSlice8Bit, PhraseExtract::Signals,
                      UTF8StringSlice8Bit::Hasher>
       dict;
-  vector<ItemType> items;
+  std::vector<ItemType> items;
   marisa::Trie marisa_trie;
   std::vector<int> marisa_id_item_map;
 };
@@ -277,7 +278,7 @@ typedef std::unordered_map<PhraseExtract::UTF8StringSlice8Bit, size_t,
 
 template <bool SUFFIX>
 void CalculatePrefixSuffixEntropy(
-    const vector<PhraseExtract::UTF8StringSlice8Bit>& presuffixes,
+    const std::vector<PhraseExtract::UTF8StringSlice8Bit>& presuffixes,
     const PhraseExtract::LengthType setLength,
     const PhraseExtract::LengthType wordMinLength,
     const PhraseExtract::LengthType wordMaxLength,

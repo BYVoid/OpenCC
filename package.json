@@ -1,8 +1,8 @@
 {
   "name": "opencc",
-  "version": "1.1.0-1",
+  "version": "1.1.0-3",
   "description": "Conversion between Traditional and Simplified Chinese",
-  "author": "BYVoid <byvoid@byvoid.com>",
+  "author": "Carbo Kuo <byvoid@byvoid.com>",
   "license": "Apache-2.0",
   "main": "node/opencc.js",
   "types": "node/opencc.d.ts",
@@ -37,11 +37,11 @@
     "Traditional Chinese"
   ],
   "devDependencies": {
-    "mocha": "^7.1.1",
+    "mocha": "^7.1.2",
     "node-pre-gyp-github": "^1.4.3"
   },
   "dependencies": {
-    "nan": "^2.14.0",
+    "nan": "^2.14.1",
     "node-pre-gyp": "^0.14.0"
   }
 }

@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <sstream>
+
 #include "Common.hpp"
 
 namespace opencc {
@@ -30,13 +32,13 @@ public:
   Segments() {}
 
   Segments(std::initializer_list<const char*> initList) {
-    for (const string& item : initList) {
+    for (const std::string& item : initList) {
       AddSegment(item);
     }
   }
 
-  Segments(std::initializer_list<string> initList) {
-    for (const string& item : initList) {
+  Segments(std::initializer_list<std::string> initList) {
+    for (const std::string& item : initList) {
       AddSegment(item);
     }
   }
@@ -46,7 +48,7 @@ public:
     unmanaged.push_back(unmanagedString);
   }
 
-  void AddSegment(const string& str) {
+  void AddSegment(const std::string& str) {
     indexes.push_back(std::make_pair(managed.size(), true));
     managed.push_back(str);
   }
@@ -91,7 +93,7 @@ public:
 
   iterator end() const { return iterator(this, indexes.size()); }
 
-  string ToString() const {
+  std::string ToString() const {
     // TODO implement a nested structure to reduce concatenation,
     // like a purely functional differential list
     std::ostringstream buffer;
@@ -104,9 +106,9 @@ public:
 private:
   Segments(const Segments&) {}
 
-  vector<const char*> unmanaged;
-  vector<string> managed;
+  std::vector<const char*> unmanaged;
+  std::vector<std::string> managed;
   // index, managed
-  vector<std::pair<size_t, bool>> indexes;
+  std::vector<std::pair<size_t, bool>> indexes;
 };
 } // namespace opencc

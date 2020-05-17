@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2020 BYVoid <byvoid@byvoid.com>
+ * Copyright 2020 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ protected:
         fileName("dict.bin"){};
 
   const std::shared_ptr<SerializedValues> binDict;
-  const string fileName;
+  const std::string fileName;
 };
 
 TEST_F(SerializedValuesTest, Serialization) {

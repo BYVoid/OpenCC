@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 BYVoid <byvoid@byvoid.com>
+ * Copyright 2015 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,10 +37,10 @@ protected:
 TEST_F(MaxMatchSegmentationTest, Segment) {
   const auto& segments = segmenter->Segment(utf8("太后的头发干燥"));
   EXPECT_EQ(4, segments->Length());
-  EXPECT_EQ(utf8("太后"), string(segments->At(0)));
-  EXPECT_EQ(utf8("的"), string(segments->At(1)));
-  EXPECT_EQ(utf8("头发"), string(segments->At(2)));
-  EXPECT_EQ(utf8("干燥"), string(segments->At(3)));
+  EXPECT_EQ(utf8("太后"), std::string(segments->At(0)));
+  EXPECT_EQ(utf8("的"), std::string(segments->At(1)));
+  EXPECT_EQ(utf8("头发"), std::string(segments->At(2)));
+  EXPECT_EQ(utf8("干燥"), std::string(segments->At(3)));
 }
 
 } // namespace opencc

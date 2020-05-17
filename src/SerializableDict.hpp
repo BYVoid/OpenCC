@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ public:
   /**
    * Serializes the dictionary and writes in to a file.
    */
-  virtual void SerializeToFile(const string& fileName) const {
+  virtual void SerializeToFile(const std::string& fileName) const {
     FILE* fp = fopen(fileName.c_str(), "wb");
     if (fp == NULL) {
       throw FileNotWritable(fileName);
@@ -45,7 +45,7 @@ public:
   }
 
   template <typename DICT>
-  static bool TryLoadFromFile(const string& fileName,
+  static bool TryLoadFromFile(const std::string& fileName,
                               std::shared_ptr<DICT>* dict) {
     FILE* fp =
 #ifdef _MSC_VER
@@ -66,7 +66,7 @@ public:
   }
 
   template <typename DICT>
-  static std::shared_ptr<DICT> NewFromFile(const string& fileName) {
+  static std::shared_ptr<DICT> NewFromFile(const std::string& fileName) {
     std::shared_ptr<DICT> dict;
     if (!TryLoadFromFile<DICT>(fileName, &dict)) {
       throw FileNotFound(fileName);

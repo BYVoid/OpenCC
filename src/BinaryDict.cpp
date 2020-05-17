@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2020 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2020 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <algorithm>
+#include <cassert>
+#include <cstring>
 
 #include "BinaryDict.hpp"
 #include "Lexicon.hpp"
@@ -30,8 +34,8 @@ size_t BinaryDict::KeyMaxLength() const {
 }
 
 void BinaryDict::SerializeToFile(FILE* fp) const {
-  string keyBuf, valueBuf;
-  vector<size_t> keyOffsets, valueOffsets;
+  std::string keyBuf, valueBuf;
+  std::vector<size_t> keyOffsets, valueOffsets;
   size_t keyTotalLength = 0, valueTotalLength = 0;
   ConstructBuffer(keyBuf, keyOffsets, keyTotalLength, valueBuf, valueOffsets,
                   valueTotalLength);
@@ -114,7 +118,7 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
     }
     std::string key = dict->keyBuffer.c_str() + keyOffset;
     // Value offset
-    vector<std::string> values;
+    std::vector<std::string> values;
     for (size_t j = 0; j < numValues; j++) {
       size_t valueOffset;
       unitsRead = fread(&valueOffset, sizeof(size_t), 1, fp);
@@ -131,9 +135,10 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
   return dict;
 }
 
-void BinaryDict::ConstructBuffer(string& keyBuf, vector<size_t>& keyOffset,
-                                 size_t& keyTotalLength, string& valueBuf,
-                                 vector<size_t>& valueOffset,
+void BinaryDict::ConstructBuffer(std::string& keyBuf,
+                                 std::vector<size_t>& keyOffset,
+                                 size_t& keyTotalLength, std::string& valueBuf,
+                                 std::vector<size_t>& valueOffset,
                                  size_t& valueTotalLength) const {
   keyTotalLength = 0;
   valueTotalLength = 0;

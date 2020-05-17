@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 
 using namespace opencc;
 
-string Conversion::Convert(const char* phrase) const {
+std::string Conversion::Convert(const char* phrase) const {
   std::ostringstream buffer;
   for (const char* pstr = phrase; *pstr != '\0';) {
     Optional<const DictEntry*> matched = dict->MatchPrefix(pstr);
@@ -38,7 +38,7 @@ string Conversion::Convert(const char* phrase) const {
   return buffer.str();
 }
 
-string Conversion::Convert(const string& phrase) const {
+std::string Conversion::Convert(const std::string& phrase) const {
   return Convert(phrase.c_str());
 }
 

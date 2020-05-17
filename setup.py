@@ -79,7 +79,6 @@ def get_long_description():
 def build_libopencc():
     if _libopencc_built:
         return  # Skip building binary file
-
     print('building libopencc into %s' % _build_dir)
 
     is_windows = sys.platform == 'win32'
@@ -141,6 +140,8 @@ class BuildExtCommand(setuptools.command.build_ext.build_ext, object):
     def build_extension(self, ext):
         if isinstance(ext, OpenCCExtension):
             build_libopencc()
+        else:
+            super(BuildExtCommand, self).build_extension(ext)
 
 
 class BDistWheelCommand(wheel.bdist_wheel.bdist_wheel, object):

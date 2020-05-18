@@ -83,7 +83,7 @@ def build_libopencc():
 
     is_windows = sys.platform == 'win32'
 
-    # Directories
+    # Make build directories
     if is_windows:
         subprocess.call('md {}'.format(_build_dir), shell=True)
         subprocess.call('md {}'.format(_clib_dir), shell=True)
@@ -98,6 +98,7 @@ def build_libopencc():
         '-DENABLE_GTEST:BOOL=OFF',
         '-DENABLE_BENCHMARK:BOOL=OFF',
         '-DBUILD_PYTHON:BOOL=ON',
+        '-DCMAKE_BUILD_TYPE=Release',
         '-DCMAKE_INSTALL_PREFIX={}'.format(_clib_dir),
         '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}'.format(_clib_dir),
         '-DPYTHON_EXECUTABLE={}'.format(sys.executable),
@@ -108,8 +109,6 @@ def build_libopencc():
             ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE={}'.format(_clib_dir)]
         if sys.maxsize > 2**32:
             cmake_args += ['-A', 'x64']
-    else:
-        cmake_args += ['-DCMAKE_BUILD_TYPE=Release']
 
     cmd = ['cmake', '-B', _build_dir] + cmake_args
     errno = subprocess.call(cmd)
@@ -203,9 +202,6 @@ setuptools.setup(
         'build_ext': BuildExtCommand,
         'bdist_wheel': BDistWheelCommand
     },
-
-    tests_require=['pytest'],
-    test_suite='tests',
 
     classifiers=[
         'Development Status :: 5 - Production/Stable',

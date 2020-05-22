@@ -26,7 +26,7 @@ protected:
   UTF8StringSliceTest()
       : text("天行健，君子以自強不息。地勢坤，君子以厚德載物。"), empty(""){};
 
-  const UTF8StringSlice text;
+  UTF8StringSlice text;
   const UTF8StringSlice empty;
 };
 
@@ -62,7 +62,6 @@ TEST_F(UTF8StringSliceTest, Compare) {
 }
 
 TEST_F(UTF8StringSliceTest, MoveRight) {
-  UTF8StringSlice text = this->text;
   text.MoveRight();
   EXPECT_EQ(UTF8StringSlice("行健，君子以自強不息。地勢坤，君子以厚德載物。"),
             text);
@@ -75,7 +74,6 @@ TEST_F(UTF8StringSliceTest, MoveRight) {
 }
 
 TEST_F(UTF8StringSliceTest, MoveLeft) {
-  UTF8StringSlice text = this->text;
   text.MoveLeft();
   EXPECT_EQ(UTF8StringSlice("天行健，君子以自強不息。地勢坤，君子以厚德載物"),
             text);

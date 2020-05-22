@@ -39,7 +39,7 @@ for:
     - SET arch=%platform%
     - IF "%platform%"=="x86" SET arch=Win32
 
-    - cmake -A%arch% -S. -Bbuild -DCMAKE_INSTALL_PREFIX:PATH=. -DENABLE_GTEST:BOOL=ON -DCMAKE_BUILD_TYPE=Release
+    - cmake -A%arch% -S. -Bbuild -DCMAKE_INSTALL_PREFIX:PATH=. -DENABLE_GTEST:BOOL=ON -DENABLE_BENCHMARK:BOOL=ON -DCMAKE_BUILD_TYPE=Release
     - cmake --build build --config Release --target install
   test_script:
     - cd build

@@ -3,7 +3,12 @@
 #include <iostream>
 #include <memory>
 #include <streambuf>
+
+#ifdef _MSC_VER
+#include <direct.h>
+#else
 #include <unistd.h>
+#endif
 
 #include "SimpleConverter.hpp"
 #include "TestUtilsUTF8.hpp"

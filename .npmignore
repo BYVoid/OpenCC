@@ -3,6 +3,8 @@
 CMakeLists.txt
 *.cmake
 *.pyc
+*.cmd
+*.tgz
 
 /.github
 /.vscode
@@ -10,6 +12,8 @@ CMakeLists.txt
 /.clang-format
 /.travis.yml
 /Makefile
+/src/*Test.cpp
+/src/*TestBase.cpp
 /doc
 /data/scheme
 /deps/google-benchmark

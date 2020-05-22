@@ -38,8 +38,6 @@ def get_version_info():
             elif match.group(1) == 'REVISION':
                 version_info[2] = match.group(2)
     version = '.'.join(version_info)
-    # Remove the next line in the next version.
-    version += '-1'
     return version
 
 

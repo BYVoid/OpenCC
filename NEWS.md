@@ -1,5 +1,15 @@
 # Change History of OpenCC
 
+## Version 1.1.1
+
+2020年5月22日
+
+* 正式提供[Python](https://pypi.org/project/OpenCC/)接口和TypeScript類型標註。
+* 更新動態鏈接庫`SOVERSION`到`1.1`，由於C++內部接口發生變更。
+* 進一步改進與Windows MSVC的兼容性。
+* 簡化頭文件結構，加快編譯速度。刪除不必要的`using`。
+* 修復部分香港標準字。
+
 ## Version 1.1.0
 
 2020年5月10日

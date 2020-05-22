@@ -69,8 +69,7 @@ protected:
   DictPtr CreateDictForTaiwanVariants() const {
     LexiconPtr lexicon(new Lexicon);
     lexicon->Add(DictEntryFactory::New(utf8("裏"), utf8("裡")));
-    TextDictPtr textDict(new TextDict(lexicon));
-    return textDict;
+    return TextDictPtr(new TextDict(lexicon));
   }
 
   DictPtr CreateTaiwanPhraseDict() const {

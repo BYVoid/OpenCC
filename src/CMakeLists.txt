@@ -138,12 +138,12 @@ install(
 if (ENABLE_GTEST)
   if (WIN32)
     add_custom_target(
-        copy_gtest
+        copy_gtest_to_src
         ${CMAKE_COMMAND} -E copy $<TARGET_FILE:gtest> ${CMAKE_CURRENT_BINARY_DIR}
       COMMENT "Copy gtest"
     )
     add_custom_target(
-        copy_gtest_main
+        copy_gtest_main_to_src
         ${CMAKE_COMMAND} -E copy $<TARGET_FILE:gtest_main> ${CMAKE_CURRENT_BINARY_DIR}
       COMMENT "Copy gtest_main"
     )
@@ -154,7 +154,7 @@ if (ENABLE_GTEST)
     target_link_libraries(${TESTCASE} gtest gtest_main libopencc)
     add_test(${TESTCASE} ${TESTCASE})
     if (WIN32)
-      add_dependencies(${TESTCASE} copy_gtest copy_gtest_main)
+      add_dependencies(${TESTCASE} copy_gtest_to_src copy_gtest_main_to_src)
     endif()
   endforeach()
 endif()

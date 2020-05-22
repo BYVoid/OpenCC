@@ -54,11 +54,11 @@ protected:
 #ifndef _MSC_VER
     return PROJECT_BINARY_DIR "/src/tools/opencc";
 #else
-  #ifdef NDEBUG
+#ifdef NDEBUG
     return PROJECT_BINARY_DIR "/src/tools/Release/opencc.exe";
-  #else
+#else
     return PROJECT_BINARY_DIR "/src/tools/Debug/opencc.exe";
-  #endif
+#endif
 #endif
   }
 

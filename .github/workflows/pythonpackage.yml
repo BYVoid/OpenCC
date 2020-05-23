@@ -34,6 +34,4 @@ jobs:
     - name: Build and install
       run: python setup.py build_ext install
     - name: Test with pytest
-      run:
-        cd python
-        pytest
+      run: cd python && pytest

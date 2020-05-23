@@ -207,6 +207,8 @@ setuptools.setup(
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
+        'Natural Language :: Chinese (Simplified)',
+        'Natural Language :: Chinese (Traditional)',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
@@ -216,6 +218,7 @@ setuptools.setup(
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Localization',
+        'Topic :: Text Processing :: Linguistic',
     ],
     license='Apache License 2.0',
     keywords=['opencc', 'convert', 'chinese']

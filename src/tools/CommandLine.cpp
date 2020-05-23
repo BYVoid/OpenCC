@@ -66,7 +66,7 @@ void ConvertLineByLine() {
   fclose(fout);
 }
 
-void Convert(std::string inputFileName) {
+void Convert(std::string fileName) {
   const int BUFFER_SIZE = 1024 * 1024;
   static bool bufferInitialized = false;
   static std::string buffer;
@@ -84,20 +84,20 @@ void Convert(std::string inputFileName) {
   }
 
   bool needToRemove = false;
-  if (!outputFileName.IsNull() && inputFileName == outputFileName.Get()) {
+  if (!outputFileName.IsNull() && fileName == outputFileName.Get()) {
     // Special case: input == output
     const std::string tempFileName = std::tmpnam(nullptr);
-    std::ifstream src(inputFileName, std::ios::binary);
+    std::ifstream src(fileName, std::ios::binary);
     std::ofstream dst(tempFileName, std::ios::binary);
     dst << src.rdbuf();
     dst.close();
-    inputFileName = tempFileName;
+    fileName = tempFileName;
     needToRemove = true;
   }
 
-  FILE* fin = fopen(inputFileName.c_str(), "r");
+  FILE* fin = fopen(fileName.c_str(), "r");
   if (!fin) {
-    throw FileNotFound(inputFileName);
+    throw FileNotFound(fileName);
   }
   FILE* fout = GetOutputStream();
   while (!feof(fin)) {
@@ -139,7 +139,7 @@ void Convert(std::string inputFileName) {
   fclose(fout);
   if (needToRemove) {
     // Remove temporary file.
-    std::remove(inputFileName.c_str());
+    std::remove(fileName.c_str());
   }
 }
 

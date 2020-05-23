@@ -61,10 +61,10 @@ std::vector<const DictEntry*> DictGroup::MatchAllPrefixes(const char* word,
     const std::vector<const DictEntry*>& entries =
         dict->MatchAllPrefixes(word, len);
     for (const auto& entry : entries) {
-      size_t len = entry->KeyLength();
+      size_t entryLen = entry->KeyLength();
       // If the current length has already result, skip
-      if (matched.find(len) == matched.end()) {
-        matched[len] = entry;
+      if (matched.find(entryLen) == matched.end()) {
+        matched[entryLen] = entry;
       }
     }
   }

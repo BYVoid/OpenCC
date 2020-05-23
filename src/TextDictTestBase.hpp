@@ -69,8 +69,7 @@ protected:
   DictPtr CreateDictForTaiwanVariants() const {
     LexiconPtr lexicon(new Lexicon);
     lexicon->Add(DictEntryFactory::New(utf8("裏"), utf8("裡")));
-    TextDictPtr textDict(new TextDict(lexicon));
-    return textDict;
+    return TextDictPtr(new TextDict(lexicon));
   }
 
   DictPtr CreateTaiwanPhraseDict() const {
@@ -109,7 +108,7 @@ protected:
     EXPECT_EQ(utf8("BYVoid"), entry.Get()->Key());
     EXPECT_EQ(utf8("byv"), entry.Get()->GetDefault());
 
-    entry = dict->MatchPrefix("清華大學");
+    entry = dict->MatchPrefix(utf8("清華大學"));
     EXPECT_TRUE(!entry.IsNull());
     EXPECT_EQ(utf8("清華大學"), entry.Get()->Key());
     EXPECT_EQ(utf8("TsinghuaUniversity"), entry.Get()->GetDefault());

@@ -6,10 +6,6 @@ on:
   pull_request:
     branches: [ master ]
 
-defaults:
-  run:
-    working-directory: ./python
-
 jobs:
   build:
 
@@ -38,4 +34,6 @@ jobs:
     - name: Build
       run: python setup.py build
     - name: Test with pytest
-      run: pytest
+      run:
+        cd python
+        pytest

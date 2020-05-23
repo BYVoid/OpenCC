@@ -55,7 +55,7 @@ TEST_F(ConfigTest, ConvertBuffer) {
 TEST_F(ConfigTest, NonexistingPath) {
   const std::string path = "/opencc/no/such/file/or/directory";
   try {
-    const ConverterPtr converter = config.NewFromFile(path);
+    const ConverterPtr _ = config.NewFromFile(path);
   } catch (FileNotFound& e) {
     EXPECT_EQ(path + " not found or not accessible.", e.what());
   }
@@ -67,7 +67,7 @@ TEST_F(ConfigTest, NewFromStringWitoutTrailingSlash) {
                       (std::istreambuf_iterator<char>()));
   std::string pathWithoutTrailingSlash = CMAKE_SOURCE_DIR "/test/config_test";
 
-  const ConverterPtr converter =
+  const ConverterPtr _ =
       config.NewFromString(content, pathWithoutTrailingSlash);
 }
 

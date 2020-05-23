@@ -118,13 +118,15 @@ Document 文檔: https://byvoid.github.io/OpenCC/
 
 ### Build with CMake
 
-Linux (g++ 4.6 is required) and Mac OS X (clang 3.2 is required):
+#### Linux & Mac OS X
+
+g++ 4.6+ or clang 3.2+ is required.
 
 ```bash
 make
 ```
 
-Windows Visual Studio:
+#### Windows Visual Studio:
 
 ```bash
 build.cmd
@@ -132,8 +134,16 @@ build.cmd
 
 ### Test 測試
 
+#### Linux & Mac OS X
+
 ```
 make test
+```
+
+#### Windows Visual Studio:
+
+```bash
+test.cmd
 ```
 
 ### Benchmark 基準測試

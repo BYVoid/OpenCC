@@ -39,8 +39,11 @@ for:
     - SET arch=%platform%
     - IF "%platform%"=="x86" SET arch=Win32
 
-    - cmake -A%arch% -S. -Bbuild -DCMAKE_INSTALL_PREFIX:PATH=.
+    - cmake -A%arch% -S. -Bbuild -DCMAKE_INSTALL_PREFIX:PATH=. -DENABLE_GTEST:BOOL=ON -DENABLE_BENCHMARK:BOOL=ON -DCMAKE_BUILD_TYPE=Release
     - cmake --build build --config Release --target install
+  test_script:
+    - cd build
+    - ctest --verbose -C Release
   after_build:
     - 7z a OpenCC.zip build/bin build/include build/lib build/share
   artifacts:

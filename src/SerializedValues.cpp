@@ -117,7 +117,7 @@ void SerializedValues::ConstructBuffer(std::string* valueBuffer,
   for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
     assert(entry->NumValues() != 0);
     for (const auto& value : entry->Values()) {
-      *valueTotalLength += value.length() + 1;
+      *valueTotalLength += static_cast<uint32_t>(value.length()) + 1;
     }
   }
   // Write values to the buffer.

@@ -97,7 +97,8 @@ TextDictPtr TextDict::NewFromDict(const Dict& dict) {
 size_t TextDict::KeyMaxLength() const { return maxLength; }
 
 Optional<const DictEntry*> TextDict::Match(const char* word, size_t len) const {
-  std::unique_ptr<DictEntry> entry(new NoValueDictEntry(word));
+  std::unique_ptr<DictEntry> entry(
+      new NoValueDictEntry(std::string(word, len)));
   const auto& found = std::lower_bound(lexicon->begin(), lexicon->end(), entry,
                                        DictEntry::UPtrLessThan);
   if ((found != lexicon->end()) && ((*found)->Key() == entry->Key())) {

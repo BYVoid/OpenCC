@@ -1,18 +1,19 @@
 #!/usr/bin/env python
-#coding: utf-8
+# -*- coding: utf-8 -*-
 import sys
+
 from common import sort_items
 
 if len(sys.argv) < 2:
-  print("Sort the dictionary")
-  print(("Usage: ", sys.argv[0], "[input] ([output])"))
-  exit(1)
+    print("Sort the dictionary")
+    print(("Usage: ", sys.argv[0], "[input] ([output])"))
+    exit(1)
 
 input = sys.argv[1]
 
 if len(sys.argv) < 3:
-  output = input
+    output = input
 else:
-  output = sys.argv[2]
+    output = sys.argv[2]
 
 sort_items(input, output)

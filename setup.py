@@ -15,7 +15,6 @@ _build_dir = os.path.join(_this_dir, 'build', 'python')
 _cmake_file = os.path.join(_this_dir, 'CMakeLists.txt')
 _author_file = os.path.join(_this_dir, 'AUTHORS')
 _readme_file = os.path.join(_this_dir, 'README.md')
-_version_file = os.path.join(_this_dir, 'python', 'opencc', 'version.py')
 
 try:
     sys.path.insert(0, os.path.join(_this_dir, 'python'))
@@ -43,11 +42,6 @@ def get_version_info():
                 version_info[2] = match.group(2)
     version = '.'.join(version_info)
     return version
-
-
-def write_version_file(version_info):
-    with open(_version_file, 'w') as f:
-        f.write('__version__ = "{}"\n'.format(version_info))
 
 
 def get_author_info():
@@ -178,8 +172,6 @@ packages = ['opencc', 'opencc.clib']
 
 version_info = get_version_info()
 author_info = get_author_info()
-
-write_version_file(version_info)
 
 setuptools.setup(
     name='OpenCC',

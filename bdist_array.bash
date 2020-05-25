@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 DESC="Build distributable python wheel files for multiple python versions"

@@ -6,11 +6,11 @@
 /build
 /other
 /doc/html
+/dist
 /opencc.xcodeproj
 /test/dict.ocd
 /test/dict.txt
 /test/dict.bin
 /xcode
 /node_modules
-/dist
 /*.egg-info

@@ -4,10 +4,10 @@ import os
 import sys
 
 from opencc.clib import opencc_clib
-from opencc.version import __version__
 
 __all__ = ['OpenCC', 'CONFIGS', '__version__']
 
+__version__ = opencc_clib.__version__
 _thisdir = os.path.dirname(os.path.abspath(__file__))
 _opencc_share_dir = os.path.join(_thisdir, 'clib', 'share', 'opencc')
 
@@ -41,6 +41,7 @@ class OpenCC(opencc_clib._OpenCC):
         if not os.path.isfile(config):
             config = os.path.join(_opencc_share_dir, config)
         super(OpenCC, self).__init__(config)
+        self.config = config
 
     def convert(self, text):
         if isinstance(text, text_type):

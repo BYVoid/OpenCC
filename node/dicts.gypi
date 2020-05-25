@@ -113,7 +113,7 @@
     }, {
       "action_name": "HKDeFactoVariants",
       "variables": {
-        "input": "<(input_prefix)HKVariants.txt",
+        "input": "<(input_prefix)HKDeFactoVariants.txt",
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)HKDeFactoVariants.ocd2"],

@@ -1,0 +1,19 @@
+{
+  "name": "Traditional Chinese to Traditional Chinese (Hong Kong de facto standard)",
+  "segmentation": {
+    "type": "mmseg",
+    "dict": {
+      "type": "ocd2",
+      "file": "HKDeFactoVariants.ocd2"
+    }
+  },
+  "conversion_chain": [{
+    "dict": {
+      "type": "group",
+      "dicts": [{
+        "type": "ocd2",
+        "file": "HKDeFactoVariants.ocd2"
+      }]
+    }
+  }]
+}

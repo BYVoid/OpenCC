@@ -111,6 +111,14 @@
       "outputs": ["<(output_prefix)TWPhrasesRev.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
+      "action_name": "HKDeFactoVariants",
+      "variables": {
+        "input": "<(input_prefix)HKVariants.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)HKDeFactoVariants.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
       "action_name": "HKVariants",
       "variables": {
         "input": "<(input_prefix)HKVariants.txt",

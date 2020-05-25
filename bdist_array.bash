@@ -37,7 +37,6 @@ function clean_build_files() {
 VERSIONS="2.7 3.5 3.6 3.7 3.8"
 ROOT_DIR=$PWD
 
-rm -r dist  # Clear dist directory and rebuild all .whl files
 for VER in ${VERSIONS}; do
 	echo "Building for python==$VER"
 	ENV_NAME=opencc-$VER

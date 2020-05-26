@@ -29,6 +29,7 @@ option(ENABLE_GTEST "Build all tests." OFF)
 option(ENABLE_BENCHMARK "Build benchmark tests." OFF)
 option(ENABLE_DARTS "Build DartsDict (ocd format)." ON)
 option(BUILD_BUNDLED_LIBMARISA "" ON)
+option(BUILD_PYTHON "Build python library" OFF)
 
 ######## Package information
 set (PACKAGE_URL https://github.com/BYVoid/Opencc)
@@ -202,4 +203,12 @@ if (ENABLE_BENCHMARK)
   set(BENCHMARK_ENABLE_TESTING OFF)
   add_subdirectory(deps/google-benchmark)
   enable_testing()
+endif()
+
+######## Python
+
+if (BUILD_PYTHON)
+  add_subdirectory(deps/pybind11-2.5.0)
+  pybind11_add_module(opencc_clib src/py_opencc.cpp)
+  target_link_libraries(opencc_clib PRIVATE libopencc)
 endif()

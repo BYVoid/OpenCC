@@ -78,10 +78,13 @@ xcode-build:
 	xcodebuild build)
 
 python-build:
-	cd python; python setup.py build
+	python setup.py build_ext
 
 python-install: python-build
-	cd python; python setup.py install
+	python setup.py install
+
+python-dist: python-build
+	python setup.py bdist_wheel
 
 python-test: python-build
 	cd python; pytest .
@@ -94,7 +97,7 @@ format:
 	| xargs clang-format -i
 
 clean:
-	rm -rf build xcode python/opencc/clib
+	rm -rf build xcode python/opencc/clib *.egg-info
 
 install: build
 	make -C build/rel install VERBOSE=${VERBOSE} PREFIX=${PREFIX}

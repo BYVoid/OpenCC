@@ -20,11 +20,8 @@
     }
   }, {
     "dict": {
-      "type": "group",
-      "dicts": [{
-        "type": "ocd2",
-        "file": "HKVariants.ocd2"
-      }] 
+      "type": "ocd2",
+      "file": "HKVariants.ocd2"
     }
   }]
 }

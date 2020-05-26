@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import os
 import re
 import subprocess
@@ -7,28 +5,33 @@ import sys
 import warnings
 
 import setuptools
-import setuptools.command.build_py
+import setuptools.command.build_ext
 import wheel.bdist_wheel
 
-from opencc import _libopenccfile
+_this_dir = os.path.dirname(os.path.abspath(__file__))
+_clib_dir = os.path.join(_this_dir, 'python', 'opencc', 'clib')
+_build_dir = os.path.join(_this_dir, 'build', 'python')
 
-_clib_dir = os.path.join('opencc', 'clib')
-_opencc_rootdir = '..'
+_cmake_file = os.path.join(_this_dir, 'CMakeLists.txt')
+_author_file = os.path.join(_this_dir, 'AUTHORS')
+_readme_file = os.path.join(_this_dir, 'README.md')
 
-_cmake_file = os.path.join(_opencc_rootdir, 'CMakeLists.txt')
-assert os.path.isfile(_cmake_file)
+try:
+    sys.path.insert(0, os.path.join(_this_dir, 'python'))
 
-_build_dir = build_dir = os.path.join(_opencc_rootdir, 'build', 'python')
-
-_version_pattern = re.compile(r'OPENCC_VERSION_(MAJOR|MINOR|REVISION) (\d+)')
-_version_file = os.path.join('opencc', 'version.py')
+    import opencc  # noqa
+    _libopencc_built = True
+except ImportError:
+    _libopencc_built = False
 
 
 def get_version_info():
     version_info = ['1', '0', '0']
+    version_pattern = re.compile(
+        r'OPENCC_VERSION_(MAJOR|MINOR|REVISION) (\d+)')
     with open(_cmake_file, 'rb') as f:
         for l in f:
-            match = _version_pattern.search(l.decode('utf-8'))
+            match = version_pattern.search(l.decode('utf-8'))
             if not match:
                 continue
             if match.group(1) == 'MAJOR':
@@ -41,20 +44,14 @@ def get_version_info():
     return version
 
 
-def write_version_file(version_info):
-    with open(_version_file, 'w') as f:
-        f.write('__version__ = "{}"\n'.format(version_info))
-
-
 def get_author_info():
-    author_file = os.path.join(_opencc_rootdir, 'AUTHORS')
-    if not os.path.isfile(author_file):
+    if not os.path.isfile(_author_file):
         return 'BYVoid', 'byvoid@byvoid.com'
 
     authors = []
     emails = []
     author_pattern = re.compile(r'(.+) <(.+)>')
-    with open(author_file, 'rb') as f:
+    with open(_author_file, 'rb') as f:
         for line in f:
             match = author_pattern.search(line.decode('utf-8'))
             if not match:
@@ -69,76 +66,75 @@ def get_author_info():
 
 
 def get_long_description():
-    with open(os.path.join(_opencc_rootdir, 'README.md'), 'rb') as f:
+    with open(_readme_file, 'rb') as f:
         return f.read().decode('utf-8')
 
 
 def build_libopencc():
-    if os.path.isfile(_libopenccfile):
+    if _libopencc_built:
         return  # Skip building binary file
-
     print('building libopencc into %s' % _build_dir)
 
-    def build_on_windows():
-        subprocess.call('md %s' % _build_dir, shell=True)
-        cmd = (
-            'cmake '
-            '-B {build_dir} '
-            '-DBUILD_DOCUMENTATION:BOOL=OFF '
-            '-DENABLE_GTEST:BOOL=OFF '
-            '-DCMAKE_BUILD_TYPE=Release '
-            '-DCMAKE_INSTALL_PREFIX={clib_dir} '
-            '..'
-        ).format(
-            build_dir=_build_dir,
-            clib_dir=_clib_dir
-        )
-        errno = subprocess.call(cmd, shell=True)
-        assert errno == 0, 'Configure failed'
-        cmd = (
-            'cmake --build {build_dir} --config Release --target install'
-        ).format(
-            build_dir=_build_dir
-        )
-        errno = subprocess.call(cmd, shell=True)
-        assert errno == 0, 'Build failed'
+    is_windows = sys.platform == 'win32'
 
-    def build_on_posix():
-        assert subprocess.call('command -v make', shell=True) == 0, \
-            'Build requires `make`'
-        assert subprocess.call('command -v cmake', shell=True) == 0, \
-            'Build requires `cmake`'
-        # Probably also needs to check for cpp-compilier
-
-        errno = subprocess.call((
-            'mkdir -p {build_dir};'
-            'cmake '
-            '-B {build_dir} '
-            '-DBUILD_DOCUMENTATION:BOOL=OFF '
-            '-DENABLE_GTEST:BOOL=OFF '
-            '-DCMAKE_BUILD_TYPE=Release '
-            '-DCMAKE_INSTALL_PREFIX={clib_dir} '
-            '..;'
-            'make -C {build_dir} -j;'
-            'make -C {build_dir} install;'
-        ).format(
-            build_dir=_build_dir,
-            clib_dir=_clib_dir
-        ), shell=True)
-
-        assert errno == 0, 'Build failed'
-
-    if sys.platform == 'win32':
-        build_on_windows()
+    # Make build directories
+    if is_windows:
+        subprocess.call('md {}'.format(_build_dir), shell=True)
+        subprocess.call('md {}'.format(_clib_dir), shell=True)
     else:
-        build_on_posix()
-    assert os.path.isfile(_libopenccfile)
+        subprocess.call('mkdir -p {}'.format(_build_dir), shell=True)
+        subprocess.call('mkdir -p {}'.format(_clib_dir), shell=True)
+
+    # Configure
+    cmake_args = [
+        '-DBUILD_DOCUMENTATION:BOOL=OFF',
+        '-DBUILD_SHARED_LIBS:BOOL=OFF',
+        '-DENABLE_GTEST:BOOL=OFF',
+        '-DENABLE_BENCHMARK:BOOL=OFF',
+        '-DBUILD_PYTHON:BOOL=ON',
+        '-DCMAKE_BUILD_TYPE=Release',
+        '-DCMAKE_INSTALL_PREFIX={}'.format(_clib_dir),
+        '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}'.format(_clib_dir),
+        '-DPYTHON_EXECUTABLE={}'.format(sys.executable),
+    ]
+
+    if is_windows:
+        cmake_args += \
+            ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE={}'.format(_clib_dir)]
+        if sys.maxsize > 2**32:
+            cmake_args += ['-A', 'x64']
+
+    cmd = ['cmake', '-B', _build_dir] + cmake_args
+    errno = subprocess.call(cmd)
+    assert errno == 0, 'Configure failed'
+
+    # Build
+    cmd = [
+        'cmake', '--build', _build_dir,
+        '--config', 'Release',
+        '--target', 'install'
+    ]
+    errno = subprocess.call(cmd)
+    assert errno == 0, 'Build failed'
+
+    # Empty __init__.py file has to be created
+    # to make opencc.clib a module
+    with open('{}/__init__.py'.format(_clib_dir), 'w'):
+        pass
 
 
-class BuildPyCommand(setuptools.command.build_py.build_py, object):
-    def run(self):
-        build_libopencc()
-        super(BuildPyCommand, self).run()
+class OpenCCExtension(setuptools.Extension, object):
+    def __init__(self, name, sourcedir=''):
+        setuptools.Extension.__init__(self, name, sources=[])
+        self.sourcedir = os.path.abspath(sourcedir)
+
+
+class BuildExtCommand(setuptools.command.build_ext.build_ext, object):
+    def build_extension(self, ext):
+        if isinstance(ext, OpenCCExtension):
+            build_libopencc()
+        else:
+            super(BuildExtCommand, self).build_extension(ext)
 
 
 class BDistWheelCommand(wheel.bdist_wheel.bdist_wheel, object):
@@ -172,9 +168,9 @@ class BDistWheelCommand(wheel.bdist_wheel.bdist_wheel, object):
         self.plat_name = self._determine_platform_tag()
 
 
-version_info = get_version_info()
-write_version_file(version_info)
+packages = ['opencc', 'opencc.clib']
 
+version_info = get_version_info()
 author_info = get_author_info()
 
 setuptools.setup(
@@ -187,15 +183,15 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/BYVoid/OpenCC",
 
-    packages=['opencc'],
+    packages=packages,
+    package_dir={'opencc': 'python/opencc'},
     package_data={str('opencc'): [
-        'clib/bin/*.dll',
-        'clib/include/opencc/*',
-        'clib/lib/libopencc.*',
+        'clib/opencc_clib*',
         'clib/share/opencc/*',
     ]},
+    ext_modules=[OpenCCExtension('opencc.clib.opencc_clib', 'python')],
     cmdclass={
-        'build_py': BuildPyCommand,
+        'build_ext': BuildExtCommand,
         'bdist_wheel': BDistWheelCommand
     },
 

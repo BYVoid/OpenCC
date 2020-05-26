@@ -21,6 +21,7 @@ CMakeLists.txt
 /deps/tclap-1.2.2
 /build
 /debug
+/dist
 /release
 /other
 /opencc.pc.in
@@ -35,3 +36,4 @@ CMakeLists.txt
 /test/CommandLineConvertTest.cpp
 /node_modules
 /xcode
+/*.egg-info

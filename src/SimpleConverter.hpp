@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+#include <string>
 #include "Export.hpp"
 
 #ifndef __OPENCC_SIMPLECONVERTER_HPP_

@@ -5,6 +5,7 @@ const util = require('util');
 const OpenCC = require('./opencc');
 
 const configs = [
+  'hk2t',
   'hks2s',
   'hks2t',
   'jp2t',

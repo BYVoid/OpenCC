@@ -105,7 +105,7 @@ TEST_P(ConfigurationTest, Convert) {
 }
 
 INSTANTIATE_TEST_CASE_P(CommandLine, ConfigurationTest,
-                        ::testing::Values("hks2s", "hks2t", "jp2t", "s2hk", "s2hks",
+                        ::testing::Values("hk2t", "hks2s", "hks2t", "jp2t", "s2hk", "s2hks",
                                           "s2t", "s2tw", "s2twp", "t2hk", "t2hks",
                                           "t2jp", "t2s", "tw2s", "tw2sp", "tw2t"));
 

@@ -44,6 +44,7 @@ static void BM_Initialization(benchmark::State& state,
     state.ResumeTiming();
   }
 }
+BENCHMARK_CAPTURE(BM_Initialization, hk2t, "hk2t");
 BENCHMARK_CAPTURE(BM_Initialization, hks2s, "hks2s");
 BENCHMARK_CAPTURE(BM_Initialization, hks2t, "hks2t");
 BENCHMARK_CAPTURE(BM_Initialization, jp2t, "jp2t");

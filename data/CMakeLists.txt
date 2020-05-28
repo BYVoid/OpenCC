@@ -15,7 +15,6 @@ set(
   TWVariants
   TWVariantsRevPhrases
   HKVariants
-  HKStandardVariants
   HKVariantsRevPhrases
   JPVariants
   JPShinjitaiCharacters
@@ -28,7 +27,6 @@ set(
   TWPhrasesRev
   TWVariantsRev
   HKVariantsRev
-  HKStandardVariantsRev
   JPVariantsRev
 )
 
@@ -89,15 +87,6 @@ set(
 set(
   DICT_HKVariantsRev_GENERATING_COMMAND
   ${DICT_REVERSE_BIN} ${DICT_HKVariantsRev_GENERATING_INPUT} HKVariantsRev.txt
-)
-
-set(
-  DICT_HKStandardVariantsRev_GENERATING_INPUT
-  ${DICT_DIR}/HKStandardVariants.txt
-)
-set(
-  DICT_HKStandardVariantsRev_GENERATING_COMMAND
-  ${DICT_REVERSE_BIN} ${DICT_HKStandardVariantsRev_GENERATING_INPUT} HKStandardVariantsRev.txt
 )
 
 set(

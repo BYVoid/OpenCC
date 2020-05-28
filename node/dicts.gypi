@@ -111,14 +111,6 @@
       "outputs": ["<(output_prefix)TWPhrasesRev.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
-      "action_name": "HKDeFactoVariants",
-      "variables": {
-        "input": "<(input_prefix)HKDeFactoVariants.txt",
-      },
-      "inputs": ["<(input)"],
-      "outputs": ["<(output_prefix)HKDeFactoVariants.ocd2"],
-      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
-    }, {
       "action_name": "HKVariants",
       "variables": {
         "input": "<(input_prefix)HKVariants.txt",
@@ -127,28 +119,36 @@
       "outputs": ["<(output_prefix)HKVariants.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
-      "action_name": "HKVariantsRevPhrases",
+      "action_name": "HKStandardVariants",
       "variables": {
-        "input": "<(input_prefix)HKVariantsRevPhrases.txt",
+        "input": "<(input_prefix)HKStandardVariants.txt",
       },
       "inputs": ["<(input)"],
-      "outputs": ["<(output_prefix)HKVariantsRevPhrases.ocd2"],
+      "outputs": ["<(output_prefix)HKStandardVariants.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
-      "action_name": "HKVariantsRev.txt",
+      "action_name": "HKStandardVariantsRevPhrases",
       "variables": {
-        "input": "<(input_prefix)HKVariants.txt",
+        "input": "<(input_prefix)HKStandardVariantsRevPhrases.txt",
       },
       "inputs": ["<(input)"],
-      "outputs": ["<(output_prefix)HKVariantsRev.txt"],
+      "outputs": ["<(output_prefix)HKStandardVariantsRevPhrases.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "HKStandardVariantsRev.txt",
+      "variables": {
+        "input": "<(input_prefix)HKStandardVariants.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)HKStandardVariantsRev.txt"],
       "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
     }, {
-      "action_name": "HKVariantsRev",
+      "action_name": "HKStandardVariantsRev",
       "variables": {
-        "input": "<(output_prefix)HKVariantsRev.txt",
+        "input": "<(output_prefix)HKStandardVariantsRev.txt",
       },
       "inputs": ["<(input)"],
-      "outputs": ["<(output_prefix)HKVariantsRev.ocd2"],
+      "outputs": ["<(output_prefix)HKStandardVariantsRev.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "JPVariantsRev.txt",

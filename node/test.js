@@ -5,16 +5,16 @@ const util = require('util');
 const OpenCC = require('./opencc');
 
 const configs = [
-  'hk2s',
-  'hk2t',
+  'hks2s',
+  'hks2t',
   'jp2t',
   's2hk',
-  's2hkd',
+  's2hks',
   's2t',
   's2tw',
   's2twp',
   't2hk',
-  't2hkd',
+  't2hks',
   't2jp',
   't2s',
   'tw2s',

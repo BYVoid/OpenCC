@@ -5,6 +5,7 @@
     "copies": [{
       "destination": "<(PRODUCT_DIR)",
       "files": [
+        "../data/config/hk2s.json",
         "../data/config/hk2t.json",
         "../data/config/hks2s.json",
         "../data/config/hks2t.json",

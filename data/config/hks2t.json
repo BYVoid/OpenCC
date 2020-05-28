@@ -4,7 +4,7 @@
     "type": "mmseg",
     "dict": {
       "type": "ocd2",
-      "file": "HKVariantsRevPhrases.ocd2"
+      "file": "HKStandardVariantsRevPhrases.ocd2"
     }
   },
   "conversion_chain": [{
@@ -12,10 +12,10 @@
       "type": "group",
       "dicts": [{
         "type": "ocd2",
-        "file": "HKVariantsRevPhrases.ocd2"
+        "file": "HKStandardVariantsRevPhrases.ocd2"
       }, {
         "type": "ocd2",
-        "file": "HKVariantsRev.ocd2"
+        "file": "HKStandardVariantsRev.ocd2"
       }] 
     }
   }]

@@ -160,18 +160,21 @@ Example results (from Travis CI):
 1: ------------------------------------------------------------------
 1: Benchmark                        Time             CPU   Iterations
 1: ------------------------------------------------------------------
-1: BM_Initialization/s2t     27325410 ns     27337754 ns           26
-1: BM_Initialization/t2s      1427929 ns      1428890 ns          492
-1: BM_Initialization/s2tw    26888809 ns     26900500 ns           26
-1: BM_Initialization/s2twp   27286513 ns     27297972 ns           25
-1: BM_Initialization/tw2s     1442091 ns      1442939 ns          475
-1: BM_Initialization/tw2sp    1737702 ns      1738815 ns          398
-1: BM_Initialization/s2hk    27070874 ns     27081523 ns           26
-1: BM_Initialization/hk2s     1515165 ns      1516135 ns          466
-1: BM_Initialization/t2jp      147005 ns       146864 ns         4850
-1: BM_Initialization/jp2t      246554 ns       246479 ns         2859
-1: BM_Convert                     531 ms          531 ms            1
-1/1 Test #1: performance ......................   Passed   11.52 sec
+1: BM_Initialization/hk2s     1587215 ns      1587485 ns          435
+1: BM_Initialization/hk2t      126112 ns       125976 ns         5384
+1: BM_Initialization/jp2t      245646 ns       245414 ns         2847
+1: BM_Initialization/s2hk    26017749 ns     26017390 ns           27
+1: BM_Initialization/s2t     26298084 ns     26296375 ns           27
+1: BM_Initialization/s2tw    26483120 ns     26482164 ns           27
+1: BM_Initialization/s2twp   26455564 ns     26454666 ns           26
+1: BM_Initialization/t2hk       44759 ns        44636 ns        15733
+1: BM_Initialization/t2jp      143401 ns       143227 ns         4876
+1: BM_Initialization/t2s      1374298 ns      1373979 ns          510
+1: BM_Initialization/tw2s     1443389 ns      1443701 ns          464
+1: BM_Initialization/tw2sp    1699645 ns      1699823 ns          399
+1: BM_Initialization/tw2t       76294 ns        76083 ns         9229
+1: BM_Convert                     581 ms          581 ms            1
+1/1 Test #1: BenchmarkTest ....................   Passed   14.49 sec
 ```
 
 ## Projects using OpenCC 使用 OpenCC 的項目

@@ -137,7 +137,7 @@
     }, {
       "action_name": "HKVariantsRev.txt",
       "variables": {
-        "input": "<(input_prefix)HKStandardVariants.txt",
+        "input": "<(input_prefix)HKVariants.txt",
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)HKVariantsRev.txt"],

@@ -1,5 +1,5 @@
 {
-  "name": "Traditional Chinese to Traditional Chinese (Hong Kong standard)",
+  "name": "Traditional Chinese to Traditional Chinese (Hong Kong variant)",
   "segmentation": {
     "type": "mmseg",
     "dict": {

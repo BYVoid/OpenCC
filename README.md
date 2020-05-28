@@ -105,18 +105,21 @@ Document 文檔: https://byvoid.github.io/OpenCC/
 * `t2s.json` Traditional Chinese to Simplified Chinese 繁體到簡體
 * `s2tw.json` Simplified Chinese to Traditional Chinese (Taiwan Standard) 簡體到臺灣正體
 * `tw2s.json` Traditional Chinese (Taiwan Standard) to Simplified Chinese 臺灣正體到簡體
-* `s2hkd.json` Simplified Chinese to Traditional Chinese (Hong Kong de facto Standard) 簡體到香港繁體（香港事實標準）
-* `s2hk.json` Simplified Chinese to Traditional Chinese (Hong Kong Standard) 簡體到香港繁體（香港小學學習字詞表標準）
-* `hk2s.json` Traditional Chinese (Hong Kong Standard) to Simplified Chinese 香港繁體（香港小學學習字詞表標準）到簡體
+* `s2hk.json` Simplified Chinese to Traditional Chinese (Hong Kong de facto Standard) 簡體到香港繁體（香港事實標準）
 * `s2twp.json` Simplified Chinese to Traditional Chinese (Taiwan Standard) with Taiwanese idiom 簡體到繁體（臺灣正體標準）並轉換爲臺灣常用詞彙
 * `tw2sp.json` Traditional Chinese (Taiwan Standard) to Simplified Chinese with Mainland Chinese idiom 繁體（臺灣正體標準）到簡體並轉換爲中國大陸常用詞彙
 * `t2tw.json` Traditional Chinese (OpenCC Standard) to Taiwan Standard 繁體（OpenCC 標準）到臺灣正體
-* `t2hkd.json` Traditional Chinese (OpenCC Standard) to Hong Kong de facto Standard 繁體（OpenCC 標準）到香港繁體（香港事實標準）
-* `t2hk.json` Traditional Chinese (OpenCC Standard) to Hong Kong Standard 繁體（OpenCC 標準）到香港繁體（香港小學學習字詞表標準）
+* `t2hk.json` Traditional Chinese (OpenCC Standard) to Hong Kong de facto Standard 繁體（OpenCC 標準）到香港繁體（香港事實標準）
 * `t2jp.json` Traditional Chinese Characters (Kyūjitai) to New Japanese Kanji (Shinjitai) 繁體（OpenCC 標準，舊字體）到日文新字體
 * `jp2t.json` New Japanese Kanji (Shinjitai) to Traditional Chinese Characters (Kyūjitai) 日文新字體到繁體（OpenCC 標準，舊字體）
-* `hk2t.json` Traditional Chinese (Hong Kong standard) to Traditional Chinese 香港繁體（香港小學學習字詞表標準）到繁體（OpenCC 標準）
 * `tw2t.json` Traditional Chinese (Taiwan standard) to Traditional Chinese 臺灣正體到繁體（OpenCC 標準）
+
+不推薦使用：
+
+* `s2hks.json` Simplified Chinese to Traditional Chinese (Hong Kong Standard) 簡體到香港繁體（香港小學學習字詞表標準）
+* `hks2s.json` Traditional Chinese (Hong Kong Standard) to Simplified Chinese 香港繁體（香港小學學習字詞表標準）到簡體
+* `t2hks.json` Traditional Chinese (OpenCC Standard) to Hong Kong Standard 繁體（OpenCC 標準）到香港繁體（香港小學學習字詞表標準）
+* `hks2t.json` Traditional Chinese (Hong Kong standard) to Traditional Chinese 香港繁體（香港小學學習字詞表標準）到繁體（OpenCC 標準）
 
 ## Build 編譯
 

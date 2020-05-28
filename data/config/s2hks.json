@@ -21,7 +21,7 @@
   }, {
     "dict": {
       "type": "ocd2",
-      "file": "HKDeFactoVariants.ocd2"
+      "file": "HKStandardVariants.ocd2"
     }
   }]
 }

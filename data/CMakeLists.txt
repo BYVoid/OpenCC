@@ -16,7 +16,7 @@ set(
   TWVariantsRevPhrases
   HKVariants
   HKStandardVariants
-  HKStandardVariantsRevPhrases
+  HKVariantsRevPhrases
   JPVariants
   JPShinjitaiCharacters
   JPShinjitaiPhrases
@@ -27,6 +27,7 @@ set(
   TWPhrases
   TWPhrasesRev
   TWVariantsRev
+  HKVariantsRev
   HKStandardVariantsRev
   JPVariantsRev
 )
@@ -79,6 +80,15 @@ set(
 set(
   DICT_TWPhrasesRev_GENERATING_COMMAND
   ${DICT_REVERSE_BIN} ${DICT_TWPhrasesRev_GENERATING_INPUT} TWPhrasesRev.txt
+)
+
+set(
+  DICT_HKVariantsRev_GENERATING_INPUT
+  ${DICT_DIR}/HKVariants.txt
+)
+set(
+  DICT_HKVariantsRev_GENERATING_COMMAND
+  ${DICT_REVERSE_BIN} ${DICT_HKVariantsRev_GENERATING_INPUT} HKVariantsRev.txt
 )
 
 set(
@@ -151,6 +161,7 @@ foreach(DICT ${DICTS})
 endforeach(DICT)
 
 set(CONFIG_FILES
+  config/hk2t.json
   config/hks2s.json
   config/hks2t.json
   config/jp2t.json

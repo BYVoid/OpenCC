@@ -1,5 +1,5 @@
 {
-  "name": "Traditional Chinese (Hong Kong standard) to Traditional Chinese",
+  "name": "Traditional Chinese (Hong Kong variant) to Traditional Chinese",
   "segmentation": {
     "type": "mmseg",
     "dict": {
@@ -15,7 +15,7 @@
         "file": "HKVariantsRevPhrases.ocd2"
       }, {
         "type": "ocd2",
-        "file": "HKStandardVariantsRev.ocd2"
+        "file": "HKVariantsRev.ocd2"
       }] 
     }
   }]

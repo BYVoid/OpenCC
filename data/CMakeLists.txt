@@ -161,6 +161,7 @@ foreach(DICT ${DICTS})
 endforeach(DICT)
 
 set(CONFIG_FILES
+  config/hk2s.json
   config/hk2t.json
   config/hks2s.json
   config/hks2t.json

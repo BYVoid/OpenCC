@@ -3,6 +3,7 @@
 .project
 .cproject
 /.vscode
+/.mypy_cache
 /build
 /other
 /doc/html

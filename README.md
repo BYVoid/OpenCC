@@ -81,6 +81,22 @@ int main() {
 }
 ```
 
+### C
+
+```c
+#include "opencc.h"
+
+int main() {
+  opencc_t opencc = opencc_open("s2t.json");
+  const char* input = "汉字";
+  char* converted = opencc_convert_utf8(opencc, input, strlen(input));  // 漢字
+  opencc_convert_utf8_free(converted);
+  opencc_close(opencc);
+  return 0;
+}
+
+```
+
 Document 文檔: https://byvoid.github.io/OpenCC/
 
 ### Command Line

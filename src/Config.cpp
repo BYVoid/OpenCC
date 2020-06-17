@@ -105,7 +105,8 @@ public:
   DictPtr LoadDictFromFile(const std::string& type,
                            const std::string& fileName) {
     if (type == "text") {
-      return LoadDictWithPaths<TextDict>(fileName);
+      DictPtr dict = LoadDictWithPaths<TextDict>(fileName);
+      return MarisaDict::NewFromDict(*dict.get());
     }
 #ifdef ENABLE_DARTS
     if (type == "ocd") {

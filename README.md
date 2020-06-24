@@ -36,7 +36,7 @@ https://opencc.byvoid.com/
 
 ### Node.js
 
-[npm](https://www.npmjs.com/opencc) `npm i install opencc`
+[npm](https://www.npmjs.com/opencc) `npm install opencc`
 
 #### JavaScript
 ```js

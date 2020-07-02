@@ -54,6 +54,7 @@ BENCHMARK_CAPTURE(BM_Initialization, s2twp, "s2twp");
 BENCHMARK_CAPTURE(BM_Initialization, t2hk, "t2hk");
 BENCHMARK_CAPTURE(BM_Initialization, t2jp, "t2jp");
 BENCHMARK_CAPTURE(BM_Initialization, t2s, "t2s");
+BENCHMARK_CAPTURE(BM_Initialization, t2twp, "t2twp");
 BENCHMARK_CAPTURE(BM_Initialization, tw2s, "tw2s");
 BENCHMARK_CAPTURE(BM_Initialization, tw2sp, "tw2sp");
 BENCHMARK_CAPTURE(BM_Initialization, tw2t, "tw2t");

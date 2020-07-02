@@ -161,6 +161,7 @@ set(CONFIG_FILES
   config/t2jp.json
   config/t2s.json
   config/t2tw.json
+  config/t2twp.json
   config/tw2s.json
   config/tw2sp.json
   config/tw2t.json

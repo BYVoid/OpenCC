@@ -15,6 +15,7 @@ const configs = [
   't2hk',
   't2jp',
   't2s',
+  't2twp',
   'tw2s',
   'tw2sp',
   'tw2t',

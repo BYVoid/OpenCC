@@ -14,6 +14,7 @@
         "../data/config/s2twp.json",
         "../data/config/t2hk.json",
         "../data/config/t2jp.json",
+        "../data/config/t2jpx.json",
         "../data/config/t2s.json",
         "../data/config/t2tw.json",
         "../data/config/tw2s.json",

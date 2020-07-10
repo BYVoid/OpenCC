@@ -14,6 +14,7 @@ const configs = [
   's2twp',
   't2hk',
   't2jp',
+  't2jpx',
   't2s',
   'tw2s',
   'tw2sp',

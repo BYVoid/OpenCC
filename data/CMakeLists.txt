@@ -17,6 +17,7 @@ set(
   HKVariants
   HKVariantsRevPhrases
   JPVariants
+  JPVariantsEx
   JPShinjitaiCharacters
   JPShinjitaiPhrases
 )
@@ -28,6 +29,7 @@ set(
   TWVariantsRev
   HKVariantsRev
   JPVariantsRev
+  JPVariantsExRev
 )
 
 set(DICTS ${DICTS_RAW} ${DICTS_GENERATED})
@@ -98,6 +100,15 @@ set(
   ${DICT_REVERSE_BIN} ${DICT_JPVariantsRev_GENERATING_INPUT} JPVariantsRev.txt
 )
 
+set(
+  DICT_JPVariantsExRev_GENERATING_INPUT
+  ${DICT_DIR}/JPVariantsEx.txt
+)
+set(
+  DICT_JPVariantsExRev_GENERATING_COMMAND
+  ${DICT_REVERSE_BIN} ${DICT_JPVariantsExRev_GENERATING_INPUT} JPVariantsExRev.txt
+)
+
 foreach(DICT ${DICTS_GENERATED})
   add_custom_command(
     OUTPUT
@@ -159,6 +170,7 @@ set(CONFIG_FILES
   config/s2twp.json
   config/t2hk.json
   config/t2jp.json
+  config/t2jpx.json
   config/t2s.json
   config/t2tw.json
   config/tw2s.json

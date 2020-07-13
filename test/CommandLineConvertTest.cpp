@@ -105,8 +105,8 @@ TEST_P(ConfigurationTest, Convert) {
 }
 
 INSTANTIATE_TEST_CASE_P(CommandLine, ConfigurationTest,
-                        ::testing::Values("hk2s", "hk2t", "jp2t", "s2hk", "s2t",
-                                          "s2tw", "s2twp", "t2hk", "t2jp", "t2s",
-                                          "tw2s", "tw2sp", "tw2t"));
+                        ::testing::Values("hk2s", "hk2sp", "hk2t", "jp2t", "s2hk",
+                                          "s2hkp", "s2t", "s2tw", "s2twp", "t2hk",
+                                          "t2jp", "t2s", "tw2s", "tw2sp", "tw2t"));
 
 } // namespace opencc

@@ -79,13 +79,18 @@
       "outputs": ["<(output_prefix)TWVariantsRev.txt"],
       "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
     }, {
-      "action_name": "TWPhrasesRev.txt",
+      "action_name": "TWPhrasesRevAuto.txt",
       "variables": {
         "input": "<(output_prefix)TWPhrases.txt",
       },
       "inputs": ["<(input)"],
-      "outputs": ["<(output_prefix)TWPhrasesRev.txt"],
+      "outputs": ["<(output_prefix)TWPhrasesRevAuto.txt"],
       "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "TWPhrasesRev.txt",
+      "inputs": ["<(cmd)"],
+      "outputs": ["<(output_prefix)TWPhrasesRev.txt"],
+      "action": ["python", "<(dict_merge)", "<(output_prefix)TWPhrasesRevAuto.txt", "<(input_prefix)TWPhrasesRev.txt", "<@(_outputs)"]
     }, {
       "action_name": "TWPhrases",
       "variables": {

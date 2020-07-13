@@ -127,6 +127,14 @@
       "outputs": ["<(output_prefix)HKVariantsRevPhrases.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
+      "action_name": "HKPhrases",
+      "variables": {
+        "input": "<(input_prefix)HKPhrases.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)HKPhrases.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
       "action_name": "HKVariantsRev.txt",
       "variables": {
         "input": "<(input_prefix)HKVariants.txt",
@@ -135,12 +143,28 @@
       "outputs": ["<(output_prefix)HKVariantsRev.txt"],
       "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
     }, {
+      "action_name": "HKPhrasesRev.txt",
+      "variables": {
+        "input": "<(input_prefix)HKPhrases.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)HKPhrasesRev.txt"],
+      "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
+    }, {
       "action_name": "HKVariantsRev",
       "variables": {
         "input": "<(output_prefix)HKVariantsRev.txt",
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)HKVariantsRev.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "HKPhrasesRev",
+      "variables": {
+        "input": "<(output_prefix)HKPhrasesRev.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)HKPhrasesRev.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "JPVariantsRev.txt",

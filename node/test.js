@@ -6,9 +6,11 @@ const OpenCC = require('./opencc');
 
 const configs = [
   'hk2s',
+  'hk2sp',
   'hk2t',
   'jp2t',
   's2hk',
+  's2hkp',
   's2t',
   's2tw',
   's2twp',

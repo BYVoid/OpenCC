@@ -45,9 +45,11 @@ static void BM_Initialization(benchmark::State& state,
   }
 }
 BENCHMARK_CAPTURE(BM_Initialization, hk2s, "hk2s");
+BENCHMARK_CAPTURE(BM_Initialization, hk2sp, "hk2sp");
 BENCHMARK_CAPTURE(BM_Initialization, hk2t, "hk2t");
 BENCHMARK_CAPTURE(BM_Initialization, jp2t, "jp2t");
 BENCHMARK_CAPTURE(BM_Initialization, s2hk, "s2hk");
+BENCHMARK_CAPTURE(BM_Initialization, s2hkp, "s2hkp");
 BENCHMARK_CAPTURE(BM_Initialization, s2t, "s2t");
 BENCHMARK_CAPTURE(BM_Initialization, s2tw, "s2tw");
 BENCHMARK_CAPTURE(BM_Initialization, s2twp, "s2twp");

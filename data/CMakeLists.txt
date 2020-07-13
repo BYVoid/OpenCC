@@ -27,6 +27,7 @@ set(
   TWPhrases
   TWPhrasesRev
   TWVariantsRev
+  HKPhrasesRevAuto
   HKPhrasesRev
   HKVariantsRev
   JPVariantsRev
@@ -92,12 +93,22 @@ set(
 )
 
 set(
-  DICT_HKPhrasesRev_GENERATING_INPUT
+  DICT_HKPhrasesRevAuto_GENERATING_INPUT
   ${DICT_DIR}/HKPhrases.txt
 )
 set(
+  DICT_HKPhrasesRevAuto_GENERATING_COMMAND
+  ${DICT_REVERSE_BIN} ${DICT_HKPhrasesRevAuto_GENERATING_INPUT} HKPhrasesRevAuto.txt
+)
+
+set(
+  DICT_HKPhrasesRev_GENERATING_INPUT
+  ${DICT_GENERATED_DIR}/HKPhrasesRevAuto.txt
+  ${DICT_DIR}/HKPhrasesRev.txt
+)
+set(
   DICT_HKPhrasesRev_GENERATING_COMMAND
-  ${DICT_REVERSE_BIN} ${DICT_HKPhrasesRev_GENERATING_INPUT} HKPhrasesRev.txt
+  ${DICT_MERGE_BIN} ${DICT_HKPhrasesRev_GENERATING_INPUT} HKPhrasesRev.txt
 )
 
 set(

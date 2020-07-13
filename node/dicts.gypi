@@ -143,13 +143,18 @@
       "outputs": ["<(output_prefix)HKVariantsRev.txt"],
       "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
     }, {
-      "action_name": "HKPhrasesRev.txt",
+      "action_name": "HKPhrasesRevAuto.txt",
       "variables": {
         "input": "<(input_prefix)HKPhrases.txt",
       },
       "inputs": ["<(input)"],
-      "outputs": ["<(output_prefix)HKPhrasesRev.txt"],
+      "outputs": ["<(output_prefix)HKPhrasesRevAuto.txt"],
       "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "HKPhrasesRev.txt",
+      "inputs": ["<(cmd)"],
+      "outputs": ["<(output_prefix)HKPhrasesRev.txt"],
+      "action": ["python", "<(dict_merge)", "<(output_prefix)HKPhrasesRevAuto.txt", "<(input_prefix)HKPhrasesRev.txt", "<@(_outputs)"]
     }, {
       "action_name": "HKVariantsRev",
       "variables": {

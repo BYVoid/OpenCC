@@ -20,6 +20,8 @@ set(
   HKVariantsPhrases
   HKVariants
   HKVariantsRevPhrases
+  HKPhrases
+  HKPhrasesRev
   JPVariants
   JPShinjitaiCharacters
   JPShinjitaiPhrases
@@ -157,9 +159,11 @@ endforeach(DICT)
 
 set(CONFIG_FILES
   config/hk2s.json
+  config/hk2sp.json
   config/hk2t.json
   config/jp2t.json
   config/s2hk.json
+  config/s2hkp.json
   config/s2t.json
   config/s2tw.json
   config/s2twp.json

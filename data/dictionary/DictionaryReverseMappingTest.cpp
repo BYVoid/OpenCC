@@ -27,14 +27,14 @@ static FILE* OpenFile(const std::string& path) {
 #endif
 }
 
-TEST(DictionaryReverseMappingTest, TWPhrasesReverseMapping) {
+void ExpectRevComplete(const std::string& phrasesName) {
   std::unique_ptr<Runfiles> runfiles(Runfiles::CreateForTest());
   ASSERT_NE(nullptr, runfiles);
 
-  const std::string twPhrasesFile =
-      runfiles->Rlocation("_main/data/dictionary/TWPhrases.txt");
-  const std::string twPhrasesRevFile =
-      runfiles->Rlocation("_main/data/dictionary/TWPhrasesRev.txt");
+  const std::string phrasesFile =
+      runfiles->Rlocation("_main/data/dictionary/" + phrasesName + ".txt");
+  const std::string phrasesRevFile =
+      runfiles->Rlocation("_main/data/dictionary/" + phrasesName + "Rev" + ".txt");
 
   auto loadLexicon = [](const std::string& path) -> LexiconPtr {
     FILE* fp = OpenFile(path);
@@ -62,28 +62,28 @@ TEST(DictionaryReverseMappingTest, TWPhrasesReverseMapping) {
   };
 
   try {
-    LexiconPtr twPhrases = loadLexicon(twPhrasesFile);
-    LexiconPtr twPhrasesRev = loadLexicon(twPhrasesRevFile);
+    LexiconPtr twPhrases = loadLexicon(phrasesFile);
+    LexiconPtr twPhrasesRev = loadLexicon(phrasesRevFile);
     ASSERT_NE(twPhrases, nullptr);
     ASSERT_NE(twPhrasesRev, nullptr);
 
-    auto twMap = buildMap(twPhrases);
-    auto twRevMap = buildMap(twPhrasesRev);
+    auto phrasesMap = buildMap(twPhrases);
+    auto phrasesRevMap = buildMap(twPhrasesRev);
 
-    for (const auto& entry : twMap) {
+    for (const auto& entry : phrasesMap) {
       const std::string& key = entry.first;
       for (const auto& value : entry.second) {
-        auto it = twRevMap.find(value);
-        EXPECT_TRUE(it != twRevMap.end() && it->second.count(key) > 0)
+        auto it = phrasesRevMap.find(value);
+        EXPECT_TRUE(it != phrasesRevMap.end() && it->second.count(key) > 0)
             << "Missing reverse mapping: " << key << " -> " << value;
       }
     }
 
-    for (const auto& entry : twRevMap) {
+    for (const auto& entry : phrasesRevMap) {
       const std::string& key = entry.first;
       for (const auto& value : entry.second) {
-        auto it = twMap.find(value);
-        EXPECT_TRUE(it != twMap.end() && it->second.count(key) > 0)
+        auto it = phrasesMap.find(value);
+        EXPECT_TRUE(it != phrasesMap.end() && it->second.count(key) > 0)
             << "Missing reverse mapping: " << key << " -> " << value;
       }
     }
@@ -94,6 +94,14 @@ TEST(DictionaryReverseMappingTest, TWPhrasesReverseMapping) {
   } catch (...) {
     FAIL() << "Unknown exception thrown during reverse mapping check.";
   }
+}
+
+TEST(DictionaryReverseMappingTest, HKPhrasesReverseMapping) {
+  ExpectRevComplete("HKPhrases");
+}
+
+TEST(DictionaryReverseMappingTest, TWPhrasesReverseMapping) {
+  ExpectRevComplete("TWPhrases");
 }
 
 } // namespace

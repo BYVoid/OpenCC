@@ -94,10 +94,12 @@ filegroup(
 ]
 
 cc_test(
-    name = "dictionary_TWPhrases_reverse_mapping_test",
+    name = "dictionary_phrases_reverse_mapping_test",
     size = "small",
     srcs = ["DictionaryReverseMappingTest.cpp"],
     data = [
+        "HKPhrases.txt",
+        "HKPhrasesRev.txt",
         "TWPhrases.txt",
         "TWPhrasesRev.txt",
     ],
@@ -110,10 +112,11 @@ cc_test(
 )
 
 cc_test(
-    name = "dictionary_TWPhrases_segmentation_test",
+    name = "dictionary_phrases_segmentation_test",
     size = "small",
-    srcs = ["DictionaryTaiwanPhraseSegmentationTest.cpp"],
+    srcs = ["DictionaryPhraseSegmentationTest.cpp"],
     data = [
+        "HKPhrases.txt",
         "STPhrases.txt",
         "TWPhrases.txt",
     ],
@@ -192,8 +195,8 @@ test_suite(
         ":dictionary_" + txt[:-4] + "_test"
         for txt in TEXT_DICTS
     ] + [
-        ":dictionary_TWPhrases_reverse_mapping_test",
-        ":dictionary_TWPhrases_segmentation_test",
+        ":dictionary_phrases_reverse_mapping_test",
+        ":dictionary_phrases_segmentation_test",
         ":dictionary_compatibility_ideographs_test",
         ":dictionary_phrase_character_dependency_test",
         ":dictionary_variant_rev_phrases_test",

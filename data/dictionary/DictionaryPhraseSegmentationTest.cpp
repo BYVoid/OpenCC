@@ -143,27 +143,26 @@ bool FindSTPhraseValueFragment(const std::string& key,
   return false;
 }
 
-TEST(DictionaryTaiwanPhraseSegmentationTest,
-     TWPhrasesKeysAreCoveredBySTPhraseValues) {
+void ExpectProperSegmentationCoverage(const std::string& phrasesName) {
   std::unique_ptr<Runfiles> runfiles(Runfiles::CreateForTest());
   ASSERT_NE(nullptr, runfiles);
 
   const std::string stPhrasesFile =
       runfiles->Rlocation("_main/data/dictionary/STPhrases.txt");
-  const std::string twPhrasesFile =
-      runfiles->Rlocation("_main/data/dictionary/TWPhrases.txt");
+  const std::string phrasesFile =
+      runfiles->Rlocation("_main/data/dictionary/" + phrasesName + ".txt");
 
   try {
-    LexiconPtr twPhrases = LoadLexicon(twPhrasesFile);
-    ASSERT_NE(twPhrases, nullptr);
+    LexiconPtr phrases = LoadLexicon(phrasesFile);
+    ASSERT_NE(phrases, nullptr);
 
     std::vector<STPhraseValue> stValues = LoadSTPhraseValues(stPhrasesFile);
     ASSERT_FALSE(stValues.empty());
 
     std::ostringstream missing;
     size_t missingCount = 0;
-    for (size_t i = 0; i < twPhrases->Length(); ++i) {
-      const std::string key = twPhrases->At(i)->Key();
+    for (size_t i = 0; i < phrases->Length(); ++i) {
+      const std::string key = phrases->At(i)->Key();
       if (IsCoveredBySTPhraseValue(key, stValues)) {
         continue;
       }
@@ -174,26 +173,36 @@ TEST(DictionaryTaiwanPhraseSegmentationTest,
       }
 
       ++missingCount;
-      missing << "TWPhrases key \"" << key
+      missing << phrasesName << " key \"" << key
               << "\" is not covered by any STPhrases value.\n"
               << "  Conflicting STPhrases record: STPhrases.txt:"
               << risk.lineNumber << " \"" << risk.key
               << "\" -> \"" << risk.value << "\"\n"
               << "  The existing value appears as a " << risk.category
-              << " fragment of the Taiwan phrase key.\n";
+              << " fragment of the " << phrasesName << " key.\n";
     }
 
     EXPECT_EQ(0U, missingCount)
-        << "Potential missing STPhrases entries for s2twp segmentation:\n"
+        << "Potential missing STPhrases entries for " << phrasesName << ":\n"
         << missing.str();
   } catch (const Exception& ex) {
     FAIL() << "Exception: " << ex.what();
   } catch (const std::exception& ex) {
     FAIL() << "std::exception: " << ex.what();
   } catch (...) {
-    FAIL() << "Unknown exception thrown during Taiwan phrase segmentation "
+    FAIL() << "Unknown exception thrown during " << phrasesName << " segmentation "
               "check.";
   }
+}
+
+TEST(DictionaryPhraseSegmentationTest,
+     HKPhrasesKeysAreCoveredBySTPhraseValues) {
+  ExpectProperSegmentationCoverage("HKPhrases");
+}
+
+TEST(DictionaryPhraseSegmentationTest,
+     TWPhrasesKeysAreCoveredBySTPhraseValues) {
+  ExpectProperSegmentationCoverage("TWPhrases");
 }
 
 } // namespace

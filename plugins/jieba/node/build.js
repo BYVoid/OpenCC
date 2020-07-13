@@ -127,7 +127,9 @@ console.log(`Copied ${libName} to prebuilds/${target}/`);
 
 const configSrcDir = path.join(rootDir, 'plugins/jieba/data/config');
 const configs = [
+  'hk2sp_jieba.json',
   's2hk_jieba.json',
+  's2hkp_jieba.json',
   's2t_jieba.json',
   's2tw_jieba.json',
   's2twp_jieba.json',

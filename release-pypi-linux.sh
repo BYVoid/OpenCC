@@ -31,8 +31,7 @@ for VERSION in 2.7 3.5 3.6 3.7 3.8; do
     conda activate py$VERSION
 
     # Build and package
-    conda install -y cmake  # Require version of cmake later than xenial-stable
-    pip install --no-cache-dir setuptools wheel
+    pip install --no-cache-dir setuptools wheel cmake
     python setup.py build_ext bdist_wheel \
         --plat-name manylinux1_x86_64
 

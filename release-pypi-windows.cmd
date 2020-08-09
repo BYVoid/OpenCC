@@ -27,6 +27,6 @@ for %%v in (%VERSIONS%) do (
 )
 
 REM Upload to PyPI
-REM C:\Miniconda/condabin/conda.bat activate py3.8
-REM python -m pip install twine
-REM python -m twine upload dist/*
+C:\Miniconda/condabin/conda.bat activate py3.8
+python -m pip install twine
+python -m twine upload dist/*

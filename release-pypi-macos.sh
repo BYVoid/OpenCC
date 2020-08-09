@@ -27,6 +27,6 @@ for VERSION in 2.7 3.5 3.6 3.7 3.8; do
 done
 
 # Upload to PyPI
-# conda activate py3.8
-# python -m pip install twine
-# python -m twine upload dist/*
+conda activate py3.8
+python -m pip install twine
+python -m twine upload dist/*

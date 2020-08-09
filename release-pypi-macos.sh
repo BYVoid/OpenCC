@@ -15,7 +15,7 @@ eval "$(conda shell.bash hook)"
 for VERSION in 2.7 3.5 3.6 3.7 3.8; do
     # Create and activate environment
     conda create -y -n py$VERSION python=$VERSION
-    conda activate py$VERSIONs
+    conda activate py$VERSION
 
     # Build and package
     pip install --no-cache-dir setuptools wheel

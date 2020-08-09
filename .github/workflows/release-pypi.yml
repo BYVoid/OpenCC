@@ -25,7 +25,9 @@ jobs:
 
     - name: Build package and upload (Windows)
       if: runner.os == 'Windows'
-      run: ./release-pypi-windows.cmd
+      run: |
+        C:\Miniconda/condabin/conda.bat init powershell
+        ./release-pypi-windows.cmd
 
     - name: Upload macos packages
       if: runner.os == 'macOS'

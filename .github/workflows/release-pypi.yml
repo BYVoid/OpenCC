@@ -2,7 +2,9 @@ name: Build and upload python package to PyPI
 
 on:
   workflow_dispatch:
-    branches: [ feature/* ]
+    inputs:
+      name:
+        description: 'Build and upload python package to PyPI'
 
 jobs:
   release-pypi:

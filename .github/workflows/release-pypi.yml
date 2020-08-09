@@ -18,13 +18,22 @@ jobs:
       run: |
         docker run --rm -v "${PWD}:/opt/OpenCC" \
           ubuntu:16.04 /bin/bash /opt/OpenCC/release-pypi-linux.sh
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
 
     - name: Build package and upload (macOS)
       if: runner.os == 'macOS'
       run: bash release-pypi-macos.sh
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
 
     - name: Build package and upload (Windows)
       if: runner.os == 'Windows'
       run: |
         C:\Miniconda/condabin/conda.bat init powershell
         ./release-pypi-windows.cmd
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}

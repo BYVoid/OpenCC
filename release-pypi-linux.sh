@@ -13,7 +13,7 @@ set -e
 export DEBIAN_FRONTEND=noninteractive
 apt update
 apt upgrade -y
-apt install -y g++ make cmake
+apt install -y g++ make cmake curl
 
 cd /opt/OpenCC
 

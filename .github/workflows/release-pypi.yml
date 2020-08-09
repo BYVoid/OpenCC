@@ -1,10 +1,7 @@
 name: Build and upload python package to PyPI
 
 on:
-  workflow_dispatch:
-    inputs:
-      name:
-        description: 'Build and upload python package to PyPI'
+  workflow_dispatch
 
 jobs:
   release-pypi:

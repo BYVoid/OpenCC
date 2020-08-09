@@ -1,9 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
 
-REM Initialize conda
-C:\Miniconda/condabin/conda.bat init powershell
-
 SET VERSIONS=2.7 3.5 3.6 3.7 3.8
 SET SOURCEDIR=%cd%
 

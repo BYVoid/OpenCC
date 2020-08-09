@@ -255,10 +255,14 @@ ConverterPtr Config::NewFromString(const std::string& json,
   }
 
   ConfigInternal* impl = (ConfigInternal*)internal;
-  if (configDirectory.back() == '/' || configDirectory.back() == '\\')
-    impl->configDirectory = configDirectory;
-  else
-    impl->configDirectory = configDirectory + '/';
+  if (!configDirectory.empty()) {
+    if (configDirectory.back() == '/' || configDirectory.back() == '\\')
+      impl->configDirectory = configDirectory;
+    else
+      impl->configDirectory = configDirectory + '/';
+  } else {
+    impl->configDirectory.clear();
+  }
 
   // Required: segmentation
   SegmentationPtr segmentation =

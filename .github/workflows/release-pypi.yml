@@ -1,0 +1,41 @@
+name: Build and upload python package to PyPI
+
+on:
+  workflow_dispatch
+
+jobs:
+  release-pypi:
+    matrix:
+      os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Build package and upload from docker (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        docker run --rm -v "${PWD}:/opt/OpenCC" \
+          ubuntu:16.04 /bin/bash /opt/OpenCC/release-pypi-linux.sh
+
+    - name: Build package and upload (macOS)
+      if: runner.os == 'macOS'
+      run: bash release-pypi-macos.sh
+
+    - name: Build package and upload (Windows)
+      if: runner.os == 'Windows'
+      run: ./release-pypi-windows.cmd
+
+    - name: Upload macos packages
+      if: runner.os == 'macOS'
+      uses: actions/upload-artifact@v2
+      with:
+        name: macos-builds
+        path: dist
+
+    - name: Upload windows packages
+      if: runner.os == 'Windows'
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows-builds
+        path: dist

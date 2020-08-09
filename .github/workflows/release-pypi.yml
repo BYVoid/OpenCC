@@ -32,11 +32,11 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: macos-builds
-        path: dist
+        path: dist/*
 
     - name: Upload windows packages
       if: runner.os == 'Windows'
       uses: actions/upload-artifact@v2
       with:
         name: windows-builds
-        path: dist
+        path: dist/*

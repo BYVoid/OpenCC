@@ -101,7 +101,7 @@ private:
   void BuildTrie() {
     std::unordered_map<std::string, int> key_item_id_map;
     marisa::Keyset keyset;
-    for (int i = 0; i < items.size(); i++) {
+    for (size_t i = 0; i < items.size(); i++) {
       const auto& key = items[i].first;
       key_item_id_map[key.ToString()] = i;
       keyset.push_back(key.CString(), key.ByteLength());

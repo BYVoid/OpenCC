@@ -1,0 +1,113 @@
+.TH OPENCC 1 "" "OPENCC" "開放中文轉換"
+.SH 名稱
+opencc \- 開放中文轉換
+.
+.SH 概要
+.B opencc
+[--noflush <bool>] [-i <file>] [-o <file>] [-c <file>] [--] [--version] [-h]
+.
+.SH 說明
+中文簡繁轉換開源項目，支援詞彙級別的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、臺灣、香港、日本新字體）。
+不提供普通話與粵語的轉換。
+.PP
+.B OpenCC\fR 有交互與非交互兩種運行模式。按下 Ctrl+D 可以從交互模式中退出。
+.
+.SH 選項
+.TP
+.B --noflush <bool>
+停用每行刷新緩衝區。
+.
+.TP
+.B -i <檔案>,  --input <檔案>
+從 <檔案> 讀入轉換內容。
+.
+.TP
+.B -o <檔案>,  --output <檔案>
+將轉換結果寫出到 <檔案>。
+.
+.TP
+.B -c <檔案>,  --config <檔案>。
+設定檔。
+.
+.TP
+.B --,  --ignore_rest
+忽略排在此選項後面的引數。
+.
+.TP
+.B --version
+顯示版本資訊然後退出。
+.
+.TP
+.B -h,  --help
+顯示使用說明然後退出。
+.
+.SH 設定檔
+.TP
+s2t.json
+簡體到繁體
+.
+.TP
+t2s.json
+繁體到簡體
+.
+.TP
+s2tw.json
+簡體到臺灣正體
+.
+.TP
+tw2s.json
+臺灣正體到簡體
+
+.TP
+s2hk.json
+簡體到香港繁體
+
+.TP
+hk2s.json
+香港繁體到簡體
+.
+.TP
+s2twp.json
+簡體到繁體（臺灣正體標準）並轉換爲臺灣常用詞彙
+.
+.TP
+tw2sp.json
+繁體（臺灣正體標準）到簡體並轉換爲中國大陸常用詞彙
+.
+.TP
+t2tw.json
+繁體（OpenCC 標準）到臺灣正體
+.
+.TP
+hk2t.json
+香港繁體到繁體（OpenCC 標準）
+.
+.TP
+t2hk.json
+繁體（OpenCC 標準）到香港繁體
+.
+.TP
+t2jp.json
+繁體（OpenCC 標準，舊字體）到日文新字體
+.
+.TP
+jp2t.json
+日文新字體到繁體（OpenCC 標準，舊字體）
+.
+.TP
+tw2t.json
+臺灣正體到繁體（OpenCC 標準）
+.
+.SH 範例
+.TP
+將 input.txt 從簡體轉換到繁體（臺灣正體標準）和臺灣常用詞彙，並把結果寫出到 output.txt：
+.IP
+opencc -i input.txt -o output.txt -c s2twp
+.
+.SH 參見
+opencc_dict(1), opencc_phrase_extract(1)
+.PP
+瞭解更多關於 OpenCC 專案以及回報缺陷請造訪 https://github.com/BYVoid/OpenCC。
+.
+.SH 作者
+Carbo Kuo <byvoid@byvoid.com>

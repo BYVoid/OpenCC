@@ -1,0 +1,42 @@
+.TH OPENCC_DICT 1 "" "OPENCC" "开放中文转换"
+.SH 名称
+opencc_dict \- OpenCC 字典工具
+.
+.SH 概要
+.B opencc_dict
+-i <文件> -o <文件> -f <text|ocd> -t <text|ocd> [--] [--version] [-h]
+.
+.SH 选项
+.TP
+.B -i <文件>,  --input <文件>
+（必填） 输入字典的路径
+.
+.TP
+.B -o <文件>,  --output <文件>
+（必填） 输出字典的路径
+.
+.TP
+.B -f <text|ocd>,  --from <text|ocd>
+（必填） 输入格式
+.
+.TP
+.B -t <text|ocd>,  --to <text|ocd>
+（必填） 输出格式
+.
+.TP
+.B --,  --ignore_rest
+忽略排在此选项后面的引数。
+.
+.TP
+.B --version
+显示版本信息然后退出。
+.
+.TP
+.B -h,  --help
+显示使用说明然后退出。
+.
+.SH 参见
+opencc(1)
+.
+.SH 作者
+Carbo Kuo <byvoid@byvoid.com>

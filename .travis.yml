@@ -4,8 +4,7 @@ cache:
   npm: true
   ccache: true
 
-node_js:
-  - stable
+node_js: 
   - 13
   - 10
   - 8

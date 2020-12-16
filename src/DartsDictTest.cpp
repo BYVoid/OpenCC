@@ -17,6 +17,7 @@
  */
 
 #include "DartsDict.hpp"
+#include "TestUtilsUTF8.hpp"
 #include "TextDictTestBase.hpp"
 
 namespace opencc {
@@ -54,6 +55,17 @@ TEST_F(DartsDictTest, Deserialization) {
 
   const TextDictPtr deserializedTextDict(new TextDict(lex2));
   TestDict(deserializedTextDict);
+}
+
+TEST_F(DartsDictTest, ExactMatch) {
+  auto there = dartsDict->Match("積羽沉舟", 12);
+  EXPECT_FALSE(there.IsNull());
+  auto dictEntry = there.Get();
+  EXPECT_EQ(1, dictEntry->NumValues());
+  EXPECT_EQ(utf8("羣輕折軸"), dictEntry->GetDefault());
+
+  auto nowhere = dartsDict->Match("積羽沉舟衆口鑠金", 24);
+  EXPECT_TRUE(nowhere.IsNull());
 }
 
 } // namespace opencc

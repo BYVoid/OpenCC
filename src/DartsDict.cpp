@@ -54,10 +54,13 @@ size_t DartsDict::KeyMaxLength() const { return maxLength; }
 
 Optional<const DictEntry*> DartsDict::Match(const char* word,
                                             size_t len) const {
+  if (len > maxLength) {
+    return Optional<const DictEntry*>::Null();
+  }
   Darts::DoubleArray& dict = *internal->doubleArray;
   Darts::DoubleArray::result_pair_type result;
 
-  dict.exactMatchSearch(word, result, (std::min)(maxLength, len));
+  dict.exactMatchSearch(word, result, len);
   if (result.value != -1) {
     return Optional<const DictEntry*>(
         lexicon->At(static_cast<size_t>(result.value)));

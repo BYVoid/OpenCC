@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+#include "TestUtilsUTF8.hpp"
 #include "TextDictTestBase.hpp"
 
 namespace opencc {
@@ -37,6 +38,17 @@ TEST_F(TextDictTest, Deserialization) {
   const TextDictPtr& deserialized =
       SerializableDict::NewFromFile<TextDict>(fileName);
   TestDict(deserialized);
+}
+
+TEST_F(TextDictTest, ExactMatch) {
+  auto there = textDict->Match("積羽沉舟", 12);
+  EXPECT_FALSE(there.IsNull());
+  auto dictEntry = there.Get();
+  EXPECT_EQ(1, dictEntry->NumValues());
+  EXPECT_EQ(utf8("羣輕折軸"), dictEntry->GetDefault());
+
+  auto nowhere = textDict->Match("積羽沉舟衆口鑠金", 24);
+  EXPECT_TRUE(nowhere.IsNull());
 }
 
 } // namespace opencc

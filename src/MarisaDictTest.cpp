@@ -17,6 +17,7 @@
  */
 
 #include "MarisaDict.hpp"
+#include "TestUtilsUTF8.hpp"
 #include "TextDictTestBase.hpp"
 
 namespace opencc {
@@ -50,6 +51,17 @@ TEST_F(MarisaDictTest, Deserialization) {
     EXPECT_EQ(lex1->At(i)->Key(), lex2->At(i)->Key());
     EXPECT_EQ(lex1->At(i)->NumValues(), lex2->At(i)->NumValues());
   }
+}
+
+TEST_F(MarisaDictTest, ExactMatch) {
+  auto there = dict->Match("積羽沉舟", 12);
+  EXPECT_FALSE(there.IsNull());
+  auto dictEntry = there.Get();
+  EXPECT_EQ(1, dictEntry->NumValues());
+  EXPECT_EQ(utf8("羣輕折軸"), dictEntry->GetDefault());
+
+  auto nowhere = dict->Match("積羽沉舟衆口鑠金", 24);
+  EXPECT_TRUE(nowhere.IsNull());
 }
 
 } // namespace opencc

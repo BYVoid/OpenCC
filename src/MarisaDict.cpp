@@ -47,9 +47,12 @@ size_t MarisaDict::KeyMaxLength() const { return maxLength; }
 
 Optional<const DictEntry*> MarisaDict::Match(const char* word,
                                              size_t len) const {
+  if (len > maxLength) {
+    return Optional<const DictEntry*>::Null();
+  }
   const marisa::Trie& trie = *internal->marisa;
   marisa::Agent agent;
-  agent.set_query(word, (std::min)(maxLength, len));
+  agent.set_query(word, len);
   if (trie.lookup(agent)) {
     return Optional<const DictEntry*>(lexicon->At(agent.key().id()));
   } else {

@@ -1,7 +1,13 @@
 include (GenerateExportHeader)
-include_directories(../deps/marisa-0.2.5/include)
-include_directories(../deps/rapidjson-1.1.0)
-include_directories(../deps/tclap-1.2.2)
+if(NOT USE_SYSTEM_MARISA)
+  include_directories(../deps/marisa-0.2.5/include)
+endif()
+if(NOT USE_SYSTEM_RAPIDJSON)
+  include_directories(../deps/rapidjson-1.1.0)
+endif()
+if(NOT USE_SYSTEM_TCLAP)
+  include_directories(../deps/tclap-1.2.2)
+endif()
 
 # Library
 
@@ -72,7 +78,9 @@ set(UNITTESTS
 )
 
 if (ENABLE_DARTS)
-  include_directories(../deps/darts-clone)
+  if(NOT USE_SYSTEM_DARTS)
+    include_directories(../deps/darts-clone)
+  endif()
   set(
     LIBOPENCC_HEADERS
     ${LIBOPENCC_HEADERS}

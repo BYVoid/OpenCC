@@ -1,4 +1,3 @@
-include_directories(../deps/libdarts/src)
 include_directories(../src)
 
 set(CONFIG_TEST
@@ -27,7 +26,9 @@ if (ENABLE_GTEST)
     )
   endif()
 
-  include_directories(../deps/gtest-1.7.0/include)
+  if(NOT USE_SYSTEM_GTEST)
+    include_directories(../deps/gtest-1.7.0/include)
+  endif()
   set(UNITTESTS
     CommandLineConvertTest
   )

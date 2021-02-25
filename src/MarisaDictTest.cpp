@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2020 Carbo Kuo <byvoid@byvoid.com>
+ * Copyright 2020-2021 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,33 @@ TEST_F(MarisaDictTest, ExactMatch) {
 
   auto nowhere = dict->Match("積羽沉舟衆口鑠金", 24);
   EXPECT_TRUE(nowhere.IsNull());
+}
+
+TEST_F(MarisaDictTest, MatchPrefix) {
+  {
+    auto there = dict->MatchPrefix("清華", 3);
+    EXPECT_FALSE(there.IsNull());
+    auto dictEntry = there.Get();
+    EXPECT_EQ(utf8("Tsing"), dictEntry->GetDefault());
+  }
+  {
+    auto there = dict->MatchPrefix("清華", 5);
+    EXPECT_FALSE(there.IsNull());
+    auto dictEntry = there.Get();
+    EXPECT_EQ(utf8("Tsing"), dictEntry->GetDefault());
+  }
+  {
+    auto there = dict->MatchPrefix("清華", 6);
+    EXPECT_FALSE(there.IsNull());
+    auto dictEntry = there.Get();
+    EXPECT_EQ(utf8("Tsinghua"), dictEntry->GetDefault());
+  }
+  {
+    auto there = dict->MatchPrefix("清華", 100);
+    EXPECT_FALSE(there.IsNull());
+    auto dictEntry = there.Get();
+    EXPECT_EQ(utf8("Tsinghua"), dictEntry->GetDefault());
+  }
 }
 
 } // namespace opencc

@@ -66,6 +66,14 @@
       "outputs": ["<(output_prefix)JPVariants.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
+      "action_name": "JPVariantsEx",
+      "variables": {
+        "input": "<(input_prefix)JPVariantsEx.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)JPVariantsEx.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
       "action_name": "TWPhrases.txt",
       "inputs": ["<(cmd)"],
       "outputs": ["<(output_prefix)TWPhrases.txt"],
@@ -151,12 +159,28 @@
       "outputs": ["<(output_prefix)JPVariantsRev.txt"],
       "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
     }, {
+      "action_name": "JPVariantsExRev.txt",
+      "variables": {
+        "input": "<(input_prefix)JPVariantsEx.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)JPVariantsExRev.txt"],
+      "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
+    }, {
       "action_name": "JPVariantsRev",
       "variables": {
         "input": "<(output_prefix)JPVariantsRev.txt",
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)JPVariantsRev.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "JPVariantsExRev",
+      "variables": {
+        "input": "<(output_prefix)JPVariantsExRev.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)JPVariantsExRev.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "JPShinjitaiCharacters",

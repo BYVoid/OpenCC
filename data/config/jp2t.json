@@ -19,6 +19,9 @@
       }, {
         "type": "ocd2",
         "file": "JPVariantsRev.ocd2"
+      }, {
+        "type": "ocd2",
+        "file": "JPVariantsExRev.ocd2"
       }]
     }
   }]

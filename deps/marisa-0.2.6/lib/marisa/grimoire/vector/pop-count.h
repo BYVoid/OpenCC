@@ -49,7 +49,7 @@ class PopCount {
  #ifdef _MSC_VER
     return __popcnt64(x);
  #else  // _MSC_VER
-    return _mm_popcnt_u64(x);
+    return static_cast<std::size_t>(_mm_popcnt_u64(x));
  #endif  // _MSC_VER
 #else  // defined(MARISA_X64) && defined(MARISA_USE_POPCNT)
     return PopCount(x).lo64();

@@ -400,7 +400,8 @@ void LoudsTrie::build_current_trie(Vector<T> &keys,
           keys[w_range.begin()][w_range.key_pos()]);
 
       if (key_pos == w_range.key_pos() + 1) {
-        bases_.push_back(keys[w_range.begin()][w_range.key_pos()]);
+        bases_.push_back(static_cast<unsigned char>(
+            keys[w_range.begin()][w_range.key_pos()]));
         link_flags_.push_back(false);
       } else {
         bases_.push_back('\0');

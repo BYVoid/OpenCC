@@ -1,6 +1,6 @@
 include (GenerateExportHeader)
 if(NOT USE_SYSTEM_MARISA)
-  include_directories(../deps/marisa-0.2.5/include)
+  include_directories(../deps/marisa-0.2.6/include)
 endif()
 if(NOT USE_SYSTEM_RAPIDJSON)
   include_directories(../deps/rapidjson-1.1.0)

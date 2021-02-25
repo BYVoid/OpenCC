@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 Carbo Kuo <byvoid@byvoid.com>
+ * Copyright 2015-2021 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,31 @@ protected:
   DictGroupTest() {}
 };
 
+TEST_F(DictGroupTest, KeyMaxLength) {
+  const DictGroupPtr& dictGroup = CreateDictGroupForConversion();
+  EXPECT_EQ(6, dictGroup->KeyMaxLength());
+  EXPECT_EQ(6, dictGroup->GetDicts().front()->KeyMaxLength());
+  EXPECT_EQ(3, dictGroup->GetDicts().back()->KeyMaxLength());
+}
+
 TEST_F(DictGroupTest, SimpleGroupTest) {
   const DictGroupPtr& dictGroup = CreateDictGroupForConversion();
-  const auto& entry = dictGroup->Dict::MatchPrefix(utf8("Unknown"));
-  EXPECT_TRUE(entry.IsNull());
-
-  const auto& matches = dictGroup->Dict::MatchAllPrefixes(utf8("干燥"));
-  EXPECT_EQ(2, matches.size());
-  EXPECT_EQ(utf8("乾燥"), matches.at(0)->GetDefault());
-  EXPECT_EQ(utf8("幹"), matches.at(1)->GetDefault());
+  {
+    const auto& entry = dictGroup->Dict::MatchPrefix(utf8("Unknown"));
+    EXPECT_TRUE(entry.IsNull());
+  }
+  {
+    const auto& entry = dictGroup->Dict::MatchPrefix(utf8("里面"));
+    EXPECT_FALSE(entry.IsNull());
+    EXPECT_EQ(3, entry.Get()->KeyLength());
+    EXPECT_EQ(utf8("裏"), entry.Get()->GetDefault());
+  }
+  {
+    const auto& matches = dictGroup->Dict::MatchAllPrefixes(utf8("干燥"));
+    EXPECT_EQ(2, matches.size());
+    EXPECT_EQ(utf8("乾燥"), matches.at(0)->GetDefault());
+    EXPECT_EQ(utf8("幹"), matches.at(1)->GetDefault());
+  }
 }
 
 TEST_F(DictGroupTest, TaiwanPhraseGroupTest) {

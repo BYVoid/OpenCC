@@ -9,9 +9,9 @@ environment:
   matrix:
     # Build Node.js
     - nodejs_version: stable
-    - nodejs_version: 13
+    - nodejs_version: 14
+    - nodejs_version: 12
     - nodejs_version: 10
-    - nodejs_version: 8
 
     # Build plain C++
     - nodejs_version: none

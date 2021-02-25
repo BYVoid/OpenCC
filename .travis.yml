@@ -5,6 +5,7 @@ cache:
   ccache: true
 
 node_js: 
+  - lts/*
   - 13
   - 10
   - 8

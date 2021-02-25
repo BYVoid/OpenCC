@@ -14,6 +14,10 @@ os:
   - linux
   - osx
 
+arch:
+  - amd64
+  - arm64
+
 addons:
   apt:
     sources:

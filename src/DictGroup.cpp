@@ -29,7 +29,7 @@ namespace {
 size_t GetKeyMaxLength(const std::list<DictPtr>& dicts) {
   size_t keyMaxLength = 0;
   for (const DictPtr& dict : dicts) {
-    keyMaxLength = std::max(keyMaxLength, dict->KeyMaxLength());
+    keyMaxLength = (std::max)(keyMaxLength, dict->KeyMaxLength());
   }
   return keyMaxLength;
 }

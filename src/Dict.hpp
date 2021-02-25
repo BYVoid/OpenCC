@@ -52,6 +52,13 @@ public:
   /**
    * Matches the longest matched prefix of a word.
    */
+  Optional<const DictEntry*> MatchPrefix(const char* word) const {
+    return MatchPrefix(word, KeyMaxLength());
+  }
+
+  /**
+   * Matches the longest matched prefix of a word.
+   */
   Optional<const DictEntry*> MatchPrefix(const std::string& word) const {
     return MatchPrefix(word.c_str(), word.length());
   }

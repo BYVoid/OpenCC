@@ -148,12 +148,12 @@ if (ENABLE_GTEST)
     add_custom_target(
         copy_gtest_to_src
         ${CMAKE_COMMAND} -E copy $<TARGET_FILE:gtest> ${CMAKE_CURRENT_BINARY_DIR}
-      COMMENT "Copy gtest"
+      COMMENT "Copying gtest to src"
     )
     add_custom_target(
         copy_gtest_main_to_src
         ${CMAKE_COMMAND} -E copy $<TARGET_FILE:gtest_main> ${CMAKE_CURRENT_BINARY_DIR}
-      COMMENT "Copy gtest_main"
+      COMMENT "Copying gtest_main to src"
     )
   endif()
 

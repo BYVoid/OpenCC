@@ -8,12 +8,12 @@ if (WIN32)
   add_custom_target(
     copy_benchmark
     ${CMAKE_COMMAND} -E copy $<TARGET_FILE:benchmark> ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Copy benchmark"
+    COMMENT "Copying benchmark to src/benchmark"
   )
   add_custom_target(
-    copy_opencc
+    copy_libopencc
     ${CMAKE_COMMAND} -E copy $<TARGET_FILE:libopencc> ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Copy opencc"
+    COMMENT "Copying libopencc to src/benchmark"
   )
-  add_dependencies(performance copy_benchmark copy_opencc)
+  add_dependencies(performance copy_benchmark copy_libopencc)
 endif()

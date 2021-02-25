@@ -116,6 +116,19 @@ foreach(DICT ${DICTS_GENERATED})
   )
 endforeach(DICT)
 
+add_custom_target(
+  copy_libopencc_to_dir_of_opencc_dict
+  COMMENT
+    "Copying libopencc to directory of opencc_dict"
+  COMMAND
+    ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:libopencc>" "$<TARGET_FILE_DIR:${OPENCC_DICT_BIN}>"
+)
+if (WIN32)
+  set(DICT_WIN32_DEPENDS copy_libopencc_to_dir_of_opencc_dict)
+else()
+  set(DICT_WIN32_DEPENDS)
+endif()
+
 foreach(DICT ${DICTS})
   add_custom_command(
     OUTPUT
@@ -123,14 +136,13 @@ foreach(DICT ${DICTS})
     COMMENT
       "Building ${DICT}.ocd2"
     COMMAND
-      ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:libopencc>" "$<TARGET_FILE_DIR:${OPENCC_DICT_BIN}>"
-    COMMAND
       ${OPENCC_DICT_BIN}
         --input ${DICT_${DICT}_INPUT}
         --output ${DICT}.ocd2
         --from text
         --to ocd2
     DEPENDS
+      ${DICT_WIN32_DEPENDS}
       ${OPENCC_DICT_BIN}
       ${DICT_${DICT}_INPUT}
   )

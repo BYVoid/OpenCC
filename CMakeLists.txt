@@ -181,7 +181,7 @@ endif()
 
 if(NOT USE_SYSTEM_MARISA)
   message(STATUS "Use bundled marisa library.")
-  add_subdirectory(deps/marisa-0.2.5)
+  add_subdirectory(deps/marisa-0.2.6)
 else()
   find_library(LIBMARISA NAMES marisa)
   if (LIBMARISA)

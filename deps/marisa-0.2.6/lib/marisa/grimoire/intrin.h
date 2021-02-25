@@ -8,6 +8,12 @@
 #elif defined(__i386__) || defined(_M_IX86)
  #define MARISA_X86
 #else  // defined(__i386__) || defined(_M_IX86)
+ #ifdef MARISA_USE_BMI2
+  #undef MARISA_USE_BMI2
+ #endif  // MARISA_USE_BMI2
+ #ifdef MARISA_USE_BMI
+  #undef MARISA_USE_BMI
+ #endif  // MARISA_USE_BMI
  #ifdef MARISA_USE_POPCNT
   #undef MARISA_USE_POPCNT
  #endif  // MARISA_USE_POPCNT
@@ -34,16 +40,22 @@
  #endif  // MARISA_USE_SSE2
 #endif  // defined(__i386__) || defined(_M_IX86)
 
-#ifdef MARISA_USE_POPCNT
- #ifndef MARISA_USE_SSE3
-  #define MARISA_USE_SSE3
- #endif  // MARISA_USE_SSE3
+#ifdef MARISA_USE_BMI2
+ #ifndef MARISA_USE_BMI
+  #define MARISA_USE_BMI
+ #endif  // MARISA_USE_BMI
  #ifdef _MSC_VER
-  #include <intrin.h>
+  #include <immintrin.h>
  #else  // _MSC_VER
-  #include <popcntintrin.h>
+  #include <x86intrin.h>
  #endif  // _MSC_VER
-#endif  // MARISA_USE_POPCNT
+#endif  // MARISA_USE_BMI2
+
+#ifdef MARISA_USE_BMI
+ #ifndef MARISA_USE_SSE4
+  #define MARISA_USE_SSE4
+ #endif  // MARISA_USE_SSE4
+#endif  // MARISA_USE_BMI
 
 #ifdef MARISA_USE_SSE4A
  #ifndef MARISA_USE_SSE3
@@ -74,6 +86,17 @@
   #define MARISA_USE_SSSE3
  #endif  // MARISA_USE_SSSE3
 #endif  // MARISA_USE_SSE4_1
+
+#ifdef MARISA_USE_POPCNT
+ #ifndef MARISA_USE_SSE3
+  #define MARISA_USE_SSE3
+ #endif  // MARISA_USE_SSE3
+ #ifdef _MSC_VER
+  #include <intrin.h>
+ #else  // _MSC_VER
+  #include <popcntintrin.h>
+ #endif  // _MSC_VER
+#endif  // MARISA_USE_POPCNT
 
 #ifdef MARISA_USE_SSSE3
  #ifndef MARISA_USE_SSE3

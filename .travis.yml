@@ -4,8 +4,7 @@ cache:
   npm: true
   ccache: true
 
-node_js:
-  - stable
+node_js: 
   - 13
   - 10
   - 8
@@ -14,6 +13,9 @@ os:
   - linux
   - osx
 
+arch:
+     - amd64
+     - ppc64le
 addons:
   apt:
     sources:

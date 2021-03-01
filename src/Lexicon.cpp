@@ -30,4 +30,13 @@ bool Lexicon::IsSorted() {
                         DictEntry::UPtrLessThan);
 }
 
+bool Lexicon::IsUnique() {
+  for (size_t i = 1; i < entries.size(); ++i) {
+    if (entries[i - 1]->Key() == entries[i]->Key()) {
+      return false;
+    }
+  }
+  return true;
+}
+
 } // namespace opencc

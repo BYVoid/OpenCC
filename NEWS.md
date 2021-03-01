@@ -1,8 +1,8 @@
 # Change History of OpenCC
 
-## Version 1.1.2 (Not released)
+## Version 1.1.2
 
-2021年
+2021年3月2日
 
 * 新增香港繁體轉換。
 * 根據《通用漢字規範表》修正大量簡體異體字轉換。調整臺灣標準，避免過度轉換。

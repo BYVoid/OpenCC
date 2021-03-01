@@ -17,8 +17,9 @@ CMakeLists.txt
 /doc
 /data/scheme
 /deps/google-benchmark
-/deps/gtest-1.11.0
-/deps/tclap-1.2.2
+/deps/gtest*
+/deps/pybind*
+/deps/tclap*
 /build
 /debug
 /dist

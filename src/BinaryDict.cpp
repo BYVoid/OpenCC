@@ -67,6 +67,12 @@ void BinaryDict::SerializeToFile(FILE* fp) const {
 }
 
 BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
+  size_t offsetBound, savedOffset;
+  savedOffset = ftell(fp);
+  fseek(fp, 0L, SEEK_END);
+  offsetBound = ftell(fp) - savedOffset;
+  fseek(fp, savedOffset, SEEK_SET);
+
   BinaryDictPtr dict(new BinaryDict(LexiconPtr(new Lexicon)));
 
   // Number of items
@@ -113,7 +119,7 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
     // Key offset
     size_t keyOffset;
     unitsRead = fread(&keyOffset, sizeof(size_t), 1, fp);
-    if (unitsRead != 1) {
+    if (unitsRead != 1 || keyOffset >= offsetBound) {
       throw InvalidFormat("Invalid OpenCC binary dictionary (keyOffset)");
     }
     std::string key = dict->keyBuffer.c_str() + keyOffset;
@@ -122,7 +128,7 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
     for (size_t j = 0; j < numValues; j++) {
       size_t valueOffset;
       unitsRead = fread(&valueOffset, sizeof(size_t), 1, fp);
-      if (unitsRead != 1) {
+      if (unitsRead != 1 || valueOffset >= offsetBound) {
         throw InvalidFormat("Invalid OpenCC binary dictionary (valueOffset)");
       }
       const char* value = dict->valueBuffer.c_str() + valueOffset;

@@ -89,7 +89,7 @@ TextDictPtr TextDict::NewFromFile(FILE* fp) {
   const LexiconPtr& lexicon = ParseLexiconFromFile(fp);
   lexicon->Sort();
   if (!lexicon->IsUnique()) {
-    throw InvalidFormat("The text dictionary contain duplicated keys.");
+    throw InvalidFormat("The text dictionary contains duplicated keys.");
   }
   return TextDictPtr(new TextDict(lexicon));
 }

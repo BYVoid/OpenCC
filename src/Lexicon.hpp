@@ -43,7 +43,11 @@ public:
 
   void Sort();
 
+  // Returns true if the lexicon is sorted by key.
   bool IsSorted();
+
+  // Returns true if every key unique (after sorted).
+  bool IsUnique();
 
   const DictEntry* At(size_t index) const { return entries.at(index).get(); }
 

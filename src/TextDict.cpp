@@ -75,6 +75,7 @@ static LexiconPtr ParseLexiconFromFile(FILE* fp) {
 TextDict::TextDict(const LexiconPtr& _lexicon)
     : maxLength(GetKeyMaxLength(_lexicon)), lexicon(_lexicon) {
   assert(lexicon->IsSorted());
+  assert(lexicon->IsUnique());
 }
 
 TextDict::~TextDict() {}
@@ -87,6 +88,9 @@ TextDictPtr TextDict::NewFromSortedFile(FILE* fp) {
 TextDictPtr TextDict::NewFromFile(FILE* fp) {
   const LexiconPtr& lexicon = ParseLexiconFromFile(fp);
   lexicon->Sort();
+  if (!lexicon->IsUnique()) {
+    throw InvalidFormat("The text dictionary contain duplicated keys.");
+  }
   return TextDictPtr(new TextDict(lexicon));
 }
 

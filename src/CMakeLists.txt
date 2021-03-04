@@ -1,4 +1,8 @@
 include (GenerateExportHeader)
+
+include_directories("${PROJECT_BINARY_DIR}/src")
+include_directories("${PROJECT_SOURCE_DIR}/src")
+
 if(NOT USE_SYSTEM_MARISA)
   include_directories(../deps/marisa-0.2.6/include)
 endif()
@@ -38,6 +42,7 @@ set(
   UTF8StringSlice.hpp
   UTF8Util.hpp
   opencc.h
+  "${PROJECT_BINARY_DIR}/src/opencc_config.h"
 )
 
 set(
@@ -78,6 +83,7 @@ set(UNITTESTS
 )
 
 if (ENABLE_DARTS)
+  set(OPENCC_ENABLE_DARTS 1)
   if(NOT USE_SYSTEM_DARTS)
     include_directories(../deps/darts-clone)
   endif()
@@ -100,6 +106,10 @@ if (ENABLE_DARTS)
     DartsDictTest
   )
 endif()
+
+configure_file(
+  "${PROJECT_SOURCE_DIR}/src/opencc_config.h.in"
+  "${PROJECT_BINARY_DIR}/src/opencc_config.h")
 
 add_library(libopencc ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
 set_target_properties(libopencc PROPERTIES POSITION_INDEPENDENT_CODE ON)

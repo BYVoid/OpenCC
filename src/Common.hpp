@@ -30,6 +30,7 @@
 
 #include "Export.hpp"
 #include "Optional.hpp"
+#include "opencc_config.h"
 
 // Forward decalarations and alias
 namespace opencc {
@@ -61,7 +62,7 @@ typedef std::shared_ptr<Segments> SegmentsPtr;
 typedef std::shared_ptr<SerializableDict> SerializableDictPtr;
 typedef std::shared_ptr<TextDict> TextDictPtr;
 
-#ifdef ENABLE_DARTS
+#ifdef OPENCC_ENABLE_DARTS
 class BinaryDict;
 class DartsDict;
 typedef std::shared_ptr<BinaryDict> BinaryDictPtr;
@@ -79,6 +80,3 @@ const std::string PACKAGE_DATA_DIRECTORY = PKGDATADIR "/";
 #ifndef VERSION
 #define VERSION "1.0.*"
 #endif // ifndef VERSION
-
-// The following definitions are provided by CMake
-// #define ENABLE_DARTS

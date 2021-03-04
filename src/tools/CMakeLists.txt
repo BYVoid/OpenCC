@@ -1,5 +1,3 @@
-include_directories(..)
-
 # Executables
 
 ## opencc

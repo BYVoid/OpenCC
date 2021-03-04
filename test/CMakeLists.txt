@@ -1,4 +1,5 @@
-include_directories(../src)
+include_directories("${PROJECT_BINARY_DIR}/src")
+include_directories("${PROJECT_SOURCE_DIR}/src")
 
 set(CONFIG_TEST
   config_test/config_test.json

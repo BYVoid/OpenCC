@@ -91,7 +91,11 @@ void Convert(std::string fileName) {
     const std::string tempFileName = std::tmpnam(nullptr);
 #else
     // std::tmpnam is deprecated
-    std::string tempFileName = std::getenv("TMPDIR");
+    std::string tempFileName;
+    const char* tmpDirEnv = std::getenv("TMPDIR");
+    if (tmpDirEnv != nullptr) {
+      tempFileName = tmpDirEnv;
+    }
 #ifdef P_tmpdir
     if (tempFileName.empty()) {
       tempFileName = P_tmpdir;

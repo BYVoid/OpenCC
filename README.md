@@ -115,6 +115,7 @@ Document 文檔: https://byvoid.github.io/OpenCC/
 * PHP: [opencc4php](https://github.com/nauxliu/opencc4php)
 * Pure JavaScript: [opencc-js](https://github.com/nk2028/opencc-js)
 * WebAssembly: [wasm-opencc](https://github.com/oyyd/wasm-opencc)
+* Browser Extension: [opencc-extension](https://github.com/tnychn/opencc-extension)
 
 ### Configurations 配置文件
 

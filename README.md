@@ -208,6 +208,7 @@ Example results (from Github CI):
 * [ibus-libpinyin](https://github.com/libpinyin/ibus-libpinyin)
 * [alfred-chinese-converter](https://github.com/amowu/alfred-chinese-converter)
 * [GoldenDict](https://github.com/goldendict/goldendict)
+* [opencc-extension](https://github.com/tnychn/opencc-extension)
 
 ## License 許可協議
 

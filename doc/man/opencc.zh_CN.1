@@ -1,0 +1,113 @@
+.TH OPENCC 1 "" "OPENCC" "开放中文转换"
+.SH 名称
+opencc \- 开放中文转换
+.
+.SH 概要
+.B opencc
+[--noflush <bool>] [-i <file>] [-o <file>] [-c <file>] [--] [--version] [-h]
+.
+.SH 说明
+中文简繁转换开源项目，支持词汇级别的转换、异体字转换和地区习惯用词转换（中国大陆、台湾、香港、日本新字体）。
+不提供普通话与粤语的转换。
+.PP
+.B OpenCC\fR 有交互与非交互两种运作模式。按下 Ctrl+D 可以从交互模式中退出。
+.
+.SH 选项
+.TP
+.B --noflush <bool>
+停用每行刷新缓冲区。
+.
+.TP
+.B -i <文件>,  --input <文件>
+从 <文件> 读入转换内容。
+.
+.TP
+.B -o <文件>,  --output <文件>
+将转换结果写出到 <文件>。
+.
+.TP
+.B -c <文件>,  --config <文件>。
+配置文件。
+.
+.TP
+.B --,  --ignore_rest
+忽略排在此选项后面的引数。
+.
+.TP
+.B --version
+显示版本信息然后退出。
+.
+.TP
+.B -h,  --help
+显示使用说明然后退出。
+.
+.SH 配置文件
+.TP
+s2t.json
+简体到繁体
+.
+.TP
+t2s.json
+繁体到简体
+.
+.TP
+s2tw.json
+简体到台湾正体
+.
+.TP
+tw2s.json
+台湾正体到简体
+.
+.TP
+s2hk.json
+简体到香港繁体
+.
+.TP
+hk2s.json
+香港繁体到简体
+.
+.TP
+s2twp.json
+简体到繁体（台湾正体标准）并转换为台湾常用词汇
+.
+.TP
+tw2sp.json
+繁体（台湾正体标准）到简体并转换为中国大陆常用词汇
+.
+.TP
+t2tw.json
+繁体（OpenCC 标准）到台湾正体
+.
+.TP
+hk2t.json
+香港繁体到繁体（OpenCC 标准）
+.
+.TP
+t2hk.json
+繁体（OpenCC 标准）到香港繁体
+.
+.TP
+t2jp.json
+繁体（OpenCC 标准，旧字体）到日文新字体
+.
+.TP
+jp2t.json
+日文新字体到繁体（OpenCC 标准，旧字体）
+.
+.TP
+tw2t.json
+台湾正体到繁体（OpenCC 标准）
+.
+.SH 范例
+.TP
+将 input.txt 从简体转换到繁体（台湾正体标准）和台湾常用词汇，并把结果写出到 output.txt：
+.IP
+opencc -i input.txt -o output.txt -c s2twp
+.
+.SH 参见
+opencc_dict(1), opencc_phrase_extract(1)
+.PP
+了解更多关于 OpenCC 项目以及回报缺陷请造访 https://github.com/BYVoid/OpenCC。
+.
+.SH 作者
+Carbo Kuo <byvoid@byvoid.com>

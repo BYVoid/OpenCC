@@ -40,6 +40,18 @@ TEST_F(TextDictTest, Deserialization) {
   TestDict(deserialized);
 }
 
+TEST_F(TextDictTest, DeserializationEmptyLine) {
+  FILE* fp = fopen(fileName.c_str(), "w");
+  fprintf(fp, "A\tB\n\n\nC\tD E\n\n");
+  fclose(fp);
+  const TextDictPtr& dict = SerializableDict::NewFromFile<TextDict>(fileName);
+  EXPECT_EQ(dict->GetLexicon()->Length(), 2);
+
+  Optional<const DictEntry*> entry = dict->opencc::Dict::Match("A");
+  EXPECT_TRUE(!entry.IsNull());
+  EXPECT_EQ(utf8("A"), entry.Get()->Key());
+}
+
 TEST_F(TextDictTest, ExactMatch) {
   auto there = textDict->Match("積羽沉舟", 12);
   EXPECT_FALSE(there.IsNull());

@@ -277,4 +277,4 @@ All these libraries are statically linked by default.
 * [Tony Able](https://github.com/TonyAble)
 * [Xiao Liang](https://github.com/yxliang01)
 
-Please update this list you have contributed OpenCC.
+Please feel free to update this list if you have contributed OpenCC.

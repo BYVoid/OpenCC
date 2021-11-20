@@ -275,6 +275,7 @@ All these libraries are statically linked by default.
 * [Cychih](https://github.com/pi314)
 * [kyleskimo](https://github.com/kyleskimo)
 * [Ryuan Choi](https://github.com/bunhere)
+* [Prcuvu](https://github.com/Prcuvu)
 * [Tony Able](https://github.com/TonyAble)
 * [Xiao Liang](https://github.com/yxliang01)
 

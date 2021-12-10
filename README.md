@@ -108,8 +108,8 @@ Document 文檔: https://byvoid.github.io/OpenCC/
 * `opencc_phrase_extract --help`
 
 ### Others (Unofficial)
-
 * Swift (iOS): [SwiftyOpenCC](https://github.com/XQS6LB3A/SwiftyOpenCC)
+* iOSOpenCC(pod): [iOSOpenCC](https://github.com/swiftdo/OpenCC)
 * Java: [opencc4j](https://github.com/houbb/opencc4j)
 * Android: [android-opencc](https://github.com/qichuan/android-opencc)
 * PHP: [opencc4php](https://github.com/nauxliu/opencc4php)

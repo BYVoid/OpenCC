@@ -152,7 +152,7 @@ public:
   }
 
   /**
-   * Copies a substd::string with given length to a new std::string.
+   * Copies a substring with given length to a new string.
    */
   static std::string FromSubstr(const char* str, size_t length) {
     std::string newStr;

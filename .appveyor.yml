@@ -12,7 +12,6 @@ environment:
     - nodejs_version: 16
     - nodejs_version: 14
     - nodejs_version: 12
-    - nodejs_version: 10
 
     # Build plain C++
     - nodejs_version: none

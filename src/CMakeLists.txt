@@ -132,7 +132,7 @@ set_target_properties(
     OUTPUT_NAME
       opencc
     VERSION
-      1.1.3
+      1.1.2
     SOVERSION
       1.1
 )

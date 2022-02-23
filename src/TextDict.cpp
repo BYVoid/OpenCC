@@ -35,9 +35,6 @@ static size_t GetKeyMaxLength(const LexiconPtr& lexicon) {
 
 static DictEntry* ParseKeyValues(const char* buff, size_t lineNum) {
   size_t length;
-  if (buff == nullptr || UTF8Util::IsLineEndingOrFileEnding(*buff)) {
-    return nullptr;
-  }
   const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
   if (UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
     throw InvalidTextDictionary("Tabular not found " + std::string(buff),
@@ -69,10 +66,7 @@ static LexiconPtr ParseLexiconFromFile(FILE* fp) {
   UTF8Util::SkipUtf8Bom(fp);
   size_t lineNum = 1;
   while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
-    DictEntry* entry = ParseKeyValues(buff, lineNum);
-    if (entry != nullptr) {
-      lexicon->Add(entry);
-    }
+    lexicon->Add(ParseKeyValues(buff, lineNum));
     lineNum++;
   }
   return lexicon;

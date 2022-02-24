@@ -58,10 +58,10 @@ SerializableDictPtr ConvertDict(const std::string& format, const DictPtr dict) {
 }
 
 namespace opencc {
-void ConvertDictionary(const std::string inputFileName,
-                       const std::string outputFileName,
-                       const std::string formatFrom,
-                       const std::string formatTo) {
+void ConvertDictionary(const std::string& inputFileName,
+                       const std::string& outputFileName,
+                       const std::string& formatFrom,
+                       const std::string& formatTo) {
   DictPtr dictFrom = LoadDictionary(formatFrom, inputFileName);
   SerializableDictPtr dictTo = ConvertDict(formatTo, dictFrom);
   dictTo->SerializeToFile(outputFileName);

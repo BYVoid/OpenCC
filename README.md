@@ -110,12 +110,14 @@ Document 文檔: https://byvoid.github.io/OpenCC/
 ### Others (Unofficial)
 
 * Swift (iOS): [SwiftyOpenCC](https://github.com/XQS6LB3A/SwiftyOpenCC)
+* iOSOpenCC (pod): [iOSOpenCC](https://github.com/swiftdo/OpenCC)
 * Java: [opencc4j](https://github.com/houbb/opencc4j)
 * Android: [android-opencc](https://github.com/qichuan/android-opencc)
 * PHP: [opencc4php](https://github.com/nauxliu/opencc4php)
 * Pure JavaScript: [opencc-js](https://github.com/nk2028/opencc-js)
 * WebAssembly: [wasm-opencc](https://github.com/oyyd/wasm-opencc)
 * Browser Extension: [opencc-extension](https://github.com/tnychn/opencc-extension)
+* Go (Pure): [OpenCC for Go](https://github.com/longbridgeapp/opencc)
 
 ### Configurations 配置文件
 
@@ -274,7 +276,8 @@ All these libraries are statically linked by default.
 * [Cychih](https://github.com/pi314)
 * [kyleskimo](https://github.com/kyleskimo)
 * [Ryuan Choi](https://github.com/bunhere)
+* [Prcuvu](https://github.com/Prcuvu)
 * [Tony Able](https://github.com/TonyAble)
 * [Xiao Liang](https://github.com/yxliang01)
 
-Please update this list you have contributed OpenCC.
+Please feel free to update this list if you have contributed OpenCC.

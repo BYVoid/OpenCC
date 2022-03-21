@@ -94,8 +94,10 @@ TextDictPtr TextDict::NewFromSortedFile(FILE* fp) {
 TextDictPtr TextDict::NewFromFile(FILE* fp) {
   const LexiconPtr& lexicon = ParseLexiconFromFile(fp);
   lexicon->Sort();
-  if (!lexicon->IsUnique()) {
-    throw InvalidFormat("The text dictionary contains duplicated keys.");
+  std::string dupkey;
+  if (!lexicon->IsUnique(&dupkey)) {
+    throw InvalidFormat(
+        "The text dictionary contains duplicated keys: " + dupkey + ".");
   }
   return TextDictPtr(new TextDict(lexicon));
 }

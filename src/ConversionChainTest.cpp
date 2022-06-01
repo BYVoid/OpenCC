@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 Carbo Kuo <byvoid@byvoid.com>
+ * Copyright 2015-2021 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,8 @@ protected:
     const size_t length = expected->Length();
     EXPECT_TRUE(length == actual->Length());
     for (size_t i = 0; i < length; i++) {
-      EXPECT_EQ(std::string(expected->At(i)), std::string(actual->At(i)));
+      EXPECT_EQ(std::string(expected->At(i)), std::string(actual->At(i)))
+          << "i = " << i;
     }
   }
 

@@ -9,8 +9,7 @@ namespace trie {
 
 class Entry {
  public:
-  Entry()
-      : ptr_(static_cast<const char *>(NULL) - 1), length_(0), id_(0) {}
+  Entry() : ptr_(NULL), length_(0), id_(0) {}
   Entry(const Entry &entry)
       : ptr_(entry.ptr_), length_(entry.length_), id_(entry.id_) {}
 

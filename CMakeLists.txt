@@ -28,15 +28,21 @@ option(BUILD_SHARED_LIBS "Build opencc as shared library" ON)
 option(ENABLE_GTEST "Build all tests." OFF)
 option(ENABLE_BENCHMARK "Build benchmark tests." OFF)
 option(ENABLE_DARTS "Build DartsDict (ocd format)." ON)
-option(BUILD_BUNDLED_LIBMARISA "" ON)
 option(BUILD_PYTHON "Build python library" OFF)
+option(USE_SYSTEM_DARTS "Use system version of Darts" OFF)
+option(USE_SYSTEM_GOOGLE_BENCHMARK "Use system version of Google Benchmark" OFF)
+option(USE_SYSTEM_GTEST "Use system version of GoogleTest" OFF)
+option(USE_SYSTEM_MARISA "Use system version of Marisa" OFF)
+option(USE_SYSTEM_PYBIND11 "Use system version of pybind11" OFF)
+option(USE_SYSTEM_RAPIDJSON "Use system version of RapidJSON" OFF)
+option(USE_SYSTEM_TCLAP "Use system version of TCLAP" OFF)
 
 ######## Package information
 set (PACKAGE_URL https://github.com/BYVoid/Opencc)
 set (PACKAGE_BUGREPORT https://github.com/BYVoid/Opencc/issues)
 set (OPENCC_VERSION_MAJOR 1)
 set (OPENCC_VERSION_MINOR 1)
-set (OPENCC_VERSION_REVISION 1)
+set (OPENCC_VERSION_REVISION 3)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
   set (version_suffix .Debug)
@@ -121,7 +127,7 @@ add_definitions(
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   add_definitions(
-    -std=c++11
+    -std=c++14
     -Wall
   )
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
@@ -130,7 +136,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   add_definitions(
-    -std=c++0x
+    -std=c++14
     -Wall
   )
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
@@ -173,9 +179,9 @@ endif()
 
 ######## Dependencies
 
-if(BUILD_BUNDLED_LIBMARISA)
+if(NOT USE_SYSTEM_MARISA)
   message(STATUS "Use bundled marisa library.")
-  add_subdirectory(deps/marisa-0.2.5)
+  add_subdirectory(deps/marisa-0.2.6)
 else()
   find_library(LIBMARISA NAMES marisa)
   if (LIBMARISA)
@@ -195,20 +201,28 @@ add_subdirectory(test)
 ######## Testing
 
 if (ENABLE_GTEST)
-  add_subdirectory(deps/gtest-1.11.0)
+  if(NOT USE_SYSTEM_GTEST)
+    add_subdirectory(deps/gtest-1.11.0)
+  endif()
   enable_testing()
 endif()
 
 if (ENABLE_BENCHMARK)
   set(BENCHMARK_ENABLE_TESTING OFF)
-  add_subdirectory(deps/google-benchmark)
+  if(NOT USE_SYSTEM_GOOGLE_BENCHMARK)
+    add_subdirectory(deps/google-benchmark)
+  endif()
   enable_testing()
 endif()
 
 ######## Python
 
 if (BUILD_PYTHON)
-  add_subdirectory(deps/pybind11-2.5.0)
+  if(USE_SYSTEM_PYBIND11)
+    find_package(pybind11 CONFIG)
+  else()
+    add_subdirectory(deps/pybind11-2.5.0)
+  endif()
   pybind11_add_module(opencc_clib src/py_opencc.cpp)
   target_link_libraries(opencc_clib PRIVATE libopencc)
 endif()

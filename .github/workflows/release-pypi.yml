@@ -1,0 +1,38 @@
+name: Build and upload python package to PyPI
+
+on:
+  workflow_dispatch
+
+jobs:
+  release-pypi:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Build package and upload from docker (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        docker run --rm -v "${PWD}:/opt/OpenCC" \
+          -e TWINE_USERNAME=__token__ \
+          -e TWINE_PASSWORD=${{ secrets.PYPI_TOKEN }} \
+          ubuntu:16.04 /bin/bash /opt/OpenCC/release-pypi-linux.sh
+
+    - name: Build package and upload (macOS)
+      if: runner.os == 'macOS'
+      run: bash release-pypi-macos.sh
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+
+    - name: Build package and upload (Windows)
+      if: runner.os == 'Windows'
+      run: |
+        C:\Miniconda/condabin/conda.bat init powershell
+        ./release-pypi-windows.cmd
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}

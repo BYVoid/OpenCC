@@ -6,13 +6,18 @@ cache:
 
 node_js:
   - stable
-  - 13
+  - 16
+  - 14
+  - 12
   - 10
-  - 8
 
 os:
   - linux
   - osx
+
+arch:
+  - amd64
+  - arm64
 
 addons:
   apt:
@@ -20,11 +25,9 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - doxygen
-      - g++-4.8
 
 # Install scripts. (runs after repo cloning)
 install:
-  - if [ $TRAVIS_OS_NAME == "linux" ]; then export CXX=g++-4.8; fi
   # install modules
   - npm install --build-from-source
 

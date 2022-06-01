@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
+ * Copyright 2010-2021 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+#include <algorithm>
 #include <map>
 
 #include "DictGroup.hpp"
@@ -24,8 +25,20 @@
 
 using namespace opencc;
 
+namespace {
+
+size_t GetKeyMaxLength(const std::list<DictPtr>& dicts) {
+  size_t keyMaxLength = 0;
+  for (const DictPtr& dict : dicts) {
+    keyMaxLength = (std::max)(keyMaxLength, dict->KeyMaxLength());
+  }
+  return keyMaxLength;
+}
+
+} // namespace
+
 DictGroup::DictGroup(const std::list<DictPtr>& _dicts)
-    : keyMaxLength(0), dicts(_dicts) {}
+    : keyMaxLength(GetKeyMaxLength(_dicts)), dicts(_dicts) {}
 
 DictGroup::~DictGroup() {}
 

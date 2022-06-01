@@ -86,8 +86,30 @@ void Convert(std::string fileName) {
   bool needToRemove = false;
   if (!outputFileName.IsNull() && fileName == outputFileName.Get()) {
     // Special case: input == output
-    const std::string tempFileName = std::tmpnam(nullptr);
     std::ifstream src(fileName, std::ios::binary);
+#ifdef _WIN32
+    const std::string tempFileName = std::tmpnam(nullptr);
+#else
+    // std::tmpnam is deprecated
+    std::string tempFileName;
+    const char* tmpDirEnv = std::getenv("TMPDIR");
+    if (tmpDirEnv != nullptr) {
+      tempFileName = tmpDirEnv;
+    }
+#ifdef P_tmpdir
+    if (tempFileName.empty()) {
+      tempFileName = P_tmpdir;
+    }
+#endif
+    if (tempFileName.empty()) {
+      tempFileName = "/tmp";
+    }
+    tempFileName += "/openccXXXXXX";
+    int fd = mkstemp(const_cast<char*>(tempFileName.c_str()));
+    if (fd == 0) {
+      throw FileNotWritable(tempFileName);
+    }
+#endif
     std::ofstream dst(tempFileName, std::ios::binary);
     dst << src.rdbuf();
     dst.close();

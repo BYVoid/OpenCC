@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2020 Carbo Kuo <byvoid@byvoid.com>
+ * Copyright 2020-2021 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 #include "MarisaDict.hpp"
+#include "TestUtilsUTF8.hpp"
 #include "TextDictTestBase.hpp"
 
 namespace opencc {
@@ -49,6 +50,44 @@ TEST_F(MarisaDictTest, Deserialization) {
   for (size_t i = 0; i < lex1->Length(); i++) {
     EXPECT_EQ(lex1->At(i)->Key(), lex2->At(i)->Key());
     EXPECT_EQ(lex1->At(i)->NumValues(), lex2->At(i)->NumValues());
+  }
+}
+
+TEST_F(MarisaDictTest, ExactMatch) {
+  auto there = dict->Match("積羽沉舟", 12);
+  EXPECT_FALSE(there.IsNull());
+  auto dictEntry = there.Get();
+  EXPECT_EQ(1, dictEntry->NumValues());
+  EXPECT_EQ(utf8("羣輕折軸"), dictEntry->GetDefault());
+
+  auto nowhere = dict->Match("積羽沉舟衆口鑠金", 24);
+  EXPECT_TRUE(nowhere.IsNull());
+}
+
+TEST_F(MarisaDictTest, MatchPrefix) {
+  {
+    auto there = dict->MatchPrefix("清華", 3);
+    EXPECT_FALSE(there.IsNull());
+    auto dictEntry = there.Get();
+    EXPECT_EQ(utf8("Tsing"), dictEntry->GetDefault());
+  }
+  {
+    auto there = dict->MatchPrefix("清華", 5);
+    EXPECT_FALSE(there.IsNull());
+    auto dictEntry = there.Get();
+    EXPECT_EQ(utf8("Tsing"), dictEntry->GetDefault());
+  }
+  {
+    auto there = dict->MatchPrefix("清華", 6);
+    EXPECT_FALSE(there.IsNull());
+    auto dictEntry = there.Get();
+    EXPECT_EQ(utf8("Tsinghua"), dictEntry->GetDefault());
+  }
+  {
+    auto there = dict->MatchPrefix("清華", 100);
+    EXPECT_FALSE(there.IsNull());
+    auto dictEntry = there.Get();
+    EXPECT_EQ(utf8("Tsinghua"), dictEntry->GetDefault());
   }
 }
 

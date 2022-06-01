@@ -35,6 +35,9 @@ static size_t GetKeyMaxLength(const LexiconPtr& lexicon) {
 
 static DictEntry* ParseKeyValues(const char* buff, size_t lineNum) {
   size_t length;
+  if (buff == nullptr || UTF8Util::IsLineEndingOrFileEnding(*buff)) {
+    return nullptr;
+  }
   const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
   if (UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
     throw InvalidTextDictionary("Tabular not found " + std::string(buff),
@@ -66,7 +69,10 @@ static LexiconPtr ParseLexiconFromFile(FILE* fp) {
   UTF8Util::SkipUtf8Bom(fp);
   size_t lineNum = 1;
   while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
-    lexicon->Add(ParseKeyValues(buff, lineNum));
+    DictEntry* entry = ParseKeyValues(buff, lineNum);
+    if (entry != nullptr) {
+      lexicon->Add(entry);
+    }
     lineNum++;
   }
   return lexicon;
@@ -75,6 +81,7 @@ static LexiconPtr ParseLexiconFromFile(FILE* fp) {
 TextDict::TextDict(const LexiconPtr& _lexicon)
     : maxLength(GetKeyMaxLength(_lexicon)), lexicon(_lexicon) {
   assert(lexicon->IsSorted());
+  assert(lexicon->IsUnique());
 }
 
 TextDict::~TextDict() {}
@@ -87,6 +94,11 @@ TextDictPtr TextDict::NewFromSortedFile(FILE* fp) {
 TextDictPtr TextDict::NewFromFile(FILE* fp) {
   const LexiconPtr& lexicon = ParseLexiconFromFile(fp);
   lexicon->Sort();
+  std::string dupkey;
+  if (!lexicon->IsUnique(&dupkey)) {
+    throw InvalidFormat(
+        "The text dictionary contains duplicated keys: " + dupkey + ".");
+  }
   return TextDictPtr(new TextDict(lexicon));
 }
 

@@ -17,6 +17,7 @@
  */
 
 #include <fstream>
+#include <iostream>
 
 #include "Common.hpp"
 #include "gtest/gtest.h"
@@ -76,6 +77,10 @@ protected:
     return CMAKE_SOURCE_DIR "/data/config/";
   }
 
+  std::string InputFile(const char* config) const {
+    return std::string(InputDirectory()) + config + ".in";
+  }
+
   std::string OutputFile(const char* config) const {
     return std::string(OutputDirectory()) + config + ".out";
   }
@@ -84,10 +89,10 @@ protected:
     return std::string(AnswerDirectory()) + config + ".ans";
   }
 
-  std::string TestCommand(const char* config) const {
-    return OpenccCommand() + std::string("") + " -i " + InputDirectory() +
-           config + ".in" + " -o " + OutputFile(config) + " -c " +
-           ConfigurationDirectory() + config + ".json";
+  std::string TestCommand(const char* config, const std::string& inputFile,
+                          const std::string& outputFile) const {
+    return OpenccCommand() + std::string("") + " -i " + inputFile + " -o " +
+           outputFile + " -c " + ConfigurationDirectory() + config + ".json";
   }
 
   char* originalWorkingDirectory;
@@ -98,15 +103,35 @@ class ConfigurationTest : public CommandLineConvertTest,
 
 TEST_P(ConfigurationTest, Convert) {
   const char* config = GetParam();
-  ASSERT_EQ(0, system(TestCommand(config).c_str()));
-  const std::string& output = GetFileContents(OutputFile(config));
-  const std::string& answer = GetFileContents(AnswerFile(config));
+  const std::string inputFile = InputFile(config);
+  const std::string outputFile = OutputFile(config);
+  ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+  const std::string output = GetFileContents(OutputFile(config));
+  const std::string answer = GetFileContents(AnswerFile(config));
   ASSERT_EQ(answer, output);
 }
 
-INSTANTIATE_TEST_CASE_P(CommandLine, ConfigurationTest,
-                        ::testing::Values("hk2s", "hk2t", "jp2t", "s2hk", "s2t",
-                                          "s2tw", "s2twp", "t2hk", "t2jp", "t2s",
-                                          "tw2s", "tw2sp", "tw2t"));
+TEST_P(ConfigurationTest, InPlaceConvert) {
+  const char* config = GetParam();
+  // Copy input to output
+  const std::string inputFile = InputFile(config);
+  const std::string outputFile = OutputFile(config);
+  std::ifstream source(inputFile, std::ios::binary);
+  std::ofstream dest(outputFile, std::ios::binary);
+  dest << source.rdbuf();
+  source.close();
+  dest.close();
+  // Test in-place convert (same file)
+  ASSERT_EQ(0, system(TestCommand(config, outputFile, outputFile).c_str()));
+  const std::string output = GetFileContents(OutputFile(config));
+  const std::string answer = GetFileContents(AnswerFile(config));
+  ASSERT_EQ(answer, output);
+}
+
+INSTANTIATE_TEST_SUITE_P(CommandLine, ConfigurationTest,
+                         ::testing::Values("hk2s", "hk2t", "jp2t", "s2hk",
+                                           "s2t", "s2tw", "s2twp", "t2hk",
+                                           "t2jp", "t2s", "tw2s", "tw2sp",
+                                           "tw2t"));
 
 } // namespace opencc

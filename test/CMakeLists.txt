@@ -1,5 +1,5 @@
-include_directories(../deps/libdarts/src)
-include_directories(../src)
+include_directories("${PROJECT_BINARY_DIR}/src")
+include_directories("${PROJECT_SOURCE_DIR}/src")
 
 set(CONFIG_TEST
   config_test/config_test.json
@@ -18,16 +18,18 @@ if (ENABLE_GTEST)
     add_custom_target(
         copy_gtest_to_test
         ${CMAKE_COMMAND} -E copy $<TARGET_FILE:gtest> ${CMAKE_CURRENT_BINARY_DIR}
-      COMMENT "Copy gtest"
+      COMMENT "Copying gtest to test"
     )
     add_custom_target(
         copy_gtest_main_to_test
         ${CMAKE_COMMAND} -E copy $<TARGET_FILE:gtest_main> ${CMAKE_CURRENT_BINARY_DIR}
-      COMMENT "Copy gtest_main"
+      COMMENT "Copying gtest_main to test"
     )
   endif()
 
-  include_directories(../deps/gtest-1.7.0/include)
+  if(NOT USE_SYSTEM_GTEST)
+    include_directories(../deps/gtest-1.7.0/include)
+  endif()
   set(UNITTESTS
     CommandLineConvertTest
   )

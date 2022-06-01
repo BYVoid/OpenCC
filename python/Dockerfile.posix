@@ -1,9 +1,0 @@
-FROM continuumio/miniconda:latest
-COPY . /opt/OpenCC
-WORKDIR /opt/OpenCC
-
-RUN apt update && \
-    apt install -y g++ make cmake && \
-    apt autoremove -y && \
-    apt autoclean -y
-RUN make clean && make python-install && make clean

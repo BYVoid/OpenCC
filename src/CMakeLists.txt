@@ -1,7 +1,17 @@
 include (GenerateExportHeader)
-include_directories(../deps/marisa-0.2.5/include)
-include_directories(../deps/rapidjson-1.1.0)
-include_directories(../deps/tclap-1.2.2)
+
+include_directories("${PROJECT_BINARY_DIR}/src")
+include_directories("${PROJECT_SOURCE_DIR}/src")
+
+if(NOT USE_SYSTEM_MARISA)
+  include_directories(../deps/marisa-0.2.6/include)
+endif()
+if(NOT USE_SYSTEM_RAPIDJSON)
+  include_directories(../deps/rapidjson-1.1.0)
+endif()
+if(NOT USE_SYSTEM_TCLAP)
+  include_directories(../deps/tclap-1.2.2)
+endif()
 
 # Library
 
@@ -32,6 +42,7 @@ set(
   UTF8StringSlice.hpp
   UTF8Util.hpp
   opencc.h
+  "${PROJECT_BINARY_DIR}/src/opencc_config.h"
 )
 
 set(
@@ -72,7 +83,10 @@ set(UNITTESTS
 )
 
 if (ENABLE_DARTS)
-  include_directories(../deps/darts-clone)
+  set(OPENCC_ENABLE_DARTS 1)
+  if(NOT USE_SYSTEM_DARTS)
+    include_directories(../deps/darts-clone)
+  endif()
   set(
     LIBOPENCC_HEADERS
     ${LIBOPENCC_HEADERS}
@@ -92,6 +106,10 @@ if (ENABLE_DARTS)
     DartsDictTest
   )
 endif()
+
+configure_file(
+  "${PROJECT_SOURCE_DIR}/src/opencc_config.h.in"
+  "${PROJECT_BINARY_DIR}/src/opencc_config.h")
 
 add_library(libopencc ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
 set_target_properties(libopencc PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -114,7 +132,7 @@ set_target_properties(
     OUTPUT_NAME
       opencc
     VERSION
-      1.1.1
+      1.1.3
     SOVERSION
       1.1
 )
@@ -140,12 +158,12 @@ if (ENABLE_GTEST)
     add_custom_target(
         copy_gtest_to_src
         ${CMAKE_COMMAND} -E copy $<TARGET_FILE:gtest> ${CMAKE_CURRENT_BINARY_DIR}
-      COMMENT "Copy gtest"
+      COMMENT "Copying gtest to src"
     )
     add_custom_target(
         copy_gtest_main_to_src
         ${CMAKE_COMMAND} -E copy $<TARGET_FILE:gtest_main> ${CMAKE_CURRENT_BINARY_DIR}
-      COMMENT "Copy gtest_main"
+      COMMENT "Copying gtest_main to src"
     )
   endif()
 

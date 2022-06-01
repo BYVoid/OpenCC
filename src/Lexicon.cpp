@@ -30,4 +30,16 @@ bool Lexicon::IsSorted() {
                         DictEntry::UPtrLessThan);
 }
 
+bool Lexicon::IsUnique(std::string* dupkey) {
+  for (size_t i = 1; i < entries.size(); ++i) {
+    if (entries[i - 1]->Key() == entries[i]->Key()) {
+      if (dupkey) {
+        *dupkey = entries[i]->Key();
+      }
+      return false;
+    }
+  }
+  return true;
+}
+
 } // namespace opencc

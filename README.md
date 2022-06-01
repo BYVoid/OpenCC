@@ -2,7 +2,9 @@
 
 [![Travis](https://img.shields.io/travis/BYVoid/OpenCC.svg)](https://travis-ci.org/BYVoid/OpenCC)
 [![AppVeyor](https://img.shields.io/appveyor/ci/Carbo/OpenCC.svg)](https://ci.appveyor.com/project/Carbo/OpenCC)
-[![Python package](https://github.com/BYVoid/OpenCC/workflows/Python%20package/badge.svg?branch=master)](https://github.com/BYVoid/OpenCC/actions?query=workflow%3A%22Python+package%22)
+[![C/C++ CI](https://github.com/BYVoid/OpenCC/actions/workflows/cmake.yml/badge.svg)](https://github.com/BYVoid/OpenCC/actions/workflows/cmake.yml)
+[![Node.js CI](https://github.com/BYVoid/OpenCC/actions/workflows/nodejs.yml/badge.svg)](https://github.com/BYVoid/OpenCC/actions/workflows/nodejs.yml)
+[![Python CI](https://github.com/BYVoid/OpenCC/actions/workflows/python.yml/badge.svg)](https://github.com/BYVoid/OpenCC/actions/workflows/python.yml)
 
 ## Introduction 介紹
 
@@ -108,10 +110,14 @@ Document 文檔: https://byvoid.github.io/OpenCC/
 ### Others (Unofficial)
 
 * Swift (iOS): [SwiftyOpenCC](https://github.com/XQS6LB3A/SwiftyOpenCC)
+* iOSOpenCC (pod): [iOSOpenCC](https://github.com/swiftdo/OpenCC)
 * Java: [opencc4j](https://github.com/houbb/opencc4j)
 * Android: [android-opencc](https://github.com/qichuan/android-opencc)
 * PHP: [opencc4php](https://github.com/nauxliu/opencc4php)
+* Pure JavaScript: [opencc-js](https://github.com/nk2028/opencc-js)
 * WebAssembly: [wasm-opencc](https://github.com/oyyd/wasm-opencc)
+* Browser Extension: [opencc-extension](https://github.com/tnychn/opencc-extension)
+* Go (Pure): [OpenCC for Go](https://github.com/longbridgeapp/opencc)
 
 ### Configurations 配置文件
 
@@ -170,27 +176,30 @@ test.cmd
 make benchmark
 ```
 
-Example results (from Travis CI):
+Example results (from Github CI):
 
 ```
 1: ------------------------------------------------------------------
 1: Benchmark                        Time             CPU   Iterations
 1: ------------------------------------------------------------------
-1: BM_Initialization/hk2s     1587215 ns      1587485 ns          435
-1: BM_Initialization/hk2t      126112 ns       125976 ns         5384
-1: BM_Initialization/jp2t      245646 ns       245414 ns         2847
-1: BM_Initialization/s2hk    26017749 ns     26017390 ns           27
-1: BM_Initialization/s2t     26298084 ns     26296375 ns           27
-1: BM_Initialization/s2tw    26483120 ns     26482164 ns           27
-1: BM_Initialization/s2twp   26455564 ns     26454666 ns           26
-1: BM_Initialization/t2hk       44759 ns        44636 ns        15733
-1: BM_Initialization/t2jp      143401 ns       143227 ns         4876
-1: BM_Initialization/t2s      1374298 ns      1373979 ns          510
-1: BM_Initialization/tw2s     1443389 ns      1443701 ns          464
-1: BM_Initialization/tw2sp    1699645 ns      1699823 ns          399
-1: BM_Initialization/tw2t       76294 ns        76083 ns         9229
-1: BM_Convert                     581 ms          581 ms            1
-1/1 Test #1: BenchmarkTest ....................   Passed   14.49 sec
+1: BM_Initialization/hk2s        1.56 ms         1.56 ms          442
+1: BM_Initialization/hk2t       0.144 ms        0.144 ms         4878
+1: BM_Initialization/jp2t       0.260 ms        0.260 ms         2604
+1: BM_Initialization/s2hk        23.8 ms         23.8 ms           29
+1: BM_Initialization/s2t         25.6 ms         25.6 ms           28
+1: BM_Initialization/s2tw        24.0 ms         23.9 ms           30
+1: BM_Initialization/s2twp       24.6 ms         24.6 ms           28
+1: BM_Initialization/t2hk       0.052 ms        0.052 ms        12897
+1: BM_Initialization/t2jp       0.141 ms        0.141 ms         5012
+1: BM_Initialization/t2s         1.30 ms         1.30 ms          540
+1: BM_Initialization/tw2s        1.39 ms         1.39 ms          529
+1: BM_Initialization/tw2sp       1.69 ms         1.69 ms          426
+1: BM_Initialization/tw2t       0.089 ms        0.089 ms         7707
+1: BM_Convert2M                   582 ms          582 ms            1
+1: BM_Convert/100                1.07 ms         1.07 ms          636
+1: BM_Convert/1000               11.0 ms         11.0 ms           67
+1: BM_Convert/10000               113 ms          113 ms            6
+1: BM_Convert/100000             1176 ms         1176 ms            1
 ```
 
 ## Projects using OpenCC 使用 OpenCC 的項目
@@ -215,7 +224,7 @@ Apache License 2.0
 * [rapidjson](https://github.com/Tencent/rapidjson) MIT License
 * [Google Test](https://github.com/google/googletest) BSD License
 
-All these libraries are statically linked.
+All these libraries are statically linked by default.
 
 ## Change History 版本歷史
 
@@ -267,7 +276,8 @@ All these libraries are statically linked.
 * [Cychih](https://github.com/pi314)
 * [kyleskimo](https://github.com/kyleskimo)
 * [Ryuan Choi](https://github.com/bunhere)
+* [Prcuvu](https://github.com/Prcuvu)
 * [Tony Able](https://github.com/TonyAble)
 * [Xiao Liang](https://github.com/yxliang01)
 
-Please update this list you have contributed OpenCC.
+Please feel free to update this list if you have contributed OpenCC.

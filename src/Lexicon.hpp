@@ -43,7 +43,12 @@ public:
 
   void Sort();
 
+  // Returns true if the lexicon is sorted by key.
   bool IsSorted();
+
+  // Returns true if every key unique (after sorted).
+  // When dupkey is set, it is set to the duplicate key.
+  bool IsUnique(std::string* dupkey = nullptr);
 
   const DictEntry* At(size_t index) const { return entries.at(index).get(); }
 

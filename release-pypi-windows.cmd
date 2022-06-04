@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableDelayedExpansion
 
-SET VERSIONS=3.5 3.6 3.7 3.8 3.9 3.10
+SET VERSIONS=3.7 3.8 3.9 3.10
 SET SOURCEDIR=%cd%
 
 REM Build packages

@@ -4,8 +4,8 @@
 
 2022年6月4日
 
-* 支持Python 3.10（[#637](https://github.com/BYVoid/OpenCC/issues/637）。
-* 移除针对Python 2.7、3.5、3.6和Node 10的构建（[#690](https://github.com/BYVoid/OpenCC/issues/690), [#691](https://github.com/BYVoid/OpenCC/issues/691)）。
+* 支持Python 3.10（[#637](https://github.com/BYVoid/OpenCC/issues/637)）。
+* 移除針對Python 2.7、3.5、3.6和Node 10的構建（[#690](https://github.com/BYVoid/OpenCC/issues/690), [#691](https://github.com/BYVoid/OpenCC/issues/691)）。
 * 若干其他小修復。
 
 ## Version 1.1.3

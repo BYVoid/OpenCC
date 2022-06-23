@@ -145,7 +145,7 @@ public:
   }
 
   /**
-   * Returns ture if the character is a line ending or end of file.
+   * Returns true if the character is a line ending or end of file.
    */
   static bool IsLineEndingOrFileEnding(const char ch) {
     return ch == '\0' || ch == '\n' || ch == '\r';

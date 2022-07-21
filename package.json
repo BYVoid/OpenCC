@@ -42,6 +42,6 @@
   },
   "dependencies": {
     "nan": "^2.14.2",
-    "@mapbox/node-pre-gyp": "^1.0.9",
+    "@mapbox/node-pre-gyp": "^1.0.9"
   }
 }

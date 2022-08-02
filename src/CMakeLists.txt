@@ -132,9 +132,9 @@ set_target_properties(
     OUTPUT_NAME
       opencc
     VERSION
-      1.1.3
+      ${OPENCC_VERSION_MAJOR}.${OPENCC_VERSION_MINOR}.${OPENCC_VERSION_REVISION}
     SOVERSION
-      1.1
+      ${OPENCC_VERSION_MAJOR}.${OPENCC_VERSION_MINOR}
 )
 
 # Installation

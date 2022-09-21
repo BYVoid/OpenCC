@@ -151,8 +151,13 @@ class BDistWheelCommand(wheel.bdist_wheel.bdist_wheel, object):
 
         if sys.platform == 'darwin':
             _, _, _, _, machine = os.uname()
-            return 'macosx-10.9-{}'.format(machine)
-
+            if machine == 'x86_64':
+                return 'macosx-10.9-{}'.format(machine)
+            if machine == 'arm64':
+                return 'macosx-11.0-{}'.format(machine)
+            else:
+                raise NotImplementedError
+                
         if os.name == 'posix':
             _, _, _, _, machine = os.uname()
             return 'manylinux1-{}'.format(machine)

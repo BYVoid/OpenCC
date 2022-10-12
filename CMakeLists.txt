@@ -111,7 +111,7 @@ configure_file(
 
 install(
   FILES
-    ${CMAKE_BINARY_DIR}/opencc.pc
+    ${CMAKE_CURRENT_BINARY_DIR}/opencc.pc
   DESTINATION
     ${DIR_LIBRARY}/pkgconfig
 )

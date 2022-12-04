@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableDelayedExpansion
 
-SET VERSIONS=3.7 3.8 3.9 3.10
+SET VERSIONS=3.7 3.8 3.9 3.10 3.11
 SET SOURCEDIR=%cd%
 
 REM Build packages
@@ -10,6 +10,9 @@ for %%v in (%VERSIONS%) do (
 
     REM Create and activate environment
     cd %ROOT_DIR%
+    CALL C:\Miniconda/condabin/conda.bat config --add channels conda-forge
+    CALL C:\Miniconda/condabin/conda.bat config --set channel_priority strict
+
     CALL C:\Miniconda/condabin/conda.bat create -y -n py%%v python=%%v
     if !ERRORLEVEL! NEQ 0 (EXIT !ERRORLEVEL!)
     CALL C:\Miniconda/condabin/conda.bat activate py%%v

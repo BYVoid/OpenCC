@@ -26,15 +26,17 @@ void BM_Counters_Simple(benchmark::State& state) {
   for (auto _ : state) {
   }
   state.counters["foo"] = 1;
-  state.counters["bar"] = 2 * (double)state.iterations();
+  state.counters["bar"] = 2 * static_cast<double>(state.iterations());
 }
 BENCHMARK(BM_Counters_Simple);
 ADD_CASES(TC_ConsoleOut,
           {{"^BM_Counters_Simple %console_report bar=%hrfloat foo=%hrfloat$"}});
 ADD_CASES(TC_JSONOut, {{"\"name\": \"BM_Counters_Simple\",$"},
+                       {"\"family_index\": 0,$", MR_Next},
+                       {"\"per_family_instance_index\": 0,$", MR_Next},
                        {"\"run_name\": \"BM_Counters_Simple\",$", MR_Next},
                        {"\"run_type\": \"iteration\",$", MR_Next},
-                       {"\"repetitions\": 0,$", MR_Next},
+                       {"\"repetitions\": 1,$", MR_Next},
                        {"\"repetition_index\": 0,$", MR_Next},
                        {"\"threads\": 1,$", MR_Next},
                        {"\"iterations\": %int,$", MR_Next},
@@ -78,9 +80,11 @@ ADD_CASES(TC_ConsoleOut, {{"^BM_Counters_WithBytesAndItemsPSec %console_report "
                            "foo=%hrfloat items_per_second=%hrfloat/s$"}});
 ADD_CASES(TC_JSONOut,
           {{"\"name\": \"BM_Counters_WithBytesAndItemsPSec\",$"},
+           {"\"family_index\": 1,$", MR_Next},
+           {"\"per_family_instance_index\": 0,$", MR_Next},
            {"\"run_name\": \"BM_Counters_WithBytesAndItemsPSec\",$", MR_Next},
            {"\"run_type\": \"iteration\",$", MR_Next},
-           {"\"repetitions\": 0,$", MR_Next},
+           {"\"repetitions\": 1,$", MR_Next},
            {"\"repetition_index\": 0,$", MR_Next},
            {"\"threads\": 1,$", MR_Next},
            {"\"iterations\": %int,$", MR_Next},
@@ -125,9 +129,11 @@ ADD_CASES(
     TC_ConsoleOut,
     {{"^BM_Counters_Rate %console_report bar=%hrfloat/s foo=%hrfloat/s$"}});
 ADD_CASES(TC_JSONOut, {{"\"name\": \"BM_Counters_Rate\",$"},
+                       {"\"family_index\": 2,$", MR_Next},
+                       {"\"per_family_instance_index\": 0,$", MR_Next},
                        {"\"run_name\": \"BM_Counters_Rate\",$", MR_Next},
                        {"\"run_type\": \"iteration\",$", MR_Next},
-                       {"\"repetitions\": 0,$", MR_Next},
+                       {"\"repetitions\": 1,$", MR_Next},
                        {"\"repetition_index\": 0,$", MR_Next},
                        {"\"threads\": 1,$", MR_Next},
                        {"\"iterations\": %int,$", MR_Next},
@@ -165,9 +171,11 @@ BENCHMARK(BM_Invert);
 ADD_CASES(TC_ConsoleOut,
           {{"^BM_Invert %console_report bar=%hrfloatu foo=%hrfloatk$"}});
 ADD_CASES(TC_JSONOut, {{"\"name\": \"BM_Invert\",$"},
+                       {"\"family_index\": 3,$", MR_Next},
+                       {"\"per_family_instance_index\": 0,$", MR_Next},
                        {"\"run_name\": \"BM_Invert\",$", MR_Next},
                        {"\"run_type\": \"iteration\",$", MR_Next},
-                       {"\"repetitions\": 0,$", MR_Next},
+                       {"\"repetitions\": 1,$", MR_Next},
                        {"\"repetition_index\": 0,$", MR_Next},
                        {"\"threads\": 1,$", MR_Next},
                        {"\"iterations\": %int,$", MR_Next},
@@ -187,8 +195,7 @@ void CheckInvert(Results const& e) {
 CHECK_BENCHMARK_RESULTS("BM_Invert", &CheckInvert);
 
 // ========================================================================= //
-// ------------------------- InvertedRate Counters Output
-// -------------------------- //
+// --------------------- InvertedRate Counters Output ---------------------- //
 // ========================================================================= //
 
 void BM_Counters_InvertedRate(benchmark::State& state) {
@@ -207,9 +214,11 @@ ADD_CASES(TC_ConsoleOut, {{"^BM_Counters_InvertedRate %console_report "
                            "bar=%hrfloats foo=%hrfloats$"}});
 ADD_CASES(TC_JSONOut,
           {{"\"name\": \"BM_Counters_InvertedRate\",$"},
+           {"\"family_index\": 4,$", MR_Next},
+           {"\"per_family_instance_index\": 0,$", MR_Next},
            {"\"run_name\": \"BM_Counters_InvertedRate\",$", MR_Next},
            {"\"run_type\": \"iteration\",$", MR_Next},
-           {"\"repetitions\": 0,$", MR_Next},
+           {"\"repetitions\": 1,$", MR_Next},
            {"\"repetition_index\": 0,$", MR_Next},
            {"\"threads\": 1,$", MR_Next},
            {"\"iterations\": %int,$", MR_Next},
@@ -246,9 +255,11 @@ ADD_CASES(TC_ConsoleOut, {{"^BM_Counters_Threads/threads:%int %console_report "
                            "bar=%hrfloat foo=%hrfloat$"}});
 ADD_CASES(TC_JSONOut,
           {{"\"name\": \"BM_Counters_Threads/threads:%int\",$"},
+           {"\"family_index\": 5,$", MR_Next},
+           {"\"per_family_instance_index\": 0,$", MR_Next},
            {"\"run_name\": \"BM_Counters_Threads/threads:%int\",$", MR_Next},
            {"\"run_type\": \"iteration\",$", MR_Next},
-           {"\"repetitions\": 0,$", MR_Next},
+           {"\"repetitions\": 1,$", MR_Next},
            {"\"repetition_index\": 0,$", MR_Next},
            {"\"threads\": 1,$", MR_Next},
            {"\"iterations\": %int,$", MR_Next},
@@ -285,9 +296,11 @@ ADD_CASES(TC_ConsoleOut, {{"^BM_Counters_AvgThreads/threads:%int "
                            "%console_report bar=%hrfloat foo=%hrfloat$"}});
 ADD_CASES(TC_JSONOut,
           {{"\"name\": \"BM_Counters_AvgThreads/threads:%int\",$"},
+           {"\"family_index\": 6,$", MR_Next},
+           {"\"per_family_instance_index\": 0,$", MR_Next},
            {"\"run_name\": \"BM_Counters_AvgThreads/threads:%int\",$", MR_Next},
            {"\"run_type\": \"iteration\",$", MR_Next},
-           {"\"repetitions\": 0,$", MR_Next},
+           {"\"repetitions\": 1,$", MR_Next},
            {"\"repetition_index\": 0,$", MR_Next},
            {"\"threads\": 1,$", MR_Next},
            {"\"iterations\": %int,$", MR_Next},
@@ -327,10 +340,12 @@ ADD_CASES(TC_ConsoleOut, {{"^BM_Counters_AvgThreadsRate/threads:%int "
                            "%console_report bar=%hrfloat/s foo=%hrfloat/s$"}});
 ADD_CASES(TC_JSONOut,
           {{"\"name\": \"BM_Counters_AvgThreadsRate/threads:%int\",$"},
+           {"\"family_index\": 7,$", MR_Next},
+           {"\"per_family_instance_index\": 0,$", MR_Next},
            {"\"run_name\": \"BM_Counters_AvgThreadsRate/threads:%int\",$",
             MR_Next},
            {"\"run_type\": \"iteration\",$", MR_Next},
-           {"\"repetitions\": 0,$", MR_Next},
+           {"\"repetitions\": 1,$", MR_Next},
            {"\"repetition_index\": 0,$", MR_Next},
            {"\"threads\": 1,$", MR_Next},
            {"\"iterations\": %int,$", MR_Next},
@@ -367,9 +382,11 @@ ADD_CASES(TC_ConsoleOut, {{"^BM_Counters_IterationInvariant %console_report "
                            "bar=%hrfloat foo=%hrfloat$"}});
 ADD_CASES(TC_JSONOut,
           {{"\"name\": \"BM_Counters_IterationInvariant\",$"},
+           {"\"family_index\": 8,$", MR_Next},
+           {"\"per_family_instance_index\": 0,$", MR_Next},
            {"\"run_name\": \"BM_Counters_IterationInvariant\",$", MR_Next},
            {"\"run_type\": \"iteration\",$", MR_Next},
-           {"\"repetitions\": 0,$", MR_Next},
+           {"\"repetitions\": 1,$", MR_Next},
            {"\"repetition_index\": 0,$", MR_Next},
            {"\"threads\": 1,$", MR_Next},
            {"\"iterations\": %int,$", MR_Next},
@@ -412,10 +429,12 @@ ADD_CASES(TC_ConsoleOut, {{"^BM_Counters_kIsIterationInvariantRate "
                            "%console_report bar=%hrfloat/s foo=%hrfloat/s$"}});
 ADD_CASES(TC_JSONOut,
           {{"\"name\": \"BM_Counters_kIsIterationInvariantRate\",$"},
+           {"\"family_index\": 9,$", MR_Next},
+           {"\"per_family_instance_index\": 0,$", MR_Next},
            {"\"run_name\": \"BM_Counters_kIsIterationInvariantRate\",$",
             MR_Next},
            {"\"run_type\": \"iteration\",$", MR_Next},
-           {"\"repetitions\": 0,$", MR_Next},
+           {"\"repetitions\": 1,$", MR_Next},
            {"\"repetition_index\": 0,$", MR_Next},
            {"\"threads\": 1,$", MR_Next},
            {"\"iterations\": %int,$", MR_Next},
@@ -440,7 +459,7 @@ CHECK_BENCHMARK_RESULTS("BM_Counters_kIsIterationInvariantRate",
                         &CheckIsIterationInvariantRate);
 
 // ========================================================================= //
-// ------------------- AvgIterations Counters Output ------------------ //
+// --------------------- AvgIterations Counters Output --------------------- //
 // ========================================================================= //
 
 void BM_Counters_AvgIterations(benchmark::State& state) {
@@ -455,9 +474,11 @@ ADD_CASES(TC_ConsoleOut, {{"^BM_Counters_AvgIterations %console_report "
                            "bar=%hrfloat foo=%hrfloat$"}});
 ADD_CASES(TC_JSONOut,
           {{"\"name\": \"BM_Counters_AvgIterations\",$"},
+           {"\"family_index\": 10,$", MR_Next},
+           {"\"per_family_instance_index\": 0,$", MR_Next},
            {"\"run_name\": \"BM_Counters_AvgIterations\",$", MR_Next},
            {"\"run_type\": \"iteration\",$", MR_Next},
-           {"\"repetitions\": 0,$", MR_Next},
+           {"\"repetitions\": 1,$", MR_Next},
            {"\"repetition_index\": 0,$", MR_Next},
            {"\"threads\": 1,$", MR_Next},
            {"\"iterations\": %int,$", MR_Next},
@@ -480,7 +501,7 @@ void CheckAvgIterations(Results const& e) {
 CHECK_BENCHMARK_RESULTS("BM_Counters_AvgIterations", &CheckAvgIterations);
 
 // ========================================================================= //
-// ----------------- AvgIterationsRate Counters Output ---------------- //
+// ------------------- AvgIterationsRate Counters Output ------------------- //
 // ========================================================================= //
 
 void BM_Counters_kAvgIterationsRate(benchmark::State& state) {
@@ -498,9 +519,11 @@ ADD_CASES(TC_ConsoleOut, {{"^BM_Counters_kAvgIterationsRate "
                            "%console_report bar=%hrfloat/s foo=%hrfloat/s$"}});
 ADD_CASES(TC_JSONOut,
           {{"\"name\": \"BM_Counters_kAvgIterationsRate\",$"},
+           {"\"family_index\": 11,$", MR_Next},
+           {"\"per_family_instance_index\": 0,$", MR_Next},
            {"\"run_name\": \"BM_Counters_kAvgIterationsRate\",$", MR_Next},
            {"\"run_type\": \"iteration\",$", MR_Next},
-           {"\"repetitions\": 0,$", MR_Next},
+           {"\"repetitions\": 1,$", MR_Next},
            {"\"repetition_index\": 0,$", MR_Next},
            {"\"threads\": 1,$", MR_Next},
            {"\"iterations\": %int,$", MR_Next},

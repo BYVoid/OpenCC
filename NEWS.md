@@ -1,5 +1,12 @@
 # Change History of OpenCC
 
+## Version 1.1.6
+
+2022年12月08日
+
+* 修复python3.11 macos构建 ([#744](https://github.com/BYVoid/OpenCC/pull/744))。
+* Bump gtest 和 benchmark 以与最新的 github runners 一起工作 ([#747](https://github.com/BYVoid/OpenCC/pull/747))。
+
 ## Version 1.1.5
 
 2022年12月03日

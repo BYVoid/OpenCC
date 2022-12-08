@@ -17,7 +17,7 @@
 #
 
 ######## Project settings
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 set (PACKAGE_NAME opencc)
 project (${PACKAGE_NAME} CXX)
 include (CTest)
@@ -204,7 +204,7 @@ add_subdirectory(test)
 
 if (ENABLE_GTEST)
   if(NOT USE_SYSTEM_GTEST)
-    add_subdirectory(deps/gtest-1.11.0)
+    add_subdirectory(deps/gtest-1.12.1)
   endif()
   enable_testing()
 endif()

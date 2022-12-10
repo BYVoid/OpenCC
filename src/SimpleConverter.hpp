@@ -66,7 +66,7 @@ public:
 
   /**
    * Converts a text and writes to an allocated buffer
-   * Please make sure the buffer has sufficent space.
+   * Please make sure the buffer has sufficient space.
    * @param input  A C-Style std::string (terminated by '\0') to be converted.
    * @param output Buffer to write the converted text.
    * @return       Length of converted text.
@@ -75,7 +75,7 @@ public:
 
   /**
    * Converts a text and writes to an allocated buffer
-   * Please make sure the buffer has sufficent space.
+   * Please make sure the buffer has sufficient space.
    * @param input  A C-Style std::string limited by a given length to be
    * converted.
    * @param length Maximal length in byte of the input std::string.

@@ -133,25 +133,25 @@ std::string StrFormatImp(const char* msg, va_list args) {
   // TODO(ericwf): use std::array for first attempt to avoid one memory
   // allocation guess what the size might be
   std::array<char, 256> local_buff;
-  std::size_t size = local_buff.size();
+
   // 2015-10-08: vsnprintf is used instead of snd::vsnprintf due to a limitation
   // in the android-ndk
-  auto ret = vsnprintf(local_buff.data(), size, msg, args_cp);
+  auto ret = vsnprintf(local_buff.data(), local_buff.size(), msg, args_cp);
 
   va_end(args_cp);
 
   // handle empty expansion
   if (ret == 0) return std::string{};
-  if (static_cast<std::size_t>(ret) < size)
+  if (static_cast<std::size_t>(ret) < local_buff.size())
     return std::string(local_buff.data());
 
   // we did not provide a long enough buffer on our first attempt.
   // add 1 to size to account for null-byte in size cast to prevent overflow
-  size = static_cast<std::size_t>(ret) + 1;
+  std::size_t size = static_cast<std::size_t>(ret) + 1;
   auto buff_ptr = std::unique_ptr<char[]>(new char[size]);
   // 2015-10-08: vsnprintf is used instead of snd::vsnprintf due to a limitation
   // in the android-ndk
-  ret = vsnprintf(buff_ptr.get(), size, msg, args);
+  vsnprintf(buff_ptr.get(), size, msg, args);
   return std::string(buff_ptr.get());
 }
 
@@ -161,6 +161,19 @@ std::string StrFormat(const char* format, ...) {
   std::string tmp = StrFormatImp(format, args);
   va_end(args);
   return tmp;
+}
+
+std::vector<std::string> StrSplit(const std::string& str, char delim) {
+  if (str.empty()) return {};
+  std::vector<std::string> ret;
+  size_t first = 0;
+  size_t next = str.find(delim);
+  for (; next != std::string::npos;
+       first = next + 1, next = str.find(delim, first)) {
+    ret.push_back(str.substr(first, next - first));
+  }
+  ret.push_back(str.substr(first));
+  return ret;
 }
 
 #ifdef BENCHMARK_STL_ANDROID_GNUSTL
@@ -185,11 +198,10 @@ unsigned long stoul(const std::string& str, size_t* pos, int base) {
 
   /* Check for errors and return */
   if (strtoulErrno == ERANGE) {
-    throw std::out_of_range(
-      "stoul failed: " + str + " is outside of range of unsigned long");
+    throw std::out_of_range("stoul failed: " + str +
+                            " is outside of range of unsigned long");
   } else if (strEnd == strStart || strtoulErrno != 0) {
-    throw std::invalid_argument(
-      "stoul failed: " + str + " is not an integer");
+    throw std::invalid_argument("stoul failed: " + str + " is not an integer");
   }
   if (pos != nullptr) {
     *pos = static_cast<size_t>(strEnd - strStart);
@@ -212,11 +224,10 @@ int stoi(const std::string& str, size_t* pos, int base) {
 
   /* Check for errors and return */
   if (strtolErrno == ERANGE || long(int(result)) != result) {
-    throw std::out_of_range(
-      "stoul failed: " + str + " is outside of range of int");
+    throw std::out_of_range("stoul failed: " + str +
+                            " is outside of range of int");
   } else if (strEnd == strStart || strtolErrno != 0) {
-    throw std::invalid_argument(
-      "stoul failed: " + str + " is not an integer");
+    throw std::invalid_argument("stoul failed: " + str + " is not an integer");
   }
   if (pos != nullptr) {
     *pos = static_cast<size_t>(strEnd - strStart);
@@ -239,11 +250,10 @@ double stod(const std::string& str, size_t* pos) {
 
   /* Check for errors and return */
   if (strtodErrno == ERANGE) {
-    throw std::out_of_range(
-      "stoul failed: " + str + " is outside of range of int");
+    throw std::out_of_range("stoul failed: " + str +
+                            " is outside of range of int");
   } else if (strEnd == strStart || strtodErrno != 0) {
-    throw std::invalid_argument(
-      "stoul failed: " + str + " is not an integer");
+    throw std::invalid_argument("stoul failed: " + str + " is not an integer");
   }
   if (pos != nullptr) {
     *pos = static_cast<size_t>(strEnd - strStart);

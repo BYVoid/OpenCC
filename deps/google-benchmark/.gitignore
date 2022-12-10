@@ -11,6 +11,7 @@
 *.swp
 *.pyc
 __pycache__
+.DS_Store
 
 # lcov
 *.lcov
@@ -60,3 +61,7 @@ CMakeSettings.json
 
 # Visual Studio Code cache/options directory
 .vscode/
+
+# Python build stuff
+dist/
+*.egg-info*

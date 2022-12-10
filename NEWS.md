@@ -1,5 +1,21 @@
 # Change History of OpenCC
 
+## Version 1.1.6
+
+2022年12月08日
+
+* 修复python3.11 macos构建 ([#744](https://github.com/BYVoid/OpenCC/pull/744))。
+* Bump gtest 和 benchmark 以与最新的 github runners 一起工作 ([#747](https://github.com/BYVoid/OpenCC/pull/747))。
+
+## Version 1.1.5
+
+2022年12月03日
+
+* 支持Python 3.11 ([#728](https://github.com/BYVoid/OpenCC/pull/728))。
+* Automatically name SO files ([#708](https://github.com/BYVoid/OpenCC/pull/708))
+* Add support for Apple silicon build tag ([#716](https://github.com/BYVoid/OpenCC/pull/716))
+* 若干其他小修復。
+
 ## Version 1.1.4
 
 2022年6月4日

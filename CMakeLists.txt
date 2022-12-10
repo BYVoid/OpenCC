@@ -17,7 +17,7 @@
 #
 
 ######## Project settings
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 set (PACKAGE_NAME opencc)
 project (${PACKAGE_NAME} CXX)
 include (CTest)
@@ -42,7 +42,7 @@ set (PACKAGE_URL https://github.com/BYVoid/Opencc)
 set (PACKAGE_BUGREPORT https://github.com/BYVoid/Opencc/issues)
 set (OPENCC_VERSION_MAJOR 1)
 set (OPENCC_VERSION_MINOR 1)
-set (OPENCC_VERSION_REVISION 4)
+set (OPENCC_VERSION_REVISION 6)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
   set (version_suffix .Debug)
@@ -72,6 +72,8 @@ include(CPack)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(CMAKE_MACOSX_RPATH 1)
+    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
 ######## Directory
@@ -111,7 +113,7 @@ configure_file(
 
 install(
   FILES
-    ${CMAKE_BINARY_DIR}/opencc.pc
+    ${CMAKE_CURRENT_BINARY_DIR}/opencc.pc
   DESTINATION
     ${DIR_LIBRARY}/pkgconfig
 )
@@ -202,7 +204,7 @@ add_subdirectory(test)
 
 if (ENABLE_GTEST)
   if(NOT USE_SYSTEM_GTEST)
-    add_subdirectory(deps/gtest-1.11.0)
+    add_subdirectory(deps/gtest-1.12.1)
   endif()
   enable_testing()
 endif()
@@ -221,7 +223,7 @@ if (BUILD_PYTHON)
   if(USE_SYSTEM_PYBIND11)
     find_package(pybind11 CONFIG)
   else()
-    add_subdirectory(deps/pybind11-2.5.0)
+    add_subdirectory(deps/pybind11-2.10.0)
   endif()
   pybind11_add_module(opencc_clib src/py_opencc.cpp)
   target_link_libraries(opencc_clib PRIVATE libopencc)

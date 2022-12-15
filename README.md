@@ -77,7 +77,7 @@ converter.convert('汉字')  # 漢字
 #include "opencc.h"
 
 int main() {
-  const SimpleConverter converter("s2t.json");
+  const opencc::SimpleConverter converter("s2t.json");
   converter.Convert("汉字");  // 漢字
   return 0;
 }

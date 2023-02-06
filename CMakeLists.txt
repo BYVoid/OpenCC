@@ -105,6 +105,10 @@ set (DIR_SHARE_LOCALE ${DIR_SHARE}/locale/)
 
 ######## Configuration
 
+include(CMakePackageConfigHelpers)
+
+set(targets_export_name OpenCCTargets)
+
 configure_file(
   opencc.pc.in
   opencc.pc
@@ -116,6 +120,26 @@ install(
     ${CMAKE_CURRENT_BINARY_DIR}/opencc.pc
   DESTINATION
     ${DIR_LIBRARY}/pkgconfig
+)
+
+write_basic_package_version_file(
+  OpenCCConfigVersion.cmake
+  VERSION ${OPENCC_VERSION}
+  COMPATIBILITY SameMajorVersion
+)
+
+configure_package_config_file(
+  OpenCCConfig.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/OpenCCConfig.cmake
+  INSTALL_DESTINATION lib/cmake/opencc
+)
+
+install(
+  FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/OpenCCConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/OpenCCConfigVersion.cmake
+  DESTINATION
+    lib/cmake/opencc
 )
 
 ######## Compiler flags

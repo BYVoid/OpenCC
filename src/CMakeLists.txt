@@ -112,6 +112,7 @@ configure_file(
   "${PROJECT_BINARY_DIR}/src/opencc_config.h")
 
 add_library(libopencc ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
+add_library(OpenCC::OpenCC ALIAS libopencc)
 set_target_properties(libopencc PROPERTIES POSITION_INDEPENDENT_CODE ON)
 source_group(libopencc FILES ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
 target_link_libraries(libopencc marisa)
@@ -131,6 +132,8 @@ set_target_properties(
       CXX
     OUTPUT_NAME
       opencc
+    EXPORT_NAME
+      OpenCC
     VERSION
       ${OPENCC_VERSION_MAJOR}.${OPENCC_VERSION_MINOR}.${OPENCC_VERSION_REVISION}
     SOVERSION
@@ -139,11 +142,24 @@ set_target_properties(
 
 # Installation
 
+if (USE_SYSTEM_MARISA)
+  set(INSTALL_TARGETS libopencc)
+else()
+  set(INSTALL_TARGETS libopencc marisa)
+endif()
+
 install(
-  TARGETS libopencc
-  LIBRARY DESTINATION ${DIR_LIBRARY}
-  ARCHIVE DESTINATION ${DIR_LIBRARY}
+  TARGETS ${INSTALL_TARGETS} EXPORT ${targets_export_name}
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib
   RUNTIME DESTINATION bin
+)
+
+install(
+  EXPORT ${targets_export_name}
+  FILE ${targets_export_name}.cmake
+  DESTINATION lib/cmake/opencc
+  NAMESPACE OpenCC::
 )
 
 install(

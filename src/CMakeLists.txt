@@ -150,15 +150,15 @@ endif()
 
 install(
   TARGETS ${INSTALL_TARGETS} EXPORT ${targets_export_name}
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION ${DIR_LIBRARY}
+  ARCHIVE DESTINATION ${DIR_LIBRARY}
   RUNTIME DESTINATION bin
 )
 
 install(
   EXPORT ${targets_export_name}
   FILE ${targets_export_name}.cmake
-  DESTINATION lib/cmake/opencc
+  DESTINATION ${DIR_LIBRARY}/cmake/opencc
   NAMESPACE OpenCC::
 )
 

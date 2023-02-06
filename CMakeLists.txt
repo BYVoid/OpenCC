@@ -131,7 +131,7 @@ write_basic_package_version_file(
 configure_package_config_file(
   OpenCCConfig.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/OpenCCConfig.cmake
-  INSTALL_DESTINATION lib/cmake/opencc
+  INSTALL_DESTINATION ${DIR_LIBRARY}/cmake/opencc
 )
 
 install(
@@ -139,7 +139,7 @@ install(
     ${CMAKE_CURRENT_BINARY_DIR}/OpenCCConfig.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/OpenCCConfigVersion.cmake
   DESTINATION
-    lib/cmake/opencc
+    ${DIR_LIBRARY}/cmake/opencc
 )
 
 ######## Compiler flags

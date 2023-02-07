@@ -132,6 +132,7 @@ configure_package_config_file(
   OpenCCConfig.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/OpenCCConfig.cmake
   INSTALL_DESTINATION ${DIR_LIBRARY}/cmake/opencc
+  PATH_VARS DIR_INCLUDE
 )
 
 install(

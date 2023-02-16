@@ -116,6 +116,10 @@ add_library(OpenCC::OpenCC ALIAS libopencc)
 set_target_properties(libopencc PROPERTIES POSITION_INDEPENDENT_CODE ON)
 source_group(libopencc FILES ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
 target_link_libraries(libopencc marisa)
+target_include_directories(libopencc PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:${DIR_INCLUDE}/opencc>
+)
 
 GENERATE_EXPORT_HEADER(
   libopencc

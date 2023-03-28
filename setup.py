@@ -144,29 +144,8 @@ class BDistWheelCommand(wheel.bdist_wheel.bdist_wheel, object):
 
     @staticmethod
     def _determine_platform_tag():
-        if sys.platform == 'win32':
-            if 'amd64' in sys.version.lower():
-                return 'win-amd64'
-            return sys.platform
-
-        if sys.platform == 'darwin':
-            _, _, _, _, machine = os.uname()
-            if machine == 'x86_64':
-                return 'macosx-10.9-{}'.format(machine)
-            if machine == 'arm64':
-                return 'macosx-11.0-{}'.format(machine)
-            else:
-                raise NotImplementedError
-                
-        if os.name == 'posix':
-            _, _, _, _, machine = os.uname()
-            return 'manylinux1-{}'.format(machine)
-
-        warnings.warn(
-            'Windows macos and linux are all not detected, '
-            'Proper distribution name cannot be determined.')
-        from distutils.util import get_platform
-        return get_platform()
+        from wheel.vendored.packaging.tags import platform_tags
+        return next(platform_tags())
 
     def initialize_options(self):
         super(BDistWheelCommand, self).initialize_options()

@@ -63,27 +63,59 @@ static void BM_Initialization(benchmark::State& state,
     state.ResumeTiming();
   }
 }
+BENCHMARK_CAPTURE(BM_Initialization, hk2cnp, "hk2cnp")
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Initialization, hk2myp, "hk2myp")
+    ->Unit(benchmark::kMillisecond);
 BENCHMARK_CAPTURE(BM_Initialization, hk2s, "hk2s")
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Initialization, hk2sgp, "hk2sgp")
     ->Unit(benchmark::kMillisecond);
 BENCHMARK_CAPTURE(BM_Initialization, hk2t, "hk2t")
     ->Unit(benchmark::kMillisecond);
 BENCHMARK_CAPTURE(BM_Initialization, jp2t, "jp2t")
     ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Initialization, s2cnp, "s2cnp")
+    ->Unit(benchmark::kMillisecond);
 BENCHMARK_CAPTURE(BM_Initialization, s2hk, "s2hk")
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Initialization, s2hkp, "s2hkp")
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Initialization, s2mop, "s2mop")
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Initialization, s2myp, "s2myp")
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Initialization, s2sgp, "s2sgp")
     ->Unit(benchmark::kMillisecond);
 BENCHMARK_CAPTURE(BM_Initialization, s2t, "s2t")->Unit(benchmark::kMillisecond);
 BENCHMARK_CAPTURE(BM_Initialization, s2tw, "s2tw")
     ->Unit(benchmark::kMillisecond);
 BENCHMARK_CAPTURE(BM_Initialization, s2twp, "s2twp")
     ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Initialization, t2cnp, "t2cnp")
+    ->Unit(benchmark::kMillisecond);
 BENCHMARK_CAPTURE(BM_Initialization, t2hk, "t2hk")
     ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Initialization, t2hkp, "t2hkp")
+    ->Unit(benchmark::kMillisecond);
 BENCHMARK_CAPTURE(BM_Initialization, t2jp, "t2jp")
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Initialization, t2mop, "t2mop")
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Initialization, t2myp, "t2myp")
     ->Unit(benchmark::kMillisecond);
 BENCHMARK_CAPTURE(BM_Initialization, t2s, "t2s")->Unit(benchmark::kMillisecond);
 BENCHMARK_CAPTURE(BM_Initialization, tw2s, "tw2s")
     ->Unit(benchmark::kMillisecond);
-BENCHMARK_CAPTURE(BM_Initialization, tw2sp, "tw2sp")
+BENCHMARK_CAPTURE(BM_Initialization, t2sgp, "t2sgp")
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Initialization, t2twp, "t2twp")
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Initialization, tw2cnp, "tw2cnp")
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Initialization, tw2myp, "tw2myp")
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Initialization, tw2sgp, "tw2sgp")
     ->Unit(benchmark::kMillisecond);
 BENCHMARK_CAPTURE(BM_Initialization, tw2t, "tw2t")
     ->Unit(benchmark::kMillisecond);

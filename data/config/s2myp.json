@@ -1,0 +1,16 @@
+{
+  "name": "Simplified Chinese to Simplified Chinese, with Malaysia Vocabulary",
+  "segmentation": {
+    "type": "mmseg",
+    "dict": {
+      "type": "ocd2",
+      "file": "MYVocabulary.ocd2"
+    }
+  },
+  "conversion_chain": [{
+    "dict": {
+      "type": "ocd2",
+      "file": "MYVocabulary.ocd2"
+    }
+  }]
+}

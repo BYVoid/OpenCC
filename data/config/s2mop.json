@@ -1,10 +1,10 @@
 {
-  "name": "Simplified Chinese to Traditional Chinese (Taiwan standard), with Taiwan Vocabulary",
+  "name": "Simplified Chinese to Traditional Chinese (Hong Kong standard), with Macau Vocabulary",
   "segmentation": {
     "type": "mmseg",
     "dict": {
       "type": "ocd2",
-      "file": "STPhrases.ocd2"
+      "file": "MOVocabulary.ocd2"
     }
   },
   "conversion_chain": [{
@@ -23,10 +23,10 @@
       "type": "group",
       "dicts": [{
         "type": "ocd2",
-        "file": "TWVocabulary.ocd2"
+        "file": "MOVocabulary.ocd2"
       }, {
         "type": "ocd2",
-        "file": "TWVariants.ocd2"
+        "file": "HKVariants.ocd2"
       }]
     }
   }]

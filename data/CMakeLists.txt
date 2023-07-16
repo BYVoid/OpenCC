@@ -212,36 +212,36 @@ foreach(DICT ${DICTS})
 endforeach(DICT)
 
 set(CONFIG_FILES
-  config/hk2s.json
-  config/hk2t.json
-  config/jp2t.json
-  config/s2hk.json
-  config/s2t.json
-  config/s2tw.json
-  config/t2hk.json
-  config/t2jp.json
-  config/t2s.json
-  config/t2tw.json
-  config/tw2s.json
-  config/tw2t.json
   config/hk2cnp.json
   config/hk2myp.json
+  config/hk2s.json
   config/hk2sgp.json
+  config/hk2t.json
+  config/jp2t.json
   config/s2cnp.json
+  config/s2hk.json
   config/s2hkp.json
   config/s2mop.json
   config/s2myp.json
   config/s2sgp.json
+  config/s2t.json
+  config/s2tw.json
   config/s2twp.json
   config/t2cnp.json
+  config/t2hk.json
   config/t2hkp.json
+  config/t2jp.json
   config/t2mop.json
   config/t2myp.json
+  config/t2s.json
   config/t2sgp.json
+  config/t2tw.json
   config/t2twp.json
   config/tw2cnp.json
   config/tw2myp.json
+  config/tw2s.json
   config/tw2sgp.json
+  config/tw2t.json
 )
 
 install(

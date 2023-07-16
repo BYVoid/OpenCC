@@ -42,6 +42,84 @@
       "outputs": ["<(output_prefix)TSPhrases.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
+      "action_name": "CNVocabulary.txt",
+      "inputs": ["<(cmd)"],
+      "outputs": ["<(output_prefix)CNVocabulary.txt"],
+      "action": ["python", "<(dict_merge)", "<(input_prefix)CNVocabToponym.txt", "<(input_prefix)CNVocabSciTech.txt", "<(input_prefix)CNVocabOthers.txt", "<@(_outputs)"]
+    }, {
+      "action_name": "CNVocabulary",
+      "variables": {
+        "input": "<(output_prefix)CNVocabulary.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)CNVocabulary.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "HKVocabulary.txt",
+      "inputs": ["<(cmd)"],
+      "outputs": ["<(output_prefix)HKVocabulary.txt"],
+      "action": ["python", "<(dict_merge)", "<(input_prefix)HKVocabToponym.txt", "<(input_prefix)HKVocabSciTech.txt", "<(input_prefix)HKVocabOthers.txt", "<@(_outputs)"]
+    }, {
+      "action_name": "HKVocabulary",
+      "variables": {
+        "input": "<(output_prefix)HKVocabulary.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)HKVocabulary.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "MOVocabulary.txt",
+      "inputs": ["<(cmd)"],
+      "outputs": ["<(output_prefix)MOVocabulary.txt"],
+      "action": ["python", "<(dict_merge)", "<(input_prefix)MOVocabToponym.txt", "<(input_prefix)MOVocabSciTech.txt", "<(input_prefix)MOVocabOthers.txt", "<@(_outputs)"]
+    }, {
+      "action_name": "MOVocabulary",
+      "variables": {
+        "input": "<(output_prefix)MOVocabulary.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)MOVocabulary.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "MYVocabulary.txt",
+      "inputs": ["<(cmd)"],
+      "outputs": ["<(output_prefix)MYVocabulary.txt"],
+      "action": ["python", "<(dict_merge)", "<(input_prefix)MYVocabToponym.txt", "<(input_prefix)MYVocabSciTech.txt", "<(input_prefix)MYVocabOthers.txt", "<@(_outputs)"]
+    }, {
+      "action_name": "MYVocabulary",
+      "variables": {
+        "input": "<(output_prefix)MYVocabulary.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)MYVocabulary.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "SGVocabulary.txt",
+      "inputs": ["<(cmd)"],
+      "outputs": ["<(output_prefix)SGVocabulary.txt"],
+      "action": ["python", "<(dict_merge)", "<(input_prefix)SGVocabToponym.txt", "<(input_prefix)SGVocabSciTech.txt", "<(input_prefix)SGVocabOthers.txt", "<@(_outputs)"]
+    }, {
+      "action_name": "SGVocabulary",
+      "variables": {
+        "input": "<(output_prefix)SGVocabulary.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)SGVocabulary.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "TWVocabulary.txt",
+      "inputs": ["<(cmd)"],
+      "outputs": ["<(output_prefix)TWVocabulary.txt"],
+      "action": ["python", "<(dict_merge)", "<(input_prefix)TWVocabToponym.txt", "<(input_prefix)TWVocabSciTech.txt", "<(input_prefix)TWVocabOthers.txt", "<@(_outputs)"]
+    }, {
+      "action_name": "TWVocabulary",
+      "variables": {
+        "input": "<(output_prefix)TWVocabulary.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)TWVocabulary.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
       "action_name": "TWVariants",
       "variables": {
         "input": "<(input_prefix)TWVariants.txt",
@@ -66,11 +144,6 @@
       "outputs": ["<(output_prefix)JPVariants.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
-      "action_name": "TWPhrases.txt",
-      "inputs": ["<(cmd)"],
-      "outputs": ["<(output_prefix)TWPhrases.txt"],
-      "action": ["python", "<(dict_merge)", "<(input_prefix)TWPhrasesIT.txt", "<(input_prefix)TWPhrasesName.txt", "<(input_prefix)TWPhrasesOther.txt", "<@(_outputs)"]
-    }, {
       "action_name": "TWVariantsRev.txt",
       "variables": {
         "input": "<(input_prefix)TWVariants.txt",
@@ -79,36 +152,12 @@
       "outputs": ["<(output_prefix)TWVariantsRev.txt"],
       "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
     }, {
-      "action_name": "TWPhrasesRev.txt",
-      "variables": {
-        "input": "<(output_prefix)TWPhrases.txt",
-      },
-      "inputs": ["<(input)"],
-      "outputs": ["<(output_prefix)TWPhrasesRev.txt"],
-      "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
-    }, {
-      "action_name": "TWPhrases",
-      "variables": {
-        "input": "<(output_prefix)TWPhrases.txt",
-      },
-      "inputs": ["<(input)"],
-      "outputs": ["<(output_prefix)TWPhrases.ocd2"],
-      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
-    }, {
       "action_name": "TWVariantsRev",
       "variables": {
         "input": "<(output_prefix)TWVariantsRev.txt",
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)TWVariantsRev.ocd2"],
-      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
-    }, {
-      "action_name": "TWPhrasesRev",
-      "variables": {
-        "input": "<(output_prefix)TWPhrasesRev.txt",
-      },
-      "inputs": ["<(input)"],
-      "outputs": ["<(output_prefix)TWPhrasesRev.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "HKVariants",

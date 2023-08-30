@@ -1,0 +1,32 @@
+name: mingw-w64 CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - uses: msys2/setup-msys2@v2
+    - uses: actions/checkout@v3
+    - name: Install dependencies
+      run: pacman -S --noconfirm base-devel mingw-w64-x86_64-toolchain cmake ninja python
+    - name: Build with mingw-w64
+      run: |
+        CC=/mingw64/bin/cc CXX=/mingw64/bin/c++ cmake \
+          -B build -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_INSTALL_PREFIX=/usr \
+          -DENABLE_GTEST=ON \
+          -DBUILD_SHARED_LIBS=OFF
+        cmake --build build
+    - name: Run test
+      run: |
+        cd build
+        ctest

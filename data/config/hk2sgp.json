@@ -1,10 +1,10 @@
 {
-  "name": "Traditional Chinese (Taiwan standard) to Simplified Chinese (with phrases)",
+  "name": "Traditional Chinese (Hong Kong standard) to Simplified Chinese, with Singapore Vocabulary",
   "segmentation": {
     "type": "mmseg",
     "dict": {
       "type": "ocd2",
-      "file": "TSPhrases.ocd2"
+      "file": "SGVocabulary.ocd2"
     }
   },
   "conversion_chain": [{
@@ -12,13 +12,10 @@
       "type": "group",
       "dicts": [{
         "type": "ocd2",
-        "file": "TWPhrasesRev.ocd2"
+        "file": "HKVariantsRevPhrases.ocd2"
       }, {
         "type": "ocd2",
-        "file": "TWVariantsRevPhrases.ocd2"
-      }, {
-        "type": "ocd2",
-        "file": "TWVariantsRev.ocd2"
+        "file": "HKVariantsRev.ocd2"
       }] 
     }
   }, {
@@ -31,6 +28,11 @@
         "type": "ocd2",
         "file": "TSCharacters.ocd2"
       }]
+    }
+  }, {
+    "dict": {
+      "type": "ocd2",
+      "file": "SGVocabulary.ocd2"
     }
   }]
 }

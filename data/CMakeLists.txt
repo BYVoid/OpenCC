@@ -23,8 +23,12 @@ set(
 
 set(
   DICTS_GENERATED
-  TWPhrases
-  TWPhrasesRev
+  CNVocabulary
+  HKVocabulary
+  MOVocabulary
+  MYVocabulary
+  SGVocabulary
+  TWVocabulary
   TWVariantsRev
   HKVariantsRev
   JPVariantsRev
@@ -52,14 +56,69 @@ foreach(DICT ${DICTS_GENERATED})
 endforeach(DICT)
 
 set(
-  DICT_TWPhrases_GENERATING_INPUT
-  ${DICT_DIR}/TWPhrasesIT.txt
-  ${DICT_DIR}/TWPhrasesName.txt
-  ${DICT_DIR}/TWPhrasesOther.txt
+  DICT_CNVocabulary_GENERATING_INPUT
+  ${DICT_DIR}/CNVocabSciTech.txt
+  ${DICT_DIR}/CNVocabToponym.txt
+  ${DICT_DIR}/CNVocabOthers.txt
 )
 set(
-  DICT_TWPhrases_GENERATING_COMMAND
-  ${DICT_MERGE_BIN} ${DICT_TWPhrases_GENERATING_INPUT} TWPhrases.txt
+  DICT_CNVocabulary_GENERATING_COMMAND
+  ${DICT_MERGE_BIN} ${DICT_CNVocabulary_GENERATING_INPUT} CNVocabulary.txt
+)
+
+set(
+  DICT_HKVocabulary_GENERATING_INPUT
+  ${DICT_DIR}/HKVocabSciTech.txt
+  ${DICT_DIR}/HKVocabToponym.txt
+  ${DICT_DIR}/HKVocabOthers.txt
+)
+set(
+  DICT_HKVocabulary_GENERATING_COMMAND
+  ${DICT_MERGE_BIN} ${DICT_HKVocabulary_GENERATING_INPUT} HKVocabulary.txt
+)
+
+set(
+  DICT_MOVocabulary_GENERATING_INPUT
+  ${DICT_DIR}/MOVocabSciTech.txt
+  ${DICT_DIR}/MOVocabToponym.txt
+  ${DICT_DIR}/MOVocabOthers.txt
+)
+set(
+  DICT_MOVocabulary_GENERATING_COMMAND
+  ${DICT_MERGE_BIN} ${DICT_MOVocabulary_GENERATING_INPUT} MOVocabulary.txt
+)
+
+set(
+  DICT_MYVocabulary_GENERATING_INPUT
+  ${DICT_DIR}/MYVocabSciTech.txt
+  ${DICT_DIR}/MYVocabToponym.txt
+  ${DICT_DIR}/MYVocabOthers.txt
+)
+set(
+  DICT_MYVocabulary_GENERATING_COMMAND
+  ${DICT_MERGE_BIN} ${DICT_MYVocabulary_GENERATING_INPUT} MYVocabulary.txt
+)
+
+set(
+  DICT_SGVocabulary_GENERATING_INPUT
+  ${DICT_DIR}/SGVocabSciTech.txt
+  ${DICT_DIR}/SGVocabToponym.txt
+  ${DICT_DIR}/SGVocabOthers.txt
+)
+set(
+  DICT_SGVocabulary_GENERATING_COMMAND
+  ${DICT_MERGE_BIN} ${DICT_SGVocabulary_GENERATING_INPUT} SGVocabulary.txt
+)
+
+set(
+  DICT_TWVocabulary_GENERATING_INPUT
+  ${DICT_DIR}/TWVocabSciTech.txt
+  ${DICT_DIR}/TWVocabToponym.txt
+  ${DICT_DIR}/TWVocabOthers.txt
+)
+set(
+  DICT_TWVocabulary_GENERATING_COMMAND
+  ${DICT_MERGE_BIN} ${DICT_TWVocabulary_GENERATING_INPUT} TWVocabulary.txt
 )
 
 set(
@@ -69,15 +128,6 @@ set(
 set(
   DICT_TWVariantsRev_GENERATING_COMMAND
   ${DICT_REVERSE_BIN} ${DICT_TWVariantsRev_GENERATING_INPUT} TWVariantsRev.txt
-)
-
-set(
-  DICT_TWPhrasesRev_GENERATING_INPUT
-  ${DICT_GENERATED_DIR}/TWPhrases.txt
-)
-set(
-  DICT_TWPhrasesRev_GENERATING_COMMAND
-  ${DICT_REVERSE_BIN} ${DICT_TWPhrasesRev_GENERATING_INPUT} TWPhrasesRev.txt
 )
 
 set(
@@ -162,19 +212,35 @@ foreach(DICT ${DICTS})
 endforeach(DICT)
 
 set(CONFIG_FILES
+  config/hk2cnp.json
+  config/hk2myp.json
   config/hk2s.json
+  config/hk2sgp.json
   config/hk2t.json
   config/jp2t.json
+  config/s2cnp.json
   config/s2hk.json
+  config/s2hkp.json
+  config/s2mop.json
+  config/s2myp.json
+  config/s2sgp.json
   config/s2t.json
   config/s2tw.json
   config/s2twp.json
+  config/t2cnp.json
   config/t2hk.json
+  config/t2hkp.json
   config/t2jp.json
+  config/t2mop.json
+  config/t2myp.json
   config/t2s.json
+  config/t2sgp.json
   config/t2tw.json
+  config/t2twp.json
+  config/tw2cnp.json
+  config/tw2myp.json
   config/tw2s.json
-  config/tw2sp.json
+  config/tw2sgp.json
   config/tw2t.json
 )
 

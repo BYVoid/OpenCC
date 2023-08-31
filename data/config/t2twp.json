@@ -1,0 +1,22 @@
+{
+  "name": "Traditional Chinese to Traditional Chinese (Taiwan standard), with Taiwan Vocabulary",
+  "segmentation": {
+    "type": "mmseg",
+    "dict": {
+      "type": "ocd2",
+      "file": "TWVocabulary.ocd2"
+    }
+  },
+  "conversion_chain": [{
+     "dict": {
+      "type": "group",
+      "dicts": [{
+        "type": "ocd2",
+        "file": "TWVocabulary.ocd2"
+      }, {
+        "type": "ocd2",
+        "file": "TWVariants.ocd2"
+      }]
+    }
+  }]
+}

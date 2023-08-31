@@ -130,8 +130,12 @@ TEST_P(ConfigurationTest, InPlaceConvert) {
 
 INSTANTIATE_TEST_SUITE_P(CommandLine, ConfigurationTest,
                          ::testing::Values("hk2s", "hk2t", "jp2t", "s2hk",
-                                           "s2t", "s2tw", "s2twp", "t2hk",
-                                           "t2jp", "t2s", "tw2s", "tw2sp",
-                                           "tw2t"));
+                                           "s2t", "s2tw", "t2hk", "t2jp",
+                                           "t2s", "tw2s", "tw2t",
+                                           "hk2myp", "hk2sgp", "s2cnp",
+                                           "s2hkp", "s2mop", "s2myp",
+                                           "s2sgp", "s2twp", "t2hkp",
+                                           "t2mop", "t2myp", "t2sgp",
+                                           "tw2cnp", "tw2myp", "tw2sgp"));
 
 } // namespace opencc

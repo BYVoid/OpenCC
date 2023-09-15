@@ -1,0 +1,34 @@
+.TH OPENCC_PHRASE_EXTRACT 1 "" "OPENCC" "開放中文轉換"
+.SH 名稱
+opencc_phrase_extract \- OpenCC 語句抓取工具
+.
+.SH 概要
+.B opencc_phrase_extract
+-o <檔案> [--] [--version] [-h] <檔案> ...
+.
+.SH 選項
+.TP
+.B -o <檔案>,  --output <檔案>
+（必填） 輸出檔案
+.
+.TP
+.B --,  --ignore_rest
+忽略排在此選項後面的引數。
+.
+.TP
+.B --version
+顯示版本資訊然後退出。
+.
+.TP
+.B -h,  --help
+顯示使用說明然後退出。
+.
+.TP
+.B <檔案>\fR （接受多個引數）
+（必填） 輸入檔案
+.
+.SH 參見
+opencc(1)
+.
+.SH 作者
+Carbo Kuo <byvoid@byvoid.com>

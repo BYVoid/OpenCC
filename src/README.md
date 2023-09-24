@@ -19,9 +19,6 @@
 
 ## Main Files
 
-
-## CPP Files
-
 - Lexicon: Storage of all entries
 - BinaryDict: Binary dictionary for faster deserialization
 - CmdLineOutput: Output command line usage

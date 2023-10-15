@@ -29,7 +29,9 @@ for %%v in (%VERSIONS%) do (
     rmdir /S /Q build python\opencc\clib OpenCC.egg-info
 )
 
-REM Upload to PyPI
-C:\Miniconda/condabin/conda.bat activate py3.8
-python -m pip install twine
-python -m twine upload dist/*
+if NOT "%~1"=="testonly" (
+    REM Upload to PyPI
+    C:\Miniconda/condabin/conda.bat activate py3.8
+    python -m pip install twine
+    python -m twine upload dist/*
+)

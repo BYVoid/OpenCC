@@ -19,7 +19,7 @@ jobs:
         docker run --rm -v "${PWD}:/opt/OpenCC" \
           -e TWINE_USERNAME=__token__ \
           -e TWINE_PASSWORD=${{ secrets.PYPI_TOKEN }} \
-          ubuntu:18.04 /bin/bash /opt/OpenCC/release-pypi-linux.sh
+          ubuntu:22.04 /bin/bash /opt/OpenCC/release-pypi-linux.sh
 
     - name: Build package and upload (macOS)
       if: runner.os == 'macOS'

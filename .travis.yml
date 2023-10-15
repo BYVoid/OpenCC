@@ -6,8 +6,8 @@ cache:
 
 node_js:
   - stable
+  - 20
   - 18
-  - 16
 
 os:
   - linux

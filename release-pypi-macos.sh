@@ -28,7 +28,9 @@ for VERSION in 3.8 3.9 3.10 3.11 3.12; do
     rm -rf build python/opencc/clib OpenCC.egg-info
 done
 
-# Upload to PyPI
-conda activate py3.8
-python -m pip install twine
-python -m twine upload dist/*
+if [ "$1" != "testonly" ]; then
+    # Upload to PyPI
+    conda activate py3.8
+    python -m pip install twine
+    python -m twine upload dist/*
+fi

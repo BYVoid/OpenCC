@@ -5,6 +5,7 @@
 [![C/C++ CI](https://github.com/BYVoid/OpenCC/actions/workflows/cmake.yml/badge.svg)](https://github.com/BYVoid/OpenCC/actions/workflows/cmake.yml)
 [![Node.js CI](https://github.com/BYVoid/OpenCC/actions/workflows/nodejs.yml/badge.svg)](https://github.com/BYVoid/OpenCC/actions/workflows/nodejs.yml)
 [![Python CI](https://github.com/BYVoid/OpenCC/actions/workflows/python.yml/badge.svg)](https://github.com/BYVoid/OpenCC/actions/workflows/python.yml)
+[![WASM CI](https://github.com/BYVoid/OpenCC/actions/workflows/wasm.yml/badge.svg)](https://github.com/BYVoid/OpenCC/actions/workflows/wasm.yml)
 
 ## Introduction 介紹
 
@@ -99,6 +100,10 @@ int main() {
 
 ```
 
+### WASM
+
+See [wasm.yml](https://github.com/BYVoid/OpenCC/blob/master/.github/workflows/wasm.yml).
+
 Document 文檔: https://byvoid.github.io/OpenCC/
 
 ### Command Line
@@ -115,7 +120,7 @@ Document 文檔: https://byvoid.github.io/OpenCC/
 * Android: [android-opencc](https://github.com/qichuan/android-opencc)
 * PHP: [opencc4php](https://github.com/nauxliu/opencc4php)
 * Pure JavaScript: [opencc-js](https://github.com/nk2028/opencc-js)
-* WebAssembly: [wasm-opencc](https://github.com/oyyd/wasm-opencc)
+* asm.js: [wasm-opencc](https://github.com/oyyd/wasm-opencc)
 * Browser Extension: [opencc-extension](https://github.com/tnychn/opencc-extension)
 * Go (Pure): [OpenCC for Go](https://github.com/longbridgeapp/opencc)
 
@@ -279,5 +284,6 @@ All these libraries are statically linked by default.
 * [Prcuvu](https://github.com/Prcuvu)
 * [Tony Able](https://github.com/TonyAble)
 * [Xiao Liang](https://github.com/yxliang01)
+* [Qijia Liu](https://github.com/eagleoflqj)
 
 Please feel free to update this list if you have contributed OpenCC.

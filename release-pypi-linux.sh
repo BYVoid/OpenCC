@@ -33,9 +33,8 @@ for VERSION in 3.8 3.9 3.10 3.11 3.12; do
     conda activate py$VERSION
 
     # Build and package
-    pip install --no-cache-dir setuptools wheel cmake
-    python setup.py build_ext bdist_wheel \
-        --plat-name manylinux1_x86_64
+    pip install --no-cache-dir build
+    python -m build -C--plat-name manylinux1_x86_64
 
     # Cleanup
     conda deactivate

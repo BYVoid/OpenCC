@@ -71,6 +71,14 @@ converter = opencc.OpenCC('s2t.json')
 converter.convert('汉字')  # 漢字
 ```
 
+### Ruby
+
+```ruby
+require "opencc"
+cc = OpenCC.create :s2t
+cc.convert "汉字" # => 漢字
+```
+
 ### C++
 
 ```c++

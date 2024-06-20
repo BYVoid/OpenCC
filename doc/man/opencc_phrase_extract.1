@@ -1,0 +1,34 @@
+.TH OPENCC_PHRASE_EXTRACT 1 "" "OPENCC" "Open Chinese Convert"
+.SH NAME
+opencc_phrase_extract \- Open Chinese Convert (OpenCC) phrase extractor
+.
+.SH SYNOPSIS
+.B opencc_phrase_extract
+-o <file> [--] [--version] [-h] <files> ...
+.
+.SH OPTIONS
+.TP
+.B -o <file>,  --output <file>
+(required) Output file
+.
+.TP
+.B --,  --ignore_rest
+Ignores the rest of the labeled arguments following this flag.
+.
+.TP
+.B --version
+Displays version information and exits.
+.
+.TP
+.B -h,  --help
+Displays usage information and exits.
+.
+.TP
+.B <files>\fR  (accepted multiple times)
+(required) Input file
+.
+.SH SEE ALSO
+opencc(1)
+.
+.SH AUTHORS
+Carbo Kuo <byvoid@byvoid.com>

@@ -1,0 +1,42 @@
+.TH OPENCC_DICT 1 "" "OPENCC" "Open Chinese Convert"
+.SH NAME
+opencc_dict \- Open Chinese Convert (OpenCC) dictionary tool
+.
+.SH SYNOPSIS
+.B opencc_dict
+-i <file> -o <file> -f <text|ocd> -t <text|ocd> [--] [--version] [-h]
+.
+.SH OPTIONS
+.TP
+.B -i <file>,  --input <file>
+(required)  Path to input dictionary
+.
+.TP
+.B -o <file>,  --output <file>
+(required)  Path to output dictionary
+.
+.TP
+.B -f <text|ocd>,  --from <text|ocd>
+(required)  Input format
+.
+.TP
+.B -t <text|ocd>,  --to <text|ocd>
+(required)  Output format
+.
+.TP
+.B --,  --ignore_rest
+Ignores the rest of the labeled arguments following this flag.
+.
+.TP
+.B --version
+Displays version information and exits.
+.
+.TP
+.B -h,  --help
+Displays usage information and exits.
+.
+.SH SEE ALSO
+opencc(1)
+.
+.SH AUTHORS
+Carbo Kuo <byvoid@byvoid.com>

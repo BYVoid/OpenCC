@@ -1,0 +1,115 @@
+.TH OPENCC 1 "" "OPENCC" "Open Chinese Convert"
+.SH NAME
+opencc \- Open Chinese Convert
+.
+.SH SYNOPSIS
+.B opencc
+[--noflush <bool>] [-i <file>] [-o <file>] [-c <file>] [--] [--version] [-h]
+.
+.SH DESCRIPTION
+.B OpenCC
+is an opensource project for conversions between Traditional Chinese, Simplified Chinese and Japanese Kanji (Shinjitai).
+It supports character-level and phrase-level conversion, character variant conversion and regional idioms among Mainland China, Taiwan and Hong Kong.
+This is not translation tool between Mandarin and Cantonese, etc.
+.PP
+.B OpenCC\fR works in interactive and non-interactive mode. To exit from interactive mode press Ctrl+D.
+.
+.SH OPTIONS
+.TP
+.B --noflush <bool>
+Disable flush for every line.
+.
+.TP
+.B -i <file>,  --input <file>
+Read original text from <file>.
+.
+.TP
+.B -o <file>,  --output <file>
+Write converted text to <file>.
+.
+.TP
+.B -c <file>,  --config <file>
+Configuration file.
+.
+.TP
+.B --,  --ignore_rest
+Ignores the rest of the labeled arguments following this flag.
+.
+.TP
+.B --version
+Displays version information and exits.
+.
+.TP
+.B -h,  --help
+Displays usage information and exits.
+.
+.SH CONFIGURATIONS
+.TP
+s2t.json
+Simplified Chinese to Traditional Chinese
+.
+.TP
+t2s.json
+Traditional Chinese to Simplified Chinese
+.
+.TP
+s2tw.json
+Simplified Chinese to Traditional Chinese (Taiwan Standard)
+.
+.TP
+tw2s.json
+Traditional Chinese (Taiwan Standard) to Simplified Chinese
+.
+.TP
+s2hk.json
+Simplified Chinese to Traditional Chinese (Hong Kong variant)
+.
+.TP
+hk2s.json
+Traditional Chinese (Hong Kong variant) to Simplified Chinese
+.
+.TP
+s2twp.json
+Simplified Chinese to Traditional Chinese (Taiwan Standard) with Taiwanese idiom
+.
+.TP
+tw2sp.json
+Traditional Chinese (Taiwan Standard) to Simplified Chinese with Mainland Chinese idiom
+.
+.TP
+t2tw.json
+Traditional Chinese (OpenCC Standard) to Taiwan Standard
+.
+.TP
+hk2t.json
+Traditional Chinese (Hong Kong variant) to Traditional Chinese
+.
+.TP
+t2hk.json
+Traditional Chinese (OpenCC Standard) to Hong Kong variant
+.
+.TP
+t2jp.json
+Traditional Chinese Characters (Kyūjitai) to New Japanese Kanji (Shinjitai)
+.
+.TP
+jp2t.json
+New Japanese Kanji (Shinjitai) to Traditional Chinese Characters (Kyūjitai)
+.
+.TP
+tw2t.json
+Traditional Chinese (Taiwan standard) to Traditional Chinese
+.
+.SH EXAMPLES
+.TP
+Convert input.txt from Simplified Chinese to Traditional Chinese (Taiwan Standard) with Taiwanese idiom and write the result to output.txt:
+.IP
+opencc -i input.txt -o output.txt -c s2twp
+.
+.SH SEE ALSO
+opencc_dict(1), opencc_phrase_extract(1)
+.PP
+More information about the OpenCC project and reporting bugs can be found at https://github.com/BYVoid/OpenCC.
+.
+.SH AUTHOR
+Carbo Kuo <byvoid@byvoid.com>

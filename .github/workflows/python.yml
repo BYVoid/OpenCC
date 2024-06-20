@@ -15,7 +15,7 @@ jobs:
         python-version: [3.8, 3.9, '3.10', '3.11', '3.12']
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
@@ -32,7 +32,7 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --exclude deps --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Build and install
-      run: python setup.py build_ext install
+      run: python -m pip install .
     - name: Test with pytest
       run: cd python && pytest
 

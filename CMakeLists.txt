@@ -157,7 +157,9 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     -std=c++14
     -Wall
   )
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
+  if (NOT EMSCRIPTEN)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
+  endif ()
   if (CMAKE_BUILD_TYPE MATCHES Debug)
     add_definitions(-O0 -g3)
   endif ()
@@ -221,9 +223,11 @@ endif()
 ######## Subdirectories
 
 add_subdirectory(src)
-add_subdirectory(doc)
-add_subdirectory(data)
-add_subdirectory(test)
+if (NOT EMSCRIPTEN)
+  add_subdirectory(doc)
+  add_subdirectory(data)
+  add_subdirectory(test)
+endif ()
 
 ######## Testing
 

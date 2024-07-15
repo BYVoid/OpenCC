@@ -1,0 +1,85 @@
+cc_library(
+    name = "binart_dict",
+    srcs = ["BinaryDict.cpp"],
+    hdrs = ["BinaryDict.hpp"],
+    deps = [
+        ":common",
+        ":lexicon",
+        ":serializable_dict",
+    ],
+)
+
+cc_library(
+    name = "common",
+    hdrs = [
+        "Common.hpp",
+        "Export.hpp",
+        "Optional.hpp",
+        "opencc_config.h",
+    ],
+)
+
+cc_library(
+    name = "dict",
+    srcs = ["Dict.cpp"],
+    hdrs = ["Dict.hpp"],
+    deps = [
+        ":common",
+        ":dict_entry",
+    ],
+)
+
+cc_library(
+    name = "dict_entry",
+    srcs = ["DictEntry.cpp"],
+    hdrs = ["DictEntry.hpp"],
+    deps = [
+        ":common",
+        ":segments",
+        ":utf8_util",
+    ],
+)
+
+cc_library(
+    name = "exception",
+    hdrs = [
+        "Exception.hpp",
+    ],
+    deps = [":common"],
+)
+
+cc_library(
+    name = "lexicon",
+    srcs = ["Lexicon.cpp"],
+    hdrs = ["Lexicon.hpp"],
+    deps = [
+        ":common",
+        ":dict_entry",
+    ],
+)
+
+cc_library(
+    name = "segments",
+    hdrs = [
+        "Segments.hpp",
+    ],
+    deps = [":common"],
+)
+
+cc_library(
+    name = "serializable_dict",
+    hdrs = ["SerializableDict.hpp"],
+    deps = [
+        ":dict",
+    ],
+)
+
+cc_library(
+    name = "utf8_util",
+    srcs = ["UTF8Util.cpp"],
+    hdrs = ["UTF8Util.hpp"],
+    deps = [
+        ":common",
+        ":exception",
+    ],
+)

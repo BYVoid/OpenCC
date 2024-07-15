@@ -30,6 +30,29 @@ cc_library(
 )
 
 cc_library(
+    name = "darts_dict",
+    srcs = ["DartsDict.cpp"],
+    hdrs = ["DartsDict.hpp"],
+    deps = [
+        ":binary_dict",
+        ":common",
+        ":lexicon",
+        ":serializable_dict",
+        "@darts-clone"
+    ],
+)
+
+cc_test(
+    name = "darts_dict_test",
+    srcs = ["DartsDictTest.cpp"],
+    deps = [
+        ":darts_dict",
+        ":text_dict_test_base",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "dict",
     srcs = ["Dict.cpp"],
     hdrs = ["Dict.hpp"],

@@ -6,4 +6,5 @@ module(
     compatibility_level = 1,
 )
 
+bazel_dep(name = "darts-clone", version = "0.32")
 bazel_dep(name = "googletest", version = "1.14.0.bcr.1")

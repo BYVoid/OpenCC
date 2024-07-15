@@ -1,0 +1,6 @@
+cc_library(
+    name = "opencc",
+    deps = [
+        "//src:opencc",
+    ],
+)

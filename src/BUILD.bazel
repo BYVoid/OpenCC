@@ -38,7 +38,7 @@ cc_library(
         ":common",
         ":lexicon",
         ":serializable_dict",
-        "@darts-clone"
+        "@darts-clone",
     ],
 )
 
@@ -92,6 +92,28 @@ cc_library(
 )
 
 cc_library(
+    name = "marisa_dict",
+    srcs = ["MarisaDict.cpp"],
+    hdrs = ["MarisaDict.hpp"],
+    deps = [
+        ":common",
+        ":lexicon",
+        ":serialized_values",
+        "@marisa-trie",
+    ],
+)
+
+cc_test(
+    name = "marisa_dict_test",
+    srcs = ["MarisaDictTest.cpp"],
+    deps = [
+        ":marisa_dict",
+        ":text_dict_test_base",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "segments",
     hdrs = [
         "Segments.hpp",
@@ -104,6 +126,27 @@ cc_library(
     hdrs = ["SerializableDict.hpp"],
     deps = [
         ":dict",
+    ],
+)
+
+cc_library(
+    name = "serialized_values",
+    srcs = ["SerializedValues.cpp"],
+    hdrs = ["SerializedValues.hpp"],
+    deps = [
+        ":common",
+        ":lexicon",
+        ":serializable_dict",
+    ],
+)
+
+cc_test(
+    name = "serialized_values_test",
+    srcs = ["SerializedValuesTest.cpp"],
+    deps = [
+        ":serialized_values",
+        ":text_dict_test_base",
+        "@googletest//:gtest_main",
     ],
 )
 

@@ -1,5 +1,15 @@
 # Change History of OpenCC
 
+## Version 1.1.7
+
+2023年10月15日
+
+* 添加提交时 python 包重建以验证包生成 ([#822](https://github.com/BYVoid/OpenCC/pull/822))。
+* 支持Python 3.12 和 Node 20，移除針對Python 3.7和Node 16的構建 ([#820](https://github.com/BYVoid/OpenCC/pull/820))。
+* add mingw-w64 ci ([#802](https://github.com/BYVoid/OpenCC/pull/802))。
+* Add support of CMake config modules ([#763](https://github.com/BYVoid/OpenCC/pull/763))。
+* 若干其他小修復。
+
 ## Version 1.1.6
 
 2022年12月08日

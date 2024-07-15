@@ -160,7 +160,7 @@ class BDistWheelCommand(wheel.bdist_wheel.bdist_wheel, object):
                 
         if os.name == 'posix':
             _, _, _, _, machine = os.uname()
-            return 'manylinux1-{}'.format(machine)
+            return 'manylinux2014-{}'.format(machine)
 
         warnings.warn(
             'Windows macos and linux are all not detected, '

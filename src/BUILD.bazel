@@ -1,4 +1,14 @@
 cc_library(
+    name = "opencc",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":binary_dict",
+        ":common",
+        ":darts_dict",
+    ],
+)
+
+cc_library(
     name = "binary_dict",
     srcs = ["BinaryDict.cpp"],
     hdrs = ["BinaryDict.hpp"],

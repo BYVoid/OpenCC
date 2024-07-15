@@ -1,11 +1,21 @@
 cc_library(
-    name = "binart_dict",
+    name = "binary_dict",
     srcs = ["BinaryDict.cpp"],
     hdrs = ["BinaryDict.hpp"],
     deps = [
         ":common",
         ":lexicon",
         ":serializable_dict",
+    ],
+)
+
+cc_test(
+    name = "binary_dict_test",
+    srcs = ["BinaryDictTest.cpp"],
+    deps = [
+        ":binary_dict",
+        ":text_dict_test_base",
+        "@googletest//:gtest_main",
     ],
 )
 
@@ -75,11 +85,69 @@ cc_library(
 )
 
 cc_library(
+    name = "test_utils",
+    testonly = True,
+    hdrs = ["TestUtils.hpp"],
+    deps = [
+        "@googletest//:gtest",
+    ],
+)
+
+cc_library(
+    name = "test_utils_utf8",
+    testonly = True,
+    srcs = ["TestUtilsUTF8.hpp"],
+)
+
+cc_library(
+    name = "text_dict",
+    srcs = ["TextDict.cpp"],
+    hdrs = ["TextDict.hpp"],
+    deps = [
+        ":common",
+        ":lexicon",
+        ":serializable_dict",
+    ],
+)
+
+cc_test(
+    name = "text_dict_test",
+    srcs = ["TextDictTest.cpp"],
+    deps = [
+        ":text_dict",
+        ":text_dict_test_base",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "text_dict_test_base",
+    testonly = True,
+    srcs = ["TextDictTestBase.hpp"],
+    deps = [
+        ":lexicon",
+        ":test_utils",
+        ":test_utils_utf8",
+        ":text_dict",
+    ],
+)
+
+cc_library(
     name = "utf8_util",
     srcs = ["UTF8Util.cpp"],
     hdrs = ["UTF8Util.hpp"],
     deps = [
         ":common",
         ":exception",
+    ],
+)
+
+cc_test(
+    name = "utf8_util_test",
+    srcs = ["UTF8UtilTest.cpp"],
+    deps = [
+        ":test_utils",
+        ":utf8_util",
+        "@googletest//:gtest_main",
     ],
 )

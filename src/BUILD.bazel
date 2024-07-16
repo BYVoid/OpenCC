@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
 cc_library(
     name = "opencc",
     visibility = ["//visibility:public"],
@@ -18,8 +20,8 @@ cc_library(
         ":marisa_dict",
         ":max_match_segmentation",
         ":phrase_extract",
-        ":segments",
         ":segmentation",
+        ":segments",
         ":serializable_dict",
         ":serialized_values",
         ":simple_converter",
@@ -73,6 +75,31 @@ cc_library(
         ":max_match_segmentation",
         ":text_dict",
         "@rapidjson",
+    ],
+)
+
+cc_test(
+    name = "config_test",
+    srcs = ["ConfigTest.cpp"],
+    deps = [
+        ":common",
+        ":config",
+        ":config_test_base",
+        ":converter",
+        ":test_utils_utf8",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "config_test_base",
+    testonly = True,
+    hdrs = ["ConfigTestBase.hpp"],
+    data = ["//test/config_test"],
+    defines = ["BAZEL"],
+    deps = [
+        ":test_utils",
+        "@bazel_tools//tools/cpp/runfiles",
     ],
 )
 
@@ -209,8 +236,8 @@ cc_test(
 
 cc_library(
     name = "dict_group_test_base",
-    hdrs = ["DictGroupTestBase.hpp"],
     testonly = True,
+    hdrs = ["DictGroupTestBase.hpp"],
     deps = [
         ":dict_group",
         ":text_dict_test_base",
@@ -272,8 +299,8 @@ cc_test(
     name = "max_match_segmentation_test",
     srcs = ["MaxMatchSegmentationTest.cpp"],
     deps = [
-        ":max_match_segmentation",
         ":dict_group_test_base",
+        ":max_match_segmentation",
         "@googletest//:gtest_main",
     ],
 )
@@ -334,12 +361,26 @@ cc_test(
 cc_library(
     name = "simple_converter",
     srcs = ["SimpleConverter.cpp"],
-    hdrs = ["SimpleConverter.hpp", "opencc.h"],
+    hdrs = [
+        "SimpleConverter.hpp",
+        "opencc.h",
+    ],
     deps = [
         ":common",
         ":config",
         ":converter",
         ":utf8_util",
+    ],
+)
+
+cc_test(
+    name = "simple_converter_test",
+    srcs = ["SimpleConverterTest.cpp"],
+    deps = [
+        ":config_test_base",
+        ":simple_converter",
+        ":test_utils_utf8",
+        "@googletest//:gtest_main",
     ],
 )
 

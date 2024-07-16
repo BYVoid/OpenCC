@@ -37,15 +37,15 @@ protected:
   }
 };
 
-TEST_F(SimpleConverterTest, Convert) { TestConverter(CONFIG_TEST_PATH); }
+TEST_F(SimpleConverterTest, Convert) { TestConverter(CONFIG_TEST_JSON_PATH); }
 
 TEST_F(SimpleConverterTest, Multithreading) {
   const auto& routine = [this](const std::string& config) {
     TestConverter(config);
   };
-  std::thread thread1(routine, CONFIG_TEST_PATH);
-  std::thread thread2(routine, CONFIG_TEST_PATH);
-  routine(CONFIG_TEST_PATH);
+  std::thread thread1(routine, CONFIG_TEST_JSON_PATH);
+  std::thread thread2(routine, CONFIG_TEST_JSON_PATH);
+  routine(CONFIG_TEST_JSON_PATH);
   thread1.join();
   thread2.join();
 }
@@ -54,7 +54,7 @@ TEST_F(SimpleConverterTest, CInterface) {
   const std::string& text = utf8("燕燕于飞差池其羽之子于归远送于野");
   const std::string& expected = utf8("燕燕于飛差池其羽之子于歸遠送於野");
   {
-    opencc_t od = opencc_open(CONFIG_TEST_PATH.c_str());
+    opencc_t od = opencc_open(CONFIG_TEST_JSON_PATH.c_str());
     char* converted = opencc_convert_utf8(od, text.c_str(), (size_t)-1);
     EXPECT_EQ(expected, converted);
     opencc_convert_utf8_free(converted);
@@ -62,7 +62,7 @@ TEST_F(SimpleConverterTest, CInterface) {
   }
   {
     char output[1024];
-    opencc_t od = opencc_open(CONFIG_TEST_PATH.c_str());
+    opencc_t od = opencc_open(CONFIG_TEST_JSON_PATH.c_str());
     size_t length =
         opencc_convert_utf8_to_buffer(od, text.c_str(), (size_t)-1, output);
     EXPECT_EQ(expected.length(), length);

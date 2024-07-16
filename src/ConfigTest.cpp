@@ -32,7 +32,9 @@ protected:
       : input(utf8("燕燕于飞差池其羽之子于归远送于野")),
         expected(utf8("燕燕于飛差池其羽之子于歸遠送於野")) {}
 
-  virtual void SetUp() { converter = config.NewFromFile(CONFIG_TEST_PATH); }
+  virtual void SetUp() {
+    converter = config.NewFromFile(CONFIG_TEST_JSON_PATH);
+  }
 
   Config config;
   ConverterPtr converter;
@@ -62,13 +64,11 @@ TEST_F(ConfigTest, NonexistingPath) {
 }
 
 TEST_F(ConfigTest, NewFromStringWitoutTrailingSlash) {
-  std::ifstream ifs(CONFIG_TEST_PATH);
+  std::ifstream ifs(CONFIG_TEST_JSON_PATH);
   std::string content(std::istreambuf_iterator<char>(ifs),
                       (std::istreambuf_iterator<char>()));
-  std::string pathWithoutTrailingSlash = CMAKE_SOURCE_DIR "/test/config_test";
 
-  const ConverterPtr _ =
-      config.NewFromString(content, pathWithoutTrailingSlash);
+  const ConverterPtr _ = config.NewFromString(content, CONFIG_TEST_DIR_PATH);
 }
 
 } // namespace opencc

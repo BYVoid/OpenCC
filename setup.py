@@ -9,7 +9,6 @@ import setuptools.command.build_ext
 import wheel.bdist_wheel
 
 _this_dir = os.path.dirname(os.path.abspath(__file__))
-_clib_dir = os.path.join(_this_dir, 'python', 'opencc', 'clib')
 _build_dir = os.path.join(_this_dir, 'build', 'python')
 
 _cmake_file = os.path.join(_this_dir, 'CMakeLists.txt')
@@ -70,7 +69,7 @@ def get_long_description():
         return f.read().decode('utf-8')
 
 
-def build_libopencc():
+def build_libopencc(output_path):
     if _libopencc_built:
         return  # Skip building binary file
     print('building libopencc into %s' % _build_dir)
@@ -78,12 +77,7 @@ def build_libopencc():
     is_windows = sys.platform == 'win32'
 
     # Make build directories
-    if is_windows:
-        subprocess.call('md {}'.format(_build_dir), shell=True)
-        subprocess.call('md {}'.format(_clib_dir), shell=True)
-    else:
-        subprocess.call('mkdir -p {}'.format(_build_dir), shell=True)
-        subprocess.call('mkdir -p {}'.format(_clib_dir), shell=True)
+    os.makedirs(_build_dir, exist_ok=True)
 
     # Configure
     cmake_args = [
@@ -93,14 +87,14 @@ def build_libopencc():
         '-DENABLE_BENCHMARK:BOOL=OFF',
         '-DBUILD_PYTHON:BOOL=ON',
         '-DCMAKE_BUILD_TYPE=Release',
-        '-DCMAKE_INSTALL_PREFIX={}'.format(_clib_dir),
-        '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}'.format(_clib_dir),
+        '-DCMAKE_INSTALL_PREFIX={}'.format(output_path),
+        '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}'.format(output_path),
         '-DPYTHON_EXECUTABLE={}'.format(sys.executable),
     ]
 
     if is_windows:
         cmake_args += \
-            ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE={}'.format(_clib_dir)]
+            ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE={}'.format(output_path)]
         if sys.maxsize > 2**32:
             cmake_args += ['-A', 'x64']
 
@@ -117,11 +111,6 @@ def build_libopencc():
     errno = subprocess.call(cmd)
     assert errno == 0, 'Build failed'
 
-    # Empty __init__.py file has to be created
-    # to make opencc.clib a module
-    with open('{}/__init__.py'.format(_clib_dir), 'w'):
-        pass
-
 
 class OpenCCExtension(setuptools.Extension, object):
     def __init__(self, name, sourcedir=''):
@@ -131,8 +120,9 @@ class OpenCCExtension(setuptools.Extension, object):
 
 class BuildExtCommand(setuptools.command.build_ext.build_ext, object):
     def build_extension(self, ext):
+        output_path = os.path.abspath(os.path.join(self.build_lib, 'opencc', 'clib'))
         if isinstance(ext, OpenCCExtension):
-            build_libopencc()
+            build_libopencc(output_path)
         else:
             super(BuildExtCommand, self).build_extension(ext)
 
@@ -157,7 +147,7 @@ class BDistWheelCommand(wheel.bdist_wheel.bdist_wheel, object):
                 return 'macosx-11.0-{}'.format(machine)
             else:
                 raise NotImplementedError
-                
+
         if os.name == 'posix':
             _, _, _, _, machine = os.uname()
             return 'manylinux2014-{}'.format(machine)

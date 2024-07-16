@@ -15,14 +15,6 @@ _cmake_file = os.path.join(_this_dir, 'CMakeLists.txt')
 _author_file = os.path.join(_this_dir, 'AUTHORS')
 _readme_file = os.path.join(_this_dir, 'README.md')
 
-try:
-    sys.path.insert(0, os.path.join(_this_dir, 'python'))
-
-    import opencc  # noqa
-    _libopencc_built = True
-except ImportError:
-    _libopencc_built = False
-
 
 def get_version_info():
     version_info = ['1', '0', '0']
@@ -70,8 +62,6 @@ def get_long_description():
 
 
 def build_libopencc(output_path):
-    if _libopencc_built:
-        return  # Skip building binary file
     print('building libopencc into %s' % _build_dir)
 
     is_windows = sys.platform == 'win32'
@@ -120,7 +110,10 @@ class OpenCCExtension(setuptools.Extension, object):
 
 class BuildExtCommand(setuptools.command.build_ext.build_ext, object):
     def build_extension(self, ext):
-        output_path = os.path.abspath(os.path.join(self.build_lib, 'opencc', 'clib'))
+        if self.inplace:
+            output_path = os.path.join(_this_dir, 'python', 'opencc', 'clib')
+        else:
+            output_path = os.path.abspath(os.path.join(self.build_lib, 'opencc', 'clib'))
         if isinstance(ext, OpenCCExtension):
             build_libopencc(output_path)
         else:

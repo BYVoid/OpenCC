@@ -17,16 +17,16 @@ for %%v in (%VERSIONS%) do (
     if !ERRORLEVEL! NEQ 0 (EXIT !ERRORLEVEL!)
     CALL C:\Miniconda/condabin/conda.bat activate py%%v
     if !ERRORLEVEL! NEQ 0 (EXIT !ERRORLEVEL!)
-    pip install --no-cache-dir setuptools wheel pytest
+    pip install --no-cache-dir build
     if !ERRORLEVEL! NEQ 0 (EXIT !ERRORLEVEL!)
 
     REM Build and package
-    python setup.py build_ext bdist_wheel
+    python -m build --wheel
     if !ERRORLEVEL! NEQ 0 (EXIT !ERRORLEVEL!)
 
     REM Cleanup
     CALL C:\Miniconda/condabin/conda.bat deactivate
-    rmdir /S /Q build python\opencc\clib OpenCC.egg-info
+    rmdir /S /Q build OpenCC.egg-info
 )
 
 if NOT "%~1"=="testonly" (

@@ -25,7 +25,7 @@ for VERSION in 3.8 3.9 3.10 3.11 3.12; do
 
     # Cleanup
     conda deactivate
-    rm -rf build python/opencc/clib OpenCC.egg-info
+    rm -rf build OpenCC.egg-info
 done
 
 if [ "$1" != "testonly" ]; then

@@ -26,7 +26,7 @@ for %%v in (%VERSIONS%) do (
 
     REM Cleanup
     CALL C:\Miniconda/condabin/conda.bat deactivate
-    rmdir /S /Q build python\opencc\clib OpenCC.egg-info
+    rmdir /S /Q build OpenCC.egg-info
 )
 
 if NOT "%~1"=="testonly" (

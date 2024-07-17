@@ -34,12 +34,12 @@ for VERSION in 3.8 3.9 3.10 3.11 3.12; do
 
     # Build and package
     pip install --no-cache-dir build
-    python setup.py build_ext bdist_wheel \
-        --plat-name "manylinux2014_$(uname --machine)"
+    python -m build \
+        -C--plat-name="manylinux2014_$(uname --machine)"
 
     # Cleanup
     conda deactivate
-    rm -rf build python/opencc/clib OpenCC.egg-info
+    rm -rf build OpenCC.egg-info
 done
 
 if [ "$1" != "testonly" ]; then

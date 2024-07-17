@@ -173,10 +173,6 @@ setuptools.setup(
 
     packages=packages,
     package_dir={'opencc': 'python/opencc'},
-    package_data={str('opencc'): [
-        'clib/opencc_clib*',
-        'clib/share/opencc/*',
-    ]},
     ext_modules=[OpenCCExtension('opencc.clib.opencc_clib', 'python')],
     cmdclass={
         'build_ext': BuildExtCommand,

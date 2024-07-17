@@ -16,3 +16,4 @@
 /xcode
 /node_modules
 /*.egg-info
+/.venv/

@@ -1,0 +1,9 @@
+graft src
+graft deps
+graft test
+graft data
+graft doc
+include CMakeLists.txt OpenCCConfig.cmake.in opencc.pc.in README* LICENSE*
+global-exclude *~ *.py[cod] *.so
+include python/**/__init__.py
+graft python/tests

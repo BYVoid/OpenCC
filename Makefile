@@ -78,13 +78,13 @@ xcode-build:
 	xcodebuild build)
 
 python-build:
-	python setup.py build_ext
+	echo "No need to build"
 
 python-install: python-build
-	python setup.py install
+	python -m pip install .
 
 python-dist: python-build
-	python setup.py bdist_wheel
+	python -m build
 
 python-test: python-build
 	cd python; pytest .

@@ -53,6 +53,15 @@ cc_test(
 )
 
 cc_library(
+    name = "cmd_line_output",
+    hdrs = ["CmdLineOutput.hpp"],
+    visibility = ["//src/tools:__pkg__"],
+    deps = [
+        "@tclap",
+    ],
+)
+
+cc_library(
     name = "common",
     hdrs = [
         "Common.hpp",
@@ -310,6 +319,7 @@ cc_library(
     name = "phrase_extract",
     srcs = ["PhraseExtract.cpp"],
     hdrs = ["PhraseExtract.hpp"],
+    visibility = ["//src/tools:__pkg__"],
     deps = [
         ":common",
         ":marisa_dict",

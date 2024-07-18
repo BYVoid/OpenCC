@@ -1,0 +1,8 @@
+cc_binary(
+    name = "phrase_extract",
+    srcs = ["PhraseExtract.cpp"],
+    deps = [
+        "//src:phrase_extract",
+        "//src:cmd_line_output",
+    ],
+)

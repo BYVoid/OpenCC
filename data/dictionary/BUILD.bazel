@@ -1,0 +1,15 @@
+filegroup(
+    name = "dictionaries",
+    srcs = glob(["*.txt"]),
+)
+
+cc_test(
+    name = "dictionary_test",
+    srcs = ["DictionaryTest.cpp"],
+    data = [":dictionaries"],
+    deps = [
+        "//src:lexicon",
+        "//src:utf8_util",
+        "@googletest//:gtest_main",
+    ],
+)

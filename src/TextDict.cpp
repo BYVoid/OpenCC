@@ -33,51 +33,6 @@ static size_t GetKeyMaxLength(const LexiconPtr& lexicon) {
   return maxLength;
 }
 
-static DictEntry* ParseKeyValues(const char* buff, size_t lineNum) {
-  size_t length;
-  if (buff == nullptr || UTF8Util::IsLineEndingOrFileEnding(*buff)) {
-    return nullptr;
-  }
-  const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
-  if (UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
-    throw InvalidTextDictionary("Tabular not found " + std::string(buff),
-                                lineNum);
-  }
-  length = static_cast<size_t>(pbuff - buff);
-  std::string key = UTF8Util::FromSubstr(buff, length);
-  std::vector<std::string> values;
-  while (!UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
-    buff = pbuff = UTF8Util::NextChar(pbuff);
-    pbuff = UTF8Util::FindNextInline(buff, ' ');
-    length = static_cast<size_t>(pbuff - buff);
-    const std::string& value = UTF8Util::FromSubstr(buff, length);
-    values.push_back(value);
-  }
-  if (values.size() == 0) {
-    throw InvalidTextDictionary("No value in an item", lineNum);
-  } else if (values.size() == 1) {
-    return DictEntryFactory::New(key, values.at(0));
-  } else {
-    return DictEntryFactory::New(key, values);
-  }
-}
-
-static LexiconPtr ParseLexiconFromFile(FILE* fp) {
-  const int ENTRY_BUFF_SIZE = 4096;
-  char buff[ENTRY_BUFF_SIZE];
-  LexiconPtr lexicon(new Lexicon);
-  UTF8Util::SkipUtf8Bom(fp);
-  size_t lineNum = 1;
-  while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
-    DictEntry* entry = ParseKeyValues(buff, lineNum);
-    if (entry != nullptr) {
-      lexicon->Add(entry);
-    }
-    lineNum++;
-  }
-  return lexicon;
-}
-
 TextDict::TextDict(const LexiconPtr& _lexicon)
     : maxLength(GetKeyMaxLength(_lexicon)), lexicon(_lexicon) {
   assert(lexicon->IsSorted());
@@ -87,12 +42,12 @@ TextDict::TextDict(const LexiconPtr& _lexicon)
 TextDict::~TextDict() {}
 
 TextDictPtr TextDict::NewFromSortedFile(FILE* fp) {
-  const LexiconPtr& lexicon = ParseLexiconFromFile(fp);
+  const LexiconPtr& lexicon = Lexicon::ParseLexiconFromFile(fp);
   return TextDictPtr(new TextDict(lexicon));
 }
 
 TextDictPtr TextDict::NewFromFile(FILE* fp) {
-  const LexiconPtr& lexicon = ParseLexiconFromFile(fp);
+  const LexiconPtr& lexicon = Lexicon::ParseLexiconFromFile(fp);
   lexicon->Sort();
   std::string dupkey;
   if (!lexicon->IsUnique(&dupkey)) {

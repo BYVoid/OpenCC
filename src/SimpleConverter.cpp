@@ -29,20 +29,32 @@
 
 using namespace opencc;
 
+namespace {
+
 struct InternalData {
   const ConverterPtr converter;
 
   InternalData(const ConverterPtr& _converter) : converter(_converter) {}
+
+  static InternalData* NewInternalData(const std::string& configFileName,
+                                       const std::vector<std::string>& paths) {
+    try {
+      Config config;
+      return new InternalData(config.NewFromFile(configFileName, paths));
+    } catch (Exception& ex) {
+      throw std::runtime_error(ex.what());
+    }
+  }
 };
 
-SimpleConverter::SimpleConverter(const std::string& configFileName) {
-  try {
-    Config config;
-    internalData = new InternalData(config.NewFromFile(configFileName));
-  } catch (Exception& ex) {
-    throw std::runtime_error(ex.what());
-  }
-}
+} // namespace
+
+SimpleConverter::SimpleConverter(const std::string& configFileName)
+    : SimpleConverter(configFileName, std::vector<std::string>()) {}
+
+SimpleConverter::SimpleConverter(const std::string& configFileName,
+                                 const std::vector<std::string>& paths)
+    : internalData(InternalData::NewInternalData(configFileName, paths)) {}
 
 SimpleConverter::~SimpleConverter() { delete (InternalData*)internalData; }
 

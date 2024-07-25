@@ -18,6 +18,7 @@
 
 #include "Export.hpp"
 #include <string>
+#include <vector>
 
 #ifndef __OPENCC_SIMPLECONVERTER_HPP_
 #define __OPENCC_SIMPLECONVERTER_HPP_

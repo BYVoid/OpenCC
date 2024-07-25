@@ -1,4 +1,13 @@
 cc_test(
+    name = "bazel_opencc_test",
+    srcs = ["BazelOpenccTest.cpp"],
+    deps = [
+        "//:opencc",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
     name = "command_line_converter_test",
     srcs = ["CommandLineConvertTest.cpp"],
     data = [

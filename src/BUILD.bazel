@@ -376,11 +376,13 @@ cc_library(
         "SimpleConverter.hpp",
         "opencc.h",
     ],
+    defines = ["BAZEL"],
     deps = [
         ":common",
         ":config",
         ":converter",
         ":utf8_util",
+        "@bazel_tools//tools/cpp/runfiles",
     ],
 )
 

@@ -1,14 +1,38 @@
+[
+    genrule(
+        name = "generate_" + txt.replace(".", "_"),
+        srcs = [txt],
+        outs = [txt.replace(".txt", ".ocd2")],
+        cmd = "$(location //src/tools:dict_converter) " +
+              "--input $(location " + txt + ") " +
+              "--output $@ " +
+              "--from text " +
+              "--to ocd2",
+        tools = ["//src/tools:dict_converter"],
+    )
+    for txt in glob(["*.txt"])
+]
+
 filegroup(
-    name = "dictionaries",
+    name = "text_dictionaries",
     srcs = glob(["*.txt"]),
+)
+
+filegroup(
+    name = "binary_dictionaries",
+    srcs = [txt.replace(".txt", ".ocd2") for txt in glob(["*.txt"])],
 )
 
 cc_test(
     name = "dictionary_test",
     srcs = ["DictionaryTest.cpp"],
-    data = [":dictionaries"],
+    data = [
+        ":binary_dictionaries",
+        ":text_dictionaries",
+    ],
     deps = [
         "//src:lexicon",
+        "//src:marisa_dict",
         "//src:utf8_util",
         "@googletest//:gtest_main",
     ],

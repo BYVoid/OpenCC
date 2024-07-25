@@ -19,6 +19,7 @@
 #include "gtest/gtest.h"
 
 #include "src/Lexicon.hpp"
+#include "src/MarisaDict.hpp"
 #include "src/UTF8Util.hpp"
 
 namespace opencc {
@@ -43,9 +44,20 @@ protected:
 
 std::string DictionaryTest::runfile_dir_;
 
-TEST_P(DictionaryTest, DictTest) {
+INSTANTIATE_TEST_SUITE_P(
+    , DictionaryTest,
+    ::testing::Values("HKVariants", "HKVariantsRevPhrases",
+                      "JPShinjitaiCharacters", "JPShinjitaiPhrases",
+                      "JPVariants", "STCharacters", "STPhrases", "TSCharacters",
+                      "TSPhrases", "TWPhrasesIT", "TWPhrasesName",
+                      "TWPhrasesOther", "TWVariants", "TWVariantsRevPhrases"),
+    [](const testing::TestParamInfo<DictionaryTest::ParamType>& info) {
+      return info.param;
+    });
+
+TEST_P(DictionaryTest, UniqueSortedTest) {
   const std::string dictionaryFileName =
-      runfile_dir_ + "/data/dictionary/" + GetParam();
+      runfile_dir_ + "/data/dictionary/" + GetParam() + ".txt";
   FILE* fp =
       fopen(UTF8Util::GetPlatformString(dictionaryFileName).c_str(), "rb");
   ASSERT_NE(fp, nullptr);
@@ -54,13 +66,23 @@ TEST_P(DictionaryTest, DictTest) {
   EXPECT_TRUE(lexicon->IsSorted()) << GetParam() << " is not sorted.";
 }
 
-INSTANTIATE_TEST_SUITE_P(
-    Dictionary, DictionaryTest,
-    ::testing::Values("HKVariants.txt", "HKVariantsRevPhrases.txt",
-                      "JPShinjitaiCharacters.txt", "JPShinjitaiPhrases.txt",
-                      "JPVariants.txt", "STCharacters.txt", "STPhrases.txt",
-                      "TSCharacters.txt", "TSPhrases.txt", "TWPhrasesIT.txt",
-                      "TWPhrasesName.txt", "TWPhrasesOther.txt",
-                      "TWVariants.txt", "TWVariantsRevPhrases.txt"));
+TEST_P(DictionaryTest, BinaryTest) {
+  const std::string binaryDictionaryFileName =
+      runfile_dir_ + "/data/dictionary/" + GetParam() + ".ocd2";
+  FILE* fp_bin = fopen(
+      UTF8Util::GetPlatformString(binaryDictionaryFileName).c_str(), "rb");
+  ASSERT_NE(fp_bin, nullptr);
+  MarisaDictPtr dict = MarisaDict::NewFromFile(fp_bin);
+  ASSERT_NE(dict, nullptr);
+
+  const std::string textDictionaryFileName =
+      runfile_dir_ + "/data/dictionary/" + GetParam() + ".txt";
+  FILE* fp_txt =
+      fopen(UTF8Util::GetPlatformString(textDictionaryFileName).c_str(), "rb");
+  ASSERT_NE(fp_txt, nullptr);
+  LexiconPtr txt_lexicon = Lexicon::ParseLexiconFromFile(fp_txt);
+
+  EXPECT_EQ(dict->GetLexicon()->Length(), txt_lexicon->Length());
+}
 
 } // namespace opencc

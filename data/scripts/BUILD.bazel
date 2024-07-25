@@ -1,0 +1,23 @@
+load("@rules_python//python:py_binary.bzl", "py_binary")
+load("@rules_python//python:py_library.bzl", "py_library")
+
+package(default_visibility = ["//visibility:public"])
+
+py_library(
+    name = "common",
+    srcs = ["common.py"],
+)
+
+py_binary(
+    name = "merge",
+    srcs = ["merge.py"],
+    imports = ["."],
+    deps = [":common"],
+)
+
+py_binary(
+    name = "reverse",
+    srcs = ["reverse.py"],
+    imports = ["."],
+    deps = [":common"],
+)

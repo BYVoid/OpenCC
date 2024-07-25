@@ -50,7 +50,9 @@ INSTANTIATE_TEST_SUITE_P(
                       "JPShinjitaiCharacters", "JPShinjitaiPhrases",
                       "JPVariants", "STCharacters", "STPhrases", "TSCharacters",
                       "TSPhrases", "TWPhrasesIT", "TWPhrasesName",
-                      "TWPhrasesOther", "TWVariants", "TWVariantsRevPhrases"),
+                      "TWPhrasesOther", "TWVariants", "TWVariantsRevPhrases",
+                      "TWPhrases", "TWVariantsRev", "TWPhrasesRev",
+                      "HKVariantsRev", "JPVariantsRev"),
     [](const testing::TestParamInfo<DictionaryTest::ParamType>& info) {
       return info.param;
     });

@@ -11,7 +11,7 @@ if len(sys.argv) < 2:
     exit(1)
 
 directory = sys.argv[1]
-files = glob.glob(directory + "/*")
+files = glob.glob(directory + "/*.txt")
 for filename in files:
     print(filename)
     sort_items(filename, filename)

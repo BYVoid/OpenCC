@@ -18,8 +18,8 @@
 
 #include <fstream>
 
-#include "CmdLineOutput.hpp"
-#include "PhraseExtract.hpp"
+#include "src/CmdLineOutput.hpp"
+#include "src/PhraseExtract.hpp"
 
 using opencc::Exception;
 using opencc::PhraseExtract;

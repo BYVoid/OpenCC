@@ -18,10 +18,10 @@
 
 #include <fstream>
 
-#include "CmdLineOutput.hpp"
-#include "Config.hpp"
-#include "Converter.hpp"
-#include "UTF8Util.hpp"
+#include "src/CmdLineOutput.hpp"
+#include "src/Config.hpp"
+#include "src/Converter.hpp"
+#include "src/UTF8Util.hpp"
 
 using namespace opencc;
 

@@ -1,5 +1,7 @@
 # Executables
 
+include_directories("${PROJECT_SOURCE_DIR}")
+
 ## opencc
 add_executable(opencc CommandLine.cpp)
 target_link_libraries(opencc libopencc)

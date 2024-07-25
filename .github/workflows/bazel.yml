@@ -2,9 +2,9 @@ name: C++ CI with Bazel
 
 on:
   push:
-    branches: [ master ]
+    branches: [master, bazel]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:

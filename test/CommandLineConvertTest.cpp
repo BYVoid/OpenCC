@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 Carbo Kuo <byvoid@byvoid.com>
+ * Copyright 2015-2024 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,13 @@
 #include <fstream>
 #include <iostream>
 
-#include "Common.hpp"
+#include "src/Common.hpp"
 #include "gtest/gtest.h"
+
+#ifdef BAZEL
+#include "tools/cpp/runfiles/runfiles.h"
+using bazel::tools::cpp::runfiles::Runfiles;
+#endif
 
 namespace opencc {
 
@@ -31,16 +36,20 @@ protected:
   virtual ~CommandLineConvertTest() { free(originalWorkingDirectory); }
 
   virtual void SetUp() {
+#ifdef BAZEL
+    runfiles_.reset(Runfiles::CreateForTest());
+#else
     ASSERT_NE("", PROJECT_BINARY_DIR);
     ASSERT_NE("", CMAKE_SOURCE_DIR);
     ASSERT_EQ(0, chdir(PROJECT_BINARY_DIR "/data"));
+#endif
   }
 
   virtual void TearDown() { ASSERT_EQ(0, chdir(originalWorkingDirectory)); }
 
   std::string GetFileContents(const std::string& fileName) const {
     std::ifstream fs(fileName);
-    EXPECT_TRUE(fs.is_open());
+    EXPECT_TRUE(fs.is_open()) << fileName;
     const std::string content((std::istreambuf_iterator<char>(fs)),
                               (std::istreambuf_iterator<char>()));
     fs.close();
@@ -51,7 +60,10 @@ protected:
     originalWorkingDirectory = getcwd(nullptr, 0);
   }
 
-  const char* OpenccCommand() const {
+  std::string OpenccCommand() const {
+#ifdef BAZEL
+    return runfiles_->Rlocation("_main/src/tools/command_line");
+#else
 #ifndef _MSC_VER
     return PROJECT_BINARY_DIR "/src/tools/opencc";
 #else
@@ -61,41 +73,70 @@ protected:
     return PROJECT_BINARY_DIR "/src/tools/Debug/opencc.exe";
 #endif
 #endif
+#endif
   }
 
-  const char* InputDirectory() const {
+  std::string InputDirectory() const {
+#ifdef BAZEL
+    return runfiles_->Rlocation("_main/test/testcases") + "/";
+#else
     return CMAKE_SOURCE_DIR "/test/testcases/";
+#endif
   }
 
-  const char* OutputDirectory() const { return PROJECT_BINARY_DIR "/test/"; }
+  std::string OutputDirectory() const {
+#ifdef BAZEL
+    return ::testing::TempDir() + "/";
+#else
+    return PROJECT_BINARY_DIR "/test/";
+#endif
+  }
 
-  const char* AnswerDirectory() const {
+  std::string AnswerDirectory() const {
+#ifdef BAZEL
+    return runfiles_->Rlocation("_main/test/testcases") + "/";
+#else
     return CMAKE_SOURCE_DIR "/test/testcases/";
+#endif
   }
 
-  const char* ConfigurationDirectory() const {
+  std::string ConfigurationDirectory() const {
+#ifdef BAZEL
+    return "";
+#else
     return CMAKE_SOURCE_DIR "/data/config/";
+#endif
   }
 
   std::string InputFile(const char* config) const {
-    return std::string(InputDirectory()) + config + ".in";
+    return InputDirectory() + config + ".in";
   }
 
   std::string OutputFile(const char* config) const {
-    return std::string(OutputDirectory()) + config + ".out";
+    return OutputDirectory() + config + ".out";
   }
 
   std::string AnswerFile(const char* config) const {
-    return std::string(AnswerDirectory()) + config + ".ans";
+    return AnswerDirectory() + config + ".ans";
   }
 
   std::string TestCommand(const char* config, const std::string& inputFile,
                           const std::string& outputFile) const {
-    return OpenccCommand() + std::string("") + " -i " + inputFile + " -o " +
-           outputFile + " -c " + ConfigurationDirectory() + config + ".json";
+    std::string cmd = OpenccCommand() + " -i " + inputFile + " -o " +
+                      outputFile + " -c " + ConfigurationDirectory() + config +
+                      ".json";
+#ifdef BAZEL
+    cmd += " --path " + runfiles_->Rlocation("_main/data/dictionary") + "/" +
+           " --path " + runfiles_->Rlocation("_main/data/config") + "/";
+#endif
+    return cmd;
   }
 
   char* originalWorkingDirectory;
+
+#ifdef BAZEL
+  std::unique_ptr<Runfiles> runfiles_;
+#endif
 };
 
 class ConfigurationTest : public CommandLineConvertTest,
@@ -128,10 +169,12 @@ TEST_P(ConfigurationTest, InPlaceConvert) {
   ASSERT_EQ(answer, output);
 }
 
-INSTANTIATE_TEST_SUITE_P(CommandLine, ConfigurationTest,
-                         ::testing::Values("hk2s", "hk2t", "jp2t", "s2hk",
-                                           "s2t", "s2tw", "s2twp", "t2hk",
-                                           "t2jp", "t2s", "tw2s", "tw2sp",
-                                           "tw2t"));
+INSTANTIATE_TEST_SUITE_P(
+    CommandLine, ConfigurationTest,
+    ::testing::Values("hk2s", "hk2t", "jp2t", "s2hk", "s2t", "s2tw", "s2twp",
+                      "t2hk", "t2jp", "t2s", "tw2s", "tw2sp", "tw2t"),
+    [](const testing::TestParamInfo<ConfigurationTest::ParamType>& info) {
+      return info.param;
+    });
 
 } // namespace opencc

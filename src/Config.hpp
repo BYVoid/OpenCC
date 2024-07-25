@@ -34,7 +34,11 @@ public:
   ConverterPtr NewFromString(const std::string& json,
                              const std::string& configDirectory);
 
-  ConverterPtr NewFromFile(const std::string& fileName);
+  ConverterPtr NewFromString(const std::string& json,
+                             const std::vector<std::string>& paths);
+
+  ConverterPtr NewFromFile(const std::string& fileName,
+                           const std::vector<std::string>& paths = {});
 
 private:
   void* internal;

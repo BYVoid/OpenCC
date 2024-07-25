@@ -184,6 +184,9 @@ int main(int argc, const char* argv[]) {
     TCLAP::ValueArg<bool> noFlushArg(
         "", "noflush", "Disable flush for every line", false /* required */,
         false /* default */, "bool" /* type */, cmd);
+    TCLAP::MultiArg<std::string> pathArg(
+        "", "path", "Additional paths to locate config and dictionary files.",
+        false /* required */, "file" /* type */, cmd);
     cmd.parse(argc, argv);
     configFileName = configArg.getValue();
     noFlush = noFlushArg.getValue();
@@ -194,7 +197,7 @@ int main(int argc, const char* argv[]) {
       outputFileName = Optional<std::string>(outputArg.getValue());
       noFlush = true;
     }
-    converter = config.NewFromFile(configFileName);
+    converter = config.NewFromFile(configFileName, pathArg.getValue());
     bool lineByLine = inputFileName.IsNull();
     if (lineByLine) {
       ConvertLineByLine();

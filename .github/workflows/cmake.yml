@@ -12,10 +12,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        architecture: [x86_64, x86, arm64]
-        exclude:
-          - os: macos-latest
-            architecture: x86
     steps:
       - uses: actions/checkout@v4
       - name: make build

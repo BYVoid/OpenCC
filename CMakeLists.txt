@@ -57,7 +57,7 @@ set(CPACK_SOURCE_PACKAGE_FILE_NAME
   "${PACKAGE_NAME}-${OPENCC_VERSION_MAJOR}.${OPENCC_VERSION_MINOR}.${OPENCC_VERSION_REVISION}"
 )
 set(CPACK_SOURCE_IGNORE_FILES
-  "/build/;/test/dict.ocd;/test/dict.txt;/test/dict.bin;/other/;/opencc.xcodeproj/;/.git/;.gitignore;~$;.pyc;${CPACK_SOURCE_IGNORE_FILES}"
+  "/build/;/test/dict.ocd;/test/dict.txt;/test/dict.bin;/other/;/opencc.xcodeproj/;/.git/;.gitignore;~$;.pyc;/bazel*;/node_modules;/.github;/.pytest_cache;/.vscode;${CPACK_SOURCE_IGNORE_FILES}"
 )
 include(CPack)
 

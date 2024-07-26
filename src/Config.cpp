@@ -238,10 +238,11 @@ ConverterPtr Config::NewFromString(const std::string& json,
                                    const std::string& configDirectory) {
   std::vector<std::string> paths;
   if (!configDirectory.empty()) {
-    if (configDirectory.back() == '/' || configDirectory.back() == '\\')
+    if (configDirectory.back() == '/' || configDirectory.back() == '\\') {
       paths.push_back(configDirectory);
-    else
+    } else {
       paths.push_back(configDirectory + '/');
+    }
   }
   return NewFromString(json, paths);
 }

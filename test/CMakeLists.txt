@@ -29,7 +29,7 @@ if (ENABLE_GTEST)
   endif()
 
   if(NOT USE_SYSTEM_GTEST)
-    include_directories(../deps/gtest-1.7.0/include)
+    include_directories(../deps/googletest-1.15.0/googletest/include)
   endif()
   set(UNITTESTS
     CommandLineConvertTest

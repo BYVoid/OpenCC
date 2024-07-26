@@ -154,7 +154,7 @@ add_definitions(
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   add_definitions(
-    -std=c++17
+    -std=c++14
     -Wall
   )
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
@@ -163,7 +163,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   add_definitions(
-    -std=c++17
+    -std=c++14
     -Wall
   )
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")

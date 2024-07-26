@@ -2,7 +2,7 @@ name: MSVC
 
 on:
   push:
-    branches: [master, win]
+    branches: [master]
   pull_request:
     branches: [master]
 

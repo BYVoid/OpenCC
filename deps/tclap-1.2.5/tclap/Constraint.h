@@ -1,9 +1,12 @@
+// -*- Mode: c++; c-basic-offset: 4; tab-width: 4; -*-
+
 
 /******************************************************************************
  *
  *  file:  Constraint.h
  *
  *  Copyright (c) 2005, Michael E. Smoot
+ *  Copyright (c) 2017, Google LLC
  *  All rights reserved.
  *
  *  See the file COPYING in the top directory of this distribution for
@@ -28,6 +31,7 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <stdexcept>
 
 namespace TCLAP {
 
@@ -62,6 +66,12 @@ class Constraint
 		 * functions but without a virtual destructor.
 		 */
 		virtual ~Constraint() { ; }
+
+		static std::string shortID(Constraint<T> *constraint) {
+		  if (!constraint)
+		    throw std::logic_error("Cannot create a ValueArg with a NULL constraint");
+		  return constraint->shortID();
+		}
 };
 
 } //namespace TCLAP

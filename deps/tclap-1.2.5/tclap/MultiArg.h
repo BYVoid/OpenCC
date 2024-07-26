@@ -1,9 +1,12 @@
+// -*- Mode: c++; c-basic-offset: 4; tab-width: 4; -*-
+
 /****************************************************************************** 
  * 
  *  file:  MultiArg.h
  * 
  *  Copyright (c) 2003, Michael E. Smoot .
  *  Copyright (c) 2004, Michael E. Smoot, Daniel Aarno.
+ *  Copyright (c) 2017, Google LLC
  *  All rights reserved.
  * 
  *  See the file COPYING in the top directory of this distribution for
@@ -185,7 +188,7 @@ public:
 	 * Returns a vector of type T containing the values parsed from
 	 * the command line.
 	 */
-	const std::vector<T>& getValue();
+	const std::vector<T>& getValue() const { return _values; }
 
 	/**
 	 * Returns an iterator over the values parsed from the command
@@ -225,8 +228,8 @@ private:
 	/**
 	 * Prevent accidental copying
 	 */
-	MultiArg<T>(const MultiArg<T>& rhs);
-	MultiArg<T>& operator=(const MultiArg<T>& rhs);
+	MultiArg(const MultiArg<T>& rhs);
+	MultiArg& operator=(const MultiArg<T>& rhs);
 
 };
 
@@ -276,7 +279,7 @@ MultiArg<T>::MultiArg(const std::string& flag,
                       Visitor* v)
 : Arg( flag, name, desc, req, true, v ),
   _values(std::vector<T>()),
-  _typeDesc( constraint->shortID() ),
+  _typeDesc( Constraint<T>::shortID(constraint) ),
   _constraint( constraint ),
   _allowMore(false)
 { 
@@ -293,16 +296,13 @@ MultiArg<T>::MultiArg(const std::string& flag,
                       Visitor* v)
 : Arg( flag, name, desc, req, true, v ),
   _values(std::vector<T>()),
-  _typeDesc( constraint->shortID() ),
+  _typeDesc( Constraint<T>::shortID(constraint) ),
   _constraint( constraint ),
   _allowMore(false)
 { 
 	parser.add( this );
 	_acceptsMultipleValues = true;
 }
-
-template<class T>
-const std::vector<T>& MultiArg<T>::getValue() { return _values; }
 
 template<class T>
 bool MultiArg<T>::processArg(int *i, std::vector<std::string>& args) 
@@ -362,7 +362,7 @@ template<class T>
 std::string MultiArg<T>::shortID(const std::string& val) const
 {
 	static_cast<void>(val); // Ignore input, don't warn
-	return Arg::shortID(_typeDesc) + " ... ";
+	return Arg::shortID(_typeDesc) + " ...";
 }
 
 /**

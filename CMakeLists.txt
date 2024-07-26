@@ -38,8 +38,8 @@ option(USE_SYSTEM_RAPIDJSON "Use system version of RapidJSON" OFF)
 option(USE_SYSTEM_TCLAP "Use system version of TCLAP" OFF)
 
 ######## Package information
-set (PACKAGE_URL https://github.com/BYVoid/Opencc)
-set (PACKAGE_BUGREPORT https://github.com/BYVoid/Opencc/issues)
+set (PACKAGE_URL https://github.com/BYVoid/OpenCC)
+set (PACKAGE_BUGREPORT https://github.com/BYVoid/OpenCC/issues)
 set (OPENCC_VERSION_MAJOR 1)
 set (OPENCC_VERSION_MINOR 1)
 set (OPENCC_VERSION_REVISION 8)

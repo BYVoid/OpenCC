@@ -69,7 +69,7 @@
       "action_name": "TWPhrases.txt",
       "inputs": ["<(cmd)"],
       "outputs": ["<(output_prefix)TWPhrases.txt"],
-      "action": ["python3", "<(dict_merge)", "<(input_prefix)TWPhrasesIT.txt", "<(input_prefix)TWPhrasesName.txt", "<(input_prefix)TWPhrasesOther.txt", "<@(_outputs)"]
+      "action": ["python", "<(dict_merge)", "<(input_prefix)TWPhrasesIT.txt", "<(input_prefix)TWPhrasesName.txt", "<(input_prefix)TWPhrasesOther.txt", "<@(_outputs)"]
     }, {
       "action_name": "TWVariantsRev.txt",
       "variables": {
@@ -77,7 +77,7 @@
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)TWVariantsRev.txt"],
-      "action": ["python3", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
+      "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "TWPhrasesRev.txt",
       "variables": {
@@ -85,7 +85,7 @@
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)TWPhrasesRev.txt"],
-      "action": ["python3", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
+      "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "TWPhrases",
       "variables": {
@@ -133,7 +133,7 @@
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)HKVariantsRev.txt"],
-      "action": ["python3", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
+      "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "HKVariantsRev",
       "variables": {
@@ -149,7 +149,7 @@
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)JPVariantsRev.txt"],
-      "action": ["python3", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
+      "action": ["python", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "JPVariantsRev",
       "variables": {

@@ -4,6 +4,7 @@
 .cproject
 /.vscode
 /.mypy_cache
+/bazel-*
 /build
 /other
 /doc/html
@@ -15,3 +16,4 @@
 /xcode
 /node_modules
 /*.egg-info
+/.venv/

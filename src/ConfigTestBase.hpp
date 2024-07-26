@@ -18,17 +18,41 @@
 
 #pragma once
 
+#ifdef BAZEL
+#include "tools/cpp/runfiles/runfiles.h"
+#endif
+
 #include "TestUtils.hpp"
 
 namespace opencc {
 
+#ifdef CMAKE_SOURCE_DIR
 class ConfigTestBase : public ::testing::Test {
 protected:
   ConfigTestBase()
-      : CONFIG_TEST_PATH(CMAKE_SOURCE_DIR
-                         "/test/config_test/config_test.json") {}
+      : CONFIG_TEST_JSON_PATH(CMAKE_SOURCE_DIR
+                              "/test/config_test/config_test.json"),
+        CONFIG_TEST_DIR_PATH(CMAKE_SOURCE_DIR "/test/config_test") {}
 
-  const std::string CONFIG_TEST_PATH;
+  const std::string CONFIG_TEST_JSON_PATH;
+  const std::string CONFIG_TEST_DIR_PATH;
 };
+#endif
+
+#ifdef BAZEL
+using bazel::tools::cpp::runfiles::Runfiles;
+class ConfigTestBase : public ::testing::Test {
+protected:
+  ConfigTestBase()
+      : runfiles_(Runfiles::CreateForTest()),
+        CONFIG_TEST_JSON_PATH(
+            runfiles_->Rlocation("_main/test/config_test/config_test.json")),
+        CONFIG_TEST_DIR_PATH(runfiles_->Rlocation("_main/test/config_test")) {}
+
+  const std::unique_ptr<Runfiles> runfiles_;
+  const std::string CONFIG_TEST_JSON_PATH;
+  const std::string CONFIG_TEST_DIR_PATH;
+};
+#endif
 
 } // namespace opencc

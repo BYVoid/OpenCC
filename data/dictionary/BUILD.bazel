@@ -1,0 +1,79 @@
+package(default_visibility = ["//visibility:public"])
+
+genrule(
+    name = "merge_TWPhrases",
+    srcs = [
+        "TWPhrasesIT.txt",
+        "TWPhrasesName.txt",
+        "TWPhrasesOther.txt",
+    ],
+    outs = ["TWPhrases.txt"],
+    cmd = "$(location //data/scripts:merge) " +
+          "$(SRCS) $(OUTS)",
+    tools = ["//data/scripts:merge"],
+)
+
+[
+    genrule(
+        name = "reverse_" + txt,
+        srcs = [txt + ".txt"],
+        outs = [txt + "Rev.txt"],
+        cmd = "$(location //data/scripts:reverse) " +
+              "$(SRCS) $(OUTS)",
+        tools = ["//data/scripts:reverse"],
+    )
+    for txt in [
+        "TWVariants",
+        "TWPhrases",
+        "HKVariants",
+        "JPVariants",
+    ]
+]
+
+TEXT_DICTS = glob(["*.txt"]) + [
+    "TWPhrases.txt",
+    "TWVariantsRev.txt",
+    "TWPhrasesRev.txt",
+    "HKVariantsRev.txt",
+    "JPVariantsRev.txt",
+]
+
+[
+    genrule(
+        name = "generate_bin_" + txt[:-4],
+        srcs = [txt],
+        outs = [txt.replace(".txt", ".ocd2")],
+        cmd = "$(location //src/tools:dict_converter) " +
+              "--input $(location " + txt + ") " +
+              "--output $(OUTS) " +
+              "--from text " +
+              "--to ocd2",
+        tools = ["//src/tools:dict_converter"],
+    )
+    for txt in TEXT_DICTS
+]
+
+filegroup(
+    name = "text_dictionaries",
+    srcs = TEXT_DICTS,
+)
+
+filegroup(
+    name = "binary_dictionaries",
+    srcs = [txt.replace(".txt", ".ocd2") for txt in TEXT_DICTS],
+)
+
+cc_test(
+    name = "dictionary_test",
+    srcs = ["DictionaryTest.cpp"],
+    data = [
+        ":binary_dictionaries",
+        ":text_dictionaries",
+    ],
+    deps = [
+        "//src:lexicon",
+        "//src:marisa_dict",
+        "//src:utf8_util",
+        "@googletest//:gtest_main",
+    ],
+)

@@ -20,12 +20,12 @@ for VERSION in 3.8 3.9 3.10 3.11 3.12; do
     conda activate py$VERSION
 
     # Build and package
-    pip install --no-cache-dir setuptools wheel
-    python setup.py build_ext bdist_wheel
+    pip install --no-cache-dir build
+    python -m build --wheel
 
     # Cleanup
     conda deactivate
-    rm -rf build python/opencc/clib OpenCC.egg-info
+    rm -rf build OpenCC.egg-info
 done
 
 if [ "$1" != "testonly" ]; then

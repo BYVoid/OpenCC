@@ -1,0 +1,30 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "command_line",
+    srcs = ["CommandLine.cpp"],
+    deps = [
+        "//src:cmd_line_output",
+        "//src:config",
+        "//src:converter",
+        "//src:utf8_util",
+    ],
+)
+
+cc_binary(
+    name = "dict_converter",
+    srcs = ["DictConverter.cpp"],
+    deps = [
+        "//src:cmd_line_output",
+        "//src:dict_converter",
+    ],
+)
+
+cc_binary(
+    name = "phrase_extract",
+    srcs = ["PhraseExtract.cpp"],
+    deps = [
+        "//src:cmd_line_output",
+        "//src:phrase_extract",
+    ],
+)

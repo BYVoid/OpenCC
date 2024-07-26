@@ -27,22 +27,50 @@
 #include "UTF8Util.hpp"
 #include "opencc.h"
 
+#ifdef BAZEL
+#include "tools/cpp/runfiles/runfiles.h"
+using bazel::tools::cpp::runfiles::Runfiles;
+#endif
+
 using namespace opencc;
+
+namespace {
 
 struct InternalData {
   const ConverterPtr converter;
 
   InternalData(const ConverterPtr& _converter) : converter(_converter) {}
+
+  static InternalData* NewInternalData(const std::string& configFileName,
+                                       const std::vector<std::string>& paths) {
+    try {
+      Config config;
+#ifdef BAZEL
+      std::unique_ptr<Runfiles> bazel_runfiles(Runfiles::Create(""));
+      std::vector<std::string> paths_with_runfiles = paths;
+      paths_with_runfiles.push_back(
+          bazel_runfiles->Rlocation("_main/data/config"));
+      paths_with_runfiles.push_back(
+          bazel_runfiles->Rlocation("_main/data/dictionary"));
+      return new InternalData(
+          config.NewFromFile(configFileName, paths_with_runfiles));
+#else
+      return new InternalData(config.NewFromFile(configFileName, paths));
+#endif
+    } catch (Exception& ex) {
+      throw std::runtime_error(ex.what());
+    }
+  }
 };
 
-SimpleConverter::SimpleConverter(const std::string& configFileName) {
-  try {
-    Config config;
-    internalData = new InternalData(config.NewFromFile(configFileName));
-  } catch (Exception& ex) {
-    throw std::runtime_error(ex.what());
-  }
-}
+} // namespace
+
+SimpleConverter::SimpleConverter(const std::string& configFileName)
+    : SimpleConverter(configFileName, std::vector<std::string>()) {}
+
+SimpleConverter::SimpleConverter(const std::string& configFileName,
+                                 const std::vector<std::string>& paths)
+    : internalData(InternalData::NewInternalData(configFileName, paths)) {}
 
 SimpleConverter::~SimpleConverter() { delete (InternalData*)internalData; }
 

@@ -1,0 +1,477 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "opencc",
+    deps = [
+        ":binary_dict",
+        ":common",
+        ":config",
+        ":conversion",
+        ":conversion_chain",
+        ":converter",
+        ":darts_dict",
+        ":dict",
+        ":dict_converter",
+        ":dict_entry",
+        ":dict_group",
+        ":exception",
+        ":lexicon",
+        ":marisa_dict",
+        ":max_match_segmentation",
+        ":phrase_extract",
+        ":segmentation",
+        ":segments",
+        ":serializable_dict",
+        ":serialized_values",
+        ":simple_converter",
+        ":utf8_string_slice",
+        ":utf8_util",
+    ],
+)
+
+cc_library(
+    name = "binary_dict",
+    srcs = ["BinaryDict.cpp"],
+    hdrs = ["BinaryDict.hpp"],
+    deps = [
+        ":common",
+        ":lexicon",
+        ":serializable_dict",
+    ],
+)
+
+cc_test(
+    name = "binary_dict_test",
+    srcs = ["BinaryDictTest.cpp"],
+    deps = [
+        ":binary_dict",
+        ":text_dict_test_base",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "cmd_line_output",
+    hdrs = ["CmdLineOutput.hpp"],
+    visibility = ["//src/tools:__pkg__"],
+    deps = [
+        "@tclap",
+    ],
+)
+
+cc_library(
+    name = "common",
+    hdrs = [
+        "Common.hpp",
+        "Export.hpp",
+        "Optional.hpp",
+        "opencc_config.h",
+    ],
+    defines = ["Opencc_BUILT_AS_STATIC"],
+)
+
+cc_library(
+    name = "config",
+    srcs = ["Config.cpp"],
+    hdrs = ["Config.hpp"],
+    deps = [
+        ":common",
+        ":conversion_chain",
+        ":converter",
+        ":darts_dict",
+        ":dict_group",
+        ":marisa_dict",
+        ":max_match_segmentation",
+        ":text_dict",
+        "@rapidjson",
+    ],
+)
+
+cc_test(
+    name = "config_test",
+    srcs = ["ConfigTest.cpp"],
+    deps = [
+        ":common",
+        ":config",
+        ":config_test_base",
+        ":converter",
+        ":test_utils_utf8",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "config_test_base",
+    testonly = True,
+    hdrs = ["ConfigTestBase.hpp"],
+    data = ["//test/config_test"],
+    defines = ["BAZEL"],
+    deps = [
+        ":test_utils",
+        "@bazel_tools//tools/cpp/runfiles",
+    ],
+)
+
+cc_library(
+    name = "conversion",
+    srcs = ["Conversion.cpp"],
+    hdrs = ["Conversion.hpp"],
+    deps = [
+        ":common",
+        ":dict",
+        ":segmentation",
+    ],
+)
+
+cc_test(
+    name = "conversion_test",
+    srcs = ["ConversionTest.cpp"],
+    deps = [
+        ":conversion",
+        ":dict_group_test_base",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "conversion_chain",
+    srcs = ["ConversionChain.cpp"],
+    hdrs = ["ConversionChain.hpp"],
+    deps = [
+        ":common",
+        ":conversion",
+        ":segments",
+    ],
+)
+
+cc_test(
+    name = "conversion_chain_test",
+    srcs = ["ConversionChainTest.cpp"],
+    deps = [
+        ":conversion_chain",
+        ":dict_group_test_base",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "converter",
+    srcs = ["Converter.cpp"],
+    hdrs = ["Converter.hpp"],
+    deps = [
+        ":common",
+        ":conversion_chain",
+        ":segmentation",
+        ":segments",
+    ],
+)
+
+cc_library(
+    name = "darts_dict",
+    srcs = ["DartsDict.cpp"],
+    hdrs = ["DartsDict.hpp"],
+    deps = [
+        ":binary_dict",
+        ":common",
+        ":lexicon",
+        ":serializable_dict",
+        "@darts-clone",
+    ],
+)
+
+cc_test(
+    name = "darts_dict_test",
+    srcs = ["DartsDictTest.cpp"],
+    deps = [
+        ":darts_dict",
+        ":text_dict_test_base",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "dict",
+    srcs = ["Dict.cpp"],
+    hdrs = ["Dict.hpp"],
+    deps = [
+        ":common",
+        ":dict_entry",
+    ],
+)
+
+cc_library(
+    name = "dict_converter",
+    srcs = ["DictConverter.cpp"],
+    hdrs = ["DictConverter.hpp"],
+    deps = [
+        ":common",
+        ":darts_dict",
+        ":marisa_dict",
+        ":text_dict",
+    ],
+)
+
+cc_library(
+    name = "dict_entry",
+    srcs = ["DictEntry.cpp"],
+    hdrs = ["DictEntry.hpp"],
+    deps = [
+        ":common",
+        ":segments",
+        ":utf8_util",
+    ],
+)
+
+cc_library(
+    name = "dict_group",
+    srcs = ["DictGroup.cpp"],
+    hdrs = ["DictGroup.hpp"],
+    deps = [
+        ":common",
+        ":dict",
+        ":lexicon",
+        ":text_dict",
+    ],
+)
+
+cc_test(
+    name = "dict_group_test",
+    srcs = ["DictGroupTest.cpp"],
+    deps = [
+        ":dict_group_test_base",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "dict_group_test_base",
+    testonly = True,
+    hdrs = ["DictGroupTestBase.hpp"],
+    deps = [
+        ":dict_group",
+        ":text_dict_test_base",
+    ],
+)
+
+cc_library(
+    name = "exception",
+    hdrs = [
+        "Exception.hpp",
+    ],
+    deps = [":common"],
+)
+
+cc_library(
+    name = "lexicon",
+    srcs = ["Lexicon.cpp"],
+    hdrs = ["Lexicon.hpp"],
+    deps = [
+        ":common",
+        ":dict_entry",
+    ],
+)
+
+cc_library(
+    name = "marisa_dict",
+    srcs = ["MarisaDict.cpp"],
+    hdrs = ["MarisaDict.hpp"],
+    deps = [
+        ":common",
+        ":lexicon",
+        ":serialized_values",
+        "@marisa-trie",
+    ],
+)
+
+cc_test(
+    name = "marisa_dict_test",
+    srcs = ["MarisaDictTest.cpp"],
+    deps = [
+        ":marisa_dict",
+        ":text_dict_test_base",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "max_match_segmentation",
+    srcs = ["MaxMatchSegmentation.cpp"],
+    hdrs = ["MaxMatchSegmentation.hpp"],
+    deps = [
+        ":common",
+        ":dict_group",
+        ":segmentation",
+    ],
+)
+
+cc_test(
+    name = "max_match_segmentation_test",
+    srcs = ["MaxMatchSegmentationTest.cpp"],
+    deps = [
+        ":dict_group_test_base",
+        ":max_match_segmentation",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "phrase_extract",
+    srcs = ["PhraseExtract.cpp"],
+    hdrs = ["PhraseExtract.hpp"],
+    visibility = ["//src/tools:__pkg__"],
+    deps = [
+        ":common",
+        ":marisa_dict",
+        ":utf8_string_slice",
+    ],
+)
+
+cc_library(
+    name = "segmentation",
+    srcs = ["Segmentation.cpp"],
+    hdrs = ["Segmentation.hpp"],
+    deps = [":common"],
+)
+
+cc_library(
+    name = "segments",
+    hdrs = ["Segments.hpp"],
+    deps = [":common"],
+)
+
+cc_library(
+    name = "serializable_dict",
+    hdrs = ["SerializableDict.hpp"],
+    deps = [
+        ":dict",
+    ],
+)
+
+cc_library(
+    name = "serialized_values",
+    srcs = ["SerializedValues.cpp"],
+    hdrs = ["SerializedValues.hpp"],
+    deps = [
+        ":common",
+        ":lexicon",
+        ":serializable_dict",
+    ],
+)
+
+cc_test(
+    name = "serialized_values_test",
+    srcs = ["SerializedValuesTest.cpp"],
+    deps = [
+        ":serialized_values",
+        ":text_dict_test_base",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "simple_converter",
+    srcs = ["SimpleConverter.cpp"],
+    hdrs = [
+        "SimpleConverter.hpp",
+        "opencc.h",
+    ],
+    defines = ["BAZEL"],
+    deps = [
+        ":common",
+        ":config",
+        ":converter",
+        ":utf8_util",
+        "@bazel_tools//tools/cpp/runfiles",
+    ],
+)
+
+cc_test(
+    name = "simple_converter_test",
+    srcs = ["SimpleConverterTest.cpp"],
+    deps = [
+        ":config_test_base",
+        ":simple_converter",
+        ":test_utils_utf8",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "test_utils",
+    testonly = True,
+    hdrs = ["TestUtils.hpp"],
+    deps = [
+        "@googletest//:gtest",
+    ],
+)
+
+cc_library(
+    name = "test_utils_utf8",
+    testonly = True,
+    srcs = ["TestUtilsUTF8.hpp"],
+)
+
+cc_library(
+    name = "text_dict",
+    srcs = ["TextDict.cpp"],
+    hdrs = ["TextDict.hpp"],
+    deps = [
+        ":common",
+        ":lexicon",
+        ":serializable_dict",
+    ],
+)
+
+cc_test(
+    name = "text_dict_test",
+    srcs = ["TextDictTest.cpp"],
+    deps = [
+        ":text_dict",
+        ":text_dict_test_base",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "text_dict_test_base",
+    testonly = True,
+    srcs = ["TextDictTestBase.hpp"],
+    deps = [
+        ":lexicon",
+        ":test_utils",
+        ":test_utils_utf8",
+        ":text_dict",
+    ],
+)
+
+cc_library(
+    name = "utf8_string_slice",
+    srcs = ["UTF8StringSlice.cpp"],
+    hdrs = ["UTF8StringSlice.hpp"],
+    deps = [
+        ":common",
+        ":utf8_util",
+    ],
+)
+
+cc_library(
+    name = "utf8_util",
+    srcs = ["UTF8Util.cpp"],
+    hdrs = ["UTF8Util.hpp"],
+    deps = [
+        ":common",
+        ":exception",
+    ],
+)
+
+cc_test(
+    name = "utf8_util_test",
+    srcs = ["UTF8UtilTest.cpp"],
+    deps = [
+        ":test_utils",
+        ":utf8_util",
+        "@googletest//:gtest_main",
+    ],
+)

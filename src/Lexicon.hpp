@@ -62,6 +62,8 @@ public:
     return entries.end();
   }
 
+  static LexiconPtr ParseLexiconFromFile(FILE* fp);
+
 private:
   std::vector<std::unique_ptr<DictEntry>> entries;
 };

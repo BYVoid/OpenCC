@@ -1,0 +1,19 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "opencc",
+    hdrs = [
+        "//src:Export.hpp",
+        "//src:SimpleConverter.hpp",
+        "//src:opencc.h",
+    ],
+    data = [
+        "//data/config",
+        "//data/dictionary:binary_dictionaries",
+        "//data/dictionary:text_dictionaries",
+    ],
+    strip_include_prefix = "src",
+    deps = [
+        "//src:opencc",
+    ],
+)

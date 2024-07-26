@@ -1,0 +1,26 @@
+cc_test(
+    name = "bazel_opencc_test",
+    srcs = ["BazelOpenccTest.cpp"],
+    deps = [
+        "//:opencc",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "command_line_converter_test",
+    srcs = ["CommandLineConvertTest.cpp"],
+    data = [
+        "//data/config",
+        "//data/dictionary:binary_dictionaries",
+        "//data/dictionary:text_dictionaries",
+        "//src/tools:command_line",
+        "//test/testcases",
+    ],
+    defines = ["BAZEL"],
+    deps = [
+        "//src:common",
+        "@bazel_tools//tools/cpp/runfiles",
+        "@googletest//:gtest_main",
+    ],
+)

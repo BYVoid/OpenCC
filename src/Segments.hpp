@@ -32,7 +32,7 @@ public:
   Segments() {}
 
   Segments(std::initializer_list<const char*> initList) {
-    for (const std::string& item : initList) {
+    for (const char* item : initList) {
       AddSegment(item);
     }
   }

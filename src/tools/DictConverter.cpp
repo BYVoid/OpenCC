@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-#include "DictConverter.hpp"
-#include "CmdLineOutput.hpp"
-#include "Exception.hpp"
+#include "src/DictConverter.hpp"
+#include "src/CmdLineOutput.hpp"
+#include "src/Exception.hpp"
 
 using namespace opencc;
 

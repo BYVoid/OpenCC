@@ -158,8 +158,8 @@ TEST_F(PhraseExtractTest, SelectWords) {
   phraseExtract.SetWordMaxLength(3);
   phraseExtract.SetFullText(siShi);
   phraseExtract.SetPostCalculationFilter(
-      [](const PhraseExtract& phraseExtract, const UTF8StringSlice8Bit& word) {
-        return phraseExtract.Frequency(word) == 1;
+      [](const PhraseExtract& p, const UTF8StringSlice8Bit& word) {
+        return p.Frequency(word) == 1;
       });
   phraseExtract.SelectWords();
   EXPECT_EQ(std::vector<UTF8StringSlice8Bit>({"十", "四", "是", "四十", "十四",

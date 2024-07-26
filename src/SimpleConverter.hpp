@@ -18,6 +18,7 @@
 
 #include "Export.hpp"
 #include <string>
+#include <vector>
 
 #ifndef __OPENCC_SIMPLECONVERTER_HPP_
 #define __OPENCC_SIMPLECONVERTER_HPP_
@@ -29,6 +30,7 @@
  */
 
 namespace opencc {
+
 /**
  * A high level converter
  * This interface does not require C++11 to compile.
@@ -40,7 +42,15 @@ public:
    * Constructor of SimpleConverter
    * @param configFileName File name of configuration.
    */
-  SimpleConverter(const std::string& configFileName);
+  explicit SimpleConverter(const std::string& configFileName);
+
+  /**
+   * Constructor of SimpleConverter
+   * @param configFileName File name of configuration.
+   * @param paths Additional paths to locate configuration and dictionary files.
+   */
+  SimpleConverter(const std::string& configFileName,
+                  const std::vector<std::string>& paths);
 
   ~SimpleConverter();
 

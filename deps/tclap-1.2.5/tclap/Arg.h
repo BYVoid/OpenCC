@@ -39,16 +39,6 @@
 
 #include <tclap/sstream.h>
 
-#if defined(HAVE_SSTREAM)
-#include <sstream>
-typedef std::istringstream istringstream;
-#elif defined(HAVE_STRSTREAM)
-#include <strstream>
-typedef std::istrstream istringstream;
-#else
-#error "Need a stringstream (sstream or strstream) to compile!"
-#endif
-
 #include <tclap/ArgException.h>
 #include <tclap/Visitor.h>
 #include <tclap/CmdLineInterface.h>
@@ -394,17 +384,17 @@ class Arg
 /**
  * Typedef of an Arg list iterator.
  */
-typedef std::list<Arg*>::iterator ArgListIterator;
+typedef std::list<Arg*>::const_iterator ArgListIterator;
 
 /**
  * Typedef of an Arg vector iterator.
  */
-typedef std::vector<Arg*>::iterator ArgVectorIterator;
+typedef std::vector<Arg*>::const_iterator ArgVectorIterator;
 
 /**
  * Typedef of a Visitor list iterator.
  */
-typedef std::list<Visitor*>::iterator VisitorListIterator;
+typedef std::list<Visitor*>::const_iterator VisitorListIterator;
 
 /*
  * Extract a value of type T from it's string representation contained

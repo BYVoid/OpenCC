@@ -1,3 +1,5 @@
+// -*- Mode: c++; c-basic-offset: 4; tab-width: 4; -*-
+
 
 /****************************************************************************** 
 *
@@ -6,6 +8,7 @@
 *  Copyright (c) 2003, Michael E. Smoot .
 *  Copyright (c) 2004, Michael E. Smoot, Daniel Aarno.
 *  Copyright (c) 2005, Michael E. Smoot, Daniel Aarno, Erik Zeek.
+*  Copyright (c) 2017, Google LLC
 *  All rights reserved.
 *
 *  See the file COPYING in the top directory of this distribution for
@@ -108,7 +111,7 @@ class MultiSwitchArg : public SwitchArg
 		/**
 		 * Returns int, the number of times the switch has been set.
 		 */
-		int getValue();
+		int getValue() const { return _value; }
 
 		/**
 		 * Returns the shortID for this Arg.
@@ -150,8 +153,6 @@ _default( init )
 	parser.add( this );
 }
 
-inline int MultiSwitchArg::getValue() { return _value; }
-
 inline bool MultiSwitchArg::processArg(int *i, std::vector<std::string>& args)
 {
 	if ( _ignoreable && Arg::ignoreRest() )
@@ -192,7 +193,7 @@ inline bool MultiSwitchArg::processArg(int *i, std::vector<std::string>& args)
 inline std::string 
 MultiSwitchArg::shortID(const std::string& val) const
 {
-	return Arg::shortID(val) + " ... ";
+	return Arg::shortID(val) + " ...";
 }
 
 inline std::string 

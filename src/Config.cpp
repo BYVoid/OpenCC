@@ -172,7 +172,7 @@ public:
   }
 
   std::string FindConfigFile(std::string fileName,
-                             const std::vector<std::string>& paths) {
+                             const std::vector<std::string>& configPaths) {
     std::ifstream ifs;
 
     // Working directory
@@ -194,7 +194,7 @@ public:
       }
     }
 
-    for (const std::string& dirPath : paths) {
+    for (const std::string& dirPath : configPaths) {
       std::string path = dirPath + '/' + fileName;
       ifs.open(UTF8Util::GetPlatformString(path).c_str());
       if (ifs.is_open()) {

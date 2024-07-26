@@ -14,13 +14,13 @@ jobs:
         arch:
           - amd64
           - amd64_x86
-          # - amd64_arm64
+          - amd64_arm64
     steps:
       - uses: actions/checkout@v4
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.arch }}
       - name: build
-        run: build.cmd
+        run: ./build.cmd
       - name: test
-        run: test.cmd
+        run: ./test.cmd

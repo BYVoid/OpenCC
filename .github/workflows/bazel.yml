@@ -1,8 +1,8 @@
-name: C++ CI with Bazel
+name: Bazel
 
 on:
   push:
-    branches: [master, bazel]
+    branches: [master]
   pull_request:
     branches: [master]
 

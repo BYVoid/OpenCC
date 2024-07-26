@@ -2,13 +2,17 @@ name: Bazel
 
 on:
   push:
-    branches: [master]
+    branches: [master, win]
   pull_request:
     branches: [master]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build-and-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
     steps:
       - uses: actions/checkout@v4
       - uses: bazelbuild/setup-bazelisk@v3

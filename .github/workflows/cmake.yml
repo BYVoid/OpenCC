@@ -12,14 +12,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        compiler: [gcc, clang]
+        architecture: [x86_64, x86, arm64]
         exclude:
-          # Exclude gcc on MacOS
           - os: macos-latest
-            compiler: gcc
-    env:
-      CC: ${{ matrix.compiler }}
-      CXX: ${{ matrix.compiler }}++
+            architecture: x86
     steps:
       - uses: actions/checkout@v4
       - name: make build

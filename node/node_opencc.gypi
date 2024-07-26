@@ -2,9 +2,6 @@
   "targets": [
     {
       "target_name": "opencc",
-      "cflags_cc": [
-        "-std=c++17"
-      ],
       "sources": [
         "../node/marisa.cc",
         "../node/opencc.cc"

@@ -27,7 +27,7 @@
  */
 
 const path = require('path');
-const bindingPath = require('node-pre-gyp').find(require.resolve('../package.json'));
+const bindingPath = require('@mapbox/node-pre-gyp').find(require.resolve('../package.json'));
 const binding = require(bindingPath);
 
 const assetsPath = path.dirname(bindingPath);

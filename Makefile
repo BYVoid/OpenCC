@@ -17,13 +17,14 @@
 #
 
 PREFIX = /usr
+REL_BUILD_DOCUMENTATION ?= ON
 
 .PHONY: build clean node test xcode-build
 
 build:
 	mkdir -p build/rel
 	(cd build/rel; cmake \
-	-DBUILD_DOCUMENTATION:BOOL=ON \
+	-DBUILD_DOCUMENTATION:BOOL=${REL_BUILD_DOCUMENTATION} \
 	-DENABLE_GTEST:BOOL=OFF \
 	-DENABLE_BENCHMARK:BOOL=OFF \
 	-DCMAKE_BUILD_TYPE=Release \

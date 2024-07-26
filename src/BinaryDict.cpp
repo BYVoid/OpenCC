@@ -67,7 +67,7 @@ void BinaryDict::SerializeToFile(FILE* fp) const {
 }
 
 BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
-  size_t offsetBound, savedOffset;
+  long offsetBound, savedOffset;
   savedOffset = ftell(fp);
   fseek(fp, 0L, SEEK_END);
   offsetBound = ftell(fp) - savedOffset;

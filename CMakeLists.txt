@@ -42,7 +42,7 @@ set (PACKAGE_URL https://github.com/BYVoid/Opencc)
 set (PACKAGE_BUGREPORT https://github.com/BYVoid/Opencc/issues)
 set (OPENCC_VERSION_MAJOR 1)
 set (OPENCC_VERSION_MINOR 1)
-set (OPENCC_VERSION_REVISION 7)
+set (OPENCC_VERSION_REVISION 8)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
   set (version_suffix .Debug)

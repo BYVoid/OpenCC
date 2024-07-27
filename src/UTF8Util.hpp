@@ -19,9 +19,10 @@
 #pragma once
 
 #ifdef _MSC_VER
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <Windows.h>
-#undef NOMINMAX
 #endif // _MSC_VER
 
 #include <cstring>

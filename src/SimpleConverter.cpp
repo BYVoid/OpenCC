@@ -16,12 +16,6 @@
  * limitations under the License.
  */
 
-#ifdef _MSC_VER
-#define NOMINMAX
-#include <Windows.h>
-#undef NOMINMAX
-#endif // _MSC_VER
-
 #include "Config.hpp"
 #include "Converter.hpp"
 #include "UTF8Util.hpp"

@@ -99,9 +99,9 @@ private:
   }
 
   void BuildTrie() {
-    std::unordered_map<std::string, int> key_item_id_map;
+    std::unordered_map<std::string, size_t> key_item_id_map;
     marisa::Keyset keyset;
-    for (int i = 0; i < items.size(); i++) {
+    for (size_t i = 0; i < items.size(); i++) {
       const auto& key = items[i].first;
       key_item_id_map[key.ToString()] = i;
       keyset.push_back(key.CString(), key.ByteLength());
@@ -117,7 +117,7 @@ private:
       if (it == key_item_id_map.end()) {
         throw ShouldNotBeHere();
       }
-      int item_id = it->second;
+      size_t item_id = it->second;
       marisa_id_item_map[marisa_id] = item_id;
     }
   }
@@ -127,7 +127,7 @@ private:
       dict;
   std::vector<ItemType> items;
   marisa::Trie marisa_trie;
-  std::vector<int> marisa_id_item_map;
+  std::vector<size_t> marisa_id_item_map;
 };
 
 using namespace internal;

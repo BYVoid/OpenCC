@@ -117,8 +117,8 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
       throw InvalidFormat("Invalid OpenCC binary dictionary (numValues)");
     }
     // Key offset
-    size_t keyOffset;
-    unitsRead = fread(&keyOffset, sizeof(size_t), 1, fp);
+    long keyOffset;
+    unitsRead = fread(&keyOffset, sizeof(long), 1, fp);
     if (unitsRead != 1 || keyOffset >= offsetBound) {
       throw InvalidFormat("Invalid OpenCC binary dictionary (keyOffset)");
     }
@@ -126,8 +126,8 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
     // Value offset
     std::vector<std::string> values;
     for (size_t j = 0; j < numValues; j++) {
-      size_t valueOffset;
-      unitsRead = fread(&valueOffset, sizeof(size_t), 1, fp);
+      long valueOffset;
+      unitsRead = fread(&valueOffset, sizeof(long), 1, fp);
       if (unitsRead != 1 || valueOffset >= offsetBound) {
         throw InvalidFormat("Invalid OpenCC binary dictionary (valueOffset)");
       }

@@ -1,10 +1,22 @@
 # Change History of OpenCC
 
+## Version 1.1.8
+
+2024年7月27日
+
+* 修正Node新版本編譯的問題（[#782](https://github.com/BYVoid/OpenCC/issues/782), [#798](https://github.com/BYVoid/OpenCC/issues/798)）。
+* 進一步修正Python包生成腳本（[#875](https://github.com/BYVoid/OpenCC/pull/875)）。
+* 引入Bazel構建系統以及CI（[#879](https://github.com/BYVoid/OpenCC/pull/879)）。
+* 引入Github MSVC CI（[#880](https://github.com/BYVoid/OpenCC/pull/880)）。
+* 爲`opencc`命令行工具添加了字典和配置的路徑`--path`參數。
+* 更新附帶的`googletest`版本到1.15，`pybind11`到2.13.1，`tclap`到1.2.5。
+* 若干轉換字詞修正（[#609](https://github.com/BYVoid/OpenCC/pull/609), [#698](https://github.com/BYVoid/OpenCC/pull/698), [#707](https://github.com/BYVoid/OpenCC/pull/707), [#760](https://github.com/BYVoid/OpenCC/pull/760), [#779](https://github.com/BYVoid/OpenCC/pull/779), [#786](https://github.com/BYVoid/OpenCC/pull/786), [#792](https://github.com/BYVoid/OpenCC/pull/792), [#806](https://github.com/BYVoid/OpenCC/pull/806), [#808](https://github.com/BYVoid/OpenCC/pull/808), [#810](https://github.com/BYVoid/OpenCC/pull/810), [#825](https://github.com/BYVoid/OpenCC/pull/825), [#826](https://github.com/BYVoid/OpenCC/pull/826), [#837](https://github.com/BYVoid/OpenCC/pull/837), [#864](https://github.com/BYVoid/OpenCC/pull/864), [#865](https://github.com/BYVoid/OpenCC/pull/865), [#870](https://github.com/BYVoid/OpenCC/pull/870), [#877](https://github.com/BYVoid/OpenCC/pull/877), [#878](https://github.com/BYVoid/OpenCC/pull/878)）。
+
 ## Version 1.1.7
 
 2023年10月15日
 
-* 添加提交时 python 包重建以验证包生成 ([#822](https://github.com/BYVoid/OpenCC/pull/822))。
+* 添加提交時 python 包重建以驗證包生成 ([#822](https://github.com/BYVoid/OpenCC/pull/822))。
 * 支持Python 3.12 和 Node 20，移除針對Python 3.7和Node 16的構建 ([#820](https://github.com/BYVoid/OpenCC/pull/820))。
 * add mingw-w64 ci ([#802](https://github.com/BYVoid/OpenCC/pull/802))。
 * Add support of CMake config modules ([#763](https://github.com/BYVoid/OpenCC/pull/763))。
@@ -14,8 +26,8 @@
 
 2022年12月08日
 
-* 修复python3.11 macos构建 ([#744](https://github.com/BYVoid/OpenCC/pull/744))。
-* Bump gtest 和 benchmark 以与最新的 github runners 一起工作 ([#747](https://github.com/BYVoid/OpenCC/pull/747))。
+* 修復python3.11 macos構建 ([#744](https://github.com/BYVoid/OpenCC/pull/744))。
+* Bump gtest 和 benchmark 以與最新的 github runners 一起工作 ([#747](https://github.com/BYVoid/OpenCC/pull/747))。
 
 ## Version 1.1.5
 

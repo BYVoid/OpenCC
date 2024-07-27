@@ -19,7 +19,7 @@
 PREFIX = /usr
 REL_BUILD_DOCUMENTATION ?= ON
 
-.PHONY: build clean node test xcode-build
+.PHONY: bazel build clean node test xcode-build
 
 build:
 	mkdir -p build/rel
@@ -98,7 +98,14 @@ format:
 	| xargs clang-format -i
 
 clean:
-	rm -rf build xcode python/opencc/clib *.egg-info
+	rm -rf build xcode python/opencc/clib *.egg-info bazel-*
 
 install: build
 	make -C build/rel install VERBOSE=${VERBOSE} PREFIX=${PREFIX}
+
+bazel:
+	bazel build //:opencc
+	bazel test --test_output=all //src/... //data/... //test/...
+
+bazel-clean:
+	bazel clean --expunge

@@ -57,7 +57,7 @@ public:
     marisa::Agent agent;
     agent.set_query(key.CString(), key.ByteLength());
     if (marisa_trie.lookup(agent)) {
-      int item_id = marisa_id_item_map[agent.key().id()];
+      size_t item_id = marisa_id_item_map[agent.key().id()];
       return items[item_id].second;
     }
 

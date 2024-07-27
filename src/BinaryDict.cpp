@@ -67,11 +67,12 @@ void BinaryDict::SerializeToFile(FILE* fp) const {
 }
 
 BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
-  long offsetBound, savedOffset;
-  savedOffset = ftell(fp);
+  long savedOffset = ftell(fp);
   fseek(fp, 0L, SEEK_END);
-  offsetBound = ftell(fp) - savedOffset;
+  long offsetBoundLong = ftell(fp) - savedOffset;
   fseek(fp, savedOffset, SEEK_SET);
+  assert(offsetBoundLong >= 0);
+  size_t offsetBound = static_cast<size_t>(offsetBoundLong);
 
   BinaryDictPtr dict(new BinaryDict(LexiconPtr(new Lexicon)));
 
@@ -117,8 +118,8 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
       throw InvalidFormat("Invalid OpenCC binary dictionary (numValues)");
     }
     // Key offset
-    long keyOffset;
-    unitsRead = fread(&keyOffset, sizeof(long), 1, fp);
+    size_t keyOffset;
+    unitsRead = fread(&keyOffset, sizeof(size_t), 1, fp);
     if (unitsRead != 1 || keyOffset >= offsetBound) {
       throw InvalidFormat("Invalid OpenCC binary dictionary (keyOffset)");
     }
@@ -126,8 +127,8 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
     // Value offset
     std::vector<std::string> values;
     for (size_t j = 0; j < numValues; j++) {
-      long valueOffset;
-      unitsRead = fread(&valueOffset, sizeof(long), 1, fp);
+      size_t valueOffset;
+      unitsRead = fread(&valueOffset, sizeof(size_t), 1, fp);
       if (unitsRead != 1 || valueOffset >= offsetBound) {
         throw InvalidFormat("Invalid OpenCC binary dictionary (valueOffset)");
       }

@@ -171,8 +171,7 @@ public:
     return chain;
   }
 
-  std::string FindConfigFile(std::string fileName,
-                             const std::vector<std::string>& configPaths) {
+  std::string FindConfigFile(std::string fileName) {
     std::ifstream ifs;
 
     // Working directory
@@ -194,7 +193,7 @@ public:
       }
     }
 
-    for (const std::string& dirPath : configPaths) {
+    for (const std::string& dirPath : paths) {
       std::string path = dirPath + '/' + fileName;
       ifs.open(UTF8Util::GetPlatformString(path).c_str());
       if (ifs.is_open()) {
@@ -205,16 +204,39 @@ public:
     throw FileNotFound(fileName);
   }
 };
+
+std::string GetParentDirectory(const std::string& path) {
+  size_t pos = path.rfind('/', path.length() - 1);
+  if (pos == std::string::npos) {
+    pos = path.rfind('\\', path.length() - 1);
+  }
+  if (pos == std::string::npos) {
+    return "";
+  }
+  return path.substr(0, pos + 1);
+}
+
 } // namespace
 
 Config::Config() : internal(new ConfigInternal()) {}
 
-Config::~Config() { delete (ConfigInternal*)internal; }
+Config::~Config() { delete reinterpret_cast<ConfigInternal*>(internal); }
 
 ConverterPtr Config::NewFromFile(const std::string& fileName,
-                                 const std::vector<std::string>& paths) {
-  ConfigInternal* impl = (ConfigInternal*)internal;
-  std::string prefixedFileName = impl->FindConfigFile(fileName, paths);
+                                 const std::vector<std::string>& paths,
+                                 const char* argv0) {
+  ConfigInternal* impl = reinterpret_cast<ConfigInternal*>(internal);
+  impl->paths = paths;
+  if (argv0 != nullptr) {
+    std::string parent = GetParentDirectory(argv0);
+    if (!parent.empty()) {
+      impl->paths.push_back(parent);
+    }
+  }
+  if (PACKAGE_DATA_DIRECTORY != "") {
+    impl->paths.push_back(PACKAGE_DATA_DIRECTORY);
+  }
+  std::string prefixedFileName = impl->FindConfigFile(fileName);
   std::ifstream ifs(UTF8Util::GetPlatformString(prefixedFileName));
   std::string content(std::istreambuf_iterator<char>(ifs),
                       (std::istreambuf_iterator<char>()));
@@ -227,11 +249,10 @@ ConverterPtr Config::NewFromFile(const std::string& fileName,
   if (slashPos != std::string::npos) {
     configDirectory = prefixedFileName.substr(0, slashPos) + "/";
   }
-  std::vector<std::string> dictPaths = paths;
   if (!configDirectory.empty()) {
-    dictPaths.push_back(configDirectory);
+    impl->paths.push_back(configDirectory);
   }
-  return NewFromString(content, dictPaths);
+  return NewFromString(content, impl->paths);
 }
 
 ConverterPtr Config::NewFromString(const std::string& json,
@@ -265,11 +286,8 @@ ConverterPtr Config::NewFromString(const std::string& json,
     name = doc["name"].GetString();
   }
 
-  ConfigInternal* impl = (ConfigInternal*)internal;
+  ConfigInternal* impl = reinterpret_cast<ConfigInternal*>(internal);
   impl->paths = paths;
-  if (PACKAGE_DATA_DIRECTORY != "") {
-    impl->paths.push_back(PACKAGE_DATA_DIRECTORY);
-  }
 
   // Required: segmentation
   SegmentationPtr segmentation =

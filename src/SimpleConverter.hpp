@@ -52,6 +52,16 @@ public:
   SimpleConverter(const std::string& configFileName,
                   const std::vector<std::string>& paths);
 
+  /**
+   * Constructor of SimpleConverter
+   * @param configFileName File name of configuration.
+   * @param paths Additional paths to locate configuration and dictionary files.
+   * @param argv0 Path of the executable (argv[0]), in addition to additional
+   * paths.
+   */
+  SimpleConverter(const std::string& configFileName,
+                  const std::vector<std::string>& paths, const char* argv0);
+
   ~SimpleConverter();
 
   /**

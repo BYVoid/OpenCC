@@ -38,7 +38,8 @@ public:
                              const std::vector<std::string>& paths);
 
   ConverterPtr NewFromFile(const std::string& fileName,
-                           const std::vector<std::string>& paths = {});
+                           const std::vector<std::string>& paths = {},
+                           const char* argv0 = nullptr);
 
 private:
   void* internal;

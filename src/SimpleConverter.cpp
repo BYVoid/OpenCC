@@ -36,21 +36,29 @@ struct InternalData {
   InternalData(const ConverterPtr& _converter) : converter(_converter) {}
 
   static InternalData* NewInternalData(const std::string& configFileName,
-                                       const std::vector<std::string>& paths) {
+                                       const std::vector<std::string>& paths,
+                                       const char* argv0) {
     try {
       Config config;
 #ifdef BAZEL
-      std::unique_ptr<Runfiles> bazel_runfiles(Runfiles::Create(""));
-      std::vector<std::string> paths_with_runfiles = paths;
-      paths_with_runfiles.push_back(
-          bazel_runfiles->Rlocation("_main/data/config"));
-      paths_with_runfiles.push_back(
-          bazel_runfiles->Rlocation("_main/data/dictionary"));
-      return new InternalData(
-          config.NewFromFile(configFileName, paths_with_runfiles));
-#else
-      return new InternalData(config.NewFromFile(configFileName, paths));
+      std::string err;
+      std::unique_ptr<Runfiles> bazel_runfiles(
+          Runfiles::Create(argv0 != nullptr ? argv0 : "", &err));
+      if (bazel_runfiles != nullptr) {
+        std::vector<std::string> paths_with_runfiles = paths;
+        paths_with_runfiles.push_back(
+            bazel_runfiles->Rlocation("opencc~/data/config"));
+        paths_with_runfiles.push_back(
+            bazel_runfiles->Rlocation("opencc~/data/dictionary"));
+        paths_with_runfiles.push_back(
+            bazel_runfiles->Rlocation("_main/data/config"));
+        paths_with_runfiles.push_back(
+            bazel_runfiles->Rlocation("_main/data/dictionary"));
+        return new InternalData(
+            config.NewFromFile(configFileName, paths_with_runfiles));
+      }
 #endif
+      return new InternalData(config.NewFromFile(configFileName, paths, argv0));
     } catch (Exception& ex) {
       throw std::runtime_error(ex.what());
     }
@@ -64,7 +72,13 @@ SimpleConverter::SimpleConverter(const std::string& configFileName)
 
 SimpleConverter::SimpleConverter(const std::string& configFileName,
                                  const std::vector<std::string>& paths)
-    : internalData(InternalData::NewInternalData(configFileName, paths)) {}
+    : SimpleConverter(configFileName, paths, nullptr) {}
+
+SimpleConverter::SimpleConverter(const std::string& configFileName,
+                                 const std::vector<std::string>& paths,
+                                 const char* argv0)
+    : internalData(
+          InternalData::NewInternalData(configFileName, paths, argv0)) {}
 
 SimpleConverter::~SimpleConverter() { delete (InternalData*)internalData; }
 

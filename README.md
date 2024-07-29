@@ -27,7 +27,21 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 
 ## Installation 安裝
 
-See [Download](https://github.com/BYVoid/OpenCC/wiki/Download).
+### Package Managers 包管理器
+
+* [Debian](https://tracker.debian.org/pkg/opencc)
+* [Ubuntu](https://launchpad.net/ubuntu/+source/opencc)
+* [Fedora](https://packages.fedoraproject.org/pkgs/opencc/opencc/)
+* [Arch Linux](https://archlinux.org/packages/extra/x86_64/opencc/)
+* [Mac](https://formulae.brew.sh/formula/opencc)
+* [Bazel](https://registry.bazel.build/modules/opencc)
+* [Node.js](https://npmjs.org/package/opencc)
+* [Python](https://pypi.org/project/OpenCC/)
+
+### Prebuilt 預編譯
+
+* Windows (x86_64): [Latest build](https://ci.appveyor.com/api/projects/Carbo/opencc/artifacts/OpenCC.zip?branch=master&job=Environment:%20nodejs_version=none;%20Platform:%20x64)
+* Windows (x86): [Latest build](https://ci.appveyor.com/api/projects/Carbo/opencc/artifacts/OpenCC.zip?branch=master&job=Environment:%20nodejs_version=none;%20Platform:%20x86)
 
 ## Usage 使用
 
@@ -64,7 +78,7 @@ See [demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js) and [ts
 
 ### Python
 
-[PyPI](https://pypi.org/project/OpenCC/) `pip install opencc` (Windows, Linux, Mac)
+`pip install opencc` (Windows, Linux, Mac)
 
 ```python
 import opencc

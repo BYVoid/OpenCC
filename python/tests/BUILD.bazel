@@ -5,9 +5,6 @@ py_test(
     name = "test_opencc",
     srcs = ["test_opencc.py"],
     data = [
-        "//data/config",
-        "//data/dictionary:binary_dictionaries",
-        "//data/dictionary:text_dictionaries",
         "//test/testcases",
     ],
     imports = [".."],

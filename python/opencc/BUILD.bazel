@@ -5,6 +5,11 @@ package(default_visibility = ["//visibility:public"])
 py_library(
     name = "opencc",
     srcs = ["__init__.py"],
+    data = [
+        "//data/config",
+        "//data/dictionary:binary_dictionaries",
+        "//data/dictionary:text_dictionaries",
+    ],
     imports = [".."],
     deps = ["//src:py_opencc"],
 )

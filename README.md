@@ -98,6 +98,8 @@ int main() {
 }
 ```
 
+[Full example with Bazel](https://github.com/BYVoid/opencc-bazel-example)
+
 ### C
 
 ```c

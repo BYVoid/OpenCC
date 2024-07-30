@@ -3,13 +3,18 @@ from __future__ import absolute_import, unicode_literals
 import os
 import sys
 
-from opencc.clib import opencc_clib
+try:
+    import opencc_clib               
+except ImportError:
+    from opencc.clib import opencc_clib
 
 __all__ = ['OpenCC', 'CONFIGS', '__version__']
 
 __version__ = opencc_clib.__version__
-_thisdir = os.path.dirname(os.path.abspath(__file__))
-_opencc_share_dir = os.path.join(_thisdir, 'clib', 'share', 'opencc')
+_this_dir = os.path.dirname(os.path.abspath(__file__))
+_opencc_share_dir = os.path.join(_this_dir, 'clib', 'share', 'opencc')
+_opencc_rootdir =  os.path.abspath(os.path.join(_this_dir, '..', '..'))
+_opencc_configdir = os.path.join(_opencc_rootdir, 'data', 'config')
 
 if sys.version_info.major == 2:
     text_type = unicode  # noqa
@@ -18,6 +23,8 @@ else:
 
 if os.path.isdir(_opencc_share_dir):
     CONFIGS = [f for f in os.listdir(_opencc_share_dir) if f.endswith('.json')]
+elif os.path.isdir(_opencc_configdir):
+    CONFIGS = [f for f in os.listdir(_opencc_configdir) if f.endswith('.json')]
 else:
     CONFIGS = []
 
@@ -39,7 +46,9 @@ class OpenCC(opencc_clib._OpenCC):
         if not config.endswith('.json'):
             config += '.json'
         if not os.path.isfile(config):
-            config = os.path.join(_opencc_share_dir, config)
+            config_under_share_dir = os.path.join(_opencc_share_dir, config)
+            if os.path.isfile(config_under_share_dir):
+                config = config_under_share_dir
         super(OpenCC, self).__init__(config)
         self.config = config
 

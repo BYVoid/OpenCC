@@ -1,0 +1,16 @@
+load("@pip//:requirements.bzl", "requirement")
+load("@rules_python//python:py_test.bzl", "py_test")
+
+py_test(
+    name = "test_opencc",
+    srcs = ["test_opencc.py"],
+    data = [
+        "//test/testcases",
+    ],
+    imports = [".."],
+    deps = [
+        "//python/opencc",
+        requirement("pytest"),
+        requirement("exceptiongroup"),
+    ],
+)

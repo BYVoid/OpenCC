@@ -1,3 +1,4 @@
+.bazelversion
 .npmignore
 .gitignore
 CMakeLists.txt
@@ -18,8 +19,9 @@ CMakeLists.txt
 /src/*TestBase.cpp
 /doc
 /data/scheme
+/data/scripts
 /deps/google-benchmark
-/deps/gtest*
+/deps/googletest*
 /deps/pybind*
 /deps/tclap*
 /bazel-*

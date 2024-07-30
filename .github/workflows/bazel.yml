@@ -16,5 +16,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: bazelbuild/setup-bazelisk@v3
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - run: bazel build //:opencc
       - run: bazel test --test_output=all //src/... //data/... //test/... //python/...

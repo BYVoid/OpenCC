@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
 
 import os
+import pytest
+import sys
+
 from glob import glob
 
 _this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -39,3 +42,7 @@ def test_conversion():
         for text, ans in zip(intexts, anstexts):
             assert converter.convert(text) == ans, \
                 'Failed to convert {} for {} -> {}'.format(pref, text, ans)
+
+
+if __name__ == "__main__":
+    sys.exit(pytest.main(sys.argv[1:]))

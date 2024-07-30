@@ -1,0 +1,10 @@
+load("@rules_python//python:py_library.bzl", "py_library")
+
+package(default_visibility = ["//visibility:public"])
+
+py_library(
+    name = "opencc",
+    srcs = ["__init__.py"],
+    imports = [".."],
+    deps = ["//src:py_opencc"],
+)

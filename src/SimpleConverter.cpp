@@ -55,7 +55,7 @@ struct InternalData {
         paths_with_runfiles.push_back(
             bazel_runfiles->Rlocation("_main/data/dictionary"));
         return new InternalData(
-            config.NewFromFile(configFileName, paths_with_runfiles));
+            config.NewFromFile(configFileName, paths_with_runfiles, argv0));
       }
 #endif
       return new InternalData(config.NewFromFile(configFileName, paths, argv0));

@@ -222,6 +222,10 @@ Config::Config() : internal(new ConfigInternal()) {}
 
 Config::~Config() { delete reinterpret_cast<ConfigInternal*>(internal); }
 
+ConverterPtr Config::NewFromFile(const std::string& fileName) {
+  return NewFromFile(fileName, std::vector<std::string>{}, nullptr);
+}
+
 ConverterPtr Config::NewFromFile(const std::string& fileName,
                                  const std::vector<std::string>& paths,
                                  const char* argv0) {

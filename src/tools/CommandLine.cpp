@@ -197,7 +197,7 @@ int main(int argc, const char* argv[]) {
       outputFileName = Optional<std::string>(outputArg.getValue());
       noFlush = true;
     }
-    converter = config.NewFromFile(configFileName, pathArg.getValue());
+    converter = config.NewFromFile(configFileName, pathArg.getValue(), argv[0]);
     bool lineByLine = inputFileName.IsNull();
     if (lineByLine) {
       ConvertLineByLine();

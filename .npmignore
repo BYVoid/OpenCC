@@ -19,7 +19,6 @@ CMakeLists.txt
 /src/*TestBase.cpp
 /doc
 /data/scheme
-/data/scripts
 /deps/google-benchmark
 /deps/googletest*
 /deps/pybind*

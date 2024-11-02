@@ -11,7 +11,7 @@
         "OS==\"linux\"",
         {
           "cflags": [
-            "-std=c++17"
+            "-std=c++20"
           ],
           "cflags!": [
             "-fno-exceptions"
@@ -28,7 +28,7 @@
             "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
             "MACOSX_DEPLOYMENT_TARGET": "10.7",
             "OTHER_CPLUSPLUSFLAGS": [
-              "-std=c++17",
+              "-std=c++20",
               "-stdlib=libc++"
             ],
             "OTHER_LDFLAGS": [

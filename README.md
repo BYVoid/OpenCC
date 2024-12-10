@@ -134,7 +134,7 @@ Document 文檔: https://byvoid.github.io/OpenCC/
 * Pure JavaScript: [opencc-js](https://github.com/nk2028/opencc-js)
 * WebAssembly: [wasm-opencc](https://github.com/oyyd/wasm-opencc)
 * Browser Extension: [opencc-extension](https://github.com/tnychn/opencc-extension)
-* Go (Pure): [OpenCC for Go](https://github.com/longbridgeapp/opencc)
+* Go (Pure): [OpenCC for Go](https://github.com/longbridge/opencc)
 * Dart (native-assets): [opencc-dart](https://github.com/lindeer/opencc-dart)
 
 ### Configurations 配置文件

@@ -24,6 +24,7 @@ set(
 set(
   DICTS_GENERATED
   TWPhrases
+  TWPhrasesRevAuto
   TWPhrasesRev
   TWVariantsRev
   HKVariantsRev
@@ -72,12 +73,22 @@ set(
 )
 
 set(
-  DICT_TWPhrasesRev_GENERATING_INPUT
+  DICT_TWPhrasesRevAuto_GENERATING_INPUT
   ${DICT_GENERATED_DIR}/TWPhrases.txt
 )
 set(
+  DICT_TWPhrasesRevAuto_GENERATING_COMMAND
+  ${DICT_REVERSE_BIN} ${DICT_TWPhrasesRevAuto_GENERATING_INPUT} TWPhrasesRevAuto.txt
+)
+
+set(
+  DICT_TWPhrasesRev_GENERATING_INPUT
+  ${DICT_GENERATED_DIR}/TWPhrasesRevAuto.txt
+  ${DICT_DIR}/TWPhrasesRev.txt
+)
+set(
   DICT_TWPhrasesRev_GENERATING_COMMAND
-  ${DICT_REVERSE_BIN} ${DICT_TWPhrasesRev_GENERATING_INPUT} TWPhrasesRev.txt
+  ${DICT_MERGE_BIN} ${DICT_TWPhrasesRev_GENERATING_INPUT} TWPhrasesRev.txt
 )
 
 set(

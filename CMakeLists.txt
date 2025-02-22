@@ -152,9 +152,9 @@ add_definitions(
   -DPACKAGE_NAME="${PACKAGE_NAME}"
 )
 
+set(CMAKE_CXX_STANDARD 14) # default C++ version for new target afterward
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   add_definitions(
-    -std=c++14
     -Wall
   )
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
@@ -163,7 +163,6 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   add_definitions(
-    -std=c++14
     -Wall
   )
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")

@@ -29,7 +29,7 @@ else:
     CONFIGS = []
 
 
-def _append_path_to_env(name, path):
+def _append_path_to_env(name: str, path: str) -> None:
     value = os.environ.get(name, '')
     if path in value:  # Path already exists
         return
@@ -42,7 +42,7 @@ def _append_path_to_env(name, path):
 
 class OpenCC(opencc_clib._OpenCC):
 
-    def __init__(self, config='t2s'):
+    def __init__(self, config: str = 't2s') -> None:
         if not config.endswith('.json'):
             config += '.json'
         if not os.path.isfile(config):

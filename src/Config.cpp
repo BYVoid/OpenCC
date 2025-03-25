@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+#include <sys/stat.h>
 #include <fstream>
 #include <list>
 #include <unordered_map>
@@ -216,6 +217,16 @@ std::string GetParentDirectory(const std::string& path) {
   return path.substr(0, pos + 1);
 }
 
+bool isRegularFile(const std::string& path) {
+    struct stat info;
+
+    if (stat(path.c_str(), &info) != 0)
+        return false;
+
+    // Check if it's a regular file
+    return (info.st_mode & S_IFMT) == S_IFREG;
+}
+
 } // namespace
 
 Config::Config() : internal(new ConfigInternal()) {}
@@ -241,6 +252,8 @@ ConverterPtr Config::NewFromFile(const std::string& fileName,
     impl->paths.push_back(PACKAGE_DATA_DIRECTORY);
   }
   std::string prefixedFileName = impl->FindConfigFile(fileName);
+  if (!isRegularFile(prefixedFileName))
+      throw FileNotFound(prefixedFileName);
   std::ifstream ifs(UTF8Util::GetPlatformString(prefixedFileName));
   std::string content(std::istreambuf_iterator<char>(ifs),
                       (std::istreambuf_iterator<char>()));

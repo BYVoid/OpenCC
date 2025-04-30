@@ -68,7 +68,7 @@ include(CPack)
 #  set(CMAKE_STATIC_LIBRARY_PREFIX ${CMAKE_INSTALL_PREFIX})
 #endif (WIN32)
 
-######## Mac OS X
+######## macOS
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(CMAKE_MACOSX_RPATH 1)

@@ -181,7 +181,7 @@ setuptools.setup(
     ext_modules=[OpenCCExtension('opencc.clib.opencc_clib', 'python')],
     cmdclass={
         'build_ext': BuildExtCommand,
-        'bdist_wheel': BDistWheelCommand
+        'bdist_wheel': BDistWheelCommand,
     },
     setup_requires=setup_requires,
 
@@ -200,7 +200,8 @@ setuptools.setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Software Development :: Localization',
         'Topic :: Text Processing :: Linguistic',
+        'Typing :: Typed',
     ],
     license='Apache License 2.0',
-    keywords=['opencc', 'convert', 'chinese']
+    keywords=['opencc', 'convert', 'chinese'],
 )

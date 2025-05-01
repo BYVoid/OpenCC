@@ -7,8 +7,19 @@
       "dict_merge": "<(module_root_dir)/data/scripts/merge.py",
       "dict_reverse": "<(module_root_dir)/data/scripts/reverse.py",
       "input_prefix": "<(module_root_dir)/data/dictionary/",
-      "output_prefix": "<(PRODUCT_DIR)/"
+      "output_prefix": "<(PRODUCT_DIR)/",
+      "python_cmd": "python3"
     },
+    "conditions": [
+      [
+        "OS==\"win\"",
+        {
+          "variables": {
+            "python_cmd": "python.exe"
+          }
+        }
+      ]
+    ],
     "actions": [{
       "action_name": "STCharacters",
       "variables": {
@@ -69,7 +80,7 @@
       "action_name": "TWPhrases.txt",
       "inputs": ["<(cmd)"],
       "outputs": ["<(output_prefix)TWPhrases.txt"],
-      "action": ["python3", "<(dict_merge)", "<(input_prefix)TWPhrasesIT.txt", "<(input_prefix)TWPhrasesName.txt", "<(input_prefix)TWPhrasesOther.txt", "<@(_outputs)"]
+      "action": ["<(python_cmd)", "<(dict_merge)", "<(input_prefix)TWPhrasesIT.txt", "<(input_prefix)TWPhrasesName.txt", "<(input_prefix)TWPhrasesOther.txt", "<@(_outputs)"]
     }, {
       "action_name": "TWVariantsRev.txt",
       "variables": {
@@ -77,7 +88,7 @@
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)TWVariantsRev.txt"],
-      "action": ["python3", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
+      "action": ["<(python_cmd)", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "TWPhrasesRev.txt",
       "variables": {
@@ -85,7 +96,7 @@
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)TWPhrasesRev.txt"],
-      "action": ["python3", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
+      "action": ["<(python_cmd)", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "TWPhrases",
       "variables": {
@@ -133,7 +144,7 @@
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)HKVariantsRev.txt"],
-      "action": ["python3", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
+      "action": ["<(python_cmd)", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "HKVariantsRev",
       "variables": {
@@ -149,7 +160,7 @@
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)JPVariantsRev.txt"],
-      "action": ["python3", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
+      "action": ["<(python_cmd)", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "JPVariantsRev",
       "variables": {

@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <iterator>
 #include <sstream>
 
 #include "Common.hpp"
@@ -53,8 +54,11 @@ public:
     managed.push_back(str);
   }
 
-  class iterator : public std::iterator<std::input_iterator_tag, const char*> {
+  class iterator {
   public:
+    using iterator_category = std::input_iterator_tag;
+    using value_type = const char*;
+
     iterator(const Segments* const _segments, size_t _cursor)
         : segments(_segments), cursor(_cursor) {}
 

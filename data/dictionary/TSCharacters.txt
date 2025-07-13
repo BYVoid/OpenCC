@@ -5018,3 +5018,4 @@
 𫒡	𫒡 𫓷
 # @tofu-risk: not covered by PingFang/Source Han baseline: 𫜫 U+2B72B
 𫜦	𫜦 𫜫
+𰻞	𰻝

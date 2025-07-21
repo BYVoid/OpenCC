@@ -72,7 +72,7 @@ include(CPack)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(CMAKE_MACOSX_RPATH 1)
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
 endif()
 
@@ -152,7 +152,7 @@ add_definitions(
   -DPACKAGE_NAME="${PACKAGE_NAME}"
 )
 
-set(CMAKE_CXX_STANDARD 14) # default C++ version for new target afterward
+set(CMAKE_CXX_STANDARD 17) # default C++ version for new target afterward
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   add_definitions(
     -Wall

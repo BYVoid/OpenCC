@@ -202,6 +202,15 @@ public:
       }
     }
 
+    const char* envPath = std::getenv("OPENCC_DATA_DIR");
+    if (envPath != nullptr) {
+      auto path = std::string(envPath) + '/' + fileName;
+      ifs.open(UTF8Util::GetPlatformString(path).c_str());
+      if (ifs.is_open()) {
+        return path;
+      }
+    }
+
     throw FileNotFound(fileName);
   }
 };

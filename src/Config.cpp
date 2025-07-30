@@ -202,6 +202,16 @@ public:
       }
     }
 
+    const char* envPath = std::getenv("OPENCC_SHARED_DIR");
+    if (envPath != nullptr) {
+      std::string path(envPath);
+      path += '/' + fileName;
+      ifs.open(UTF8Util::GetPlatformString(path).c_str());
+      if (ifs.is_open()) {
+        return path;
+      }
+    }
+
     throw FileNotFound(fileName);
   }
 };

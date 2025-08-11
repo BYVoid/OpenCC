@@ -21,6 +21,7 @@ cmake_minimum_required(VERSION 3.5)
 set (PACKAGE_NAME opencc)
 project (${PACKAGE_NAME} CXX)
 include (CTest)
+include(GNUInstallDirs)
 
 ######## Options
 option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
@@ -77,6 +78,11 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif()
 
 ######## Directory
+
+set(LIB_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}" CACHE PATH "")
+if(CMAKE_INSTALL_LIBDIR MATCHES "lib64$")
+  set(LIB_SUFFIX 64)
+endif()
 
 set (DIR_PREFIX ${CMAKE_INSTALL_PREFIX})
 set (DIR_INCLUDE ${DIR_PREFIX}/include)

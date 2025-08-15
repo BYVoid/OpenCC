@@ -12,6 +12,10 @@ bash ${MINICONDA_FILENAME} -b -f -p $HOME/miniconda3
 export PATH=$HOME/miniconda3/bin:$PATH
 eval "$(conda shell.bash hook)"
 
+# Accept conda Terms of Service for required channels
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+
 for VERSION in 3.8 3.9 3.10 3.11 3.12; do
     # Create and activate environment
     conda config --add channels conda-forge

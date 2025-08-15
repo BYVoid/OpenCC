@@ -5,7 +5,14 @@ set -e
 # this script has to be ran from a clean dockerfile
 
 # Download and init conda
-MINICONDA_FILENAME=Miniconda3-latest-MacOSX-x86_64.sh
+# Detect architecture and set appropriate Miniconda filename
+ARCH=$(uname -m)
+if [ "$ARCH" = "arm64" ]; then
+    MINICONDA_FILENAME=Miniconda3-latest-MacOSX-arm64.sh
+else
+    MINICONDA_FILENAME=Miniconda3-latest-MacOSX-x86_64.sh
+fi
+
 curl -L -o $MINICONDA_FILENAME \
     "https://repo.continuum.io/miniconda/$MINICONDA_FILENAME"
 bash ${MINICONDA_FILENAME} -b -f -p $HOME/miniconda3

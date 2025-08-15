@@ -4,6 +4,10 @@ setlocal EnableDelayedExpansion
 SET VERSIONS=3.8 3.9 3.10 3.11 3.12
 SET SOURCEDIR=%cd%
 
+REM Accept conda Terms of Service for required channels
+CALL C:\Miniconda/condabin/conda.bat tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+CALL C:\Miniconda/condabin/conda.bat tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+
 REM Build packages
 for %%v in (%VERSIONS%) do (
     SET ENV_NAME=py%%v

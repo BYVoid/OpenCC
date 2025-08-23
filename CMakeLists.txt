@@ -21,6 +21,7 @@ cmake_minimum_required(VERSION 3.5)
 set (PACKAGE_NAME opencc)
 project (${PACKAGE_NAME} CXX)
 include (CTest)
+include (GNUInstallDirs)
 
 ######## Options
 option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
@@ -79,10 +80,10 @@ endif()
 ######## Directory
 
 set (DIR_PREFIX ${CMAKE_INSTALL_PREFIX})
-set (DIR_INCLUDE ${DIR_PREFIX}/include)
-set (DIR_SHARE ${DIR_PREFIX}/share)
-set (DIR_ETC ${DIR_PREFIX}/etc)
-set (DIR_LIBRARY ${DIR_PREFIX}/lib${LIB_SUFFIX})
+set (DIR_INCLUDE ${CMAKE_INSTALL_INCLUDEDIR})
+set (DIR_SHARE ${CMAKE_INSTALL_DATAROOTDIR})
+set (DIR_ETC ${CMAKE_INSTALL_SYSCONFDIR})
+set (DIR_LIBRARY ${CMAKE_INSTALL_FULL_LIBDIR})
 
 if (DEFINED SHARE_INSTALL_PREFIX)
   set (DIR_SHARE ${SHARE_INSTALL_PREFIX})

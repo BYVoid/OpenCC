@@ -5,12 +5,23 @@ set -e
 # this script has to be ran from a clean dockerfile
 
 # Download and init conda
-MINICONDA_FILENAME=Miniconda3-latest-MacOSX-x86_64.sh
+# Detect architecture and set appropriate Miniconda filename
+ARCH=$(uname -m)
+if [ "$ARCH" = "arm64" ]; then
+    MINICONDA_FILENAME=Miniconda3-latest-MacOSX-arm64.sh
+else
+    MINICONDA_FILENAME=Miniconda3-latest-MacOSX-x86_64.sh
+fi
+
 curl -L -o $MINICONDA_FILENAME \
     "https://repo.continuum.io/miniconda/$MINICONDA_FILENAME"
 bash ${MINICONDA_FILENAME} -b -f -p $HOME/miniconda3
 export PATH=$HOME/miniconda3/bin:$PATH
 eval "$(conda shell.bash hook)"
+
+# Accept conda Terms of Service for required channels
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
 
 for VERSION in 3.8 3.9 3.10 3.11 3.12; do
     # Create and activate environment

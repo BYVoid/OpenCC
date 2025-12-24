@@ -12,9 +12,15 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20.x, 22.x, latest]
-        os: [ubuntu-latest, macos-latest, macos-14]
-
+        # Bleeding Edge: Latest Node × Latest OS
+        os: [ubuntu-latest, macos-latest]
+        node-version: [latest]
+        # Stable: Node 20, 22 (LTS) on macOS 14 (ARM64)
+        include:
+          - os: macos-14
+            node-version: 22
+          - os: macos-14
+            node-version: 20
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}

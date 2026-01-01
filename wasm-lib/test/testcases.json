@@ -1,0 +1,257 @@
+[
+  {
+    "config": "s2twp.json",
+    "input": "鼠标里面的硅二极管坏了，导致光标分辨率降低。",
+    "expected": "滑鼠裡面的矽二極體壞了，導致游標解析度降低。"
+  },
+  {
+    "config": "s2twp.json",
+    "input": "我们在老挝的服务器的硬盘需要使用互联网算法软件解决异步的问题。",
+    "expected": "我們在寮國的伺服器的硬碟需要使用網際網路演算法軟體解決非同步的問題。"
+  },
+  {
+    "config": "s2twp.json",
+    "input": "为什么你在床里面睡着？",
+    "expected": "為什麼你在床裡面睡著？"
+  },
+  {
+    "config": "s2twp.json",
+    "input": "海内存知己",
+    "expected": "海內存知己"
+  },
+  {
+    "config": "s2twp.json",
+    "input": "摩尔线程",
+    "expected": "摩爾線程"
+  },
+  {
+    "config": "s2twp.json",
+    "input": "字节跳动",
+    "expected": "字節跳動"
+  },
+  {
+    "config": "t2s.json",
+    "input": "曾經有一份真誠的愛情放在我面前，我沒有珍惜，等我失去的時候我才後悔莫及。人事間最痛苦的事莫過於此。如果上天能夠給我一個再來一次得機會，我會對那個女孩子說三個字，我愛你。如果非要在這份愛上加個期限，我希望是，一萬年。",
+    "expected": "曾经有一份真诚的爱情放在我面前，我没有珍惜，等我失去的时候我才后悔莫及。人事间最痛苦的事莫过于此。如果上天能够给我一个再来一次得机会，我会对那个女孩子说三个字，我爱你。如果非要在这份爱上加个期限，我希望是，一万年。"
+  },
+  {
+    "config": "t2s.json",
+    "input": "二噁英",
+    "expected": "二𫫇英"
+  },
+  {
+    "config": "tw2sp.json",
+    "input": "滑鼠裡面的矽二極體壞了，導致游標解析度降低。",
+    "expected": "鼠标里面的硅二极管坏了，导致光标分辨率降低。"
+  },
+  {
+    "config": "tw2sp.json",
+    "input": "我們在寮國的伺服器的硬碟需要使用網際網路演算法軟體解決非同步的問題。",
+    "expected": "我们在老挝的服务器的硬盘需要使用互联网算法软件解决异步的问题。"
+  },
+  {
+    "config": "tw2sp.json",
+    "input": "為什麼你在床裡面睡著？",
+    "expected": "为什么你在床里面睡着？"
+  },
+  {
+    "config": "tw2sp.json",
+    "input": "用滑鼠點選正規表示式",
+    "expected": "用鼠标点击正则表达式"
+  },
+  {
+    "config": "tw2sp.json",
+    "input": "KB大橋也被視為帛琉人的後花園",
+    "expected": "KB大桥也被视为帕劳人的后花园"
+  },
+  {
+    "config": "t2hk.json",
+    "input": "潮溼的露臺",
+    "expected": "潮濕的露台"
+  },
+  {
+    "config": "t2hk.json",
+    "input": "爲了覈實這說法",
+    "expected": "為了核實這説法"
+  },
+  {
+    "config": "t2hk.json",
+    "input": "包糉子活動告一段落",
+    "expected": "包粽子活動告一段落"
+  },
+  {
+    "config": "jp2t.json",
+    "input": "旧字体歴史仮名遣 新字体現代仮名遣",
+    "expected": "舊字體歷史假名遣 新字體現代假名遣"
+  },
+  {
+    "config": "jp2t.json",
+    "input": "横浜 糸魚川 伊予国",
+    "expected": "橫濱 絲魚川 伊豫國"
+  },
+  {
+    "config": "jp2t.json",
+    "input": "駅弁当 弁別 弁護士 弁膜",
+    "expected": "驛辨當 辨別 辯護士 瓣膜"
+  },
+  {
+    "config": "jp2t.json",
+    "input": "芸術 欠航 欠缺 飲料缶",
+    "expected": "藝術 缺航 欠缺 飲料罐"
+  },
+  {
+    "config": "tw2t.json",
+    "input": "為了眾人化妝床頭裡面衛生，醞釀群峰鐵鉤嘆氣事件",
+    "expected": "爲了衆人化妝牀頭裏面衛生，醞釀羣峯鐵鉤嘆氣事件"
+  },
+  {
+    "config": "tw2t.json",
+    "input": "在廚房裡做手擀麵",
+    "expected": "在廚房裏做手擀麪"
+  },
+  {
+    "config": "tw2t.json",
+    "input": "想到自己一緊張就口吃，我就沒胃口吃飯",
+    "expected": "想到自己一緊張就口吃，我就沒胃口喫飯"
+  },
+  {
+    "config": "s2hk.json",
+    "input": "虚伪叹息",
+    "expected": "虛偽嘆息"
+  },
+  {
+    "config": "s2hk.json",
+    "input": "潮湿灶台",
+    "expected": "潮濕灶台"
+  },
+  {
+    "config": "s2hk.json",
+    "input": "赞叹沙河涌汹涌的波浪",
+    "expected": "讚歎沙河涌洶湧的波浪"
+  },
+  {
+    "config": "s2hk.json",
+    "input": "为了核实这说法",
+    "expected": "為了核實這説法"
+  },
+  {
+    "config": "hk2s.json",
+    "input": "虛偽歎息",
+    "expected": "虚伪叹息"
+  },
+  {
+    "config": "hk2s.json",
+    "input": "潮濕灶台",
+    "expected": "潮湿灶台"
+  },
+  {
+    "config": "hk2s.json",
+    "input": "讚歎沙河涌洶湧的波浪",
+    "expected": "赞叹沙河涌汹涌的波浪"
+  },
+  {
+    "config": "s2t.json",
+    "input": "夸夸其谈 夸父逐日",
+    "expected": "誇誇其談 夸父逐日"
+  },
+  {
+    "config": "s2t.json",
+    "input": "我干什么不干你事。",
+    "expected": "我幹什麼不干你事。"
+  },
+  {
+    "config": "s2t.json",
+    "input": "太后的头发很干燥。",
+    "expected": "太后的頭髮很乾燥。"
+  },
+  {
+    "config": "s2t.json",
+    "input": "燕燕于飞，差池其羽。之子于归，远送于野。",
+    "expected": "燕燕于飛，差池其羽。之子于歸，遠送於野。"
+  },
+  {
+    "config": "s2t.json",
+    "input": "请成相，世之殃，愚暗愚暗堕贤良。人主无贤，如瞽无相何伥伥！请布基，慎圣人，愚而自专事不治。主忌苟胜，群臣莫谏必逢灾。",
+    "expected": "請成相，世之殃，愚闇愚闇墮賢良。人主無賢，如瞽無相何倀倀！請布基，慎聖人，愚而自專事不治。主忌苟勝，羣臣莫諫必逢災。"
+  },
+  {
+    "config": "s2t.json",
+    "input": "曾经有一份真诚的爱情放在我面前，我没有珍惜，等我失去的时候我才后悔莫及。人事间最痛苦的事莫过于此。如果上天能够给我一个再来一次得机会，我会对那个女孩子说三个字，我爱你。如果非要在这份爱上加个期限，我希望是，一万年。",
+    "expected": "曾經有一份真誠的愛情放在我面前，我沒有珍惜，等我失去的時候我才後悔莫及。人事間最痛苦的事莫過於此。如果上天能夠給我一個再來一次得機會，我會對那個女孩子說三個字，我愛你。如果非要在這份愛上加個期限，我希望是，一萬年。"
+  },
+  {
+    "config": "s2t.json",
+    "input": "新的理论被发现了。",
+    "expected": "新的理論被發現了。"
+  },
+  {
+    "config": "s2t.json",
+    "input": "金胄不是金色的甲胄。",
+    "expected": "金胄不是金色的甲冑。"
+  },
+  {
+    "config": "s2t.json",
+    "input": "经理发现后劝谕两人",
+    "expected": "經理發現後勸諭兩人"
+  },
+  {
+    "config": "s2t.json",
+    "input": "想到自己一紧张就口吃，我就没胃口吃饭",
+    "expected": "想到自己一緊張就口吃，我就沒胃口喫飯"
+  },
+  {
+    "config": "s2t.json",
+    "input": "恒指最新消息，恒生指数跌破 2 万点",
+    "expected": "恒指最新消息，恒生指數跌破 2 萬點"
+  },
+  {
+    "config": "s2t.json",
+    "input": "恒生银行和恒大集团发布财报",
+    "expected": "恒生銀行和恒大集團發佈財報"
+  },
+  {
+    "config": "hk2t.json",
+    "input": "為賦新詞強説愁",
+    "expected": "爲賦新詞強說愁"
+  },
+  {
+    "config": "hk2t.json",
+    "input": "想到自己一緊張就口吃，我就沒胃口吃飯",
+    "expected": "想到自己一緊張就口吃，我就沒胃口喫飯"
+  },
+  {
+    "config": "s2tw.json",
+    "input": "着装污染虚伪发泄棱柱群众里面",
+    "expected": "著裝汙染虛偽發洩稜柱群眾裡面"
+  },
+  {
+    "config": "s2tw.json",
+    "input": "鲶鱼和鲇鱼是一种生物。",
+    "expected": "鯰魚和鯰魚是一種生物。"
+  },
+  {
+    "config": "tw2s.json",
+    "input": "著裝著作汙染虛偽發洩稜柱群眾裡面",
+    "expected": "着装著作污染虚伪发泄棱柱群众里面"
+  },
+  {
+    "config": "t2jp.json",
+    "input": "舊字體歷史假名遣 新字體現代假名遣",
+    "expected": "旧字体歴史仮名遣 新字体現代仮名遣"
+  },
+  {
+    "config": "t2jp.json",
+    "input": "橫濱 絲魚川 伊豫國",
+    "expected": "横浜 糸魚川 伊予国"
+  },
+  {
+    "config": "t2jp.json",
+    "input": "驛辨當 辨別 辯護士 瓣膜",
+    "expected": "駅弁当 弁別 弁護士 弁膜"
+  },
+  {
+    "config": "t2jp.json",
+    "input": "藝術 缺航 飲料罐",
+    "expected": "芸術 欠航 飲料缶"
+  }
+]

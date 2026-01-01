@@ -1,0 +1,38 @@
+{
+  "name": "opencc-wasm",
+  "version": "0.1.0",
+  "description": "WebAssembly backend for OpenCC with opencc-js compatible API and official configs/ocd2 dictionaries.",
+  "keywords": [
+    "opencc",
+    "wasm",
+    "chinese",
+    "simplified",
+    "traditional",
+    "converter"
+  ],
+  "type": "module",
+  "main": "./dist/opencc-wasm.cjs",
+  "module": "./dist/opencc-wasm.js",
+  "exports": {
+    ".": {
+      "import": "./dist/opencc-wasm.js",
+      "require": "./dist/opencc-wasm.cjs"
+    }
+  },
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "./build.sh && node scripts/build-api.js",
+    "test": "node --test test/opencc.test.js"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "author": "Frank Lin (based on OpenCC)",
+  "contributors": [
+    "OpenCC Authors"
+  ],
+  "license": "Apache-2.0"
+}

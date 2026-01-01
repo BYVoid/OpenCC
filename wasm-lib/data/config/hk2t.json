@@ -1,0 +1,22 @@
+{
+  "name": "Traditional Chinese (Hong Kong variant) to Traditional Chinese",
+  "segmentation": {
+    "type": "mmseg",
+    "dict": {
+      "type": "ocd2",
+      "file": "HKVariantsRevPhrases.ocd2"
+    }
+  },
+  "conversion_chain": [{
+    "dict": {
+      "type": "group",
+      "dicts": [{
+        "type": "ocd2",
+        "file": "HKVariantsRevPhrases.ocd2"
+      }, {
+        "type": "ocd2",
+        "file": "HKVariantsRev.ocd2"
+      }] 
+    }
+  }]
+}

@@ -11,17 +11,27 @@
     "converter"
   ],
   "type": "module",
-  "main": "./dist/opencc-wasm.cjs",
-  "module": "./dist/opencc-wasm.js",
+  "main": "./dist/cjs/index.cjs",
+  "module": "./dist/esm/index.js",
+  "types": "./index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/opencc-wasm.js",
-      "require": "./dist/opencc-wasm.cjs"
-    }
+      "types": "./index.d.ts",
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.cjs"
+    },
+    "./wasm": {
+      "import": "./dist/esm/opencc-wasm.js",
+      "require": "./dist/cjs/opencc-wasm.cjs"
+    },
+    "./dist/*": "./dist/*"
   },
   "files": [
     "dist/",
-    "README.md"
+    "index.d.ts",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
   ],
   "scripts": {
     "build": "./build.sh && node scripts/build-api.js",

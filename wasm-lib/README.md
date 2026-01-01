@@ -37,19 +37,82 @@ console.log(custom("悟空道：“师父又来了。怎么叫做‘水中捞月
 const OpenCC = require("opencc-wasm").default;
 ```
 
-## Files and entry points
-- ESM: `dist/opencc-wasm.js`
-- CJS: `dist/opencc-wasm.cjs`
-- Data: `dist/data/config/*.json`, `dist/data/dict/*.ocd2` (copied during `npm run build`)
+## Build
 
-The package `exports` map is set so bundlers and Node can pick the right build automatically.
+The project uses a two-stage build process with semantic separation:
+
+### Stage 1: Build WASM (intermediate artifacts)
+
+```bash
+./build.sh
+```
+
+Compiles OpenCC + marisa-trie to WASM and generates intermediate build artifacts in `build/`:
+- `build/opencc-wasm.esm.js` - ESM WASM glue (for tests/development)
+- `build/opencc-wasm.cjs` - CJS WASM glue (for tests/development)
+- `build/opencc-wasm.wasm` - WASM binary
+
+**Semantic: `build/` = internal intermediate artifacts, not for publishing**
+
+### Stage 2: Build API wrappers (publishable dist)
+
+```bash
+node scripts/build-api.js
+```
+
+Generates publishable distribution in `dist/`:
+- Copies WASM artifacts from `build/` to `dist/esm/` and `dist/cjs/`
+- Transforms source `index.js` to `dist/esm/index.js` with production paths
+- Generates `dist/cjs/index.cjs` with CJS-compatible wrapper
+- Copies data files to `dist/data/`
+
+**Semantic: `dist/` = publishable artifacts for npm**
+
+### Complete build
+
+```bash
+npm run build
+```
+
+Runs both stages automatically.
 
 ## Testing
 ```bash
-cd wasm-lib
 npm test
 ```
+
+Tests import from source `index.js`, which references `build/` artifacts.
+This ensures tests validate the actual build output, not stale dist files.
+
 Runs the upstream OpenCC testcases (converted to JSON) against the WASM build.
+
+## Project Structure
+
+```
+wasm-lib/
+├── build/              ← Intermediate WASM artifacts (gitignored, for tests)
+│   ├── opencc-wasm.esm.js
+│   ├── opencc-wasm.cjs
+│   └── opencc-wasm.wasm
+├── dist/               ← Publishable distribution (committed to git)
+│   ├── esm/
+│   │   ├── index.js
+│   │   └── opencc-wasm.js
+│   ├── cjs/
+│   │   ├── index.cjs
+│   │   └── opencc-wasm.cjs
+│   ├── opencc-wasm.wasm
+│   └── data/           ← OpenCC config + dict files
+├── index.js            ← Source API (references build/ for tests)
+├── index.d.ts          ← TypeScript definitions
+└── scripts/
+    └── build-api.js    ← Transforms build/ → dist/
+```
+
+**Invariants:**
+- Tests import source (`index.js`) → loads from `build/`
+- Published package exports `dist/` only
+- `build/` = internal, `dist/` = publishable
 
 ## Notes
 - Internally uses persistent OpenCC handles (`opencc_create/convert/destroy`) to avoid reloading configs.

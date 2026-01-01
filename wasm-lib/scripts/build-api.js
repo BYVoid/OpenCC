@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Build API wrappers (ESM + CJS) that call the generated WASM factory.
- * Assumes `build.sh` has produced dist/opencc-wasm.js|.cjs|.wasm
+ * Build publishable dist/ from intermediate build/ artifacts.
+ * Assumes `build.sh` has produced build/opencc-wasm.{esm.js,cjs,wasm}
  * and data/ contains config/ + dict/ to be copied into dist/data/.
  */
 
@@ -11,12 +11,18 @@ import url from "node:url";
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
+const build = path.join(root, "build");
 const dist = path.join(root, "dist");
 const distEsm = path.join(dist, "esm");
 const distCjs = path.join(dist, "cjs");
 
 fs.mkdirSync(distEsm, { recursive: true });
 fs.mkdirSync(distCjs, { recursive: true });
+
+// Copy WASM glue from build/ to dist/
+fs.copyFileSync(path.join(build, "opencc-wasm.esm.js"), path.join(distEsm, "opencc-wasm.js"));
+fs.copyFileSync(path.join(build, "opencc-wasm.cjs"), path.join(distCjs, "opencc-wasm.cjs"));
+fs.copyFileSync(path.join(build, "opencc-wasm.wasm"), path.join(dist, "opencc-wasm.wasm"));
 
 // Copy data folder into dist/data for bundled lookup
 const dataSrc = path.join(root, "data");
@@ -32,12 +38,12 @@ apiSource = apiSource.replace(
   'const BASE_URL = new URL("../", import.meta.url);'
 );
 apiSource = apiSource.replace(
-  "const { default: create } = await import(wasmUrl.href);",
-  "const { default: create } = await import(wasmUrl.href); modulePromise = create({ locateFile: (p) => new URL(p, wasmUrl).href }); return modulePromise;"
+  'const glueUrl = new URL("build/opencc-wasm.esm.js", pkgBase);',
+  'const glueUrl = new URL("./opencc-wasm.js", import.meta.url);'
 );
 apiSource = apiSource.replace(
-  './dist/opencc-wasm.js',
-  '../opencc-wasm.js'
+  'locateFile: (p) => new URL(`build/${p}`, pkgBase).href',
+  'locateFile: (p) => new URL(`../${p}`, import.meta.url).href'
 );
 fs.writeFileSync(path.join(distEsm, "index.js"), apiSource, "utf-8");
 
@@ -68,7 +74,7 @@ let api = null;
 
 async function getModule() {
   if (!modulePromise) {
-    const wasmUrl = new URL("../opencc-wasm.cjs", BASE_URL);
+    const wasmUrl = new URL("./opencc-wasm.cjs", import.meta.url || "file://" + __filename);
     const create = require(wasmUrl);
     modulePromise = create();
   }

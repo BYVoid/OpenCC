@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# 输出目录
-OUT_DIR="dist"
-mkdir -p "${OUT_DIR}"
+# 输出目录（中间构建产物）
+BUILD_DIR="build"
+mkdir -p "${BUILD_DIR}"
 
 # 单独的 emcc 缓存目录，避免权限问题
 export EM_CACHE="$(pwd)/.emcache"
@@ -83,13 +83,19 @@ COMMON_FLAGS=(
 em++ \
   "${COMMON_FLAGS[@]}" \
   -s EXPORT_ES6=1 \
-  -o "${OUT_DIR}/opencc-wasm.js"
+  -o "${BUILD_DIR}/opencc-wasm.esm.js"
 
 # CommonJS（适合 Node.js require）
 em++ \
   "${COMMON_FLAGS[@]}" \
   -s EXPORT_ES6=0 \
   -s ENVIRONMENT='node' \
-  -o "${OUT_DIR}/opencc-wasm.cjs"
+  -o "${BUILD_DIR}/opencc-wasm.cjs"
 
-echo "Build complete. Files in ${OUT_DIR}/"
+# WASM 文件由 emcc 自动生成
+echo "Build complete. Intermediate files in ${BUILD_DIR}/"
+echo "  - ${BUILD_DIR}/opencc-wasm.esm.js (ESM glue for tests/rebuild)"
+echo "  - ${BUILD_DIR}/opencc-wasm.cjs (CJS glue for tests/rebuild)"
+echo "  - ${BUILD_DIR}/opencc-wasm.wasm (WASM binary)"
+echo ""
+echo "Run 'node scripts/build-api.js' to generate dist/ for publishing."

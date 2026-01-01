@@ -1,1 +1,39 @@
+# Emscripten cache
 .emcache
+
+# Node modules
+node_modules/
+
+# Build intermediates (not committed)
+build/
+
+# Dist outputs (keep in git for npm package)
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.swp
+*.swo
+*~
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Temporary files
+*.tmp
+.cache/

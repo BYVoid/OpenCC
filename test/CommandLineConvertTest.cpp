@@ -201,6 +201,9 @@ TEST_F(CommandLineConvertTest, ConvertFromJson) {
     std::string line;
     size_t idx = 0;
     while (std::getline(ofs, line)) {
+      if (!line.empty() && line.back() == '\r') {
+        line.pop_back(); // normalize Windows CRLF
+      }
       ASSERT_LT(idx, entry.second.size());
       EXPECT_EQ(entry.second[idx].expected, line)
           << "config=" << config << " index=" << idx;

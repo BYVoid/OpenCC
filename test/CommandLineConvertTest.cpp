@@ -188,6 +188,8 @@ TEST_F(CommandLineConvertTest, ConvertFromJson) {
     // Write inputs into a temp file (one per line).
     {
       std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open()) << "Failed to open input file for writing: "
+                                 << inputFile;
       for (const auto& item : entry.second) {
         ofs << item.input << "\n";
       }
@@ -196,11 +198,11 @@ TEST_F(CommandLineConvertTest, ConvertFromJson) {
     ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
 
     // Read outputs and compare line by line.
-    std::ifstream ofs(outputFile, std::ios::binary);
-    ASSERT_TRUE(ofs.is_open());
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open());
     std::string line;
     size_t idx = 0;
-    while (std::getline(ofs, line)) {
+    while (std::getline(ifs, line)) {
       if (!line.empty() && line.back() == '\r') {
         line.pop_back(); // normalize Windows CRLF
       }

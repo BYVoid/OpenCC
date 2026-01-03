@@ -52,7 +52,7 @@ describe('Async Promise API', function () {
   cases.forEach(function (tc, idx) {
     Object.entries(tc.expected || {}).forEach(function ([cfg, expected]) {
       it('[' + cfg + '] case #' + (idx + 1), function (done) {
-        testAsyncPromise(tc, cfg, expected).then(done, done);
+        testAsyncPromise(tc, cfg, expected).then(() => done(), done);
       });
     });
   });

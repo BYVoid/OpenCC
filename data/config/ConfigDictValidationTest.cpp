@@ -4,6 +4,11 @@
  * End-to-end validation of all configs against consolidated testcases.json.
  */
 
+#ifndef BAZEL
+// This test is Bazel-only; CMake builds should skip compiling it.
+static_assert(false, "ConfigDictValidationTest is only supported under Bazel");
+#else
+
 #include <fstream>
 #include <memory>
 #include <sstream>
@@ -14,10 +19,8 @@
 #include "rapidjson/document.h"
 #include "src/SimpleConverter.hpp"
 
-#ifdef BAZEL
 #include "tools/cpp/runfiles/runfiles.h"
 using bazel::tools::cpp::runfiles::Runfiles;
-#endif
 
 namespace opencc {
 namespace {
@@ -102,3 +105,5 @@ TEST_F(ConfigDictValidationTest, ConvertExpectedOutputs) {
 
 } // namespace
 } // namespace opencc
+
+#endif // BAZEL

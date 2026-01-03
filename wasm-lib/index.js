@@ -56,9 +56,9 @@ async function getModule() {
 
   const { default: create } = await import(glueUrl.href);
 
-  // 3) locateFile 必须相对 pkgBase，而不是 glueUrl
+  // 3) locateFile looks for wasm in same directory as glue code
   modulePromise = create({
-    locateFile: (p) => new URL(`build/${p}`, pkgBase).href
+    locateFile: (p) => new URL(p, glueUrl).href
   });
 
   return modulePromise;

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenCC WASM CDN Test</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    textarea, input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+      font-family: inherit;
+    }
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .output {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f5f5f5;
+      border-radius: 4px;
+      min-height: 50px;
+      white-space: pre-wrap;
+    }
+    .status {
+      color: #666;
+      font-size: 14px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>OpenCC WASM CDN 测试</h1>
+  <div class="status" id="status">正在初始化...</div>
+
+  <label>
+    输入文本（简体中文）：
+    <textarea id="input" placeholder="请输入简体中文文本...">开源中文转换工具</textarea>
+  </label>
+
+  <button id="run" disabled>转换为繁体中文</button>
+
+  <div class="output" id="output"></div>
+
+  <script type="module">
+    const status = document.getElementById('status');
+    const input = document.getElementById('input');
+    const run = document.getElementById('run');
+    const output = document.getElementById('output');
+
+    try {
+      status.textContent = '正在加载 OpenCC WASM 模块...';
+
+      // 从本地 dist 导入（模拟 CDN）
+      // 实际发布后可以用：
+      // import initOpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.2.1/dist/esm/opencc-wasm.js";
+      const { default: initOpenCC } = await import('../dist/esm/opencc-wasm.js');
+
+      status.textContent = '正在初始化 WASM 运行时...';
+      const wasmModule = await initOpenCC();
+
+      status.textContent = '正在包装 API...';
+      const api = {
+        create: wasmModule.cwrap("opencc_create", "number", ["string"]),
+        convert: wasmModule.cwrap("opencc_convert", "string", ["number", "string"]),
+        destroy: wasmModule.cwrap("opencc_destroy", null, ["number"]),
+      };
+
+      // 准备虚拟文件系统
+      status.textContent = '正在加载配置和字典...';
+      wasmModule.FS.mkdirTree("/data/config");
+      wasmModule.FS.mkdirTree("/data/dict");
+
+      // 加载 s2t.json 配置
+      const configResp = await fetch('../dist/data/config/s2t.json');
+      const configJson = await configResp.json();
+
+      // 收集需要的字典文件
+      const dicts = new Set();
+      function collectOcd2Files(node) {
+        if (!node || typeof node !== "object") return;
+        if (node.type === "ocd2" && node.file) dicts.add(node.file);
+        if (node.type === "group" && Array.isArray(node.dicts)) {
+          node.dicts.forEach(collectOcd2Files);
+        }
+      }
+      collectOcd2Files(configJson.segmentation?.dict);
+      if (Array.isArray(configJson.conversion_chain)) {
+        configJson.conversion_chain.forEach(item => collectOcd2Files(item?.dict));
+      }
+
+      // 加载字典文件
+      for (const file of dicts) {
+        const dictResp = await fetch(`../dist/data/dict/${file}`);
+        const buf = new Uint8Array(await dictResp.arrayBuffer());
+        wasmModule.FS.writeFile(`/data/dict/${file}`, buf);
+      }
+
+      // 修改配置中的路径
+      function patchPaths(node) {
+        if (!node || typeof node !== "object") return;
+        if (node.type === "ocd2" && node.file) {
+          node.file = `/data/dict/${node.file}`;
+        }
+        if (node.type === "group" && Array.isArray(node.dicts)) {
+          node.dicts.forEach(patchPaths);
+        }
+      }
+      patchPaths(configJson.segmentation?.dict);
+      if (Array.isArray(configJson.conversion_chain)) {
+        configJson.conversion_chain.forEach(item => patchPaths(item?.dict));
+      }
+
+      wasmModule.FS.writeFile("/data/config/s2t.json", JSON.stringify(configJson));
+
+      // 创建转换器实例
+      const handle = api.create("/data/config/s2t.json");
+      if (!handle || handle < 0) {
+        throw new Error("opencc_create failed");
+      }
+
+      status.textContent = '✅ 初始化成功！可以使用了';
+      run.disabled = false;
+
+      run.onclick = async () => {
+        try {
+          const text = input.value;
+          if (!text.trim()) {
+            output.textContent = '请输入文本';
+            return;
+          }
+
+          output.textContent = '转换中...';
+          const result = api.convert(handle, text);
+          output.textContent = result;
+        } catch (err) {
+          output.textContent = '❌ 转换失败：' + err.message;
+          console.error(err);
+        }
+      };
+
+      // 自动执行一次
+      run.click();
+
+    } catch (err) {
+      status.textContent = '❌ 初始化失败：' + err.message;
+      output.textContent = err.stack;
+      console.error(err);
+    }
+  </script>
+</body>
+</html>

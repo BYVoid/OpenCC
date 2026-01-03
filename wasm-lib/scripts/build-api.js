@@ -21,12 +21,19 @@ fs.mkdirSync(distCjs, { recursive: true });
 
 // Copy WASM glue from build/ to dist/
 let esmGlue = fs.readFileSync(path.join(build, "opencc-wasm.esm.js"), "utf-8");
-// Keep the .esm.wasm reference; package both wasm filenames for compatibility.
-esmGlue = esmGlue.replace(/opencc-wasm\\.esm\\.wasm/g, "opencc-wasm.esm.wasm");
+// Change wasm reference to same directory (remove .esm suffix)
+// Note: The source has both escaped (\.) and literal (.) dots, so we need to replace both forms
+esmGlue = esmGlue.replace(/opencc-wasm\\.esm\\.wasm/g, "opencc-wasm.wasm");
+esmGlue = esmGlue.replace(/opencc-wasm\.esm\.wasm/g, "opencc-wasm.wasm");
 fs.writeFileSync(path.join(distEsm, "opencc-wasm.js"), esmGlue, "utf-8");
 fs.copyFileSync(path.join(build, "opencc-wasm.cjs"), path.join(distCjs, "opencc-wasm.cjs"));
+
+// Copy wasm to esm/ directory (must be same level as opencc-wasm.js)
+fs.copyFileSync(path.join(build, "opencc-wasm.wasm"), path.join(distEsm, "opencc-wasm.wasm"));
+// Copy wasm to cjs/ directory (must be same level as opencc-wasm.cjs)
+fs.copyFileSync(path.join(build, "opencc-wasm.wasm"), path.join(distCjs, "opencc-wasm.wasm"));
+// Optional: keep a copy at root for legacy/Node compatibility
 fs.copyFileSync(path.join(build, "opencc-wasm.wasm"), path.join(dist, "opencc-wasm.wasm"));
-fs.copyFileSync(path.join(build, "opencc-wasm.esm.wasm"), path.join(dist, "opencc-wasm.esm.wasm"));
 
 // Copy data folder into dist/data for bundled lookup
 const dataSrc = path.join(root, "data");
@@ -46,8 +53,8 @@ apiSource = apiSource.replace(
   'const glueUrl = new URL("./opencc-wasm.js", import.meta.url);'
 );
 apiSource = apiSource.replace(
-  'locateFile: (p) => new URL(`build/${p}`, pkgBase).href',
-  'locateFile: (p) => new URL(`../${p}`, import.meta.url).href'
+  'locateFile: (p) => new URL(p, glueUrl).href',
+  'locateFile: (p) => new URL(p, import.meta.url).href'
 );
 fs.writeFileSync(path.join(distEsm, "index.js"), apiSource, "utf-8");
 

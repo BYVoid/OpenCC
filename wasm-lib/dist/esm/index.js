@@ -47,18 +47,18 @@ async function getModule() {
   if (modulePromise) return modulePromise;
 
   // 1) 先确定包根目录（一定要以 / 结尾）
-  const pkgBase = new URL("../", import.meta.url); 
+  const pkgBase = new URL("./", import.meta.url);
   // 如果这段代码在 HTML inline script 里，没有 import.meta.url，那就用绝对路径：
   // const pkgBase = new URL("/vendor/opencc-wasm/", window.location.origin);
 
-  // 2) import glue
-  const glueUrl = new URL("opencc-wasm.js", pkgBase);
+  // 2) import glue (from build/ for testing/development)
+  const glueUrl = new URL("./opencc-wasm.js", import.meta.url);
 
   const { default: create } = await import(glueUrl.href);
 
   // 3) locateFile 必须相对 pkgBase，而不是 glueUrl
   modulePromise = create({
-    locateFile: (p) => new URL(p, pkgBase).href
+    locateFile: (p) => new URL(`../${p}`, import.meta.url).href
   });
 
   return modulePromise;

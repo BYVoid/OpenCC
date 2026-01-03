@@ -24,7 +24,7 @@ let api = null;
 
 async function getModule() {
   if (!modulePromise) {
-    const wasmUrl = new URL("../opencc-wasm.cjs", BASE_URL);
+    const wasmUrl = new URL("./opencc-wasm.cjs", import.meta.url || "file://" + __filename);
     const create = require(wasmUrl);
     modulePromise = create();
   }

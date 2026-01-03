@@ -119,3 +119,8 @@ wasm-lib/
 - Dictionaries are written under `/data/dict/` in the virtual FS; configs under `/data/config/`. Paths inside configs are rewritten automatically.
 - Memory grows on demand (`ALLOW_MEMORY_GROWTH=1`); no native dependencies needed.
 - Performance note: opencc-wasm focuses on fidelity and compatibility (uses official configs and `.ocd2`, matches Node OpenCC output 1:1). Raw throughput can be slower than pure JS implementations like `opencc-js`, but the WASM version guarantees full OpenCC behavior and config coverage.
+
+## 0.2.0 changes
+- Conversion rules and bundled dictionaries are rebuilt from OpenCC commit [`36c7cbbc`](https://github.com/frankslin/OpenCC/commit/36c7cbbc9702d2a46a89ea7a55ff8ba5656455df). This aligns the WASM build with the upstream configs in that revision (including updated `.ocd2` data).
+- Output layout now mirrors the new `dist/` structure: ESM glue under `dist/esm/`, CJS glue under `dist/cjs/`, shared `opencc-wasm.wasm` at `dist/opencc-wasm.wasm`, and configs/dicts in `dist/data/`. Adjust your bundler/static hosting paths accordingly.
+- Tests are rewritten to use `node:test` with data-driven cases (`test/testcases.json`) instead of ad-hoc assertions, keeping coverage aligned with upstream OpenCC fixtures.

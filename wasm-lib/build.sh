@@ -92,10 +92,14 @@ em++ \
   -s ENVIRONMENT='node' \
   -o "${BUILD_DIR}/opencc-wasm.cjs"
 
+# 兼容旧命名：复制一份同内容的 wasm 为 opencc-wasm.esm.wasm（两份 glue 可直接引用）
+cp "${BUILD_DIR}/opencc-wasm.wasm" "${BUILD_DIR}/opencc-wasm.esm.wasm"
+
 # WASM 文件由 emcc 自动生成
 echo "Build complete. Intermediate files in ${BUILD_DIR}/"
 echo "  - ${BUILD_DIR}/opencc-wasm.esm.js (ESM glue for tests/rebuild)"
 echo "  - ${BUILD_DIR}/opencc-wasm.cjs (CJS glue for tests/rebuild)"
 echo "  - ${BUILD_DIR}/opencc-wasm.wasm (WASM binary)"
+echo "  - ${BUILD_DIR}/opencc-wasm.esm.wasm (alias, same content as above)"
 echo ""
 echo "Run 'node scripts/build-api.js' to generate dist/ for publishing."

@@ -1,6 +1,6 @@
 {
   "name": "opencc-wasm",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "WebAssembly backend for OpenCC with opencc-js compatible API and official configs/ocd2 dictionaries.",
   "keywords": [
     "opencc",

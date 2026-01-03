@@ -20,9 +20,13 @@ fs.mkdirSync(distEsm, { recursive: true });
 fs.mkdirSync(distCjs, { recursive: true });
 
 // Copy WASM glue from build/ to dist/
-fs.copyFileSync(path.join(build, "opencc-wasm.esm.js"), path.join(distEsm, "opencc-wasm.js"));
+let esmGlue = fs.readFileSync(path.join(build, "opencc-wasm.esm.js"), "utf-8");
+// Keep the .esm.wasm reference; package both wasm filenames for compatibility.
+esmGlue = esmGlue.replace(/opencc-wasm\\.esm\\.wasm/g, "opencc-wasm.esm.wasm");
+fs.writeFileSync(path.join(distEsm, "opencc-wasm.js"), esmGlue, "utf-8");
 fs.copyFileSync(path.join(build, "opencc-wasm.cjs"), path.join(distCjs, "opencc-wasm.cjs"));
 fs.copyFileSync(path.join(build, "opencc-wasm.wasm"), path.join(dist, "opencc-wasm.wasm"));
+fs.copyFileSync(path.join(build, "opencc-wasm.esm.wasm"), path.join(dist, "opencc-wasm.esm.wasm"));
 
 // Copy data folder into dist/data for bundled lookup
 const dataSrc = path.join(root, "data");

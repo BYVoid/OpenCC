@@ -102,8 +102,9 @@ python3 data/scripts/sort_all.py data/dictionary
 ### 6. 執行測試（確認成功）
 
 ```bash
-bazel test //test:opencc_test
-bazel test //data/dictionary:dictionary_test
+bazel test //test:bazel_opencc_test \
+    //data/dictionary:dictionary_test \
+    //data/config:config_dict_validation_test
 ```
 
 所有測試應該通過。

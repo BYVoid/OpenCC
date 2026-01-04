@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenCC WASM - 开箱即用演示</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #333;
+      border-bottom: 3px solid #007bff;
+      padding-bottom: 10px;
+    }
+    .demo-section {
+      background: #f8f9fa;
+      border-left: 4px solid #007bff;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .code-block {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin: 10px 0;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 14px;
+    }
+    .highlight {
+      background: #28a745;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-weight: bold;
+    }
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+      font-family: inherit;
+      min-height: 80px;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      resize: vertical;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      margin: 10px 5px 10px 0;
+      transition: background 0.3s;
+    }
+    button:hover:not(:disabled) {
+      background: #0056b3;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .output {
+      margin-top: 10px;
+      padding: 15px;
+      background: white;
+      border: 2px solid #28a745;
+      border-radius: 4px;
+      min-height: 60px;
+      white-space: pre-wrap;
+      font-size: 16px;
+    }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .status.loading {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+    }
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .converter-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .info-box {
+      background: #e7f3ff;
+      border-left: 4px solid #2196F3;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🚀 OpenCC WASM - 开箱即用演示</h1>
+
+  <div class="info-box">
+    <h3>✨ 特点：无需任何配置！</h3>
+    <p>这个页面从 CDN 加载 opencc-wasm，<span class="highlight">自动下载</span>所有需要的配置和字典文件。</p>
+    <p>您只需要 3 行代码就能完成中文转换！</p>
+  </div>
+
+  <div class="demo-section">
+    <h2>📝 示例代码（仅需 3 行！）</h2>
+    <div class="code-block">
+// 1. 从本地 dist 导入（模拟 CDN）
+import OpenCC from '../dist/esm/index.js';
+
+// 2. 创建转换器（自动加载配置和字典！）
+const converter = OpenCC.Converter({ from: "cn", to: "tw" });
+
+// 3. 转换文本
+const result = await converter("简体中文");
+    </div>
+    <p><strong>就是这样！</strong>所有配置文件（.json）和字典文件（.ocd2）都会从 CDN 自动下载。</p>
+  </div>
+
+  <div class="status" id="status">准备就绪</div>
+
+  <div class="demo-section">
+    <h2>🧪 实时演示</h2>
+
+    <label>
+      <strong>输入文本：</strong>
+      <textarea id="input" placeholder="请输入简体中文文本...">开源中文转换工具可以将简体中文转换为繁体中文（台湾、香港）。鼠标里面的硅二极管坏了，导致光标分辨率降低。</textarea>
+    </label>
+
+    <div class="converter-group">
+      <button id="btnSimp2Trad">简体 → 繁体 (s2t)</button>
+      <button id="btnSimp2TW">简体 → 台湾 (s2tw)</button>
+      <button id="btnSimp2HK">简体 → 香港 (s2hk)</button>
+      <button id="btnSimp2TWP">简体 → 台湾（惯用词）(s2twp)</button>
+    </div>
+
+    <div class="converter-group">
+      <button id="btnTrad2Simp">繁体 → 简体 (t2s)</button>
+      <button id="btnTW2Simp">台湾 → 简体 (tw2s)</button>
+      <button id="btnHK2Simp">香港 → 简体 (hk2s)</button>
+    </div>
+
+    <strong>输出结果：</strong>
+    <div class="output" id="output">（点击上方按钮进行转换）</div>
+  </div>
+
+  <div class="info-box">
+    <h3>📦 自动加载的资源</h3>
+    <p>当您点击转换按钮时，会看到以下过程（首次使用时）：</p>
+    <ul>
+      <li>✅ 加载 WASM 模块（opencc-wasm.wasm）</li>
+      <li>✅ 从 CDN 下载配置文件（如 s2tw.json）</li>
+      <li>✅ 从 CDN 下载所需字典（如 STPhrases.ocd2、TWPhrases.ocd2 等）</li>
+      <li>✅ 缓存配置和字典（后续转换无需重新下载）</li>
+    </ul>
+    <p><strong>所有这些都是自动完成的！</strong>您不需要写任何加载代码。</p>
+  </div>
+
+  <div class="demo-section">
+    <h2>🔍 支持的转换类型</h2>
+    <table style="width: 100%; border-collapse: collapse;">
+      <tr style="background: #f0f0f0; font-weight: bold;">
+        <td style="padding: 8px; border: 1px solid #ddd;">From</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">To</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">代码</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;">简体 (cn)</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">繁体 (t)</td>
+        <td style="padding: 8px; border: 1px solid #ddd;"><code>{ from: "cn", to: "t" }</code></td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;">简体 (cn)</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">台湾繁体 (tw)</td>
+        <td style="padding: 8px; border: 1px solid #ddd;"><code>{ from: "cn", to: "tw" }</code></td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;">简体 (cn)</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">香港繁体 (hk)</td>
+        <td style="padding: 8px; border: 1px solid #ddd;"><code>{ from: "cn", to: "hk" }</code></td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;">繁体 (t)</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">简体 (cn)</td>
+        <td style="padding: 8px; border: 1px solid #ddd;"><code>{ from: "t", to: "cn" }</code></td>
+      </tr>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;">台湾 (tw)</td>
+        <td style="padding: 8px; border: 1px solid #ddd;">简体 (cn)</td>
+        <td style="padding: 8px; border: 1px solid #ddd;"><code>{ from: "tw", to: "cn" }</code></td>
+      </tr>
+    </table>
+  </div>
+
+  <script type="module">
+    const status = document.getElementById('status');
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
+
+    let converters = {};
+    let isLoading = false;
+
+    // 显示状态
+    function showStatus(message, type = 'loading') {
+      status.textContent = message;
+      status.className = `status ${type}`;
+    }
+
+    // 创建或获取转换器（自动加载配置和字典！）
+    async function getConverter(from, to) {
+      const key = `${from}-${to}`;
+
+      if (converters[key]) {
+        return converters[key];
+      }
+
+      showStatus(`🔄 首次使用「${from} → ${to}」转换，正在从 CDN 加载配置和字典...`, 'loading');
+
+      try {
+        // 从本地 dist 导入（模拟 CDN）
+        // 实际使用时替换为：
+        // const { default: OpenCC } = await import("https://cdn.jsdelivr.net/npm/opencc-wasm@0.3.0/dist/esm/index.js");
+        const { default: OpenCC } = await import('../dist/esm/index.js');
+
+        // 创建转换器 - 所有配置和字典都会自动从 CDN 下载！
+        const converter = OpenCC.Converter({ from, to });
+
+        converters[key] = converter;
+        showStatus(`✅ 转换器「${from} → ${to}」准备完毕！（配置和字典已缓存）`, 'success');
+
+        return converter;
+      } catch (err) {
+        showStatus(`❌ 加载失败: ${err.message}`, 'error');
+        throw err;
+      }
+    }
+
+    // 执行转换
+    async function convert(from, to) {
+      if (isLoading) return;
+
+      const text = input.value.trim();
+      if (!text) {
+        output.textContent = '请输入文本';
+        return;
+      }
+
+      isLoading = true;
+      output.textContent = '转换中...';
+
+      try {
+        const converter = await getConverter(from, to);
+        showStatus(`🔄 转换中...`, 'loading');
+
+        const result = await converter(text);
+
+        output.textContent = result;
+        showStatus(`✅ 转换完成！使用配置: ${from} → ${to}`, 'success');
+      } catch (err) {
+        output.textContent = `转换失败: ${err.message}`;
+        showStatus(`❌ 转换失败: ${err.message}`, 'error');
+        console.error(err);
+      } finally {
+        isLoading = false;
+      }
+    }
+
+    // 绑定按钮事件
+    document.getElementById('btnSimp2Trad').onclick = () => convert('cn', 't');
+    document.getElementById('btnSimp2TW').onclick = () => convert('cn', 'tw');
+    document.getElementById('btnSimp2HK').onclick = () => convert('cn', 'hk');
+    document.getElementById('btnSimp2TWP').onclick = () => convert('cn', 'twp');
+    document.getElementById('btnTrad2Simp').onclick = () => convert('t', 'cn');
+    document.getElementById('btnTW2Simp').onclick = () => convert('tw', 'cn');
+    document.getElementById('btnHK2Simp').onclick = () => convert('hk', 'cn');
+
+    showStatus('✨ 准备就绪！选择转换类型开始使用', 'success');
+  </script>
+</body>
+</html>

@@ -29,11 +29,37 @@ const readFileBuffer = (url) => {
 
 // 预设映射：from -> to -> config 文件名
 const CONFIG_MAP = {
-  cn: { t: "s2t.json", tw: "s2tw.json", hk: "s2hk.json", cn: null },
-  tw: { cn: "tw2s.json", t: "tw2t.json", tw: null },
-  hk: { cn: "hk2s.json", t: "hk2t.json", hk: null },
-  t: { cn: "t2s.json", tw: "t2tw.json", hk: "t2hk.json", jp: "t2jp.json", t: null },
-  jp: { t: "jp2t.json" },
+  cn: {
+    t: "s2t.json",
+    tw: "s2tw.json",
+    twp: "s2twp.json",  // 台湾惯用词
+    hk: "s2hk.json",
+    cn: null
+  },
+  tw: {
+    cn: "tw2s.json",
+    s: "tw2s.json",     // 别名
+    sp: "tw2sp.json",   // 简体惯用词
+    t: "tw2t.json",
+    tw: null
+  },
+  hk: {
+    cn: "hk2s.json",
+    s: "hk2s.json",     // 别名
+    t: "hk2t.json",
+    hk: null
+  },
+  t: {
+    cn: "t2s.json",
+    s: "t2s.json",      // 别名
+    tw: "t2tw.json",
+    hk: "t2hk.json",
+    jp: "t2jp.json",
+    t: null
+  },
+  jp: {
+    t: "jp2t.json"
+  },
 };
 
 // 缓存已加载的配置/字典与打开的句柄，避免重复加载和重复构建
@@ -158,7 +184,19 @@ function resolveConfig(from, to) {
 }
 
 function createConverter({ from, to, config }) {
-  const configName = config || resolveConfig(from, to);
+  // Support direct config name (e.g., "s2twp.json" or "s2twp")
+  let configName;
+
+  if (config) {
+    // Direct config parameter takes priority
+    configName = config.endsWith('.json') ? config : `${config}.json`;
+  } else if (from && to) {
+    // Legacy from/to parameters
+    configName = resolveConfig(from, to);
+  } else {
+    throw new Error('Either "config" or both "from" and "to" must be specified');
+  }
+
   return async (text) => {
     if (configName === null) return text; // no-op
     const handle = await ensureConfig(configName);

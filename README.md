@@ -1,5 +1,25 @@
 # Open Chinese Convert 開放中文轉換
 
+## 專案說明
+
+本項目為 [BYVoid/OpenCC](https://github.com/BYVoid/OpenCC) 的 fork，目的有二：
+
+1. **新增一個與原版 OpenCC 兼容、算法完全一致的 WASM 實現。**
+   提供可直接在瀏覽器和 Node.js 環境運行的 WebAssembly 版本，方便前端開發者使用。
+
+2. **在增加測試案例的情況下，於現有框架內擴充詞表，修正不準確的轉換。**
+   持續優化詞庫質量，提升轉換準確度。
+
+### 背景
+
+注意到已有的 [opencc-js](https://github.com/nk2028/opencc-js) 和 [wasm-opencc](https://github.com/oyyd/wasm-opencc) 項目已於多年前停止維護，詞表更新不夠及時。在 LLM 時代，缺乏上下文感知的轉換已經落後於時代，不過 OpenCC 的算法和詞表並未過時。我們會在保持算法穩定性的前提下，透過增加測試案例來擴充和改進詞表，以提供更準確的轉換結果。
+
+---
+
+## 原版 OpenCC 說明
+
+以下為原版 OpenCC 的 README 內容，保留作為參考。
+
 [![CMake](https://github.com/BYVoid/OpenCC/actions/workflows/cmake.yml/badge.svg)](https://github.com/BYVoid/OpenCC/actions/workflows/cmake.yml)
 [![Bazel](https://github.com/BYVoid/OpenCC/actions/workflows/bazel.yml/badge.svg)](https://github.com/BYVoid/OpenCC/actions/workflows/bazel.yml)
 [![MSVC](https://github.com/BYVoid/OpenCC/actions/workflows/msvc.yml/badge.svg)](https://github.com/BYVoid/OpenCC/actions/workflows/msvc.yml)
@@ -7,7 +27,7 @@
 [![Python CI](https://github.com/BYVoid/OpenCC/actions/workflows/python.yml/badge.svg)](https://github.com/BYVoid/OpenCC/actions/workflows/python.yml)
 [![AppVeyor](https://img.shields.io/appveyor/ci/Carbo/OpenCC.svg)](https://ci.appveyor.com/project/Carbo/OpenCC)
 
-## Introduction 介紹
+### Introduction 介紹
 
 ![OpenCC](https://opencc.byvoid.com/img/opencc.png)
 

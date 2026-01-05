@@ -102,6 +102,14 @@ async function getApi() {
   return { mod, api };
 }
 
+function ensureParentDir(mod, filePath) {
+  const idx = filePath.lastIndexOf("/");
+  if (idx > 0) {
+    const dir = filePath.slice(0, idx);
+    mod.FS.mkdirTree(dir);
+  }
+}
+
 function collectOcd2Files(node, acc) {
   if (!node || typeof node !== "object") return;
   if (node.type === "ocd2" && node.file) acc.add(node.file);
@@ -145,7 +153,9 @@ async function ensureConfig(configName) {
     if (loadedDicts.has(file)) continue; // 避免重复加载同一字典
     const dictUrl = new URL(`./data/dict/${file}`, BASE_URL);
     const buf = await fetchBuffer(dictUrl);
-    mod.FS.writeFile(`/data/dict/${file}`, buf);
+    const dictPath = `/data/dict/${file}`;
+    ensureParentDir(mod, dictPath);
+    mod.FS.writeFile(dictPath, buf);
     loadedDicts.add(file);
   }
   // 重写配置中的 ocd2 路径到 /data/dict 下

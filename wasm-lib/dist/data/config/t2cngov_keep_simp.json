@@ -1,0 +1,29 @@
+{
+  "name": "Traditional Chinese to CN Government Standard (Keep Simplified)",
+  "author": "TerryTian-tech",
+  "license": "Apache License 2.0",
+  "source": "https://github.com/TerryTian-tech/OpenCC-Traditional-Chinese-characters-according-to-Chinese-government-standards",
+  "contributors": ["TerryTian-tech", "Yi Jianpeng", "Hu Xinmei", "Duan Yatong"],
+  "reference": "《通用规范汉字表》(2013)",
+  "description": "Conservative conversion that preserves intentional simplified characters in mixed documents while standardizing traditional characters only.",
+
+  "segmentation": {
+    "type": "mmseg",
+    "dict": {
+      "type": "ocd2",
+      "file": "cngov/TGPhrases.ocd2"
+    }
+  },
+  "conversion_chain": [{
+    "dict": {
+      "type": "group",
+      "dicts": [{
+        "type": "ocd2",
+        "file": "cngov/TGPhrases.ocd2"
+      }, {
+        "type": "ocd2",
+        "file": "cngov/TGCharacters_keep_simp.ocd2"
+      }]
+    }
+  }]
+}

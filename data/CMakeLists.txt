@@ -3,6 +3,7 @@ find_package(PythonInterp REQUIRED)
 set(OPENCC_DICT_BIN opencc_dict)
 set(DICT_REVERSE_BIN "${PYTHON_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/reverse.py")
 set(DICT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dictionary)
+set(DICT_CNGOV_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dictionary/cngov)
 set(DICT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 set(
@@ -29,7 +30,21 @@ set(
   JPVariantsRev
 )
 
-set(DICTS ${DICTS_RAW} ${DICTS_GENERATED})
+# ==============================================================================
+# CN Government Standard Conversion Dictionaries (Third-party)
+# Copyright 2024 TerryTian-tech
+# Source: https://github.com/TerryTian-tech/OpenCC-Traditional-Chinese-characters-according-to-Chinese-government-standards
+# License: Apache License 2.0
+# Reference: 《通用规范汉字表》(2013)
+# ==============================================================================
+set(
+  DICTS_CNGOV
+  TGCharacters
+  TGCharacters_keep_simp
+  TGPhrases
+)
+
+set(DICTS ${DICTS_RAW} ${DICTS_GENERATED} ${DICTS_CNGOV})
 
 foreach(DICT ${DICTS})
   set(DICT_TARGETS ${DICT_TARGETS} ${DICT}.ocd2)
@@ -48,6 +63,10 @@ endforeach(DICT)
 
 foreach(DICT ${DICTS_GENERATED})
   set(DICT_${DICT}_INPUT ${DICT_GENERATED_DIR}/${DICT}.txt)
+endforeach(DICT)
+
+foreach(DICT ${DICTS_CNGOV})
+  set(DICT_${DICT}_INPUT ${DICT_CNGOV_DIR}/${DICT}.txt)
 endforeach(DICT)
 
 set(
@@ -140,6 +159,22 @@ foreach(DICT ${DICTS})
   )
 endforeach(DICT)
 
+# Create cngov subdirectory and copy files for testing
+add_custom_command(
+  TARGET Dictionaries POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/cngov
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+          ${CMAKE_CURRENT_BINARY_DIR}/TGCharacters.ocd2
+          ${CMAKE_CURRENT_BINARY_DIR}/cngov/TGCharacters.ocd2
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+          ${CMAKE_CURRENT_BINARY_DIR}/TGCharacters_keep_simp.ocd2
+          ${CMAKE_CURRENT_BINARY_DIR}/cngov/TGCharacters_keep_simp.ocd2
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+          ${CMAKE_CURRENT_BINARY_DIR}/TGPhrases.ocd2
+          ${CMAKE_CURRENT_BINARY_DIR}/cngov/TGPhrases.ocd2
+  COMMENT "Copying cngov dictionaries to subdirectory for testing"
+)
+
 set(CONFIG_FILES
   config/hk2s.json
   config/hk2t.json
@@ -155,6 +190,8 @@ set(CONFIG_FILES
   config/tw2s.json
   config/tw2sp.json
   config/tw2t.json
+  config/t2cngov.json
+  config/t2cngov_keep_simp.json
 )
 
 install(
@@ -163,3 +200,13 @@ install(
   DESTINATION
     ${DIR_SHARE_OPENCC}
 )
+
+# Install cngov dictionaries to subdirectory
+foreach(DICT ${DICTS_CNGOV})
+  install(
+    FILES
+      ${DICT_GENERATED_DIR}/${DICT}.ocd2
+    DESTINATION
+      ${DIR_SHARE_OPENCC}/cngov
+  )
+endforeach(DICT)

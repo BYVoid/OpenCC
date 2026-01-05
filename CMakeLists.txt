@@ -237,6 +237,21 @@ if (ENABLE_GTEST)
     add_subdirectory(deps/googletest-1.15.0)
   endif()
   enable_testing()
+  # Provide 'make check' target that builds and runs tests
+  # Note: Use 'make check' for a complete build-and-test workflow
+  #       Or run 'make' first, then 'make test' to just run tests
+  set(CHECK_DEPENDS
+      CommandLineConvertTest opencc Dictionaries
+      ConfigTest ConversionChainTest ConversionTest DictGroupTest
+      MarisaDictTest MaxMatchSegmentationTest PhraseExtractTest
+      SerializedValuesTest SimpleConverterTest TextDictTest
+      UTF8StringSliceTest UTF8UtilTest)
+  # Add optional DARTS tests if enabled
+  if (ENABLE_DARTS)
+    list(APPEND CHECK_DEPENDS BinaryDictTest DartsDictTest)
+  endif()
+  add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+                    DEPENDS ${CHECK_DEPENDS})
 endif()
 
 if (ENABLE_BENCHMARK)

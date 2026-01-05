@@ -175,6 +175,35 @@ Document 文檔: https://byvoid.github.io/OpenCC/
 * `t2jp.json` Traditional Chinese Characters (Kyūjitai) to New Japanese Kanji (Shinjitai) 繁體（OpenCC 標準，舊字體）到日文新字體
 * `jp2t.json` New Japanese Kanji (Shinjitai) to Traditional Chinese Characters (Kyūjitai) 日文新字體到繁體（OpenCC 標準，舊字體）
 * `tw2t.json` Traditional Chinese (Taiwan standard) to Traditional Chinese 臺灣正體到繁體（OpenCC 標準）
+* `t2cngov.json` Traditional Chinese to CN Government Standard 繁體到大陸政府標準繁體
+* `t2cngov_keep_simp.json` Traditional Chinese to CN Government Standard (Keep Simplified) 繁體到大陸政府標準繁體（保留簡體）
+
+#### CN Government Standard Mode 大陸政府標準模式
+
+將各種標準的繁體中文（港、台、混合格式）轉換為中國《通用規範漢字表》（2013）定義的規範繁體字。
+
+**兩種轉換模式：**
+
+* **t2cngov** - 全部轉為標準繁體（包括簡體→繁體）
+* **t2cngov_keep_simp** - 保留原有簡體字，僅標準化繁體部分
+
+**使用示例：**
+
+```bash
+# 全轉為政府標準繁體
+echo "測試简体混繁體" | opencc -c t2cngov.json
+# 輸出: 測試簡體混繁體
+
+# 保留簡體字
+echo "測試简体混繁體" | opencc -c t2cngov_keep_simp.json
+# 輸出: 测试简体混繁體
+
+# 異體字標準化
+echo "潮溼的露臺" | opencc -c t2cngov.json
+# 輸出: 潮湿的露台
+```
+
+**致謝：**基於 [TerryTian-tech](https://github.com/TerryTian-tech) 的[研究成果](https://github.com/TerryTian-tech/OpenCC-Traditional-Chinese-characters-according-to-Chinese-government-standards)，在此表示感謝。
 
 ## Build 編譯
 
@@ -205,7 +234,12 @@ bazel test --test_output=all //src/... //data/... //test/...
 
 #### Linux & macOS
 
-```
+```bash
+# Build and run all tests (recommended)
+make check
+
+# Or build first, then run tests separately
+make
 make test
 ```
 

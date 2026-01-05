@@ -2,8 +2,9 @@
 set -euo pipefail
 
 # Regenerate wasm-lib assets from Bazel outputs:
-#  - data/dictionary/*.ocd2  -> wasm-lib/data/dict/
-#  - test/testcases.json      -> wasm-lib/test/testcases.json
+#  - data/dictionary/*.ocd2       -> wasm-lib/data/dict/
+#  - test/testcases/testcases.json -> wasm-lib/test/testcases.json
+#  - test/testcases/cngov_testcases.json -> wasm-lib/test/cngov_testcases.json
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT}/.."
@@ -35,8 +36,16 @@ fi
 
 echo "Refreshing dicts in ${DICT_DST}"
 rm -f "${DICT_DST}"/*.ocd2
+rm -rf "${DICT_DST}"/cngov
+mkdir -p "${DICT_DST}/cngov"
 for f in "${NEEDED_DICTS[@]}"; do
-  install -m 644 "${DICT_SRC}/${f}" "${DICT_DST}/${f}"
+  # Handle subdirectory paths like cngov/TGCharacters.ocd2
+  if [[ "$f" == */* ]]; then
+    mkdir -p "${DICT_DST}/$(dirname "$f")"
+    install -m 644 "${DICT_SRC}/$(basename "$f")" "${DICT_DST}/${f}"
+  else
+    install -m 644 "${DICT_SRC}/${f}" "${DICT_DST}/${f}"
+  fi
 done
 
 CASE_SRC="${ROOT}/../test/testcases/testcases.json"
@@ -46,5 +55,10 @@ mkdir -p "$(dirname "${CASE_DST}")"
 rm -f "${CASE_DST}"
 echo "Copying testcases.json from ${CASE_SRC} -> ${CASE_DST}"
 install -m 644 "${CASE_SRC}" "${CASE_DST}"
+
+CNGOV_CASE_SRC="${ROOT}/../test/testcases/cngov_testcases.json"
+CNGOV_CASE_DST="${ROOT}/test/cngov_testcases.json"
+echo "Copying cngov_testcases.json from ${CNGOV_CASE_SRC} -> ${CNGOV_CASE_DST}"
+install -m 644 "${CNGOV_CASE_SRC}" "${CNGOV_CASE_DST}"
 
 echo "Done."

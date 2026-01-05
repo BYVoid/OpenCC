@@ -2,5 +2,5 @@ package(default_visibility = ["//visibility:public"])
 
 filegroup(
     name = "testcases",
-    srcs = ["testcases.json"],
+    srcs = glob(["*.json"]),
 )

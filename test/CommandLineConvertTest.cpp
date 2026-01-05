@@ -215,4 +215,48 @@ TEST_F(CommandLineConvertTest, ConvertFromJson) {
   }
 }
 
+TEST_F(CommandLineConvertTest, ConvertCNGovFromJson) {
+#ifdef BAZEL
+  const std::string casesPath =
+      runfiles_->Rlocation("_main/test/testcases/cngov_testcases.json");
+#else
+  const std::string casesPath =
+      CMAKE_SOURCE_DIR "/test/testcases/cngov_testcases.json";
+#endif
+  const CasesByConfig cases = LoadCases(casesPath);
+
+  for (const auto& entry : cases) {
+    const std::string& config = entry.first;
+    const std::string inputFile = InputFile(config.c_str());
+    const std::string outputFile = OutputFile(config.c_str());
+
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open()) << "Failed to open: " << inputFile;
+      for (const auto& item : entry.second) {
+        ofs << item.input << "\n";
+      }
+    }
+
+    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()))
+        << "Conversion failed for config: " << config;
+
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open()) << "Failed to open: " << outputFile;
+    std::string line;
+    size_t idx = 0;
+    while (std::getline(ifs, line)) {
+      if (!line.empty() && line.back() == '\r') {
+        line.pop_back();
+      }
+      ASSERT_LT(idx, entry.second.size());
+      EXPECT_EQ(entry.second[idx].expected, line)
+          << "Mismatch at config=" << config << " index=" << idx
+          << " input=\"" << entry.second[idx].input << "\"";
+      idx++;
+    }
+    EXPECT_EQ(idx, entry.second.size()) << "Line count mismatch: " << config;
+  }
+}
+
 } // namespace opencc

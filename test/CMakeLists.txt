@@ -39,6 +39,8 @@ if (ENABLE_GTEST)
     add_executable(${UNITTEST} ${UNITTEST}.cpp)
     target_link_libraries(${UNITTEST} gtest gtest_main libopencc)
     add_test(${UNITTEST} ${UNITTEST})
+    # CommandLineConvertTest needs opencc tool and dictionaries
+    add_dependencies(${UNITTEST} opencc Dictionaries)
     if (WIN32)
       add_dependencies(${UNITTEST} copy_gtest_to_test copy_gtest_main_to_test)
     endif()

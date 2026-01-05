@@ -1,0 +1,40 @@
+# ==============================================================================
+# CN Government Standard Conversion Dictionaries (Third-party)
+# Copyright 2024 TerryTian-tech
+# Source: https://github.com/TerryTian-tech/OpenCC-Traditional-Chinese-characters-according-to-Chinese-government-standards
+# License: Apache License 2.0
+# Reference: 《通用规范汉字表》(2013)
+# ==============================================================================
+
+package(default_visibility = ["//visibility:public"])
+
+TEXT_DICTS = [
+    "TGCharacters.txt",
+    "TGCharacters_keep_simp.txt",
+    "TGPhrases.txt",
+]
+
+[
+    genrule(
+        name = "generate_bin_" + txt[:-4],
+        srcs = [txt],
+        outs = [txt.replace(".txt", ".ocd2")],
+        cmd = "$(location //src/tools:dict_converter) " +
+              "--input $(location " + txt + ") " +
+              "--output $(OUTS) " +
+              "--from text " +
+              "--to ocd2",
+        tools = ["//src/tools:dict_converter"],
+    )
+    for txt in TEXT_DICTS
+]
+
+filegroup(
+    name = "text_dictionaries",
+    srcs = TEXT_DICTS,
+)
+
+filegroup(
+    name = "binary_dictionaries",
+    srcs = [txt.replace(".txt", ".ocd2") for txt in TEXT_DICTS],
+)

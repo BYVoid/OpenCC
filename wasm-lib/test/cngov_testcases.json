@@ -1,0 +1,45 @@
+{
+  "cases": [
+    {
+      "id": "cngov_001",
+      "description": "Basic character conversion",
+      "input": "盫",
+      "expected": {
+        "t2cngov": "盦"
+      }
+    },
+    {
+      "id": "cngov_002",
+      "description": "Mixed simplified-traditional (convert all)",
+      "input": "简体混杂繁體",
+      "expected": {
+        "t2cngov": "簡體混雜繁體"
+      }
+    },
+    {
+      "id": "cngov_003",
+      "description": "Mixed simplified-traditional (keep simplified)",
+      "input": "简体混杂繁體",
+      "expected": {
+        "t2cngov_keep_simp": "简体混杂繁體"
+      }
+    },
+    {
+      "id": "cngov_004",
+      "description": "Variant standardization",
+      "input": "潮溼的露臺",
+      "expected": {
+        "t2cngov": "潮濕的露臺",
+        "t2cngov_keep_simp": "潮濕的露臺"
+      }
+    },
+    {
+      "id": "cngov_005",
+      "description": "Phrase conversion",
+      "input": "一乾二淨",
+      "expected": {
+        "t2cngov": "一乾二净"
+      }
+    }
+  ]
+}

@@ -91,6 +91,8 @@ const result = await converter("服务器软件");  // 伺服器軟體
 | `hk2s` | Hong Kong → Simplified | 打印機 → 打印机 |
 | `hk2t` | Hong Kong → Traditional | 香港 → 香港 |
 | `jp2t` | Japanese Shinjitai → Traditional | 繁体 → 繁體 |
+| `t2cngov` | Traditional → CN Gov Standard | 潮溼 → 潮湿 |
+| `t2cngov_keep_simp` | Traditional → CN Gov (Keep Simp) | 简体繁體 → 简体繁體 |
 
 #### Method 2: Using `from`/`to` parameters (Legacy)
 

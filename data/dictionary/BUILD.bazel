@@ -39,12 +39,16 @@ TEXT_DICTS = glob(["*.txt"]) + [
 
 filegroup(
     name = "text_dictionaries",
-    srcs = TEXT_DICTS,
+    srcs = TEXT_DICTS + [
+        "//data/dictionary/cngov:text_dictionaries",
+    ],
 )
 
 filegroup(
     name = "binary_dictionaries",
-    srcs = [txt.replace(".txt", ".ocd2") for txt in TEXT_DICTS],
+    srcs = [txt.replace(".txt", ".ocd2") for txt in TEXT_DICTS] + [
+        "//data/dictionary/cngov:binary_dictionaries",
+    ],
 )
 
 cc_test(

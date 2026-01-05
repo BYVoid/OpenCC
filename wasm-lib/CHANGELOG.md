@@ -5,6 +5,26 @@ All notable changes to opencc-wasm will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-01-04
+
+### Added
+
+- **Config-first API**: `Converter()` now accepts `config` for direct OpenCC config names and expanded conversion aliases.
+- **CN Government Standard conversions**: New `t2cngov` and `t2cngov_keep_simp` configs, dictionaries, and tests.
+- **Demo & tests**: New demo page and additional regression coverage for new conversions.
+
+### Changed
+
+- **Documentation**: Consolidated API docs and expanded usage examples across environments.
+
+### Fixed
+
+- **s2twp duplication bug**: Resolved issue #950 where certain phrases duplicated characters.
+- **tw2sp "方程式" regression**: Synced dictionary updates and added regression tests.
+- **Package assets**: Included missing cngov configs and dictionaries in wasm-lib distribution.
+
+---
+
 ## [0.3.0] - 2026-01-03
 
 ### Changed
@@ -100,6 +120,7 @@ If you were importing the WASM module directly (not the high-level API), no chan
 
 ---
 
+[0.4.0]: https://github.com/frankslin/OpenCC/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/frankslin/OpenCC/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/frankslin/OpenCC/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/frankslin/OpenCC/releases/tag/v0.2.0

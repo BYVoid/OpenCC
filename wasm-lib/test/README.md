@@ -19,7 +19,7 @@ npm test
 
 **模拟的 CDN 用法：**
 ```javascript
-import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.2.1/dist/esm/index.js";
+import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm.4.0/dist/esm/index.js";
 const converter = OpenCC.Converter({ from: "cn", to: "t" });
 const result = await converter("简体中文");
 ```
@@ -48,7 +48,7 @@ node test/cdn-simple.mjs
 
 **模拟的 CDN 用法：**
 ```javascript
-import initOpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.2.1/dist/esm/opencc-wasm.js";
+import initOpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm.4.0/dist/esm/opencc-wasm.js";
 const wasmModule = await initOpenCC();
 const api = {
   create: wasmModule.cwrap("opencc_create", "number", ["string"]),
@@ -144,7 +144,7 @@ python3 -m http.server 8888
 import OpenCC from "../dist/esm/index.js";
 
 // 实际生产（CDN）
-import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.2.1/dist/esm/index.js";
+import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm.4.0/dist/esm/index.js";
 ```
 
 这确保了测试环境与生产环境一致。

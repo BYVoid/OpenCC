@@ -16,7 +16,7 @@ npm test          # 运行所有测试（推荐）
 
 **输出示例：**
 ```
-> opencc-wasm@0.2.1 test
+> opencc-wasm.4.0 test
 > npm run test:core && npm run test:cdn
 
 [核心测试]
@@ -144,7 +144,7 @@ test/
 **模拟场景：**
 ```javascript
 // 用户从 CDN 导入
-import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.2.1/dist/esm/index.js";
+import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm.4.0/dist/esm/index.js";
 
 // 创建转换器
 const converter = OpenCC.Converter({ from: "cn", to: "t" });
@@ -172,7 +172,7 @@ const result = await converter("简体中文");
 **模拟场景：**
 ```javascript
 // 直接导入 WASM 模块
-import initOpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.2.1/dist/esm/opencc-wasm.js";
+import initOpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm.4.0/dist/esm/opencc-wasm.js";
 
 // 初始化并手动操作
 const wasmModule = await initOpenCC();

@@ -3,7 +3,7 @@
  * 简化版 CDN 使用示例 - 使用高级 API
  *
  * 实际使用：
- * import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.2.1/dist/esm/index.js";
+ * import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm.4.0/dist/esm/index.js";
  */
 
 import { join, dirname } from "node:path";
@@ -42,7 +42,7 @@ try {
   console.log("📝 实际使用示例：");
   console.log(`
   // 从 CDN 导入
-  import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.2.1/dist/esm/index.js";
+  import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm.4.0/dist/esm/index.js";
 
   // 创建转换器
   const converter = OpenCC.Converter({ from: "cn", to: "t" });

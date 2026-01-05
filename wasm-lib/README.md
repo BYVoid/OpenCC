@@ -30,7 +30,7 @@ WebAssembly port of OpenCC (Open Chinese Convert) with full API compatibility. B
 ```html
 <script type="module">
   // 1. Import from CDN
-  import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.3.0/dist/esm/index.js";
+  import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.4.0/dist/esm/index.js";
 
   // 2. Create converter (auto-downloads everything!)
   const converter = OpenCC.Converter({ from: "cn", to: "tw" });
@@ -42,6 +42,18 @@ WebAssembly port of OpenCC (Open Chinese Convert) with full API compatibility. B
 ```
 
 **That's it!** All configs and dictionaries are automatically downloaded from CDN.
+
+### CDN (Converter API)
+
+```javascript
+import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.4.0/dist/esm/index.js";
+
+const converter = OpenCC.Converter({ from: "cn", to: "t" });
+const result = await converter("简体中文");
+console.log(result); // 簡體中文
+```
+
+Example source: `test/cdn-simple.mjs`
 
 ### Node.js (NPM)
 
@@ -379,6 +391,18 @@ A: Initial load downloads configs + dicts (~1-2MB). Subsequent conversions are f
 - Performance: Focuses on fidelity and compatibility with official OpenCC. May be slower than pure-JS implementations for raw throughput, but guarantees full OpenCC behavior.
 
 ## 📜 Changelog
+
+### 0.4.0 - 2026-01-04
+
+**Added:**
+- `config` parameter in `Converter()` for direct OpenCC config names
+- New CN Government Standard conversions: `t2cngov`, `t2cngov_keep_simp`
+- New demo page and regression tests for new configs
+
+**Fixed:**
+- s2twp duplication bug (issue #950)
+- tw2sp `方程式` conversion regression and dictionary sync
+- Missing cngov configs/dicts in wasm-lib distribution
 
 ### 0.3.0 - 2026-01-03
 

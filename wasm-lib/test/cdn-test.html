@@ -77,7 +77,7 @@
 
       // 从本地 dist 导入（模拟 CDN）
       // 实际发布后可以用：
-      // import initOpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.2.1/dist/esm/opencc-wasm.js";
+      // import initOpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm.4.0/dist/esm/opencc-wasm.js";
       const { default: initOpenCC } = await import('../dist/esm/opencc-wasm.js');
 
       status.textContent = '正在初始化 WASM 运行时...';

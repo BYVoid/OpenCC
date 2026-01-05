@@ -30,7 +30,7 @@ OpenCC（Open Chinese Convert）的 WebAssembly 移植版本，完全相容原�
 ```html
 <script type="module">
   // 1. 從 CDN 匯入
-  import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.3.0/dist/esm/index.js";
+  import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.4.0/dist/esm/index.js";
 
   // 2. 建立轉換器（自動下載所有資源！）
   const converter = OpenCC.Converter({ from: "cn", to: "tw" });
@@ -42,6 +42,18 @@ OpenCC（Open Chinese Convert）的 WebAssembly 移植版本，完全相容原�
 ```
 
 **就是這麼簡單！** 所有設定檔和字典檔都會自動從 CDN 下載。
+
+### CDN（Converter API）
+
+```javascript
+import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.4.0/dist/esm/index.js";
+
+const converter = OpenCC.Converter({ from: "cn", to: "t" });
+const result = await converter("简体中文");
+console.log(result); // 繁體中文
+```
+
+範例來源：`test/cdn-simple.mjs`
 
 ### Node.js（NPM）
 
@@ -379,6 +391,18 @@ A：首次載入需要下載設定檔和字典檔（約 1-2MB）。後續轉換�
 - 效能：專注於精確度和與官方 OpenCC 的相容性。原始吞吐量可能比純 JavaScript 實作慢，但保證完整的 OpenCC 行為。
 
 ## 📜 變更歷史
+
+### 0.4.0 - 2026-01-04
+
+**新增：**
+- `Converter()` 新增 `config` 參數，可直接使用 OpenCC 設定檔名稱
+- 新增中國政府規範字轉換：`t2cngov`、`t2cngov_keep_simp`
+- 新增示範頁與回歸測試，涵蓋新設定
+
+**修正：**
+- 修復 s2twp 重複字元問題（issue #950）
+- 修正 tw2sp `方程式` 轉換錯誤並同步字典
+- 補齊 wasm-lib 發行包中的 cngov 設定與字典
 
 ### 0.3.0 - 2026-01-03
 

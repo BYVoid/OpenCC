@@ -238,7 +238,7 @@ const result = await converter("简体中文");
       try {
         // 从本地 dist 导入（模拟 CDN）
         // 实际使用时替换为：
-        // const { default: OpenCC } = await import("https://cdn.jsdelivr.net/npm/opencc-wasm@0.3.0/dist/esm/index.js");
+        // const { default: OpenCC } = await import("https://cdn.jsdelivr.net/npm/opencc-wasm.4.0/dist/esm/index.js");
         const { default: OpenCC } = await import('../dist/esm/index.js');
 
         // 创建转换器 - 所有配置和字典都会自动从 CDN 下载！

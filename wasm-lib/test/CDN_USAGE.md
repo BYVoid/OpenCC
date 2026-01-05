@@ -23,7 +23,7 @@ dist/
 这是最简单的使用方式：
 
 ```javascript
-import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.2.1/dist/esm/index.js";
+import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm.4.0/dist/esm/index.js";
 
 // 创建转换器
 const converter = OpenCC.Converter({ from: "cn", to: "t" });
@@ -73,7 +73,7 @@ const result = await converter("服务器上的文件通过网络传输");
 如果你需要完全控制，可以直接导入 WASM glue code：
 
 ```javascript
-import initOpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.2.1/dist/esm/opencc-wasm.js";
+import initOpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm.4.0/dist/esm/opencc-wasm.js";
 
 // 初始化 WASM 模块
 const wasmModule = await initOpenCC();
@@ -118,7 +118,7 @@ api.destroy(handle);
   <div id="output"></div>
 
   <script type="module">
-    import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.2.1/dist/esm/index.js";
+    import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm.4.0/dist/esm/index.js";
 
     const converter = OpenCC.Converter({ from: "cn", to: "t" });
 

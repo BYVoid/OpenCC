@@ -3,7 +3,7 @@
  * 测试直接导入 opencc-wasm.js 的 CDN 使用模式
  *
  * 模拟用法：
- * import initOpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.2.1/dist/esm/opencc-wasm.js";
+ * import initOpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm.4.0/dist/esm/opencc-wasm.js";
  */
 
 import { fileURLToPath } from "node:url";
@@ -123,7 +123,7 @@ try {
   console.log("🎉 所有测试通过！CDN 使用模式可以正常工作！\n");
   console.log("📝 实际使用示例：");
   console.log(`
-  import initOpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.2.1/dist/esm/opencc-wasm.js";
+  import initOpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm.4.0/dist/esm/opencc-wasm.js";
 
   const wasmModule = await initOpenCC();
   const api = {

@@ -35,6 +35,7 @@
   ],
   "scripts": {
     "build": "./build.sh && node scripts/build-api.js",
+    "prepack": "npm run build",
     "test": "npm run test:core && npm run test:cdn",
     "test:core": "node --test test/opencc.test.js",
     "test:cdn": "node test/cdn-simple.mjs && node test/cdn-usage.mjs"

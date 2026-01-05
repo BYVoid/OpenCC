@@ -30,7 +30,7 @@ WebAssembly port of OpenCC (Open Chinese Convert) with full API compatibility. B
 ```html
 <script type="module">
   // 1. Import from CDN
-  import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.4.0/dist/esm/index.js";
+  import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.4.1/dist/esm/index.js";
 
   // 2. Create converter (auto-downloads everything!)
   const converter = OpenCC.Converter({ from: "cn", to: "tw" });
@@ -46,7 +46,7 @@ WebAssembly port of OpenCC (Open Chinese Convert) with full API compatibility. B
 ### CDN (Converter API)
 
 ```javascript
-import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.4.0/dist/esm/index.js";
+import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.4.1/dist/esm/index.js";
 
 const converter = OpenCC.Converter({ from: "cn", to: "t" });
 const result = await converter("简体中文");
@@ -391,6 +391,11 @@ A: Initial load downloads configs + dicts (~1-2MB). Subsequent conversions are f
 - Performance: Focuses on fidelity and compatibility with official OpenCC. May be slower than pure-JS implementations for raw throughput, but guarantees full OpenCC behavior.
 
 ## 📜 Changelog
+
+### 0.4.1 - 2026-01-05
+
+- Ensure nested dict directories (e.g., `cngov`) are created before writing to the in-memory FS
+- Refresh script correctly handles nested `.ocd2` paths and config JSON copying
 
 ### 0.4.0 - 2026-01-04
 

@@ -30,7 +30,7 @@ OpenCC（Open Chinese Convert）的 WebAssembly 移植版本，完全相容原�
 ```html
 <script type="module">
   // 1. 從 CDN 匯入
-  import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.4.0/dist/esm/index.js";
+  import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.4.1/dist/esm/index.js";
 
   // 2. 建立轉換器（自動下載所有資源！）
   const converter = OpenCC.Converter({ from: "cn", to: "tw" });
@@ -46,7 +46,7 @@ OpenCC（Open Chinese Convert）的 WebAssembly 移植版本，完全相容原�
 ### CDN（Converter API）
 
 ```javascript
-import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.4.0/dist/esm/index.js";
+import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.4.1/dist/esm/index.js";
 
 const converter = OpenCC.Converter({ from: "cn", to: "t" });
 const result = await converter("简体中文");
@@ -391,6 +391,11 @@ A：首次載入需要下載設定檔和字典檔（約 1-2MB）。後續轉換�
 - 效能：專注於精確度和與官方 OpenCC 的相容性。原始吞吐量可能比純 JavaScript 實作慢，但保證完整的 OpenCC 行為。
 
 ## 📜 變更歷史
+
+### 0.4.1 - 2026-01-05
+
+- 修正 WASM 載入子目錄詞典（例如 `cngov`）時的目錄建立
+- 資產刷新腳本可正確處理巢狀 `.ocd2` 與 config JSON 複製
 
 ### 0.4.0 - 2026-01-04
 

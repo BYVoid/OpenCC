@@ -72,6 +72,7 @@ set(UNITTESTS
   ConversionChainTest
   ConversionTest
   DictGroupTest
+  LexiconAnnotationTest
   MarisaDictTest
   MaxMatchSegmentationTest
   PhraseExtractTest

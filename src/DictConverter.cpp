@@ -27,9 +27,17 @@
 using namespace opencc;
 
 DictPtr LoadDictionary(const std::string& format,
-                       const std::string& inputFileName) {
+                       const std::string& inputFileName,
+                       bool preserveComments) {
   if (format == "text") {
-    return SerializableDict::NewFromFile<TextDict>(inputFileName);
+    FILE* fp = fopen(inputFileName.c_str(), "r");
+    if (!fp) {
+      fprintf(stderr, "Cannot open file: %s\n", inputFileName.c_str());
+      exit(2);
+    }
+    DictPtr dict = TextDict::NewFromFile(fp, preserveComments);
+    fclose(fp);
+    return dict;
   } else if (format == "ocd") {
 #ifdef ENABLE_DARTS
     return SerializableDict::NewFromFile<DartsDict>(inputFileName);
@@ -61,8 +69,9 @@ namespace opencc {
 void ConvertDictionary(const std::string& inputFileName,
                        const std::string& outputFileName,
                        const std::string& formatFrom,
-                       const std::string& formatTo) {
-  DictPtr dictFrom = LoadDictionary(formatFrom, inputFileName);
+                       const std::string& formatTo,
+                       bool preserveComments) {
+  DictPtr dictFrom = LoadDictionary(formatFrom, inputFileName, preserveComments);
   SerializableDictPtr dictTo = ConvertDict(formatTo, dictFrom);
   dictTo->SerializeToFile(outputFileName);
 }

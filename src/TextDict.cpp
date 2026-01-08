@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <map>
 
 #include "Lexicon.hpp"
 #include "TextDict.hpp"
@@ -41,14 +42,18 @@ TextDict::TextDict(const LexiconPtr& _lexicon)
 
 TextDict::~TextDict() {}
 
-TextDictPtr TextDict::NewFromSortedFile(FILE* fp) {
-  const LexiconPtr& lexicon = Lexicon::ParseLexiconFromFile(fp);
+TextDictPtr TextDict::NewFromSortedFile(FILE* fp, bool preserveComments) {
+  const LexiconPtr& lexicon = Lexicon::ParseLexiconFromFile(fp, preserveComments);
   return TextDictPtr(new TextDict(lexicon));
 }
 
-TextDictPtr TextDict::NewFromFile(FILE* fp) {
-  const LexiconPtr& lexicon = Lexicon::ParseLexiconFromFile(fp);
-  lexicon->Sort();
+TextDictPtr TextDict::NewFromFile(FILE* fp, bool preserveComments) {
+  const LexiconPtr& lexicon = Lexicon::ParseLexiconFromFile(fp, preserveComments);
+  if (lexicon->HasAnnotations()) {
+    lexicon->SortWithAnnotations();
+  } else {
+    lexicon->Sort();
+  }
   std::string dupkey;
   if (!lexicon->IsUnique(&dupkey)) {
     throw InvalidFormat(
@@ -78,7 +83,94 @@ Optional<const DictEntry*> TextDict::Match(const char* word, size_t len) const {
 LexiconPtr TextDict::GetLexicon() const { return lexicon; }
 
 void TextDict::SerializeToFile(FILE* fp) const {
-  for (const auto& entry : *lexicon) {
-    fprintf(fp, "%s\n", entry->ToString().c_str());
+  if (!lexicon->HasAnnotations()) {
+    // No annotations, use simple serialization
+    for (const auto& entry : *lexicon) {
+      fprintf(fp, "%s\n", entry->ToString().c_str());
+    }
+    return;
+  }
+
+  // Serialize with annotations
+  const auto& headerBlocks = lexicon->GetHeaderBlocks();
+  const auto& footerBlocks = lexicon->GetFooterBlocks();
+  const auto& annotatedEntries = lexicon->GetAnnotatedEntries();
+  const auto& floatingBlocks = lexicon->GetFloatingBlocks();
+
+  // Write header blocks
+  for (size_t i = 0; i < headerBlocks.size(); ++i) {
+    for (const auto& line : headerBlocks[i].lines) {
+      fprintf(fp, "%s\n", line.c_str());
+    }
+    // Add empty line after each header block
+    if (i < headerBlocks.size() - 1) {
+      fprintf(fp, "\n");
+    }
+  }
+
+  // Add empty line after header if there were header blocks
+  if (!headerBlocks.empty() && !annotatedEntries.empty()) {
+    fprintf(fp, "\n");
+  }
+
+  // Group floating blocks by anchor index
+  std::map<size_t, std::vector<const CommentBlock*>> floatingByAnchor;
+  for (const auto& pair : floatingBlocks) {
+    floatingByAnchor[pair.first].push_back(&pair.second);
+  }
+
+  // Write entries with their attached comments and floating blocks
+  for (size_t i = 0; i < annotatedEntries.size(); ++i) {
+    // Write floating blocks anchored before this entry
+    auto floatIt = floatingByAnchor.find(i);
+    if (floatIt != floatingByAnchor.end()) {
+      for (const auto* block : floatIt->second) {
+        // Ensure empty line before floating block
+        fprintf(fp, "\n");
+        for (const auto& line : block->lines) {
+          fprintf(fp, "%s\n", line.c_str());
+        }
+        // Ensure empty line after floating block
+        fprintf(fp, "\n");
+      }
+    }
+
+    // Write attached comment if present
+    if (annotatedEntries[i].attachedComment) {
+      for (const auto& line : annotatedEntries[i].attachedComment->lines) {
+        fprintf(fp, "%s\n", line.c_str());
+      }
+      // No empty line after attached comment (it must be directly before entry)
+    }
+
+    // Write the entry
+    fprintf(fp, "%s\n", annotatedEntries[i].entry->ToString().c_str());
+  }
+
+  // Write floating blocks anchored after all entries
+  auto floatIt = floatingByAnchor.find(annotatedEntries.size());
+  if (floatIt != floatingByAnchor.end()) {
+    for (const auto* block : floatIt->second) {
+      fprintf(fp, "\n");
+      for (const auto& line : block->lines) {
+        fprintf(fp, "%s\n", line.c_str());
+      }
+    }
+  }
+
+  // Write footer blocks
+  if (!footerBlocks.empty()) {
+    // Add empty line before footer if there were entries
+    if (!annotatedEntries.empty()) {
+      fprintf(fp, "\n");
+    }
+    for (size_t i = 0; i < footerBlocks.size(); ++i) {
+      for (const auto& line : footerBlocks[i].lines) {
+        fprintf(fp, "%s\n", line.c_str());
+      }
+      if (i < footerBlocks.size() - 1) {
+        fprintf(fp, "\n");
+      }
+    }
   }
 }

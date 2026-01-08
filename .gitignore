@@ -16,3 +16,42 @@
 /node_modules
 /*.egg-info
 /.venv/
+
+# CMake build artifacts (when building in source directory)
+/CMakeCache.txt
+CMakeFiles/
+CPackConfig.cmake
+CPackSourceConfig.cmake
+CTestTestfile.cmake
+/DartConfiguration.tcl
+/OpenCCConfig.cmake
+/OpenCCConfigVersion.cmake
+cmake_install.cmake
+Makefile
+/opencc.pc
+/lib/
+
+# Generated files
+/src/Opencc_Export.h
+/deps/googletest-1.15.0/googletest/generated/
+
+# Compiled dictionaries
+*.ocd2
+*Rev.txt
+/data/TWPhrases.txt
+/data/cngov/
+
+# Test executables
+*Test
+!/src/*Test.cpp
+!/src/*TestBase.hpp
+
+# Tool executables
+/src/tools/opencc
+/src/tools/opencc_dict
+/src/tools/opencc_phrase_extract
+
+# Shared libraries
+*.so
+*.so.*
+*.a

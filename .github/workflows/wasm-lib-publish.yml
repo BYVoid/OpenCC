@@ -1,0 +1,46 @@
+name: Publish wasm-lib
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-package-publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: wasm-lib
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Set up Emscripten
+        uses: emscripten-core/emsdk@v4
+        with:
+          version: 3.1.64
+
+      - name: Set up Bazel
+        uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Refresh wasm-lib assets
+        run: ./scripts/refresh_assets.sh
+
+      - name: Build wasm-lib
+        run: npm run build
+
+      - name: Package wasm-lib
+        run: npm pack
+
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

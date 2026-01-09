@@ -1,9 +1,13 @@
-name: Publish wasm-lib
+name: Publish opencc-wasm to npm
 
 on:
   release:
     types: [published]
   workflow_dispatch:
+
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
 
 jobs:
   build-package-publish:
@@ -18,12 +22,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: https://registry.npmjs.org
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Set up Emscripten
-        uses: emscripten-core/emsdk@v4
+        # See https://github.com/emscripten-core/emsdk/tags
+        uses: mymindstorm/setup-emsdk@v14
         with:
-          version: 3.1.64
+          version: 4.0.22
+
+      - name: Verify
+        run: em++ -v
 
       - name: Set up Bazel
         uses: bazelbuild/setup-bazelisk@v3
@@ -34,13 +42,10 @@ jobs:
       - name: Refresh wasm-lib assets
         run: ./scripts/refresh_assets.sh
 
-      - name: Build wasm-lib
-        run: npm run build
-
-      - name: Package wasm-lib
+      - name: Package wasm-lib (includes build)
         run: npm pack
 
       - name: Publish to npm
-        run: npm publish --access public
+        run: npm publish --provenance
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true

@@ -53,5 +53,9 @@
     "url": "https://github.com/frankslin/OpenCC.git",
     "directory": "wasm-lib"
   },
-  "homepage": "https://github.com/frankslin/OpenCC/tree/master/wasm-lib"
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "homepage": "https://opencc.js.org/"
 }

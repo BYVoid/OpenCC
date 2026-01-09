@@ -25,7 +25,7 @@ WebAssembly port of OpenCC (Open Chinese Convert) with full API compatibility. B
 
 ## 🚀 Quick Start
 
-### Browser (CDN - Zero Install!)
+### Browser (CDN - Zero Installation Required!)
 
 ```html
 <script type="module">
@@ -33,7 +33,7 @@ WebAssembly port of OpenCC (Open Chinese Convert) with full API compatibility. B
   import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.4.1/dist/esm/index.js";
 
   // 2. Create converter (auto-downloads everything!)
-  const converter = OpenCC.Converter({ from: "cn", to: "tw" });
+  const converter = OpenCC.Converter({ config: "s2twp" });
 
   // 3. Convert - Done!
   const result = await converter("简体中文");
@@ -42,18 +42,6 @@ WebAssembly port of OpenCC (Open Chinese Convert) with full API compatibility. B
 ```
 
 **That's it!** All configs and dictionaries are automatically downloaded from CDN.
-
-### CDN (Converter API)
-
-```javascript
-import OpenCC from "https://cdn.jsdelivr.net/npm/opencc-wasm@0.4.1/dist/esm/index.js";
-
-const converter = OpenCC.Converter({ from: "cn", to: "t" });
-const result = await converter("简体中文");
-console.log(result); // 簡體中文
-```
-
-Example source: `test/cdn-simple.mjs`
 
 ### Node.js (NPM)
 
@@ -64,7 +52,7 @@ npm install opencc-wasm
 ```javascript
 import OpenCC from "opencc-wasm";
 
-const converter = OpenCC.Converter({ from: "cn", to: "tw" });
+const converter = OpenCC.Converter({ config: "s2twp" });
 const result = await converter("简体中文");
 console.log(result);  // 簡體中文
 ```
@@ -89,24 +77,24 @@ const result = await converter("服务器软件");  // 伺服器軟體
 
 | Config | Description | Example |
 |--------|-------------|---------|
-| `s2t` | Simplified → Traditional | 简体 → 簡體 |
-| `s2tw` | Simplified → Taiwan | 软件 → 軟件 |
-| `s2twp` | Simplified → Taiwan (phrases) | 软件 → 軟體 |
-| `s2hk` | Simplified → Hong Kong | 打印机 → 打印機 |
-| `t2s` | Traditional → Simplified | 繁體 → 繁体 |
-| `t2tw` | Traditional → Taiwan | 台灣 → 臺灣 |
-| `t2hk` | Traditional → Hong Kong | 香港 → 香港 |
-| `t2jp` | Traditional → Japanese Shinjitai | 繁體 → 繁体 |
+| `s2twp` | Simplified → Taiwan Traditional (with regional phrases) | 软件 → 軟體 |
+| `s2tw` | Simplified → Taiwan Traditional | 心里 → 心裡 |
+| `s2hk` | Simplified → Hong Kong Traditional | 心里  → 心裏 |
+| `s2t` | Simplified → OpenCC Standard Traditional | 简体 → 簡體 |
+| `tw2sp` | Taiwan → Simplified (with regional phrases) | 滑鼠 → 鼠标 |
 | `tw2s` | Taiwan → Simplified | 軟體 → 软件 |
-| `tw2sp` | Taiwan → Simplified (phrases) | 滑鼠 → 鼠标 |
-| `tw2t` | Taiwan → Traditional | 臺灣 → 台灣 |
+| `tw2t` | Taiwan → Traditional | 吃飯 → 喫飯 |
 | `hk2s` | Hong Kong → Simplified | 打印機 → 打印机 |
-| `hk2t` | Hong Kong → Traditional | 香港 → 香港 |
-| `jp2t` | Japanese Shinjitai → Traditional | 繁体 → 繁體 |
+| `hk2t` | Hong Kong → Traditional | 為 → 爲 |
+| `t2s` | OpenCC Standard Traditional → Simplified | 繁體 → 繁体 |
+| `t2tw` | OpenCC Standard Traditional → Taiwan | 牀 → 床 |
+| `t2hk` | OpenCC Standard Traditional → Hong Kong | 爲 → 為 |
+| `jp2t` | Japanese Shinjitai → Traditional | 桜花 → 櫻花 |
+| `t2jp` | Traditional → Japanese Shinjitai | 櫻花 → 桜花 |
 | `t2cngov` | Traditional → CN Gov Standard | 潮溼 → 潮湿 |
 | `t2cngov_keep_simp` | Traditional → CN Gov (Keep Simp) | 简体繁體 → 简体繁體 |
 
-#### Method 2: Using `from`/`to` parameters (Legacy)
+#### Method 2: Using `from`/`to` parameters (compatible with `opencc-js`)
 
 Specify source and target locales:
 

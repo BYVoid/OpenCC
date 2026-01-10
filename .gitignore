@@ -2,7 +2,6 @@
 *.tgz
 .project
 .cproject
-/.vscode
 /.mypy_cache
 /bazel-*
 /build

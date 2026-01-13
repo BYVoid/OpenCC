@@ -13,6 +13,14 @@ genrule(
     tools = ["//data/scripts:merge"],
 )
 
+# These component files are only used for merge_TWPhrases and should not
+# produce standalone .ocd2 outputs.
+PHRASE_PARTS = [
+    "TWPhrasesIT.txt",
+    "TWPhrasesName.txt",
+    "TWPhrasesOther.txt",
+]
+
 [
     genrule(
         name = "reverse_" + txt,
@@ -30,7 +38,7 @@ genrule(
     ]
 ]
 
-TEXT_DICTS = glob(["*.txt"]) + [
+TEXT_DICTS = glob(["*.txt"], exclude = PHRASE_PARTS) + [
     "TWPhrases.txt",
     "TWVariantsRev.txt",
     "TWPhrasesRev.txt",

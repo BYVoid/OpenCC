@@ -1,6 +1,7 @@
 include_directories("${PROJECT_SOURCE_DIR}")
 include_directories("${PROJECT_BINARY_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/src")
+include_directories("${PROJECT_SOURCE_DIR}/deps/rapidjson-1.1.0")
 
 set(CONFIG_TEST
   config_test/config_test.json

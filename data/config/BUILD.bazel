@@ -4,3 +4,19 @@ filegroup(
     name = "config",
     srcs = glob(["*.json"]),
 )
+
+cc_test(
+    name = "config_dict_validation_test",
+    srcs = ["ConfigDictValidationTest.cpp"],
+    data = [
+        ":config",
+        "//data/dictionary:binary_dictionaries",
+        "//test/testcases",
+    ],
+    deps = [
+        "//src:simple_converter",
+        "@bazel_tools//tools/cpp/runfiles",
+        "@googletest//:gtest_main",
+        "@rapidjson",
+    ],
+)

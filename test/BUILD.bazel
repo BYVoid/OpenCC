@@ -22,5 +22,6 @@ cc_test(
         "//src:common",
         "@bazel_tools//tools/cpp/runfiles",
         "@googletest//:gtest_main",
+        "@rapidjson",
     ],
 )

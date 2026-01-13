@@ -1,14 +1,13 @@
 from __future__ import unicode_literals
 
+import json
 import os
 import pytest
 import sys
 
-from glob import glob
-
 _this_dir = os.path.dirname(os.path.abspath(__file__))
 _opencc_rootdir = os.path.abspath(os.path.join(_this_dir, '..', '..'))
-_test_assets_dir = os.path.join(_opencc_rootdir, 'test', 'testcases')
+_testcases_path = os.path.join(_opencc_rootdir, 'test', 'testcases', 'testcases.json')
 
 
 def test_import():
@@ -26,22 +25,18 @@ def test_init_delete_converter():
 def test_conversion():
     import opencc
 
-    for inpath in glob(os.path.join(_test_assets_dir, '*.in')):
-        pref = os.path.splitext(inpath)[0]
-        config = os.path.basename(pref)
-        converter = opencc.OpenCC(config)
-        anspath = '{}.{}'.format(pref, 'ans')
-        assert os.path.isfile(anspath)
+    with open(_testcases_path, 'r', encoding='utf-8') as f:
+        parsed = json.load(f)
 
-        with open(inpath, 'rb') as f:
-            intexts = [l.strip().decode('utf-8') for l in f]
-        with open(anspath, 'rb') as f:
-            anstexts = [l.strip().decode('utf-8') for l in f]
-        assert len(intexts) == len(anstexts)
-
-        for text, ans in zip(intexts, anstexts):
-            assert converter.convert(text) == ans, \
-                'Failed to convert {} for {} -> {}'.format(pref, text, ans)
+    for case in parsed.get('cases', []):
+        input_text = case.get('input')
+        expected = case.get('expected', {})
+        if not input_text or not isinstance(expected, dict):
+            continue
+        for cfg, ans in expected.items():
+            converter = opencc.OpenCC(f'{cfg}.json')
+            assert converter.convert(input_text) == ans, \
+                'Failed to convert {} for {} -> {}'.format(cfg, input_text, ans)
 
 
 if __name__ == "__main__":

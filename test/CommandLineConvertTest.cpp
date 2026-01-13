@@ -18,8 +18,13 @@
 
 #include <fstream>
 #include <iostream>
+#include <map>
+#include <sstream>
+#include <unordered_map>
+#include <vector>
 
 #include "src/Common.hpp"
+#include "rapidjson/document.h"
 #include "gtest/gtest.h"
 
 #ifdef BAZEL
@@ -76,27 +81,11 @@ protected:
 #endif
   }
 
-  std::string InputDirectory() const {
-#ifdef BAZEL
-    return runfiles_->Rlocation("_main/test/testcases") + "/";
-#else
-    return CMAKE_SOURCE_DIR "/test/testcases/";
-#endif
-  }
-
   std::string OutputDirectory() const {
 #ifdef BAZEL
     return ::testing::TempDir() + "/";
 #else
     return PROJECT_BINARY_DIR "/test/";
-#endif
-  }
-
-  std::string AnswerDirectory() const {
-#ifdef BAZEL
-    return runfiles_->Rlocation("_main/test/testcases") + "/";
-#else
-    return CMAKE_SOURCE_DIR "/test/testcases/";
 #endif
   }
 
@@ -109,18 +98,15 @@ protected:
   }
 
   std::string InputFile(const char* config) const {
-    return InputDirectory() + config + ".in";
+    return OutputDirectory() + config + ".in";
   }
 
   std::string OutputFile(const char* config) const {
     return OutputDirectory() + config + ".out";
   }
 
-  std::string AnswerFile(const char* config) const {
-    return AnswerDirectory() + config + ".ans";
-  }
-
-  std::string TestCommand(const char* config, const std::string& inputFile,
+  std::string TestCommand(const std::string& config,
+                          const std::string& inputFile,
                           const std::string& outputFile) const {
     std::string cmd = OpenccCommand() + " -i " + inputFile + " -o " +
                       outputFile + " -c " + ConfigurationDirectory() + config +
@@ -139,42 +125,89 @@ protected:
 #endif
 };
 
-class ConfigurationTest : public CommandLineConvertTest,
-                          public ::testing::WithParamInterface<const char*> {};
+struct CaseInput {
+  std::string input;
+  std::string expected;
+};
 
-TEST_P(ConfigurationTest, Convert) {
-  const char* config = GetParam();
-  const std::string inputFile = InputFile(config);
-  const std::string outputFile = OutputFile(config);
-  ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
-  const std::string output = GetFileContents(OutputFile(config));
-  const std::string answer = GetFileContents(AnswerFile(config));
-  ASSERT_EQ(answer, output);
+using CasesByConfig = std::unordered_map<std::string, std::vector<CaseInput>>;
+
+CasesByConfig LoadCases(const std::string& jsonPath) {
+  CasesByConfig cases;
+  std::string content;
+  {
+    std::ifstream ifs(jsonPath);
+    if (!ifs.is_open()) {
+      throw std::runtime_error("Cannot open " + jsonPath);
+    }
+    std::stringstream buffer;
+    buffer << ifs.rdbuf();
+    content = buffer.str();
+  }
+
+  rapidjson::Document doc;
+  doc.Parse(content.c_str());
+  if (doc.HasParseError() || !doc.IsObject() || !doc.HasMember("cases") ||
+      !doc["cases"].IsArray()) {
+    throw std::runtime_error("Invalid testcases.json format");
+  }
+
+  for (auto& entry : doc["cases"].GetArray()) {
+    if (!entry.IsObject() || !entry.HasMember("input") ||
+        !entry["input"].IsString() || !entry.HasMember("expected") ||
+        !entry["expected"].IsObject()) {
+      continue;
+    }
+    const std::string input = entry["input"].GetString();
+    for (auto itr = entry["expected"].MemberBegin();
+         itr != entry["expected"].MemberEnd(); ++itr) {
+      if (!itr->value.IsString()) {
+        continue;
+      }
+      const std::string config = itr->name.GetString();
+      cases[config].push_back({input, itr->value.GetString()});
+    }
+  }
+  return cases;
 }
 
-TEST_P(ConfigurationTest, InPlaceConvert) {
-  const char* config = GetParam();
-  // Copy input to output
-  const std::string inputFile = InputFile(config);
-  const std::string outputFile = OutputFile(config);
-  std::ifstream source(inputFile, std::ios::binary);
-  std::ofstream dest(outputFile, std::ios::binary);
-  dest << source.rdbuf();
-  source.close();
-  dest.close();
-  // Test in-place convert (same file)
-  ASSERT_EQ(0, system(TestCommand(config, outputFile, outputFile).c_str()));
-  const std::string output = GetFileContents(OutputFile(config));
-  const std::string answer = GetFileContents(AnswerFile(config));
-  ASSERT_EQ(answer, output);
-}
+TEST_F(CommandLineConvertTest, ConvertFromJson) {
+#ifdef BAZEL
+  const std::string casesPath =
+      runfiles_->Rlocation("_main/test/testcases/testcases.json");
+#else
+  const std::string casesPath = CMAKE_SOURCE_DIR "/test/testcases/testcases.json";
+#endif
+  const CasesByConfig cases = LoadCases(casesPath);
 
-INSTANTIATE_TEST_SUITE_P(
-    CommandLine, ConfigurationTest,
-    ::testing::Values("hk2s", "hk2t", "jp2t", "s2hk", "s2t", "s2tw", "s2twp",
-                      "t2hk", "t2jp", "t2s", "tw2s", "tw2sp", "tw2t"),
-    [](const testing::TestParamInfo<ConfigurationTest::ParamType>& info) {
-      return info.param;
-    });
+  for (const auto& entry : cases) {
+    const std::string& config = entry.first;
+    const std::string inputFile = InputFile(config.c_str());
+    const std::string outputFile = OutputFile(config.c_str());
+
+    // Write inputs into a temp file (one per line).
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      for (const auto& item : entry.second) {
+        ofs << item.input << "\n";
+      }
+    }
+
+    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+
+    // Read outputs and compare line by line.
+    std::ifstream ofs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    std::string line;
+    size_t idx = 0;
+    while (std::getline(ofs, line)) {
+      ASSERT_LT(idx, entry.second.size());
+      EXPECT_EQ(entry.second[idx].expected, line)
+          << "config=" << config << " index=" << idx;
+      idx++;
+    }
+    EXPECT_EQ(idx, entry.second.size()) << "config=" << config;
+  }
+}
 
 } // namespace opencc

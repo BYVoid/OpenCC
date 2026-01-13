@@ -2,13 +2,5 @@ package(default_visibility = ["//visibility:public"])
 
 filegroup(
     name = "testcases",
-    srcs = glob(["*.in"]) + glob(["*.ans"]),
-)
-
-genrule(
-    name = "testcases_json",
-    srcs = glob(["*.in"]) + glob(["*.ans"]),
-    tools = ["gen_testcases_json.py"],
-    outs = ["testcases.json"],
-    cmd = "python3 $(location gen_testcases_json.py) $(SRCS) > $@",
+    srcs = ["testcases.json"],
 )

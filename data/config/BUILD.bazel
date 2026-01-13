@@ -11,7 +11,7 @@ cc_test(
     data = [
         ":config",
         "//data/dictionary:binary_dictionaries",
-        "//test/testcases:testcases_json",
+        "//test/testcases",
     ],
     deps = [
         "//src:simple_converter",

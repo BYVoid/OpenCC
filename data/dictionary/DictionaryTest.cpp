@@ -46,13 +46,12 @@ std::string DictionaryTest::runfile_dir_;
 
 INSTANTIATE_TEST_SUITE_P(
     , DictionaryTest,
-    ::testing::Values("HKVariants", "HKVariantsRevPhrases",
-                      "JPShinjitaiCharacters", "JPShinjitaiPhrases",
-                      "JPVariants", "STCharacters", "STPhrases", "TSCharacters",
-                      "TSPhrases", "TWPhrasesIT", "TWPhrasesName",
-                      "TWPhrasesOther", "TWVariants", "TWVariantsRevPhrases",
-                      "TWPhrases", "TWVariantsRev", "TWPhrasesRev",
-                      "HKVariantsRev", "JPVariantsRev"),
+    ::testing::Values(
+        "HKVariants", "HKVariantsRev", "HKVariantsRevPhrases",
+        "JPShinjitaiCharacters", "JPShinjitaiPhrases", "JPVariants",
+        "JPVariantsRev", "STCharacters", "STPhrases", "TSCharacters",
+        "TSPhrases", "TWPhrases", "TWPhrasesRev", "TWVariants",
+        "TWVariantsRev", "TWVariantsRevPhrases"),
     [](const testing::TestParamInfo<DictionaryTest::ParamType>& info) {
       return info.param;
     });

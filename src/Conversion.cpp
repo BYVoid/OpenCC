@@ -23,14 +23,30 @@ using namespace opencc;
 
 std::string Conversion::Convert(const char* phrase) const {
   std::ostringstream buffer;
+  // Calculate string end to prevent reading beyond null terminator
+  const char* phraseEnd = phrase;
+  while (*phraseEnd != '\0') {
+    phraseEnd++;
+  }
+
   for (const char* pstr = phrase; *pstr != '\0';) {
-    Optional<const DictEntry*> matched = dict->MatchPrefix(pstr);
+    size_t remainingLength = phraseEnd - pstr;
+    Optional<const DictEntry*> matched = dict->MatchPrefix(pstr, remainingLength);
     size_t matchedLength;
     if (matched.IsNull()) {
       matchedLength = UTF8Util::NextCharLength(pstr);
+      // Ensure we don't read beyond the null terminator
+      if (matchedLength > remainingLength) {
+        matchedLength = remainingLength;
+      }
       buffer << UTF8Util::FromSubstr(pstr, matchedLength);
     } else {
       matchedLength = matched.Get()->KeyLength();
+      // Defensive: ensure dictionary key length does not exceed remaining input
+      // (MatchPrefix should already guarantee this, but defense in depth)
+      if (matchedLength > remainingLength) {
+        matchedLength = remainingLength;
+      }
       buffer << matched.Get()->GetDefault();
     }
     pstr += matchedLength;

@@ -61,7 +61,7 @@ set(
 
 set(
   DICT_TWPhrasesRev_GENERATING_INPUT
-  ${DICT_GENERATED_DIR}/TWPhrases.txt
+  ${DICT_DIR}/TWPhrases.txt
 )
 set(
   DICT_TWPhrasesRev_GENERATING_COMMAND

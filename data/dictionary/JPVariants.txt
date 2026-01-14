@@ -1,3 +1,10 @@
+# Open Chinese Convert (OpenCC) Dictionary
+# File: JPVariants.txt
+# Format: key	value(s) (values separated by spaces)
+# License: Apache-2.0 (see LICENSE)
+# Source: https://github.com/ByVoid/OpenCC
+# Used in configs: t2jp.json
+
 乘	乗
 亂	乱
 亙	亘

@@ -80,7 +80,7 @@ TEST_P(DictionaryTest, UniqueSortedTest) {
   FILE* fp =
       fopen(UTF8Util::GetPlatformString(dictionaryFileName).c_str(), "rb");
   ASSERT_NE(fp, nullptr);
-  LexiconPtr lexicon = Lexicon::ParseLexiconFromFile(fp);
+  LexiconPtr lexicon = Lexicon::ParseLexiconFromFile(fp, true);
   EXPECT_TRUE(lexicon->IsUnique()) << GetParam() << " has duplicated keys.";
   EXPECT_TRUE(lexicon->IsSorted()) << GetParam() << " is not sorted.";
 }
@@ -99,7 +99,7 @@ TEST_P(DictionaryTest, BinaryTest) {
   FILE* fp_txt =
       fopen(UTF8Util::GetPlatformString(textDictionaryFileName).c_str(), "rb");
   ASSERT_NE(fp_txt, nullptr);
-  LexiconPtr txt_lexicon = Lexicon::ParseLexiconFromFile(fp_txt);
+  LexiconPtr txt_lexicon = Lexicon::ParseLexiconFromFile(fp_txt, true);
 
   EXPECT_EQ(dict->GetLexicon()->Length(), txt_lexicon->Length());
 }

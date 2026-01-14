@@ -31,7 +31,8 @@ TEXT_DICTS = glob(["*.txt"]) + [
               "--input $(location " + txt + ") " +
               "--output $(OUTS) " +
               "--from text " +
-              "--to ocd2",
+              "--to ocd2 " +
+              "--preserve-comments",
         tools = ["//src/tools:dict_converter"],
     )
     for txt in TEXT_DICTS

@@ -314,6 +314,12 @@ void Lexicon::SortWithAnnotations() {
     return;
   }
 
+  std::vector<std::string> originalKeys;
+  originalKeys.reserve(annotatedEntries.size());
+  for (const auto& annotated : annotatedEntries) {
+    originalKeys.push_back(annotated.Key());
+  }
+
   // Create a mapping from old entry pointers to their annotated counterparts
   std::map<std::string, size_t> keyToAnnotatedIndex;
   for (size_t i = 0; i < annotatedEntries.size(); ++i) {
@@ -326,6 +332,7 @@ void Lexicon::SortWithAnnotations() {
   // Rebuild annotatedEntries in the new order
   std::vector<AnnotatedEntry> sortedAnnotated;
   sortedAnnotated.reserve(annotatedEntries.size());
+  std::map<std::string, size_t> keyToNewIndex;
 
   for (const auto& entry : entries) {
     auto it = keyToAnnotatedIndex.find(entry->Key());
@@ -343,12 +350,31 @@ void Lexicon::SortWithAnnotations() {
       DictEntry* entryCopy = DictEntryFactory::New(entry.get());
       sortedAnnotated.emplace_back(entryCopy, nullptr);
     }
+    keyToNewIndex[entry->Key()] = sortedAnnotated.size() - 1;
   }
 
   annotatedEntries = std::move(sortedAnnotated);
 
-  // Floating blocks' anchor indices remain valid as they refer to the sorted position
-  // No need to update floatingBlocks
+  if (!floatingBlocks.empty()) {
+    std::vector<std::pair<size_t, CommentBlock>> updatedFloating;
+    updatedFloating.reserve(floatingBlocks.size());
+    const size_t newCount = annotatedEntries.size();
+    for (const auto& pair : floatingBlocks) {
+      size_t anchor = pair.first;
+      if (anchor >= originalKeys.size()) {
+        updatedFloating.emplace_back(newCount, pair.second);
+        continue;
+      }
+      const std::string& anchorKey = originalKeys[anchor];
+      auto newIt = keyToNewIndex.find(anchorKey);
+      if (newIt != keyToNewIndex.end()) {
+        updatedFloating.emplace_back(newIt->second, pair.second);
+      } else {
+        updatedFloating.emplace_back(newCount, pair.second);
+      }
+    }
+    floatingBlocks = std::move(updatedFloating);
+  }
 }
 
 } // namespace opencc

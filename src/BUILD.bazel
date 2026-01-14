@@ -275,6 +275,16 @@ cc_library(
     ],
 )
 
+cc_test(
+    name = "lexicon_annotation_test",
+    srcs = ["LexiconAnnotationTest.cpp"],
+    deps = [
+        ":text_dict",
+        ":text_dict_test_base",
+        "@googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "marisa_dict",
     srcs = ["MarisaDict.cpp"],
@@ -322,11 +332,25 @@ cc_library(
     name = "phrase_extract",
     srcs = ["PhraseExtract.cpp"],
     hdrs = ["PhraseExtract.hpp"],
-    visibility = ["//src/tools:__pkg__"],
+    visibility = [
+        "//src:__pkg__",
+        "//src/tools:__pkg__",
+    ],
     deps = [
         ":common",
         ":marisa_dict",
         ":utf8_string_slice",
+    ],
+)
+
+cc_test(
+    name = "phrase_extract_test",
+    srcs = ["PhraseExtractTest.cpp"],
+    deps = [
+        ":phrase_extract",
+        ":test_utils",
+        ":test_utils_utf8",
+        "@googletest//:gtest_main",
     ],
 )
 
@@ -467,6 +491,16 @@ cc_library(
     deps = [
         ":common",
         ":utf8_util",
+    ],
+)
+
+cc_test(
+    name = "utf8_string_slice_test",
+    srcs = ["UTF8StringSliceTest.cpp"],
+    deps = [
+        ":test_utils",
+        ":utf8_string_slice",
+        "@googletest//:gtest_main",
     ],
 )
 

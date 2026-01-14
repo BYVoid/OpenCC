@@ -4,7 +4,6 @@
     "type": "none",
     "variables": {
       "cmd": "<(module_root_dir)/node/dict.js",
-      "dict_merge": "<(module_root_dir)/data/scripts/merge.py",
       "dict_reverse": "<(module_root_dir)/data/scripts/reverse.py",
       "input_prefix": "<(module_root_dir)/data/dictionary/",
       "output_prefix": "<(PRODUCT_DIR)/",
@@ -77,11 +76,6 @@
       "outputs": ["<(output_prefix)JPVariants.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
-      "action_name": "TWPhrases.txt",
-      "inputs": ["<(cmd)"],
-      "outputs": ["<(output_prefix)TWPhrases.txt"],
-      "action": ["<(python_cmd)", "<(dict_merge)", "<(input_prefix)TWPhrasesIT.txt", "<(input_prefix)TWPhrasesName.txt", "<(input_prefix)TWPhrasesOther.txt", "<@(_outputs)"]
-    }, {
       "action_name": "TWVariantsRev.txt",
       "variables": {
         "input": "<(input_prefix)TWVariants.txt",
@@ -92,7 +86,7 @@
     }, {
       "action_name": "TWPhrasesRev.txt",
       "variables": {
-        "input": "<(output_prefix)TWPhrases.txt",
+        "input": "<(input_prefix)TWPhrases.txt",
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)TWPhrasesRev.txt"],
@@ -100,7 +94,7 @@
     }, {
       "action_name": "TWPhrases",
       "variables": {
-        "input": "<(output_prefix)TWPhrases.txt",
+        "input": "<(input_prefix)TWPhrases.txt",
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)TWPhrases.ocd2"],

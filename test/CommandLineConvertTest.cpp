@@ -114,6 +114,9 @@ protected:
 #ifdef BAZEL
     cmd += " --path " + runfiles_->Rlocation("_main/data/dictionary") + "/" +
            " --path " + runfiles_->Rlocation("_main/data/config") + "/";
+#else
+    cmd += " --path " + std::string(PROJECT_BINARY_DIR) + "/data/" +
+           " --path " + std::string(PROJECT_BINARY_DIR) + "/data/cngov/";
 #endif
     return cmd;
   }

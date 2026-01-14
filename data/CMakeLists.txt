@@ -139,6 +139,7 @@ foreach(DICT ${DICTS})
         --output ${DICT}.ocd2
         --from text
         --to ocd2
+        --preserve-comments
     DEPENDS
       ${DICT_WIN32_DEPENDS}
       ${OPENCC_DICT_BIN}

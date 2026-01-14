@@ -9,13 +9,6 @@ py_library(
 )
 
 py_binary(
-    name = "merge",
-    srcs = ["merge.py"],
-    imports = ["."],
-    deps = [":common"],
-)
-
-py_binary(
     name = "reverse",
     srcs = ["reverse.py"],
     imports = ["."],

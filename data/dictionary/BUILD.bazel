@@ -1,26 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-genrule(
-    name = "merge_TWPhrases",
-    srcs = [
-        "TWPhrasesIT.txt",
-        "TWPhrasesName.txt",
-        "TWPhrasesOther.txt",
-    ],
-    outs = ["TWPhrases.txt"],
-    cmd = "$(location //data/scripts:merge) " +
-          "$(SRCS) $(OUTS)",
-    tools = ["//data/scripts:merge"],
-)
-
-# These component files are only used for merge_TWPhrases and should not
-# produce standalone .ocd2 outputs.
-PHRASE_PARTS = [
-    "TWPhrasesIT.txt",
-    "TWPhrasesName.txt",
-    "TWPhrasesOther.txt",
-]
-
 [
     genrule(
         name = "reverse_" + txt,
@@ -38,8 +17,7 @@ PHRASE_PARTS = [
     ]
 ]
 
-TEXT_DICTS = glob(["*.txt"], exclude = PHRASE_PARTS) + [
-    "TWPhrases.txt",
+TEXT_DICTS = glob(["*.txt"]) + [
     "TWVariantsRev.txt",
     "TWPhrasesRev.txt",
     "HKVariantsRev.txt",

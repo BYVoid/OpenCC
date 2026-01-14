@@ -1,7 +1,6 @@
 find_package(PythonInterp REQUIRED)
 
 set(OPENCC_DICT_BIN opencc_dict)
-set(DICT_MERGE_BIN "${PYTHON_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/merge.py")
 set(DICT_REVERSE_BIN "${PYTHON_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/reverse.py")
 set(DICT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dictionary)
 set(DICT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR})
@@ -12,6 +11,7 @@ set(
   STPhrases
   TSCharacters
   TSPhrases
+  TWPhrases
   TWVariants
   TWVariantsRevPhrases
   HKVariants
@@ -23,7 +23,6 @@ set(
 
 set(
   DICTS_GENERATED
-  TWPhrases
   TWPhrasesRev
   TWVariantsRev
   HKVariantsRev
@@ -50,17 +49,6 @@ endforeach(DICT)
 foreach(DICT ${DICTS_GENERATED})
   set(DICT_${DICT}_INPUT ${DICT_GENERATED_DIR}/${DICT}.txt)
 endforeach(DICT)
-
-set(
-  DICT_TWPhrases_GENERATING_INPUT
-  ${DICT_DIR}/TWPhrasesIT.txt
-  ${DICT_DIR}/TWPhrasesName.txt
-  ${DICT_DIR}/TWPhrasesOther.txt
-)
-set(
-  DICT_TWPhrases_GENERATING_COMMAND
-  ${DICT_MERGE_BIN} ${DICT_TWPhrases_GENERATING_INPUT} TWPhrases.txt
-)
 
 set(
   DICT_TWVariantsRev_GENERATING_INPUT

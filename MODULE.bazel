@@ -21,6 +21,8 @@ python = use_extension("@rules_python//python/extensions:python.bzl", "python")
 python.toolchain(
     python_version = "3.12",
 )
+use_repo(python, "python_3_12", "pythons_hub")
+register_toolchains("@pythons_hub//:all")
 pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
 pip.parse(
     hub_name = "pip",

@@ -83,6 +83,7 @@
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)TWVariantsRev.txt"],
       "action": ["<(python_cmd)", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
+    }, {
       "action_name": "TWPhrases",
       "variables": {
         "input": "<(input_prefix)TWPhrases.txt",

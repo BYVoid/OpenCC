@@ -1,3 +1,10 @@
+# Open Chinese Convert (OpenCC) Dictionary
+# File: JPShinjitaiPhrases.txt
+# Format: key	value(s) (values separated by spaces)
+# License: Apache-2.0 (see LICENSE)
+# Source: https://github.com/ByVoid/OpenCC
+# Used in configs: jp2t.json
+
 一獲千金	一攫千金
 丁寧	叮嚀
 丁重	鄭重

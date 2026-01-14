@@ -1,3 +1,10 @@
+# Open Chinese Convert (OpenCC) Dictionary
+# File: TSCharacters.txt
+# Format: key	value(s) (values separated by spaces)
+# License: Apache-2.0 (see LICENSE)
+# Source: https://github.com/ByVoid/OpenCC
+# Used in configs: hk2s.json, t2s.json, tw2s.json, tw2sp.json
+
 㑮	𫝈
 㑯	㑔
 㑳	㑇

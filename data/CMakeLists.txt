@@ -12,6 +12,7 @@ set(
   TSCharacters
   TSPhrases
   TWPhrases
+  TWPhrasesRev
   TWVariants
   TWVariantsRevPhrases
   HKVariants
@@ -23,7 +24,6 @@ set(
 
 set(
   DICTS_GENERATED
-  TWPhrasesRev
   TWVariantsRev
   HKVariantsRev
   JPVariantsRev
@@ -57,15 +57,6 @@ set(
 set(
   DICT_TWVariantsRev_GENERATING_COMMAND
   ${DICT_REVERSE_BIN} ${DICT_TWVariantsRev_GENERATING_INPUT} TWVariantsRev.txt
-)
-
-set(
-  DICT_TWPhrasesRev_GENERATING_INPUT
-  ${DICT_DIR}/TWPhrases.txt
-)
-set(
-  DICT_TWPhrasesRev_GENERATING_COMMAND
-  ${DICT_REVERSE_BIN} ${DICT_TWPhrasesRev_GENERATING_INPUT} TWPhrasesRev.txt
 )
 
 set(

@@ -178,7 +178,6 @@ build.cmd
 
 ```bash
 bazel build //:opencc
-bazel test --test_output=all //src/... //data/... //test/...
 ```
 
 ### Test 測試
@@ -193,6 +192,12 @@ make test
 
 ```bash
 test.cmd
+```
+
+#### Test with Bazel
+
+```bash
+bazel test --test_output=all //src/... //data/... //python/... //test/...
 ```
 
 ### Benchmark 基準測試
@@ -238,6 +243,7 @@ Please update if your project is using OpenCC.
 * [ibus-libpinyin](https://github.com/libpinyin/ibus-libpinyin)
 * [alfred-chinese-converter](https://github.com/amowu/alfred-chinese-converter)
 * [GoldenDict](https://github.com/goldendict/goldendict)
+* [China Biographical Database Project (CBDB)](https://cbdb.hsites.harvard.edu/)
 
 ## License 許可協議
 
@@ -306,5 +312,6 @@ All these libraries are statically linked by default.
 * [Prcuvu](https://github.com/Prcuvu)
 * [Tony Able](https://github.com/TonyAble)
 * [Xiao Liang](https://github.com/yxliang01)
+* [Frank Lin](https://github.com/frankslin)
 
 Please feel free to update this list if you have contributed OpenCC.

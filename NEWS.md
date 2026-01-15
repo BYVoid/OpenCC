@@ -1,5 +1,16 @@
 # Change History of OpenCC
 
+## Version 1.1.9
+
+2024年8月3日
+
+* 恢復`Config::NewFromFile`單參數接口以保持ABI兼容性。
+* 增加Bazel Python庫與測試（[#882](https://github.com/BYVoid/OpenCC/pull/882)）。
+* 構建與腳本切換至Python 3。
+* 修正`rapidjson`補丁與`npmignore`配置。
+* 補充安裝文檔與調整Bazel依賴配置（`googletest`改爲`dev_dependency`）。
+* 此版本爲維護性更新，詞典無顯著改動。
+
 ## Version 1.1.8
 
 2024年7月27日

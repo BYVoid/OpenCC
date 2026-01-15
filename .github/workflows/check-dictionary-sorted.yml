@@ -1,0 +1,27 @@
+name: Check Dictionary Sorting
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  sort-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Sort dictionaries
+        run: |
+          for file in data/dictionary/*.txt; do
+            python3 data/scripts/sort.py "$file"
+          done
+      - name: Verify no diff
+        run: |
+          if ! git diff --exit-code; then
+            echo "Dictionary files are not sorted. Run: python3 data/scripts/sort.py data/dictionary/*.txt"
+            exit 1
+          fi

@@ -88,7 +88,7 @@ public:
     return entries.end();
   }
 
-  static LexiconPtr ParseLexiconFromFile(FILE* fp, bool preserveComments = false);
+  static LexiconPtr ParseLexiconFromFile(FILE* fp);
 
   // Annotation support
   void SetHeaderBlocks(std::vector<CommentBlock> blocks) {

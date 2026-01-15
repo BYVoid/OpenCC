@@ -41,7 +41,7 @@ TEST_F(LexiconAnnotationTest, ParseCommentLines) {
   fclose(fp);
 
   FILE* readFp = fopen(testFileName.c_str(), "r");
-  const TextDictPtr& dict = TextDict::NewFromFile(readFp, true);
+  const TextDictPtr& dict = TextDict::NewFromFile(readFp);
   fclose(readFp);
   EXPECT_EQ(dict->GetLexicon()->Length(), 2);
   EXPECT_TRUE(dict->GetLexicon()->HasAnnotations());
@@ -63,7 +63,7 @@ TEST_F(LexiconAnnotationTest, ParseAttachedComment) {
   fclose(fp);
 
   FILE* readFp = fopen(testFileName.c_str(), "r");
-  const TextDictPtr& dict = TextDict::NewFromFile(readFp, true);
+  const TextDictPtr& dict = TextDict::NewFromFile(readFp);
   fclose(readFp);
   const auto& annotated = dict->GetLexicon()->GetAnnotatedEntries();
 
@@ -84,7 +84,7 @@ TEST_F(LexiconAnnotationTest, ParseFloatingComment) {
   fclose(fp);
 
   FILE* readFp = fopen(testFileName.c_str(), "r");
-  const TextDictPtr& dict = TextDict::NewFromFile(readFp, true);
+  const TextDictPtr& dict = TextDict::NewFromFile(readFp);
   fclose(readFp);
   const auto& floatingBlocks = dict->GetLexicon()->GetFloatingBlocks();
 
@@ -104,7 +104,7 @@ TEST_F(LexiconAnnotationTest, ParseFooterComment) {
   fclose(fp);
 
   FILE* readFp = fopen(testFileName.c_str(), "r");
-  const TextDictPtr& dict = TextDict::NewFromFile(readFp, true);
+  const TextDictPtr& dict = TextDict::NewFromFile(readFp);
   fclose(readFp);
   const auto& footerBlocks = dict->GetLexicon()->GetFooterBlocks();
 
@@ -126,7 +126,7 @@ TEST_F(LexiconAnnotationTest, SerializeWithAnnotations) {
   fclose(fp);
 
   FILE* readFp = fopen(testFileName.c_str(), "r");
-  const TextDictPtr& dict = TextDict::NewFromFile(readFp, true);
+  const TextDictPtr& dict = TextDict::NewFromFile(readFp);
   fclose(readFp);
 
   // Serialize back
@@ -176,7 +176,7 @@ TEST_F(LexiconAnnotationTest, SortWithAnnotations) {
   fclose(fp);
 
   FILE* readFp = fopen(testFileName.c_str(), "r");
-  const TextDictPtr& dict = TextDict::NewFromFile(readFp, true);
+  const TextDictPtr& dict = TextDict::NewFromFile(readFp);
   fclose(readFp);
 
   // Entries should be sorted, but comments should follow their entries

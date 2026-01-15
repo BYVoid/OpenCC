@@ -44,14 +44,9 @@ int main(int argc, const char* argv[]) {
     TCLAP::ValueArg<std::string> inputArg(
         "i", "input", "Path to input dictionary", true /* required */,
         "" /* default */, "file" /* type */, cmd);
-    TCLAP::SwitchArg preserveCommentsArg(
-        "p", "preserve-comments",
-        "Preserve comments when converting text dictionaries (default: false)",
-        cmd, false);
     cmd.parse(argc, argv);
     ConvertDictionary(inputArg.getValue(), outputArg.getValue(),
-                      fromArg.getValue(), toArg.getValue(),
-                      preserveCommentsArg.getValue());
+                      fromArg.getValue(), toArg.getValue());
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error() << " for arg " << e.argId()
               << std::endl;

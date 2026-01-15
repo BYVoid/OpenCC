@@ -42,13 +42,13 @@ TextDict::TextDict(const LexiconPtr& _lexicon)
 
 TextDict::~TextDict() {}
 
-TextDictPtr TextDict::NewFromSortedFile(FILE* fp, bool preserveComments) {
-  const LexiconPtr& lexicon = Lexicon::ParseLexiconFromFile(fp, preserveComments);
+TextDictPtr TextDict::NewFromSortedFile(FILE* fp) {
+  const LexiconPtr& lexicon = Lexicon::ParseLexiconFromFile(fp);
   return TextDictPtr(new TextDict(lexicon));
 }
 
-TextDictPtr TextDict::NewFromFile(FILE* fp, bool preserveComments) {
-  const LexiconPtr& lexicon = Lexicon::ParseLexiconFromFile(fp, preserveComments);
+TextDictPtr TextDict::NewFromFile(FILE* fp) {
+  const LexiconPtr& lexicon = Lexicon::ParseLexiconFromFile(fp);
   if (lexicon->HasAnnotations()) {
     lexicon->SortWithAnnotations();
   } else {

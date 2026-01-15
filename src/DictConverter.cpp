@@ -17,8 +17,11 @@
  */
 
 #include "DictConverter.hpp"
+#include "Exception.hpp"
+#include "Lexicon.hpp"
 #include "MarisaDict.hpp"
 #include "TextDict.hpp"
+#include "UTF8Util.hpp"
 
 #ifdef ENABLE_DARTS
 #include "DartsDict.hpp"
@@ -27,15 +30,19 @@
 using namespace opencc;
 
 DictPtr LoadDictionary(const std::string& format,
-                       const std::string& inputFileName,
-                       bool preserveComments) {
+                       const std::string& inputFileName) {
   if (format == "text") {
-    FILE* fp = fopen(inputFileName.c_str(), "r");
+    FILE* fp =
+#ifdef _MSC_VER
+        _wfopen(UTF8Util::GetPlatformString(inputFileName).c_str(), L"r")
+#else
+        fopen(UTF8Util::GetPlatformString(inputFileName).c_str(), "r")
+#endif
+        ;
     if (!fp) {
-      fprintf(stderr, "Cannot open file: %s\n", inputFileName.c_str());
-      exit(2);
+      throw FileNotFound(inputFileName);
     }
-    DictPtr dict = TextDict::NewFromFile(fp, preserveComments);
+    DictPtr dict = TextDict::NewFromFile(fp);
     fclose(fp);
     return dict;
   } else if (format == "ocd") {
@@ -50,8 +57,16 @@ DictPtr LoadDictionary(const std::string& format,
   return nullptr;
 }
 
-SerializableDictPtr ConvertDict(const std::string& format, const DictPtr dict) {
+SerializableDictPtr ConvertDict(const std::string& format,
+                                const DictPtr dict,
+                                const std::string& formatFrom) {
   if (format == "text") {
+    if (formatFrom == "text") {
+      TextDictPtr textDict = std::static_pointer_cast<TextDict>(dict);
+      if (textDict->GetLexicon()->HasAnnotations()) {
+        return std::static_pointer_cast<SerializableDict>(textDict);
+      }
+    }
     return TextDict::NewFromDict(*dict.get());
   } else if (format == "ocd") {
 #ifdef ENABLE_DARTS
@@ -69,10 +84,10 @@ namespace opencc {
 void ConvertDictionary(const std::string& inputFileName,
                        const std::string& outputFileName,
                        const std::string& formatFrom,
-                       const std::string& formatTo,
-                       bool preserveComments) {
-  DictPtr dictFrom = LoadDictionary(formatFrom, inputFileName, preserveComments);
-  SerializableDictPtr dictTo = ConvertDict(formatTo, dictFrom);
+                       const std::string& formatTo) {
+  DictPtr dictFrom = LoadDictionary(formatFrom, inputFileName);
+  SerializableDictPtr dictTo =
+      ConvertDict(formatTo, dictFrom, formatFrom);
   dictTo->SerializeToFile(outputFileName);
 }
 } // namespace opencc

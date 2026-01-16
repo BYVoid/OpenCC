@@ -17,8 +17,11 @@
  */
 
 #include "DictConverter.hpp"
+#include "Exception.hpp"
+#include "Lexicon.hpp"
 #include "MarisaDict.hpp"
 #include "TextDict.hpp"
+#include "UTF8Util.hpp"
 
 #ifdef ENABLE_DARTS
 #include "DartsDict.hpp"
@@ -29,7 +32,19 @@ using namespace opencc;
 DictPtr LoadDictionary(const std::string& format,
                        const std::string& inputFileName) {
   if (format == "text") {
-    return SerializableDict::NewFromFile<TextDict>(inputFileName);
+    FILE* fp =
+#ifdef _MSC_VER
+        _wfopen(UTF8Util::GetPlatformString(inputFileName).c_str(), L"r")
+#else
+        fopen(UTF8Util::GetPlatformString(inputFileName).c_str(), "r")
+#endif
+        ;
+    if (!fp) {
+      throw FileNotFound(inputFileName);
+    }
+    DictPtr dict = TextDict::NewFromFile(fp);
+    fclose(fp);
+    return dict;
   } else if (format == "ocd") {
 #ifdef ENABLE_DARTS
     return SerializableDict::NewFromFile<DartsDict>(inputFileName);

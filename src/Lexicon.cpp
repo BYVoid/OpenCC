@@ -81,8 +81,13 @@ LexiconPtr Lexicon::ParseLexiconFromFile(FILE* fp) {
   char buff[ENTRY_BUFF_SIZE];
   LexiconPtr lexicon(new Lexicon);
   UTF8Util::SkipUtf8Bom(fp);
+
   size_t lineNum = 1;
   while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
+    if (*buff == '#') {
+      lineNum++;
+      continue;
+    }
     DictEntry* entry = ParseKeyValues(buff, lineNum);
     if (entry != nullptr) {
       lexicon->Add(entry);

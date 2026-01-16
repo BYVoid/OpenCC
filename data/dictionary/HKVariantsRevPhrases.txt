@@ -1,3 +1,10 @@
+# Open Chinese Convert (OpenCC) Dictionary
+# File: HKVariantsRevPhrases.txt
+# Format: key	value(s) (values separated by spaces)
+# License: Apache-2.0 (see LICENSE)
+# Source: https://github.com/ByVoid/OpenCC
+# Used in configs: hk2s.json, hk2t.json
+
 一口吃個	一口喫個
 一口吃成	一口喫成
 一家三口	一家三口

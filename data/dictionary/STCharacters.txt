@@ -1,3 +1,10 @@
+# Open Chinese Convert (OpenCC) Dictionary
+# File: STCharacters.txt
+# Format: key	value(s) (values separated by spaces)
+# License: Apache-2.0 (see LICENSE)
+# Source: https://github.com/ByVoid/OpenCC
+# Used in configs: s2hk.json, s2t.json, s2tw.json, s2twp.json
+
 㐷	傌
 㐹	㑶 㐹
 㐽	偑

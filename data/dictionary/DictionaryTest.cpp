@@ -135,30 +135,38 @@ TEST_F(DictionaryRunfilesTest, TWPhrasesReverseMapping) {
     return map;
   };
 
-  LexiconPtr twPhrases = loadLexicon(twPhrasesFile);
-  LexiconPtr twPhrasesRev = loadLexicon(twPhrasesRevFile);
-  ASSERT_NE(twPhrases, nullptr);
-  ASSERT_NE(twPhrasesRev, nullptr);
+  try {
+    LexiconPtr twPhrases = loadLexicon(twPhrasesFile);
+    LexiconPtr twPhrasesRev = loadLexicon(twPhrasesRevFile);
+    ASSERT_NE(twPhrases, nullptr);
+    ASSERT_NE(twPhrasesRev, nullptr);
 
-  auto twMap = buildMap(twPhrases);
-  auto twRevMap = buildMap(twPhrasesRev);
+    auto twMap = buildMap(twPhrases);
+    auto twRevMap = buildMap(twPhrasesRev);
 
-  for (const auto& entry : twMap) {
-    const std::string& key = entry.first;
-    for (const auto& value : entry.second) {
-      auto it = twRevMap.find(value);
-      EXPECT_TRUE(it != twRevMap.end() && it->second.count(key) > 0)
-          << "Missing reverse mapping: " << key << " -> " << value;
+    for (const auto& entry : twMap) {
+      const std::string& key = entry.first;
+      for (const auto& value : entry.second) {
+        auto it = twRevMap.find(value);
+        EXPECT_TRUE(it != twRevMap.end() && it->second.count(key) > 0)
+            << "Missing reverse mapping: " << key << " -> " << value;
+      }
     }
-  }
 
-  for (const auto& entry : twRevMap) {
-    const std::string& key = entry.first;
-    for (const auto& value : entry.second) {
-      auto it = twMap.find(value);
-      EXPECT_TRUE(it != twMap.end() && it->second.count(key) > 0)
-          << "Missing reverse mapping: " << key << " -> " << value;
+    for (const auto& entry : twRevMap) {
+      const std::string& key = entry.first;
+      for (const auto& value : entry.second) {
+        auto it = twMap.find(value);
+        EXPECT_TRUE(it != twMap.end() && it->second.count(key) > 0)
+            << "Missing reverse mapping: " << key << " -> " << value;
+      }
     }
+  } catch (const Exception& ex) {
+    FAIL() << "Exception: " << ex.what();
+  } catch (const std::exception& ex) {
+    FAIL() << "std::exception: " << ex.what();
+  } catch (...) {
+    FAIL() << "Unknown exception thrown during reverse mapping check.";
   }
 }
 

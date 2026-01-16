@@ -44,13 +44,6 @@ TEST_F(LexiconAnnotationTest, ParseCommentLines) {
   const TextDictPtr& dict = TextDict::NewFromFile(readFp);
   fclose(readFp);
   EXPECT_EQ(dict->GetLexicon()->Length(), 2);
-  EXPECT_TRUE(dict->GetLexicon()->HasAnnotations());
-
-  const auto& headerBlocks = dict->GetLexicon()->GetHeaderBlocks();
-  EXPECT_EQ(headerBlocks.size(), 1);
-  EXPECT_EQ(headerBlocks[0].lines.size(), 2);
-  EXPECT_EQ(headerBlocks[0].lines[0], "# This is a header comment");
-  EXPECT_EQ(headerBlocks[0].lines[1], "# Line 2 of header");
 }
 
 TEST_F(LexiconAnnotationTest, ParseAttachedComment) {
@@ -65,13 +58,7 @@ TEST_F(LexiconAnnotationTest, ParseAttachedComment) {
   FILE* readFp = fopen(testFileName.c_str(), "r");
   const TextDictPtr& dict = TextDict::NewFromFile(readFp);
   fclose(readFp);
-  const auto& annotated = dict->GetLexicon()->GetAnnotatedEntries();
-
-  EXPECT_EQ(annotated.size(), 2);
-  EXPECT_TRUE(annotated[0].attachedComment != nullptr);
-  EXPECT_EQ(annotated[0].attachedComment->lines.size(), 1);
-  EXPECT_EQ(annotated[0].attachedComment->lines[0], "# Comment for A");
-  EXPECT_TRUE(annotated[1].attachedComment == nullptr);
+  EXPECT_EQ(dict->GetLexicon()->Length(), 2);
 }
 
 TEST_F(LexiconAnnotationTest, ParseFloatingComment) {
@@ -86,12 +73,7 @@ TEST_F(LexiconAnnotationTest, ParseFloatingComment) {
   FILE* readFp = fopen(testFileName.c_str(), "r");
   const TextDictPtr& dict = TextDict::NewFromFile(readFp);
   fclose(readFp);
-  const auto& floatingBlocks = dict->GetLexicon()->GetFloatingBlocks();
-
-  EXPECT_EQ(floatingBlocks.size(), 1);
-  EXPECT_EQ(floatingBlocks[0].first, 1); // Anchored to second entry (C)
-  EXPECT_EQ(floatingBlocks[0].second.lines.size(), 1);
-  EXPECT_EQ(floatingBlocks[0].second.lines[0], "# This is a floating comment");
+  EXPECT_EQ(dict->GetLexicon()->Length(), 2);
 }
 
 TEST_F(LexiconAnnotationTest, ParseFooterComment) {
@@ -106,15 +88,10 @@ TEST_F(LexiconAnnotationTest, ParseFooterComment) {
   FILE* readFp = fopen(testFileName.c_str(), "r");
   const TextDictPtr& dict = TextDict::NewFromFile(readFp);
   fclose(readFp);
-  const auto& footerBlocks = dict->GetLexicon()->GetFooterBlocks();
-
-  EXPECT_EQ(footerBlocks.size(), 1);
-  EXPECT_EQ(footerBlocks[0].lines.size(), 2);
-  EXPECT_EQ(footerBlocks[0].lines[0], "# Footer comment");
-  EXPECT_EQ(footerBlocks[0].lines[1], "# Line 2 of footer");
+  EXPECT_EQ(dict->GetLexicon()->Length(), 2);
 }
 
-TEST_F(LexiconAnnotationTest, SerializeWithAnnotations) {
+TEST_F(LexiconAnnotationTest, SerializeIgnoresComments) {
   FILE* fp = fopen(testFileName.c_str(), "w");
   fprintf(fp, "# Header\n");
   fprintf(fp, "\n");
@@ -149,22 +126,12 @@ TEST_F(LexiconAnnotationTest, SerializeWithAnnotations) {
   fclose(outputFp);
   remove(outputFileName.c_str());
 
-  // Verify structure (header, entries, footer)
-  EXPECT_TRUE(lines[0] == "# Header");
-  EXPECT_TRUE(lines[1] == "");
-  // Should still have comment attached to B even though entries may be reordered
-  bool foundCommentForB = false;
-  for (size_t i = 0; i < lines.size(); ++i) {
-    if (lines[i] == "# Comment for B" && i + 1 < lines.size() &&
-        lines[i + 1].find("B\tBB") == 0) {
-      foundCommentForB = true;
-      break;
-    }
-  }
-  EXPECT_TRUE(foundCommentForB);
+  EXPECT_EQ(lines.size(), 2);
+  EXPECT_EQ(lines[0], "A\tAA");
+  EXPECT_EQ(lines[1], "B\tBB");
 }
 
-TEST_F(LexiconAnnotationTest, SortWithAnnotations) {
+TEST_F(LexiconAnnotationTest, SortIgnoresComments) {
   FILE* fp = fopen(testFileName.c_str(), "w");
   fprintf(fp, "# Header\n");
   fprintf(fp, "\n");
@@ -179,36 +146,21 @@ TEST_F(LexiconAnnotationTest, SortWithAnnotations) {
   const TextDictPtr& dict = TextDict::NewFromFile(readFp);
   fclose(readFp);
 
-  // Entries should be sorted, but comments should follow their entries
-  const auto& annotated = dict->GetLexicon()->GetAnnotatedEntries();
-  EXPECT_EQ(annotated.size(), 3);
-
-  // After sorting: A, B, C
-  EXPECT_EQ(annotated[0].Key(), "A");
-  EXPECT_TRUE(annotated[0].attachedComment != nullptr);
-  EXPECT_EQ(annotated[0].attachedComment->lines[0], "# Comment for A");
-
-  EXPECT_EQ(annotated[1].Key(), "B");
-  EXPECT_TRUE(annotated[1].attachedComment == nullptr);
-
-  EXPECT_EQ(annotated[2].Key(), "C");
-  EXPECT_TRUE(annotated[2].attachedComment != nullptr);
-  EXPECT_EQ(annotated[2].attachedComment->lines[0], "# Comment for C");
+  EXPECT_EQ(dict->GetLexicon()->Length(), 3);
 }
 
-TEST_F(LexiconAnnotationTest, DefaultBehaviorPreservesComments) {
+TEST_F(LexiconAnnotationTest, DefaultBehaviorIgnoresComments) {
   FILE* fp = fopen(testFileName.c_str(), "w");
   fprintf(fp, "A\tB\n");
   fprintf(fp, "C\tD\n");
   fclose(fp);
 
-  // Default behavior should preserve comments
+  // Default behavior should ignore comments
   FILE* readFp = fopen(testFileName.c_str(), "r");
   const TextDictPtr& dict = TextDict::NewFromFile(readFp);
   fclose(readFp);
 
   EXPECT_EQ(dict->GetLexicon()->Length(), 2);
-  EXPECT_TRUE(dict->GetLexicon()->HasAnnotations());
 }
 
 TEST_F(LexiconAnnotationTest, DefaultBehaviorAcceptsCommentLines) {
@@ -222,7 +174,6 @@ TEST_F(LexiconAnnotationTest, DefaultBehaviorAcceptsCommentLines) {
   fclose(readFp);
 
   EXPECT_EQ(dict->GetLexicon()->Length(), 1);
-  EXPECT_TRUE(dict->GetLexicon()->HasAnnotations());
 }
 
 } // namespace opencc

@@ -57,16 +57,8 @@ DictPtr LoadDictionary(const std::string& format,
   return nullptr;
 }
 
-SerializableDictPtr ConvertDict(const std::string& format,
-                                const DictPtr dict,
-                                const std::string& formatFrom) {
+SerializableDictPtr ConvertDict(const std::string& format, const DictPtr dict) {
   if (format == "text") {
-    if (formatFrom == "text") {
-      TextDictPtr textDict = std::static_pointer_cast<TextDict>(dict);
-      if (textDict->GetLexicon()->HasAnnotations()) {
-        return std::static_pointer_cast<SerializableDict>(textDict);
-      }
-    }
     return TextDict::NewFromDict(*dict.get());
   } else if (format == "ocd") {
 #ifdef ENABLE_DARTS
@@ -86,8 +78,7 @@ void ConvertDictionary(const std::string& inputFileName,
                        const std::string& formatFrom,
                        const std::string& formatTo) {
   DictPtr dictFrom = LoadDictionary(formatFrom, inputFileName);
-  SerializableDictPtr dictTo =
-      ConvertDict(formatTo, dictFrom, formatFrom);
+  SerializableDictPtr dictTo = ConvertDict(formatTo, dictFrom);
   dictTo->SerializeToFile(outputFileName);
 }
 } // namespace opencc

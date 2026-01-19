@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [master]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-test:
     runs-on: ${{ matrix.os }}
@@ -20,3 +24,12 @@ jobs:
         run: make test VERBOSE=1
       - name: make benchmark
         run: make benchmark VERBOSE=1
+      - name: upload artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencc-cmake-${{ matrix.os }}
+          path: |
+            build/rel/**
+            build/dbg/**
+            build/perf/**

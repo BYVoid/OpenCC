@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [master]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-test:
     runs-on: ${{ matrix.os }}
@@ -22,3 +26,11 @@ jobs:
           python-version: "3.12"
       - run: bazel build //:opencc
       - run: bazel test --test_output=all //src/... //data/... //test/... //python/...
+      - name: upload artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencc-bazel-${{ matrix.os }}
+          path: |
+            bazel-bin/**
+            bazel-testlogs/**

@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [master]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-test:
     runs-on: windows-latest
@@ -24,3 +28,15 @@ jobs:
         run: ./build.cmd
       - name: test
         run: ./test.cmd
+      - name: upload artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencc-msvc-${{ matrix.arch }}
+          path: |
+            bin/**
+            lib/**
+            share/**
+            include/**
+            build/ctest.log
+            build/Testing/**

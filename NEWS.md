@@ -1,5 +1,18 @@
 # Change History of OpenCC
 
+## Version 1.2.0
+
+2026年1月22日
+
+* 詞典與詞條更新：STPhrases/TWPhrases整合與修訂，新增醫療術語若干、Nvidia譯名、日文「兔/兎」等詞彙，並補充測試（[#948](https://github.com/BYVoid/OpenCC/pull/948), [#1007](https://github.com/BYVoid/OpenCC/pull/1007), [#1009](https://github.com/BYVoid/OpenCC/pull/1009), [#1011](https://github.com/BYVoid/OpenCC/pull/1011), [#1012](https://github.com/BYVoid/OpenCC/pull/1012), [#1023](https://github.com/BYVoid/OpenCC/pull/1023), [#992](https://github.com/BYVoid/OpenCC/pull/992)）。
+* 修正`tw2sp`/`s2twp`配置導致的與詞條錯誤（[#1013](https://github.com/BYVoid/OpenCC/pull/1013), [#1024](https://github.com/BYVoid/OpenCC/pull/1024), [#1025](https://github.com/BYVoid/OpenCC/pull/1025)）。
+* `txt`詞典新增註釋語法與排序規則；`TWPhrasesRev`改爲直接納入倉庫並加入一致性測試（[#1016](https://github.com/BYVoid/OpenCC/pull/1016), [#1012](https://github.com/BYVoid/OpenCC/pull/1012)）。
+* 測試用例改用JSON格式（[#1006](https://github.com/BYVoid/OpenCC/pull/1006)。
+* 修正截斷UTF-8處理的越界讀取問題（[#1005](https://github.com/BYVoid/OpenCC/pull/1005)）。
+* 構建與依賴更新：Bazel 8.5.1、C++17 + marisa 0.3.0、`nan`升級，修復GCC 15與C++17棄用警告（[#1021](https://github.com/BYVoid/OpenCC/pull/1021), [#968](https://github.com/BYVoid/OpenCC/pull/968)）。
+* 語言與平台支持調整：移除Python 2殘留、註冊hermetic Python 3.12工具鏈、更新Node.js測試矩陣並移除Node 18與Windows x86（[#946](https://github.com/BYVoid/OpenCC/pull/946), [#1010](https://github.com/BYVoid/OpenCC/pull/1010), [#999](https://github.com/BYVoid/OpenCC/pull/999), [#960](https://github.com/BYVoid/OpenCC/pull/960)）。
+* CI、發佈腳本與文檔完善：macOS 14支持、制品上傳與任務取消、README補充Bazel測試/貢獻者說明、繁體中文貢獻指南與opencc-wasm列表、PyPI腳本修復（[#1022](https://github.com/BYVoid/OpenCC/pull/1022), [#973](https://github.com/BYVoid/OpenCC/pull/973), [#1019](https://github.com/BYVoid/OpenCC/pull/1019), [#1017](https://github.com/BYVoid/OpenCC/pull/1017), [#1020](https://github.com/BYVoid/OpenCC/pull/1020)）。
+
 ## Version 1.1.9
 
 2024年8月3日

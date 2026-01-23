@@ -239,15 +239,15 @@ bazel test //data/config:config_dict_validation_test
 
 2. **`s2tw.json`** - 簡體轉臺灣正體
    - 使用 `STPhrases.txt`、`STCharacters.txt`
-   - 額外使用 `TWVariants.txt`
+   - 額外使用 `TWVariantsPhrases.txt`、`TWVariants.txt`
 
 3. **`s2twp.json`** - 簡體轉臺灣正體（含慣用詞）
    - 使用 `STPhrases.txt`、`STCharacters.txt`
-   - 額外使用 `TWPhrases.txt`、`TWVariants.txt`
+   - 額外使用 `TWPhrases.txt`、`TWVariantsPhrases.txt`、`TWVariants.txt`
 
 4. **`s2hk.json`** - 簡體轉香港繁體
    - 使用 `STPhrases.txt`、`STCharacters.txt`
-   - 額外使用 `HKVariants.txt`
+   - 額外使用 `HKVariantsPhrases.txt`、`HKVariants.txt`
 
 ### 測試建議
 
@@ -272,8 +272,8 @@ bazel test //data/config:config_dict_validation_test
 
 - **僅修改基本簡繁對應**：修改 `STCharacters.txt`，測試至少包含 `s2t`
 - **修改詞組轉換**：修改 `STPhrases.txt`，測試包含 `s2t`、`s2tw`、`s2twp`、`s2hk`
-- **臺灣特有用詞**：修改 `TWPhrases*.txt` 或 `TWVariants.txt`，測試包含 `s2tw`、`s2twp`
-- **香港特有用詞**：修改 `HKVariants*.txt`，測試包含 `s2hk`
+- **臺灣特有用詞**：修改 `TWPhrases*.txt` 或 `TWVariantsPhrases.txt`、`TWVariants.txt`，測試包含 `s2tw`、`s2twp`
+- **香港特有用詞**：修改 `HKVariantsPhrases.txt`、`HKVariants*.txt`，測試包含 `s2hk`
 
 ## 提交變更
 

@@ -38,10 +38,12 @@ jobs:
       - name: list installed files
         if: ${{ always() }}
         run: |
-          echo "=== Contents of install directory ==="
+          echo "=== Contents of install/bin ==="
+          if [ -d install/bin ]; then ls -lh install/bin/; fi
+          echo -e "\n=== Contents of install/share/opencc ==="
+          if [ -d install/share/opencc ]; then ls -lh install/share/opencc/; fi
+          echo -e "\n=== All installed files ==="
           if [ -d install ]; then find install -type f; fi
-          echo -e "\n=== Contents of build/src/tools directory ==="
-          if [ -d build/src/tools ]; then find build/src/tools -name "*.exe" -o -name "opencc*"; fi
       - name: upload artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4

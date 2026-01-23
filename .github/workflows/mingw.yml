@@ -26,18 +26,29 @@ jobs:
           CC=/mingw64/bin/cc CXX=/mingw64/bin/c++ cmake \
             -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_INSTALL_PREFIX=/usr \
+            -DCMAKE_INSTALL_PREFIX=$PWD/install \
             -DENABLE_GTEST=ON \
             -DBUILD_SHARED_LIBS=OFF
           cmake --build build
+          cmake --install build
       - name: Run test
         run: |
           cd build
           ctest
+      - name: list installed files
+        if: ${{ always() }}
+        run: |
+          echo "=== Contents of install directory ==="
+          if [ -d install ]; then find install -type f; fi
+          echo -e "\n=== Contents of build/src/tools directory ==="
+          if [ -d build/src/tools ]; then find build/src/tools -name "*.exe" -o -name "opencc*"; fi
       - name: upload artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: opencc-mingw
           path: |
-            build/**
+            install/**
+            build/src/tools/*.exe
+            build/Testing/**
+            build/ctest.log

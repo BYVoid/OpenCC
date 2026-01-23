@@ -28,6 +28,18 @@ jobs:
         run: ./build.cmd
       - name: test
         run: ./test.cmd
+      - name: list installed files
+        if: ${{ always() }}
+        shell: pwsh
+        run: |
+          Write-Host "=== Contents of bin directory ==="
+          if (Test-Path bin) { Get-ChildItem bin -Recurse | Select-Object FullName }
+          Write-Host "`n=== Contents of lib directory ==="
+          if (Test-Path lib) { Get-ChildItem lib -Recurse | Select-Object FullName }
+          Write-Host "`n=== Contents of build/Release directory ==="
+          if (Test-Path build/Release) { Get-ChildItem build/Release | Select-Object FullName }
+          Write-Host "`n=== Contents of build/src/tools directory ==="
+          if (Test-Path build/src/tools) { Get-ChildItem build/src/tools -Recurse | Select-Object FullName }
       - name: upload artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
@@ -38,5 +50,8 @@ jobs:
             lib/**
             share/**
             include/**
+            build/Release/*.exe
+            build/Release/*.dll
+            build/src/tools/Release/*.exe
             build/ctest.log
             build/Testing/**

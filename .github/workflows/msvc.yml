@@ -28,15 +28,27 @@ jobs:
         run: ./build.cmd
       - name: test
         run: ./test.cmd
+      - name: list installed files
+        if: ${{ always() }}
+        shell: pwsh
+        run: |
+          Write-Host "=== Contents of build/bin directory ==="
+          if (Test-Path build/bin) { Get-ChildItem build/bin -Recurse | Select-Object FullName }
+          Write-Host "`n=== Contents of build/lib directory ==="
+          if (Test-Path build/lib) { Get-ChildItem build/lib -Recurse | Select-Object FullName }
+          Write-Host "`n=== Contents of build/share directory ==="
+          if (Test-Path build/share) { Get-ChildItem build/share -Recurse | Select-Object FullName }
+          Write-Host "`n=== Contents of build/include directory ==="
+          if (Test-Path build/include) { Get-ChildItem build/include -Recurse | Select-Object FullName }
       - name: upload artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: opencc-msvc-${{ matrix.arch }}
           path: |
-            bin/**
-            lib/**
-            share/**
-            include/**
+            build/bin/**
+            build/lib/**
+            build/share/**
+            build/include/**
             build/ctest.log
             build/Testing/**

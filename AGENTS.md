@@ -7,30 +7,6 @@ This document compiles the Open Chinese Convert (OpenCC) project information to 
 - The project provides a C++ core library, C language interface, command-line tools, as well as Python, Node.js and other language bindings. The dictionary and program are decoupled for easy customization and extension.
 - Main dependencies: `rapidjson` for configuration parsing, `marisa-trie` for high-performance dictionaries (`.ocd2`), optional `Darts` for legacy `.ocd` support.
 
-## Core Modules and Flow
-1. **Configuration Loading (`src/Config.cpp`)**
-   - Reads JSON configuration (located in `data/config/*.json`), parses segmenter definitions and conversion chains.
-   - Loads different dictionary formats (plain text, `ocd2`, dictionary groups) based on the `type` field, with support for additional search paths.
-   - Creates `Converter` objects that hold segmenters and conversion chains.
-
-2. **Segmentation (`src/MaxMatchSegmentation.cpp`)**
-   - The default segmentation type is `mmseg`, i.e., Maximum Forward Matching.
-   - Performs longest prefix matching using the dictionary, splitting input into `Segments`; unmatched UTF-8 fragments are preserved by character length.
-
-3. **Conversion Chain (`src/ConversionChain.cpp`, `src/Conversion.cpp`)**
-   - The conversion chain is an ordered list of `Conversion` objects, each node relies on a dictionary to replace segments with target values through longest prefix matching.
-   - Supports advanced scenarios like phrase priority, variant character replacement, and multi-stage composition.
-
-4. **Dictionary System**
-   - Abstract interface `Dict` unifies prefix matching, all-prefix matching, and dictionary traversal.
-   - `TextDict` (`.txt`) builds dictionaries from tab-delimited plain text; `MarisaDict` (`.ocd2`) provides high-performance trie structures; `DictGroup` can compose multiple dictionaries into a sequential collection.
-   - `SerializableDict` defines serialization and file loading logic, which command-line tools use to convert between different formats.
-
-5. **API Encapsulation**
-   - `SimpleConverter` (high-level C++ interface) encapsulates `Config + Converter`, providing various overloads for string, pointer buffer, and partial length conversion.
-   - `opencc.h` exposes the C API: `opencc_open`, `opencc_convert_utf8`, etc., for language bindings and command-line reuse.
-   - The command-line program `opencc` (`src/tools/CommandLine.cpp`) demonstrates batch conversion, stream reading, auto-flushing, and same-file input/output handling.
-
 ## Data and Configuration
 - Dictionaries are maintained in `data/dictionary/*.txt`, covering phrases, characters, regional differences, Japanese new characters, and other topic files; converted to `.ocd2` during build for acceleration.
 - Default configurations are located in `data/config/`, such as `s2t.json`, `t2s.json`, `s2tw.json`, etc., defining segmenter types, dictionaries used, and combination methods.
@@ -59,11 +35,6 @@ This document compiles the Open Chinese Convert (OpenCC) project information to 
 
 > For deeper understanding, read the module documentation in `src/README.md`, or refer to test cases in `test/` to understand conversion chain combinations.
 
-## Browser and Third-Party Implementation Notes
-- Official pure frontend execution is not directly supported; community solutions (such as `opencc-js`, `opencc-wasm`) can be referenced.
-- For self-compiled WebAssembly, use Emscripten to write `.ocd2` to the virtual file system, call conversion in Web Worker to avoid blocking UI, and use gzip/brotli with Service Worker caching to reduce initial load cost.
-- For pure JavaScript table lookup, pre-process dictionaries into JSON/Trie structures and implement longest prefix matching manually; pay attention to resource size control and avoid unnecessary string copies when converting long texts.
-
 ### Common Deviations in Third-Party Implementations (Speculation)
 - **Missing segmentation and conversion chain order**: If `group` configuration or dictionary priority is not restored, compound words may be split apart or overwritten by single characters.
 - **Missing longest prefix logic**: Character-by-character replacement alone will miss idioms and multi-character word results.
@@ -72,9 +43,6 @@ This document compiles the Open Chinese Convert (OpenCC) project information to 
 - **Path and loading process differences**: If OpenCC's path search and configuration parsing details are not followed, the actual loaded resources will differ from official ones, naturally leading to different results.
 
 ## Further Reading
-
-### Technical Documents
-- **[Algorithm and Theoretical Limitations Analysis](doc/ALGORITHM_AND_LIMITATIONS.md)** - In-depth exploration of OpenCC's core algorithm (Maximum Forward Matching segmentation), conversion chain mechanism, dictionary system, and theoretical limitations faced in Chinese Simplified-Traditional conversion (one-to-many ambiguity, lack of context understanding, maintenance burden, etc.).
 
 ### Contribution Guide
 - **[CONTRIBUTING.md](CONTRIBUTING.md)** - Complete guide on how to contribute dictionary entries to OpenCC, write test cases, and execute testing procedures.

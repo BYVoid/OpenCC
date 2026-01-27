@@ -65,10 +65,10 @@ std::string DictionaryRunfilesTest::runfile_dir_;
 INSTANTIATE_TEST_SUITE_P(
     , DictionaryTest,
     ::testing::Values(
-        "HKVariants", "HKVariantsRev", "HKVariantsRevPhrases",
+        "HKVariants", "HKVariantsPhrases", "HKVariantsRev", "HKVariantsRevPhrases",
         "JPShinjitaiCharacters", "JPShinjitaiPhrases", "JPVariants",
         "JPVariantsRev", "STCharacters", "STPhrases", "TSCharacters",
-        "TSPhrases", "TWPhrases", "TWPhrasesRev", "TWVariants",
+        "TSPhrases", "TWPhrases", "TWPhrasesRev", "TWVariants", "TWVariantsPhrases",
         "TWVariantsRev", "TWVariantsRevPhrases"),
     [](const testing::TestParamInfo<DictionaryTest::ParamType>& info) {
       return info.param;

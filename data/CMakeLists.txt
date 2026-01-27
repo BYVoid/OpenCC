@@ -14,8 +14,10 @@ set(
   TWPhrases
   TWPhrasesRev
   TWVariants
+  TWVariantsPhrases
   TWVariantsRevPhrases
   HKVariants
+  HKVariantsPhrases
   HKVariantsRevPhrases
   JPVariants
   JPShinjitaiCharacters

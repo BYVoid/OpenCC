@@ -1,7 +1,7 @@
 @echo off
 setlocal EnableDelayedExpansion
 
-SET VERSIONS=3.8 3.9 3.10 3.11 3.12
+SET VERSIONS=3.8 3.9 3.10 3.11 3.12 3.13 3.14
 SET SOURCEDIR=%cd%
 
 REM Accept conda Terms of Service for required channels

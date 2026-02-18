@@ -72,8 +72,8 @@ jobs:
           name: sdist
           path: dist/*.tar.gz
 
-  publish_test_pypi:
-    name: Upload to TestPyPI
+  publish_pypi:
+    name: Upload to PyPI
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
     permissions:
@@ -93,9 +93,9 @@ jobs:
           name: sdist
           path: dist
 
-      - name: Publish to TestPyPI
+      - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          repository-url: https://test.pypi.org/legacy/
+          repository-url: https://upload.pypi.org/legacy/
           packages-dir: dist
           skip-existing: true

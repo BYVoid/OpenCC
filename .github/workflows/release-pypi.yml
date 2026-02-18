@@ -1,38 +1,101 @@
 name: Build and upload python package to PyPI
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  release-pypi:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, macos-14, windows-latest]
+  build_wheels:
+    name: Build wheels (${{ matrix.label }})
     runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: linux-x86_64
+            os: ubuntu-24.04
+            cibw_archs: x86_64
+          - label: linux-aarch64
+            os: ubuntu-24.04-arm
+            cibw_archs: aarch64
+          - label: macos-arm64
+            os: macos-14
+            cibw_archs: arm64
+          - label: windows-amd64
+            os: windows-latest
+            cibw_archs: AMD64
 
     steps:
-    - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
 
-    - name: Build package and upload from docker (Linux)
-      if: runner.os == 'Linux'
-      run: |
-        docker run --rm -v "${PWD}:/opt/OpenCC" \
-          -e TWINE_USERNAME=__token__ \
-          -e TWINE_PASSWORD=${{ secrets.PYPI_TOKEN }} \
-          ubuntu:22.04 /bin/bash /opt/OpenCC/release-pypi-linux.sh
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-    - name: Build package and upload (macOS)
-      if: runner.os == 'macOS'
-      run: bash release-pypi-macos.sh
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.22.0
+        env:
+          CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-*"
+          CIBW_SKIP: "*-musllinux_*"
+          CIBW_ARCHS: ${{ matrix.cibw_archs }}
+          CIBW_BEFORE_BUILD: "python -m pip install --upgrade pip"
 
-    - name: Build package and upload (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        C:\Miniconda/condabin/conda.bat init powershell
-        ./release-pypi-windows.cmd
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+      - name: Upload wheel artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels-${{ matrix.label }}
+          path: wheelhouse/*.whl
+
+  build_sdist:
+    name: Build sdist
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build sdist
+        run: |
+          python -m pip install --upgrade pip build
+          python -m build --sdist
+
+      - name: Upload sdist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdist
+          path: dist/*.tar.gz
+
+  publish_test_pypi:
+    name: Upload to TestPyPI
+    needs: [build_wheels, build_sdist]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Download wheel artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: wheels-*
+          path: dist
+          merge-multiple: true
+
+      - name: Download sdist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sdist
+          path: dist
+
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages-dir: dist
+          skip-existing: true

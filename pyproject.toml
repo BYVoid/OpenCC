@@ -1,3 +1,3 @@
 [build-system]
-requires = ["setuptools>=61", "wheel"]
+requires = ["setuptools>=61", "wheel", "cmake"]
 build-backend = "setuptools.build_meta"

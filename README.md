@@ -158,6 +158,13 @@ Document 文檔: https://byvoid.github.io/OpenCC/
 * `jp2t.json` New Japanese Kanji (Shinjitai) to Traditional Chinese Characters (Kyūjitai) 日文新字體到繁體（OpenCC 標準，舊字體）
 * `tw2t.json` Traditional Chinese (Taiwan standard) to Traditional Chinese 臺灣正體到繁體（OpenCC 標準）
 
+#### 指定配置文件
+
+通过环境变量`OPENCC_DATA_DIR`加载指定路径下的配置文件
+```sh
+OPENCC_DATA_DIR=/path/to/your/config/dir opencc --help
+```
+
 ## Build 編譯
 
 ### Build with CMake

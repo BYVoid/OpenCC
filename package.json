@@ -12,7 +12,7 @@
     "install": "node-pre-gyp install --fallback-to-build || node-pre-gyp rebuild"
   },
   "engines": {
-    "node": ">= 8.0.0"
+    "node": ">=20 <25"
   },
   "binary": {
     "module_name": "opencc",

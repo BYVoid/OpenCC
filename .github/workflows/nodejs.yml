@@ -16,10 +16,10 @@ jobs:
 
     strategy:
       matrix:
-        # Bleeding Edge: Latest Node × Latest OS
+        # Current stable line on latest hosted runners
         os: [ubuntu-latest, macos-latest]
-        node-version: [latest]
-        # Stable: Node 20, 22 (LTS) on macOS 14 (ARM64)
+        node-version: [24]
+        # LTS coverage on macOS 14 (ARM64)
         include:
           - os: macos-14
             node-version: 22

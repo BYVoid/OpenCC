@@ -20,8 +20,14 @@
     }
   }, {
     "dict": {
-      "type": "ocd2",
-      "file": "TWVariants.ocd2"
+      "type": "group",
+      "dicts": [{
+        "type": "ocd2",
+        "file": "TWVariantsPhrases.ocd2"
+      }, {
+        "type": "ocd2",
+        "file": "TWVariants.ocd2"
+      }]
     }
   }]
 }

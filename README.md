@@ -34,6 +34,7 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 * [Fedora](https://packages.fedoraproject.org/pkgs/opencc/opencc/)
 * [Arch Linux](https://archlinux.org/packages/extra/x86_64/opencc/)
 * [macOS](https://formulae.brew.sh/formula/opencc)
+* WinGet (`winget install BYVoid.OpenCC`)
 * [Bazel](https://registry.bazel.build/modules/opencc)
 * [Node.js](https://npmjs.org/package/opencc)
 * [Python](https://pypi.org/project/OpenCC/)
@@ -42,6 +43,8 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 
 * Windows (x86_64): [Latest build](https://ci.appveyor.com/api/projects/Carbo/opencc/artifacts/OpenCC.zip?branch=master&job=Environment:%20nodejs_version=none;%20Platform:%20x64)
 * Windows (x86): [Latest build](https://ci.appveyor.com/api/projects/Carbo/opencc/artifacts/OpenCC.zip?branch=master&job=Environment:%20nodejs_version=none;%20Platform:%20x86)
+
+For a versioned Windows release intended for WinGet distribution, see [doc/windows-winget-release.md](doc/windows-winget-release.md).
 
 ## Usage 使用
 

@@ -15,40 +15,86 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        arch:
-          - amd64
-          - amd64_x86
-          - amd64_arm64
+        include:
+          - arch: amd64
+            cmake_arch: x64
+            package_suffix: x64
+            can_run_binaries: true
+          - arch: amd64_x86
+            cmake_arch: Win32
+            package_suffix: x86
+            can_run_binaries: true
+          - arch: amd64_arm64
+            cmake_arch: ARM64
+            package_suffix: arm64
+            can_run_binaries: false
     steps:
       - uses: actions/checkout@v4
       - uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.arch }}
-      - name: build
-        run: ./build.cmd
-      - name: test
-        run: ./test.cmd
-      - name: list installed files
+
+      - name: Build release package tree
+        if: ${{ matrix.can_run_binaries }}
+        shell: pwsh
+        run: |
+          cmake -S . -B build-release `
+            -A "${{ matrix.cmake_arch }}" `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_INSTALL_PREFIX:PATH="${{ github.workspace }}\dist\opencc-msvc-${{ matrix.package_suffix }}"
+          cmake --build build-release --config Release --target install
+
+      - name: Build ARM64 compile-only targets
+        if: ${{ !matrix.can_run_binaries }}
+        shell: pwsh
+        run: |
+          cmake -S . -B build-release `
+            -A "${{ matrix.cmake_arch }}" `
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build build-release --config Release --target libopencc opencc opencc_dict opencc_phrase_extract
+
+      - name: Build and test debug
+        if: ${{ matrix.can_run_binaries }}
+        shell: pwsh
+        run: |
+          cmake -S . -B build-debug `
+            -A "${{ matrix.cmake_arch }}" `
+            -DCMAKE_BUILD_TYPE=Debug `
+            -DENABLE_GTEST:BOOL=ON
+          cmake --build build-debug --config Debug
+          ctest --test-dir build-debug --build-config Debug --output-on-failure | Tee-Object -FilePath build-debug\ctest.log
+
+      - name: Create portable zip artifact
+        if: ${{ matrix.can_run_binaries }}
+        shell: pwsh
+        run: |
+          $packageRoot = "dist\opencc-msvc-${{ matrix.package_suffix }}"
+          $zipPath = "dist\OpenCC-msvc-${{ matrix.package_suffix }}.zip"
+          if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
+          Compress-Archive -Path $packageRoot -DestinationPath $zipPath -CompressionLevel Optimal
+
+      - name: List packaged files
         if: ${{ always() }}
         shell: pwsh
         run: |
-          Write-Host "=== Contents of build/bin directory ==="
-          if (Test-Path build/bin) { Get-ChildItem build/bin -Recurse | Select-Object FullName }
-          Write-Host "`n=== Contents of build/lib directory ==="
-          if (Test-Path build/lib) { Get-ChildItem build/lib -Recurse | Select-Object FullName }
-          Write-Host "`n=== Contents of build/share directory ==="
-          if (Test-Path build/share) { Get-ChildItem build/share -Recurse | Select-Object FullName }
-          Write-Host "`n=== Contents of build/include directory ==="
-          if (Test-Path build/include) { Get-ChildItem build/include -Recurse | Select-Object FullName }
+          Write-Host "=== Contents of dist package root ==="
+          if (Test-Path "dist\opencc-msvc-${{ matrix.package_suffix }}") {
+            Get-ChildItem "dist\opencc-msvc-${{ matrix.package_suffix }}" -Recurse | Select-Object FullName
+          }
+          Write-Host "`n=== Contents of build-debug Testing directory ==="
+          if (Test-Path build-debug\Testing) { Get-ChildItem build-debug\Testing -Recurse | Select-Object FullName }
+          Write-Host "`n=== Contents of build-release output directories ==="
+          if (Test-Path build-release\src) { Get-ChildItem build-release\src -Recurse | Select-Object FullName }
+
       - name: upload artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: opencc-msvc-${{ matrix.arch }}
           path: |
-            build/bin/**
-            build/lib/**
-            build/share/**
-            build/include/**
-            build/ctest.log
-            build/Testing/**
+            dist/OpenCC-msvc-${{ matrix.package_suffix }}.zip
+            dist/opencc-msvc-${{ matrix.package_suffix }}/**
+            build-release/src/Release/**
+            build-release/src/tools/Release/**
+            build-debug/ctest.log
+            build-debug/Testing/**

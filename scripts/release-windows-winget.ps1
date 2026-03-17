@@ -222,7 +222,7 @@ try {
     Copy-Item -Path (Join-Path $installRoot "bin\opencc.exe") -Destination (Join-Path $stagingRoot "bin\opencc.exe")
     Copy-Item -Path (Join-Path $installRoot "bin\opencc_dict.exe") -Destination (Join-Path $stagingRoot "bin\opencc_dict.exe")
     Copy-Item -Path (Join-Path $installRoot "bin\opencc_phrase_extract.exe") -Destination (Join-Path $stagingRoot "bin\opencc_phrase_extract.exe")
-    Copy-Item -Path (Join-Path $installRoot "bin\plugins\*") -Destination (Join-Path $stagingRoot "bin\plugins") -Recurse
+    Copy-Item -Path (Join-Path $installRoot "bin\plugins\*.dll") -Destination (Join-Path $stagingRoot "bin\plugins")
     Copy-Item -Path (Join-Path $installRoot "share\opencc\*") -Destination (Join-Path $stagingRoot "share\opencc") -Recurse
     Copy-Item -Path LICENSE -Destination (Join-Path $stagingRoot "LICENSE.txt")
     Copy-Item -Path README.md -Destination (Join-Path $stagingRoot "README.md")

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title and page.title != site.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
+  <meta name="description" content="{{ page.description | default: site.description }}">
+  <link rel="stylesheet" href="{{ '/gutenweb.css' | relative_url }}">
+</head>
+<body>
+<main>
+  <header>
+    <h1>{{ site.header_title | default: site.title }}</h1>
+    <h1 style="display: flex; align-items: center; gap: 0.6rem;">
+      <img src="{{ '/img/opencc.png' | relative_url }}" style="margin: 0; width: 50px; height: 50px;" alt="OpenCC">
+      <span>{{ page.heading | default: page.title | default: site.title }}</span>
+    </h1>
+    {% if page.subheading %}
+    <p>{{ page.subheading }}</p>
+    {% endif %}
+  </header>
+  {{ content }}
+  <footer>
+    {% assign nav_pages = site.html_pages | where_exp: "item", "item.nav_title" | sort: "nav_order" %}
+    {% if nav_pages.size > 0 %}
+    <nav aria-label="Site">
+      <p>
+        {% for item in nav_pages %}
+        <a href="{{ item.url | relative_url }}"{% if item.url == page.url %} aria-current="page"{% endif %}>{{ item.nav_title }}</a>{% unless forloop.last %} · {% endunless %}
+        {% endfor %}
+      </p>
+    </nav>
+    {% endif %}
+    <p>
+      <a href="https://www.byvoid.com/">
+        <img src="{{ '/byvoid100.png' | relative_url }}" width="50" height="50" alt="ByVoid">
+      </a>
+    </p>
+  </footer>
+</main>
+</body>
+</html>

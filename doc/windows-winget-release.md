@@ -89,7 +89,6 @@ To build a specific tag or skip tests:
 ./scripts/release-windows-winget.ps1 -Version 1.2.1-rc1
 ./scripts/release-windows-winget.ps1 -Version 1.2.1-alpha1
 ./scripts/release-windows-winget.ps1 -Version ver.1.2.0 -SkipTests
-./scripts/release-windows-winget.ps1 -Version 1.2.0 -PublicBaseUrl https://opencc.byvoid.com/opencc-winget-release
 ```
 
 To test from a fork while keeping the upstream WinGet package identity:
@@ -107,16 +106,10 @@ but points release URLs at:
 
 - `https://github.com/frankslin/OpenCC`
 
-The default public download base URL is:
+The public download base URL is fixed to:
 
 ```text
 https://opencc.byvoid.com/opencc-winget-release
-```
-
-To override it explicitly:
-
-```powershell
-./scripts/release-windows-winget.ps1 -Version 1.2.0 -PublicBaseUrl https://opencc.byvoid.com/opencc-winget-release
 ```
 
 Accepted version formats are:

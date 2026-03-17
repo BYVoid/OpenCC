@@ -4,7 +4,6 @@ param(
     [string]$BuildDir = "build\winget-$Arch",
     [string]$OutputDir = "dist\winget-$Arch",
     [string]$GitHubRepository = "BYVoid/OpenCC",
-    [string]$PublicBaseUrl = "https://opencc.byvoid.com/opencc-winget-release",
     [string]$PackageIdentifier = "BYVoid.OpenCC",
     [string]$Publisher = "BYVoid",
     [switch]$SkipTests
@@ -164,6 +163,8 @@ $repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 Push-Location $repoRoot
 
 try {
+    $publicBaseUrl = "https://opencc.byvoid.com/opencc-winget-release"
+
     if (-not $Version) {
         $Version = Get-ProjectVersion
     }
@@ -176,7 +177,7 @@ try {
     }
 
     $packageRoot = "https://github.com/$GitHubRepository"
-    $releaseUrlBase = Normalize-BaseUrl -RawUrl $PublicBaseUrl
+    $releaseUrlBase = Normalize-BaseUrl -RawUrl $publicBaseUrl
     $licenseUrl = "$packageRoot/blob/master/LICENSE"
     $publisherSupportUrl = "$packageRoot/issues"
 

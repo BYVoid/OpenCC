@@ -183,8 +183,8 @@ try {
 
     $resolvedBuildDir = [System.IO.Path]::GetFullPath((Join-Path $repoRoot $BuildDir))
     $resolvedOutputDir = [System.IO.Path]::GetFullPath((Join-Path $repoRoot $OutputDir))
+    $installRoot = Join-Path $resolvedOutputDir "install"
     $stagingRoot = Join-Path $resolvedOutputDir "staging"
-    $installRoot = $stagingRoot
     $assetName = "OpenCC-$Version-windows-$Arch-portable.zip"
     $assetPath = Join-Path $resolvedOutputDir $assetName
     $checksumPath = "$assetPath.sha256"
@@ -196,11 +196,12 @@ try {
     Remove-Item -Recurse -Force $resolvedOutputDir -ErrorAction SilentlyContinue
     New-Item -ItemType Directory -Force -Path $resolvedBuildDir | Out-Null
     New-Item -ItemType Directory -Force -Path $installRoot | Out-Null
+    New-Item -ItemType Directory -Force -Path $stagingRoot | Out-Null
 
     cmake -S . -B $resolvedBuildDir -A x64 `
         -DCMAKE_BUILD_TYPE=Release `
         -DCMAKE_INSTALL_PREFIX:PATH=$installRoot `
-        -DENABLE_GTEST:BOOL=ON `
+        -DENABLE_GTEST:BOOL=OFF `
         -DENABLE_BENCHMARK:BOOL=OFF
 
     cmake --build $resolvedBuildDir --config Release --target install
@@ -209,10 +210,18 @@ try {
         ctest --test-dir $resolvedBuildDir --build-config Release --output-on-failure
     }
 
-    Copy-Item -Path LICENSE -Destination (Join-Path $installRoot "LICENSE.txt")
-    Copy-Item -Path README.md -Destination (Join-Path $installRoot "README.md")
+    New-Item -ItemType Directory -Force -Path (Join-Path $stagingRoot "bin") | Out-Null
+    New-Item -ItemType Directory -Force -Path (Join-Path $stagingRoot "share\opencc") | Out-Null
 
-    Compress-Archive -Path (Join-Path $installRoot '*') -DestinationPath $assetPath -CompressionLevel Optimal
+    Copy-Item -Path (Join-Path $installRoot "bin\opencc.exe") -Destination (Join-Path $stagingRoot "bin\opencc.exe")
+    Copy-Item -Path (Join-Path $installRoot "bin\opencc_dict.exe") -Destination (Join-Path $stagingRoot "bin\opencc_dict.exe")
+    Copy-Item -Path (Join-Path $installRoot "bin\opencc_phrase_extract.exe") -Destination (Join-Path $stagingRoot "bin\opencc_phrase_extract.exe")
+    Copy-Item -Path (Join-Path $installRoot "bin\opencc.dll") -Destination (Join-Path $stagingRoot "bin\opencc.dll")
+    Copy-Item -Path (Join-Path $installRoot "share\opencc\*") -Destination (Join-Path $stagingRoot "share\opencc") -Recurse
+    Copy-Item -Path LICENSE -Destination (Join-Path $stagingRoot "LICENSE.txt")
+    Copy-Item -Path README.md -Destination (Join-Path $stagingRoot "README.md")
+
+    Compress-Archive -Path (Join-Path $stagingRoot '*') -DestinationPath $assetPath -CompressionLevel Optimal
 
     $hash = (Get-FileHash -Path $assetPath -Algorithm SHA256).Hash.ToUpperInvariant()
     Write-Utf8File -Path $checksumPath -Content "$hash *$assetName`n"

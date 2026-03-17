@@ -45,6 +45,11 @@ dist/
   winget-x64/
     OpenCC-<version>-windows-x64-portable.zip
     OpenCC-<version>-windows-x64-portable.zip.sha256
+    install/
+      bin/
+      include/
+      lib/
+      share/
     staging/
       bin/
         opencc.exe
@@ -70,9 +75,17 @@ dist/
 The important distinction is:
 
 - `build\winget-x64` is the CMake and test working directory
-- `dist\winget-x64\staging\...` is the installed portable tree before zipping
+- `dist\winget-x64\install\...` is the full CMake install tree
+- `dist\winget-x64\staging\...` is the runtime-only portable tree before zipping
 - `dist\winget-x64\OpenCC-<version>-windows-x64-portable.zip` is the final release asset
 - `dist\winget-x64\winget-manifests\...` is the manifest payload to copy into `winget-pkgs`
+
+The final zip intentionally excludes development and test files such as:
+
+- `include/**`
+- `lib/**`
+- `gtest*`
+- `gmock*`
 
 ## Local build
 

@@ -10,16 +10,18 @@ Running `scripts/release-windows-winget.ps1` produces:
 - `OpenCC-<version>-windows-x64-portable.zip.sha256`
 - `winget-manifests/b/BYVoid/OpenCC/<version>/`
 
-By default the WinGet identity remains `BYVoid.OpenCC`, but the GitHub release source can be pointed at another repository for testing.
+By default the WinGet identity remains `BYVoid.OpenCC`, and the generated `InstallerUrl` points at `https://opencc.byvoid.com/opencc-winget-release`.
 
 The zip is structured as a portable package:
 
-- `OpenCC-<version>-windows-x64/bin/*.exe`
-- `OpenCC-<version>-windows-x64/bin/opencc.dll`
-- `OpenCC-<version>-windows-x64/share/opencc/*.json`
-- `OpenCC-<version>-windows-x64/share/opencc/*.ocd2`
+- `bin/*.exe`
+- `bin/opencc.dll`
+- `share/opencc/*.json`
+- `share/opencc/*.ocd2`
 
 OpenCC now also searches `../share/opencc` relative to the running executable or library on Windows, so the portable package works after WinGet extracts it.
+
+The WinGet manifest continues to use `InstallerType: zip` with `NestedInstallerType: portable`. This is intentional: OpenCC is not a single-file executable and still needs `opencc.dll` and `share/opencc/*` alongside the command binaries.
 
 ## Directory layout
 
@@ -44,18 +46,17 @@ dist/
     OpenCC-<version>-windows-x64-portable.zip
     OpenCC-<version>-windows-x64-portable.zip.sha256
     staging/
-      OpenCC-<version>-windows-x64/
-        bin/
-          opencc.exe
-          opencc_dict.exe
-          opencc_phrase_extract.exe
-          opencc.dll
-        share/
-          opencc/
-            *.json
-            *.ocd2
-        LICENSE.txt
-        README.md
+      bin/
+        opencc.exe
+        opencc_dict.exe
+        opencc_phrase_extract.exe
+        opencc.dll
+      share/
+        opencc/
+          *.json
+          *.ocd2
+      LICENSE.txt
+      README.md
     winget-manifests/
       b/
         BYVoid/
@@ -88,6 +89,7 @@ To build a specific tag or skip tests:
 ./scripts/release-windows-winget.ps1 -Version 1.2.1-rc1
 ./scripts/release-windows-winget.ps1 -Version 1.2.1-alpha1
 ./scripts/release-windows-winget.ps1 -Version ver.1.2.0 -SkipTests
+./scripts/release-windows-winget.ps1 -Version 1.2.0 -PublicBaseUrl https://opencc.byvoid.com/opencc-winget-release
 ```
 
 To test from a fork while keeping the upstream WinGet package identity:
@@ -104,6 +106,18 @@ This keeps:
 but points release URLs at:
 
 - `https://github.com/frankslin/OpenCC`
+
+The default public download base URL is:
+
+```text
+https://opencc.byvoid.com/opencc-winget-release
+```
+
+To override it explicitly:
+
+```powershell
+./scripts/release-windows-winget.ps1 -Version 1.2.0 -PublicBaseUrl https://opencc.byvoid.com/opencc-winget-release
+```
 
 Accepted version formats are:
 

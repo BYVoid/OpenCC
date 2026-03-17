@@ -9,6 +9,9 @@ on:
       version:
         description: "Release version or tag, for example 1.2.0, 1.2.1-rc1, 1.2.1-alpha1, or ver.1.2.0"
         required: false
+      public_base_url:
+        description: "Public base URL for published files. Defaults to https://opencc.byvoid.com/opencc-winget-release"
+        required: false
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -50,6 +53,7 @@ jobs:
             -Version "${{ steps.version.outputs.value }}" `
             -OutputDir release `
             -GitHubRepository "${{ github.repository }}" `
+            -PublicBaseUrl "${{ github.event.inputs.public_base_url }}" `
             -PackageIdentifier "BYVoid.OpenCC" `
             -Publisher "BYVoid"
 

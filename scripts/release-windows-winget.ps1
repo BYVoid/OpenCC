@@ -4,6 +4,7 @@ param(
     [string]$BuildDir = "build\winget-$Arch",
     [string]$OutputDir = "dist\winget-$Arch",
     [string]$GitHubRepository = "BYVoid/OpenCC",
+    [string]$PublicBaseUrl = "https://opencc.byvoid.com/opencc-winget-release",
     [string]$PackageIdentifier = "BYVoid.OpenCC",
     [string]$Publisher = "BYVoid",
     [switch]$SkipTests
@@ -73,13 +74,24 @@ function Normalize-GitHubRepository {
     return $value
 }
 
+function Normalize-BaseUrl {
+    param(
+        [Parameter(Mandatory = $true)][string]$RawUrl
+    )
+
+    $value = $RawUrl.Trim().TrimEnd('/')
+    if ($value -notmatch '^https://') {
+        throw "Invalid public base URL '$RawUrl'. Expected an https URL."
+    }
+    return $value
+}
+
 function New-WinGetManifests {
     param(
         [Parameter(Mandatory = $true)][string]$PackageVersion,
         [Parameter(Mandatory = $true)][string]$PackageUrl,
         [Parameter(Mandatory = $true)][string]$InstallerSha256,
         [Parameter(Mandatory = $true)][string]$ManifestRoot,
-        [Parameter(Mandatory = $true)][string]$PortableRoot,
         [Parameter(Mandatory = $true)][string]$PackageIdentifier,
         [Parameter(Mandatory = $true)][string]$Publisher,
         [Parameter(Mandatory = $true)][string]$PublisherUrl,
@@ -108,11 +120,11 @@ Installers:
   InstallerUrl: $PackageUrl
   InstallerSha256: $InstallerSha256
   NestedInstallerFiles:
-  - RelativeFilePath: $PortableRoot/bin/opencc.exe
+  - RelativeFilePath: bin/opencc.exe
     PortableCommandAlias: opencc
-  - RelativeFilePath: $PortableRoot/bin/opencc_dict.exe
+  - RelativeFilePath: bin/opencc_dict.exe
     PortableCommandAlias: opencc_dict
-  - RelativeFilePath: $PortableRoot/bin/opencc_phrase_extract.exe
+  - RelativeFilePath: bin/opencc_phrase_extract.exe
     PortableCommandAlias: opencc_phrase_extract
 ManifestType: installer
 ManifestVersion: 1.9.0
@@ -164,15 +176,14 @@ try {
     }
 
     $packageRoot = "https://github.com/$GitHubRepository"
-    $releaseUrlBase = "$packageRoot/releases/download/ver.$Version"
+    $releaseUrlBase = Normalize-BaseUrl -RawUrl $PublicBaseUrl
     $licenseUrl = "$packageRoot/blob/master/LICENSE"
     $publisherSupportUrl = "$packageRoot/issues"
 
     $resolvedBuildDir = [System.IO.Path]::GetFullPath((Join-Path $repoRoot $BuildDir))
     $resolvedOutputDir = [System.IO.Path]::GetFullPath((Join-Path $repoRoot $OutputDir))
-    $portableRoot = "OpenCC-$Version-windows-$Arch"
     $stagingRoot = Join-Path $resolvedOutputDir "staging"
-    $installRoot = Join-Path $stagingRoot $portableRoot
+    $installRoot = $stagingRoot
     $assetName = "OpenCC-$Version-windows-$Arch-portable.zip"
     $assetPath = Join-Path $resolvedOutputDir $assetName
     $checksumPath = "$assetPath.sha256"
@@ -200,7 +211,7 @@ try {
     Copy-Item -Path LICENSE -Destination (Join-Path $installRoot "LICENSE.txt")
     Copy-Item -Path README.md -Destination (Join-Path $installRoot "README.md")
 
-    Compress-Archive -Path $installRoot -DestinationPath $assetPath -CompressionLevel Optimal
+    Compress-Archive -Path (Join-Path $installRoot '*') -DestinationPath $assetPath -CompressionLevel Optimal
 
     $hash = (Get-FileHash -Path $assetPath -Algorithm SHA256).Hash.ToUpperInvariant()
     Write-Utf8File -Path $checksumPath -Content "$hash *$assetName`n"
@@ -210,7 +221,6 @@ try {
         -PackageUrl $releaseUrl `
         -InstallerSha256 $hash `
         -ManifestRoot $wingetRoot `
-        -PortableRoot $portableRoot `
         -PackageIdentifier $PackageIdentifier `
         -Publisher $Publisher `
         -PublisherUrl $packageRoot `

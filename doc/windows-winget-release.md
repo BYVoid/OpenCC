@@ -15,13 +15,12 @@ By default the WinGet identity remains `BYVoid.OpenCC`, and the generated `Insta
 The zip is structured as a portable package:
 
 - `bin/*.exe`
-- `bin/opencc.dll`
 - `share/opencc/*.json`
 - `share/opencc/*.ocd2`
 
 OpenCC now also searches `../share/opencc` relative to the running executable or library on Windows, so the portable package works after WinGet extracts it.
 
-The WinGet manifest continues to use `InstallerType: zip` with `NestedInstallerType: portable`. This is intentional: OpenCC is not a single-file executable and still needs `opencc.dll` and `share/opencc/*` alongside the command binaries.
+The WinGet manifest continues to use `InstallerType: zip` with `NestedInstallerType: portable`. This is intentional: OpenCC still needs `share/opencc/*` alongside the command binaries, even though the executables are now built as static binaries for WinGet release packaging.
 
 ## Directory layout
 
@@ -55,7 +54,6 @@ dist/
         opencc.exe
         opencc_dict.exe
         opencc_phrase_extract.exe
-        opencc.dll
       share/
         opencc/
           *.json

@@ -68,6 +68,68 @@ std::string Utf8FromWide(const std::wstring& wide) {
   return utf8;
 }
 
+std::wstring WideFromUtf8(const std::string& utf8) {
+  if (utf8.empty()) {
+    return L"";
+  }
+  int requiredSize =
+      MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, nullptr, 0);
+  if (requiredSize <= 1) {
+    return L"";
+  }
+  std::wstring wide(static_cast<size_t>(requiredSize), L'\0');
+  MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, wide.data(), requiredSize);
+  wide.resize(static_cast<size_t>(requiredSize - 1));
+  return wide;
+}
+
+std::string NormalizeModulePath(const std::string& path) {
+  if (path.empty()) {
+    return "";
+  }
+
+  std::wstring widePath = WideFromUtf8(path);
+  if (widePath.empty()) {
+    return path;
+  }
+
+  HANDLE handle =
+      CreateFileW(widePath.c_str(), 0,
+                  FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                  nullptr, OPEN_EXISTING,
+                  FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, nullptr);
+  if (handle == INVALID_HANDLE_VALUE) {
+    return path;
+  }
+
+  std::wstring finalPath(MAX_PATH, L'\0');
+  for (;;) {
+    DWORD copied =
+        GetFinalPathNameByHandleW(handle, finalPath.data(),
+                                  static_cast<DWORD>(finalPath.size()),
+                                  FILE_NAME_NORMALIZED);
+    if (copied == 0) {
+      CloseHandle(handle);
+      return path;
+    }
+    if (copied < finalPath.size()) {
+      finalPath.resize(copied);
+      break;
+    }
+    finalPath.resize(copied + 1);
+  }
+  CloseHandle(handle);
+
+  const std::wstring uncPrefix = L"\\\\?\\UNC\\";
+  const std::wstring localPrefix = L"\\\\?\\";
+  if (finalPath.rfind(uncPrefix, 0) == 0) {
+    finalPath = L"\\" + finalPath.substr(7);
+  } else if (finalPath.rfind(localPrefix, 0) == 0) {
+    finalPath = finalPath.substr(4);
+  }
+  return Utf8FromWide(finalPath);
+}
+
 std::string GetModulePath(HMODULE module) {
   std::wstring buffer(MAX_PATH, L'\0');
   for (;;) {
@@ -78,7 +140,7 @@ std::string GetModulePath(HMODULE module) {
     }
     if (copied < buffer.size() - 1) {
       buffer.resize(copied);
-      return Utf8FromWide(buffer);
+      return NormalizeModulePath(Utf8FromWide(buffer));
     }
     buffer.resize(buffer.size() * 2);
   }

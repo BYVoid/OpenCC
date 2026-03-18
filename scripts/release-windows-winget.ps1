@@ -101,6 +101,7 @@ function New-WinGetManifests {
     $releaseDate = Get-Date -Format "yyyy-MM-dd"
 
     $versionManifest = @"
+# yaml-language-server: `$schema=https://aka.ms/winget-manifest.version.1.9.0.schema.json
 PackageIdentifier: $packageIdentifier
 PackageVersion: $PackageVersion
 DefaultLocale: en-US
@@ -109,6 +110,7 @@ ManifestVersion: 1.9.0
 "@
 
     $installerManifest = @"
+# yaml-language-server: `$schema=https://aka.ms/winget-manifest.installer.1.9.0.schema.json
 PackageIdentifier: $packageIdentifier
 PackageVersion: $PackageVersion
 InstallerType: zip
@@ -130,6 +132,7 @@ ManifestVersion: 1.9.0
 "@
 
     $localeManifest = @"
+# yaml-language-server: `$schema=https://aka.ms/winget-manifest.defaultLocale.1.9.0.schema.json
 PackageIdentifier: $packageIdentifier
 PackageVersion: $PackageVersion
 PackageLocale: en-US

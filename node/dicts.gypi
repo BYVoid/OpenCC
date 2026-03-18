@@ -52,6 +52,14 @@
       "outputs": ["<(output_prefix)TSPhrases.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
+      "action_name": "TWVariantsPhrases",
+      "variables": {
+        "input": "<(input_prefix)TWVariantsPhrases.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)TWVariantsPhrases.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
       "action_name": "TWVariants",
       "variables": {
         "input": "<(input_prefix)TWVariants.txt",
@@ -106,6 +114,14 @@
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)TWPhrasesRev.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "HKVariantsPhrases",
+      "variables": {
+        "input": "<(input_prefix)HKVariantsPhrases.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)HKVariantsPhrases.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "HKVariants",

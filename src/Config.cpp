@@ -310,6 +310,12 @@ ConverterPtr Config::NewFromFile(const std::string& fileName,
                                  const char* argv0) {
   ConfigInternal* impl = reinterpret_cast<ConfigInternal*>(internal);
   impl->paths = paths;
+#if defined(_WIN32) || defined(_WIN64)
+  // Prefer real module locations on Windows because package managers such as
+  // WinGet may launch the CLI through a reparse point or shim.
+  AppendWindowsPortableSearchPaths(impl->paths, GetCurrentLibraryModulePath());
+  AppendWindowsPortableSearchPaths(impl->paths, GetCurrentProcessModulePath());
+#endif
   if (argv0 != nullptr) {
     std::string parent = GetParentDirectory(argv0);
     if (!parent.empty()) {
@@ -317,11 +323,10 @@ ConverterPtr Config::NewFromFile(const std::string& fileName,
     }
   }
 #if defined(_WIN32) || defined(_WIN64)
+  // Keep argv[0] as a last-resort fallback for non-standard launchers.
   if (argv0 != nullptr) {
     AppendWindowsPortableSearchPaths(impl->paths, argv0);
   }
-  AppendWindowsPortableSearchPaths(impl->paths, GetCurrentProcessModulePath());
-  AppendWindowsPortableSearchPaths(impl->paths, GetCurrentLibraryModulePath());
 #endif
   if (PACKAGE_DATA_DIRECTORY != "") {
     impl->paths.push_back(PACKAGE_DATA_DIRECTORY);

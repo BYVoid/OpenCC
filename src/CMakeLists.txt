@@ -112,6 +112,19 @@ configure_file(
   "${PROJECT_SOURCE_DIR}/src/opencc_config.h.in"
   "${PROJECT_BINARY_DIR}/src/opencc_config.h")
 
+if (WIN32)
+  set(RC_FILE_DESCRIPTION "Open Chinese Convert Library")
+  set(RC_INTERNAL_NAME "opencc")
+  set(RC_ORIGINAL_FILENAME "opencc.dll")
+  set(RC_FILE_TYPE "VFT_DLL")
+  configure_file(
+    "${PROJECT_SOURCE_DIR}/src/version.rc.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/version_libopencc.rc"
+    @ONLY
+  )
+  list(APPEND LIBOPENCC_SOURCES "${CMAKE_CURRENT_BINARY_DIR}/version_libopencc.rc")
+endif()
+
 add_library(libopencc ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
 add_library(OpenCC::OpenCC ALIAS libopencc)
 set_target_properties(libopencc PROPERTIES POSITION_INDEPENDENT_CODE ON)

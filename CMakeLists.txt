@@ -78,16 +78,35 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif()
 
 ######## Directory
+# Installation directories follow GNU Coding Standards via CMake's GNUInstallDirs module:
+# https://cmake.org/cmake/help/latest/module/GNUInstallDirs.html
+#
+# Default values and parity with previously hardcoded paths
+# (shown for CMAKE_INSTALL_PREFIX=/usr/local and /usr):
+#
+#   CMAKE_INSTALL_INCLUDEDIR     "include"  -> /usr/local/include  or  /usr/include
+#     (replaces: ${CMAKE_INSTALL_PREFIX}/include)
+#
+#   CMAKE_INSTALL_SYSCONFDIR     "etc"      -> /usr/local/etc      or  /etc
+#     (replaces: ${CMAKE_INSTALL_PREFIX}/etc)
+#     NOTE: when prefix is /usr the full path is /etc per GNU Coding Standards,
+#           whereas the old code would have produced /usr/etc.
+#
+#   CMAKE_INSTALL_LIBDIR         "lib"      -> /usr/local/lib      or  /usr/lib
+#     (also resolves to lib64 or lib/<multiarch> on applicable platforms)
+#     (replaces: ${CMAKE_INSTALL_PREFIX}/lib[64])
+#
+#   CMAKE_INSTALL_FULL_DATAROOTDIR  (absolute) -> /usr/local/share  or  /usr/share
+#     (replaces: ${CMAKE_INSTALL_PREFIX}/share)
+#     Full/absolute form is required here because the value is baked into the
+#     binary as PKGDATADIR/LOCALEDIR at compile time for runtime data lookup.
 
 set (DIR_PREFIX ${CMAKE_INSTALL_PREFIX})
-# Use relative GNUInstallDirs paths for install() destinations and cmake package
-# config (relative paths enable relocatable packages).
+# Relative paths are used for install() destinations and CMake package config
+# so that packages remain relocatable.
 set (DIR_INCLUDE ${CMAKE_INSTALL_INCLUDEDIR})
 set (DIR_ETC ${CMAKE_INSTALL_SYSCONFDIR})
 set (DIR_LIBRARY ${CMAKE_INSTALL_LIBDIR})
-# Use the full absolute path for the data directory because it is embedded as a
-# compile-time PKGDATADIR/LOCALEDIR definition that the binary uses at runtime
-# to locate its data files.
 set (DIR_SHARE ${CMAKE_INSTALL_FULL_DATAROOTDIR})
 
 if (DEFINED SHARE_INSTALL_PREFIX)

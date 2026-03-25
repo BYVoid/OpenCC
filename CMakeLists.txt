@@ -96,18 +96,15 @@ endif()
 #     (also resolves to lib64 or lib/<multiarch> on applicable platforms)
 #     (replaces: ${CMAKE_INSTALL_PREFIX}/lib[64])
 #
-#   CMAKE_INSTALL_FULL_DATAROOTDIR  (absolute) -> /usr/local/share  or  /usr/share
+#   CMAKE_INSTALL_DATAROOTDIR    "share"    -> /usr/local/share    or  /usr/share
 #     (replaces: ${CMAKE_INSTALL_PREFIX}/share)
-#     Full/absolute form is required here because the value is baked into the
-#     binary as PKGDATADIR/LOCALEDIR at compile time for runtime data lookup.
 
-set (DIR_PREFIX ${CMAKE_INSTALL_PREFIX})
-# Relative paths are used for install() destinations and CMake package config
-# so that packages remain relocatable.
+# All DIR_* variables use relative paths so that install() destinations and
+# CMake package config files remain relocatable.
 set (DIR_INCLUDE ${CMAKE_INSTALL_INCLUDEDIR})
 set (DIR_ETC ${CMAKE_INSTALL_SYSCONFDIR})
 set (DIR_LIBRARY ${CMAKE_INSTALL_LIBDIR})
-set (DIR_SHARE ${CMAKE_INSTALL_FULL_DATAROOTDIR})
+set (DIR_SHARE ${CMAKE_INSTALL_DATAROOTDIR})
 
 if (DEFINED SHARE_INSTALL_PREFIX)
   set (DIR_SHARE ${SHARE_INSTALL_PREFIX})
@@ -121,8 +118,23 @@ if (DEFINED SYSCONF_INSTALL_DIR)
   set (DIR_ETC ${SYSCONF_INSTALL_DIR})
 endif (DEFINED SYSCONF_INSTALL_DIR)
 
+if (DEFINED LIB_INSTALL_DIR)
+  set (DIR_LIBRARY ${LIB_INSTALL_DIR})
+endif (DEFINED LIB_INSTALL_DIR)
+
 set (DIR_SHARE_OPENCC ${DIR_SHARE}/opencc)
 set (DIR_SHARE_LOCALE ${DIR_SHARE}/locale)
+
+# Compute absolute paths needed for compile-time macros (PKGDATADIR/LOCALEDIR)
+# and for the pkg-config file.  We must handle both the GNUInstallDirs relative
+# defaults and user-supplied absolute override paths (SHARE_INSTALL_PREFIX etc.).
+foreach (_gnu_dir SHARE INCLUDE LIBRARY)
+  if (IS_ABSOLUTE "${DIR_${_gnu_dir}}")
+    set (DIR_${_gnu_dir}_FULL "${DIR_${_gnu_dir}}")
+  else ()
+    set (DIR_${_gnu_dir}_FULL "${CMAKE_INSTALL_PREFIX}/${DIR_${_gnu_dir}}")
+  endif ()
+endforeach ()
 
 ######## Configuration
 
@@ -167,8 +179,8 @@ install(
 ######## Compiler flags
 
 add_definitions(
-  -DPKGDATADIR="${DIR_SHARE_OPENCC}"
-  -DLOCALEDIR="${DIR_SHARE_LOCALE}"
+  -DPKGDATADIR="${DIR_SHARE_FULL}/opencc"
+  -DLOCALEDIR="${DIR_SHARE_FULL}/locale"
   -DVERSION="${OPENCC_VERSION}"
   -DPACKAGE_NAME="${PACKAGE_NAME}"
 )

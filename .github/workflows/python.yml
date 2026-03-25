@@ -47,7 +47,7 @@ jobs:
             os: ubuntu-24.04-arm
             cibw_archs: aarch64
           - label: macos-arm64
-            os: macos-14
+            os: macos-15
             cibw_archs: arm64
           - label: windows-amd64
             os: windows-latest

@@ -123,7 +123,6 @@ if (DEFINED LIB_INSTALL_DIR)
 endif (DEFINED LIB_INSTALL_DIR)
 
 set (DIR_SHARE_OPENCC ${DIR_SHARE}/opencc)
-set (DIR_SHARE_LOCALE ${DIR_SHARE}/locale)
 
 # Compute absolute paths needed for compile-time macros (PKGDATADIR/LOCALEDIR)
 # and for the pkg-config file.  We must handle both the GNUInstallDirs relative

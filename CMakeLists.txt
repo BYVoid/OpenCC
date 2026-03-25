@@ -136,6 +136,9 @@ foreach (_gnu_dir SHARE INCLUDE LIBRARY)
   endif ()
 endforeach ()
 
+set (DIR_SHARE_OPENCC_FULL ${DIR_SHARE_FULL}/opencc)
+set (DIR_SHARE_LOCALE_FULL ${DIR_SHARE_FULL}/locale)
+
 ######## Configuration
 
 include(CMakePackageConfigHelpers)
@@ -179,8 +182,8 @@ install(
 ######## Compiler flags
 
 add_definitions(
-  -DPKGDATADIR="${DIR_SHARE_FULL}/opencc"
-  -DLOCALEDIR="${DIR_SHARE_FULL}/locale"
+  -DPKGDATADIR="${DIR_SHARE_OPENCC_FULL}"
+  -DLOCALEDIR="${DIR_SHARE_LOCALE_FULL}"
   -DVERSION="${OPENCC_VERSION}"
   -DPACKAGE_NAME="${PACKAGE_NAME}"
 )

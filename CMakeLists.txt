@@ -79,16 +79,16 @@ endif()
 
 ######## Directory
 
-set(LIB_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}" CACHE PATH "")
-if(CMAKE_INSTALL_LIBDIR MATCHES "lib64$")
-  set(LIB_SUFFIX 64)
-endif()
-
 set (DIR_PREFIX ${CMAKE_INSTALL_PREFIX})
-set (DIR_INCLUDE ${DIR_PREFIX}/include)
-set (DIR_SHARE ${DIR_PREFIX}/share)
-set (DIR_ETC ${DIR_PREFIX}/etc)
-set (DIR_LIBRARY ${DIR_PREFIX}/lib${LIB_SUFFIX})
+# Use relative GNUInstallDirs paths for install() destinations and cmake package
+# config (relative paths enable relocatable packages).
+set (DIR_INCLUDE ${CMAKE_INSTALL_INCLUDEDIR})
+set (DIR_ETC ${CMAKE_INSTALL_SYSCONFDIR})
+set (DIR_LIBRARY ${CMAKE_INSTALL_LIBDIR})
+# Use the full absolute path for the data directory because it is embedded as a
+# compile-time PKGDATADIR/LOCALEDIR definition that the binary uses at runtime
+# to locate its data files.
+set (DIR_SHARE ${CMAKE_INSTALL_FULL_DATAROOTDIR})
 
 if (DEFINED SHARE_INSTALL_PREFIX)
   set (DIR_SHARE ${SHARE_INSTALL_PREFIX})
@@ -101,10 +101,6 @@ endif (DEFINED INCLUDE_INSTALL_DIR)
 if (DEFINED SYSCONF_INSTALL_DIR)
   set (DIR_ETC ${SYSCONF_INSTALL_DIR})
 endif (DEFINED SYSCONF_INSTALL_DIR)
-
-if (DEFINED LIB_INSTALL_DIR)
-  set (DIR_LIBRARY ${LIB_INSTALL_DIR})
-endif (DEFINED LIB_INSTALL_DIR)
 
 set (DIR_SHARE_OPENCC ${DIR_SHARE}/opencc)
 set (DIR_SHARE_LOCALE ${DIR_SHARE}/locale)

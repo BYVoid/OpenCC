@@ -33,11 +33,12 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 * [Ubuntu](https://launchpad.net/ubuntu/+source/opencc)
 * [Fedora](https://packages.fedoraproject.org/pkgs/opencc/opencc/)
 * [Arch Linux](https://archlinux.org/packages/extra/x86_64/opencc/)
-* [macOS](https://formulae.brew.sh/formula/opencc)
+* [macOS (Homebrew)](https://formulae.brew.sh/formula/opencc)
 * WinGet (`winget install BYVoid.OpenCC`) - WIP
 * [Bazel](https://registry.bazel.build/modules/opencc)
 * [Node.js](https://npmjs.org/package/opencc)
 * [Python](https://pypi.org/project/OpenCC/)
+* [More (Repology)](https://repology.org/project/opencc/versions)
 
 ### Prebuilt 預編譯
 

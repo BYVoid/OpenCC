@@ -123,6 +123,7 @@ if (DEFINED LIB_INSTALL_DIR)
 endif (DEFINED LIB_INSTALL_DIR)
 
 set (DIR_SHARE_OPENCC ${DIR_SHARE}/opencc)
+set (DIR_SHARE_LOCALE ${DIR_SHARE}/locale)
 
 # Compute absolute paths needed for compile-time macros (PKGDATADIR/LOCALEDIR)
 # and for the pkg-config file.  We must handle both the GNUInstallDirs relative
@@ -136,6 +137,7 @@ foreach (_gnu_dir SHARE INCLUDE LIBRARY)
 endforeach ()
 
 set (DIR_SHARE_OPENCC_FULL ${DIR_SHARE_FULL}/opencc)
+set (DIR_SHARE_LOCALE_FULL ${DIR_SHARE_FULL}/locale)
 
 ######## Configuration
 
@@ -181,7 +183,7 @@ install(
 
 add_definitions(
   -DPKGDATADIR="${DIR_SHARE_OPENCC_FULL}"
-  -DLOCALEDIR="${DIR_SHARE_FULL}/locale"
+  -DLOCALEDIR="${DIR_SHARE_LOCALE_FULL}"
   -DVERSION="${OPENCC_VERSION}"
   -DPACKAGE_NAME="${PACKAGE_NAME}"
 )

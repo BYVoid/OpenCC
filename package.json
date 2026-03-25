@@ -37,11 +37,15 @@
     "Traditional Chinese"
   ],
   "devDependencies": {
-    "mocha": "^9.2.1",
+    "mocha": "^11.7.5",
     "node-pre-gyp-github": "^2.0.0"
   },
   "dependencies": {
     "@mapbox/node-pre-gyp": "^2.0.3",
     "nan": "^2.22.0"
+  },
+  "overrides": {
+    "diff": "^8.0.3",
+    "serialize-javascript": "^7.0.3"
   }
 }

@@ -19,11 +19,11 @@ jobs:
         # Current stable line on latest hosted runners
         os: [ubuntu-latest, macos-latest]
         node-version: [24]
-        # LTS coverage on macOS 14 (ARM64)
+        # LTS coverage on macOS 15 (ARM64)
         include:
-          - os: macos-14
+          - os: macos-15
             node-version: 22
-          - os: macos-14
+          - os: macos-15
             node-version: 20
     steps:
       - uses: actions/checkout@v4

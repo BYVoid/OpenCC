@@ -49,6 +49,7 @@ if(GIT_FOUND)
     endif()
 
     # Case 1: Exact tag — v1.2.3-0-g<sha>
+    # NOTE: version tag patterns here must be kept in sync with scripts/compute-version.sh
     string(REGEX MATCH "^v([0-9]+)\\.([0-9]+)\\.([0-9]+)-0-g[0-9a-f]+$" _match_tag "${_git_raw}")
     if(_match_tag)
       set(OPENCC_VERSION_MAJOR "${CMAKE_MATCH_1}")

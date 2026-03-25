@@ -32,6 +32,7 @@ if [ -z "$RAW" ]; then
 fi
 
 # Case 1: Exact tag (e.g. v1.2.3-0-gabc1234 from --long)
+# NOTE: version tag patterns here must be kept in sync with cmake/GitVersion.cmake
 if [[ "$RAW" =~ ^(v[0-9]+\.[0-9]+\.[0-9]+)-0-g[0-9a-f]+$ ]]; then
   TAG="${BASH_REMATCH[1]}"
   echo "${TAG}${DIRTY}"

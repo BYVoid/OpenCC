@@ -22,10 +22,7 @@ def get_version_info():
     env_version = os.environ.get('VERSION', '')
     if env_version:
         # Strip leading 'v' prefix for PEP 440 compatibility
-        v = env_version.lstrip('v')
-        # Convert .devN+g<sha> format to PEP 440: .devN+g<sha>
-        # Already compatible; just strip dirty suffix for PyPI uploads
-        return v
+        return env_version.lstrip('v')
 
     # Fallback: parse version from CMakeLists.txt
     version_info = ['1', '0', '0']

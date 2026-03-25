@@ -17,7 +17,7 @@ BEGIN
             VALUE "FileDescription",  "@RC_FILE_DESCRIPTION@"
             VALUE "FileVersion",      "@OPENCC_VERSION_MAJOR@.@OPENCC_VERSION_MINOR@.@OPENCC_VERSION_REVISION@"
             VALUE "InternalName",     "@RC_INTERNAL_NAME@"
-            VALUE "LegalCopyright",   "Copyright 2010-2020 Carbo Kuo and contributors"
+            VALUE "LegalCopyright",   "Copyright 2010-2026 Carbo Kuo and contributors"
             VALUE "OriginalFilename", "@RC_ORIGINAL_FILENAME@"
             VALUE "ProductName",      "Open Chinese Convert (OpenCC)"
             VALUE "ProductVersion",   "@OPENCC_VERSION_MAJOR@.@OPENCC_VERSION_MINOR@.@OPENCC_VERSION_REVISION@"

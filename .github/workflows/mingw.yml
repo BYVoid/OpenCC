@@ -19,6 +19,15 @@ jobs:
     steps:
       - uses: msys2/setup-msys2@v2
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compute version
+        id: version
+        run: |
+          VERSION=$(bash scripts/compute-version.sh)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Computed version: $VERSION"
       - name: Install dependencies
         run: pacman -S --noconfirm base-devel mingw-w64-x86_64-toolchain cmake ninja python
       - name: Build with mingw-w64
@@ -48,7 +57,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: opencc-mingw
+          name: opencc-${{ env.VERSION }}-mingw
           path: |
             install/**
             build/src/tools/*.exe

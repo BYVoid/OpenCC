@@ -12,6 +12,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Compute version
+      id: version
+      shell: bash
+      run: |
+        VERSION=$(bash scripts/compute-version.sh)
+        echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+        echo "Computed version: $VERSION"
 
     - name: Build package and upload from docker (Linux)
       if: runner.os == 'Linux'

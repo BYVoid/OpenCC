@@ -41,18 +41,10 @@ option(USE_SYSTEM_TCLAP "Use system version of TCLAP" OFF)
 ######## Package information
 set (PACKAGE_URL https://github.com/BYVoid/OpenCC)
 set (PACKAGE_BUGREPORT https://github.com/BYVoid/OpenCC/issues)
-set (OPENCC_VERSION_MAJOR 1)
-set (OPENCC_VERSION_MINOR 2)
-set (OPENCC_VERSION_REVISION 1)
 
-if (CMAKE_BUILD_TYPE MATCHES Debug)
-  set (version_suffix .Debug)
-endif (CMAKE_BUILD_TYPE MATCHES Debug)
-
-set (
-  OPENCC_VERSION
-  ${OPENCC_VERSION_MAJOR}.${OPENCC_VERSION_MINOR}.${OPENCC_VERSION_REVISION}${version_suffix}
-)
+# Derive version from Git tags (falls back to hardcoded default when Git is unavailable)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+include(GitVersion)
 
 set(CPACK_SOURCE_PACKAGE_FILE_NAME
   "${PACKAGE_NAME}-${OPENCC_VERSION_MAJOR}.${OPENCC_VERSION_MINOR}.${OPENCC_VERSION_REVISION}"

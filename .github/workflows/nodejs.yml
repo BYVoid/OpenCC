@@ -27,6 +27,16 @@ jobs:
             node-version: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compute version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(bash scripts/compute-version.sh)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Computed version: $VERSION"
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
@@ -37,7 +47,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: opencc-nodejs-${{ matrix.os }}-node-${{ matrix.node-version }}
+          name: opencc-${{ env.VERSION }}-nodejs-${{ matrix.os }}-node-${{ matrix.node-version }}
           path: |
             node/build/**
             **/npm-debug.log

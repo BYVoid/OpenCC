@@ -18,6 +18,16 @@ _readme_file = os.path.join(_this_dir, 'README.md')
 
 
 def get_version_info():
+    # Prefer Git-derived version from environment (set by CI or compute-version.sh)
+    env_version = os.environ.get('VERSION', '')
+    if env_version:
+        # Strip leading 'v' prefix for PEP 440 compatibility
+        v = env_version.lstrip('v')
+        # Convert .devN+g<sha> format to PEP 440: .devN+g<sha>
+        # Already compatible; just strip dirty suffix for PyPI uploads
+        return v
+
+    # Fallback: parse version from CMakeLists.txt
     version_info = ['1', '0', '0']
     version_pattern = re.compile(
         r'OPENCC_VERSION_(MAJOR|MINOR|REVISION) (\d+)')

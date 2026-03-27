@@ -1,4 +1,11 @@
 #if (defined _WIN32) || (defined _WIN64)
+ // Require Windows 8+ for PrefetchVirtualMemory / WIN32_MEMORY_RANGE_ENTRY
+ #ifndef _WIN32_WINNT
+  #define _WIN32_WINNT 0x0602
+ #elif _WIN32_WINNT < 0x0602
+  #undef _WIN32_WINNT
+  #define _WIN32_WINNT 0x0602
+ #endif
  #include <sys/stat.h>
  #include <sys/types.h>
  #include <windows.h>

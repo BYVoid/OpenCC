@@ -5,6 +5,8 @@ on:
 
 jobs:
   release-pypi:
+    permissions:
+      contents: read
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, macos-14, windows-latest]

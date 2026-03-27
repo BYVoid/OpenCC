@@ -50,8 +50,10 @@ int main(int argc, const char* argv[]) {
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error() << " for arg " << e.argId()
               << std::endl;
+    return 1;
   } catch (Exception& e) {
     std::cerr << e.what() << std::endl;
+    return 1;
   }
   return 0;
 }

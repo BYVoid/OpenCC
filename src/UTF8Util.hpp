@@ -156,7 +156,10 @@ public:
    * Copies a substring with given length to a new string.
    */
   static std::string FromSubstr(const char* str, size_t length) {
-    return std::string(str, length);
+    std::string newStr;
+    newStr.resize(length);
+    strncpy(newStr.data(), str, length);
+    return newStr;
   }
 
   /**

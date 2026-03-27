@@ -6,14 +6,17 @@
 #   Tag build (release):    v1.2.3
 #   Dev build (clean):      v1.2.3.dev4+gabc1234
 #   Dev build (dirty):      v1.2.3.dev4+gabc1234.dirty
-#   No tag (clean):         gabc1234
-#   No tag (dirty):         gabc1234.dirty
+#   No tag (clean):         v1.2.1+gabc1234
+#   No tag (dirty):         v1.2.1+gabc1234.dirty
 #
 # Usage:
 #   ./scripts/compute-version.sh          # prints version to stdout
 #   VERSION=$(./scripts/compute-version.sh)
 #
 set -euo pipefail
+
+# Fallback version — must be kept in sync with cmake/GitVersion.cmake
+FALLBACK_VERSION="1.2.1"
 
 # Detect dirty working tree
 DIRTY=""
@@ -25,9 +28,13 @@ fi
 RAW=$(git describe --tags --long --always 2>/dev/null) || RAW=""
 
 if [ -z "$RAW" ]; then
-  # No git available at all — fall back to unknown
-  SHA=$(git rev-parse --short HEAD 2>/dev/null) || SHA="unknown"
-  echo "g${SHA}${DIRTY}"
+  # No git available at all — use fallback version
+  SHA=$(git rev-parse --short HEAD 2>/dev/null) || SHA=""
+  if [ -n "$SHA" ]; then
+    echo "v${FALLBACK_VERSION}+g${SHA}${DIRTY}"
+  else
+    echo "v${FALLBACK_VERSION}${DIRTY}"
+  fi
   exit 0
 fi
 
@@ -48,5 +55,5 @@ if [[ "$RAW" =~ ^(v[0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)-g([0-9a-f]+)$ ]]; then
   exit 0
 fi
 
-# Case 3: No tag — raw is just a short SHA
-echo "g${RAW}${DIRTY}"
+# Case 3: No tag — use fallback version with commit SHA
+echo "v${FALLBACK_VERSION}+g${RAW}${DIRTY}"

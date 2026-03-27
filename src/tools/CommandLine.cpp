@@ -173,7 +173,7 @@ void Convert(std::string fileName) {
     bufferPtr = bufferBegin + remainingLength;
     bufferSizeAvailble = BUFFER_SIZE - remainingLength;
     if (remainingLength > 0) {
-      strncpy(bufferBegin, remainingTemp.c_str(), remainingLength);
+      memcpy(bufferBegin, remainingTemp.c_str(), remainingLength);
     }
   }
   fclose(fout);

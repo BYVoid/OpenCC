@@ -32,6 +32,6 @@ std::string Converter::Convert(const std::string& text) const {
 
 size_t Converter::Convert(const char* input, char* output) const {
   const std::string& converted = Convert(input);
-  strcpy(output, converted.c_str());
+  memcpy(output, converted.c_str(), converted.length() + 1);
   return converted.length();
 }

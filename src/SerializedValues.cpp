@@ -126,7 +126,7 @@ void SerializedValues::ConstructBuffer(std::string* valueBuffer,
   char* pValueBuffer = const_cast<char*>(valueBuffer->c_str());
   for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
     for (const auto& value : entry->Values()) {
-      strcpy(pValueBuffer, value.c_str());
+      memcpy(pValueBuffer, value.c_str(), value.length() + 1);
       valueBytes->push_back(static_cast<uint16_t>(value.length() + 1));
       pValueBuffer += value.length() + 1;
     }

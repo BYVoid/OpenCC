@@ -42,7 +42,7 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 
 ### Prebuilt 預編譯
 
-* Windows (x86_64): [OpenCC-1.2.1-alpha1](https://opencc.byvoid.com/opencc-winget-release/OpenCC-1.2.1-alpha1-windows-x64-portable.zip)
+* Windows (x86_64): [OpenCC-1.2.1-alpha2](https://opencc.byvoid.com/opencc-winget-release/OpenCC-1.2.1-alpha2-windows-x64-portable.zip) ([SHA-256](https://opencc.byvoid.com/opencc-winget-release/OpenCC-1.2.1-alpha2-windows-x64-portable.zip.sha256))
 
 This is a Windows release intended for WinGet distribution. For details, see [doc/windows-winget-release.md](doc/windows-winget-release.md).
 

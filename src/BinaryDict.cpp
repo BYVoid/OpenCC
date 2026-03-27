@@ -172,21 +172,21 @@ void BinaryDict::ConstructBuffer(std::string& keyBuf,
   char* pValueBuffer = valueBuf.data();
   for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
     const std::string& key = entry->Key();
-    memcpy(pKeyBuffer, key.data(), key.length() + 1);
+    strcpy(pKeyBuffer, key.data());
     keyOffset.push_back(pKeyBuffer - keyBuf.data());
     pKeyBuffer += key.length() + 1;
     if (entry->NumValues() == 1) {
       const auto* svEntry =
           static_cast<const SingleValueDictEntry*>(entry.get());
       const std::string& val = svEntry->Value();
-      memcpy(pValueBuffer, val.data(), val.length() + 1);
+      strcpy(pValueBuffer, val.data());
       valueOffset.push_back(pValueBuffer - valueBuf.data());
       pValueBuffer += val.length() + 1;
     } else {
       const auto* mvEntry =
           static_cast<const MultiValueDictEntry*>(entry.get());
       for (const auto& value : mvEntry->Values()) {
-        memcpy(pValueBuffer, value.data(), value.length() + 1);
+        strcpy(pValueBuffer, value.data());
         valueOffset.push_back(pValueBuffer - valueBuf.data());
         pValueBuffer += value.length() + 1;
       }

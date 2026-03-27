@@ -16,8 +16,6 @@
  * limitations under the License.
  */
 
-#include <cstring>
-
 #include "Config.hpp"
 #include "Converter.hpp"
 #include "UTF8Util.hpp"
@@ -192,7 +190,8 @@ char* opencc_convert_utf8(opencc_t opencc, const char* input, size_t length) {
     SimpleConverter* instance = reinterpret_cast<SimpleConverter*>(opencc);
     std::string converted = instance->Convert(input, length);
     char* output = new char[converted.length() + 1];
-    memcpy(output, converted.data(), converted.length() + 1);
+    strncpy(output, converted.data(), converted.length());
+    output[converted.length()] = '\0';
     return output;
   } catch (std::runtime_error& ex) {
     cError = ex.what();

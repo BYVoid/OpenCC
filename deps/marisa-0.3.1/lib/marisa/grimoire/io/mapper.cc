@@ -3,8 +3,7 @@
  #ifndef _WIN32_WINNT
   #define _WIN32_WINNT 0x0602
  #elif _WIN32_WINNT < 0x0602
-  #undef _WIN32_WINNT
-  #define _WIN32_WINNT 0x0602
+  #error marisa-trie requires _WIN32_WINNT >= 0x0602 (Windows 8)
  #endif
  #include <sys/stat.h>
  #include <sys/types.h>

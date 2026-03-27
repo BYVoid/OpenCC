@@ -21,6 +21,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: ilammy/msvc-dev-cmd@v1
         with:

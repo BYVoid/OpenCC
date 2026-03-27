@@ -19,6 +19,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compute version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(bash scripts/compute-version.sh)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Computed version: $VERSION"
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
@@ -42,7 +52,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: opencc-python-${{ matrix.python-version }}
+          name: opencc-${{ env.VERSION }}-python-${{ matrix.python-version }}
           path: |
             pytest.xml
 
@@ -54,6 +64,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compute version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(bash scripts/compute-version.sh)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Computed version: $VERSION"
 
       - name: Build package and upload from docker (Linux)
         if: runner.os == 'Linux'
@@ -61,6 +81,7 @@ jobs:
           docker run --rm -v "${PWD}:/opt/OpenCC" \
             -e TWINE_USERNAME=__token__ \
             -e TWINE_PASSWORD=${{ secrets.PYPI_TOKEN }} \
+            -e VERSION=${VERSION} \
             ubuntu:22.04 /bin/bash /opt/OpenCC/release-pypi-linux.sh testonly
 
       - name: Build package and upload (macOS)
@@ -82,6 +103,6 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: opencc-pypi-${{ matrix.os }}
+          name: opencc-${{ env.VERSION }}-pypi-${{ matrix.os }}
           path: |
             dist/**

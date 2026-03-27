@@ -18,6 +18,12 @@
 
 #include <fstream>
 
+#ifdef _WIN32
+#include <io.h>
+#else
+#include <unistd.h>
+#endif
+
 #include "src/CmdLineOutput.hpp"
 #include "src/Config.hpp"
 #include "src/Converter.hpp"
@@ -45,6 +51,18 @@ FILE* GetOutputStream() {
 }
 
 void ConvertLineByLine() {
+#ifdef _WIN32
+  if (_isatty(_fileno(stdin))) {
+    fprintf(stderr,
+            "Reading from standard input. Press Ctrl+Z then Enter to "
+            "finish.\n");
+  }
+#else
+  if (isatty(fileno(stdin))) {
+    fprintf(stderr,
+            "Reading from standard input. Press Ctrl+D to finish.\n");
+  }
+#endif
   std::istream& inputStream = std::cin;
   FILE* fout = GetOutputStream();
   bool isFirstLine = true;

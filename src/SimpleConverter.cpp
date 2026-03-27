@@ -192,7 +192,7 @@ char* opencc_convert_utf8(opencc_t opencc, const char* input, size_t length) {
     SimpleConverter* instance = reinterpret_cast<SimpleConverter*>(opencc);
     std::string converted = instance->Convert(input, length);
     char* output = new char[converted.length() + 1];
-    memcpy(output, converted.c_str(), converted.length() + 1);
+    memcpy(output, converted.data(), converted.length() + 1);
     return output;
   } catch (std::runtime_error& ex) {
     cError = ex.what();

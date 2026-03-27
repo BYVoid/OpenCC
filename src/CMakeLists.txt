@@ -4,7 +4,7 @@ include_directories("${PROJECT_BINARY_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/src")
 
 if(NOT USE_SYSTEM_MARISA)
-  include_directories(../deps/marisa-0.2.6/include)
+  include_directories(../deps/marisa-0.3.1/include)
 endif()
 if(NOT USE_SYSTEM_RAPIDJSON)
   include_directories(../deps/rapidjson-1.1.0)

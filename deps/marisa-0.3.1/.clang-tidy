@@ -1,0 +1,91 @@
+---
+# clang-tidy configuration
+#
+# clang-tidy can be run manually like this from CMake v3.26:
+#
+#     cmake -S. -Bbuild -DCMAKE_CXX_CLANG_TIDY=clang-tidy -DCMAKE_CXX_CLANG_TIDY_EXPORT_FIXES_DIR=clang-tidy-fixes
+#     cmake --build build
+#
+# To export fixes suggested by clang-tidy, run:
+#
+#     clang-apply-replacements build/clang-tidy-fixes
+#
+# To limit the run to certain checks, run:
+#
+#     cmake -S. -Bbuild -DCMAKE_CXX_CLANG_TIDY="clang-tidy;-checks='-*,modernize-use-nodiscard'"
+#
+# clang-tidy also has several IDE integrations listed here:
+# https://clang.llvm.org/extra/clang-tidy/Integrations.html
+
+HeaderFilterRegex: ".*"
+
+# Enable most checks.
+#
+# Built-in checks:
+# https://clang.llvm.org/extra/clang-tidy/checks/list.html
+#
+# Exclusions:
+#
+# -modernize-avoid-c-arrays
+#   `std::array` is not always good replacement
+#   because its length is not deduced.
+#
+# -modernize-use-constraints
+#   C++17 does not have constraints.
+#
+# -modernize-use-trailing-return-type
+# -readability-function-cognitive-complexity
+#   Subjective and/or stylistic checks.
+Checks: >
+  -*,
+  bugprone-*,
+  cppcoreguidelines-pro-type-cstyle-cast,
+  google-runtime-int,
+  llvm-include-order,
+  llvm-namespace-comment,
+  misc-*,
+  modernize-*,
+  performance-*,
+  portability-*,
+  readability-*,
+  -readability-function-cognitive-complexity,
+  -readability-identifier-length,
+  -bugprone-easily-swappable-parameters,
+  -readability-magic-numbers,
+  -misc-non-private-member-variables-in-classes,
+  -modernize-avoid-c-arrays,
+  -modernize-use-trailing-return-type,
+  -modernize-use-constraints
+
+CheckOptions:
+  - { key: readability-identifier-naming.NamespaceCase,           value: lower_case }
+  - { key: readability-identifier-naming.ClassCase,               value: CamelCase  }
+  - { key: readability-identifier-naming.StructCase,              value: CamelCase  }
+  - { key: readability-identifier-naming.TemplateParameterCase,   value: CamelCase  }
+  - { key: readability-identifier-naming.MethodCase,              value: lower_case }
+  - { key: readability-identifier-naming.FunctionCase,            value: aNy_CasE   }
+  - { key: readability-identifier-naming.ParameterCase,           value: lower_case }
+  - { key: readability-identifier-naming.MemberCase,              value: lower_case }
+  - { key: readability-identifier-naming.VariableCase,            value: lower_case }
+  - { key: readability-identifier-naming.ClassMemberCase,         value: lower_case }
+  - { key: readability-identifier-naming.GlobalVariableCase,      value: aNy_CasE   }
+  - { key: readability-identifier-naming.GlobalFunctionCase,      value: aNy_CasE   }
+  - { key: readability-identifier-naming.ClassMemberSuffix,       value: _          }
+  - { key: readability-identifier-naming.PrivateMemberSuffix,     value: _          }
+  - { key: readability-identifier-naming.ProtectedMemberSuffix,   value: _          }
+  - { key: readability-identifier-naming.EnumConstantCase,        value: UPPER_CASE }
+  - { key: readability-identifier-naming.ConstexprVariableCase,   value: CamelCase  }
+  - { key: readability-identifier-naming.GlobalConstantCase,      value: CamelCase  }
+  - { key: readability-identifier-naming.MemberConstantCase,      value: CamelCase  }
+  - { key: readability-identifier-naming.StaticConstantCase,      value: CamelCase  }
+
+  # Use <cstdint> fixed-width integer types instead of short, long and long long
+  - { key: google-runtime-int.UnsignedTypePrefix, value: "uint" }
+  - { key: google-runtime-int.SignedTypePrefix, value: "int" }
+  - { key: google-runtime-int.TypeSuffix, value: "_t" }
+
+  # `int8_t` aren't used as chars, disable misleading warning.
+  - { key: bugprone-signed-char-misuse.CharTypdefsToIgnore, value: "int8_t" }
+
+  # Single char loop counters are OK.
+  - { key: readability-identifier-length.MinimumLoopCounterNameLength, value: 1 }

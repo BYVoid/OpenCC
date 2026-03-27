@@ -10,8 +10,8 @@
         "../node",
         "../src",
         "../deps/rapidjson-1.1.0",
-        "../deps/marisa-0.2.6/include",
-        "../deps/marisa-0.2.6/lib",
+        "../deps/marisa-0.3.1/include",
+        "../deps/marisa-0.3.1/lib",
         "<!(node -e \"require('nan')\")"
       ]
     }

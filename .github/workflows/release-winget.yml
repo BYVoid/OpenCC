@@ -31,10 +31,14 @@ jobs:
       - name: Resolve version
         id: version
         shell: pwsh
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.version }}
+          GIT_REF_TYPE: ${{ github.ref_type }}
+          GIT_REF_NAME: ${{ github.ref_name }}
         run: |
-          $value = "${{ github.event.inputs.version }}"
-          if (-not $value -and "${{ github.ref_type }}" -eq "tag") {
-            $value = "${{ github.ref_name }}"
+          $value = $env:INPUT_VERSION
+          if (-not $value -and $env:GIT_REF_TYPE -eq "tag") {
+            $value = $env:GIT_REF_NAME
           }
           if ($value.StartsWith("ver.")) {
             $clean = $value.Substring(4)
@@ -47,11 +51,14 @@ jobs:
 
       - name: Build portable release and WinGet manifests
         shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
+          GITHUB_REPO: ${{ github.repository }}
         run: |
           ./scripts/release-windows-winget.ps1 `
-            -Version "${{ steps.version.outputs.value }}" `
+            -Version "$env:RELEASE_VERSION" `
             -OutputDir release `
-            -GitHubRepository "${{ github.repository }}" `
+            -GitHubRepository "$env:GITHUB_REPO" `
             -PackageIdentifier "BYVoid.OpenCC" `
             -Publisher "BYVoid"
 

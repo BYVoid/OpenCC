@@ -123,7 +123,7 @@ void SerializedValues::ConstructBuffer(std::string* valueBuffer,
   }
   // Write values to the buffer.
   valueBuffer->resize(*valueTotalLength, '\0');
-  char* pValueBuffer = const_cast<char*>(valueBuffer->c_str());
+  char* pValueBuffer = valueBuffer->data();
   for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
     for (const auto& value : entry->Values()) {
       memcpy(pValueBuffer, value.c_str(), value.length() + 1);
@@ -131,5 +131,5 @@ void SerializedValues::ConstructBuffer(std::string* valueBuffer,
       pValueBuffer += value.length() + 1;
     }
   }
-  assert(valueBuffer->c_str() + *valueTotalLength == pValueBuffer);
+  assert(valueBuffer->data() + *valueTotalLength == pValueBuffer);
 }

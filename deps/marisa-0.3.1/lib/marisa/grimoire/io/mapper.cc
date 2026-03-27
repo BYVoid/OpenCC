@@ -3,7 +3,9 @@
  #ifndef _WIN32_WINNT
   #define _WIN32_WINNT 0x0602
  #elif _WIN32_WINNT < 0x0602
-  #error marisa-trie requires _WIN32_WINNT >= 0x0602 (Windows 8)
+  #define MARISA_STRINGIFY_(x) #x
+ #define MARISA_STRINGIFY(x) MARISA_STRINGIFY_(x)
+ #error marisa-trie requires _WIN32_WINNT >= 0x0602 (Windows 8), got _WIN32_WINNT = MARISA_STRINGIFY(_WIN32_WINNT)
  #endif
  #include <sys/stat.h>
  #include <sys/types.h>

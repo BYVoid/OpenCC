@@ -38,20 +38,20 @@ if [ -z "$RAW" ]; then
   exit 0
 fi
 
-# Case 1: Exact tag (e.g. v1.2.3-0-gabc1234 from --long)
+# Case 1: Exact tag (e.g. v1.2.3-0-gabc1234 or ver.1.2.3-0-gabc1234 from --long)
 # NOTE: version tag patterns here must be kept in sync with cmake/GitVersion.cmake
-if [[ "$RAW" =~ ^(v[0-9]+\.[0-9]+\.[0-9]+)-0-g[0-9a-f]+$ ]]; then
-  TAG="${BASH_REMATCH[1]}"
-  echo "${TAG}${DIRTY}"
+if [[ "$RAW" =~ ^(v|ver\.)([0-9]+\.[0-9]+\.[0-9]+)-0-g[0-9a-f]+$ ]]; then
+  BASE="${BASH_REMATCH[2]}"
+  echo "v${BASE}${DIRTY}"
   exit 0
 fi
 
-# Case 2: Dev build with tag (e.g. v1.2.3-4-gabc1234)
-if [[ "$RAW" =~ ^(v[0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)-g([0-9a-f]+)$ ]]; then
-  BASE="${BASH_REMATCH[1]}"
-  COUNT="${BASH_REMATCH[2]}"
-  SHA="${BASH_REMATCH[3]}"
-  echo "${BASE}.dev${COUNT}+g${SHA}${DIRTY}"
+# Case 2: Dev build with tag (e.g. v1.2.3-4-gabc1234 or ver.1.2.3-4-gabc1234)
+if [[ "$RAW" =~ ^(v|ver\.)([0-9]+\.[0-9]+\.[0-9]+)-([0-9]+)-g([0-9a-f]+)$ ]]; then
+  BASE="${BASH_REMATCH[2]}"
+  COUNT="${BASH_REMATCH[3]}"
+  SHA="${BASH_REMATCH[4]}"
+  echo "v${BASE}.dev${COUNT}+g${SHA}${DIRTY}"
   exit 0
 fi
 

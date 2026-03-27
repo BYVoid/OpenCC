@@ -15,6 +15,46 @@ _build_dir = os.path.join(_this_dir, 'build', 'python')
 _cmake_file = os.path.join(_this_dir, 'CMakeLists.txt')
 _author_file = os.path.join(_this_dir, 'AUTHORS')
 _readme_file = os.path.join(_this_dir, 'README.md')
+_fallback_version = '1.2.1'
+
+
+def _get_version_from_git():
+    try:
+        raw = subprocess.check_output(
+            ['git', 'describe', '--tags', '--long', '--always'],
+            cwd=_this_dir,
+            stderr=subprocess.DEVNULL,
+        ).decode('utf-8').strip()
+    except (OSError, subprocess.CalledProcessError):
+        return ''
+
+    dirty = ''
+    for diff_cmd in (['git', 'diff', '--quiet'], ['git', 'diff', '--cached', '--quiet']):
+        try:
+            subprocess.check_call(
+                diff_cmd,
+                cwd=_this_dir,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+        except (OSError, subprocess.CalledProcessError):
+            dirty = '.dirty'
+            break
+
+    release_match = re.match(r'^(?:v|ver\.)(\d+\.\d+\.\d+)-0-g[0-9a-f]+$', raw)
+    if release_match:
+        return '{}{}'.format(release_match.group(1), dirty)
+
+    dev_match = re.match(r'^(?:v|ver\.)(\d+\.\d+\.\d+)-(\d+)-g([0-9a-f]+)$', raw)
+    if dev_match:
+        return '{}.dev{}+g{}{}'.format(
+            dev_match.group(1),
+            dev_match.group(2),
+            dev_match.group(3),
+            dirty,
+        )
+
+    return '{}+g{}{}'.format(_fallback_version, raw, dirty)
 
 
 def get_version_info():
@@ -24,23 +64,11 @@ def get_version_info():
         # Strip leading 'v' prefix for PEP 440 compatibility
         return env_version.lstrip('v')
 
-    # Fallback: parse version from CMakeLists.txt
-    version_info = ['1', '0', '0']
-    version_pattern = re.compile(
-        r'OPENCC_VERSION_(MAJOR|MINOR|REVISION) (\d+)')
-    with open(_cmake_file, 'rb') as f:
-        for l in f:
-            match = version_pattern.search(l.decode('utf-8'))
-            if not match:
-                continue
-            if match.group(1) == 'MAJOR':
-                version_info[0] = match.group(2)
-            elif match.group(1) == 'MINOR':
-                version_info[1] = match.group(2)
-            elif match.group(1) == 'REVISION':
-                version_info[2] = match.group(2)
-    version = '.'.join(version_info)
-    return version
+    git_version = _get_version_from_git()
+    if git_version:
+        return git_version
+
+    return _fallback_version
 
 
 def get_author_info():

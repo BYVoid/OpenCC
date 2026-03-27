@@ -23,12 +23,12 @@ eval "$(conda shell.bash hook)"
 conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
 conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
 
-for PYVER in 3.9 3.10 3.11 3.12 3.13 3.14; do
+for PYTHON_VERSION in 3.9 3.10 3.11 3.12 3.13 3.14; do
     # Create and activate environment
     conda config --add channels conda-forge
     conda config --set channel_priority strict
-    conda create -y -n py$PYVER python=$PYVER
-    conda activate py$PYVER
+    conda create -y -n py$PYTHON_VERSION python=$PYTHON_VERSION
+    conda activate py$PYTHON_VERSION
 
     # Build and package
     pip install --no-cache-dir build

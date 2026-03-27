@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+#include <cstring>
 #include <fstream>
 
 #ifdef _WIN32

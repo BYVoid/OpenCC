@@ -12,6 +12,8 @@ concurrency:
 
 jobs:
   build-and-test:
+    permissions:
+      contents: read
     runs-on: windows-latest
     strategy:
       matrix:

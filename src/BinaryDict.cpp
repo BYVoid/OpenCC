@@ -168,28 +168,30 @@ void BinaryDict::ConstructBuffer(std::string& keyBuf,
   // Write keys and values to buffers
   keyBuf.resize(keyTotalLength, '\0');
   valueBuf.resize(valueTotalLength, '\0');
-  char* pKeyBuffer = const_cast<char*>(keyBuf.c_str());
-  char* pValueBuffer = const_cast<char*>(valueBuf.c_str());
+  char* pKeyBuffer = keyBuf.data();
+  char* pValueBuffer = valueBuf.data();
   for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
-    strcpy(pKeyBuffer, entry->Key().c_str());
-    keyOffset.push_back(pKeyBuffer - keyBuf.c_str());
-    pKeyBuffer += entry->KeyLength() + 1;
+    const std::string& key = entry->Key();
+    strcpy(pKeyBuffer, key.c_str());
+    keyOffset.push_back(pKeyBuffer - keyBuf.data());
+    pKeyBuffer += key.length() + 1;
     if (entry->NumValues() == 1) {
       const auto* svEntry =
           static_cast<const SingleValueDictEntry*>(entry.get());
-      strcpy(pValueBuffer, svEntry->Value().c_str());
-      valueOffset.push_back(pValueBuffer - valueBuf.c_str());
-      pValueBuffer += svEntry->Value().length() + 1;
+      const std::string& val = svEntry->Value();
+      strcpy(pValueBuffer, val.c_str());
+      valueOffset.push_back(pValueBuffer - valueBuf.data());
+      pValueBuffer += val.length() + 1;
     } else {
       const auto* mvEntry =
           static_cast<const MultiValueDictEntry*>(entry.get());
       for (const auto& value : mvEntry->Values()) {
         strcpy(pValueBuffer, value.c_str());
-        valueOffset.push_back(pValueBuffer - valueBuf.c_str());
+        valueOffset.push_back(pValueBuffer - valueBuf.data());
         pValueBuffer += value.length() + 1;
       }
     }
   }
-  assert(keyBuf.c_str() + keyTotalLength == pKeyBuffer);
-  assert(valueBuf.c_str() + valueTotalLength == pValueBuffer);
+  assert(keyBuf.data() + keyTotalLength == pKeyBuffer);
+  assert(valueBuf.data() + valueTotalLength == pValueBuffer);
 }

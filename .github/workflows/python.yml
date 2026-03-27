@@ -12,6 +12,8 @@ concurrency:
 
 jobs:
   unit-test:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -57,6 +59,8 @@ jobs:
             pytest.xml
 
   test-pypi:
+    permissions:
+      contents: read
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, macos-14, windows-latest]

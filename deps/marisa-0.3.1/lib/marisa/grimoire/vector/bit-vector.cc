@@ -22,7 +22,16 @@ inline std::size_t countr_zero(uint64_t x) {
 inline std::size_t countr_zero(uint64_t x) {
  #ifdef _MSC_VER
   unsigned long pos;
+  #if defined(_M_X64) || defined(_M_ARM64)
   ::_BitScanForward64(&pos, x);
+  #else
+  // _BitScanForward64 is not available on 32-bit MSVC targets.
+  if (::_BitScanForward(&pos, static_cast<unsigned long>(x))) {
+    return pos;
+  }
+  ::_BitScanForward(&pos, static_cast<unsigned long>(x >> 32));
+  pos += 32;
+  #endif
   return pos;
  #else   // _MSC_VER
   return __builtin_ctzll(x);

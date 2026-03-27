@@ -1,12 +1,4 @@
 #if (defined _WIN32) || (defined _WIN64)
- // Require Windows 8+ for PrefetchVirtualMemory / WIN32_MEMORY_RANGE_ENTRY
- #ifndef _WIN32_WINNT
-  #define _WIN32_WINNT 0x0602
- #elif _WIN32_WINNT < 0x0602
-  #define MARISA_STRINGIFY_(x) #x
- #define MARISA_STRINGIFY(x) MARISA_STRINGIFY_(x)
- #error marisa-trie requires _WIN32_WINNT >= 0x0602 (Windows 8), got _WIN32_WINNT = MARISA_STRINGIFY(_WIN32_WINNT)
- #endif
  #include <sys/stat.h>
  #include <sys/types.h>
  #include <windows.h>
@@ -138,12 +130,14 @@ void Mapper::open_(const char *filename, int flags) {
   MARISA_THROW_SYSTEM_ERROR_IF(origin_ == nullptr, ::GetLastError(),
                                std::system_category(), "MapViewOfFile");
 
+#if defined(_WIN32_WINNT) && _WIN32_WINNT >= 0x0602
   if (flags & MARISA_MAP_POPULATE) {
     WIN32_MEMORY_RANGE_ENTRY range_entry;
     range_entry.VirtualAddress = origin_;
     range_entry.NumberOfBytes = size_;
     ::PrefetchVirtualMemory(GetCurrentProcess(), 1, &range_entry, 0);
   }
+#endif
 
   ptr_ = static_cast<const char *>(origin_);
   avail_ = size_;

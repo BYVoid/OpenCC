@@ -30,6 +30,14 @@ using bazel::tools::cpp::runfiles::Runfiles;
 
 namespace opencc {
 
+static FILE* OpenFile(const std::string& path) {
+#ifdef _MSC_VER
+  return _wfopen(UTF8Util::GetPlatformString(path).c_str(), L"rb");
+#else
+  return fopen(UTF8Util::GetPlatformString(path).c_str(), "rb");
+#endif
+}
+
 class DictionaryTest : public ::testing::Test,
                        public ::testing::WithParamInterface<std::string> {
 protected:
@@ -70,8 +78,7 @@ INSTANTIATE_TEST_SUITE_P(
 TEST_P(DictionaryTest, UniqueSortedTest) {
   const std::string dictionaryFileName =
       runfiles_->Rlocation("_main/data/dictionary/" + GetParam() + ".txt");
-  FILE* fp =
-      fopen(UTF8Util::GetPlatformString(dictionaryFileName).c_str(), "rb");
+  FILE* fp = OpenFile(dictionaryFileName);
   ASSERT_NE(fp, nullptr);
   LexiconPtr lexicon = Lexicon::ParseLexiconFromFile(fp);
   EXPECT_TRUE(lexicon->IsUnique()) << GetParam() << " has duplicated keys.";
@@ -81,16 +88,14 @@ TEST_P(DictionaryTest, UniqueSortedTest) {
 TEST_P(DictionaryTest, BinaryTest) {
   const std::string binaryDictionaryFileName =
       runfiles_->Rlocation("_main/data/dictionary/" + GetParam() + ".ocd2");
-  FILE* fp_bin = fopen(
-      UTF8Util::GetPlatformString(binaryDictionaryFileName).c_str(), "rb");
+  FILE* fp_bin = OpenFile(binaryDictionaryFileName);
   ASSERT_NE(fp_bin, nullptr);
   MarisaDictPtr dict = MarisaDict::NewFromFile(fp_bin);
   ASSERT_NE(dict, nullptr);
 
   const std::string textDictionaryFileName =
       runfiles_->Rlocation("_main/data/dictionary/" + GetParam() + ".txt");
-  FILE* fp_txt =
-      fopen(UTF8Util::GetPlatformString(textDictionaryFileName).c_str(), "rb");
+  FILE* fp_txt = OpenFile(textDictionaryFileName);
   ASSERT_NE(fp_txt, nullptr);
   LexiconPtr txt_lexicon = Lexicon::ParseLexiconFromFile(fp_txt);
 
@@ -104,7 +109,7 @@ TEST_F(DictionaryRunfilesTest, TWPhrasesReverseMapping) {
       runfiles_->Rlocation("_main/data/dictionary/TWPhrasesRev.txt");
 
   auto loadLexicon = [](const std::string& path) -> LexiconPtr {
-    FILE* fp = fopen(UTF8Util::GetPlatformString(path).c_str(), "rb");
+    FILE* fp = OpenFile(path);
     EXPECT_NE(fp, nullptr) << path;
     if (fp == nullptr) {
       return LexiconPtr();

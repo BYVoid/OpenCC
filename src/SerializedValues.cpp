@@ -92,14 +92,23 @@ std::shared_ptr<SerializedValues> SerializedValues::NewFromFile(FILE* fp) {
 
   // Offsets
   const char* pValueBuffer = valueBuffer.c_str();
+  const char* pValueBufferEnd = pValueBuffer + valueTotalLength;
   for (uint32_t i = 0; i < numItems; i++) {
     // Number of values
     uint16_t numValues = ReadInteger<uint16_t>(fp);
     // Value offset
     std::vector<std::string> values;
     for (uint16_t j = 0; j < numValues; j++) {
-      const char* value = pValueBuffer;
       uint16_t numValueBytes = ReadInteger<uint16_t>(fp);
+      if (numValueBytes == 0 || pValueBuffer + numValueBytes > pValueBufferEnd) {
+        throw InvalidFormat(
+            "Invalid OpenCC binary dictionary (value offset out of bounds)");
+      }
+      if (pValueBuffer[numValueBytes - 1] != '\0') {
+        throw InvalidFormat(
+            "Invalid OpenCC binary dictionary (value not null-terminated)");
+      }
+      const char* value = pValueBuffer;
       pValueBuffer += numValueBytes;
       values.push_back(value);
     }

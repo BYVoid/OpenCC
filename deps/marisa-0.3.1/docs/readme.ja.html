@@ -1,0 +1,791 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "https://www.w3.org/TR/html4/strict.dtd">
+<html lang="ja">
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>MARISA: Matching Algorithm with Recursively Implemented StorAge</title>
+  <link rel="stylesheet" type="text/css" href="./style.css">
+ </head>
+ <body>
+  <div id="header">
+   <div class="left">MARISA: Matching Algorithm with Recursively Implemented StorAge</div>
+   <div class="right">Last modified: 20 Jul 2025</div>
+   <div class="end"></div>
+  </div><!-- header -->
+  <div id="body">
+   <h1>MARISA: Matching Algorithm with Recursively Implemented StorAge</h1>
+   <p id="abstract">
+    <span id="heading">Abstract: </span>
+     Matching Algorithm with Recursively Implemented StorAge (MARISA) は Trie をコンパクトに表現する程度の能力を持つデータ構造です．libmarisa は MARISA を C++ で実装したライブラリであり，MARISA による辞書を構築したり，辞書からの検索をおこなったりできます．libmarisa の基本的な機能に対応するコマンドラインツールを用意しているので，辞書のサイズがどのくらいになるのか，検索にどのくらい時間がかかるのか，などを手軽に試すことができます．
+   </p><!-- abstract -->
+
+   <div class="section">
+    <h2><a name="introduction">はじめに</a></h2>
+    <div class="subsection">
+     <h3><a name="overview">概要</a></h3>
+     <p>
+      Matching Algorithm with Recursively Implemented StorAge (MARISA) は Trie に対するコンパクトなデータ構造であり，動的な更新には対応していないものの，高い空間効率とそれなりの時間効率を実現できます．また，Trie の特徴を引き継いでいるため，MARISA による辞書は，単純な辞書引きだけでなく，逆引き，Common Prefix Search や Predictive Search を効率良く実現できます．
+     </p>
+     <p>
+      ほとんどの場合，MARISA による辞書は，登録文字列の集合を連結してできるテキストと比べて，ずっとコンパクトになります．そのため，登録文字列をそのまま保持する標準的な二分探索木やハッシュ表と比べると，ずーっとコンパクトです．一方で，確率的なデータ構造である Bloom Filter と比べてみると，空間効率の面では劣りますが，False Positive がなく，逆引きに加えて Common Prefix Search や Predictive Search を効率良く実現できることが特徴になります．
+     </p>
+     <p>
+      libmarisa は MARISA を C++ で実装したライブラリであり，MARISA による辞書を構築したり，辞書からの検索をおこなったりできます．libmarisa の基本的な機能に対応するコマンドラインツールを用意しているので，辞書のサイズがどのくらいになるのか，検索にどのくらい時間がかかるのか，などを手軽に試すことができます．
+     </p>
+    </div><!-- subsection -->
+    <div class="subsection">
+     <h3><a name="ability">できること</a></h3>
+     <p>
+      libmarisa による辞書の構築では，登録文字列に <var>0</var> から順に固有の ID を割り当てるようになっています．ID は自動的に割り当てられるので，登録文字列に任意の ID を割り当てることはできません．検索においては，文字列あるいは ID をクエリとして受け取り，適合する登録文字列と ID の組を検索結果として返すようになっています．
+     </p>
+     <ul>
+      <li>辞書引き（Lookup）
+       <ul>
+        <li>入力文字列が登録されているかどうかを確認します．</li>
+       </ul>
+      </li>
+      <li>逆引き（Reverse Lookup）
+       <ul>
+        <li>入力された ID から登録文字列を復元します．</li>
+       </ul>
+      </li>
+      <li>Common Prefix Search
+       <ul>
+        <li>入力文字列の前半部分に一致する登録文字列を検索します．</li>
+       </ul>
+      </li>
+      <li>Predictive Search
+       <ul>
+        <li>入力文字列で始まる登録文字列を検索します．</li>
+       </ul>
+      </li>
+     </ul>
+    </div><!-- subsection -->
+   </div><!-- section -->
+   <div class="section">
+    <h2><a name="source">ソースコード</a></h2>
+    <div class="subsection">
+     <h3><a name="license">ライセンス</a></h3>
+     <p>
+      libmarisa および付属のコマンドラインツールはフリーソフトウェアです．使用・再配布については， BSD-2-Clause OR LGPL-2.1-or-later を採用しています．
+     </p>
+    </div><!-- subsection -->
+    <div class="subsection">
+     <h3><a name="download">ダウンロード</a></h3>
+     <p>
+      プロジェクトの管理やソースコードの配布には <a href="https://github.com/">GitHub</a> を利用しています．
+     </p>
+     <ul>
+      <li>プロジェクト
+       <ul>
+        <li><a href="https://github.com/s-yata/marisa-trie">https://github.com/s-yata/marisa-trie</a></li>
+       </ul>
+      </li>
+      <li>ソースコード
+       <ul>
+        <li><a href="https://github.com/s-yata/marisa-trie/archive/refs/tags/v0.3.1.tar.gz">marisa-trie-0.3.1.tar.gz</a></li>
+       </ul>
+      </li>
+     </ul>
+    </div><!-- subsection -->
+   </div><!-- section -->
+
+   <div class="section">
+    <h2><a name="install">インストール</a></h2>
+    <div class="subsection">
+     <h3><a name="gcc">GCC &amp; Clang</a></h3>
+     <div class="float">
+      <pre class="console">$ tar zxf marisa-trie-0.3.1.tar.gz
+$ cd marisa-trie-0.3.1
+$ cmake -S. -Bbuild-rel -DCMAKE_BUILD_TYPE=Release
+$ cmake --build build-rel
+$ cmake --install build-rel</pre>
+     </div><!-- float -->
+     <p>
+      <kbd>cmake</kbd> を使ってビルド，インストールできるようになっています．インストール先を変更したいときは，最初の <kbd>cmake</kbd> に <kbd>-DCMAKE_INSTALL_PREFIX</kbd> で指定してください．<kbd>cmake --install</kbd> については，必要に応じて <kbd>sudo</kbd> を付けてご利用ください．特に指定がなければ libmarisa はスタティックライブラリとしてインストールされます．
+     </p>
+     <div class="float">
+      <pre class="console">$ cmake --install build-rel --component Library</pre>
+     </div><!-- float -->
+     <p>
+      ツールが不要でライブラリのみをインストールしたいときは，<kbd>cmake --install</kbd> に <kbd>--component Library</kbd> を指定してください．
+     </p>
+     <div class="float">
+      <pre class="console">$ cmake --install build-rel --component Binaries</pre>
+     </div><!-- float -->
+     <p>
+      ツールのみをインストールしたいときは，<kbd>cmake --install</kbd> に <kbd>--component Binaries</kbd> を指定してください．
+     </p>
+     <div class="float">
+      <pre class="console">$ cmake -S. -Bbuild-rel -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON</pre>
+     </div><!-- float -->
+     <p>
+      共有ライブラリをビルド，インストールしたいときは，最初の <kbd>cmake</kbd> に追加で <kbd>-DBUILD_SHARED_LIBS=ON</kbd> を渡します．後の手順は同様です．
+     </p>
+     <div class="float">
+      <pre class="console">$ cmake -S. -Bbuild-rel -DCMAKE_BUILD_TYPE=Release -DENABLE_NATIVE_CODE=ON</pre>
+     </div><!-- float -->
+     <p>
+      各種 SIMD 命令が使える環境では，最初の <kbd>cmake</kbd> に追加で <kbd>-DENABLE_NATIVE_CODE=ON</kbd> を渡すことで，コンパイル環境で使える命令が有効になり，libmarisa の性能が向上します．
+     </p>
+    </div><!-- subsection -->
+    <div class="subsection">
+     <h3><a name="vs">Visual Studio 2022</a></h3>
+     <p>
+      アーカイブを展開して作成されたフォルダを Visual Studio 2022 で開けば，CMakeLists.txt が自動で検出されて，プロジェクトが作成されます．デフォルトではデバッグモードでスタティックライブラリ <kbd>marisa.lib</kbd> とコマンドラインツールをビルドするようになっています．
+     </p>
+    </div><!-- subsection -->
+    <div class="subsection">
+     <h3><a name="perl">Perl バインディング</a></h3>
+     <div class="float">
+      <pre class="console">$ cd bindings/perl
+$ perl Makefile.PL
+$ make
+$ make install</pre>
+     </div><!-- float -->
+     <p>
+      <a href="https://www.swig.org/">SWIG</a> による Perl バインディングが <kbd>bindings/perl/</kbd> にあります．<kbd>perl Makefile.PL</kbd> により <kbd>Makefile</kbd> を作成し，<kbd>make install</kbd> を実行することでインストールできます．使い方については，<kbd>bindings/perl/sample.pl</kbd> を参考にしてください．
+     </p>
+    </div><!-- subsection -->
+    <div class="subsection">
+     <h3><a name="python">Python バインディング</a></h3>
+     <div class="float">
+      <pre class="console">$ cd bindings/python3
+$ python3 setup.py build
+$ python3 setup.py install</pre>
+     </div><!-- float -->
+     <p>
+      <a href="https://www.swig.org/">SWIG</a> による Python バインディングが <kbd>bindings/python3/</kbd> にあります．<kbd>python3 setup.py install</kbd> により インストールできます．使い方については，<kbd>bindings/python3/sample.py</kbd> を参考にしてください． <kbd>bindings/python/</kbd> には古い Python バインディングがあり，互換性のために残されています．
+     </p>
+    </div><!-- subsection -->
+    <div class="subsection">
+     <h3><a name="ruby">Ruby バインディング</a></h3>
+     <div class="float">
+      <pre class="console">$ cd bindings/ruby
+$ ruby extconf.rb
+$ make
+$ make install</pre>
+     </div><!-- float -->
+     <p>
+      <a href="https://www.swig.org/">SWIG</a> による Ruby バインディングが <kbd>bindings/ruby/</kbd> にあります．<kbd>ruby extconf.rb</kbd> により <kbd>Makefile</kbd> を作成し，<kbd>make install</kbd> を実行することでインストールできます．使い方については，<kbd>bindings/ruby/sample.rb</kbd> を参考にしてください．
+     </p>
+    </div><!-- subsection -->
+    <div class="subsection">
+     <h3><a name="others">その他</a></h3>
+     <p>
+      上記以外のバインディングもあります．
+     </p>
+     <ul>
+      <li>Python
+       <ul>
+        <li><a href="https://github.com/pytries/marisa-trie">https://github.com/pytries/marisa-trie</a>高速・高機能な Python バインディング</li>
+       </ul>
+      </li>
+     </ul>
+    </div><!-- subsection -->
+   </div><!-- section -->
+
+   <div class="section">
+    <h2><a name="tools">コマンドラインツール</a></h2>
+    <div class="subsection">
+     <h3><a name="marisa-build">marisa-build</a></h3>
+     <div class="float">
+      <pre class="console">$ marisa-build &lt; keyset.txt &gt; keyset.dic
+#keys: 1342099
+#nodes: 1832373
+size: 7841664</pre>
+     </div><!-- float -->
+     <p>
+      <kbd>marisa-build</kbd> は辞書を構築するツールです．改行を区切りとして文字列を受け取り，構築した辞書を標準出力に書き出すようになっています．
+     </p>
+     <p>
+      構築する辞書のパラメータについては，オプションを使って指定できます．オプションの一覧は <kbd>marisa-build -h</kbd> により確認できます．
+     </p>
+     <p>
+      入力は改行区切りとなっていますが，水平タブが存在する行については，最後の水平タブ以降を文字列の重みとして扱うようになっています．文字列の出現頻度や出現確率を与えることにより，検索時間を短縮できる可能性があります．
+     </p>
+    </div><!-- subsection -->
+    <div class="subsection">
+     <h3><a name="marisa-lookup">marisa-lookup</a></h3>
+     <div class="float">
+      <pre class="console">$ marisa-lookup keyset.dic
+東方
+174385	東方
+とうほう
+-1	とうほう</pre>
+     </div><!-- float -->
+     <p>
+      <kbd>marisa-lookup</kbd> は単純な辞書引きをおこなうツールです．入力された文字列が登録されていれば ID とともに出力し，登録されていなければ <var>-1</var> とともに出力します．
+     </p>
+     <p>
+      オプションの一覧は <kbd>marisa-lookup -h</kbd> により確認できます．
+     </p>
+    </div><!-- subsection -->
+    <div class="subsection">
+     <h3><a name="marisa-reverse-lookup">marisa-reverse-lookup</a></h3>
+     <div class="float">
+      <pre class="console">$ marisa-reverse-lookup keyset.dic
+800000
+800000	紀元前475年</pre>
+     </div><!-- float -->
+     <p>
+      <kbd>marisa-reverse-lookup</kbd> は辞書に登録されている文字列を ID から復元するツールです．登録文字列には <var>0</var> から順に固有の ID が割り当てられるので，指定できる値は <var>0</var> 以上で<var>登録文字列数</var>より小さい整数となります．範囲外の値を入力するとエラーになるので注意してください．
+     </p>
+     <p>
+      オプションの一覧は <kbd>marisa-reverse-lookup -h</kbd> により確認できます．
+     </p>
+    </div><!-- subsection -->
+    <div class="subsection">
+     <h3><a name="marisa-common-prefix-search">marisa-common-prefix-search</a></h3>
+     <div class="float">
+      <pre class="console">$ marisa-common-prefix-search keyset.dic
+東方
+2 found
+3542	東	東方
+174385	東方	東方</pre>
+     </div><!-- float -->
+     <p>
+      <kbd>marisa-common-prefix-search</kbd> は Common Prefix Search をおこなうツールです．入力された文字列の前半部分に一致する登録文字列を ID とともに出力します．
+     </p>
+     <p>
+      オプションの一覧は <kbd>marisa-common-prefix-search -h</kbd> により確認できます．
+     </p>
+    </div><!-- subsection -->
+    <div class="subsection">
+     <h3><a name="marisa-predictive-search">marisa-predictive-search</a></h3>
+     <div class="float">
+      <pre class="console">$ marisa-predictive-search keyset.dic -n 2
+東方
+200 found
+174385	東方	東方
+639679	東方文花帖	東方</pre>
+     </div><!-- float -->
+     <p>
+      <kbd>marisa-predictive-search</kbd> は Predictive Search をおこなうツールです．入力された文字列で始まる登録文字列を ID とともに出力します．
+     </p>
+     <p>
+      オプションの一覧は <kbd>marisa-predictive-search -h</kbd> により確認できます．
+     </p>
+    </div><!-- subsection -->
+    <div class="subsection">
+     <h3><a name="marisa-benchmark">marisa-benchmark</a></h3>
+     <div class="float">
+      <pre class="console">$ marisa-benchmark keyset.txt
+Number of tries: 1 - 5
+TAIL mode: Text mode
+Node order: Descending weight order
+Cache level: Normal cache
+Number of keys: 1342099
+Total length: 28308027
+------+----------+--------+--------+--------+--------+--------
+#tries       size    build   lookup  reverse   prefix  predict
+                                      lookup   search   search
+          [bytes]    [K/s]    [K/s]    [K/s]    [K/s]    [K/s]
+------+----------+--------+--------+--------+--------+--------
+     1   11588904   506.45  1187.70  1109.17  1040.39   596.49
+     2    8467920   424.71   699.01   677.83   636.07   300.25
+     3    7841664   405.47   615.64   601.84   563.91   254.67
+     4    7633584   399.43   593.85   583.52   545.57   242.69
+     5    7548584   395.90   526.31   563.91   504.55   236.70
+------+----------+--------+--------+--------+--------+--------</pre>
+     </div><!-- float -->
+     <p>
+      <kbd>marisa-benchmark</kbd> は，<kbd>marisa-build</kbd> と同様の入力を受け取り，辞書のサイズや構築・検索にかかる時間を調べるツールです．辞書を構成する Trie の数を選択するのに有用です．
+     </p>
+     <p>
+      検索時間については，入力された文字列を一通り検索するのに要した時間を <code>std::clock()</code> で計測した結果を出力します．文字列を整列してから入力とした場合はキャッシュが効きやすい状況での検索時間になり，文字列をランダムに並べ替えてから入力とした場合はキャッシュが効きにくい状況での検索時間になります．
+     </p>
+     <p>
+      オプションの一覧は <kbd>marisa-benchmark -h</kbd> により確認できます．
+     </p>
+    </div><!-- subsection -->
+    <div class="subsection">
+     <h3><a name="marisa-dump">marisa-dump</a></h3>
+     <div class="float">
+      <pre class="console">$ marisa-dump keyset.dic | head -3
+input: keyset.dic
+フ
+ファ
+ファン</pre>
+     </div><!-- float -->
+     <p>
+      <kbd>marisa-dump</kbd> は辞書に登録されている文字列をすべて出力するツールです．デフォルトの区切り文字は改行（LF）ですが，オプションにより変更することができます．
+     </p>
+     <p>
+      オプションの一覧は <kbd>marisa-dump -h</kbd> により確認できます．
+     </p>
+    </div><!-- subsection -->
+   </div><!-- section -->
+
+   <div class="section">
+    <h2><a name="library">ライブラリ</a></h2>
+    <div class="subsection">
+     <h3><a name="howto">使い方</a></h3>
+     <div class="float">
+      <pre class="code">// sample.cc
+#include &lt;iostream&gt;
+#include &lt;marisa.h&gt;
+
+int main() {
+  marisa::Keyset keyset;
+  keyset.push_back("a");
+  keyset.push_back("app");
+  keyset.push_back("apple");
+
+  marisa::Trie trie;
+  trie.build(keyset);
+
+  marisa::Agent agent;
+  agent.set_query("apple");
+  while (trie.common_prefix_search(agent)) {
+    std::cout.write(agent.key().ptr(), agent.key().length());
+    std::cout &lt;&lt; ": " &lt;&lt; agent.key().id() &lt;&lt; std::endl;
+  }
+  return 0;
+}</pre>
+     </div><!-- float -->
+     <div class="float">
+      <pre class="console">$ g++ sample.cc -lmarisa
+$ ./a.out
+a: 0
+app: 1
+apple: 2</pre>
+     </div><!-- float -->
+     <p>
+      libmarisa のヘッダは <kbd>marisa.h</kbd> です．名前空間には <code>marisa</code> を使っています．危険なので，<code>using namespace marisa</code> とするのは避けてください．最後に，<kbd>gcc</kbd> や <kbd>clang</kbd> によるリンクでは <kbd>-lmarisa</kbd> が必要となることに注意してください．
+     </p>
+     <p>
+      libmarisa の主要なクラスは <a href="#keyset">Keyset</a>, <a href="#agent">Agent</a>, <a href="#trie">Trie</a> の 3 つです．サンプルコードでは明示的に使っていませんが，例外のクラスとして <a href="#exception">Exception</a> があるほか，<code>Keyset</code>, <code>Agent</code> のメンバとして <a href="#key">Key</a> や <a href="#query">Query</a> が存在します．
+     </p>
+     <ul>
+      <li><code>Keyset</code>: 文字列の集合を格納するクラスです．辞書を構築するときの入力として使うほか，検索結果の保存にも利用できます．</li>
+      <li><code>Agent</code>: 検索の入出力と途中経過を格納するクラスです．検索用の関数はすべて Agent への参照を引数とします．</li>
+      <li><code>Trie</code>: 辞書のクラスです．</li>
+     </ul>
+     <p>
+      コマンドラインツールのソースコードが <kbd>tools/</kbd> にあり，例外処理やファイル入出力，Predictive Search などのサンプルとして利用できます．
+     </p>
+    </div><!-- subsection -->
+
+    <div class="subsection">
+     <h3><a name="enum">定数</a></h3>
+     <div class="subsubsection">
+      <h4>エラーコード</h4>
+      <div class="float">
+       <pre class="code">typedef enum marisa_error_code_ {
+  MARISA_OK           = 0,
+  MARISA_STATE_ERROR  = 1,
+  MARISA_NULL_ERROR   = 2,
+  MARISA_BOUND_ERROR  = 3,
+  MARISA_RANGE_ERROR  = 4,
+  MARISA_CODE_ERROR   = 5,
+  MARISA_RESET_ERROR  = 6,
+  MARISA_SIZE_ERROR   = 7,
+  MARISA_MEMORY_ERROR = 8,
+  MARISA_IO_ERROR     = 9,
+  MARISA_FORMAT_ERROR = 10,
+} marisa_error_code;</pre>
+      </div><!-- float -->
+      <p>
+       libmarisa では，ファイル入出力に失敗したときや辞書のサイズが上限に到達したときなどに，<code>Exception</code> を送出します．そして，<code>Exception</code> に格納される情報の 1 つが <code>marisa_error_code</code> です．
+      </p>
+      <p>
+       辞書の入出力に関するエラーコードである <var>MARISA_IO_ERROR</var> と <var>MARISA_FORMAT_ERROR</var> 以外については，バグによる可能性が高いと思います．各エラーコードの詳細については，<kbd>marisa/base.h</kbd> をご覧ください．
+      </p>
+     </div><!-- subsubsection -->
+     <div class="subsubsection">
+      <h4>メモリマッピング用のフラグ</h4>
+      <div class="float">
+       <pre class="code">typedef enum marisa_map_flags {
+  MARISA_MAP_POPULATE = 1 &lt;&lt; 0,
+} marisa_map_flags;</pre>
+      </div><!-- float -->
+      <p>
+       libmarisa では，メモリマッピングを使用して辞書を開くことができます．<var>MARISA_MAP_POPULATE</var> は辞書の先読みを有効にするフラグであり，辞書を開くときに時間がかかるものの，辞書を引くときにページフォルトの発生を抑制できます．参照するキーが多いときに有効です．参照するキーが少ないキーでは逆に遅くなることもあります．
+      </p>
+     </div><!-- subsubsection -->
+     <div class="subsubsection">
+      <h4>トライの数</h4>
+      <div class="float">
+       <pre class="code">
+typedef enum marisa_num_tries_ {
+  MARISA_MIN_NUM_TRIES     = 0x00001,
+  MARISA_MAX_NUM_TRIES     = 0x0007F,
+  MARISA_DEFAULT_NUM_TRIES = 0x00003,
+} marisa_num_tries;</pre>
+      </div><!-- float -->
+      <p>
+       MARISA は複数の Patricia Trie を組み合わせて 1 つの Trie を構成することが特徴の 1 つであり，Patricia Trie の数を増やすほど，辞書はコンパクトになるものの，検索が遅くなるという傾向があります．<code>marisa_num_tries</code> では，辞書を構成する Patricia Trie の数について，最小値・最大値とデフォルトの値を提供します．
+      </p>
+      <p>
+       適切な設定は登録文字列やアプリケーションによって異なります．ほとんどの場合はデフォルトの設定で問題ないと思いますが，検索時間が問題になるときは，思い切って <var>1</var> にしてください．また，登録文字列が長くて少し複雑な構成になる場合，デフォルトより大きな値にすることで，辞書のサイズをさらに小さくできることがあります．設定が気になるときは，<kbd>marisa-benchmark</kbd> をお試しください．
+      </p>
+     </div><!-- subsubsection -->
+     <div class="subsubsection">
+      <h4>キャッシュのサイズ</h4>
+      <div class="float">
+       <pre class="code">typedef enum marisa_cache_level_ {
+  MARISA_HUGE_CACHE    = 0x00080,
+  MARISA_LARGE_CACHE   = 0x00100,
+  MARISA_NORMAL_CACHE  = 0x00200,
+  MARISA_SMALL_CACHE   = 0x00400,
+  MARISA_TINY_CACHE    = 0x00800,
+  MARISA_DEFAULT_CACHE = MARISA_NORMAL_CACHE
+} marisa_cache_level;</pre>
+      </div><!-- float -->
+      <p>
+       libmarisa では，検索時間の短縮を目的として，辞書にキャッシュを埋め込むようになっています．キャッシュの内容は通過する確率の高い遷移に関する情報であり，キャッシュを大きくすることによって，辞書は大きくなるものの，検索時間を短縮できます．
+      </p>
+      <p>
+       <code>marisa_cache_level</code> は，キャッシュのサイズを制御するための定数を提供します．<var>MARISA_NORMAL_CACHE</var> を基準として，<var>MARISA_LARGE_CACHE</var> は 2 倍，<var>MARISA_HUGE_CACHE</var> は 4 倍になり，<var>MARISA_SMALL_CACHE</var> は 1/2，<var>MARISA_TINY_CACHE</var> は 1/4 になります．
+      </p>
+     </div><!-- subsubsection -->
+     <div class="subsubsection">
+      <h4>TAIL の種類</h4>
+      <div class="float">
+       <pre class="code">typedef enum marisa_tail_mode_ {
+  MARISA_TEXT_TAIL    = 0x01000,
+  MARISA_BINARY_TAIL  = 0x02000,
+  MARISA_DEFAULT_TAIL = MARISA_TEXT_TAIL,
+} marisa_tail_mode;</pre>
+      </div><!-- float -->
+      <p>
+       libmarisa による辞書では，最後の Patiricia Trie について，ラベルをそのまま保存するようになっています．<code>marisa_tail_mode</code> はラベルの保存方法を選ぶためのパラメータです．
+      </p>
+      <p>
+       <var>MARISA_TEXT_TAIL</var> はラベルを <var>'\0'</var> を終端とする文字列として保存します．そのため，ラベルに <var>'\0'</var> が含まれるときは，自動的に <var>MARISA_BINARY_TAIL</var> へと切り替わるようになっています．明示的に <var>MARISA_BINARY_TAIL</var> を選ぶ理由はほとんどありません．
+      </p>
+      <p>
+       一方，<var>MARISA_BINARY_TAIL</var> では，ラベルの終端を検出するために，<var>'\0'</var> の代わりにビット列を使用します．そのため，ラベルの平均長が <var>8 bytes</var> を超えるときは <var>MARISA_TEXT_TAIL</var> の方がコンパクトになります．
+      </p>
+     </div><!-- subsubsection -->
+     <div class="subsubsection">
+      <h4>ノードの順序</h4>
+      <div class="float">
+       <pre class="code">typedef enum marisa_node_order_ {
+  MARISA_LABEL_ORDER   = 0x10000,
+  MARISA_WEIGHT_ORDER  = 0x20000,
+  MARISA_DEFAULT_ORDER = MARISA_WEIGHT_ORDER,
+} marisa_node_order;</pre>
+      </div><!-- float -->
+      <p>
+       libmarisa では，ノードの順序が辞書のパラメータになっています．選択肢は <var>MARISA_LABEL_ORDER</var> と <var>MARISA_WEIGHT_ORDER</var> の 2 つであり，前者はラベルが昇順になるようにノードを配列し，後者は重み（出現しやすさ）が降順になるようにノードを配列します．一般的な Trie の実装では <var>MARISA_LABEL_ORDER</var> の順序を用いますが，libmarisa では <var>MARISA_WEIGHT_ORDER</var> がデフォルトになっています．
+      </p>
+      <p>
+       <var>MARISA_WEIGHT_ORDER</var> の目的は，出現しやすいノードから順に並べておくことにより，線形探索の効率を高め，検索時間を短縮することにあります．日本語の単語やフレーズを用いた実験においては，辞書引きにかかる時間を 1/2 程度に短縮できることが確認されています．一方，<var>MARISA_LABEL_ORDER</var> については，検索時間は長くなるものの，Predictive Search の検索結果が文字列昇順になるという特徴があります．
+      </p>
+     </div><!-- subsubsection -->
+     <div class="subsubsection">
+      <h4>別名</h4>
+      <div class="float">
+       <pre class="code">namespace marisa {
+  typedef ::marisa_error_code ErrorCode;
+  typedef ::marisa_cache_level CacheLevel;
+  typedef ::marisa_tail_mode TailMode;
+  typedef ::marisa_node_order NodeOrder;
+}  // namespace marisa</pre>
+      </div><!-- float -->
+      <p>
+       以上の列挙型については，マクロとの衝突を避けるために，グローバル名前空間にて定義しています．<code>namespace marisa</code> に別名を用意しているので，お好きな方をご利用ください．
+      </p>
+     </div><!-- subsubsection -->
+    </div><!-- subsection -->
+
+    <div class="subsection">
+     <h3><a name="exception">class Exception</a></h3>
+     <div class="float">
+      <pre class="code">class Exception {
+ public:
+  const char *filename() const;
+  int line() const;
+  ErrorCode error_code() const;
+  const char *error_message() const;
+
+  const char *what() const;
+};</pre>
+     </div><!-- float -->
+     <p>
+      <code>Exception</code> は libmarisa が例外として送出するクラスです．エラーが検出されたファイルの名前（<code>__FILE__</code>）と行番号（<code>__LINE__</code>），さらにエラーコードを取り出せるようになっています．<code>what()</code> は使いやすさのために用意した関数であり，<code>error_message()</code> と同じく，<var>__FILE__:__LINE__: error_code: error_message</var> という書式の文字列を返します．
+     </p>
+    </div><!-- subsection -->
+
+    <div class="subsection">
+     <h3><a name="key">class Key</a></h3>
+     <div class="float">
+      <pre class="code">class Key {
+ public:
+  char operator[](std::size_t i) const;
+  std::string_view str() const;
+  const char *ptr() const;
+  std::size_t length() const;
+  std::size_t id() const;
+};</pre>
+     </div><!-- float -->
+     <p>
+      <code>Key</code> は後述する <a href="#keyset">Keyset</a> および <a href="#agent">Agent</a> のメンバになっているクラスです．登録しようとしている文字列や，検索で見つけた登録文字列の情報を格納するために使われています．基本的な使い方では，既に情報が格納されたインスタンスのみを目にすることになります．
+     </p>
+    </div><!-- subsection -->
+
+    <div class="subsection">
+     <h3><a name="query">class Query</a></h3>
+     <div class="float">
+      <pre class="code">class Query {
+ public:
+  char operator[](std::size_t i) const;
+  std::string_view str() const;
+  const char *ptr() const;
+  std::size_t length() const;
+  std::size_t id() const;
+};</pre>
+     </div><!-- float -->
+     <p>
+      <code>Query</code> は後述する <a href="#agent">Agent</a> のメンバになっているクラスです．検索しようとしている文字列や参照したい登録文字列の ID を格納するようになっています．<code>Query</code> に対する文字列や ID の設定は <code>Agent</code> を介しておこなうため，基本的な使い方では，意識する必要はありません．内容を確認したいときに参照する程度です．
+     </p>
+    </div><!-- subsection -->
+
+    <div class="subsection">
+     <h3><a name="keyset">class Keyset</a></h3>
+     <div class="float">
+      <pre class="code">class Keyset {
+ public:
+  Keyset();
+
+  void push_back(const Key &amp;key);
+  void push_back(const Key &amp;key, char end_marker);
+
+  void push_back(std::string_view str,
+                 float weight = 1.0);
+  void push_back(const char *str);
+  void push_back(const char *ptr,
+                 std::size_t length,
+                 float weight = 1.0);
+
+  const Key &amp;operator[](std::size_t i) const;
+  Key &amp;operator[](std::size_t i);
+
+  std::size_t num_keys();
+
+  bool empty() const;
+  std::size_t size() const;
+  std::size_t total_length() const;
+
+  void reset();
+
+  void clear();
+  void swap(Keyset &amp;rhs) noexcept;
+};</pre>
+     </div><!-- float -->
+     <div class="subsubsection">
+      <h4>概要</h4>
+      <p>
+       <code>Keyset</code> は辞書に登録しようとしている文字列もしくは登録されている文字列を詰め込むためのクラスです．辞書を構築するときの入力として，あるいは検索結果を保存しておくために使います．
+      </p>
+     </div><!-- subsubsection -->
+     <div class="subsubsection">
+      <h4>辞書の構築</h4>
+      <p>
+       辞書の構築に使う場合，<code>push_back()</code> で登録したい文字列を追加してから，後述する <a href="#trie">Trie</a> の <code>build()</code> に渡します．<var>weight</var> は文字列の出現しやすさを示す重みであり，同じ文字列を繰り返し追加した場合，辞書を構築する段階で加算されるようになっています．
+      </p>
+      <p>
+       辞書を構築した後は，<code>operator[]()</code> により登録文字列の ID を確認できます．その代わり，<code>Key</code> は重みと ID を共用体のメンバとして持つため，辞書の構築に使用した重みを参照できなくなります．
+      </p>
+     </div><!-- subsubsection -->
+     <div class="subsubsection">
+      <h4>検索結果の保存</h4>
+      <p>
+       検索結果の保存に使う場合，後述する <a href="#agent">Agent</a> に格納されている検索結果を <code>push_back()</code> に渡すことで，文字列を複製し，ID を残しておくことができます．検索結果の文字列に終端記号を加えたいときは <var>end_marker</var> を利用してください．文字列の長さには影響を与えず，<var>end_marker</var> を終端文字として加えることができます．
+      </p>
+      <p>
+       検索結果を破棄して別の検索結果を保存するために再利用するという場合，<code>clear()</code> の代わりに <code>reset()</code> を使うことで，既に確保している領域を再利用できます．メモリの確保・解放にかかるオーバーヘッドが気になるときにご利用ください．
+      </p>
+      <p>
+       <code>empty()</code> は文字列が格納されていないかどうかを返す関数です．<code>size()</code> は <code>num_keys()</code> と同じく格納されている文字列の数を返す関数であり，<code>total_length()</code> は格納されている文字列の合計長を byte 単位で返す関数です．
+      </p>
+     </div><!-- subsubsection -->
+    </div><!-- subsection -->
+
+    <div class="subsection">
+     <h3><a name="agent">class Agent</a></h3>
+     <div class="float">
+      <pre class="code">class Agent {
+ public:
+  Agent();
+
+  const Query &amp;query() const;
+  const Key &amp;key() const;
+
+  void set_query(std::string_view str);
+  void set_query(const char *str);
+  void set_query(const char *ptr,
+                 std::size_t length);
+  void set_query(std::size_t key_id);
+};</pre>
+     </div><!-- float -->
+     <p>
+      <code>Agent</code> は <code>Query</code> と <code>Key</code> をメンバとして持つクラスです．検索における入出力の受け渡し，および途中経過の保存に使います．後述する <a href="#trie">Trie</a> の検索関数は，例外なく <code>Agent</code> への参照を引数として受け取るようになっています．
+     </p>
+     <p>
+      検索の手順は，<code>set_query()</code> を使って検索したい文字列もしくは参照したい登録文字列の ID を設定し，<code>Trie</code> の関数に渡した後，<code>key()</code> により検索結果を取り出すという流れになります．
+     </p>
+    </div><!-- subsection -->
+
+    <div class="subsection">
+     <h3><a name="trie">class Trie</a></h3>
+     <div class="float">
+      <pre class="code">class Trie {
+ public:
+  Trie();
+
+  void build(Keyset &amp;keyset,
+             int config_flags = 0);
+
+  void mmap(const char *filename,
+            int flags = 0);
+  void map(const void *ptr,
+           std::size_t size);
+
+  void load(const char *filename);
+  void read(int fd);
+
+  void save(const char *filename) const;
+  void write(int fd) const;
+
+  bool lookup(Agent &amp;agent) const;
+  void reverse_lookup(Agent &amp;agent) const;
+  bool common_prefix_search(Agent &amp;agent) const;
+  bool predictive_search(Agent &amp;agent) const;
+
+  std::size_t num_tries() const;
+  std::size_t num_keys() const;
+  std::size_t num_nodes() const;
+
+  TailMode tail_mode() const;
+  NodeOrder node_order() const;
+
+  bool empty() const;
+  std::size_t size() const;
+  std::size_t io_size() const;
+
+  void clear();
+  void swap(Trie &amp;rhs) noexcept;
+};</pre>
+     </div><!-- float -->
+     <div class="subsubsection">
+      <h4>概要</h4>
+      <p>
+       <code>Trie</code> は辞書のクラスです．libmarisa において最も重要なクラスであり，辞書の構築・検索からファイル入出力にいたるまで，あらゆる操作に必要となります．
+      </p>
+      <p>
+       実際には，辞書のハンドルに相当するクラスであり，辞書の実体がない状況では，<code>build()</code>, <code>mmap()</code>, <code>map()</code>, <code>load()</code>, <code>read()</code>, <code>clear()</code>, <code>swap()</code> 以外の関数を呼び出すと例外が送出されます．
+      </p>
+     </div><!-- subsubsection -->
+     <div class="subsubsection">
+      <h4>辞書の構築</h4>
+      <p>
+       辞書の構築には <code>build()</code> を使います．引数は，前述の <a href="#keyset">Keyset</a> と，辞書の設定を XOR（<code>|</code>） で組み合わせた <var>config_flags</var> です．<var>config_flags</var> については，<var>2 | MARISA_BINARY_TAIL</var> のように指定します．この例では，辞書を構成する Patricia Trie の数を <var>2</var> つに制限し，ラベルの保存方法を <var>MARISA_BINARY_TAIL</var> に固定します．省略されているノードの順序とキャッシュのサイズについては，デフォルトの設定である <var>MARISA_DEFAULT_ORDER</var> と <var>MARISA_DEFAULT_CACHE</var> が採用されます．
+      </p>
+      <p>
+       辞書の構築において登録文字列に割り当てられた ID は，<var>keyset</var> の <code>operator[]()</code> を使って確認できます．登録文字列に対して関連付ける情報がある場合にご利用ください．
+      </p>
+     </div><!-- subsubsection -->
+     <div class="subsubsection">
+      <h4>ファイル入出力</h4>
+      <p>
+       <code>mmap()</code> は，Memory Mapped I/O により，辞書全体をファイルから読み込むことなく検索できる状態にする関数です．少ししか検索しないのに辞書全体を読み込むのは勿体ないという状況や，異なるプロセスで同じ辞書を共有したいという状況で使うと効果的です．逆に，たくさんの文字列を検索する場合，あらかじめ辞書全体を読み込んでおかないと，外部記憶に対するランダムアクセスにより検索時間が極端に長くなる可能性があります．このような場合，<var>flags</var> に <var>MARISA_MAP_POPULATE</var> を指定すれば，ページテーブルを先読みさせて，検索時のページフォルトを抑制できます．
+      </p>
+      <p>
+       <code>map()</code> はメモリ上に展開されている辞書のバイナリを使って検索できる状態にする関数です．<code>load()</code> と <code>read()</code> は辞書を入力する関数であり，<code>save()</code> と <code>write()</code> は辞書を出力する関数です．
+      </p>
+     </div><!-- subsubsection -->
+     <div class="subsubsection">
+      <h4>辞書からの検索</h4>
+      <p>
+       検索をおこなう関数は <code>lookup()</code>, <code>reverse_lookup()</code>, <code>common_prefix_search()</code>, <code>predictive_search()</code> の 4 種類です．
+      </p>
+      <ul>
+       <li>
+        <code>lookup()</code>: 文字列が登録されているかどうかを確認します．登録されていれば <var>true</var> を返します．このとき，<code>agent.key()</code> により検索結果を取り出すことができます．ただし，<code>agent.key().ptr()</code> については，入力として渡された文字列を指しているだけであり，文字列の複製を持っているわけではないことに注意してください．登録されていなければ <var>false</var> を返して終了です．
+       </li>
+       <li>
+        <code>reverse_lookup()</code>: ID から登録文字列を復元します．返り値はなく，復元された文字列は <var>agent.key()</var> を介してアクセスできます．文字列の実体は <var>agent</var> 内部に保持されています．<var>agent</var> を使って次の検索をおこなった段階で失われるものと考えてください．ID が範囲外であれば例外を送出して終了です．
+       </li>
+       <li>
+        <code>common_prefix_search()</code>: 入力文字列の前半部分に一致する登録文字列を検索します．該当する登録文字列があれば <var>true</var> を返します．このとき，<code>agent.key()</code> には検索結果が格納されています．<code>agent.key().ptr() == agent.query().ptr()</code> が成立することに注意してください．該当する登録文字列が複数ある場合，返り値が <var>false</var> になるまで繰り返し <code>common_prefix_search()</code> を呼び出すことにより，すべての検索結果を取得できます．
+       </li>
+       <li>
+        <code>predictive_search()</code>: 入力文字列で始まる登録文字列を検索します．該当する登録文字列があれば <var>true</var> を返します．検索によって復元された文字列には，<code>agent.key()</code> を介してアクセスできます．文字列の実体は，<var>agent</var> 内部に検索の途中経過として保持されているので，<var>agent</var> を使って次の検索をおこなった段階で失われるものと考えてください．該当する登録文字列が複数ある場合，返り値が <var>false</var> になるまで繰り返し <code>predictive_search()</code> を呼び出すことにより，すべての検索結果を取得できます．
+       </li>
+      </ul>
+      <p>
+       繰り返しにより検索が進行する <code>common_prefix_search()</code> と <code>predictive_search()</code> については，<code>agent</code> が検索の途中経過を保持するようになっています．そのため，<code>agent</code> を別の関数に渡したり，<code>agent.set_query()</code> を呼び出したりした時点で，検索の進行はリセットされます．
+      </p>
+      <p>
+       <code>empty()</code> は登録文字列が存在するかどうかを返す関数です．<code>size()</code> は <code>num_keys()</code> と同じく登録文字列の数を返す関数であり，<code>io_size()</code> は辞書をファイルに出力した場合のサイズを返す関数です．
+      </p>
+     </div><!-- subsubsection -->
+    </div><!-- subsection -->
+
+    <div class="subsection">
+     <h3><a name="stdio">stdio</a></h3>
+     <div class="float">
+      <pre class="code">void fread(std::FILE *file, Trie *trie);
+void fwrite(std::FILE *file, const Trie &amp;trie);</pre>
+     </div><!-- float -->
+     <p>
+      <code>std::FILE</code> を用いる関数は <kbd>marisa/stdio.h</kbd> で宣言されています．<code>#include &lt;cstdio&gt;</code> を入れたくないときは，<kbd>marisa.h</kbd> の代わりに <kbd>marisa/trie.h</kbd> を使ってください．
+     </p>
+    </div><!-- subsection -->
+
+    <div class="subsection">
+     <h3><a name="iostream">iostream</a></h3>
+     <div class="float">
+      <pre class="code">std::istream &amp;read(std::istream &amp;stream, Trie *trie);
+std::ostream &amp;write(std::ostream &amp;stream, const Trie &amp;trie);
+
+std::istream &amp;operator>>(std::istream &amp;stream, Trie &amp;trie);
+std::ostream &amp;operator<<(std::ostream &amp;stream, const Trie &amp;trie);</pre>
+     </div><!-- float -->
+     <p>
+      <code>std::iostream</code> を用いる関数は <kbd>marisa/iostream.h</kbd> で宣言されています．<code>#include &lt;iosfwd&gt;</code> を入れたくないときは，<kbd>marisa.h</kbd> の代わりに <kbd>marisa/trie.h</kbd> を使ってください．
+     </p>
+    </div><!-- subsection -->
+   </div><!-- section -->
+
+   <div class="section">
+    <h2><a name="compatibility">辞書の互換性</a></h2>
+    <p>
+     libmarisa により構築される辞書の書式はアーキテクチャに依存します．Little Endian な環境で構築した辞書は，Big Endian な環境では使えません．あらためて構築しなおす必要があります．また，Little Endian 形式の辞書は 32/64-bit 環境における互換性があるのに対し，Big Endian 形式の辞書は 32/64-bit 環境における互換性がありません．
+    </p>
+   </div><!-- section -->
+
+   <div class="section">
+    <h2><a name="references">参考資料</a></h2>
+    <ul>
+     <li><a href="https://www.anlp.jp/proceedings/annual_meeting/2011/html/program.html">言語処理学会第 17 回年次大会（NLP2011）</a>
+      <ul>
+       <li>言語処理学会年次大会の予稿集が公開されていて，MARISA に関する論文（<a href="https://www.anlp.jp/proceedings/annual_meeting/2011/pdf_dir/F2-6.pdf">F2-6.pdf</a>）をダウンロードできます．</li>
+      </ul>
+     </li>
+     <li><a href="https://d.hatena.ne.jp/s-yata/20110310/1299777228">発表資料（Prefix/Patricia Trie の入れ子による辞書圧縮）</a>
+      <ul>
+       <li>MARISA に関する発表資料（<a href="https://sites.google.com/site/headdythehero/cabine/2011/0311/NLP2011-F2-6.pptx?attredirects=0&amp;d=1">NLP2011-F2-6.pptx</a>, <a href="https://sites.google.com/site/headdythehero/cabine/2011/0311/NLP2011-F2-6.pdf?attredirects=0&amp;d=1">NLP2011-F2-6.pdf</a>, <a href="https://sites.google.com/site/headdythehero/cabine/2011/0311/NLP2011-F2-6-notes.pdf?attredirects=0&amp;d=1">NLP2011-F2-6-notes.pdf</a>）をダウンロードできます．</li>
+      </ul>
+     </li>
+    </ul>
+   </div><!-- section -->
+
+   <div class="section">
+    <h2><a name="conclusion">おわりに</a></h2>
+    <p>
+     質問などありましたら，欄外のメールアドレス宛てに，お気軽にご連絡ください．
+    </p>
+   </div><!-- section -->
+  </div><!-- body -->
+  <div id="footer">
+   <div class="left">MARISA: Matching Algorithm with Recursively Implemented StorAge</div>
+   <div class="right">
+  ‮moc.liamg@atay.umusus‭
+   </div>
+   <div class="end"></div>
+  </div><!-- footer -->
+ </body>
+</html>

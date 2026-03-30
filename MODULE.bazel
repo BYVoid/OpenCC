@@ -8,6 +8,7 @@ module(
 
 bazel_dep(name = "darts-clone", version = "0.32")
 bazel_dep(name = "googletest", version = "1.15.0", dev_dependency = True)
+# TODO: Update marisa-trie to 0.3.1 when it is available on the Bazel Central Registry.
 bazel_dep(name = "marisa-trie", version = "0.2.6")
 bazel_dep(name = "platforms", version = "0.0.10")
 bazel_dep(name = "pybind11_bazel", version = "2.12.0")

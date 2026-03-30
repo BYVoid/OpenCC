@@ -25,8 +25,6 @@
 
 #ifdef _WIN32
 #include <direct.h>
-#define getcwd _getcwd
-#define chdir _chdir
 #else
 #include <unistd.h>
 #endif
@@ -39,6 +37,24 @@
 #include "tools/cpp/runfiles/runfiles.h"
 using bazel::tools::cpp::runfiles::Runfiles;
 #endif
+
+namespace {
+// Cross-platform wrappers for POSIX directory functions
+inline char* portable_getcwd() {
+#ifdef _WIN32
+  return _getcwd(nullptr, 0);
+#else
+  return getcwd(nullptr, 0);
+#endif
+}
+inline int portable_chdir(const char* path) {
+#ifdef _WIN32
+  return _chdir(path);
+#else
+  return chdir(path);
+#endif
+}
+} // namespace
 
 namespace opencc {
 
@@ -54,11 +70,11 @@ protected:
 #else
     ASSERT_NE("", PROJECT_BINARY_DIR);
     ASSERT_NE("", CMAKE_SOURCE_DIR);
-    ASSERT_EQ(0, chdir(PROJECT_BINARY_DIR "/data"));
+    ASSERT_EQ(0, portable_chdir(PROJECT_BINARY_DIR "/data"));
 #endif
   }
 
-  virtual void TearDown() { ASSERT_EQ(0, chdir(originalWorkingDirectory)); }
+  virtual void TearDown() { ASSERT_EQ(0, portable_chdir(originalWorkingDirectory)); }
 
   std::string GetFileContents(const std::string& fileName) const {
     std::ifstream fs(fileName);
@@ -70,7 +86,7 @@ protected:
   }
 
   void GetCurrentWorkingDirectory() {
-    originalWorkingDirectory = getcwd(nullptr, 0);
+    originalWorkingDirectory = portable_getcwd();
   }
 
   std::string OpenccCommand() const {

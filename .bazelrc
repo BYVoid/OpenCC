@@ -1,0 +1,3 @@
+# Enable C++17 for MSVC on Windows
+build:windows --cxxopt=/std:c++17
+build:windows --host_cxxopt=/std:c++17

@@ -23,6 +23,14 @@
 #include <unordered_map>
 #include <vector>
 
+#ifdef _WIN32
+#include <direct.h>
+#define getcwd _getcwd
+#define chdir _chdir
+#else
+#include <unistd.h>
+#endif
+
 #include "src/Common.hpp"
 #include "rapidjson/document.h"
 #include "gtest/gtest.h"
@@ -67,7 +75,16 @@ protected:
 
   std::string OpenccCommand() const {
 #ifdef BAZEL
+#ifdef _WIN32
+    // On Windows, cc_binary executables have .exe extension in the runfiles manifest
+    std::string path = runfiles_->Rlocation("_main/src/tools/command_line.exe");
+    if (path.empty()) {
+      path = runfiles_->Rlocation("_main/src/tools/command_line");
+    }
+    return path;
+#else
     return runfiles_->Rlocation("_main/src/tools/command_line");
+#endif
 #else
 #ifndef _MSC_VER
     return PROJECT_BINARY_DIR "/src/tools/opencc";
@@ -79,6 +96,11 @@ protected:
 #endif
 #endif
 #endif
+  }
+
+  // Quote a path for use in a shell command, in case the path contains spaces.
+  static std::string QuotePath(const std::string& path) {
+    return "\"" + path + "\"";
   }
 
   std::string OutputDirectory() const {
@@ -108,12 +130,13 @@ protected:
   std::string TestCommand(const std::string& config,
                           const std::string& inputFile,
                           const std::string& outputFile) const {
-    std::string cmd = OpenccCommand() + " -i " + inputFile + " -o " +
-                      outputFile + " -c " + ConfigurationDirectory() + config +
-                      ".json";
+    std::string cmd = QuotePath(OpenccCommand()) + " -i " +
+                      QuotePath(inputFile) + " -o " +
+                      QuotePath(outputFile) + " -c " +
+                      ConfigurationDirectory() + config + ".json";
 #ifdef BAZEL
-    cmd += " --path " + runfiles_->Rlocation("_main/data/dictionary") + "/" +
-           " --path " + runfiles_->Rlocation("_main/data/config") + "/";
+    cmd += " --path " + QuotePath(runfiles_->Rlocation("_main/data/dictionary") + "/") +
+           " --path " + QuotePath(runfiles_->Rlocation("_main/data/config") + "/");
 #endif
     return cmd;
   }

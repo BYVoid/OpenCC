@@ -480,6 +480,13 @@
       "expected": {
         "s2t": "上下數千年，縱橫幾萬里"
       }
+    },
+    {
+      "id": "s2twp_gong_yuan_to_xi_yuan",
+      "input": "公元前100年，公元1949年",
+      "expected": {
+        "s2twp": "西元前100年，西元1949年"
+      }
     }
   ]
 }

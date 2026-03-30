@@ -149,7 +149,7 @@ protected:
     std::string cmd = QuotePath(OpenccCommand()) + " -i " +
                       QuotePath(inputFile) + " -o " +
                       QuotePath(outputFile) + " -c " +
-                      ConfigurationDirectory() + config + ".json";
+                      QuotePath(ConfigurationDirectory() + config + ".json");
 #ifdef BAZEL
     cmd += " --path " + QuotePath(runfiles_->Rlocation("_main/data/dictionary") + "/") +
            " --path " + QuotePath(runfiles_->Rlocation("_main/data/config") + "/");

@@ -154,7 +154,15 @@ protected:
     cmd += " --path " + QuotePath(runfiles_->Rlocation("_main/data/dictionary") + "/") +
            " --path " + QuotePath(runfiles_->Rlocation("_main/data/config") + "/");
 #endif
+#ifdef _WIN32
+    // On Windows, cmd.exe /C strips the first and last quote characters when
+    // the command starts with a quoted path, corrupting the command. Wrapping
+    // the entire command in an extra pair of outer quotes causes cmd.exe to
+    // strip only those outer quotes, leaving the inner quoted paths intact.
+    return "\"" + cmd + "\"";
+#else
     return cmd;
+#endif
   }
 
   char* originalWorkingDirectory;

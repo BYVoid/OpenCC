@@ -24,43 +24,44 @@
 #include "src/Lexicon.hpp"
 #include "src/MarisaDict.hpp"
 #include "src/UTF8Util.hpp"
+#include "tools/cpp/runfiles/runfiles.h"
+
+using bazel::tools::cpp::runfiles::Runfiles;
 
 namespace opencc {
 
-const char* RUNFILE_SUFFIX = ".runfiles/_main";
+static FILE* OpenFile(const std::string& path) {
+#ifdef _MSC_VER
+  return _wfopen(UTF8Util::GetPlatformString(path).c_str(), L"rb");
+#else
+  return fopen(UTF8Util::GetPlatformString(path).c_str(), "rb");
+#endif
+}
 
 class DictionaryTest : public ::testing::Test,
                        public ::testing::WithParamInterface<std::string> {
 protected:
   static void SetUpTestSuite() {
-
-    std::string program_filename = ::testing::internal::GetArgvs().front();
-    size_t suffix_pos = program_filename.find(RUNFILE_SUFFIX);
-    ASSERT_NE(suffix_pos, std::string::npos);
-
-    runfile_dir_ =
-        program_filename.substr(0, suffix_pos + strlen(RUNFILE_SUFFIX));
+    runfiles_.reset(Runfiles::CreateForTest());
+    ASSERT_NE(nullptr, runfiles_);
   }
 
-  static std::string runfile_dir_;
+  static std::unique_ptr<Runfiles> runfiles_;
 };
 
-std::string DictionaryTest::runfile_dir_;
+std::unique_ptr<Runfiles> DictionaryTest::runfiles_;
 
 class DictionaryRunfilesTest : public ::testing::Test {
 protected:
   static void SetUpTestSuite() {
-    std::string program_filename = ::testing::internal::GetArgvs().front();
-    size_t suffix_pos = program_filename.find(RUNFILE_SUFFIX);
-    ASSERT_NE(suffix_pos, std::string::npos);
-    runfile_dir_ =
-        program_filename.substr(0, suffix_pos + strlen(RUNFILE_SUFFIX));
+    runfiles_.reset(Runfiles::CreateForTest());
+    ASSERT_NE(nullptr, runfiles_);
   }
 
-  static std::string runfile_dir_;
+  static std::unique_ptr<Runfiles> runfiles_;
 };
 
-std::string DictionaryRunfilesTest::runfile_dir_;
+std::unique_ptr<Runfiles> DictionaryRunfilesTest::runfiles_;
 
 INSTANTIATE_TEST_SUITE_P(
     , DictionaryTest,
@@ -76,9 +77,8 @@ INSTANTIATE_TEST_SUITE_P(
 
 TEST_P(DictionaryTest, UniqueSortedTest) {
   const std::string dictionaryFileName =
-      runfile_dir_ + "/data/dictionary/" + GetParam() + ".txt";
-  FILE* fp =
-      fopen(UTF8Util::GetPlatformString(dictionaryFileName).c_str(), "rb");
+      runfiles_->Rlocation("_main/data/dictionary/" + GetParam() + ".txt");
+  FILE* fp = OpenFile(dictionaryFileName);
   ASSERT_NE(fp, nullptr);
   LexiconPtr lexicon = Lexicon::ParseLexiconFromFile(fp);
   EXPECT_TRUE(lexicon->IsUnique()) << GetParam() << " has duplicated keys.";
@@ -87,17 +87,15 @@ TEST_P(DictionaryTest, UniqueSortedTest) {
 
 TEST_P(DictionaryTest, BinaryTest) {
   const std::string binaryDictionaryFileName =
-      runfile_dir_ + "/data/dictionary/" + GetParam() + ".ocd2";
-  FILE* fp_bin = fopen(
-      UTF8Util::GetPlatformString(binaryDictionaryFileName).c_str(), "rb");
+      runfiles_->Rlocation("_main/data/dictionary/" + GetParam() + ".ocd2");
+  FILE* fp_bin = OpenFile(binaryDictionaryFileName);
   ASSERT_NE(fp_bin, nullptr);
   MarisaDictPtr dict = MarisaDict::NewFromFile(fp_bin);
   ASSERT_NE(dict, nullptr);
 
   const std::string textDictionaryFileName =
-      runfile_dir_ + "/data/dictionary/" + GetParam() + ".txt";
-  FILE* fp_txt =
-      fopen(UTF8Util::GetPlatformString(textDictionaryFileName).c_str(), "rb");
+      runfiles_->Rlocation("_main/data/dictionary/" + GetParam() + ".txt");
+  FILE* fp_txt = OpenFile(textDictionaryFileName);
   ASSERT_NE(fp_txt, nullptr);
   LexiconPtr txt_lexicon = Lexicon::ParseLexiconFromFile(fp_txt);
 
@@ -106,12 +104,12 @@ TEST_P(DictionaryTest, BinaryTest) {
 
 TEST_F(DictionaryRunfilesTest, TWPhrasesReverseMapping) {
   const std::string twPhrasesFile =
-      runfile_dir_ + "/data/dictionary/TWPhrases.txt";
+      runfiles_->Rlocation("_main/data/dictionary/TWPhrases.txt");
   const std::string twPhrasesRevFile =
-      runfile_dir_ + "/data/dictionary/TWPhrasesRev.txt";
+      runfiles_->Rlocation("_main/data/dictionary/TWPhrasesRev.txt");
 
   auto loadLexicon = [](const std::string& path) -> LexiconPtr {
-    FILE* fp = fopen(UTF8Util::GetPlatformString(path).c_str(), "rb");
+    FILE* fp = OpenFile(path);
     EXPECT_NE(fp, nullptr) << path;
     if (fp == nullptr) {
       return LexiconPtr();

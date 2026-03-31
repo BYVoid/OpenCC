@@ -1,0 +1,10 @@
+# On Windows, pybind_extension produces opencc_clib.pyd.dll but Python only
+# loads .pyd files. This genrule copies it to opencc_clib.pyd so it can be
+# imported when //src/pyd is on sys.path (via py_opencc's imports on Windows).
+genrule(
+    name = "opencc_clib_pyd_copy",
+    srcs = ["//src:opencc_clib"],
+    outs = ["opencc_clib.pyd"],
+    cmd = "cp $< $@",
+    visibility = ["//src:__pkg__"],
+)

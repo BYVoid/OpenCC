@@ -23,11 +23,7 @@
 #include <unordered_map>
 #include <vector>
 
-#ifdef _WIN32
-#include <direct.h>
-#else
-#include <unistd.h>
-#endif
+#include "test/PortableUtil.hpp"
 
 #include "src/Common.hpp"
 #include "rapidjson/document.h"
@@ -37,24 +33,6 @@
 #include "tools/cpp/runfiles/runfiles.h"
 using bazel::tools::cpp::runfiles::Runfiles;
 #endif
-
-namespace {
-// Cross-platform wrappers for POSIX directory functions
-inline char* portable_getcwd() {
-#ifdef _WIN32
-  return _getcwd(nullptr, 0);
-#else
-  return getcwd(nullptr, 0);
-#endif
-}
-inline int portable_chdir(const char* path) {
-#ifdef _WIN32
-  return _chdir(path);
-#else
-  return chdir(path);
-#endif
-}
-} // namespace
 
 namespace opencc {
 
@@ -151,8 +129,15 @@ protected:
                       QuotePath(outputFile) + " -c " +
                       QuotePath(ConfigurationDirectory() + config + ".json");
 #ifdef BAZEL
-    cmd += " --path " + QuotePath(runfiles_->Rlocation("_main/data/dictionary") + "/") +
-           " --path " + QuotePath(runfiles_->Rlocation("_main/data/config") + "/");
+    const std::string dictFile =
+        runfiles_->Rlocation("_main/data/dictionary/STCharacters.ocd2");
+    const std::string dictDir = dictFile.substr(0, dictFile.find_last_of("/\\"));
+    const std::string configFile =
+        runfiles_->Rlocation("_main/data/config/s2t.json");
+    const std::string configDir =
+        configFile.substr(0, configFile.find_last_of("/\\"));
+    cmd += " --path " + QuotePath(dictDir + "/") +
+           " --path " + QuotePath(configDir + "/");
 #endif
 #ifdef _WIN32
     // On Windows, cmd.exe /C strips the first and last quote characters when

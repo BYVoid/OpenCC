@@ -36,8 +36,16 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: bazel build //:opencc
-      - run: bazel test --test_output=all //src/... //data/... //test/... //python/...
+      - name: Build
+        shell: bash
+        env:
+          MSYS_NO_PATHCONV: 1
+        run: bazel build //:opencc
+      - name: Test
+        shell: bash
+        env:
+          MSYS_NO_PATHCONV: 1
+        run: bazel test --test_output=all //src/... //data/... //test/... //python/...
       - name: upload artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4

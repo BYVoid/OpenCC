@@ -38,9 +38,13 @@ jobs:
           python-version: "3.12"
       - name: Build
         shell: bash
+        env:
+          MSYS_NO_PATHCONV: 1
         run: bazel build //:opencc
       - name: Test
         shell: bash
+        env:
+          MSYS_NO_PATHCONV: 1
         run: bazel test --test_output=all //src/... //data/... //test/... //python/...
       - name: upload artifacts
         if: ${{ always() }}

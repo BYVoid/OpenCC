@@ -362,8 +362,14 @@ pybind_extension(
 
 py_library(
     name = "py_opencc",
-    data = [":opencc_clib"],
-    imports = ["."],
+    data = select({
+        "@platforms//os:windows": ["//src/pyd:opencc_clib_pyd_copy"],
+        "//conditions:default": [":opencc_clib"],
+    }),
+    imports = select({
+        "@platforms//os:windows": ["pyd"],
+        "//conditions:default": ["."],
+    }),
 )
 
 cc_library(

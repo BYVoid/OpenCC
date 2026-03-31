@@ -32,8 +32,12 @@ protected:
     runfiles_.reset(Runfiles::CreateForTest());
     ASSERT_NE(nullptr, runfiles_);
     testcasesPath_ = runfiles_->Rlocation("_main/test/testcases/testcases.json");
-    configDir_ = runfiles_->Rlocation("_main/data/config");
-    dictDir_ = runfiles_->Rlocation("_main/data/dictionary");
+    const std::string configFile =
+        runfiles_->Rlocation("_main/data/config/hk2s.json");
+    configDir_ = configFile.substr(0, configFile.find_last_of("/\\"));
+    const std::string dictFile =
+        runfiles_->Rlocation("_main/data/dictionary/STCharacters.ocd2");
+    dictDir_ = dictFile.substr(0, dictFile.find_last_of("/\\"));
 #else
     FAIL() << "This test expects Bazel runfiles.";
 #endif

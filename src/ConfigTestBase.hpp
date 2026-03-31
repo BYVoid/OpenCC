@@ -47,7 +47,8 @@ protected:
       : runfiles_(Runfiles::CreateForTest()),
         CONFIG_TEST_JSON_PATH(
             runfiles_->Rlocation("_main/test/config_test/config_test.json")),
-        CONFIG_TEST_DIR_PATH(runfiles_->Rlocation("_main/test/config_test")) {}
+        CONFIG_TEST_DIR_PATH(CONFIG_TEST_JSON_PATH.substr(
+            0, CONFIG_TEST_JSON_PATH.find_last_of("/\\"))) {}
 
   const std::unique_ptr<Runfiles> runfiles_;
   const std::string CONFIG_TEST_JSON_PATH;

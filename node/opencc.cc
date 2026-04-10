@@ -17,6 +17,7 @@
 #include "Lexicon.cpp"
 #include "MarisaDict.cpp"
 #include "MaxMatchSegmentation.cpp"
+#include "PluginSegmentation.cpp"
 #include "Segmentation.cpp"
 #include "SerializedValues.cpp"
 #include "TextDict.cpp"

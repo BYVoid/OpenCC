@@ -22,10 +22,7 @@
 #include <unordered_map>
 
 #if defined(_WIN32) || defined(_WIN64)
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#include <Windows.h>
+#include "WinUtil.hpp"
 #endif
 
 #include <rapidjson/document.h>
@@ -37,6 +34,7 @@
 #include "Exception.hpp"
 #include "MarisaDict.hpp"
 #include "MaxMatchSegmentation.hpp"
+#include "PluginSegmentation.hpp"
 #include "TextDict.hpp"
 
 #ifdef ENABLE_DARTS
@@ -52,36 +50,8 @@ namespace {
 std::string GetParentDirectory(const std::string& path);
 
 #if defined(_WIN32) || defined(_WIN64)
-std::string Utf8FromWide(const std::wstring& wide) {
-  if (wide.empty()) {
-    return "";
-  }
-  int requiredSize = WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), -1, nullptr,
-                                         0, nullptr, nullptr);
-  if (requiredSize <= 1) {
-    return "";
-  }
-  std::string utf8(static_cast<size_t>(requiredSize), '\0');
-  WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), -1, utf8.data(), requiredSize,
-                      nullptr, nullptr);
-  utf8.resize(static_cast<size_t>(requiredSize - 1));
-  return utf8;
-}
-
-std::wstring WideFromUtf8(const std::string& utf8) {
-  if (utf8.empty()) {
-    return L"";
-  }
-  int requiredSize =
-      MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, nullptr, 0);
-  if (requiredSize <= 1) {
-    return L"";
-  }
-  std::wstring wide(static_cast<size_t>(requiredSize), L'\0');
-  MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, wide.data(), requiredSize);
-  wide.resize(static_cast<size_t>(requiredSize - 1));
-  return wide;
-}
+using internal::Utf8FromWide;
+using internal::WideFromUtf8;
 
 std::string NormalizeModulePath(const std::string& path) {
   if (path.empty()) {
@@ -175,6 +145,7 @@ void AppendWindowsPortableSearchPaths(std::vector<std::string>& paths,
 class ConfigInternal {
 public:
   std::vector<std::string> paths;
+  std::string configDirectory;
 
   const JSONValue& GetProperty(const JSONValue& doc, const char* name) {
     if (!doc.HasMember(name)) {
@@ -275,7 +246,32 @@ public:
       DictPtr dict = ParseDict(GetObjectProperty(doc, "dict"));
       segmentation = SegmentationPtr(new MaxMatchSegmentation(dict));
     } else {
-      throw InvalidFormat("Unknown segmentation type: " + type);
+      PluginConfigPairs configPairs;
+      configPairs.push_back(std::make_pair("__config_dir", configDirectory));
+      if (doc.HasMember("resources")) {
+        const JSONValue& resources = GetObjectProperty(doc, "resources");
+        for (auto it = resources.MemberBegin(); it != resources.MemberEnd();
+             ++it) {
+          if (!it->value.IsString()) {
+            throw InvalidFormat("Segmentation resource must be a string: " +
+                                std::string(it->name.GetString()));
+          }
+          configPairs.push_back(std::make_pair(it->name.GetString(),
+                                               it->value.GetString()));
+        }
+      }
+      for (auto it = doc.MemberBegin(); it != doc.MemberEnd(); ++it) {
+        const std::string key = it->name.GetString();
+        if (key == "type" || key == "resources") {
+          continue;
+        }
+        if (!it->value.IsString()) {
+          throw InvalidFormat("Segmentation plugin property must be a string: " +
+                              key);
+        }
+        configPairs.push_back(std::make_pair(key, it->value.GetString()));
+      }
+      segmentation = CreatePluginSegmentation(type, configPairs);
     }
     return segmentation;
   }
@@ -415,6 +411,7 @@ ConverterPtr Config::NewFromFile(const std::string& fileName,
   if (!configDirectory.empty()) {
     impl->paths.push_back(configDirectory);
   }
+  impl->configDirectory = configDirectory;
   return NewFromString(content, impl->paths);
 }
 
@@ -451,6 +448,9 @@ ConverterPtr Config::NewFromString(const std::string& json,
 
   ConfigInternal* impl = reinterpret_cast<ConfigInternal*>(internal);
   impl->paths = paths;
+  if (impl->configDirectory.empty()) {
+    impl->configDirectory = paths.empty() ? "" : paths.front();
+  }
 
   // Required: segmentation
   SegmentationPtr segmentation =

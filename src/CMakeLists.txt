@@ -32,6 +32,7 @@ set(
   MarisaDict.hpp
   MaxMatchSegmentation.hpp
   Optional.hpp
+  PluginSegmentation.hpp
   PhraseExtract.hpp
   Segmentation.hpp
   Segments.hpp
@@ -58,6 +59,7 @@ set(
   Lexicon.cpp
   MarisaDict.cpp
   MaxMatchSegmentation.cpp
+  PluginSegmentation.cpp
   PhraseExtract.cpp
   SerializedValues.cpp
   SimpleConverter.cpp
@@ -130,6 +132,15 @@ add_library(OpenCC::OpenCC ALIAS libopencc)
 set_target_properties(libopencc PROPERTIES POSITION_INDEPENDENT_CODE ON)
 source_group(libopencc FILES ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
 target_link_libraries(libopencc marisa)
+# PluginSegmentation.cpp uses LoadLibrary on _WIN32 (MSVC and MinGW).
+# Only non-Windows targets may need libdl for dlopen.
+if (NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  include(CheckLibraryExists)
+  check_library_exists(dl dlopen "" HAVE_LIBDL)
+  if (HAVE_LIBDL)
+    target_link_libraries(libopencc dl)
+  endif ()
+endif ()
 target_include_directories(libopencc PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:${DIR_INCLUDE}/opencc>
@@ -183,6 +194,11 @@ install(
 install(
   FILES ${LIBOPENCC_HEADERS}
   DESTINATION ${DIR_INCLUDE}/opencc
+)
+
+install(
+  FILES plugin/OpenCCPlugin.h
+  DESTINATION ${DIR_INCLUDE}/opencc/plugin
 )
 
 # Gtest

@@ -1,0 +1,6 @@
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "jieba_dict",
+    srcs = glob(["*.utf8", "README.md"]),
+)

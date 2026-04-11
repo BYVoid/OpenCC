@@ -1,0 +1,62 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "config",
+    srcs = glob(["data/config/*.json"]),
+)
+
+filegroup(
+    name = "resources",
+    srcs = ["//plugins/jieba/data/jieba_dict:jieba_dict"],
+)
+
+filegroup(
+    name = "testcases",
+    srcs = ["tests/data/jieba_comparison_testcases.json"],
+)
+
+cc_binary(
+    name = "opencc-jieba",
+    srcs = [
+        "include/JiebaSegmentation.hpp",
+        "src/JiebaSegmentation.cpp",
+        "src/JiebaSegmentationPlugin.cpp",
+    ],
+    copts = [
+        "-Iplugins/jieba/include",
+        "-Isrc",
+    ],
+    defines = ["OPENCC_PLUGIN_BUILD"],
+    includes = ["include"],
+    linkshared = True,
+    deps = [
+        "//plugins/jieba/deps/cppjieba:cppjieba",
+        "//src:common",
+        "//src:exception",
+        "//src:plugin_api",
+        "//src:segmentation",
+        "//src:segments",
+    ],
+)
+
+cc_test(
+    name = "jieba_plugin_integration_test",
+    srcs = ["tests/JiebaPluginIntegrationTest.cpp"],
+    data = [
+        ":config",
+        ":opencc-jieba",
+        ":resources",
+        ":testcases",
+        "//data/dictionary:binary_dictionaries",
+        "//src/tools:command_line",
+    ],
+    defines = ["BAZEL"],
+    deps = [
+        "//test:portable_util",
+        "@bazel_tools//tools/cpp/runfiles",
+        "@googletest//:gtest_main",
+        "@rapidjson",
+    ],
+)

@@ -1,0 +1,37 @@
+{
+  "name": "Traditional Chinese (Taiwan standard) to Simplified Chinese (with phrases, Jieba Segmentation - Experimental)",
+  "segmentation": {
+    "type": "jieba",
+    "resources": {
+      "dict_path": "jieba_dict/jieba.dict.utf8",
+      "model_path": "jieba_dict/hmm_model.utf8",
+      "user_dict_path": "jieba_dict/user.dict.utf8"
+    }
+  },
+  "conversion_chain": [{
+    "dict": {
+      "type": "group",
+      "dicts": [{
+        "type": "ocd2",
+        "file": "TWPhrasesRev.ocd2"
+      }, {
+        "type": "ocd2",
+        "file": "TWVariantsRevPhrases.ocd2"
+      }, {
+        "type": "ocd2",
+        "file": "TWVariantsRev.ocd2"
+      }]
+    }
+  }, {
+    "dict": {
+      "type": "group",
+      "dicts": [{
+        "type": "ocd2",
+        "file": "TSPhrases.ocd2"
+      }, {
+        "type": "ocd2",
+        "file": "TSCharacters.ocd2"
+      }]
+    }
+  }]
+}

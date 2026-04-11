@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-#include "Application.hpp"
+#include "cppjieba/Jieba.hpp"
 
 struct opencc_segmentation_handle {
   explicit opencc_segmentation_handle(
@@ -146,7 +146,7 @@ std::string ResolveResourcePath(const std::string& rawPath,
     }
   }
 
-  const std::string devFallback = JoinPath("deps/libcppjieba/dict/",
+  const std::string devFallback = JoinPath("plugins/jieba/deps/cppjieba/dict/",
                                            rawPath.substr(rawPath.find_last_of("/\\") == std::string::npos
                                                               ? 0
                                                               : rawPath.find_last_of("/\\") + 1));
@@ -170,7 +170,7 @@ std::string ResolveAuxPath(const std::string& dictPath,
   const std::string::size_type needlePos = dictPath.find(needle);
   if (needlePos != std::string::npos) {
     std::string alt = dictPath;
-    alt.replace(needlePos, needle.size(), "deps/libcppjieba/dict/");
+    alt.replace(needlePos, needle.size(), "plugins/jieba/deps/cppjieba/dict/");
     const std::string::size_type altPos = alt.find_last_of("/\\");
     if (altPos != std::string::npos) {
       const std::string altCandidate = alt.substr(0, altPos + 1) + fileName;
@@ -225,17 +225,17 @@ int CreateJiebaSegmentation(opencc_segmentation_create_args_t* args) {
   }
 
   try {
-    std::unique_ptr<CppJieba::Application> app(
-        new CppJieba::Application(dictPath, modelPath, userDictPath, idfPath,
+    std::unique_ptr<cppjieba::Jieba> app(
+        new cppjieba::Jieba(dictPath, modelPath, userDictPath, idfPath,
                                   stopWordsPath));
     class PluginJiebaSegmentation : public opencc::Segmentation {
     public:
-      explicit PluginJiebaSegmentation(std::unique_ptr<CppJieba::Application> app)
+      explicit PluginJiebaSegmentation(std::unique_ptr<cppjieba::Jieba> app)
           : app_(std::move(app)) {}
       opencc::SegmentsPtr Segment(const std::string& text) const override {
         opencc::SegmentsPtr segments(new opencc::Segments);
         std::vector<std::string> words;
-        app_->cut(text, words, CppJieba::METHOD_MIX);
+        app_->Cut(text, words, true);
         for (const auto& word : words) {
           segments->AddSegment(word);
         }
@@ -243,7 +243,7 @@ int CreateJiebaSegmentation(opencc_segmentation_create_args_t* args) {
       }
 
     private:
-      std::unique_ptr<CppJieba::Application> app_;
+      std::unique_ptr<cppjieba::Jieba> app_;
     };
     std::unique_ptr<opencc::Segmentation> segmentation(
         new PluginJiebaSegmentation(std::move(app)));

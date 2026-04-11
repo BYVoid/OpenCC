@@ -258,8 +258,14 @@ public:
     args.token_array = &tokenArray;
     args.error = &error;
     const int status = plugin_->descriptor->segment(&args);
+
+    struct TokenGuard {
+      const opencc_segmentation_plugin_v1* desc;
+      opencc_token_array_t* arr;
+      ~TokenGuard() { desc->free_tokens(arr); }
+    } guard{plugin_->descriptor, &tokenArray};
+
     if (status != 0) {
-      plugin_->descriptor->free_tokens(&tokenArray);
       ThrowPluginError(plugin_->descriptor, &error,
                        plugin_->descriptor->segmentation_type,
                        "Segmentation plugin failed", "unknown error");
@@ -269,7 +275,6 @@ public:
     for (size_t i = 0; i < tokenArray.token_count; i++) {
       segments->AddSegment(std::string(tokenArray.tokens[i]));
     }
-    plugin_->descriptor->free_tokens(&tokenArray);
     return segments;
   }
 

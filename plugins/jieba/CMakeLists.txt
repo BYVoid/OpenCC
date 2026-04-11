@@ -1,28 +1,61 @@
-if (NOT BUILD_OPENCC_JIEBA_PLUGIN AND NOT ENABLE_GTEST)
-  return()
+if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+  # Standalone mode: Building the plugin outside of the OpenCC parent tree
+  cmake_minimum_required(VERSION 3.10)
+  project(opencc_jieba)
+
+  find_package(opencc REQUIRED)
+
+  if (NOT DEFINED DIR_PLUGIN)
+    set(DIR_PLUGIN lib)
+  endif()
+  if (NOT DEFINED DIR_SHARE_OPENCC)
+    set(DIR_SHARE_OPENCC share/opencc)
+  endif()
+
+  set(BUILD_OPENCC_JIEBA_PLUGIN ON)
+else()
+  # Integrated mode: Included from OpenCC root
+  if (NOT BUILD_OPENCC_JIEBA_PLUGIN AND NOT ENABLE_GTEST)
+    return()
+  endif()
 endif()
 
-include_directories("${PROJECT_SOURCE_DIR}")
-include_directories("${PROJECT_BINARY_DIR}/src")
-include_directories("${PROJECT_SOURCE_DIR}/src")
+if (NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+  include_directories("${PROJECT_SOURCE_DIR}")
+  include_directories("${PROJECT_BINARY_DIR}/src")
+  include_directories("${PROJECT_SOURCE_DIR}/src")
+endif()
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/deps/limonp/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
-include_directories("${PROJECT_SOURCE_DIR}/deps/rapidjson-1.1.0")
+if (NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+  include_directories("${PROJECT_SOURCE_DIR}/deps/rapidjson-1.1.0")
+endif()
 
-add_library(opencc_jieba SHARED
-  src/JiebaSegmentation.cpp
-  src/JiebaSegmentationPlugin.cpp
-  ${PROJECT_SOURCE_DIR}/src/plugin/OpenCCPlugin.h
-)
+if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+  # OpenCC C++ Headers are provided by find_package
+  add_library(opencc_jieba SHARED
+    src/JiebaSegmentation.cpp
+    src/JiebaSegmentationPlugin.cpp
+  )
+  target_link_libraries(opencc_jieba PRIVATE OpenCC::OpenCC)
+else()
+  add_library(opencc_jieba SHARED
+    src/JiebaSegmentation.cpp
+    src/JiebaSegmentationPlugin.cpp
+    ${PROJECT_SOURCE_DIR}/src/plugin/OpenCCPlugin.h
+  )
+  target_include_directories(opencc_jieba PRIVATE
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_BINARY_DIR}/src
+  )
+endif()
 target_compile_definitions(opencc_jieba PRIVATE OPENCC_PLUGIN_BUILD)
 set_target_properties(opencc_jieba PROPERTIES
   OUTPUT_NAME opencc-jieba
   POSITION_INDEPENDENT_CODE ON
 )
 target_include_directories(opencc_jieba PRIVATE
-  ${PROJECT_SOURCE_DIR}/src
-  ${PROJECT_BINARY_DIR}/src
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/include
   ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/deps/limonp/include
@@ -55,7 +88,7 @@ if (BUILD_OPENCC_JIEBA_PLUGIN)
   )
 endif()
 
-if (ENABLE_GTEST)
+if (ENABLE_GTEST AND NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   if (WIN32)
     add_custom_target(
       copy_gtest_to_plugins_jieba

@@ -6,6 +6,7 @@
 /.mypy_cache
 /bazel-*
 /build
+/plugins/*/build
 /other
 /doc/html
 /dist

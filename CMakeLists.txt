@@ -146,7 +146,7 @@ endif ()
 
 include(CMakePackageConfigHelpers)
 
-set(targets_export_name OpenCCTargets)
+set(OPENCC_TARGETS_EXPORT_NAME OpenCCTargets)
 
 configure_file(
   opencc.pc.in

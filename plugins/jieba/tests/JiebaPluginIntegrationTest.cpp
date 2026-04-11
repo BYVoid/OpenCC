@@ -171,7 +171,7 @@ protected:
     }
     return "";
 #else
-    return std::string(PROJECT_BINARY_DIR) + "/plugins/jieba";
+    return OPENCC_PLUGIN_TEST_DIR;
 #endif
   }
 

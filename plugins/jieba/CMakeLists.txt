@@ -117,13 +117,16 @@ if (ENABLE_GTEST AND NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   endif()
 
   add_executable(JiebaPluginIntegrationTest tests/JiebaPluginIntegrationTest.cpp)
+  target_compile_definitions(JiebaPluginIntegrationTest PRIVATE
+    OPENCC_PLUGIN_TEST_DIR="$<TARGET_FILE_DIR:opencc_jieba>"
+  )
   target_link_libraries(JiebaPluginIntegrationTest gtest gtest_main)
   add_dependencies(JiebaPluginIntegrationTest opencc opencc_jieba Dictionaries)
   add_test(JiebaPluginIntegrationTest JiebaPluginIntegrationTest)
   set_tests_properties(
     JiebaPluginIntegrationTest
     PROPERTIES
-      ENVIRONMENT "OPENCC_SEGMENTATION_PLUGIN_PATH=${CMAKE_CURRENT_BINARY_DIR}"
+      ENVIRONMENT "OPENCC_SEGMENTATION_PLUGIN_PATH=$<TARGET_FILE_DIR:opencc_jieba>"
   )
   if (WIN32)
     add_dependencies(JiebaPluginIntegrationTest

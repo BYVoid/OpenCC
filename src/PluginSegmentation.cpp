@@ -83,7 +83,8 @@ bool IsTruthy(const char* value) {
 
 bool IsReadableFile(const std::string& path) {
 #if defined(_WIN32) || defined(_WIN64)
-  const DWORD attributes = GetFileAttributesW(WideFromUtf8(path).c_str());
+  const DWORD attributes =
+      GetFileAttributesW(internal::WideFromUtf8(path).c_str());
   return attributes != INVALID_FILE_ATTRIBUTES &&
          (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
 #else

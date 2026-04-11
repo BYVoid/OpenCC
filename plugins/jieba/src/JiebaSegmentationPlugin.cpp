@@ -31,8 +31,21 @@
 #include "cppjieba/Jieba.hpp"
 
 #if defined(_WIN32) || defined(_WIN64)
-#include "WinUtil.hpp"
-using opencc::internal::WideFromUtf8;
+#include <windows.h>
+namespace {
+std::wstring LocalWideFromUtf8(const std::string& utf8) {
+  if (utf8.empty()) {
+    return L"";
+  }
+  int size = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, nullptr, 0);
+  if (size <= 0) {
+    return L"";
+  }
+  std::wstring wide(size - 1, L'\0');
+  MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, &wide[0], size);
+  return wide;
+}
+}  // namespace
 #endif
 
 struct opencc_segmentation_handle {
@@ -57,7 +70,7 @@ bool IsAbsolutePath(const std::string& path) {
 
 bool IsReadableFile(const std::string& path) {
 #if defined(_WIN32) || defined(_WIN64)
-  const DWORD attributes = GetFileAttributesW(WideFromUtf8(path).c_str());
+  const DWORD attributes = GetFileAttributesW(LocalWideFromUtf8(path).c_str());
   return attributes != INVALID_FILE_ATTRIBUTES &&
          (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
 #else

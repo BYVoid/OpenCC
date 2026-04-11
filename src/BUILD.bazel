@@ -22,6 +22,7 @@ cc_library(
         ":lexicon",
         ":marisa_dict",
         ":max_match_segmentation",
+        ":plugin_segmentation",
         ":phrase_extract",
         ":segmentation",
         ":segments",
@@ -86,6 +87,7 @@ cc_library(
         ":dict_group",
         ":marisa_dict",
         ":max_match_segmentation",
+        ":plugin_segmentation",
         ":text_dict",
         "@rapidjson",
     ],
@@ -340,6 +342,33 @@ cc_library(
         ":common",
         ":marisa_dict",
         ":utf8_string_slice",
+    ],
+)
+
+cc_library(
+    name = "plugin_api",
+    hdrs = ["plugin/OpenCCPlugin.h"],
+)
+
+cc_library(
+    name = "plugin_segmentation",
+    srcs = ["PluginSegmentation.cpp"],
+    hdrs = [
+        "PluginSegmentation.hpp",
+        "WinUtil.hpp",
+    ],
+    linkopts = select({
+        "@platforms//os:linux": ["-ldl"],
+        "@platforms//os:osx": [],
+        "@platforms//os:windows": [],
+        "//conditions:default": ["-ldl"],
+    }),
+    deps = [
+        ":common",
+        ":exception",
+        ":plugin_api",
+        ":segmentation",
+        ":segments",
     ],
 )
 

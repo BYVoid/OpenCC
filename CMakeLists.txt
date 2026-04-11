@@ -29,6 +29,8 @@ option(BUILD_SHARED_LIBS "Build opencc as shared library" ON)
 option(ENABLE_GTEST "Build all tests." OFF)
 option(ENABLE_BENCHMARK "Build benchmark tests." OFF)
 option(ENABLE_DARTS "Build DartsDict (ocd format)." ON)
+option(ENABLE_JIEBA "Deprecated compatibility option. Use BUILD_OPENCC_JIEBA_PLUGIN." OFF)
+option(BUILD_OPENCC_JIEBA_PLUGIN "Build Jieba segmentation as a loadable plugin." OFF)
 option(BUILD_PYTHON "Build python library" OFF)
 option(USE_SYSTEM_DARTS "Use system version of Darts" OFF)
 option(USE_SYSTEM_GOOGLE_BENCHMARK "Use system version of Google Benchmark" OFF)
@@ -115,6 +117,11 @@ if (DEFINED LIB_INSTALL_DIR)
 endif (DEFINED LIB_INSTALL_DIR)
 
 set (DIR_SHARE_OPENCC ${DIR_SHARE}/opencc)
+if (WIN32)
+  set (DIR_PLUGIN bin/opencc/plugins)
+else ()
+  set (DIR_PLUGIN ${DIR_LIBRARY}/opencc/plugins)
+endif ()
 
 # Compute absolute paths needed for compile-time macros (PKGDATADIR/LOCALEDIR)
 # and for the pkg-config file.  We must handle both the GNUInstallDirs relative
@@ -129,6 +136,11 @@ endforeach ()
 
 set (DIR_SHARE_OPENCC_FULL ${DIR_SHARE_FULL}/opencc)
 set (DIR_SHARE_LOCALE_FULL ${DIR_SHARE_FULL}/locale)
+if (IS_ABSOLUTE "${DIR_PLUGIN}")
+  set (DIR_PLUGIN_FULL "${DIR_PLUGIN}")
+else ()
+  set (DIR_PLUGIN_FULL "${CMAKE_INSTALL_PREFIX}/${DIR_PLUGIN}")
+endif ()
 
 ######## Configuration
 
@@ -229,6 +241,15 @@ if (ENABLE_DARTS)
   )
 endif()
 
+if (ENABLE_JIEBA)
+  message(WARNING "ENABLE_JIEBA is deprecated; enabling BUILD_OPENCC_JIEBA_PLUGIN for compatibility.")
+  set(BUILD_OPENCC_JIEBA_PLUGIN ON)
+endif()
+
+add_definitions(
+  -DOPENCC_SEGMENTATION_PLUGIN_DIR="${DIR_PLUGIN_FULL}"
+)
+
 
 ######## Dependencies
 
@@ -249,6 +270,7 @@ endif()
 add_subdirectory(src)
 add_subdirectory(doc)
 add_subdirectory(data)
+add_subdirectory(plugins)
 add_subdirectory(test)
 
 ######## Testing

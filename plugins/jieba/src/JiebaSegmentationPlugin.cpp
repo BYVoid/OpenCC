@@ -38,11 +38,12 @@ std::wstring LocalWideFromUtf8(const std::string& utf8) {
     return L"";
   }
   int size = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, nullptr, 0);
-  if (size <= 0) {
+  if (size <= 1) {
     return L"";
   }
-  std::wstring wide(size - 1, L'\0');
+  std::wstring wide(static_cast<size_t>(size), L'\0');
   MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, &wide[0], size);
+  wide.resize(static_cast<size_t>(size - 1));
   return wide;
 }
 }  // namespace

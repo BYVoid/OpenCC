@@ -47,6 +47,13 @@ jobs:
         run: |
           cd build
           ctest
+      - name: Test standalone plugin build
+        run: |
+          CC=/mingw64/bin/cc CXX=/mingw64/bin/c++ cmake \
+            -S plugins/jieba -B build-standalone -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DOpenCC_DIR=$PWD/install/lib/cmake/opencc
+          cmake --build build-standalone
       - name: list installed files
         if: ${{ always() }}
         run: |

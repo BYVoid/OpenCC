@@ -88,6 +88,16 @@ jobs:
           if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
           Compress-Archive -Path $packageRoot -DestinationPath $zipPath -CompressionLevel Optimal
 
+      - name: Test standalone plugin build
+        if: ${{ matrix.can_run_binaries }}
+        shell: pwsh
+        run: |
+          cmake -S plugins\jieba -B build-standalone `
+            -A "${{ matrix.cmake_arch }}" `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DOpenCC_DIR="${{ github.workspace }}\dist\opencc-msvc-${{ matrix.package_suffix }}\lib\cmake\opencc"
+          cmake --build build-standalone --config Release
+
       - name: List packaged files
         if: ${{ always() }}
         shell: pwsh

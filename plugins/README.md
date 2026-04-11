@@ -74,6 +74,19 @@ resolving them at runtime. Relative resource paths are expected to resolve
 within the existing OpenCC data layout rather than a plugin-specific ad hoc
 directory tree.
 
+### Customizing Jieba Dictionaries
+
+When using the `jieba` plugin, you can add custom terminology to the segmenter by defining a custom `user.dict.utf8` or editing the installed one. 
+
+Custom dictionaries must be encoded in UTF-8. Each line follows the format: `[Word] [Frequency] [Part-of-Speech]`, separated by spaces. The frequency and POS tags are optional.
+
+Example:
+```text
+云计算 5 n
+机器学习 8 n
+区块链 10 nz
+```
+
 ## Testing
 
 Each plugin should prefer integration tests that exercise:

@@ -356,7 +356,10 @@ private:
       throw Exception("Plugin descriptor is too small.");
     }
     if (descriptor->abi_major != OPENCC_SEGMENTATION_PLUGIN_ABI_MAJOR) {
-      throw Exception("Plugin ABI mismatch.");
+      throw Exception("Plugin ABI major version mismatch.");
+    }
+    if (descriptor->abi_minor < OPENCC_SEGMENTATION_PLUGIN_ABI_MINOR) {
+      throw Exception("Plugin ABI minor version is older than required by the host.");
     }
     if (descriptor->segmentation_type == nullptr ||
         type != descriptor->segmentation_type) {

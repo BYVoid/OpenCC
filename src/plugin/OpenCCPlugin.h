@@ -15,6 +15,18 @@
 extern "C" {
 #endif
 
+/*
+ * struct_size rules:
+ *
+ * - Caller must initialize struct_size to sizeof(struct) before passing
+ *   any structure across the ABI boundary.
+ *
+ * - Callee must validate struct_size is sufficient for fields it reads.
+ *
+ * - Future ABI-compatible extensions may append fields to the end.
+ *   Implementations must ignore unknown trailing fields.
+ */
+
 #define OPENCC_SEGMENTATION_PLUGIN_ABI_MAJOR 1
 #define OPENCC_SEGMENTATION_PLUGIN_ABI_MINOR 0
 
@@ -42,6 +54,13 @@ typedef struct opencc_segmentation_handle opencc_segmentation_handle_t;
 typedef struct {
   size_t struct_size;
   int code;
+  /*
+   * On return, error->message may point either to:
+   * - a static constant string, or
+   * - plugin-owned dynamically allocated memory.
+   * free_error(error) must release any plugin-owned resources associated with
+   * the error object and leave it in a safely destructible state.
+   */
   const char* message;
 } opencc_error_t;
 
@@ -67,14 +86,73 @@ typedef struct {
   opencc_error_t* error;
 } opencc_segmentation_segment_args_t;
 
+/*
+ * ABI Layout & Alignment Rules:
+ * 1. Uses natural C struct alignment (no #pragma pack).
+ * 2. Field order must not be altered in future versions.
+ * 3. Extensions must strictly append fields to the end.
+ */
 typedef struct {
   size_t struct_size;
+
+  /*
+   * Versioning semantics:
+   * - abi_major:
+   *   Breaking ABI changes increment this value.
+   *   Host must require exact major match.
+   *
+   * - abi_minor:
+   *   Backward-compatible ABI additions increment this value.
+   *   Host may require plugin->abi_minor >= minimum_supported_minor.
+   *   Host should not reject a plugin solely because plugin->abi_minor is
+   *   newer.
+   */
   uint16_t abi_major;
   uint16_t abi_minor;
+
+  /*
+   * Must point to static, null-terminated constant strings.
+   * Host will not attempt to free() or delete[] these pointers.
+   */
   const char* plugin_name;
   const char* segmentation_type;
+
+  /*
+   * [ABI CONTRACT]
+   * create(args):
+   * On success:
+   * - returns 0
+   * - *args->out must be set to a valid handle
+   * - args->error->code should be 0 (or unchanged)
+   * - args->error->message may be NULL
+   *
+   * On failure:
+   * - returns non-zero
+   * - *args->out must be NULL
+   * - args->error must remain in a state safe for free_error()
+   */
   int (*create)(opencc_segmentation_create_args_t* args);
+
+  /*
+   * [ABI CONTRACT]
+   * segment(args):
+   * On success:
+   * - returns 0
+   * - token_array contains plugin-owned token storage until free_tokens() is called.
+   *
+   * On failure:
+   * - returns non-zero
+   * - token_array may be partially populated, but must remain safe for free_tokens().
+   */
   int (*segment)(opencc_segmentation_segment_args_t* args);
+
+  /*
+   * Cleanup Functions:
+   * 1. Must gracefully handle null pointers (count = 0, tokens = null).
+   * 2. Host promises to call these at most once per returned object.
+   * 3. free_tokens() must also accept token_array structures that were
+   *    partially initialized by segment() on failure.
+   */
   void (*free_tokens)(opencc_token_array_t* token_array);
   void (*destroy)(opencc_segmentation_handle_t* handle);
   void (*free_error)(opencc_error_t* error);

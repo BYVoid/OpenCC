@@ -2,6 +2,8 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   # Standalone mode: Building the plugin outside of the OpenCC parent tree
   cmake_minimum_required(VERSION 3.10)
   project(opencc_jieba)
+  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
   find_package(OpenCC REQUIRED)
 

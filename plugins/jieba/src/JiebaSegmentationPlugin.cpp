@@ -23,12 +23,17 @@
 
 #include <cstdlib>
 #include <cstring>
-#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <string>
 #include <vector>
 
 #include "cppjieba/Jieba.hpp"
+
+#if defined(_WIN32) || defined(_WIN64)
+#include "WinUtil.hpp"
+using opencc::internal::WideFromUtf8;
+#endif
 
 struct opencc_segmentation_handle {
   explicit opencc_segmentation_handle(
@@ -51,8 +56,14 @@ bool IsAbsolutePath(const std::string& path) {
 }
 
 bool IsReadableFile(const std::string& path) {
-  std::error_code error;
-  return std::filesystem::is_regular_file(std::filesystem::u8path(path), error);
+#if defined(_WIN32) || defined(_WIN64)
+  const DWORD attributes = GetFileAttributesW(WideFromUtf8(path).c_str());
+  return attributes != INVALID_FILE_ATTRIBUTES &&
+         (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
+#else
+  std::ifstream ifs(path.c_str());
+  return ifs.is_open();
+#endif
 }
 
 std::string ParentDir(const std::string& path) {
@@ -189,6 +200,7 @@ int CreateJiebaSegmentation(opencc_segmentation_create_args_t* args) {
              OPENCC_ERROR_INVALID_ARGUMENT, "Output handle is null.");
     return -1;
   }
+  *args->out = nullptr;
 
   std::string configDir;
   std::string dictPath;

@@ -501,6 +501,16 @@
       "expected": {
         "tw2sp": "宏定义、宏展开、宏调用、宏替换、宏命令、宏语言、宏处理、宏函数、宏指令和宏编程"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_daomei",
+      "input": "倒霉",
+      "expected": {
+        "s2t": "倒霉",
+        "s2tw": "倒霉",
+        "s2twp": "倒霉",
+        "s2hk": "倒霉"
+      }
     }
   ]
 }

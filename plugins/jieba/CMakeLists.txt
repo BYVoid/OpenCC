@@ -66,9 +66,6 @@ set_target_properties(opencc_jieba PROPERTIES
   OUTPUT_NAME opencc-jieba
   POSITION_INDEPENDENT_CODE ON
 )
-if (WIN32)
-  set_target_properties(opencc_jieba PROPERTIES PREFIX "")
-endif()
 target_include_directories(opencc_jieba PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/include
@@ -118,6 +115,7 @@ if (ENABLE_GTEST AND NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
 
   add_executable(JiebaPluginIntegrationTest tests/JiebaPluginIntegrationTest.cpp)
   target_compile_definitions(JiebaPluginIntegrationTest PRIVATE
+    OPENCC_TEST_COMMAND="$<TARGET_FILE:opencc>"
     OPENCC_PLUGIN_TEST_DIR="$<TARGET_FILE_DIR:opencc_jieba>"
   )
   target_link_libraries(JiebaPluginIntegrationTest gtest gtest_main)

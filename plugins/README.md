@@ -30,6 +30,12 @@ Runtime naming follows the segmentation type:
 - macOS: `libopencc-<type>.dylib`
 - Windows: `opencc-<type>.dll`
 
+Windows loaders also accept the MSYS/MinGW runtime name
+`msys-opencc-<type>.dll` when that is the emitted DLL filename.
+On Windows, plugins must be built with an ABI-compatible toolchain/runtime as
+the host OpenCC binary. Mixing MSVC-built hosts with MinGW-built plugins, or
+the reverse, is unsupported.
+
 For the `jieba` plugin, that means:
 
 - Linux: `libopencc-jieba.so`
@@ -38,6 +44,9 @@ For the `jieba` plugin, that means:
 
 CMake installs plugin binaries into the platform plugin directory and installs
 plugin configs/resources into the OpenCC data directory.
+Within a single plugin search directory, keep only one DLL for a given
+segmentation type. Multiple matching DLL names for the same type are treated as
+an error.
 
 ## Resource Resolution
 

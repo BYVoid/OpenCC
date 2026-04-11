@@ -25,6 +25,7 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <fstream>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -78,6 +79,11 @@ bool IsTruthy(const char* value) {
   const std::string text(value);
   return text == "1" || text == "true" || text == "TRUE" || text == "yes" ||
          text == "on";
+}
+
+bool IsReadableFile(const std::string& path) {
+  std::ifstream ifs(path.c_str(), std::ios::binary);
+  return ifs.is_open();
 }
 
 std::vector<std::string> SplitSearchPath(const char* raw) {
@@ -297,18 +303,34 @@ public:
     }
 
     const std::vector<std::string> searchDirs = BuildSearchDirs();
-    const std::string fileName = GetPluginFileName(type);
+    const std::vector<std::string> fileNames = GetPluginFileNames(type);
     std::ostringstream attempted;
     bool first = true;
     for (const auto& dir : searchDirs) {
-      const std::string candidate = JoinPath(dir, fileName);
-      if (!first) {
-        attempted << ", ";
+      std::vector<std::string> matches;
+      for (const auto& fileName : fileNames) {
+        const std::string candidate = JoinPath(dir, fileName);
+        if (!first) {
+          attempted << ", ";
+        }
+        first = false;
+        attempted << candidate;
+        if (IsReadableFile(candidate)) {
+          matches.push_back(candidate);
+        }
       }
-      first = false;
-      attempted << candidate;
+
+      if (matches.size() > 1) {
+        throw Exception("Multiple segmentation plugin libraries found for '" +
+                        type + "' in directory '" + dir +
+                        "'. Keep only one matching DLL per plugin type.");
+      }
+      if (matches.empty()) {
+        continue;
+      }
       try {
-        std::shared_ptr<PluginLibrary> plugin = LoadFromPath(candidate, type);
+        std::shared_ptr<PluginLibrary> plugin =
+            LoadFromPath(matches.front(), type);
         cache_[type] = plugin;
         return plugin;
       } catch (const Exception&) {
@@ -319,13 +341,17 @@ public:
   }
 
 private:
-  static std::string GetPluginFileName(const std::string& type) {
+  static std::vector<std::string> GetPluginFileNames(const std::string& type) {
 #if defined(_WIN32) || defined(_WIN64)
-    return "opencc-" + type + ".dll";
+    return {
+        "opencc-" + type + ".dll",
+        "libopencc-" + type + ".dll",
+        "msys-opencc-" + type + ".dll",
+    };
 #elif defined(__APPLE__)
-    return "libopencc-" + type + ".dylib";
+    return {"libopencc-" + type + ".dylib"};
 #else
-    return "libopencc-" + type + ".so";
+    return {"libopencc-" + type + ".so"};
 #endif
   }
 

@@ -223,6 +223,16 @@ std::string TakeErrorMessage(const opencc_segmentation_plugin_v1* descriptor,
   return message;
 }
 
+[[noreturn]] void ThrowPluginError(const opencc_segmentation_plugin_v1* descriptor,
+                                   opencc_error_t* error,
+                                   const std::string& pluginType,
+                                   const std::string& fallbackPrefix,
+                                   const std::string& fallbackMessage) {
+  const std::string message =
+      TakeErrorMessage(descriptor, error, fallbackMessage);
+  throw Exception(fallbackPrefix + " '" + pluginType + "': " + message);
+}
+
 class PluginSegmentationAdapter : public Segmentation {
 public:
   PluginSegmentationAdapter(std::shared_ptr<PluginLibrary> plugin,
@@ -237,31 +247,28 @@ public:
   }
 
   SegmentsPtr Segment(const std::string& text) const override {
-    char** tokens = nullptr;
-    size_t tokenCount = 0;
+    opencc_token_array_t tokenArray = {};
+    tokenArray.struct_size = sizeof(tokenArray);
     opencc_error_t error = {};
     error.struct_size = sizeof(error);
     opencc_segmentation_segment_args_t args = {};
     args.struct_size = sizeof(args);
     args.handle = handle_;
     args.utf8_text = text.c_str();
-    args.tokens = &tokens;
-    args.token_count = &tokenCount;
+    args.token_array = &tokenArray;
     args.error = &error;
     const int status = plugin_->descriptor->segment(&args);
     if (status != 0) {
-      const std::string message =
-          TakeErrorMessage(plugin_->descriptor, &error, "unknown error");
-      throw Exception("Segmentation plugin '" +
-                      std::string(plugin_->descriptor->segmentation_type) +
-                      "' failed: " + message);
+      ThrowPluginError(plugin_->descriptor, &error,
+                       plugin_->descriptor->segmentation_type,
+                       "Segmentation plugin failed", "unknown error");
     }
 
     SegmentsPtr segments(new Segments);
-    for (size_t i = 0; i < tokenCount; i++) {
-      segments->AddSegment(std::string(tokens[i]));
+    for (size_t i = 0; i < tokenArray.token_count; i++) {
+      segments->AddSegment(std::string(tokenArray.tokens[i]));
     }
-    plugin_->descriptor->free_tokens(tokens, tokenCount);
+    plugin_->descriptor->free_tokens(&tokenArray);
     return segments;
   }
 

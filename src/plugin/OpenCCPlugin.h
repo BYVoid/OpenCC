@@ -18,6 +18,19 @@ extern "C" {
 #define OPENCC_SEGMENTATION_PLUGIN_ABI_MAJOR 1
 #define OPENCC_SEGMENTATION_PLUGIN_ABI_MINOR 0
 
+enum {
+  OPENCC_ERROR_UNKNOWN = 1,
+  OPENCC_ERROR_INVALID_ARGUMENT = 2,
+  OPENCC_ERROR_PLUGIN_NOT_FOUND = 3,
+  OPENCC_ERROR_PLUGIN_LOAD_FAILED = 4,
+  OPENCC_ERROR_PLUGIN_SYMBOL_MISSING = 5,
+  OPENCC_ERROR_PLUGIN_ABI_MISMATCH = 6,
+  OPENCC_ERROR_PLUGIN_TYPE_MISMATCH = 7,
+  OPENCC_ERROR_PLUGIN_DESCRIPTOR_INVALID = 8,
+  OPENCC_ERROR_PLUGIN_RESOURCE_MISSING = 9,
+  OPENCC_ERROR_PLUGIN_RUNTIME_FAILURE = 10,
+};
+
 typedef struct {
   size_t struct_size;
   const char* key;
@@ -34,6 +47,12 @@ typedef struct {
 
 typedef struct {
   size_t struct_size;
+  char** tokens;
+  size_t token_count;
+} opencc_token_array_t;
+
+typedef struct {
+  size_t struct_size;
   const opencc_kv_pair_t* config;
   size_t config_size;
   opencc_segmentation_handle_t** out;
@@ -44,8 +63,7 @@ typedef struct {
   size_t struct_size;
   opencc_segmentation_handle_t* handle;
   const char* utf8_text;
-  char*** tokens;
-  size_t* token_count;
+  opencc_token_array_t* token_array;
   opencc_error_t* error;
 } opencc_segmentation_segment_args_t;
 
@@ -57,7 +75,7 @@ typedef struct {
   const char* segmentation_type;
   int (*create)(opencc_segmentation_create_args_t* args);
   int (*segment)(opencc_segmentation_segment_args_t* args);
-  void (*free_tokens)(char** tokens, size_t token_count);
+  void (*free_tokens)(opencc_token_array_t* token_array);
   void (*destroy)(opencc_segmentation_handle_t* handle);
   void (*free_error)(opencc_error_t* error);
 } opencc_segmentation_plugin_v1;

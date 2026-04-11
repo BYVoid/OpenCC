@@ -353,7 +353,10 @@ cc_library(
 cc_library(
     name = "plugin_segmentation",
     srcs = ["PluginSegmentation.cpp"],
-    hdrs = ["PluginSegmentation.hpp"],
+    hdrs = [
+        "PluginSegmentation.hpp",
+        "WinUtil.hpp",
+    ],
     linkopts = select({
         "@platforms//os:linux": ["-ldl"],
         "@platforms//os:osx": [],

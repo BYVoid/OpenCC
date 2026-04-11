@@ -39,6 +39,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=$PWD/install \
             -DENABLE_GTEST=ON \
+            -DBUILD_OPENCC_JIEBA_PLUGIN=ON \
             -DBUILD_SHARED_LIBS=OFF
           cmake --build build
           cmake --install build

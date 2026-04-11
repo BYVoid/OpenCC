@@ -53,6 +53,7 @@ jobs:
           cmake -S . -B build-release `
             -A "${{ matrix.cmake_arch }}" `
             -DCMAKE_BUILD_TYPE=Release `
+            -DBUILD_OPENCC_JIEBA_PLUGIN=ON `
             -DCMAKE_INSTALL_PREFIX:PATH="${{ github.workspace }}\dist\opencc-msvc-${{ matrix.package_suffix }}"
           cmake --build build-release --config Release --target install
 
@@ -62,8 +63,9 @@ jobs:
         run: |
           cmake -S . -B build-release `
             -A "${{ matrix.cmake_arch }}" `
-            -DCMAKE_BUILD_TYPE=Release
-          cmake --build build-release --config Release --target libopencc opencc opencc_dict opencc_phrase_extract
+            -DCMAKE_BUILD_TYPE=Release `
+            -DBUILD_OPENCC_JIEBA_PLUGIN=ON
+          cmake --build build-release --config Release --target libopencc opencc opencc_dict opencc_phrase_extract opencc_jieba
 
       - name: Build and test debug
         if: ${{ matrix.can_run_binaries }}
@@ -72,6 +74,7 @@ jobs:
           cmake -S . -B build-debug `
             -A "${{ matrix.cmake_arch }}" `
             -DCMAKE_BUILD_TYPE=Debug `
+            -DBUILD_OPENCC_JIEBA_PLUGIN=ON `
             -DENABLE_GTEST:BOOL=ON
           cmake --build build-debug --config Debug
           ctest --test-dir build-debug --build-config Debug --output-on-failure | Tee-Object -FilePath build-debug\ctest.log

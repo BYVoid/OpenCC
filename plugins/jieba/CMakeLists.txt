@@ -59,12 +59,16 @@ else()
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_BINARY_DIR}/src
   )
+  target_link_libraries(opencc_jieba PRIVATE libopencc)
 endif()
 target_compile_definitions(opencc_jieba PRIVATE OPENCC_PLUGIN_BUILD)
 set_target_properties(opencc_jieba PROPERTIES
   OUTPUT_NAME opencc-jieba
   POSITION_INDEPENDENT_CODE ON
 )
+if (WIN32)
+  set_target_properties(opencc_jieba PROPERTIES PREFIX "")
+endif()
 target_include_directories(opencc_jieba PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/include

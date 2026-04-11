@@ -27,7 +27,7 @@ class Jieba;
 
 namespace opencc {
 
-class OPENCC_EXPORT JiebaSegmentation : public Segmentation {
+class JiebaSegmentation : public Segmentation {
 public:
   JiebaSegmentation(const std::string& dictPath,
                     const std::string& modelPath,

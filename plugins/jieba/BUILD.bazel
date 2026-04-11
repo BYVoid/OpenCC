@@ -9,7 +9,7 @@ filegroup(
 
 filegroup(
     name = "resources",
-    srcs = ["//plugins/jieba/data/jieba_dict:jieba_dict"],
+    srcs = ["//plugins/jieba/deps/cppjieba:dict"],
 )
 
 filegroup(

@@ -49,7 +49,8 @@ std::string ResolveAuxPath(const std::string& dictPath,
   if (IsRegularFile(candidate)) {
     return candidate;
   }
-  const std::string needle = "data/jieba_dict/";
+  // Development fallback: try deps/cppjieba/dict/ relative to the source tree
+  const std::string needle = "share/opencc/jieba_dict/";
   std::string::size_type pos = dictPath.find(needle);
   if (pos != std::string::npos) {
     std::string alt = dictPath;

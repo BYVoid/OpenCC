@@ -108,11 +108,12 @@ if (BUILD_OPENCC_JIEBA_PLUGIN)
 
   install(
     DIRECTORY
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/jieba_dict/
+      ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/
     DESTINATION
       ${DIR_SHARE_OPENCC}/jieba_dict
     FILES_MATCHING
       PATTERN "*.utf8"
+      PATTERN "pos_dict" EXCLUDE
       PATTERN "README.md" EXCLUDE
   )
 endif()

@@ -141,6 +141,16 @@ std::string ResolveResourcePath(const std::string& rawPath,
       if (IsReadableFile(parentCandidate)) {
         return parentCandidate;
       }
+      const std::string parentParent = ParentDir(parent);
+      if (!parentParent.empty()) {
+        const std::string basename = rawPath.substr(rawPath.find_last_of("/\\") == std::string::npos
+                                                        ? 0
+                                                        : rawPath.find_last_of("/\\") + 1);
+        const std::string devCandidate = JoinPath(parentParent, "deps/cppjieba/dict/" + basename);
+        if (IsReadableFile(devCandidate)) {
+          return devCandidate;
+        }
+      }
     }
   }
   const char* dataDir = std::getenv("OPENCC_DATA_DIR");
@@ -157,13 +167,7 @@ std::string ResolveResourcePath(const std::string& rawPath,
     }
   }
 
-  const std::string devFallback = JoinPath("plugins/jieba/deps/cppjieba/dict/",
-                                           rawPath.substr(rawPath.find_last_of("/\\") == std::string::npos
-                                                              ? 0
-                                                              : rawPath.find_last_of("/\\") + 1));
-  if (IsReadableFile(devFallback)) {
-    return devFallback;
-  }
+
   return rawPath;
 }
 
@@ -177,7 +181,8 @@ std::string ResolveAuxPath(const std::string& dictPath,
       return candidate;
     }
   }
-  const std::string needle = "data/jieba_dict/";
+  // Development fallback: try deps/cppjieba/dict/ relative to the source tree
+  const std::string needle = "share/opencc/jieba_dict/";
   const std::string::size_type needlePos = dictPath.find(needle);
   if (needlePos != std::string::npos) {
     std::string alt = dictPath;

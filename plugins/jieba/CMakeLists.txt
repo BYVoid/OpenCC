@@ -6,7 +6,7 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   find_package(OpenCC REQUIRED)
 
   if (NOT DEFINED DIR_PLUGIN)
-    set(DIR_PLUGIN lib)
+    set(DIR_PLUGIN lib/opencc/plugins)
   endif()
   if (NOT DEFINED DIR_SHARE_OPENCC)
     set(DIR_SHARE_OPENCC share/opencc)

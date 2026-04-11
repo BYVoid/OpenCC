@@ -23,7 +23,7 @@
 
 #include <cstdlib>
 #include <cstring>
-#include <fstream>
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
@@ -51,8 +51,8 @@ bool IsAbsolutePath(const std::string& path) {
 }
 
 bool IsReadableFile(const std::string& path) {
-  std::ifstream ifs(path.c_str());
-  return ifs.is_open();
+  std::error_code error;
+  return std::filesystem::is_regular_file(std::filesystem::u8path(path), error);
 }
 
 std::string ParentDir(const std::string& path) {

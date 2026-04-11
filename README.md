@@ -117,7 +117,7 @@ int main() {
 
 ```
 
-Document 文檔: https://byvoid.github.io/OpenCC/
+Document 文檔: https://opencc.byvoid.com/docs/
 
 ### Command Line
 
@@ -165,6 +165,40 @@ Document 文檔: https://byvoid.github.io/OpenCC/
 ```sh
 OPENCC_DATA_DIR=/path/to/your/config/dir opencc --help
 ```
+
+### Experimental Plugins 試驗性插件
+
+OpenCC 現已支援外部 C++ 分詞插件。當前第一個插件為 `opencc-jieba`，
+可通過 `s2twp_jieba.json`、`tw2sp_jieba.json` 等插件配置啓用。
+
+OpenCC now supports external C++ segmentation plugins. The first plugin is
+`opencc-jieba`, which can be enabled through plugin-backed configs such as
+`s2twp_jieba.json` and `tw2sp_jieba.json`.
+
+注意：
+
+- 該插件機制目前仍為試驗性功能。
+- `jieba` 插件是可選組件，預設 OpenCC 構建、Python 套件和 Node.js 套件都不要求它。
+- `opencc-jieba` 額外依賴 `cppjieba` 及其配套詞典資源，這些依賴僅在構建或分發該插件時需要。
+- 在下一次正式發布版本之前，插件 ABI 仍可能發生變化，不應視為穩定介面。
+- 我們預計從下一次正式發布版本開始，將插件 ABI 視為穩定介面。
+- Windows 下插件必須與宿主 OpenCC 二進位使用 ABI 相容的工具鏈／執行時構建；MSVC 與 MinGW 產物不支援混用。
+
+Notes:
+
+- The plugin mechanism is currently experimental.
+- The `jieba` plugin is optional and is not required for the default OpenCC
+  build, Python package, or Node.js package.
+- `opencc-jieba` additionally depends on `cppjieba` and its dictionary
+  resources. These dependencies are only needed when building or distributing
+  the plugin itself.
+- The plugin ABI may still change before the next formal OpenCC release and
+  should not yet be treated as stable.
+- We expect to treat the plugin ABI as stable starting with the next formal
+  OpenCC release.
+- On Windows, plugins must be built with an ABI-compatible toolchain/runtime as
+  the host OpenCC binary. Mixing MSVC-built hosts with MinGW-built plugins, or
+  the reverse, is unsupported.
 
 ## Build 編譯
 
@@ -266,6 +300,9 @@ Apache License 2.0
 * [tclap](http://tclap.sourceforge.net/) MIT License
 * [rapidjson](https://github.com/Tencent/rapidjson) MIT License
 * [Google Test](https://github.com/google/googletest) BSD License
+* [cppjieba](https://github.com/yanyiwu/cppjieba) MIT License
+  - Optional dependency used by the experimental `opencc-jieba` plugin.
+  - 試驗性 `opencc-jieba` 插件使用的可選依賴。
 
 All these libraries are statically linked by default.
 

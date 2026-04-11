@@ -25,7 +25,7 @@
 
 #include <cstddef>
 #include <cstdlib>
-#include <fstream>
+#include <filesystem>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -82,8 +82,8 @@ bool IsTruthy(const char* value) {
 }
 
 bool IsReadableFile(const std::string& path) {
-  std::ifstream ifs(path.c_str(), std::ios::binary);
-  return ifs.is_open();
+  std::error_code error;
+  return std::filesystem::is_regular_file(std::filesystem::u8path(path), error);
 }
 
 std::vector<std::string> SplitSearchPath(const char* raw) {

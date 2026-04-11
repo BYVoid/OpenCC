@@ -42,11 +42,15 @@ For the `jieba` plugin, that means:
 - macOS: `libopencc-jieba.dylib`
 - Windows: `opencc-jieba.dll`
 
+MSYS/MinGW builds may emit `msys-opencc-jieba.dll`, which is also accepted by
+the loader.
+
 CMake installs plugin binaries into the platform plugin directory and installs
 plugin configs/resources into the OpenCC data directory.
 Within a single plugin search directory, keep only one DLL for a given
-segmentation type. Multiple matching DLL names for the same type are treated as
-an error.
+segmentation type. On Windows this applies to both `opencc-<type>.dll` and
+`msys-opencc-<type>.dll`. Multiple matching DLL names for the same type in one
+search directory are treated as an error.
 
 ## Resource Resolution
 
@@ -92,27 +96,37 @@ Current `jieba` targets:
 2. Export `opencc_get_segmentation_plugin_v1()`.
 3. Name the output binary using the `opencc-<type>` convention.
 4. Keep JSON configs platform-neutral and resource-oriented.
-  5. Add both CMake and Bazel build rules.
-  6. Add an integration test that loads the built plugin through the real host.
+5. Add both CMake and Bazel build rules.
+6. Add an integration test that loads the built plugin through the real host.
 
-  ## Packaging for Distro Maintainers
+## Packaging for Distro Maintainers
 
-  To align with downstream Linux distribution packaging standards (e.g., Debian `apt`, Arch `pacman`), OpenCC plugins strongly support **decoupled compilation**. This allows maintainers to build and distribute the core `opencc` system separately from heavy third-party plugins like `opencc-jieba`.
+To align with downstream Linux distribution packaging standards (e.g., Debian
+`apt`, Arch `pacman`), OpenCC plugins support decoupled compilation. This lets
+maintainers build and distribute the core `opencc` system separately from
+heavier third-party plugins such as `opencc-jieba`.
 
-  ### 1. Build and Install Core OpenCC
-  Compile the main directory normally but ensure plugins are disabled.
-  ```bash
-  mkdir build_core && cd build_core
-  cmake .. -DBUILD_OPENCC_JIEBA_PLUGIN=OFF -DCMAKE_INSTALL_PREFIX=/usr
-  make && make install
-  ```
+### 1. Build And Install Core OpenCC
 
-  ### 2. Build the Plugin Standalone
-  Plugins can automatically detect if they are being built standalone. CD directly into the plugin directory and point `OpenCC_DIR` to the CMake registry established in step 1.
-  ```bash
-  cd plugins/jieba
-  mkdir build_plugin && cd build_plugin
-  cmake .. -DOpenCC_DIR=/usr/lib/cmake/opencc -DCMAKE_INSTALL_PREFIX=/usr
-  make && make install
-  ```
-  *(Note: Standalone default installation paths like `DIR_PLUGIN` will natively align with the core OpenCC configuration, e.g., `/usr/lib/opencc/plugins`)*
+Compile the main tree normally, but disable the optional `jieba` plugin:
+
+```bash
+mkdir build_core && cd build_core
+cmake .. -DBUILD_OPENCC_JIEBA_PLUGIN=OFF -DCMAKE_INSTALL_PREFIX=/usr
+make && make install
+```
+
+### 2. Build The Plugin Standalone
+
+Plugins can detect standalone builds automatically. Build from the plugin
+directory and point `OpenCC_DIR` at the installed OpenCC CMake package:
+
+```bash
+cd plugins/jieba
+mkdir build_plugin && cd build_plugin
+cmake .. -DOpenCC_DIR=/usr/lib/cmake/opencc -DCMAKE_INSTALL_PREFIX=/usr
+make && make install
+```
+
+Standalone default installation paths are intended to align with the core
+OpenCC layout, for example `/usr/lib/opencc/plugins`.

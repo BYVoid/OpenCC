@@ -263,6 +263,18 @@ opencc::Segmentation* GetSegmentation(opencc_segmentation_handle_t* handle) {
   return handle->segmentation.get();
 }
 
+void FreeTokens(opencc_token_array_t* tokenArray) {
+  if (tokenArray == nullptr || tokenArray->tokens == nullptr) {
+    return;
+  }
+  for (size_t i = 0; i < tokenArray->token_count; i++) {
+    delete[] tokenArray->tokens[i];
+  }
+  delete[] tokenArray->tokens;
+  tokenArray->tokens = nullptr;
+  tokenArray->token_count = 0;
+}
+
 int SegmentWithJieba(opencc_segmentation_segment_args_t* args) {
   if (args == nullptr || args->struct_size < sizeof(*args) ||
       args->handle == nullptr || args->token_array == nullptr ||
@@ -278,7 +290,7 @@ int SegmentWithJieba(opencc_segmentation_segment_args_t* args) {
         GetSegmentation(args->handle)->Segment(args->utf8_text);
     args->token_array->tokens = nullptr;
     args->token_array->token_count = segments->Length();
-    args->token_array->tokens = new char*[args->token_array->token_count];
+    args->token_array->tokens = new char*[args->token_array->token_count]();
     for (size_t i = 0; i < args->token_array->token_count; i++) {
       const char* token = segments->At(i);
       const size_t length = std::strlen(token);
@@ -287,25 +299,15 @@ int SegmentWithJieba(opencc_segmentation_segment_args_t* args) {
     }
     return 0;
   } catch (const std::exception& ex) {
+    FreeTokens(args->token_array);
     SetError(args->error, OPENCC_ERROR_PLUGIN_RUNTIME_FAILURE, ex.what());
     return -1;
   } catch (...) {
+    FreeTokens(args->token_array);
     SetError(args->error, OPENCC_ERROR_PLUGIN_RUNTIME_FAILURE,
              "Unknown error while segmenting text.");
     return -1;
   }
-}
-
-void FreeTokens(opencc_token_array_t* tokenArray) {
-  if (tokenArray == nullptr || tokenArray->tokens == nullptr) {
-    return;
-  }
-  for (size_t i = 0; i < tokenArray->token_count; i++) {
-    delete[] tokenArray->tokens[i];
-  }
-  delete[] tokenArray->tokens;
-  tokenArray->tokens = nullptr;
-  tokenArray->token_count = 0;
 }
 
 void DestroyJiebaSegmentation(opencc_segmentation_handle_t* handle) {

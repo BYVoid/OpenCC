@@ -259,6 +259,7 @@ public:
     args.error = &error;
     const int status = plugin_->descriptor->segment(&args);
     if (status != 0) {
+      plugin_->descriptor->free_tokens(&tokenArray);
       ThrowPluginError(plugin_->descriptor, &error,
                        plugin_->descriptor->segmentation_type,
                        "Segmentation plugin failed", "unknown error");

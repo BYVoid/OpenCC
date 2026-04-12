@@ -64,56 +64,73 @@ static void BM_Initialization(benchmark::State& state,
   }
 }
 BENCHMARK_CAPTURE(BM_Initialization, hk2s, "hk2s")
-    ->Unit(benchmark::kMillisecond);
+    ->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Initialization, hk2t, "hk2t")
-    ->Unit(benchmark::kMillisecond);
+    ->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Initialization, jp2t, "jp2t")
-    ->Unit(benchmark::kMillisecond);
+    ->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Initialization, s2hk, "s2hk")
-    ->Unit(benchmark::kMillisecond);
-BENCHMARK_CAPTURE(BM_Initialization, s2t, "s2t")->Unit(benchmark::kMillisecond);
+    ->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Initialization, s2t, "s2t")->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Initialization, s2tw, "s2tw")
-    ->Unit(benchmark::kMillisecond);
+    ->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Initialization, s2twp, "s2twp")
-    ->Unit(benchmark::kMillisecond);
+    ->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Initialization, t2hk, "t2hk")
-    ->Unit(benchmark::kMillisecond);
+    ->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Initialization, t2jp, "t2jp")
-    ->Unit(benchmark::kMillisecond);
-BENCHMARK_CAPTURE(BM_Initialization, t2s, "t2s")->Unit(benchmark::kMillisecond);
+    ->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Initialization, t2s, "t2s")->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Initialization, tw2s, "tw2s")
-    ->Unit(benchmark::kMillisecond);
+    ->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Initialization, tw2sp, "tw2sp")
-    ->Unit(benchmark::kMillisecond);
+    ->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Initialization, tw2t, "tw2t")
-    ->Unit(benchmark::kMillisecond);
+    ->Unit(benchmark::kMicrosecond);
 
-static void BM_Convert2M(benchmark::State& state) {
-  const std::string config_name = "s2t";
+static void BM_ConvertLongText(benchmark::State& state,
+                               std::string config_name) {
   const std::string text = ReadText("zuozhuan.txt");
   const std::unique_ptr<SimpleConverter> converter(Initialize(config_name));
   for (auto _ : state) {
     Convert(converter.get(), text);
   }
+  state.SetBytesProcessed(
+      static_cast<int64_t>(state.iterations()) * static_cast<int64_t>(text.size()));
 }
-BENCHMARK(BM_Convert2M)->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_ConvertLongText, s2t, "s2t")->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_ConvertLongText, s2twp, "s2twp")
+    ->Unit(benchmark::kMillisecond);
 
-static void BM_Convert(benchmark::State& state, int iteration) {
+static void BM_Convert(benchmark::State& state, std::string config_name,
+                       int iteration) {
   std::ostringstream os;
   for (int i = 0; i < iteration; i++) {
     os << "Open Chinese Convert 開放中文轉換" << i << std::endl;
   }
   const std::string text = os.str();
-  const std::string config_name = "s2t";
   const std::unique_ptr<SimpleConverter> converter(Initialize(config_name));
   for (auto _ : state) {
     Convert(converter.get(), text);
   }
+  state.SetBytesProcessed(
+      static_cast<int64_t>(state.iterations()) * static_cast<int64_t>(text.size()));
 }
-BENCHMARK_CAPTURE(BM_Convert, 100, 100)->Unit(benchmark::kMillisecond);
-BENCHMARK_CAPTURE(BM_Convert, 1000, 1000)->Unit(benchmark::kMillisecond);
-BENCHMARK_CAPTURE(BM_Convert, 10000, 10000)->Unit(benchmark::kMillisecond);
-BENCHMARK_CAPTURE(BM_Convert, 100000, 100000)->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Convert, s2t_100, "s2t", 100)->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Convert, s2t_1000, "s2t", 1000)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Convert, s2t_10000, "s2t", 10000)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Convert, s2t_100000, "s2t", 100000)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Convert, s2twp_100, "s2twp", 100)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Convert, s2twp_1000, "s2twp", 1000)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Convert, s2twp_10000, "s2twp", 10000)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Convert, s2twp_100000, "s2twp", 100000)
+    ->Unit(benchmark::kMillisecond);
 
 } // namespace opencc
 

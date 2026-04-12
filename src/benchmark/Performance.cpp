@@ -81,6 +81,8 @@ BENCHMARK_CAPTURE(BM_Initialization, t2hk, "t2hk")
 BENCHMARK_CAPTURE(BM_Initialization, t2jp, "t2jp")
     ->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Initialization, t2s, "t2s")->Unit(benchmark::kMicrosecond);
+BENCHMARK_CAPTURE(BM_Initialization, t2tw, "t2tw")
+    ->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Initialization, tw2s, "tw2s")
     ->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Initialization, tw2sp, "tw2sp")

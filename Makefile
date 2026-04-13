@@ -17,7 +17,7 @@
 #
 
 PREFIX = /usr
-REL_BUILD_DOCUMENTATION ?= ON
+REL_BUILD_DOCUMENTATION ?= OFF
 
 .PHONY: bazel build clean node test xcode-build
 

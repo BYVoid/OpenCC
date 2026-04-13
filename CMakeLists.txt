@@ -145,7 +145,7 @@ endif ()
 
 include(CMakePackageConfigHelpers)
 
-set(targets_export_name OpenCCTargets)
+set(OPENCC_TARGETS_EXPORT_NAME OpenCCTargets)
 
 configure_file(
   opencc.pc.in
@@ -170,7 +170,7 @@ configure_package_config_file(
   OpenCCConfig.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/OpenCCConfig.cmake
   INSTALL_DESTINATION ${DIR_LIBRARY}/cmake/opencc
-  PATH_VARS DIR_INCLUDE
+  PATH_VARS DIR_INCLUDE DIR_PLUGIN DIR_SHARE_OPENCC
 )
 
 install(

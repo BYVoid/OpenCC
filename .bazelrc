@@ -4,3 +4,9 @@ common --enable_platform_specific_config
 # Enable C++17 for MSVC on Windows
 build:windows --cxxopt=/std:c++17
 build:windows --host_cxxopt=/std:c++17
+
+# Enable C++17 for GCC/Clang on Linux and macOS
+build:linux --cxxopt=-std=c++17
+build:linux --host_cxxopt=-std=c++17
+build:macos --cxxopt=-std=c++17
+build:macos --host_cxxopt=-std=c++17

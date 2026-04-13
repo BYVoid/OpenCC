@@ -36,6 +36,13 @@ jobs:
         run: make test VERBOSE=1
       - name: make benchmark
         run: make benchmark VERBOSE=1
+      - name: Test standalone plugin build
+        run: |
+          make PREFIX=$PWD/install install VERBOSE=1
+          cmake -S plugins/jieba -B build-standalone \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DOpenCC_DIR=$PWD/install/lib/cmake/opencc
+          cmake --build build-standalone
       - name: upload artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4

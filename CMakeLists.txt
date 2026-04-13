@@ -29,7 +29,6 @@ option(BUILD_SHARED_LIBS "Build opencc as shared library" ON)
 option(ENABLE_GTEST "Build all tests." OFF)
 option(ENABLE_BENCHMARK "Build benchmark tests." OFF)
 option(ENABLE_DARTS "Build DartsDict (ocd format)." ON)
-option(ENABLE_JIEBA "Deprecated compatibility option. Use BUILD_OPENCC_JIEBA_PLUGIN." OFF)
 option(BUILD_OPENCC_JIEBA_PLUGIN "Build Jieba segmentation as a loadable plugin." OFF)
 option(BUILD_PYTHON "Build python library" OFF)
 option(USE_SYSTEM_DARTS "Use system version of Darts" OFF)
@@ -239,11 +238,6 @@ if (ENABLE_DARTS)
   add_definitions(
     -DENABLE_DARTS
   )
-endif()
-
-if (ENABLE_JIEBA)
-  message(WARNING "ENABLE_JIEBA is deprecated; enabling BUILD_OPENCC_JIEBA_PLUGIN for compatibility.")
-  set(BUILD_OPENCC_JIEBA_PLUGIN ON)
 endif()
 
 add_definitions(

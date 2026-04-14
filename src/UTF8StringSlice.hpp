@@ -56,29 +56,17 @@ public:
   typedef LENGTH_TYPE LengthType;
 
   UTF8StringSliceBase(const char* _str) : str(_str), utf8Length(0), byteLength(0) {
-    // Compute utf8Length and byteLength in one pass so they remain consistent
-    // even when the input ends with a truncated multi-byte UTF-8 sequence
-    // (issue #799 fix).  Silently stopping (rather than throwing) is
-    // intentional: the constructor is called from paths that do not catch
-    // exceptions (e.g. PhraseExtract::SetFullText), so stopping early and
-    // returning an empty/short slice is the safe fallback.
+    // UTF8Util::Length() counts only complete UTF-8 characters, stopping
+    // before any truncated multi-byte sequence at the end of the string
+    // (issue #799 fix).  Using two simple passes instead of one complex
+    // nested-loop pass avoids a MSVC LTCG code-generator ICE that is
+    // triggered by bool-flag patterns in template bodies.
+    utf8Length = static_cast<LengthType>(UTF8Util::Length(_str));
+    // Advance exactly utf8Length complete characters to derive byteLength,
+    // keeping it consistent with utf8Length even for truncated input.
     const char* pstr = _str;
-    while (*pstr != '\0') {
-      const size_t charLen = UTF8Util::NextCharLengthNoException(pstr);
-      if (charLen == 0)
-        break; // Invalid leading byte: stop
-      // Stop if advancing charLen bytes would cross the null terminator
-      bool truncated = false;
-      for (size_t i = 1; i < charLen; i++) {
-        if (pstr[i] == '\0') {
-          truncated = true;
-          break;
-        }
-      }
-      if (truncated)
-        break;
-      pstr += charLen;
-      utf8Length++;
+    for (LengthType i = 0; i < utf8Length; ++i) {
+      pstr = UTF8Util::NextChar(pstr);
     }
     byteLength = static_cast<LengthType>(pstr - _str);
   }

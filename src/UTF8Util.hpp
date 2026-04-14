@@ -135,14 +135,18 @@ public:
       if (charLen == 0) {
         throw InvalidUTF8(str);
       }
-      // Ensure the multi-byte sequence does not cross the null terminator
-      for (size_t i = 1; i < charLen; i++) {
-        if (str[i] == '\0') {
-          return length;
-        }
+      // Verify that all bytes of this character are present before the null
+      // terminator.  Use a while loop (not a for-with-return) to avoid complex
+      // control flow that triggers MSVC LTCG code-generator bugs.
+      size_t i = 1;
+      while (i < charLen && str[i] != '\0') {
+        ++i;
+      }
+      if (i < charLen) {
+        break; // Truncated sequence: stop without reading past null terminator
       }
       str += charLen;
-      length++;
+      ++length;
     }
     return length;
   }

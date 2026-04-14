@@ -76,7 +76,11 @@ TEST_F(ConfigTest, NewFromStringWitoutTrailingSlash) {
   const ConverterPtr _ = config.NewFromString(content, CONFIG_TEST_DIR_PATH);
 }
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_MSC_VER)
+// This case exists only to verify Windows Unicode path handling in OpenCC
+// itself. Other platforms do not have this specific regression, and MinGW-like
+// Windows environments do not provide a stable enough std::filesystem Unicode
+// behavior for this check to be reliable.
 TEST_F(ConfigTest, LoadConfigFromUnicodePath) {
   namespace fs = std::filesystem;
 
@@ -96,7 +100,6 @@ TEST_F(ConfigTest, LoadConfigFromUnicodePath) {
   fs::copy_file(sourceDir / "config_test_characters.txt",
                 tempDir / "config_test_characters.txt",
                 fs::copy_options::overwrite_existing);
-
   try {
     const ConverterPtr unicodeConverter =
         config.NewFromFile(tempDir.u8string() + "/config_test.json");

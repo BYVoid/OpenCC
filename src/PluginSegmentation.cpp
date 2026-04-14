@@ -369,7 +369,11 @@ private:
 
     const std::string currentLibraryDir = GetCurrentLibraryDirectory();
     if (!currentLibraryDir.empty()) {
+#if defined(_WIN32) || defined(_WIN64)
       AppendUnique(dirs, JoinPath(currentLibraryDir, "plugins"));
+#else
+      AppendUnique(dirs, JoinPath(currentLibraryDir, "opencc/plugins"));
+#endif
       AppendUnique(dirs, currentLibraryDir);
     }
     return dirs;

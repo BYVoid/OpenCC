@@ -80,12 +80,6 @@ public:
    */
   static size_t PrevCharLength(const char* str) {
     {
-      const size_t length = NextCharLengthNoException(str - 3);
-      if (length == 3) {
-        return length;
-      }
-    }
-    {
       const size_t length = NextCharLengthNoException(str - 1);
       if (length == 1) {
         return length;
@@ -94,6 +88,12 @@ public:
     {
       const size_t length = NextCharLengthNoException(str - 2);
       if (length == 2) {
+        return length;
+      }
+    }
+    {
+      const size_t length = NextCharLengthNoException(str - 3);
+      if (length == 3) {
         return length;
       }
     }
@@ -121,13 +121,30 @@ public:
   }
 
   /**
-   * Returns the UTF8 length of a valid UTF8 std::string.
+   * Returns the UTF8 length of a null-terminated string.
+   * Throws InvalidUTF8 for invalid or truncated byte sequences.
+   * The truncated-sequence check reads only up to the null terminator, so it
+   * does not read out of bounds (issue #799 fix).
    */
   static size_t Length(const char* str) {
     size_t length = 0;
     while (*str != '\0') {
-      str = NextChar(str);
-      length++;
+      const size_t charLen = NextCharLengthNoException(str);
+      if (charLen == 0) {
+        throw InvalidUTF8(str);
+      }
+      // Verify all continuation bytes are present before the null terminator.
+      // Use a while loop (not a for-with-return) to avoid complex control flow
+      // that triggers MSVC LTCG code-generator bugs.
+      size_t i = 1;
+      while (i < charLen && str[i] != '\0') {
+        ++i;
+      }
+      if (i < charLen) {
+        throw InvalidUTF8(str); // Truncated sequence: throw, don't silently skip
+      }
+      str += charLen;
+      ++length;
     }
     return length;
   }

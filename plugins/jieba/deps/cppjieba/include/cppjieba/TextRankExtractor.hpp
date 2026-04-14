@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include "Jieba.hpp"
+#include "UnicodeFile.hpp"
 
 namespace cppjieba {
   using namespace limonp;
@@ -163,7 +164,8 @@ namespace cppjieba {
     }
   private:
     void LoadStopWordDict(const string& filePath) {
-      ifstream ifs(filePath.c_str());
+      ifstream ifs;
+      OpenInputFile(filePath, ifs);
       XCHECK(ifs.is_open()) << "open " << filePath << " failed";
       string line ;
       while (getline(ifs, line)) {

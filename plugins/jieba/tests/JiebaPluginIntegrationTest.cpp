@@ -179,15 +179,31 @@ protected:
   std::string BuildCommand(const std::string& config,
                            const std::string& inputFile,
                            const std::string& outputFile) const {
-    std::string cmd = EnvPrefix() + QuotePath(OpenccCommand()) + " -i " +
-                      QuotePath(inputFile) + " -o " + QuotePath(outputFile) +
-                      " -c " + QuotePath(ConfigPath(config)) + " --path " +
-                      QuotePath(DictionaryDirectory() + "/");
+    std::string cmd =
+        BuildCommandWithPaths(ConfigPath(config), inputFile, outputFile,
+                              DictionaryDirectory() + "/", PluginDirectory());
 #ifdef _WIN32
     return "\"" + cmd + "\"";
 #else
     return cmd;
 #endif
+  }
+
+  std::string BuildCommandWithPaths(const std::string& configPath,
+                                    const std::string& inputFile,
+                                    const std::string& outputFile,
+                                    const std::string& dictionaryDir,
+                                    const std::string& pluginDir) const {
+#ifdef _WIN32
+    std::string envPrefix =
+        "set \"OPENCC_SEGMENTATION_PLUGIN_PATH=" + pluginDir + "\" && ";
+#else
+    std::string envPrefix =
+        "OPENCC_SEGMENTATION_PLUGIN_PATH=" + QuotePath(pluginDir) + " ";
+#endif
+    return envPrefix + QuotePath(OpenccCommand()) + " -i " + QuotePath(inputFile) +
+           " -o " + QuotePath(outputFile) + " -c " + QuotePath(configPath) +
+           " --path " + QuotePath(dictionaryDir);
   }
 
   static CasesByConfig LoadCases(const std::string& jsonPath) {
@@ -270,5 +286,67 @@ TEST_F(JiebaPluginIntegrationTest, ConvertFromJsonCases) {
     EXPECT_EQ(idx, entry.second.size()) << "config=" << config;
   }
 }
+
+#if defined(_WIN32) || defined(_WIN64)
+TEST_F(JiebaPluginIntegrationTest, ConvertFromUnicodePluginPath) {
+  namespace fs = std::filesystem;
+
+  const fs::path tempRoot =
+      fs::temp_directory_path() /
+      fs::u8path("opencc-jieba-中文路径-" +
+                 std::to_string(GetCurrentProcessId()));
+  const fs::path tempShareOpencc = tempRoot / "share" / "opencc";
+  const fs::path tempJiebaDict = tempShareOpencc / "jieba_dict";
+  const fs::path tempPlugins = tempRoot / "bin" / "plugins";
+  const fs::path inputFile = tempRoot / "input.txt";
+  const fs::path outputFile = tempRoot / "output.txt";
+  const fs::path configFile = tempShareOpencc / "s2twp_jieba.json";
+  const fs::path sourceConfig = fs::u8path(ConfigPath("s2twp_jieba"));
+  const fs::path sourceJiebaDict = sourceConfig.parent_path().parent_path() /
+                                   "deps" / "cppjieba" / "dict";
+  const fs::path sourcePluginDir = fs::u8path(PluginDirectory());
+
+  fs::remove_all(tempRoot);
+  fs::create_directories(tempJiebaDict);
+  fs::create_directories(tempPlugins);
+  fs::copy_file(sourceConfig, configFile, fs::copy_options::overwrite_existing);
+  for (const auto& entry : fs::directory_iterator(sourceJiebaDict)) {
+    if (!entry.is_regular_file()) {
+      continue;
+    }
+    fs::copy_file(entry.path(), tempJiebaDict / entry.path().filename(),
+                  fs::copy_options::overwrite_existing);
+  }
+  for (const auto& entry : fs::directory_iterator(sourcePluginDir)) {
+    if (!entry.is_regular_file()) {
+      continue;
+    }
+    fs::copy_file(entry.path(), tempPlugins / entry.path().filename(),
+                  fs::copy_options::overwrite_existing);
+  }
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "生活着名为正敏的少女\n";
+  }
+
+  const std::string cmd = BuildCommandWithPaths(
+      configFile.u8string(), inputFile.u8string(), outputFile.u8string(),
+      DictionaryDirectory() + "/", tempPlugins.u8string());
+  ASSERT_EQ(0, system(("\"" + cmd + "\"").c_str()));
+
+  std::ifstream ifs(outputFile, std::ios::binary);
+  ASSERT_TRUE(ifs.is_open());
+  std::string line;
+  ASSERT_TRUE(std::getline(ifs, line));
+  if (!line.empty() && line.back() == '\r') {
+    line.pop_back();
+  }
+  EXPECT_EQ("生活著名為正敏的少女", line);
+
+  fs::remove_all(tempRoot);
+}
+#endif
 
 } // namespace opencc

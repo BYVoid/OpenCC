@@ -564,6 +564,26 @@
         "s2tw": "大數據",
         "s2twp": "大數據"
       }
+    },
+    {
+      "id": "hk_place_connaught_road",
+      "input": "干诺道",
+      "expected": {
+        "s2t": "干諾道",
+        "s2hk": "干諾道",
+        "s2tw": "干諾道",
+        "s2twp": "干諾道"
+      }
+    },
+    {
+      "id": "hk_place_quarry_bay",
+      "input": "鲗鱼涌",
+      "expected": {
+        "s2t": "鰂魚涌",
+        "s2hk": "鰂魚涌",
+        "s2tw": "鰂魚涌",
+        "s2twp": "鰂魚涌"
+      }
     }
   ]
 }

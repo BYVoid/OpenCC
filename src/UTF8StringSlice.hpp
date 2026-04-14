@@ -56,8 +56,12 @@ public:
   typedef LENGTH_TYPE LengthType;
 
   UTF8StringSliceBase(const char* _str) : str(_str), utf8Length(0), byteLength(0) {
-    // Compute utf8Length and byteLength together so they remain consistent
-    // even when the input ends with a truncated multi-byte UTF-8 sequence.
+    // Compute utf8Length and byteLength in one pass so they remain consistent
+    // even when the input ends with a truncated multi-byte UTF-8 sequence
+    // (issue #799 fix).  Silently stopping (rather than throwing) is
+    // intentional: the constructor is called from paths that do not catch
+    // exceptions (e.g. PhraseExtract::SetFullText), so stopping early and
+    // returning an empty/short slice is the safe fallback.
     const char* pstr = _str;
     while (*pstr != '\0') {
       const size_t charLen = UTF8Util::NextCharLengthNoException(pstr);

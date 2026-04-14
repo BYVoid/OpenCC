@@ -122,8 +122,11 @@ public:
 
   /**
    * Returns the UTF8 length of a null-terminated string.
-   * Stops early (without reading past the null terminator) if a truncated
-   * multi-byte sequence is encountered at the end of the string.
+   * Throws InvalidUTF8 for invalid leading bytes (same as the original
+   * behaviour via NextChar/NextCharLength).
+   * Stops early and returns the count of complete characters if a truncated
+   * multi-byte sequence is found before the null terminator, instead of
+   * reading past the null terminator (issue #799 fix).
    */
   static size_t Length(const char* str) {
     size_t length = 0;

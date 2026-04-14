@@ -353,13 +353,17 @@ std::string GetParentDirectory(const std::string& path) {
 }
 
 bool isRegularFile(const std::string& path) {
-    struct stat info;
-
-    if (stat(path.c_str(), &info) != 0)
-        return false;
-
-    // Check if it's a regular file
-    return (info.st_mode & S_IFMT) == S_IFREG;
+#if defined(_WIN32) || defined(_WIN64)
+  const DWORD attributes = GetFileAttributesW(WideFromUtf8(path).c_str());
+  return attributes != INVALID_FILE_ATTRIBUTES &&
+         (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
+#else
+  struct stat info;
+  if (stat(path.c_str(), &info) != 0) {
+    return false;
+  }
+  return (info.st_mode & S_IFMT) == S_IFREG;
+#endif
 }
 
 } // namespace

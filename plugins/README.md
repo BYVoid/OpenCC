@@ -142,4 +142,7 @@ make && make install
 ```
 
 Standalone default installation paths are intended to align with the core
-OpenCC layout, for example `/usr/lib/opencc/plugins`.
+OpenCC layout:
+
+- Windows: `bin/plugins`
+- Linux/macOS: `lib/opencc/plugins`

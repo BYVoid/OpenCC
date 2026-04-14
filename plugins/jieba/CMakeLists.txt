@@ -26,7 +26,7 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
 
   if (NOT DEFINED DIR_PLUGIN)
     if (WIN32)
-      set(_opencc_default_plugin_dir bin/opencc/plugins)
+      set(_opencc_default_plugin_dir bin/plugins)
     else()
       set(_opencc_default_plugin_dir lib/opencc/plugins)
     endif()

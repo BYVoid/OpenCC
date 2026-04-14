@@ -539,6 +539,31 @@
         "s2twp": "星露谷物語",
         "s2hk": "星露谷物語"
       }
+    },
+    {
+      "id": "mobile_data_s2twp",
+      "input": "移动数据",
+      "expected": {
+        "s2t": "移動數據",
+        "s2tw": "移動數據",
+        "s2twp": "行動數據"
+      }
+    },
+    {
+      "id": "mobile_data_tw2sp",
+      "input": "行動數據",
+      "expected": {
+        "tw2sp": "移动数据"
+      }
+    },
+    {
+      "id": "big_data_s2twp",
+      "input": "大数据",
+      "expected": {
+        "s2t": "大數據",
+        "s2tw": "大數據",
+        "s2twp": "大數據"
+      }
     }
   ]
 }

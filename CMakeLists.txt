@@ -117,7 +117,7 @@ endif (DEFINED LIB_INSTALL_DIR)
 
 set (DIR_SHARE_OPENCC ${DIR_SHARE}/opencc)
 if (WIN32)
-  set (DIR_PLUGIN bin/opencc/plugins)
+  set (DIR_PLUGIN bin/plugins)
 else ()
   set (DIR_PLUGIN ${DIR_LIBRARY}/opencc/plugins)
 endif ()

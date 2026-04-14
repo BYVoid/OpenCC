@@ -27,6 +27,10 @@
 
 #include "test/PortableUtil.hpp"
 
+#if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+#endif
+
 #ifdef BAZEL
 #include "tools/cpp/runfiles/runfiles.h"
 using bazel::tools::cpp::runfiles::Runfiles;
@@ -206,6 +210,23 @@ protected:
            " --path " + QuotePath(dictionaryDir);
   }
 
+#if defined(_WIN32) || defined(_WIN64)
+  static int RunCommandUtf8(const std::string& command) {
+    const int size =
+        MultiByteToWideChar(CP_UTF8, 0, command.c_str(), -1, nullptr, 0);
+    if (size <= 1) {
+      return -1;
+    }
+    std::wstring wide(static_cast<size_t>(size), L'\0');
+    MultiByteToWideChar(CP_UTF8, 0, command.c_str(), -1, &wide[0], size);
+    return _wsystem(wide.c_str());
+  }
+#else
+  static int RunCommandUtf8(const std::string& command) {
+    return system(command.c_str());
+  }
+#endif
+
   static CasesByConfig LoadCases(const std::string& jsonPath) {
     CasesByConfig cases;
     std::ifstream ifs(jsonPath);
@@ -268,7 +289,7 @@ TEST_F(JiebaPluginIntegrationTest, ConvertFromJsonCases) {
       }
     }
 
-    ASSERT_EQ(0, system(BuildCommand(config, inputFile, outputFile).c_str()));
+    ASSERT_EQ(0, RunCommandUtf8(BuildCommand(config, inputFile, outputFile)));
 
     std::ifstream ifs(outputFile, std::ios::binary);
     ASSERT_TRUE(ifs.is_open());
@@ -334,7 +355,7 @@ TEST_F(JiebaPluginIntegrationTest, ConvertFromUnicodePluginPath) {
   const std::string cmd = BuildCommandWithPaths(
       configFile.u8string(), inputFile.u8string(), outputFile.u8string(),
       DictionaryDirectory() + "/", tempPlugins.u8string());
-  ASSERT_EQ(0, system(("\"" + cmd + "\"").c_str()));
+  ASSERT_EQ(0, RunCommandUtf8("\"" + cmd + "\""));
 
   std::ifstream ifs(outputFile, std::ios::binary);
   ASSERT_TRUE(ifs.is_open());

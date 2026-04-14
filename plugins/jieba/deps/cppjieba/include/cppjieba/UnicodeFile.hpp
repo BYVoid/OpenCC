@@ -1,6 +1,7 @@
 #ifndef CPPJIEBA_UNICODE_FILE_HPP
 #define CPPJIEBA_UNICODE_FILE_HPP
 
+#include <filesystem>
 #include <fstream>
 #include <string>
 
@@ -30,7 +31,7 @@ inline std::wstring WidePathFromUtf8(const std::string& path) {
 inline void OpenInputFile(const std::string& path, std::ifstream& ifs,
                           std::ios_base::openmode mode = std::ios::in) {
 #if defined(_WIN32) || defined(_WIN64)
-  ifs.open(WidePathFromUtf8(path), mode);
+  ifs.open(std::filesystem::path(WidePathFromUtf8(path)), mode);
 #else
   ifs.open(path.c_str(), mode);
 #endif

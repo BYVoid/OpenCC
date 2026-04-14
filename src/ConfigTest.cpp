@@ -17,6 +17,11 @@
  */
 
 #include <fstream>
+#include <filesystem>
+
+#if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+#endif
 
 #include "Config.hpp"
 #include "ConfigTestBase.hpp"
@@ -70,5 +75,39 @@ TEST_F(ConfigTest, NewFromStringWitoutTrailingSlash) {
 
   const ConverterPtr _ = config.NewFromString(content, CONFIG_TEST_DIR_PATH);
 }
+
+#if defined(_WIN32) || defined(_WIN64)
+TEST_F(ConfigTest, LoadConfigFromUnicodePath) {
+  namespace fs = std::filesystem;
+
+  const fs::path sourceDir = fs::u8path(CONFIG_TEST_DIR_PATH);
+  const fs::path tempDir =
+      fs::temp_directory_path() /
+      fs::u8path("opencc-中文路径-config-test-" +
+                 std::to_string(GetCurrentProcessId()));
+
+  fs::remove_all(tempDir);
+  fs::create_directories(tempDir);
+  fs::copy_file(sourceDir / "config_test.json", tempDir / "config_test.json",
+                fs::copy_options::overwrite_existing);
+  fs::copy_file(sourceDir / "config_test_phrases.txt",
+                tempDir / "config_test_phrases.txt",
+                fs::copy_options::overwrite_existing);
+  fs::copy_file(sourceDir / "config_test_characters.txt",
+                tempDir / "config_test_characters.txt",
+                fs::copy_options::overwrite_existing);
+
+  try {
+    const ConverterPtr unicodeConverter =
+        config.NewFromFile(tempDir.u8string() + "/config_test.json");
+    EXPECT_EQ(expected, unicodeConverter->Convert(input));
+  } catch (...) {
+    fs::remove_all(tempDir);
+    throw;
+  }
+
+  fs::remove_all(tempDir);
+}
+#endif
 
 } // namespace opencc

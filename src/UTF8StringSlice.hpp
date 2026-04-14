@@ -55,9 +55,29 @@ template <typename LENGTH_TYPE> class UTF8StringSliceBase {
 public:
   typedef LENGTH_TYPE LengthType;
 
-  UTF8StringSliceBase(const char* _str)
-      : str(_str), utf8Length(static_cast<LengthType>(UTF8Util::Length(_str))),
-        byteLength(static_cast<LengthType>(strlen(_str))) {}
+  UTF8StringSliceBase(const char* _str) : str(_str), utf8Length(0), byteLength(0) {
+    // Compute utf8Length and byteLength together so they remain consistent
+    // even when the input ends with a truncated multi-byte UTF-8 sequence.
+    const char* pstr = _str;
+    while (*pstr != '\0') {
+      const size_t charLen = UTF8Util::NextCharLengthNoException(pstr);
+      if (charLen == 0)
+        break; // Invalid leading byte: stop
+      // Stop if advancing charLen bytes would cross the null terminator
+      bool truncated = false;
+      for (size_t i = 1; i < charLen; i++) {
+        if (pstr[i] == '\0') {
+          truncated = true;
+          break;
+        }
+      }
+      if (truncated)
+        break;
+      pstr += charLen;
+      utf8Length++;
+    }
+    byteLength = static_cast<LengthType>(pstr - _str);
+  }
 
   UTF8StringSliceBase(const char* _str, const LengthType _utf8Length)
       : str(_str), utf8Length(_utf8Length) {

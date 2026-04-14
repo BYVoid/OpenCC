@@ -48,6 +48,23 @@ TEST_F(UTF8UtilTest, PrevCharLength) {
   EXPECT_THROW(EXPECT_EQ(3, UTF8Util::PrevCharLength(text + 1)), InvalidUTF8);
 }
 
+TEST(UTF8UtilASCIITest, PrevCharLengthASCII) {
+  // Heap-allocated ASCII string to catch issue #794 (OOB read with ASCII input)
+  const std::string asciiStr = "abc";
+  EXPECT_EQ(1,
+            UTF8Util::PrevCharLength(asciiStr.c_str() + asciiStr.size()));
+  EXPECT_EQ(1, UTF8Util::PrevCharLength(asciiStr.c_str() + 2));
+  EXPECT_EQ(1, UTF8Util::PrevCharLength(asciiStr.c_str() + 1));
+}
+
+TEST(UTF8UtilTruncatedTest, LengthTruncatedSequence) {
+  // Length() must not read past the null terminator for truncated sequences
+  // (issue #799: file ending with multi-byte leading byte caused heap OOB)
+  EXPECT_EQ(0, UTF8Util::Length("\xE0"));   // incomplete 3-byte sequence
+  EXPECT_EQ(0, UTF8Util::Length("\xF0"));   // incomplete 4-byte sequence
+  EXPECT_EQ(0, UTF8Util::Length("\xE0\xBF")); // still incomplete 3-byte
+}
+
 TEST_F(UTF8UtilTest, Length) {
   EXPECT_EQ(0, UTF8Util::Length(""));
   EXPECT_EQ(8, UTF8Util::Length(text));

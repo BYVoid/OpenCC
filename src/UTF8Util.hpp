@@ -80,12 +80,6 @@ public:
    */
   static size_t PrevCharLength(const char* str) {
     {
-      const size_t length = NextCharLengthNoException(str - 3);
-      if (length == 3) {
-        return length;
-      }
-    }
-    {
       const size_t length = NextCharLengthNoException(str - 1);
       if (length == 1) {
         return length;
@@ -94,6 +88,12 @@ public:
     {
       const size_t length = NextCharLengthNoException(str - 2);
       if (length == 2) {
+        return length;
+      }
+    }
+    {
+      const size_t length = NextCharLengthNoException(str - 3);
+      if (length == 3) {
         return length;
       }
     }
@@ -121,12 +121,24 @@ public:
   }
 
   /**
-   * Returns the UTF8 length of a valid UTF8 std::string.
+   * Returns the UTF8 length of a null-terminated string.
+   * Stops early (without reading past the null terminator) if a truncated
+   * multi-byte sequence is encountered at the end of the string.
    */
   static size_t Length(const char* str) {
     size_t length = 0;
     while (*str != '\0') {
-      str = NextChar(str);
+      const size_t charLen = NextCharLengthNoException(str);
+      if (charLen == 0) {
+        throw InvalidUTF8(str);
+      }
+      // Ensure the multi-byte sequence does not cross the null terminator
+      for (size_t i = 1; i < charLen; i++) {
+        if (str[i] == '\0') {
+          return length;
+        }
+      }
+      str += charLen;
       length++;
     }
     return length;

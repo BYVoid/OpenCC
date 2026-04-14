@@ -58,11 +58,11 @@ TEST(UTF8UtilASCIITest, PrevCharLengthASCII) {
 }
 
 TEST(UTF8UtilTruncatedTest, LengthTruncatedSequence) {
-  // Length() must not read past the null terminator for truncated sequences
-  // (issue #799: file ending with multi-byte leading byte caused heap OOB)
-  EXPECT_EQ(0, UTF8Util::Length("\xE0"));   // incomplete 3-byte sequence
-  EXPECT_EQ(0, UTF8Util::Length("\xF0"));   // incomplete 4-byte sequence
-  EXPECT_EQ(0, UTF8Util::Length("\xE0\xBF")); // still incomplete 3-byte
+  // Length() must throw InvalidUTF8 for truncated sequences instead of
+  // reading past the null terminator (issue #799 fix).
+  EXPECT_THROW(UTF8Util::Length("\xE0"), InvalidUTF8);   // incomplete 3-byte sequence
+  EXPECT_THROW(UTF8Util::Length("\xF0"), InvalidUTF8);   // incomplete 4-byte sequence
+  EXPECT_THROW(UTF8Util::Length("\xE0\xBF"), InvalidUTF8); // still incomplete 3-byte
 }
 
 TEST_F(UTF8UtilTest, Length) {

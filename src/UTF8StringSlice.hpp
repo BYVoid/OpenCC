@@ -55,21 +55,9 @@ template <typename LENGTH_TYPE> class UTF8StringSliceBase {
 public:
   typedef LENGTH_TYPE LengthType;
 
-  UTF8StringSliceBase(const char* _str) : str(_str), utf8Length(0), byteLength(0) {
-    // UTF8Util::Length() counts only complete UTF-8 characters, stopping
-    // before any truncated multi-byte sequence at the end of the string
-    // (issue #799 fix).  Using two simple passes instead of one complex
-    // nested-loop pass avoids a MSVC LTCG code-generator ICE that is
-    // triggered by bool-flag patterns in template bodies.
-    utf8Length = static_cast<LengthType>(UTF8Util::Length(_str));
-    // Advance exactly utf8Length complete characters to derive byteLength,
-    // keeping it consistent with utf8Length even for truncated input.
-    const char* pstr = _str;
-    for (LengthType i = 0; i < utf8Length; ++i) {
-      pstr = UTF8Util::NextChar(pstr);
-    }
-    byteLength = static_cast<LengthType>(pstr - _str);
-  }
+  UTF8StringSliceBase(const char* _str)
+      : str(_str), utf8Length(static_cast<LengthType>(UTF8Util::Length(_str))),
+        byteLength(static_cast<LengthType>(strlen(_str))) {}
 
   UTF8StringSliceBase(const char* _str, const LengthType _utf8Length)
       : str(_str), utf8Length(_utf8Length) {

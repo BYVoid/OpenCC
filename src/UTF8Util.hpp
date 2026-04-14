@@ -122,11 +122,9 @@ public:
 
   /**
    * Returns the UTF8 length of a null-terminated string.
-   * Throws InvalidUTF8 for invalid leading bytes (same as the original
-   * behaviour via NextChar/NextCharLength).
-   * Stops early and returns the count of complete characters if a truncated
-   * multi-byte sequence is found before the null terminator, instead of
-   * reading past the null terminator (issue #799 fix).
+   * Throws InvalidUTF8 for invalid or truncated byte sequences.
+   * The truncated-sequence check reads only up to the null terminator, so it
+   * does not read out of bounds (issue #799 fix).
    */
   static size_t Length(const char* str) {
     size_t length = 0;
@@ -135,15 +133,15 @@ public:
       if (charLen == 0) {
         throw InvalidUTF8(str);
       }
-      // Verify that all bytes of this character are present before the null
-      // terminator.  Use a while loop (not a for-with-return) to avoid complex
-      // control flow that triggers MSVC LTCG code-generator bugs.
+      // Verify all continuation bytes are present before the null terminator.
+      // Use a while loop (not a for-with-return) to avoid complex control flow
+      // that triggers MSVC LTCG code-generator bugs.
       size_t i = 1;
       while (i < charLen && str[i] != '\0') {
         ++i;
       }
       if (i < charLen) {
-        break; // Truncated sequence: stop without reading past null terminator
+        throw InvalidUTF8(str); // Truncated sequence: throw, don't silently skip
       }
       str += charLen;
       ++length;

@@ -20,7 +20,7 @@ jobs:
       matrix:
         # Current stable line on latest hosted runners
         os: [ubuntu-latest, macos-latest]
-        node-version: [24]
+        node-version: [24, 25]
         # LTS coverage on macOS 14 (ARM64)
         include:
           - os: macos-14

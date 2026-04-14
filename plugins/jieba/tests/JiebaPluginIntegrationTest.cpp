@@ -27,6 +27,57 @@
 
 #include "test/PortableUtil.hpp"
 
+#if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+
+std::wstring WideFromUtf8(const std::string& text) {
+  if (text.empty()) {
+    return L"";
+  }
+  const int size =
+      MultiByteToWideChar(CP_UTF8, 0, text.c_str(), -1, nullptr, 0);
+  if (size <= 1) {
+    return L"";
+  }
+  std::wstring wide(static_cast<size_t>(size), L'\0');
+  MultiByteToWideChar(CP_UTF8, 0, text.c_str(), -1, &wide[0], size);
+  wide.resize(static_cast<size_t>(size - 1));
+  return wide;
+}
+
+void CopyRegularFiles(const std::filesystem::path& sourceDir,
+                      const std::filesystem::path& targetDir) {
+  for (const auto& entry : std::filesystem::directory_iterator(sourceDir)) {
+    if (!entry.is_regular_file()) {
+      continue;
+    }
+    std::filesystem::copy_file(entry.path(), targetDir / entry.path().filename(),
+                               std::filesystem::copy_options::overwrite_existing);
+  }
+}
+
+int RunProcessWide(const std::filesystem::path& application,
+                   const std::wstring& arguments,
+                   const std::filesystem::path& workingDirectory) {
+  STARTUPINFOW startupInfo = {};
+  startupInfo.cb = sizeof(startupInfo);
+  PROCESS_INFORMATION processInfo = {};
+  std::wstring commandLine = arguments;
+  if (!CreateProcessW(WideFromUtf8(application.u8string()).c_str(),
+                      commandLine.data(), nullptr, nullptr, FALSE, 0, nullptr,
+                      WideFromUtf8(workingDirectory.u8string()).c_str(),
+                      &startupInfo, &processInfo)) {
+    return -1;
+  }
+  WaitForSingleObject(processInfo.hProcess, INFINITE);
+  DWORD exitCode = 1;
+  GetExitCodeProcess(processInfo.hProcess, &exitCode);
+  CloseHandle(processInfo.hThread);
+  CloseHandle(processInfo.hProcess);
+  return static_cast<int>(exitCode);
+}
+#endif
+
 #ifdef BAZEL
 #include "tools/cpp/runfiles/runfiles.h"
 using bazel::tools::cpp::runfiles::Runfiles;
@@ -179,16 +230,49 @@ protected:
   std::string BuildCommand(const std::string& config,
                            const std::string& inputFile,
                            const std::string& outputFile) const {
-    std::string cmd = EnvPrefix() + QuotePath(OpenccCommand()) + " -i " +
-                      QuotePath(inputFile) + " -o " + QuotePath(outputFile) +
-                      " -c " + QuotePath(ConfigPath(config)) + " --path " +
-                      QuotePath(DictionaryDirectory() + "/");
+    std::string cmd =
+        BuildCommandWithPaths(ConfigPath(config), inputFile, outputFile,
+                              DictionaryDirectory() + "/", PluginDirectory());
 #ifdef _WIN32
     return "\"" + cmd + "\"";
 #else
     return cmd;
 #endif
   }
+
+  std::string BuildCommandWithPaths(const std::string& configPath,
+                                    const std::string& inputFile,
+                                    const std::string& outputFile,
+                                    const std::string& dictionaryDir,
+                                    const std::string& pluginDir) const {
+#ifdef _WIN32
+    std::string envPrefix =
+        "set \"OPENCC_SEGMENTATION_PLUGIN_PATH=" + pluginDir + "\" && ";
+#else
+    std::string envPrefix =
+        "OPENCC_SEGMENTATION_PLUGIN_PATH=" + QuotePath(pluginDir) + " ";
+#endif
+    return envPrefix + QuotePath(OpenccCommand()) + " -i " + QuotePath(inputFile) +
+           " -o " + QuotePath(outputFile) + " -c " + QuotePath(configPath) +
+           " --path " + QuotePath(dictionaryDir);
+  }
+
+#if defined(_WIN32) || defined(_WIN64)
+  static int RunCommandUtf8(const std::string& command) {
+    const int size =
+        MultiByteToWideChar(CP_UTF8, 0, command.c_str(), -1, nullptr, 0);
+    if (size <= 1) {
+      return -1;
+    }
+    std::wstring wide(static_cast<size_t>(size), L'\0');
+    MultiByteToWideChar(CP_UTF8, 0, command.c_str(), -1, &wide[0], size);
+    return _wsystem(wide.c_str());
+  }
+#else
+  static int RunCommandUtf8(const std::string& command) {
+    return system(command.c_str());
+  }
+#endif
 
   static CasesByConfig LoadCases(const std::string& jsonPath) {
     CasesByConfig cases;
@@ -252,7 +336,7 @@ TEST_F(JiebaPluginIntegrationTest, ConvertFromJsonCases) {
       }
     }
 
-    ASSERT_EQ(0, system(BuildCommand(config, inputFile, outputFile).c_str()));
+    ASSERT_EQ(0, RunCommandUtf8(BuildCommand(config, inputFile, outputFile)));
 
     std::ifstream ifs(outputFile, std::ios::binary);
     ASSERT_TRUE(ifs.is_open());
@@ -270,5 +354,69 @@ TEST_F(JiebaPluginIntegrationTest, ConvertFromJsonCases) {
     EXPECT_EQ(idx, entry.second.size()) << "config=" << config;
   }
 }
+
+#if defined(_WIN32) || defined(_WIN64)
+TEST_F(JiebaPluginIntegrationTest, ConvertFromUnicodePluginPath) {
+  namespace fs = std::filesystem;
+
+  const fs::path tempRoot =
+      fs::temp_directory_path() /
+      fs::u8path("opencc-jieba-中文路径-" +
+                 std::to_string(GetCurrentProcessId()));
+  const fs::path tempBin = tempRoot / "bin";
+  const fs::path tempShareOpencc = tempRoot / "share" / "opencc";
+  const fs::path tempJiebaDict = tempShareOpencc / "jieba_dict";
+  const fs::path tempPlugins = tempBin / "plugins";
+  const fs::path inputFile = tempBin / "input.txt";
+  const fs::path outputFile = tempBin / "output.txt";
+  const fs::path configFile = tempShareOpencc / "s2twp_jieba.json";
+  const fs::path sourceConfig = fs::u8path(ConfigPath("s2twp_jieba"));
+  const fs::path sourcePluginRoot =
+      sourceConfig.parent_path().parent_path().parent_path();
+  const fs::path sourceJiebaDict =
+      sourcePluginRoot / "deps" / "cppjieba" / "dict";
+  const fs::path sourcePluginDir = fs::u8path(PluginDirectory());
+  const fs::path sourceOpenccExe = fs::u8path(OpenccCommand());
+  const fs::path sourceBinDir = sourceOpenccExe.parent_path();
+
+  fs::remove_all(tempRoot);
+  fs::create_directories(tempBin);
+  fs::create_directories(tempJiebaDict);
+  fs::create_directories(tempPlugins);
+  CopyRegularFiles(sourceBinDir, tempBin);
+  CopyRegularFiles(fs::u8path(DictionaryDirectory()), tempShareOpencc);
+  fs::copy_file(sourceConfig, configFile, fs::copy_options::overwrite_existing);
+  CopyRegularFiles(sourceJiebaDict, tempJiebaDict);
+  CopyRegularFiles(sourcePluginDir, tempPlugins);
+
+  try {
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open());
+      ofs << "生活着名为正敏的少女\n";
+    }
+
+    const fs::path tempOpenccExe = tempBin / sourceOpenccExe.filename();
+    const std::wstring args =
+        WideFromUtf8(sourceOpenccExe.filename().u8string()) +
+        L" -i input.txt -o output.txt -c s2twp_jieba.json";
+    ASSERT_EQ(0, RunProcessWide(tempOpenccExe, args, tempBin));
+
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open());
+    std::string line;
+    ASSERT_TRUE(std::getline(ifs, line));
+    if (!line.empty() && line.back() == '\r') {
+      line.pop_back();
+    }
+    EXPECT_EQ("生活著名為正敏的少女", line);
+  } catch (...) {
+    fs::remove_all(tempRoot);
+    throw;
+  }
+
+  fs::remove_all(tempRoot);
+}
+#endif
 
 } // namespace opencc

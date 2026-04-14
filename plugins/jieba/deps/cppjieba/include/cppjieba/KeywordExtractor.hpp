@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include "MixSegment.hpp"
+#include "UnicodeFile.hpp"
 
 namespace cppjieba {
 
@@ -91,7 +92,8 @@ class KeywordExtractor {
   }
  private:
   void LoadIdfDict(const std::string& idfPath) {
-    std::ifstream ifs(idfPath.c_str());
+    std::ifstream ifs;
+    OpenInputFile(idfPath, ifs);
     XCHECK(ifs.is_open()) << "open " << idfPath << " failed";
     std::string line ;
     std::vector<std::string> buf;
@@ -120,7 +122,8 @@ class KeywordExtractor {
     assert(idfAverage_ > 0.0);
   }
   void LoadStopWordDict(const std::string& filePath) {
-    std::ifstream ifs(filePath.c_str());
+    std::ifstream ifs;
+    OpenInputFile(filePath, ifs);
     XCHECK(ifs.is_open()) << "open " << filePath << " failed";
     std::string line ;
     while (getline(ifs, line)) {

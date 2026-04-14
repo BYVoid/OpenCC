@@ -1,6 +1,7 @@
 #ifndef CPPJIEBA_HMMMODEL_H
 #define CPPJIEBA_HMMMODEL_H
 
+#include "UnicodeFile.hpp"
 #include "limonp/StringUtil.hpp"
 #include "Trie.hpp"
 
@@ -32,7 +33,8 @@ struct HMMModel {
   ~HMMModel() {
   }
   void LoadModel(const string& filePath) {
-    ifstream ifile(filePath.c_str());
+    ifstream ifile;
+    OpenInputFile(filePath, ifile);
     XCHECK(ifile.is_open()) << "open " << filePath << " failed";
     string line;
     vector<string> tmp;

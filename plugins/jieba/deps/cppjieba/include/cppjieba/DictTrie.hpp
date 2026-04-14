@@ -15,6 +15,7 @@
 #include <unordered_set>
 #include "limonp/StringUtil.hpp"
 #include "limonp/Logging.hpp"
+#include "UnicodeFile.hpp"
 #include "Unicode.hpp"
 #include "Trie.hpp"
 
@@ -151,7 +152,8 @@ class DictTrie {
   void LoadUserDict(const std::string& filePaths) {
     std::vector<std::string> files = limonp::Split(filePaths, "|;");
     for (size_t i = 0; i < files.size(); i++) {
-      std::ifstream ifs(files[i].c_str());
+      std::ifstream ifs;
+      OpenInputFile(files[i], ifs);
       XCHECK(ifs.is_open()) << "open " << files[i] << " failed";
       std::string line;
 
@@ -236,7 +238,8 @@ class DictTrie {
   static DictCacheEntry BuildDictCacheEntry(const std::string& filePath) {
     DictCacheEntry entry;
     std::vector<DictUnit> node_infos;
-    std::ifstream ifs(filePath.c_str());
+    std::ifstream ifs;
+    OpenInputFile(filePath, ifs);
     XCHECK(ifs.is_open()) << "open " << filePath << " failed.";
     std::string line;
     std::vector<std::string> buf;

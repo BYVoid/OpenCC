@@ -22,6 +22,7 @@
 #include <memory>
 #include <sstream>
 #include <streambuf>
+#include <string>
 
 #ifdef _MSC_VER
 #include <direct.h>
@@ -34,10 +35,37 @@
 
 namespace opencc {
 
+namespace {
+
+#ifdef OPENCC_BENCHMARK_JIEBA_CONFIG_DIR
+void SetPluginSearchPath(const char* path) {
+  if (path == nullptr || *path == '\0') {
+    return;
+  }
+#ifdef _WIN32
+  _putenv_s("OPENCC_SEGMENTATION_PLUGIN_PATH", path);
+#else
+  setenv("OPENCC_SEGMENTATION_PLUGIN_PATH", path, 1);
+#endif
+}
+#endif
+
+std::string ResolveConfigPath(const std::string& config_name) {
+#ifdef OPENCC_BENCHMARK_JIEBA_CONFIG_DIR
+  if (config_name == "s2twp_jieba") {
+    SetPluginSearchPath(OPENCC_BENCHMARK_JIEBA_PLUGIN_DIR);
+    return std::string(OPENCC_BENCHMARK_JIEBA_CONFIG_DIR) + "/" + config_name +
+           ".json";
+  }
+#endif
+  return std::string(CMAKE_SOURCE_DIR) + "/data/config/" + config_name + ".json";
+}
+
+} // namespace
+
 SimpleConverter* Initialize(const std::string& config_name) {
   chdir(PROJECT_BINARY_DIR "/data");
-  const std::string config_dir = CMAKE_SOURCE_DIR "/data/config/";
-  const std::string config_path = config_dir + config_name + ".json";
+  const std::string config_path = ResolveConfigPath(config_name);
   return new SimpleConverter(config_path);
 }
 
@@ -76,6 +104,10 @@ BENCHMARK_CAPTURE(BM_Initialization, s2tw, "s2tw")
     ->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Initialization, s2twp, "s2twp")
     ->Unit(benchmark::kMicrosecond);
+#ifdef OPENCC_BENCHMARK_JIEBA_CONFIG_DIR
+BENCHMARK_CAPTURE(BM_Initialization, s2twp_jieba, "s2twp_jieba")
+    ->Unit(benchmark::kMicrosecond);
+#endif
 BENCHMARK_CAPTURE(BM_Initialization, t2hk, "t2hk")
     ->Unit(benchmark::kMicrosecond);
 BENCHMARK_CAPTURE(BM_Initialization, t2jp, "t2jp")
@@ -103,6 +135,10 @@ static void BM_ConvertLongText(benchmark::State& state,
 BENCHMARK_CAPTURE(BM_ConvertLongText, s2t, "s2t")->Unit(benchmark::kMillisecond);
 BENCHMARK_CAPTURE(BM_ConvertLongText, s2twp, "s2twp")
     ->Unit(benchmark::kMillisecond);
+#ifdef OPENCC_BENCHMARK_JIEBA_CONFIG_DIR
+BENCHMARK_CAPTURE(BM_ConvertLongText, s2twp_jieba, "s2twp_jieba")
+    ->Unit(benchmark::kMillisecond);
+#endif
 
 static void BM_Convert(benchmark::State& state, std::string config_name,
                        int iteration) {
@@ -133,6 +169,16 @@ BENCHMARK_CAPTURE(BM_Convert, s2twp_10000, "s2twp", 10000)
     ->Unit(benchmark::kMillisecond);
 BENCHMARK_CAPTURE(BM_Convert, s2twp_100000, "s2twp", 100000)
     ->Unit(benchmark::kMillisecond);
+#ifdef OPENCC_BENCHMARK_JIEBA_CONFIG_DIR
+BENCHMARK_CAPTURE(BM_Convert, s2twp_jieba_100, "s2twp_jieba", 100)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Convert, s2twp_jieba_1000, "s2twp_jieba", 1000)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Convert, s2twp_jieba_10000, "s2twp_jieba", 10000)
+    ->Unit(benchmark::kMillisecond);
+BENCHMARK_CAPTURE(BM_Convert, s2twp_jieba_100000, "s2twp_jieba", 100000)
+    ->Unit(benchmark::kMillisecond);
+#endif
 
 } // namespace opencc
 

@@ -80,6 +80,21 @@ else()
   target_link_libraries(opencc_jieba PRIVATE libopencc)
 endif()
 target_compile_definitions(opencc_jieba PRIVATE OPENCC_PLUGIN_BUILD)
+
+# On Windows, OpenCC headers must not use dllimport when the plugin links
+# against a static OpenCC library. This affects both integrated builds and
+# standalone plugin builds via find_package(OpenCC).
+if (WIN32)
+  if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    get_target_property(_opencc_target_type OpenCC::OpenCC TYPE)
+  else()
+    get_target_property(_opencc_target_type libopencc TYPE)
+  endif()
+  if (_opencc_target_type STREQUAL "STATIC_LIBRARY")
+    target_compile_definitions(opencc_jieba PRIVATE Opencc_BUILT_AS_STATIC)
+  endif()
+endif()
+
 set_target_properties(opencc_jieba PROPERTIES
   OUTPUT_NAME opencc-jieba
   POSITION_INDEPENDENT_CODE ON

@@ -4,13 +4,13 @@ include_directories("${PROJECT_BINARY_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/src")
 
 if(NOT USE_SYSTEM_MARISA)
-  include_directories(../deps/marisa-0.3.1/include)
+  include_directories(SYSTEM ../deps/marisa-0.3.1/include)
 endif()
 if(NOT USE_SYSTEM_RAPIDJSON)
-  include_directories(../deps/rapidjson-1.1.0)
+  include_directories(SYSTEM ../deps/rapidjson-1.1.0)
 endif()
 if(NOT USE_SYSTEM_TCLAP)
-  include_directories(../deps/tclap-1.2.5)
+  include_directories(SYSTEM ../deps/tclap-1.2.5)
 endif()
 
 # Library
@@ -88,7 +88,7 @@ set(UNITTESTS
 if (ENABLE_DARTS)
   set(OPENCC_ENABLE_DARTS 1)
   if(NOT USE_SYSTEM_DARTS)
-    include_directories(../deps/darts-clone-0.32)
+    include_directories(SYSTEM ../deps/darts-clone-0.32)
   endif()
   set(
     LIBOPENCC_HEADERS

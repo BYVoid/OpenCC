@@ -38,6 +38,7 @@ cc_binary(
         "//src:plugin_api",
         "//src:segmentation",
         "//src:segments",
+        "//src:utf8_util",
     ],
 )
 

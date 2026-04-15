@@ -27,7 +27,7 @@ extern "C" {
  *   Implementations must ignore unknown trailing fields.
  */
 
-#define OPENCC_SEGMENTATION_PLUGIN_ABI_MAJOR 1
+#define OPENCC_SEGMENTATION_PLUGIN_ABI_MAJOR 2
 #define OPENCC_SEGMENTATION_PLUGIN_ABI_MINOR 0
 
 enum {
@@ -66,9 +66,13 @@ typedef struct {
 
 typedef struct {
   size_t struct_size;
-  char** tokens;
-  size_t token_count;
-} opencc_token_array_t;
+  /*
+   * One positive length per segment, measured in Unicode code points.
+   * The sequence must cover the full input text in order.
+   */
+  uint32_t* codepoint_lengths;
+  size_t segment_count;
+} opencc_segment_length_array_t;
 
 typedef struct {
   size_t struct_size;
@@ -82,7 +86,7 @@ typedef struct {
   size_t struct_size;
   opencc_segmentation_handle_t* handle;
   const char* utf8_text;
-  opencc_token_array_t* token_array;
+  opencc_segment_length_array_t* segment_lengths;
   opencc_error_t* error;
 } opencc_segmentation_segment_args_t;
 
@@ -138,28 +142,35 @@ typedef struct {
    * segment(args):
    * On success:
    * - returns 0
-   * - token_array contains plugin-owned token storage until free_tokens() is called.
+   * - args->utf8_text is interpreted as null-terminated UTF-8 input
+   * - segment_lengths contains plugin-owned segment length storage until
+   *   free_segment_lengths() is called.
+   * - each returned length must be > 0 and measured in Unicode code points
+   * - the returned length sequence must cover the full input in order
    *
    * On failure:
    * - returns non-zero
-   * - token_array may be partially populated, but must remain safe for free_tokens().
+   * - segment_lengths may be partially populated, but must remain safe for
+   *   free_segment_lengths().
    */
   int (*segment)(opencc_segmentation_segment_args_t* args);
 
   /*
    * Cleanup Functions:
-   * 1. Must gracefully handle null pointers (count = 0, tokens = null).
+   * 1. Must gracefully handle null pointers
+   *    (segment_count = 0, codepoint_lengths = null).
    * 2. Host promises to call these at most once per returned object.
-   * 3. free_tokens() must also accept token_array structures that were
+   * 3. free_segment_lengths() must also accept segment length array
+   *    structures that were
    *    partially initialized by segment() on failure.
    */
-  void (*free_tokens)(opencc_token_array_t* token_array);
+  void (*free_segment_lengths)(opencc_segment_length_array_t* segment_lengths);
   void (*destroy)(opencc_segmentation_handle_t* handle);
   void (*free_error)(opencc_error_t* error);
-} opencc_segmentation_plugin_v1;
+} opencc_segmentation_plugin_v2;
 
-OPENCC_PLUGIN_EXPORT const opencc_segmentation_plugin_v1*
-opencc_get_segmentation_plugin_v1(void);
+OPENCC_PLUGIN_EXPORT const opencc_segmentation_plugin_v2*
+opencc_get_segmentation_plugin_v2(void);
 
 #ifdef __cplusplus
 }

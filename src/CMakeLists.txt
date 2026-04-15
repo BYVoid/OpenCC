@@ -132,6 +132,9 @@ add_library(OpenCC::OpenCC ALIAS libopencc)
 set_target_properties(libopencc PROPERTIES POSITION_INDEPENDENT_CODE ON)
 source_group(libopencc FILES ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
 target_link_libraries(libopencc marisa)
+if (NOT BUILD_SHARED_LIBS)
+  target_compile_definitions(libopencc PUBLIC Opencc_BUILT_AS_STATIC)
+endif()
 # PluginSegmentation.cpp uses LoadLibrary on _WIN32 (MSVC and MinGW).
 # Only non-Windows targets may need libdl for dlopen.
 if (NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")

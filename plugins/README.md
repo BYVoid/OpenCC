@@ -74,6 +74,24 @@ resolving them at runtime. Relative resource paths are expected to resolve
 within the existing OpenCC data layout rather than a plugin-specific ad hoc
 directory tree.
 
+## Segmentation ABI
+
+The current segmentation plugin ABI entry point is:
+
+- `opencc_get_segmentation_plugin_v2()`
+
+Segmentation results are returned as a sequence of segment lengths measured in
+Unicode code points, not as copied token strings. The ABI contract is:
+
+- input text is passed to the plugin as null-terminated UTF-8
+- the plugin returns `segment_count` plus `codepoint_lengths`
+- each element is the number of Unicode code points in the next segment
+- lengths must be positive and must cover the full input, in order
+- the host reconstructs segment boundaries from the original UTF-8 input
+
+This keeps the ABI simpler and avoids allocating one string per token across
+the plugin boundary.
+
 ### Customizing Jieba Dictionaries
 
 When using the `jieba` plugin, you can add custom terminology to the segmenter by defining a custom `user.dict.utf8` or editing the installed one. 
@@ -106,7 +124,7 @@ Current `jieba` targets:
 ## Adding A New Plugin
 
 1. Create `plugins/<name>/src`, `include`, `data`, and `tests`.
-2. Export `opencc_get_segmentation_plugin_v1()`.
+2. Export `opencc_get_segmentation_plugin_v2()`.
 3. Name the output binary using the `opencc-<type>` convention.
 4. Keep JSON configs platform-neutral and resource-oriented.
 5. Add both CMake and Bazel build rules.

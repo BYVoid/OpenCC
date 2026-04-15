@@ -19,6 +19,7 @@
 #include "Exception.hpp"
 #include "JiebaSegmentation.hpp"
 #include "Segments.hpp"
+#include "UTF8Util.hpp"
 #include "plugin/OpenCCPlugin.h"
 
 #include <cstdlib>
@@ -131,6 +132,10 @@ bool ReadConfigValue(const opencc_kv_pair_t* config,
     }
   }
   return false;
+}
+
+uint32_t CodePointLength(const std::string& text) {
+  return static_cast<uint32_t>(opencc::UTF8Util::Length(text.c_str()));
 }
 
 std::string ResolveResourcePath(const std::string& rawPath,
@@ -294,22 +299,19 @@ opencc::Segmentation* GetSegmentation(opencc_segmentation_handle_t* handle) {
   return handle->segmentation.get();
 }
 
-void FreeTokens(opencc_token_array_t* tokenArray) {
-  if (tokenArray == nullptr || tokenArray->tokens == nullptr) {
+void FreeSegmentLengths(opencc_segment_length_array_t* segmentLengths) {
+  if (segmentLengths == nullptr || segmentLengths->codepoint_lengths == nullptr) {
     return;
   }
-  for (size_t i = 0; i < tokenArray->token_count; i++) {
-    delete[] tokenArray->tokens[i];
-  }
-  delete[] tokenArray->tokens;
-  tokenArray->tokens = nullptr;
-  tokenArray->token_count = 0;
+  delete[] segmentLengths->codepoint_lengths;
+  segmentLengths->codepoint_lengths = nullptr;
+  segmentLengths->segment_count = 0;
 }
 
 int SegmentWithJieba(opencc_segmentation_segment_args_t* args) {
   if (args == nullptr || args->struct_size < sizeof(*args) ||
-      args->handle == nullptr || args->token_array == nullptr ||
-      args->token_array->struct_size < sizeof(*args->token_array) ||
+      args->handle == nullptr || args->segment_lengths == nullptr ||
+      args->segment_lengths->struct_size < sizeof(*args->segment_lengths) ||
       args->utf8_text == nullptr) {
     SetError(args == nullptr ? nullptr : args->error,
              OPENCC_ERROR_INVALID_ARGUMENT,
@@ -319,22 +321,41 @@ int SegmentWithJieba(opencc_segmentation_segment_args_t* args) {
   try {
     opencc::SegmentsPtr segments =
         GetSegmentation(args->handle)->Segment(args->utf8_text);
-    args->token_array->tokens = nullptr;
-    args->token_array->token_count = segments->Length();
-    args->token_array->tokens = new char*[args->token_array->token_count]();
-    for (size_t i = 0; i < args->token_array->token_count; i++) {
-      const char* token = segments->At(i);
-      const size_t length = std::strlen(token);
-      args->token_array->tokens[i] = new char[length + 1];
-      std::memcpy(args->token_array->tokens[i], token, length + 1);
+    const std::string text(args->utf8_text);
+    std::vector<uint32_t> lengths;
+    lengths.reserve(segments->Length() + 1);
+    size_t byteOffset = 0;
+
+    for (size_t i = 0; i < segments->Length(); i++) {
+      const std::string token = segments->At(i);
+      const size_t tokenPos = text.find(token, byteOffset);
+      if (tokenPos == std::string::npos) {
+        throw opencc::Exception("Jieba token sequence could not be aligned to input text.");
+      }
+      if (tokenPos > byteOffset) {
+        lengths.push_back(CodePointLength(text.substr(byteOffset, tokenPos - byteOffset)));
+      }
+      lengths.push_back(CodePointLength(token));
+      byteOffset = tokenPos + token.size();
+    }
+    if (byteOffset < text.size()) {
+      lengths.push_back(CodePointLength(text.substr(byteOffset)));
+    }
+
+    args->segment_lengths->codepoint_lengths = nullptr;
+    args->segment_lengths->segment_count = lengths.size();
+    args->segment_lengths->codepoint_lengths =
+        new uint32_t[args->segment_lengths->segment_count]();
+    for (size_t i = 0; i < args->segment_lengths->segment_count; i++) {
+      args->segment_lengths->codepoint_lengths[i] = lengths[i];
     }
     return 0;
   } catch (const std::exception& ex) {
-    FreeTokens(args->token_array);
+    FreeSegmentLengths(args->segment_lengths);
     SetError(args->error, OPENCC_ERROR_PLUGIN_RUNTIME_FAILURE, ex.what());
     return -1;
   } catch (...) {
-    FreeTokens(args->token_array);
+    FreeSegmentLengths(args->segment_lengths);
     SetError(args->error, OPENCC_ERROR_PLUGIN_RUNTIME_FAILURE,
              "Unknown error while segmenting text.");
     return -1;
@@ -353,22 +374,22 @@ void FreeError(opencc_error_t* error) {
   error->message = nullptr;
 }
 
-const opencc_segmentation_plugin_v1 kJiebaPlugin = {
-    sizeof(opencc_segmentation_plugin_v1),
+const opencc_segmentation_plugin_v2 kJiebaPlugin = {
+    sizeof(opencc_segmentation_plugin_v2),
     OPENCC_SEGMENTATION_PLUGIN_ABI_MAJOR,
     OPENCC_SEGMENTATION_PLUGIN_ABI_MINOR,
     "opencc-jieba",
     "jieba",
     &CreateJiebaSegmentation,
     &SegmentWithJieba,
-    &FreeTokens,
+    &FreeSegmentLengths,
     &DestroyJiebaSegmentation,
     &FreeError,
 };
 
 } // namespace
 
-extern "C" OPENCC_PLUGIN_EXPORT const opencc_segmentation_plugin_v1*
-opencc_get_segmentation_plugin_v1(void) {
+extern "C" OPENCC_PLUGIN_EXPORT const opencc_segmentation_plugin_v2*
+opencc_get_segmentation_plugin_v2(void) {
   return &kJiebaPlugin;
 }

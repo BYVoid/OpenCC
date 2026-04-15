@@ -3,12 +3,12 @@
   "cases": [
     {
       "id": "jieba_s2t_001",
-      "description": "Ambiguous case: 着名 (wearing+name) vs 著名 (famous)",
-      "input": "生活着名为正敏的少女",
-      "expected_segmentation": "生活/着/名为/正敏/的/少女",
+      "description": "Ambiguous case: 的/士兵 vs 的士/兵",
+      "input": "勇敢的士兵",
+      "expected_segmentation": "勇敢/的/士兵",
       "expected": {
-        "s2twp": "生活著名為正敏的少女",
-        "s2twp_jieba": "生活著名為正敏的少女"
+        "s2twp": "勇敢計程車兵",
+        "s2twp_jieba": "勇敢的士兵"
       }
     },
     {

@@ -267,6 +267,22 @@ add_subdirectory(data)
 add_subdirectory(plugins)
 add_subdirectory(test)
 
+if (ENABLE_BENCHMARK AND TARGET performance AND TARGET opencc_jieba)
+  target_compile_definitions(performance PRIVATE
+    OPENCC_BENCHMARK_JIEBA_CONFIG_DIR="${CMAKE_SOURCE_DIR}/plugins/jieba/data/config"
+    OPENCC_BENCHMARK_JIEBA_PLUGIN_DIR="$<TARGET_FILE_DIR:opencc_jieba>"
+  )
+  add_dependencies(performance opencc_jieba)
+  if (WIN32)
+    add_custom_target(
+      copy_opencc_jieba_to_benchmark
+      ${CMAKE_COMMAND} -E copy $<TARGET_FILE:opencc_jieba> ${PROJECT_BINARY_DIR}/src/benchmark
+      COMMENT "Copying opencc_jieba to src/benchmark"
+    )
+    add_dependencies(performance copy_opencc_jieba_to_benchmark)
+  endif()
+endif()
+
 ######## Testing
 
 if (ENABLE_GTEST)

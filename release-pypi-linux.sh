@@ -29,7 +29,7 @@ eval "$(conda shell.bash hook)"
 conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
 conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
 
-for PYTHON_VERSION in 3.9 3.10 3.11 3.12 3.13 3.14; do
+for PYTHON_VERSION in 3.10 3.11 3.12 3.13 3.14; do
     # Create and activate environment
     conda config --add channels conda-forge
     conda config --set channel_priority strict
@@ -48,7 +48,7 @@ done
 
 if [ "$1" != "testonly" ]; then
     # Upload to PyPI
-    conda activate py3.9
+    conda activate py3.10
     python -m pip install twine
     python -m twine upload dist/*
 fi

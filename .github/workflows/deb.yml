@@ -1,0 +1,74 @@
+name: Debian Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Optional Debian package version override, for example 1.2.0 or 1.2.1~rc1"
+        required: false
+  push:
+    tags:
+      - "v*"
+      - "ver.*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-deb:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install packaging dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake \
+            ninja-build \
+            dpkg-dev \
+            file \
+            pkg-config \
+            python3
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.version }}
+        run: |
+          if [ -n "${INPUT_VERSION:-}" ]; then
+            VERSION="$INPUT_VERSION"
+          else
+            VERSION="$(bash scripts/compute-version.sh)"
+            VERSION="${VERSION#ver.}"
+            VERSION="${VERSION#v}"
+          fi
+          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
+      - name: Build .deb packages
+        shell: bash
+        env:
+          MAINTAINER: OpenCC Contributors <opencc@users.noreply.github.com>
+        run: |
+          bash scripts/build-deb-packages.sh "${VERSION}"
+
+      - name: Inspect package metadata
+        shell: bash
+        run: |
+          dpkg-deb --info "dist/opencc_${VERSION}_$(dpkg --print-architecture).deb"
+          dpkg-deb --info "dist/opencc-jieba_${VERSION}_$(dpkg --print-architecture).deb"
+
+      - name: Upload .deb artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencc-deb-${{ steps.version.outputs.value }}
+          path: |
+            dist/*.deb
+            dist/SHA256SUMS

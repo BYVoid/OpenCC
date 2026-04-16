@@ -50,30 +50,20 @@ This is a Windows release intended for WinGet distribution. For details, see [do
 
 ## Usage 使用
 
-### Online demo 線上轉換展示
+### Online 線上轉換
 
 https://opencc.js.org/converter?config=s2t
 
 ### Node.js
 
-[npm](https://www.npmjs.com/opencc) `npm install opencc`
+`npm install opencc`
 
-#### JavaScript
-```js
-const OpenCC = require('opencc');
-const converter = new OpenCC('s2t.json');
-converter.convertPromise("汉字").then(converted => {
-  console.log(converted);  // 漢字
-});
-```
-
-#### TypeScript
 ```ts
 import { OpenCC } from 'opencc';
 async function main() {
   const converter: OpenCC = new OpenCC('s2t.json');
   const result: string = await converter.convertPromise('汉字');
-  console.log(result);
+  console.log(result);  // 漢字
 }
 ```
 
@@ -119,15 +109,14 @@ int main() {
 
 ```
 
-Document 文檔: https://opencc.byvoid.com/docs/
+[Full Document 完整文檔](https://opencc.byvoid.com/docs/)
 
 ### Command Line
 
 * `opencc --help`
 * `opencc_dict --help`
-* `opencc_phrase_extract --help`
 
-### Others (Unofficial)
+### Other Ports (Unofficial)
 
 * Swift (iOS): [SwiftyOpenCC](https://github.com/XQS6LB3A/SwiftyOpenCC)
 * iOSOpenCC (pod): [iOSOpenCC](https://github.com/swiftdo/OpenCC)
@@ -305,8 +294,6 @@ Apache License 2.0
 * [cppjieba](https://github.com/yanyiwu/cppjieba) MIT License
   - Optional dependency used by the experimental `opencc-jieba` plugin.
   - 試驗性 `opencc-jieba` 插件使用的可選依賴。
-
-All these libraries are statically linked by default.
 
 ## Change History 版本歷史
 

@@ -12,7 +12,6 @@ set -e
 # Download dependenciess
 export DEBIAN_FRONTEND=noninteractive
 apt update
-apt upgrade -y
 apt install -y g++ make curl
 
 cd /opt/OpenCC

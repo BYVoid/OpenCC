@@ -584,6 +584,22 @@
         "s2tw": "鰂魚涌",
         "s2twp": "鰂魚涌"
       }
+    },
+    {
+      "id": "obama_s2twp",
+      "input": "奥巴马",
+      "expected": {
+        "s2t": "奧巴馬",
+        "s2tw": "奧巴馬",
+        "s2twp": "歐巴馬"
+      }
+    },
+    {
+      "id": "obama_tw2sp",
+      "input": "歐巴馬",
+      "expected": {
+        "tw2sp": "奥巴马"
+      }
     }
   ]
 }

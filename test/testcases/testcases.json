@@ -600,6 +600,16 @@
       "expected": {
         "tw2sp": "奥巴马"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1001_nian_fo",
+      "input": "念佛",
+      "expected": {
+        "s2t": "念佛",
+        "s2tw": "念佛",
+        "s2twp": "念佛",
+        "s2hk": "念佛"
+      }
     }
   ]
 }

@@ -600,6 +600,16 @@
       "expected": {
         "tw2sp": "奥巴马"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_backpack",
+      "input": "背包",
+      "expected": {
+        "s2t": "背包",
+        "s2tw": "背包",
+        "s2twp": "背包",
+        "s2hk": "背包"
+      }
     }
   ]
 }

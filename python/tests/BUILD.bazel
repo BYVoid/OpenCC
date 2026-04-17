@@ -11,6 +11,7 @@ py_test(
     deps = [
         "//python/opencc",
         requirement("pytest"),
+        requirement("pygments"),
         requirement("exceptiongroup"),
     ],
 )

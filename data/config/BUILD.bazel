@@ -7,6 +7,7 @@ filegroup(
 
 cc_test(
     name = "config_dict_validation_test",
+    size = "small",
     srcs = ["ConfigDictValidationTest.cpp"],
     data = [
         ":config",

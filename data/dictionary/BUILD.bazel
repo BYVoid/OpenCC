@@ -49,6 +49,7 @@ filegroup(
 
 cc_test(
     name = "dictionary_test",
+    size = "small",
     srcs = ["DictionaryTest.cpp"],
     data = [
         ":binary_dictionaries",

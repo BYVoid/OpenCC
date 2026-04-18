@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['c_0',['C',['../index.html#autotoc_md28',1,'C'],['../index.html#autotoc_md27',1,'C++']]],
+  ['c_20api_1',['OpenCC C API',['../group__opencc__c__api.html',1,'']]],
+  ['c_20comprehensive_20api_2',['OpenCC C++ Comprehensive API',['../group__opencc__cpp__api.html',1,'']]],
+  ['c_20simple_20api_3',['OpenCC C++ Simple API',['../group__opencc__simple__api.html',1,'']]],
+  ['change_20history_20版本歷史_4',['Change History 版本歷史',['../index.html#autotoc_md48',1,'']]],
+  ['chinese_20convert_20開放中文轉換_5',['Open Chinese Convert 開放中文轉換',['../index.html',1,'']]],
+  ['cmake_6',['Build with CMake',['../index.html#autotoc_md36',1,'']]],
+  ['cmdlineoutput_7',['CmdLineOutput',['../class_cmd_line_output.html',1,'']]],
+  ['code_8',['Source code',['../dir_68267d1309a1af8e8297ef4c3efbcdba.html#autotoc_md0',1,'']]],
+  ['code_20modules_20and_20flow_9',['Code Modules and Flow',['../dir_68267d1309a1af8e8297ef4c3efbcdba.html#autotoc_md1',1,'']]],
+  ['command_20line_10',['Command Line',['../index.html#autotoc_md29',1,'']]],
+  ['comprehensive_20api_11',['OpenCC C++ Comprehensive API',['../group__opencc__cpp__api.html',1,'']]],
+  ['config_12',['Config',['../classopencc_1_1_config.html',1,'opencc']]],
+  ['configurations_20配置文件_13',['Configurations 配置文件',['../index.html#autotoc_md31',1,'']]],
+  ['contributors_20貢獻者_14',['Contributors 貢獻者',['../index.html#autotoc_md50',1,'']]],
+  ['conversion_15',['Conversion',['../classopencc_1_1_conversion.html',1,'opencc::Conversion'],['../dir_68267d1309a1af8e8297ef4c3efbcdba.html#autotoc_md5',1,'Conversion']]],
+  ['conversionchain_16',['ConversionChain',['../classopencc_1_1_conversion_chain.html',1,'opencc']]],
+  ['convert_17',['Convert',['../classopencc_1_1_simple_converter.html#a0042dba7fe92bee2cadb4d7a8cbec929',1,'opencc::SimpleConverter::Convert(const std::string &amp;input) const'],['../classopencc_1_1_simple_converter.html#a3bc95485e6b8c5bca6b728f557efd98a',1,'opencc::SimpleConverter::Convert(const char *input) const'],['../classopencc_1_1_simple_converter.html#a63baff1214203c8835105b5167daba43',1,'opencc::SimpleConverter::Convert(const char *input, size_t length) const'],['../classopencc_1_1_simple_converter.html#ac9eb53d7dbecf687e0d43eaaf9bf2bd1',1,'opencc::SimpleConverter::Convert(const char *input, char *output) const'],['../classopencc_1_1_simple_converter.html#a63f5dbba323443bd42772d4c5c77b313',1,'opencc::SimpleConverter::Convert(const char *input, size_t length, char *output) const']]],
+  ['convert_20開放中文轉換_18',['Open Chinese Convert 開放中文轉換',['../index.html',1,'']]],
+  ['convertdictionary_19',['ConvertDictionary',['../group__opencc__cpp__api.html#ga84f945fa756d6f7f8bae6700586e5cba',1,'opencc']]],
+  ['converter_20',['Converter',['../classopencc_1_1_converter.html',1,'opencc']]],
+  ['core_20opencc_21',['1. Build And Install Core OpenCC',['../dir_38c8d24aef3972a7f87b834274e76e31.html#autotoc_md15',1,'']]],
+  ['customizing_20jieba_20dictionaries_22',['Customizing Jieba Dictionaries',['../dir_38c8d24aef3972a7f87b834274e76e31.html#autotoc_md11',1,'']]]
+];

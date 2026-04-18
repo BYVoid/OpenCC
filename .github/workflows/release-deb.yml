@@ -8,7 +8,6 @@ on:
         required: false
   push:
     tags:
-      - "v*"
       - "ver.*"
 
 concurrency:
@@ -19,7 +18,7 @@ jobs:
   build-deb:
     runs-on: ubuntu-22.04
     permissions:
-      contents: read
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -72,3 +71,13 @@ jobs:
           path: |
             dist/*.deb
             dist/SHA256SUMS
+
+      - name: Upload assets to existing GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            dist/*.deb \
+            dist/SHA256SUMS \
+            --clobber

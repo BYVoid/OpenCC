@@ -47,6 +47,7 @@ cc_library(
 
 cc_test(
     name = "binary_dict_test",
+    size = "small",
     srcs = ["BinaryDictTest.cpp"],
     deps = [
         ":binary_dict",
@@ -95,6 +96,7 @@ cc_library(
 
 cc_test(
     name = "config_test",
+    size = "small",
     srcs = ["ConfigTest.cpp"],
     deps = [
         ":common",
@@ -131,6 +133,7 @@ cc_library(
 
 cc_test(
     name = "conversion_test",
+    size = "small",
     srcs = ["ConversionTest.cpp"],
     deps = [
         ":conversion",
@@ -152,6 +155,7 @@ cc_library(
 
 cc_test(
     name = "conversion_chain_test",
+    size = "small",
     srcs = ["ConversionChainTest.cpp"],
     deps = [
         ":conversion_chain",
@@ -187,6 +191,7 @@ cc_library(
 
 cc_test(
     name = "darts_dict_test",
+    size = "small",
     srcs = ["DartsDictTest.cpp"],
     deps = [
         ":darts_dict",
@@ -242,6 +247,7 @@ cc_library(
 
 cc_test(
     name = "dict_group_test",
+    size = "small",
     srcs = ["DictGroupTest.cpp"],
     deps = [
         ":dict_group_test_base",
@@ -279,6 +285,7 @@ cc_library(
 
 cc_test(
     name = "lexicon_annotation_test",
+    size = "small",
     srcs = ["LexiconAnnotationTest.cpp"],
     deps = [
         ":text_dict",
@@ -301,6 +308,7 @@ cc_library(
 
 cc_test(
     name = "marisa_dict_test",
+    size = "small",
     srcs = ["MarisaDictTest.cpp"],
     deps = [
         ":marisa_dict",
@@ -322,6 +330,7 @@ cc_library(
 
 cc_test(
     name = "max_match_segmentation_test",
+    size = "small",
     srcs = ["MaxMatchSegmentationTest.cpp"],
     deps = [
         ":dict_group_test_base",
@@ -375,6 +384,7 @@ cc_library(
 
 cc_test(
     name = "phrase_extract_test",
+    size = "small",
     srcs = ["PhraseExtractTest.cpp"],
     deps = [
         ":phrase_extract",
@@ -436,6 +446,7 @@ cc_library(
 
 cc_test(
     name = "serialized_values_test",
+    size = "small",
     srcs = ["SerializedValuesTest.cpp"],
     deps = [
         ":serialized_values",
@@ -463,6 +474,7 @@ cc_library(
 
 cc_test(
     name = "simple_converter_test",
+    size = "small",
     srcs = ["SimpleConverterTest.cpp"],
     deps = [
         ":config_test_base",
@@ -500,6 +512,7 @@ cc_library(
 
 cc_test(
     name = "text_dict_test",
+    size = "small",
     srcs = ["TextDictTest.cpp"],
     deps = [
         ":text_dict",
@@ -532,6 +545,7 @@ cc_library(
 
 cc_test(
     name = "utf8_string_slice_test",
+    size = "small",
     srcs = ["UTF8StringSliceTest.cpp"],
     deps = [
         ":test_utils",
@@ -552,6 +566,7 @@ cc_library(
 
 cc_test(
     name = "utf8_util_test",
+    size = "small",
     srcs = ["UTF8UtilTest.cpp"],
     deps = [
         ":test_utils",

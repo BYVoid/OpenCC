@@ -10,6 +10,7 @@ cc_library(
 
 cc_test(
     name = "bazel_opencc_test",
+    size = "small",
     srcs = [
         "BazelOpenccTest.cpp",
         "PortableUtil.hpp",
@@ -28,6 +29,7 @@ cc_test(
 
 cc_test(
     name = "command_line_converter_test",
+    size = "small",
     srcs = [
         "CommandLineConvertTest.cpp",
         "PortableUtil.hpp",

@@ -1,6 +1,6 @@
 {
   "variables": {
-    "opencc_version": "1.2.1"
+    "opencc_version": "1.3.0"
   },
   "target_defaults": {
     "defines": [

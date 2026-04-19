@@ -62,8 +62,10 @@ jobs:
     permissions:
       contents: read
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, macos-14, windows-latest]
+        python-build: ["cp312"]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -79,37 +81,25 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Computed version: $VERSION"
 
-      - name: Build package and upload from docker (Linux)
-        if: runner.os == 'Linux'
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        run: |
-          docker run --rm -v "${PWD}:/opt/OpenCC" \
-            -e TWINE_USERNAME \
-            -e TWINE_PASSWORD \
-            -e VERSION=${VERSION} \
-            ubuntu:22.04 /bin/bash /opt/OpenCC/release-pypi-linux.sh testonly
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-      - name: Build package and upload (macOS)
-        if: runner.os == 'macOS'
-        run: bash release-pypi-macos.sh testonly
+      - name: Build and test wheel
+        uses: pypa/cibuildwheel@v3.2.1
         env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+          CIBW_BUILD: ${{ matrix.python-build }}-*
+          CIBW_SKIP: "*-musllinux_*"
+          CIBW_ARCHS_WINDOWS: "AMD64"
+          CIBW_MANYLINUX_X86_64_IMAGE: "manylinux2014"
+          CIBW_TEST_REQUIRES: "pytest"
+          CIBW_TEST_COMMAND: "pytest {project}/python/tests"
 
-      - name: Build package and upload (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          C:\Miniconda/condabin/conda.bat init powershell
-          ./release-pypi-windows.cmd testonly
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
       - name: upload artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: opencc-${{ env.VERSION }}-pypi-${{ matrix.os }}
+          name: opencc-${{ env.VERSION }}-pypi-${{ matrix.os }}-${{ matrix.python-build }}
           path: |
-            dist/**
+            wheelhouse/*.whl

@@ -134,4 +134,14 @@ TEST_F(SerializedValuesTest, AcceptsWellFormedFile) {
   std::remove(path.c_str());
 }
 
+// Test that valueTotalLength exceeding file size triggers InvalidFormat (#812).
+TEST_F(SerializedValuesTest, RejectsHugeValueTotalLength) {
+  // File only has a few bytes, but claims valueTotalLength = 0xFFFFFFFF.
+  std::string path =
+      WriteMalformedFile(1, 0xFFFFFFFF, "", {});
+  EXPECT_THROW(SerializableDict::NewFromFile<SerializedValues>(path),
+               InvalidFormat);
+  std::remove(path.c_str());
+}
+
 } // namespace opencc

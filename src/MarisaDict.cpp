@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <stdexcept>
 #include <unordered_map>
 
 #include "marisa.h"
@@ -102,23 +103,45 @@ MarisaDictPtr MarisaDict::NewFromFile(FILE* fp) {
   free(buffer);
   // Read Marisa Trie
   MarisaDictPtr dict(new MarisaDict());
-  marisa::fread(fp, dict->internal->marisa.get());
+  try {
+    marisa::fread(fp, dict->internal->marisa.get());
+  } catch (const std::exception& e) {
+    throw InvalidFormat(std::string("Invalid OpenCC Marisa dictionary: ") +
+                        e.what());
+  }
   std::shared_ptr<SerializedValues> serialized_values =
       SerializedValues::NewFromFile(fp);
   LexiconPtr values_lexicon = serialized_values->GetLexicon();
+  // Validate key count consistency
+  size_t numKeys = dict->internal->marisa->num_keys();
+  if (numKeys != values_lexicon->Length()) {
+    throw InvalidFormat(
+        "Invalid OpenCC Marisa dictionary (key count mismatch)");
+  }
   // Extract lexicon from built Marisa Trie, in order to get the order of keys.
   marisa::Agent agent;
   agent.set_query("");
   std::vector<std::unique_ptr<DictEntry>> entries;
   entries.resize(values_lexicon->Length());
   size_t maxLength = 0;
-  while (dict->internal->marisa->predictive_search(agent)) {
-    const std::string key(agent.key().ptr(), agent.key().length());
-    size_t id = agent.key().id();
-    maxLength = (std::max)(key.length(), maxLength);
-    std::unique_ptr<DictEntry> entry(
-        DictEntryFactory::New(key, values_lexicon->At(id)->Values()));
-    entries[id] = std::move(entry);
+  try {
+    while (dict->internal->marisa->predictive_search(agent)) {
+      const std::string key(agent.key().ptr(), agent.key().length());
+      size_t id = agent.key().id();
+      if (id >= entries.size()) {
+        throw InvalidFormat(
+            "Invalid OpenCC Marisa dictionary (key id out of bounds)");
+      }
+      maxLength = (std::max)(key.length(), maxLength);
+      std::unique_ptr<DictEntry> entry(
+          DictEntryFactory::New(key, values_lexicon->At(id)->Values()));
+      entries[id] = std::move(entry);
+    }
+  } catch (const InvalidFormat&) {
+    throw;
+  } catch (const std::exception& e) {
+    throw InvalidFormat(std::string("Invalid OpenCC Marisa dictionary: ") +
+                        e.what());
   }
   // Read values
   dict->lexicon.reset(new Lexicon(std::move(entries)));

@@ -28,6 +28,17 @@ protected:
       : dartsDict(DartsDict::NewFromDict(*textDict.get())),
         fileName("dict.ocd"){};
 
+  // Write a crafted OCD file with controllable dartsSize.
+  static std::string WriteMalformedDartsFile(size_t dartsSize) {
+    const std::string path = "malformed_darts.ocd";
+    FILE* fp = fopen(path.c_str(), "wb");
+    const char* header = "OPENCCDARTS1";
+    fwrite(header, sizeof(char), strlen(header), fp);
+    fwrite(&dartsSize, sizeof(size_t), 1, fp);
+    fclose(fp);
+    return path;
+  }
+
   const DartsDictPtr dartsDict;
   const std::string fileName;
 };
@@ -66,6 +77,13 @@ TEST_F(DartsDictTest, ExactMatch) {
 
   auto nowhere = dartsDict->Match("積羽沉舟衆口鑠金", 24);
   EXPECT_TRUE(nowhere.IsNull());
+}
+
+// Test that dartsSize exceeding file size triggers InvalidFormat (#816).
+TEST_F(DartsDictTest, RejectsHugeDartsSize) {
+  std::string path = WriteMalformedDartsFile(0x1300000000000000ULL);
+  EXPECT_THROW(SerializableDict::NewFromFile<DartsDict>(path), InvalidFormat);
+  std::remove(path.c_str());
 }
 
 } // namespace opencc

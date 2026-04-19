@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <cstring>
+
 #include "MarisaDict.hpp"
 #include "TestUtilsUTF8.hpp"
 #include "TextDictTestBase.hpp"
@@ -26,6 +28,20 @@ class MarisaDictTest : public TextDictTestBase {
 protected:
   MarisaDictTest()
       : dict(MarisaDict::NewFromDict(*textDict)), fileName("dict.ocd2"){};
+
+  // Write a crafted OCD2 file with a valid header but corrupt trie data.
+  static std::string WriteMalformedMarisaFile() {
+    const std::string path = "malformed_marisa.ocd2";
+    FILE* fp = fopen(path.c_str(), "wb");
+    const char* header = "OPENCC_MARISA_0.2.5";
+    fwrite(header, sizeof(char), strlen(header), fp);
+    // Write garbage trie data
+    char garbage[128];
+    memset(garbage, 0xFF, sizeof(garbage));
+    fwrite(garbage, 1, sizeof(garbage), fp);
+    fclose(fp);
+    return path;
+  }
 
   const MarisaDictPtr dict;
   const std::string fileName;
@@ -89,6 +105,13 @@ TEST_F(MarisaDictTest, MatchPrefix) {
     auto dictEntry = there.Get();
     EXPECT_EQ(utf8("Tsinghua"), dictEntry->GetDefault());
   }
+}
+
+// Test that corrupt marisa trie data triggers InvalidFormat (#814, #817).
+TEST_F(MarisaDictTest, RejectsCorruptTrieData) {
+  std::string path = WriteMalformedMarisaFile();
+  EXPECT_THROW(SerializableDict::NewFromFile<MarisaDict>(path), InvalidFormat);
+  std::remove(path.c_str());
 }
 
 } // namespace opencc

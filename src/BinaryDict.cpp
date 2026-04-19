@@ -89,6 +89,9 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
   if (unitsRead != 1) {
     throw InvalidFormat("Invalid OpenCC binary dictionary (keyTotalLength)");
   }
+  if (keyTotalLength > offsetBound) {
+    throw InvalidFormat("Invalid OpenCC binary dictionary (keyTotalLength exceeds file size)");
+  }
   dict->keyBuffer.resize(keyTotalLength);
   unitsRead = fread(const_cast<char*>(dict->keyBuffer.c_str()), sizeof(char),
                     keyTotalLength, fp);
@@ -101,6 +104,10 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
   unitsRead = fread(&valueTotalLength, sizeof(size_t), 1, fp);
   if (unitsRead != 1) {
     throw InvalidFormat("Invalid OpenCC binary dictionary (valueTotalLength)");
+  }
+  if (valueTotalLength > offsetBound) {
+    throw InvalidFormat(
+        "Invalid OpenCC binary dictionary (valueTotalLength exceeds file size)");
   }
   dict->valueBuffer.resize(valueTotalLength);
   unitsRead = fread(const_cast<char*>(dict->valueBuffer.c_str()), sizeof(char),
@@ -120,20 +127,29 @@ BinaryDictPtr BinaryDict::NewFromFile(FILE* fp) {
     // Key offset
     size_t keyOffset;
     unitsRead = fread(&keyOffset, sizeof(size_t), 1, fp);
-    if (unitsRead != 1 || keyOffset >= offsetBound) {
+    if (unitsRead != 1 || keyOffset >= keyTotalLength) {
       throw InvalidFormat("Invalid OpenCC binary dictionary (keyOffset)");
     }
-    std::string key = dict->keyBuffer.c_str() + keyOffset;
+    const char* keyStart = dict->keyBuffer.c_str() + keyOffset;
+    if (memchr(keyStart, '\0', keyTotalLength - keyOffset) == nullptr) {
+      throw InvalidFormat(
+          "Invalid OpenCC binary dictionary (key not null-terminated)");
+    }
+    std::string key = keyStart;
     // Value offset
     std::vector<std::string> values;
     for (size_t j = 0; j < numValues; j++) {
       size_t valueOffset;
       unitsRead = fread(&valueOffset, sizeof(size_t), 1, fp);
-      if (unitsRead != 1 || valueOffset >= offsetBound) {
+      if (unitsRead != 1 || valueOffset >= valueTotalLength) {
         throw InvalidFormat("Invalid OpenCC binary dictionary (valueOffset)");
       }
-      const char* value = dict->valueBuffer.c_str() + valueOffset;
-      values.push_back(value);
+      const char* valueStart = dict->valueBuffer.c_str() + valueOffset;
+      if (memchr(valueStart, '\0', valueTotalLength - valueOffset) == nullptr) {
+        throw InvalidFormat(
+            "Invalid OpenCC binary dictionary (value not null-terminated)");
+      }
+      values.push_back(valueStart);
     }
     DictEntry* entry = DictEntryFactory::New(key, values);
     dict->lexicon->Add(entry);

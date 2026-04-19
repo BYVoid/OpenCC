@@ -26,6 +26,30 @@ protected:
   BinaryDictTest()
       : binDict(new BinaryDict(textDict->GetLexicon())), fileName("dict.bin"){};
 
+  // Write a crafted binary file for BinaryDict with controllable fields.
+  static std::string WriteMalformedBinaryDict(
+      size_t numItems, size_t keyTotalLength, const std::string& keyBuffer,
+      size_t valueTotalLength, const std::string& valueBuffer,
+      const std::vector<std::tuple<size_t, size_t, std::vector<size_t>>>&
+          items) {
+    const std::string path = "malformed_binary_dict.bin";
+    FILE* fp = fopen(path.c_str(), "wb");
+    fwrite(&numItems, sizeof(size_t), 1, fp);
+    fwrite(&keyTotalLength, sizeof(size_t), 1, fp);
+    fwrite(keyBuffer.data(), sizeof(char), keyTotalLength, fp);
+    fwrite(&valueTotalLength, sizeof(size_t), 1, fp);
+    fwrite(valueBuffer.data(), sizeof(char), valueTotalLength, fp);
+    for (const auto& [numValues, keyOffset, valueOffsets] : items) {
+      fwrite(&numValues, sizeof(size_t), 1, fp);
+      fwrite(&keyOffset, sizeof(size_t), 1, fp);
+      for (size_t vo : valueOffsets) {
+        fwrite(&vo, sizeof(size_t), 1, fp);
+      }
+    }
+    fclose(fp);
+    return path;
+  }
+
   const BinaryDictPtr binDict;
   const std::string fileName;
 };
@@ -49,6 +73,54 @@ TEST_F(BinaryDictTest, Deserialization) {
 
   const TextDictPtr deserializedTextDict(new TextDict(lex2));
   TestDict(deserializedTextDict);
+}
+
+// Test that keyTotalLength exceeding file size triggers InvalidFormat (#815).
+TEST_F(BinaryDictTest, RejectsHugeKeyTotalLength) {
+  std::string path = WriteMalformedBinaryDict(
+      1, 0x7000000000ULL, "", 0, "", {});
+  EXPECT_THROW(SerializableDict::NewFromFile<BinaryDict>(path), InvalidFormat);
+  std::remove(path.c_str());
+}
+
+// Test that valueTotalLength exceeding file size triggers InvalidFormat (#815).
+TEST_F(BinaryDictTest, RejectsHugeValueTotalLength) {
+  std::string keyBuf = {'k', '\0'};
+  std::string path = WriteMalformedBinaryDict(
+      1, 2, keyBuf, 0x7000000000ULL, "", {});
+  EXPECT_THROW(SerializableDict::NewFromFile<BinaryDict>(path), InvalidFormat);
+  std::remove(path.c_str());
+}
+
+// Test that a keyOffset beyond keyTotalLength triggers InvalidFormat (#813).
+TEST_F(BinaryDictTest, RejectsKeyOffsetOutOfBounds) {
+  std::string keyBuf = {'h', 'i', '\0'};
+  std::string valBuf = {'v', '\0'};
+  std::string path = WriteMalformedBinaryDict(
+      1, 3, keyBuf, 2, valBuf, {{1, 100, {0}}});
+  EXPECT_THROW(SerializableDict::NewFromFile<BinaryDict>(path), InvalidFormat);
+  std::remove(path.c_str());
+}
+
+// Test that a valueOffset beyond valueTotalLength triggers InvalidFormat (#813).
+TEST_F(BinaryDictTest, RejectsValueOffsetOutOfBounds) {
+  std::string keyBuf = {'h', 'i', '\0'};
+  std::string valBuf = {'v', '\0'};
+  std::string path = WriteMalformedBinaryDict(
+      1, 3, keyBuf, 2, valBuf, {{1, 0, {100}}});
+  EXPECT_THROW(SerializableDict::NewFromFile<BinaryDict>(path), InvalidFormat);
+  std::remove(path.c_str());
+}
+
+// Sanity check: a well-formed BinaryDict crafted file deserializes.
+TEST_F(BinaryDictTest, AcceptsWellFormedFile) {
+  std::string keyBuf = {'h', 'i', '\0'};
+  std::string valBuf = {'v', '\0'};
+  std::string path = WriteMalformedBinaryDict(
+      1, 3, keyBuf, 2, valBuf, {{1, 0, {0}}});
+  const auto deserialized = SerializableDict::NewFromFile<BinaryDict>(path);
+  EXPECT_EQ(deserialized->GetLexicon()->Length(), 1);
+  std::remove(path.c_str());
 }
 
 } // namespace opencc

@@ -77,11 +77,23 @@ std::shared_ptr<SerializedValues> SerializedValues::NewFromFile(FILE* fp) {
   std::shared_ptr<SerializedValues> dict(
       new SerializedValues(LexiconPtr(new Lexicon)));
 
+  // Get remaining file size for validation
+  long savedOffset = ftell(fp);
+  fseek(fp, 0L, SEEK_END);
+  long fileEnd = ftell(fp);
+  fseek(fp, savedOffset, SEEK_SET);
+  size_t remainingSize =
+      (fileEnd > savedOffset) ? static_cast<size_t>(fileEnd - savedOffset) : 0;
+
   // Number of items
   uint32_t numItems = ReadInteger<uint32_t>(fp);
 
   // Values
   uint32_t valueTotalLength = ReadInteger<uint32_t>(fp);
+  if (valueTotalLength > remainingSize) {
+    throw InvalidFormat(
+        "Invalid OpenCC binary dictionary (valueTotalLength exceeds file size)");
+  }
   std::string valueBuffer;
   valueBuffer.resize(valueTotalLength);
   size_t unitsRead = fread(const_cast<char*>(valueBuffer.c_str()), sizeof(char),

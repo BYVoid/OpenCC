@@ -19,7 +19,7 @@
 PREFIX = /usr
 REL_BUILD_DOCUMENTATION ?= OFF
 
-.PHONY: bazel build clean node test xcode-build
+.PHONY: bazel build clean doc node test xcode-build
 
 build:
 	mkdir -p build/rel
@@ -31,6 +31,17 @@ build:
 	-DCMAKE_INSTALL_PREFIX=${PREFIX} \
 	../..)
 	make -C build/rel VERBOSE=${VERBOSE} PREFIX=${PREFIX}
+
+doc:
+	mkdir -p build/doc
+	(cd build/doc; cmake \
+	-DBUILD_DOCUMENTATION:BOOL=ON \
+	-DENABLE_GTEST:BOOL=OFF \
+	-DENABLE_BENCHMARK:BOOL=OFF \
+	-DCMAKE_BUILD_TYPE=Release \
+	-DCMAKE_INSTALL_PREFIX=${PREFIX} \
+	../..)
+	make -C build/doc apidoc VERBOSE=${VERBOSE} PREFIX=${PREFIX}
 
 package: build
 	make -C build/rel package_source VERBOSE=${VERBOSE}

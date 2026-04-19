@@ -65,7 +65,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, macos-14, windows-latest]
-        python-build: ["cp310", "cp311", "cp312", "cp313", "cp314"]
+        python-build: ["cp312"]
     runs-on: ${{ matrix.os }}
 
     steps:

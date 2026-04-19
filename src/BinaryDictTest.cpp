@@ -36,9 +36,9 @@ protected:
     FILE* fp = fopen(path.c_str(), "wb");
     fwrite(&numItems, sizeof(size_t), 1, fp);
     fwrite(&keyTotalLength, sizeof(size_t), 1, fp);
-    fwrite(keyBuffer.data(), sizeof(char), keyTotalLength, fp);
+    fwrite(keyBuffer.data(), sizeof(char), keyBuffer.size(), fp);
     fwrite(&valueTotalLength, sizeof(size_t), 1, fp);
-    fwrite(valueBuffer.data(), sizeof(char), valueTotalLength, fp);
+    fwrite(valueBuffer.data(), sizeof(char), valueBuffer.size(), fp);
     for (const auto& [numValues, keyOffset, valueOffsets] : items) {
       fwrite(&numValues, sizeof(size_t), 1, fp);
       fwrite(&keyOffset, sizeof(size_t), 1, fp);

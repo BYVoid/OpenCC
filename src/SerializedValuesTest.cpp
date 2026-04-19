@@ -42,7 +42,7 @@ protected:
     FILE* fp = fopen(path.c_str(), "wb");
     fwrite(&numItems, sizeof(uint32_t), 1, fp);
     fwrite(&valueTotalLength, sizeof(uint32_t), 1, fp);
-    fwrite(valueBuffer.data(), sizeof(char), valueTotalLength, fp);
+    fwrite(valueBuffer.data(), sizeof(char), valueBuffer.size(), fp);
     for (const auto& item : itemValueBytes) {
       uint16_t numValues = static_cast<uint16_t>(item.size());
       fwrite(&numValues, sizeof(uint16_t), 1, fp);

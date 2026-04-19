@@ -1,5 +1,6 @@
 add_executable(performance Performance.cpp)
 target_link_libraries(performance benchmark libopencc)
+add_dependencies(performance opencc)
 add_test(BenchmarkTest performance)
 
 if (WIN32)

@@ -17,6 +17,7 @@
  */
 
 #include <cstring>
+#include <chrono>
 #include <fstream>
 
 #ifdef _WIN32
@@ -25,6 +26,8 @@
 #include <unistd.h>
 #endif
 
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
 #include "src/CmdLineOutput.hpp"
 #include "src/Config.hpp"
 #include "src/Converter.hpp"
@@ -34,10 +37,74 @@ using namespace opencc;
 
 Optional<std::string> inputFileName = Optional<std::string>::Null();
 Optional<std::string> outputFileName = Optional<std::string>::Null();
+Optional<std::string> measuredResultFileName = Optional<std::string>::Null();
 std::string configFileName;
 bool noFlush;
 Config config;
 ConverterPtr converter;
+
+struct MeasurementResult {
+  double loadMs = 0.0;
+  double convertMs = 0.0;
+  double writeMs = 0.0;
+  double totalMs = 0.0;
+  size_t inputBytes = 0;
+  size_t outputBytes = 0;
+  bool lineByLine = false;
+};
+
+MeasurementResult measurement;
+
+double DurationToMilliseconds(
+    const std::chrono::steady_clock::duration& duration) {
+  return std::chrono::duration<double, std::milli>(duration).count();
+}
+
+void WriteMeasuredResult() {
+  if (measuredResultFileName.IsNull()) {
+    return;
+  }
+
+  rapidjson::StringBuffer buffer;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+  writer.SetFormatOptions(rapidjson::kFormatSingleLineArray);
+  writer.StartObject();
+  writer.Key("config");
+  writer.String(configFileName.c_str());
+  writer.Key("input");
+  if (inputFileName.IsNull()) {
+    writer.Null();
+  } else {
+    writer.String(inputFileName.Get().c_str());
+  }
+  writer.Key("output");
+  if (outputFileName.IsNull()) {
+    writer.Null();
+  } else {
+    writer.String(outputFileName.Get().c_str());
+  }
+  writer.Key("mode");
+  writer.String(measurement.lineByLine ? "line_by_line" : "file");
+  writer.Key("load_ms");
+  writer.Double(measurement.loadMs);
+  writer.Key("convert_ms");
+  writer.Double(measurement.convertMs);
+  writer.Key("write_ms");
+  writer.Double(measurement.writeMs);
+  writer.Key("total_ms");
+  writer.Double(measurement.totalMs);
+  writer.Key("input_bytes");
+  writer.Uint64(measurement.inputBytes);
+  writer.Key("output_bytes");
+  writer.Uint64(measurement.outputBytes);
+  writer.EndObject();
+
+  std::ofstream ofs(measuredResultFileName.Get().c_str(), std::ios::binary);
+  if (!ofs.is_open()) {
+    throw FileNotWritable(measuredResultFileName.Get());
+  }
+  ofs << buffer.GetString() << std::endl;
+}
 
 FILE* GetOutputStream() {
   if (outputFileName.IsNull()) {
@@ -75,12 +142,20 @@ void ConvertLineByLine() {
     }
     std::string line;
     std::getline(inputStream, line);
+    measurement.inputBytes += line.size();
+    const auto convertStart = std::chrono::steady_clock::now();
     const std::string& converted = converter->Convert(line);
+    measurement.convertMs += DurationToMilliseconds(
+        std::chrono::steady_clock::now() - convertStart);
+    measurement.outputBytes += converted.size();
+    const auto writeStart = std::chrono::steady_clock::now();
     fputs(converted.c_str(), fout);
     if (!noFlush) {
       // Flush every line if the output stream is stdout.
       fflush(fout);
     }
+    measurement.writeMs += DurationToMilliseconds(
+        std::chrono::steady_clock::now() - writeStart);
   }
   fclose(fout);
 }
@@ -143,6 +218,7 @@ void Convert(std::string fileName) {
   FILE* fout = GetOutputStream();
   while (!feof(fin)) {
     size_t length = fread(bufferPtr, sizeof(char), bufferSizeAvailble, fin);
+    measurement.inputBytes += length;
     bufferPtr[length] = '\0';
     size_t remainingLength = 0;
     std::string remainingTemp;
@@ -164,12 +240,19 @@ void Convert(std::string fileName) {
       }
     }
     // Perform conversion
+    const auto convertStart = std::chrono::steady_clock::now();
     const std::string& converted = converter->Convert(buffer);
+    measurement.convertMs += DurationToMilliseconds(
+        std::chrono::steady_clock::now() - convertStart);
+    measurement.outputBytes += converted.size();
+    const auto writeStart = std::chrono::steady_clock::now();
     fputs(converted.c_str(), fout);
     if (!noFlush) {
       // Flush every line if the output stream is stdout.
       fflush(fout);
     }
+    measurement.writeMs += DurationToMilliseconds(
+        std::chrono::steady_clock::now() - writeStart);
     // Reset pointer
     bufferPtr = bufferBegin + remainingLength;
     bufferSizeAvailble = BUFFER_SIZE - remainingLength;
@@ -186,6 +269,7 @@ void Convert(std::string fileName) {
 
 int main(int argc, const char* argv[]) {
   try {
+    const auto totalStart = std::chrono::steady_clock::now();
     TCLAP::CmdLine cmd("Open Chinese Convert (OpenCC) Command Line Tool", ' ',
                        VERSION);
     CmdLineOutput cmdLineOutput;
@@ -206,9 +290,17 @@ int main(int argc, const char* argv[]) {
     TCLAP::MultiArg<std::string> pathArg(
         "", "path", "Additional paths to locate config and dictionary files.",
         false /* required */, "file" /* type */, cmd);
+    TCLAP::ValueArg<std::string> measuredResultArg(
+        "", "measured_result",
+        "Write measured timing results as JSON to <file>.", false /* required */,
+        "" /* default */, "file" /* type */, cmd);
     cmd.parse(argc, argv);
     configFileName = configArg.getValue();
     noFlush = noFlushArg.getValue();
+    if (measuredResultArg.isSet()) {
+      measuredResultFileName =
+          Optional<std::string>(measuredResultArg.getValue());
+    }
     if (inputArg.isSet()) {
       inputFileName = Optional<std::string>(inputArg.getValue());
     }
@@ -216,13 +308,20 @@ int main(int argc, const char* argv[]) {
       outputFileName = Optional<std::string>(outputArg.getValue());
       noFlush = true;
     }
+    const auto loadStart = std::chrono::steady_clock::now();
     converter = config.NewFromFile(configFileName, pathArg.getValue(), argv[0]);
+    measurement.loadMs +=
+        DurationToMilliseconds(std::chrono::steady_clock::now() - loadStart);
     bool lineByLine = inputFileName.IsNull();
+    measurement.lineByLine = lineByLine;
     if (lineByLine) {
       ConvertLineByLine();
     } else {
       Convert(inputFileName.Get());
     }
+    measurement.totalMs +=
+        DurationToMilliseconds(std::chrono::steady_clock::now() - totalStart);
+    WriteMeasuredResult();
   } catch (TCLAP::ArgException& e) {
     std::cerr << "error: " << e.error() << " for arg " << e.argId()
               << std::endl;

@@ -95,14 +95,6 @@ std::string GetProcessIdString() {
 #endif
 }
 
-std::string GetParentDirectory(const std::string& path) {
-  const std::string::size_type pos = path.find_last_of("/\\");
-  if (pos == std::string::npos) {
-    return "";
-  }
-  return path.substr(0, pos + 1);
-}
-
 std::string GetBaseNameWithoutExtension(const std::string& path) {
   const std::string::size_type slash_pos = path.find_last_of("/\\");
   const std::string::size_type start =
@@ -112,6 +104,10 @@ std::string GetBaseNameWithoutExtension(const std::string& path) {
     return path.substr(start);
   }
   return path.substr(start, dot_pos - start);
+}
+
+std::string BenchmarkTempDirectory() {
+  return std::string(PROJECT_BINARY_DIR) + "/src/benchmark/";
 }
 
 std::string ResolveConfigPath(const std::string& config_name) {
@@ -143,7 +139,8 @@ std::string ResolveTextDictionaryPath(const std::string& dict_file_name) {
   throw FileNotFound(text_file_name);
 }
 
-void RewriteDictNode(JSONValue& node, JSONDocument::AllocatorType& allocator) {
+void RewriteDictNode(JSONValue& node, JSONDocument::AllocatorType& allocator,
+                     const char* target_type) {
   if (!node.IsObject()) {
     return;
   }
@@ -152,7 +149,7 @@ void RewriteDictNode(JSONValue& node, JSONDocument::AllocatorType& allocator) {
       std::string(node["type"].GetString()) == "group" && node.HasMember("dicts") &&
       node["dicts"].IsArray()) {
     for (auto& child : node["dicts"].GetArray()) {
-      RewriteDictNode(child, allocator);
+      RewriteDictNode(child, allocator, target_type);
     }
     return;
   }
@@ -169,29 +166,30 @@ void RewriteDictNode(JSONValue& node, JSONDocument::AllocatorType& allocator) {
   }
 
   const std::string text_path = ResolveTextDictionaryPath(file_name);
-  node["type"].SetString("text", allocator);
+  node["type"].SetString(target_type, allocator);
   node["file"].SetString(text_path.c_str(),
                          static_cast<rapidjson::SizeType>(text_path.size()),
                          allocator);
 }
 
-void RewriteConfigToText(JSONValue& node, JSONDocument::AllocatorType& allocator) {
+void RewriteConfigToText(JSONValue& node, JSONDocument::AllocatorType& allocator,
+                         const char* target_type) {
   if (node.IsObject()) {
     auto type_member = node.FindMember("type");
     auto file_member = node.FindMember("file");
     if (type_member != node.MemberEnd() && file_member != node.MemberEnd()) {
-      RewriteDictNode(node, allocator);
+      RewriteDictNode(node, allocator, target_type);
     }
 
     for (auto it = node.MemberBegin(); it != node.MemberEnd(); ++it) {
-      RewriteConfigToText(it->value, allocator);
+      RewriteConfigToText(it->value, allocator, target_type);
     }
     return;
   }
 
   if (node.IsArray()) {
     for (auto& child : node.GetArray()) {
-      RewriteConfigToText(child, allocator);
+      RewriteConfigToText(child, allocator, target_type);
     }
   }
 }
@@ -210,7 +208,9 @@ public:
     }
   }
 
-  std::string Create(const std::string& source_config_path) {
+  std::string Create(const std::string& source_config_path,
+                     const char* target_type,
+                     const std::string& suffix) {
     const std::string content = ReadFile(source_config_path);
     JSONDocument document;
     document.Parse(content.c_str());
@@ -218,13 +218,13 @@ public:
       throw InvalidFormat("Error parsing benchmark config JSON");
     }
 
-    RewriteConfigToText(document, document.GetAllocator());
+    RewriteConfigToText(document, document.GetAllocator(), target_type);
 
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     document.Accept(writer);
 
-    const std::string temp_path = BuildTempPath(source_config_path);
+    const std::string temp_path = BuildTempPath(source_config_path, suffix);
     std::ofstream stream(temp_path.c_str(), std::ios::binary);
     stream << buffer.GetString();
     stream.close();
@@ -237,14 +237,14 @@ public:
   }
 
 private:
-  std::string BuildTempPath(const std::string& source_config_path) {
-    const std::string directory = GetParentDirectory(source_config_path);
+  std::string BuildTempPath(const std::string& source_config_path,
+                            const std::string& suffix) {
     const std::string base_name =
-        GetBaseNameWithoutExtension(source_config_path) + ".benchmark-text";
+        GetBaseNameWithoutExtension(source_config_path) + "." + suffix;
     const std::string pid = GetProcessIdString();
     std::string path;
     do {
-      path = directory + base_name + "." + pid + "." +
+      path = BenchmarkTempDirectory() + base_name + "." + pid + "." +
              std::to_string(counter_++) + ".json";
     } while (IsRegularFile(path));
     return path;
@@ -268,12 +268,10 @@ public:
   }
 
   std::string Create(const std::string& prefix, const std::string& extension) {
-    const std::string base_directory = std::string(PROJECT_BINARY_DIR) +
-                                       "/src/benchmark/";
     const std::string pid = GetProcessIdString();
     std::string path;
     do {
-      path = base_directory + prefix + "." + pid + "." +
+      path = BenchmarkTempDirectory() + prefix + "." + pid + "." +
              std::to_string(counter_++) + extension;
     } while (IsRegularFile(path));
     paths_.push_back(path);
@@ -318,7 +316,8 @@ std::vector<BenchmarkConfig> BuildBenchmarkConfigs(
     configs.push_back(BenchmarkConfig{config_name + "/ocd2", source_path});
     configs.push_back(BenchmarkConfig{
         config_name + "/text_json",
-        GetTemporaryTextConfigRegistry().Create(source_path),
+        GetTemporaryTextConfigRegistry().Create(source_path, "text",
+                                               "benchmark-text"),
     });
   }
   return configs;
@@ -335,11 +334,7 @@ bool IsJiebaConfig(const BenchmarkConfig& config) {
 #endif
 
 std::string OpenccBinaryPath() {
-#ifdef _WIN32
-  return std::string(PROJECT_BINARY_DIR) + "/src/tools/opencc.exe";
-#else
-  return std::string(PROJECT_BINARY_DIR) + "/src/tools/opencc";
-#endif
+  return OPENCC_BENCHMARK_OPENCC_PATH;
 }
 
 std::string SourceConfigDirectory() {

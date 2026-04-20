@@ -1,3 +1,3 @@
 # Document
 
-http://byvoid.github.io/OpenCC/
+https://opencc.byvoid.com/docs/

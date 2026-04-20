@@ -110,6 +110,39 @@ std::string BenchmarkTempDirectory() {
   return std::string(PROJECT_BINARY_DIR) + "/src/benchmark/";
 }
 
+bool IsAbsolutePath(const std::string& path) {
+  if (path.empty()) {
+    return false;
+  }
+#ifdef _WIN32
+  return path.size() > 2 &&
+         ((path[0] >= 'A' && path[0] <= 'Z') ||
+          (path[0] >= 'a' && path[0] <= 'z')) &&
+         path[1] == ':' && (path[2] == '/' || path[2] == '\\');
+#else
+  return path[0] == '/';
+#endif
+}
+
+std::string JoinPath(const std::string& directory, const std::string& child) {
+  if (directory.empty()) {
+    return child;
+  }
+  const char last = directory[directory.size() - 1];
+  if (last == '/' || last == '\\') {
+    return directory + child;
+  }
+  return directory + "/" + child;
+}
+
+std::string GetParentDirectory(const std::string& path) {
+  const std::string::size_type pos = path.find_last_of("/\\");
+  if (pos == std::string::npos) {
+    return "";
+  }
+  return path.substr(0, pos + 1);
+}
+
 std::string ResolveConfigPath(const std::string& config_name) {
 #ifdef OPENCC_BENCHMARK_JIEBA_CONFIG_DIR
   if (config_name == "s2twp_jieba") {
@@ -137,6 +170,28 @@ std::string ResolveTextDictionaryPath(const std::string& dict_file_name) {
   }
 
   throw FileNotFound(text_file_name);
+}
+
+std::string ResolveSegmentationResourcePath(
+    const std::string& source_config_directory, const std::string& resource_path) {
+  if (IsAbsolutePath(resource_path)) {
+    return resource_path;
+  }
+
+#ifdef OPENCC_BENCHMARK_JIEBA_CONFIG_DIR
+  if (resource_path.find("jieba_dict/") == 0) {
+    const std::string basename =
+        resource_path.substr(std::string("jieba_dict/").size());
+    const std::string source_jieba_path =
+        std::string(CMAKE_SOURCE_DIR) + "/plugins/jieba/deps/cppjieba/dict/" +
+        basename;
+    if (IsRegularFile(source_jieba_path)) {
+      return source_jieba_path;
+    }
+  }
+#endif
+
+  return JoinPath(source_config_directory, resource_path);
 }
 
 void RewriteDictNode(JSONValue& node, JSONDocument::AllocatorType& allocator,
@@ -194,6 +249,50 @@ void RewriteConfigToText(JSONValue& node, JSONDocument::AllocatorType& allocator
   }
 }
 
+void RewriteSegmentationResourcesToAbsolute(
+    JSONValue& node, JSONDocument::AllocatorType& allocator,
+    const std::string& source_config_directory) {
+  if (node.IsObject()) {
+    auto segmentation_member = node.FindMember("segmentation");
+    if (segmentation_member != node.MemberEnd() &&
+        segmentation_member->value.IsObject()) {
+      auto resources_member =
+          segmentation_member->value.FindMember("resources");
+      if (resources_member != segmentation_member->value.MemberEnd() &&
+          resources_member->value.IsObject()) {
+        for (auto it = resources_member->value.MemberBegin();
+             it != resources_member->value.MemberEnd(); ++it) {
+          if (!it->value.IsString()) {
+            continue;
+          }
+          const std::string resource_path = it->value.GetString();
+          if (IsAbsolutePath(resource_path)) {
+            continue;
+          }
+          const std::string absolute_path = ResolveSegmentationResourcePath(
+              source_config_directory, resource_path);
+          it->value.SetString(
+              absolute_path.c_str(),
+              static_cast<rapidjson::SizeType>(absolute_path.size()), allocator);
+        }
+      }
+    }
+
+    for (auto it = node.MemberBegin(); it != node.MemberEnd(); ++it) {
+      RewriteSegmentationResourcesToAbsolute(it->value, allocator,
+                                             source_config_directory);
+    }
+    return;
+  }
+
+  if (node.IsArray()) {
+    for (auto& child : node.GetArray()) {
+      RewriteSegmentationResourcesToAbsolute(child, allocator,
+                                             source_config_directory);
+    }
+  }
+}
+
 std::string ReadFile(const std::string& path) {
   std::ifstream stream(path.c_str(), std::ios::binary);
   return std::string((std::istreambuf_iterator<char>(stream)),
@@ -219,6 +318,8 @@ public:
     }
 
     RewriteConfigToText(document, document.GetAllocator(), target_type);
+    RewriteSegmentationResourcesToAbsolute(document, document.GetAllocator(),
+                                          GetParentDirectory(source_config_path));
 
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
@@ -327,6 +428,14 @@ std::string QuotePath(const std::string& path) {
   return "\"" + path + "\"";
 }
 
+std::string WrapSystemCommand(const std::string& command) {
+#ifdef _WIN32
+  return "\"" + command + "\"";
+#else
+  return command;
+#endif
+}
+
 #ifdef OPENCC_BENCHMARK_JIEBA_CONFIG_DIR
 bool IsJiebaConfig(const BenchmarkConfig& config) {
   return config.name.find("s2twp_jieba/") == 0;
@@ -402,7 +511,7 @@ void RunCommandLineConversion(const BenchmarkConfig& config,
                         QuotePath(BuildDataDirectory()) + " --path " +
                         QuotePath(SourceConfigDirectory()) +
                         " --measured_result " + QuotePath(measured_result_path);
-  const int status = std::system(command.c_str());
+  const int status = std::system(WrapSystemCommand(command).c_str());
   if (status != 0) {
     throw Exception("opencc command failed with status " +
                     std::to_string(status));

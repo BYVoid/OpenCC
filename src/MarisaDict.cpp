@@ -36,6 +36,7 @@ static const char* OCD2_HEADER = "OPENCC_MARISA_0.2.5";
 class MarisaDict::MarisaInternal {
 public:
   std::unique_ptr<marisa::Trie> marisa;
+  std::string mappedBuffer;
 
   MarisaInternal() : marisa(new marisa::Trie()) {}
 };
@@ -101,16 +102,40 @@ MarisaDictPtr MarisaDict::NewFromFile(FILE* fp) {
     throw InvalidFormat("Invalid OpenCC dictionary header");
   }
   free(buffer);
-  // Read Marisa Trie
+  long trieOffset = ftell(fp);
+  fseek(fp, 0L, SEEK_END);
+  long fileEnd = ftell(fp);
+  fseek(fp, trieOffset, SEEK_SET);
+  size_t remainingSize =
+      (fileEnd > trieOffset) ? static_cast<size_t>(fileEnd - trieOffset) : 0;
+
   MarisaDictPtr dict(new MarisaDict());
+  dict->internal->mappedBuffer.resize(remainingSize);
+  bytesRead = fread(const_cast<char*>(dict->internal->mappedBuffer.data()),
+                    sizeof(char), remainingSize, fp);
+  if (bytesRead != remainingSize) {
+    throw InvalidFormat("Invalid OpenCC Marisa dictionary.");
+  }
+
   try {
-    marisa::fread(fp, dict->internal->marisa.get());
+    dict->internal->marisa->map(dict->internal->mappedBuffer.data(),
+                                dict->internal->mappedBuffer.size());
   } catch (const std::exception& e) {
     throw InvalidFormat(std::string("Invalid OpenCC Marisa dictionary: ") +
                         e.what());
   }
+
+  const size_t trieSize = dict->internal->marisa->io_size();
+  if (trieSize > dict->internal->mappedBuffer.size()) {
+    throw InvalidFormat(
+        "Invalid OpenCC Marisa dictionary (trie exceeds file size)");
+  }
+
+  size_t valuesBytesRead = 0;
   std::shared_ptr<SerializedValues> serialized_values =
-      SerializedValues::NewFromFile(fp);
+      SerializedValues::NewFromBuffer(
+          dict->internal->mappedBuffer.data() + trieSize,
+          dict->internal->mappedBuffer.size() - trieSize, &valuesBytesRead);
   LexiconPtr values_lexicon = serialized_values->GetLexicon();
   // Validate key count consistency
   size_t numKeys = dict->internal->marisa->num_keys();

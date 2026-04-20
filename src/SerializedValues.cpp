@@ -36,6 +36,17 @@ template <typename INT_TYPE> INT_TYPE ReadInteger(FILE* fp) {
   return num;
 }
 
+template <typename INT_TYPE>
+INT_TYPE ReadIntegerFromBuffer(const char* data, size_t size, size_t* offset) {
+  if (size - *offset < sizeof(INT_TYPE)) {
+    throw InvalidFormat("Invalid OpenCC binary dictionary.");
+  }
+  INT_TYPE num;
+  memcpy(&num, data + *offset, sizeof(INT_TYPE));
+  *offset += sizeof(INT_TYPE);
+  return num;
+}
+
 template <typename INT_TYPE> void WriteInteger(FILE* fp, INT_TYPE num) {
   size_t unitsWritten = fwrite(&num, sizeof(INT_TYPE), 1, fp);
   if (unitsWritten != 1) {
@@ -74,10 +85,6 @@ void SerializedValues::SerializeToFile(FILE* fp) const {
 }
 
 std::shared_ptr<SerializedValues> SerializedValues::NewFromFile(FILE* fp) {
-  std::shared_ptr<SerializedValues> dict(
-      new SerializedValues(LexiconPtr(new Lexicon)));
-
-  // Get remaining file size for validation
   long savedOffset = ftell(fp);
   fseek(fp, 0L, SEEK_END);
   long fileEnd = ftell(fp);
@@ -85,33 +92,50 @@ std::shared_ptr<SerializedValues> SerializedValues::NewFromFile(FILE* fp) {
   size_t remainingSize =
       (fileEnd > savedOffset) ? static_cast<size_t>(fileEnd - savedOffset) : 0;
 
+  std::string buffer;
+  buffer.resize(remainingSize);
+  size_t unitsRead = fread(const_cast<char*>(buffer.c_str()), sizeof(char),
+                           remainingSize, fp);
+  if (unitsRead != remainingSize) {
+    throw InvalidFormat("Invalid OpenCC binary dictionary.");
+  }
+
+  size_t bytesRead = 0;
+  return NewFromBuffer(buffer.data(), buffer.size(), &bytesRead);
+}
+
+std::shared_ptr<SerializedValues> SerializedValues::NewFromBuffer(
+    const char* data, size_t size, size_t* bytesRead) {
+  std::shared_ptr<SerializedValues> dict(
+      new SerializedValues(LexiconPtr(new Lexicon)));
+  size_t offset = 0;
+
   // Number of items
-  uint32_t numItems = ReadInteger<uint32_t>(fp);
+  uint32_t numItems = ReadIntegerFromBuffer<uint32_t>(data, size, &offset);
 
   // Values
-  uint32_t valueTotalLength = ReadInteger<uint32_t>(fp);
-  if (valueTotalLength > remainingSize) {
+  uint32_t valueTotalLength =
+      ReadIntegerFromBuffer<uint32_t>(data, size, &offset);
+  if (valueTotalLength > size - offset) {
     throw InvalidFormat(
         "Invalid OpenCC binary dictionary (valueTotalLength exceeds file size)");
   }
   std::string valueBuffer;
   valueBuffer.resize(valueTotalLength);
-  size_t unitsRead = fread(const_cast<char*>(valueBuffer.c_str()), sizeof(char),
-                           valueTotalLength, fp);
-  if (unitsRead != valueTotalLength) {
-    throw InvalidFormat("Invalid OpenCC binary dictionary (valueBuffer)");
-  }
+  memcpy(valueBuffer.data(), data + offset, valueTotalLength);
+  offset += valueTotalLength;
 
   // Offsets
   const char* pValueBuffer = valueBuffer.c_str();
   const char* pValueBufferEnd = pValueBuffer + valueTotalLength;
   for (uint32_t i = 0; i < numItems; i++) {
     // Number of values
-    uint16_t numValues = ReadInteger<uint16_t>(fp);
+    uint16_t numValues = ReadIntegerFromBuffer<uint16_t>(data, size, &offset);
     // Value offset
     std::vector<std::string> values;
     for (uint16_t j = 0; j < numValues; j++) {
-      uint16_t numValueBytes = ReadInteger<uint16_t>(fp);
+      uint16_t numValueBytes =
+          ReadIntegerFromBuffer<uint16_t>(data, size, &offset);
       if (numValueBytes == 0 || pValueBuffer + numValueBytes > pValueBufferEnd) {
         throw InvalidFormat(
             "Invalid OpenCC binary dictionary (value offset out of bounds)");
@@ -128,6 +152,9 @@ std::shared_ptr<SerializedValues> SerializedValues::NewFromFile(FILE* fp) {
     dict->lexicon->Add(entry);
   }
 
+  if (bytesRead != nullptr) {
+    *bytesRead = offset;
+  }
   return dict;
 }
 

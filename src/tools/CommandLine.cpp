@@ -32,6 +32,54 @@
 
 using namespace opencc;
 
+class OpenCCOutput : public CmdLineOutput {
+public:
+  void usage(TCLAP::CmdLineInterface& cmd) override {
+    CmdLineOutput::usage(cmd);
+    std::cout
+        << "Built-in Configurations:" << std::endl
+        << std::endl
+        << "   s2t.json    Simplified Chinese to Traditional Chinese"
+        << std::endl
+        << "   t2s.json    Traditional Chinese to Simplified Chinese"
+        << std::endl
+        << "   s2tw.json   Simplified Chinese to Traditional Chinese"
+           " (Taiwan Standard)"
+        << std::endl
+        << "   tw2s.json   Traditional Chinese (Taiwan Standard) to"
+           " Simplified Chinese"
+        << std::endl
+        << "   s2hk.json   Simplified Chinese to Traditional Chinese"
+           " (Hong Kong variant)"
+        << std::endl
+        << "   hk2s.json   Traditional Chinese (Hong Kong variant) to"
+           " Simplified Chinese"
+        << std::endl
+        << "   s2twp.json  Simplified Chinese to Traditional Chinese"
+           " (Taiwan Standard) with Taiwanese idiom"
+        << std::endl
+        << "   tw2sp.json  Traditional Chinese (Taiwan Standard) to"
+           " Simplified Chinese with Mainland Chinese idiom"
+        << std::endl
+        << "   t2tw.json   Traditional Chinese (OpenCC Standard) to"
+           " Taiwan Standard"
+        << std::endl
+        << "   hk2t.json   Traditional Chinese (Hong Kong variant) to"
+           " Traditional Chinese"
+        << std::endl
+        << "   t2hk.json   Traditional Chinese (OpenCC Standard) to"
+           " Hong Kong variant"
+        << std::endl
+        << "   t2jp.json   Traditional Chinese Characters (Kyujitai) to"
+           " New Japanese Kanji (Shinjitai)"
+        << std::endl
+        << "   jp2t.json   New Japanese Kanji (Shinjitai) to Traditional"
+           " Chinese Characters (Kyujitai)"
+        << std::endl
+        << std::endl;
+  }
+};
+
 Optional<std::string> inputFileName = Optional<std::string>::Null();
 Optional<std::string> outputFileName = Optional<std::string>::Null();
 std::string configFileName;
@@ -188,7 +236,7 @@ int main(int argc, const char* argv[]) {
   try {
     TCLAP::CmdLine cmd("Open Chinese Convert (OpenCC) Command Line Tool", ' ',
                        VERSION);
-    CmdLineOutput cmdLineOutput;
+    OpenCCOutput cmdLineOutput;
     cmd.setOutput(&cmdLineOutput);
 
     TCLAP::ValueArg<std::string> configArg(

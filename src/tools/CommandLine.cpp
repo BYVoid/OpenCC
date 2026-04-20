@@ -61,11 +61,14 @@ public:
         << "   tw2sp.json  Traditional Chinese (Taiwan Standard) to"
            " Simplified Chinese with Mainland Chinese idiom"
         << std::endl
+        << "   tw2t.json   Traditional Chinese (Taiwan Standard) to"
+           " Traditional Chinese (OpenCC Standard)"
+        << std::endl
         << "   t2tw.json   Traditional Chinese (OpenCC Standard) to"
            " Taiwan Standard"
         << std::endl
         << "   hk2t.json   Traditional Chinese (Hong Kong variant) to"
-           " Traditional Chinese"
+           " Traditional Chinese (OpenCC Standard)"
         << std::endl
         << "   t2hk.json   Traditional Chinese (OpenCC Standard) to"
            " Hong Kong variant"
@@ -74,7 +77,7 @@ public:
            " New Japanese Kanji (Shinjitai)"
         << std::endl
         << "   jp2t.json   New Japanese Kanji (Shinjitai) to Traditional"
-           " Chinese Characters (Kyujitai)"
+           " Chinese Characters (Kyujitai) (OpenCC Standard)"
         << std::endl
         << std::endl;
   }

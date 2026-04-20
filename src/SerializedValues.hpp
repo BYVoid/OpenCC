@@ -37,6 +37,9 @@ public:
   virtual void SerializeToFile(FILE* fp) const;
 
   static std::shared_ptr<SerializedValues> NewFromFile(FILE* fp);
+  static std::shared_ptr<SerializedValues> NewFromBuffer(const char* data,
+                                                         size_t size,
+                                                         size_t* bytesRead);
 
   const LexiconPtr& GetLexicon() const { return lexicon; }
 

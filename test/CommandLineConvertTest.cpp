@@ -123,11 +123,15 @@ protected:
 
   std::string TestCommand(const std::string& config,
                           const std::string& inputFile,
-                          const std::string& outputFile) const {
+                          const std::string& outputFile,
+                          const std::string& measuredResultFile = "") const {
     std::string cmd = QuotePath(OpenccCommand()) + " -i " +
                       QuotePath(inputFile) + " -o " +
                       QuotePath(outputFile) + " -c " +
                       QuotePath(ConfigurationDirectory() + config + ".json");
+    if (!measuredResultFile.empty()) {
+      cmd += " --measured_result " + QuotePath(measuredResultFile);
+    }
 #ifdef BAZEL
     const std::string dictFile =
         runfiles_->Rlocation("_main/data/dictionary/STCharacters.ocd2");
@@ -245,6 +249,48 @@ TEST_F(CommandLineConvertTest, ConvertFromJson) {
     }
     EXPECT_EQ(idx, entry.second.size()) << "config=" << config;
   }
+}
+
+TEST_F(CommandLineConvertTest, WritesMeasuredResultJson) {
+  const std::string config = "s2t";
+  const std::string inputFile = InputFile(config.c_str()) + ".measured";
+  const std::string outputFile = OutputFile(config.c_str()) + ".measured";
+  const std::string measuredResultFile =
+      OutputDirectory() + config + ".measured_result.json";
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << "Failed to open input file for writing: "
+                               << inputFile;
+    ofs << "开放中文转换" << std::endl;
+  }
+
+  ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile,
+                                  measuredResultFile).c_str()));
+
+  const std::string content = GetFileContents(measuredResultFile);
+  rapidjson::Document doc;
+  doc.Parse(content.c_str());
+  ASSERT_FALSE(doc.HasParseError());
+  ASSERT_TRUE(doc.IsObject());
+  ASSERT_TRUE(doc.HasMember("config"));
+  ASSERT_TRUE(doc["config"].IsString());
+  EXPECT_EQ(ConfigurationDirectory() + config + ".json",
+            std::string(doc["config"].GetString()));
+  ASSERT_TRUE(doc.HasMember("mode"));
+  EXPECT_STREQ("file", doc["mode"].GetString());
+  ASSERT_TRUE(doc.HasMember("load_ms"));
+  EXPECT_TRUE(doc["load_ms"].IsNumber());
+  ASSERT_TRUE(doc.HasMember("convert_ms"));
+  EXPECT_TRUE(doc["convert_ms"].IsNumber());
+  ASSERT_TRUE(doc.HasMember("write_ms"));
+  EXPECT_TRUE(doc["write_ms"].IsNumber());
+  ASSERT_TRUE(doc.HasMember("total_ms"));
+  EXPECT_TRUE(doc["total_ms"].IsNumber());
+  ASSERT_TRUE(doc.HasMember("input_bytes"));
+  EXPECT_TRUE(doc["input_bytes"].IsUint64());
+  ASSERT_TRUE(doc.HasMember("output_bytes"));
+  EXPECT_TRUE(doc["output_bytes"].IsUint64());
 }
 
 } // namespace opencc

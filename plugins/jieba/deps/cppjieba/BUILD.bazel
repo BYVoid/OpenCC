@@ -2,6 +2,14 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
+exports_files([
+    "dict/jieba.dict.utf8",
+    "dict/user.dict.utf8",
+    "dict/hmm_model.utf8",
+    "dict/idf.utf8",
+    "dict/stop_words.utf8",
+])
+
 cc_library(
     name = "cppjieba",
     hdrs = glob([

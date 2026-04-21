@@ -3,9 +3,8 @@
   "segmentation": {
     "type": "jieba",
     "resources": {
-      "dict_path": "jieba_dict/jieba.dict.utf8",
-      "model_path": "jieba_dict/hmm_model.utf8",
-      "user_dict_path": "jieba_dict/user.dict.utf8"
+      "dict_path": "jieba_dict/jieba_merged.ocd2",
+      "model_path": "jieba_dict/hmm_model.utf8"
     }
   },
   "conversion_chain": [{

@@ -108,6 +108,26 @@ else()
 endif()
 target_compile_definitions(opencc_jieba PRIVATE OPENCC_PLUGIN_BUILD)
 
+set(JIEBA_MERGED_DICT_DIR "${CMAKE_CURRENT_BINARY_DIR}/jieba_dict")
+set(JIEBA_MERGED_DICT "${JIEBA_MERGED_DICT_DIR}/jieba_merged.ocd2")
+
+add_custom_command(
+  OUTPUT "${JIEBA_MERGED_DICT}"
+  COMMAND ${CMAKE_COMMAND} -E make_directory "${JIEBA_MERGED_DICT_DIR}"
+  COMMAND $<TARGET_FILE:cppjieba_dict>
+          -i "${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/jieba.dict.utf8"
+          -i "${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/user.dict.utf8"
+          -o "${JIEBA_MERGED_DICT}"
+  DEPENDS
+    cppjieba_dict
+    "${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/jieba.dict.utf8"
+    "${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/user.dict.utf8"
+  VERBATIM
+)
+
+add_custom_target(jieba_merged_dict ALL DEPENDS "${JIEBA_MERGED_DICT}")
+add_dependencies(opencc_jieba jieba_merged_dict)
+
 # On Windows, OpenCC headers must not use dllimport when the plugin links
 # against a static OpenCC library. This affects both integrated builds and
 # standalone plugin builds via find_package(OpenCC).
@@ -144,6 +164,11 @@ if (BUILD_OPENCC_JIEBA_PLUGIN)
   install(
     TARGETS cppjieba_dict
     RUNTIME DESTINATION bin
+  )
+
+  install(
+    FILES "${JIEBA_MERGED_DICT}"
+    DESTINATION ${DIR_SHARE_OPENCC}/jieba_dict
   )
 
   install(

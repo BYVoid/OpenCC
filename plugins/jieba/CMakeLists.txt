@@ -220,10 +220,20 @@ if (BUILD_OPENCC_JIEBA_PLUGIN)
   )
 
   if (OPENCC_CAN_RUN_CPPJIEBA_DICT)
-    install(
-      FILES "${JIEBA_MERGED_DICT}"
-      DESTINATION ${DIR_SHARE_OPENCC}/jieba_dict
-    )
+    if (CMAKE_CONFIGURATION_TYPES)
+      install(CODE
+        "set(_jieba_merged_dict \"${CMAKE_CURRENT_BINARY_DIR}/\${CMAKE_INSTALL_CONFIG_NAME}/jieba_dict/jieba_merged.ocd2\")\n"
+        "if(NOT EXISTS \"\${_jieba_merged_dict}\")\n"
+        "  message(FATAL_ERROR \"Merged Jieba dictionary not found: \${_jieba_merged_dict}\")\n"
+        "endif()\n"
+        "file(INSTALL DESTINATION \"\${CMAKE_INSTALL_PREFIX}/${DIR_SHARE_OPENCC}/jieba_dict\" TYPE FILE FILES \"\${_jieba_merged_dict}\")\n"
+      )
+    else()
+      install(
+        FILES "${JIEBA_MERGED_DICT}"
+        DESTINATION ${DIR_SHARE_OPENCC}/jieba_dict
+      )
+    endif()
   endif()
 
   install(

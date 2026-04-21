@@ -279,7 +279,8 @@ int CreateJiebaSegmentation(opencc_segmentation_create_args_t* args) {
 
   try {
     std::unique_ptr<opencc::Segmentation> segmentation(
-        new opencc::JiebaSegmentation(dictPath, modelPath, userDictPath));
+        new opencc::JiebaSegmentation(dictPath, modelPath, userDictPath, idfPath,
+                                      stopWordsPath));
     *args->out = new opencc_segmentation_handle(std::move(segmentation));
     return 0;
   } catch (const std::exception& ex) {

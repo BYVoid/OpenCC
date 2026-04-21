@@ -241,18 +241,28 @@ DictTrie::PrecomputedDict LoadMergedJiebaDict(const std::string& dictPath) {
 
 JiebaSegmentation::JiebaSegmentation(const std::string& dictPath,
                                      const std::string& modelPath,
-                                     const std::string& userDictPath)
+                                     const std::string& userDictPath,
+                                     const std::string& idfPath,
+                                     const std::string& stopWordsPath)
     : jieba_(
           LooksLikeOpenccMergedDict(dictPath)
               ? new cppjieba::Jieba(LoadMergedJiebaDict(dictPath), modelPath,
                                     userDictPath.empty() ? "" : userDictPath,
-                                    ResolveAuxPath(dictPath, modelPath, "idf.utf8"),
-                                    ResolveAuxPath(dictPath, modelPath, "stop_words.utf8"))
+                                    idfPath.empty()
+                                        ? ResolveAuxPath(dictPath, modelPath, "idf.utf8")
+                                        : idfPath,
+                                    stopWordsPath.empty()
+                                        ? ResolveAuxPath(dictPath, modelPath, "stop_words.utf8")
+                                        : stopWordsPath)
               : new cppjieba::Jieba(
                     dictPath, modelPath,
                     userDictPath.empty() ? "" : userDictPath,
-                    ResolveAuxPath(dictPath, modelPath, "idf.utf8"),
-                    ResolveAuxPath(dictPath, modelPath, "stop_words.utf8"))) {
+                    idfPath.empty()
+                        ? ResolveAuxPath(dictPath, modelPath, "idf.utf8")
+                        : idfPath,
+                    stopWordsPath.empty()
+                        ? ResolveAuxPath(dictPath, modelPath, "stop_words.utf8")
+                        : stopWordsPath)) {
 }
 
 JiebaSegmentation::~JiebaSegmentation() = default;

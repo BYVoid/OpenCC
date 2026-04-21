@@ -16,6 +16,7 @@ jobs:
       contents: read
     runs-on: windows-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
           - arch: amd64

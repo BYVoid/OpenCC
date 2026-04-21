@@ -81,6 +81,14 @@ bool IsReadableFile(const std::string& path) {
 #endif
 }
 
+std::string BaseName(const std::string& path) {
+  const std::string::size_type pos = path.find_last_of("/\\");
+  if (pos == std::string::npos) {
+    return path;
+  }
+  return path.substr(pos + 1);
+}
+
 std::string ParentDir(const std::string& path) {
   std::string normalized = path;
   while (!normalized.empty() &&
@@ -103,6 +111,38 @@ std::string JoinPath(const std::string& left, const std::string& right) {
     return left + right;
   }
   return left + "/" + right;
+}
+
+bool EndsWith(const std::string& value, const std::string& suffix) {
+  return value.size() >= suffix.size() &&
+         value.compare(value.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+std::vector<std::string> SplitSearchPath(const char* raw) {
+  std::vector<std::string> entries;
+  if (raw == nullptr || *raw == '\0') {
+    return entries;
+  }
+  const char separator =
+#if defined(_WIN32) || defined(_WIN64)
+      ';';
+#else
+      ':';
+#endif
+  std::string path(raw);
+  std::string::size_type start = 0;
+  while (start <= path.size()) {
+    const std::string::size_type end = path.find(separator, start);
+    const std::string entry = path.substr(start, end - start);
+    if (!entry.empty()) {
+      entries.push_back(entry);
+    }
+    if (end == std::string::npos) {
+      break;
+    }
+    start = end + 1;
+  }
+  return entries;
 }
 
 void SetError(opencc_error_t* error,
@@ -172,8 +212,8 @@ std::string ResolveResourcePath(const std::string& rawPath,
       }
     }
   }
-  const char* pluginDir = std::getenv("OPENCC_SEGMENTATION_PLUGIN_PATH");
-  if (pluginDir != nullptr && *pluginDir != '\0') {
+  for (const std::string& pluginDir :
+       SplitSearchPath(std::getenv("OPENCC_SEGMENTATION_PLUGIN_PATH"))) {
     const std::string candidate = JoinPath(pluginDir, rawPath);
     if (IsReadableFile(candidate)) {
       return candidate;
@@ -233,6 +273,44 @@ std::string ResolveAuxPath(const std::string& dictPath,
   return ResolveResourcePath("jieba_dict/" + fileName, configDir);
 }
 
+void FallbackToTextJiebaDictionaries(const std::string& requestedDictPath,
+                                     const std::string& configDir,
+                                     std::string* dictPath,
+                                     std::string* userDictPath) {
+  if (dictPath == nullptr || userDictPath == nullptr) {
+    return;
+  }
+  if (IsReadableFile(*dictPath) || !EndsWith(requestedDictPath, "jieba_merged.ocd2")) {
+    return;
+  }
+
+  std::string textDictRaw = requestedDictPath;
+  const std::string mergedBase = BaseName(requestedDictPath);
+  const std::string textBase = "jieba.dict.utf8";
+  const std::string userBase = "user.dict.utf8";
+  if (mergedBase == requestedDictPath) {
+    textDictRaw = textBase;
+  } else {
+    textDictRaw.replace(textDictRaw.size() - mergedBase.size(), mergedBase.size(),
+                        textBase);
+  }
+
+  const std::string resolvedTextDict = ResolveResourcePath(textDictRaw, configDir);
+  if (!IsReadableFile(resolvedTextDict)) {
+    return;
+  }
+
+  std::string userDictRaw = textDictRaw;
+  userDictRaw.replace(userDictRaw.size() - textBase.size(), textBase.size(),
+                      userBase);
+  const std::string resolvedUserDict = ResolveResourcePath(userDictRaw, configDir);
+
+  *dictPath = resolvedTextDict;
+  if (IsReadableFile(resolvedUserDict)) {
+    *userDictPath = resolvedUserDict;
+  }
+}
+
 int CreateJiebaSegmentation(opencc_segmentation_create_args_t* args) {
   if (args == nullptr || args->struct_size < sizeof(*args) ||
       args->out == nullptr) {
@@ -261,9 +339,12 @@ int CreateJiebaSegmentation(opencc_segmentation_create_args_t* args) {
   }
   ReadConfigValue(args->config, args->config_size, "user_dict_path", &userDictPath);
 
+  const std::string requestedDictPath = dictPath;
   dictPath = ResolveResourcePath(dictPath, configDir);
   modelPath = ResolveResourcePath(modelPath, configDir);
   userDictPath = userDictPath.empty() ? "" : ResolveResourcePath(userDictPath, configDir);
+  FallbackToTextJiebaDictionaries(requestedDictPath, configDir, &dictPath,
+                                  &userDictPath);
   const std::string idfPath =
       ResolveAuxPath(dictPath, modelPath, configDir, "idf.utf8");
   const std::string stopWordsPath =

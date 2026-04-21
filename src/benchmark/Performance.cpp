@@ -182,6 +182,16 @@ std::string ResolveSegmentationResourcePath(
   if (resource_path.find("jieba_dict/") == 0) {
     const std::string basename =
         resource_path.substr(std::string("jieba_dict/").size());
+    const std::string plugin_build_path =
+        JoinPath(std::string(OPENCC_BENCHMARK_JIEBA_PLUGIN_DIR), resource_path);
+    if (IsRegularFile(plugin_build_path)) {
+      return plugin_build_path;
+    }
+    const std::string plugin_parent_path =
+        JoinPath(GetParentDirectory(OPENCC_BENCHMARK_JIEBA_PLUGIN_DIR), resource_path);
+    if (IsRegularFile(plugin_parent_path)) {
+      return plugin_parent_path;
+    }
     const std::string source_jieba_path =
         std::string(CMAKE_SOURCE_DIR) + "/plugins/jieba/deps/cppjieba/dict/" +
         basename;
@@ -415,11 +425,16 @@ std::vector<BenchmarkConfig> BuildBenchmarkConfigs(
   for (const std::string& config_name : config_names) {
     const std::string source_path = ResolveConfigPath(config_name);
     configs.push_back(BenchmarkConfig{config_name + "/ocd2", source_path});
-    configs.push_back(BenchmarkConfig{
-        config_name + "/text_json",
-        GetTemporaryTextConfigRegistry().Create(source_path, "text",
-                                               "benchmark-text"),
-    });
+    try {
+      configs.push_back(BenchmarkConfig{
+          config_name + "/text_json",
+          GetTemporaryTextConfigRegistry().Create(source_path, "text",
+                                                 "benchmark-text"),
+      });
+    } catch (const FileNotFound&) {
+      // Some legacy benchmark configs only ship precompiled ocd2 artifacts.
+      // Skip the text-json variant when there is no source text dictionary.
+    }
   }
   return configs;
 }

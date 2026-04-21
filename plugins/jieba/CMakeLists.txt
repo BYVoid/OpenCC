@@ -245,15 +245,23 @@ if (BUILD_OPENCC_JIEBA_PLUGIN)
   )
 
   install(
-    DIRECTORY
-      ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/
+    FILES
+      ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/hmm_model.utf8
+      ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/idf.utf8
+      ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/stop_words.utf8
     DESTINATION
       ${DIR_SHARE_OPENCC}/jieba_dict
-    FILES_MATCHING
-      PATTERN "*.utf8"
-      PATTERN "pos_dict" EXCLUDE
-      PATTERN "README.md" EXCLUDE
   )
+
+  if (NOT OPENCC_CAN_RUN_CPPJIEBA_DICT)
+    install(
+      FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/jieba.dict.utf8
+        ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/user.dict.utf8
+      DESTINATION
+        ${DIR_SHARE_OPENCC}/jieba_dict
+    )
+  endif()
 endif()
 
 if (ENABLE_GTEST AND NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)

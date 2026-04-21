@@ -111,6 +111,26 @@ target_compile_definitions(opencc_jieba PRIVATE OPENCC_PLUGIN_BUILD)
 set(JIEBA_MERGED_DICT_DIR "${CMAKE_CURRENT_BINARY_DIR}/jieba_dict")
 set(JIEBA_MERGED_DICT "${JIEBA_MERGED_DICT_DIR}/jieba_merged.ocd2")
 
+if (WIN32)
+  if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    set(_opencc_runtime_target OpenCC::OpenCC)
+  else()
+    set(_opencc_runtime_target libopencc)
+  endif()
+
+  add_custom_target(
+    copy_opencc_to_cppjieba_dict
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:${_opencc_runtime_target}>
+            $<TARGET_FILE_DIR:cppjieba_dict>
+    DEPENDS cppjieba_dict
+    COMMENT "Copying OpenCC runtime to directory of cppjieba_dict"
+  )
+  set(JIEBA_MERGED_DICT_WIN32_DEPENDS copy_opencc_to_cppjieba_dict)
+else()
+  set(JIEBA_MERGED_DICT_WIN32_DEPENDS)
+endif()
+
 add_custom_command(
   OUTPUT "${JIEBA_MERGED_DICT}"
   COMMAND ${CMAKE_COMMAND} -E make_directory "${JIEBA_MERGED_DICT_DIR}"
@@ -119,6 +139,7 @@ add_custom_command(
           -i "${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/user.dict.utf8"
           -o "${JIEBA_MERGED_DICT}"
   DEPENDS
+    ${JIEBA_MERGED_DICT_WIN32_DEPENDS}
     cppjieba_dict
     "${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/jieba.dict.utf8"
     "${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/user.dict.utf8"

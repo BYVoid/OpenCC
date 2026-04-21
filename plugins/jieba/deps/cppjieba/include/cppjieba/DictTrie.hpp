@@ -30,6 +30,7 @@ class DictTrie {
  public:
   struct PrecomputedDict {
     std::vector<DictUnit> node_infos;
+    std::unordered_set<Rune> single_char_user_words;
     double freq_sum;
     double min_weight;
     double max_weight;
@@ -218,6 +219,7 @@ class DictTrie {
   void Init(const PrecomputedDict& dict, const std::string& user_dict_paths,
             UserWordWeightOption user_word_weight_opt) {
     base_static_node_infos_.reset(new std::vector<DictUnit>(dict.node_infos));
+    user_dict_single_chinese_word_ = dict.single_char_user_words;
     freq_sum_ = dict.freq_sum;
     min_weight_ = dict.min_weight;
     max_weight_ = dict.max_weight;

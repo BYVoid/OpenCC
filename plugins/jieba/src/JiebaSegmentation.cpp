@@ -248,6 +248,12 @@ DictTrie::PrecomputedDict LoadMergedJiebaDict(const std::string& dictPath) {
     } else {
       node_info.weight = std::log(entries[i].freq / base_freq_sum);
     }
+    const bool is_user_entry =
+        !entries[i].contributes_to_base_sum && (entries[i].uses_default_weight ||
+                                                entries[i].freq >= 0.0);
+    if (is_user_entry && node_info.word.size() == 1) {
+      precomputed.single_char_user_words.insert(node_info.word[0]);
+    }
     precomputed.node_infos.push_back(node_info);
   }
 

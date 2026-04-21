@@ -102,6 +102,23 @@ bool IsReadableFile(const std::string& path) {
 }
 
 } // namespace
+#else
+namespace {
+
+std::string ParentDirectory(const std::string& path) {
+  const std::string::size_type pos = path.find_last_of("/\\");
+  if (pos == std::string::npos) {
+    return "";
+  }
+  return path.substr(0, pos);
+}
+
+bool IsReadableFile(const std::string& path) {
+  std::ifstream ifs(path.c_str());
+  return ifs.is_open();
+}
+
+} // namespace
 #endif
 
 struct CaseInput {
@@ -234,7 +251,16 @@ protected:
 #ifdef BAZEL
     return runfiles_->Rlocation("_main/plugins/jieba/jieba_dict/jieba_merged.ocd2");
 #else
-    return PluginDirectory() + "/jieba_dict/jieba_merged.ocd2";
+    const std::string pluginDir = PluginDirectory();
+    const std::string candidate = pluginDir + "/jieba_dict/jieba_merged.ocd2";
+    if (IsReadableFile(candidate)) {
+      return candidate;
+    }
+    const std::string pluginParent = ParentDirectory(pluginDir);
+    if (!pluginParent.empty()) {
+      return pluginParent + "/jieba_dict/jieba_merged.ocd2";
+    }
+    return candidate;
 #endif
   }
 

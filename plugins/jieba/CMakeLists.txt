@@ -249,22 +249,19 @@ if (BUILD_OPENCC_JIEBA_PLUGIN)
       ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/hmm_model.utf8
       ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/idf.utf8
       ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/stop_words.utf8
+      ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/jieba.dict.utf8
+      ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/user.dict.utf8
     DESTINATION
       ${DIR_SHARE_OPENCC}/jieba_dict
   )
-
-  if (NOT OPENCC_CAN_RUN_CPPJIEBA_DICT)
-    install(
-      FILES
-        ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/jieba.dict.utf8
-        ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/user.dict.utf8
-      DESTINATION
-        ${DIR_SHARE_OPENCC}/jieba_dict
-    )
-  endif()
 endif()
 
 if (ENABLE_GTEST AND NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+  file(GENERATE
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/generated/$<CONFIG>/JiebaPluginIntegrationTestConfig.hpp"
+    CONTENT "#pragma once\n#define OPENCC_JIEBA_MERGED_DICT_PATH \"$<SHELL_PATH:${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/jieba_dict/jieba_merged.ocd2>\"\n"
+  )
+
   if (WIN32)
     add_custom_target(
       copy_gtest_to_plugins_jieba
@@ -282,7 +279,9 @@ if (ENABLE_GTEST AND NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   target_compile_definitions(JiebaPluginIntegrationTest PRIVATE
     OPENCC_TEST_COMMAND="$<TARGET_FILE:opencc>"
     OPENCC_PLUGIN_TEST_DIR="$<TARGET_FILE_DIR:opencc_jieba>"
-    OPENCC_JIEBA_MERGED_DICT_PATH="${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/jieba_dict/jieba_merged.ocd2"
+  )
+  target_include_directories(JiebaPluginIntegrationTest PRIVATE
+    "${CMAKE_CURRENT_BINARY_DIR}/generated/$<CONFIG>"
   )
   target_link_libraries(JiebaPluginIntegrationTest gtest gtest_main)
   add_dependencies(JiebaPluginIntegrationTest opencc opencc_jieba Dictionaries)

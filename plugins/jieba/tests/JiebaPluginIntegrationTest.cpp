@@ -25,6 +25,7 @@
 #include "gtest/gtest.h"
 #include "rapidjson/document.h"
 
+#include "JiebaPluginIntegrationTestConfig.hpp"
 #include "test/PortableUtil.hpp"
 
 #if defined(_WIN32) || defined(_WIN64)

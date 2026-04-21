@@ -333,8 +333,8 @@ int CreateJiebaSegmentation(opencc_segmentation_create_args_t* args) {
   std::string modelPath;
   std::string userDictPath;
   const bool hasExplicitUserDictPath =
-      ReadConfigValue(args->config, args->config_size, "user_dict_path", &userDictPath) &&
-      !userDictPath.empty();
+      ReadConfigValue(args->config, args->config_size, "user_dict_path",
+                      &userDictPath);
   ReadConfigValue(args->config, args->config_size, "__config_dir", &configDir);
   if (!ReadConfigValue(args->config, args->config_size, "dict_path", &dictPath) ||
       dictPath.empty()) {

@@ -78,9 +78,6 @@ bool IsCommentOrEmpty(const std::string& line) {
   }
   for (size_t i = 0; i < line.size(); ++i) {
     const unsigned char ch = static_cast<unsigned char>(line[i]);
-    if (ch == '#') {
-      return true;
-    }
     if (!std::isspace(ch)) {
       return false;
     }
@@ -94,7 +91,7 @@ std::vector<std::string> ParseBaseDictValues(const std::vector<std::string>& tok
     throw std::runtime_error("invalid base dict line " +
                              std::to_string(line_number));
   }
-  return std::vector<std::string>{tokens[1], tokens[2]};
+  return std::vector<std::string>{tokens[1], tokens[2], "base"};
 }
 
 std::vector<std::string> ParseUserDictValues(const std::vector<std::string>& tokens,
@@ -104,12 +101,12 @@ std::vector<std::string> ParseUserDictValues(const std::vector<std::string>& tok
                              std::to_string(line_number));
   }
   if (tokens.size() == 1) {
-    return std::vector<std::string>{""};
+    return std::vector<std::string>{"", "", "user_default"};
   }
   if (tokens.size() == 2) {
-    return std::vector<std::string>{tokens[1]};
+    return std::vector<std::string>{"", tokens[1], "user_default"};
   }
-  return std::vector<std::string>{tokens[1], tokens[2]};
+  return std::vector<std::string>{tokens[1], tokens[2], "user_freq"};
 }
 
 class LexiconDict : public Dict {

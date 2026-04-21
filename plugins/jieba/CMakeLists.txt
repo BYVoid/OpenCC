@@ -119,6 +119,7 @@ if (WIN32)
   endif()
   if (_opencc_target_type STREQUAL "STATIC_LIBRARY")
     target_compile_definitions(opencc_jieba PRIVATE Opencc_BUILT_AS_STATIC)
+    target_compile_definitions(cppjieba_dict PRIVATE Opencc_BUILT_AS_STATIC)
   endif()
 endif()
 

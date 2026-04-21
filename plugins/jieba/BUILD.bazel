@@ -9,7 +9,10 @@ filegroup(
 
 filegroup(
     name = "resources",
-    srcs = ["//plugins/jieba/deps/cppjieba:dict"],
+    srcs = [
+        "//plugins/jieba/deps/cppjieba:dict",
+        ":jieba_merged_dict",
+    ],
 )
 
 filegroup(
@@ -35,11 +38,23 @@ cc_binary(
         "//plugins/jieba/deps/cppjieba:cppjieba",
         "//src:common",
         "//src:exception",
+        "//src:marisa_dict",
         "//src:plugin_api",
         "//src:segmentation",
         "//src:segments",
         "//src:utf8_util",
     ],
+)
+
+genrule(
+    name = "jieba_merged_dict",
+    srcs = [
+        "//plugins/jieba/deps/cppjieba:dict/jieba.dict.utf8",
+        "//plugins/jieba/deps/cppjieba:dict/user.dict.utf8",
+    ],
+    outs = ["jieba_dict/jieba_merged.ocd2"],
+    cmd = "$(location :cppjieba_dict) -i $(location //plugins/jieba/deps/cppjieba:dict/jieba.dict.utf8) -i $(location //plugins/jieba/deps/cppjieba:dict/user.dict.utf8) -o $@",
+    tools = [":cppjieba_dict"],
 )
 
 cc_binary(

@@ -25,6 +25,9 @@
 #include "gtest/gtest.h"
 #include "rapidjson/document.h"
 
+#ifndef BAZEL
+#include "JiebaPluginIntegrationTestConfig.hpp"
+#endif
 #include "test/PortableUtil.hpp"
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -102,6 +105,23 @@ bool IsReadableFile(const std::string& path) {
 }
 
 } // namespace
+#else
+namespace {
+
+std::string ParentDirectory(const std::string& path) {
+  const std::string::size_type pos = path.find_last_of("/\\");
+  if (pos == std::string::npos) {
+    return "";
+  }
+  return path.substr(0, pos);
+}
+
+bool IsReadableFile(const std::string& path) {
+  std::ifstream ifs(path.c_str());
+  return ifs.is_open();
+}
+
+} // namespace
 #endif
 
 struct CaseInput {
@@ -150,6 +170,18 @@ protected:
 
   static std::string QuotePath(const std::string& path) {
     return "\"" + path + "\"";
+  }
+
+  static std::string JsonString(const std::string& value) {
+    std::string escaped = "\"";
+    for (char ch : value) {
+      if (ch == '\\' || ch == '"') {
+        escaped.push_back('\\');
+      }
+      escaped.push_back(ch);
+    }
+    escaped.push_back('"');
+    return escaped;
   }
 
   std::string OutputDirectory() const {
@@ -215,6 +247,51 @@ protected:
     return "";
 #else
     return OPENCC_PLUGIN_TEST_DIR;
+#endif
+  }
+
+  std::string MergedJiebaDictPath() const {
+#ifdef BAZEL
+    return runfiles_->Rlocation("_main/plugins/jieba/jieba_dict/jieba_merged.ocd2");
+#else
+    const std::string pluginDir = PluginDirectory();
+    const std::string pluginParent = ParentDirectory(pluginDir);
+
+    std::vector<std::string> candidates;
+    candidates.push_back(OPENCC_JIEBA_MERGED_DICT_PATH);
+    candidates.push_back(pluginDir + "/jieba_dict/jieba_merged.ocd2");
+    if (!pluginParent.empty()) {
+      candidates.push_back(pluginParent + "/jieba_dict/jieba_merged.ocd2");
+    }
+#if defined(_WIN32) || defined(_WIN64)
+    const char* const configs[] = {"Debug", "Release", "RelWithDebInfo",
+                                   "MinSizeRel"};
+    for (const char* config : configs) {
+      candidates.push_back(pluginDir + "/" + config +
+                           "/jieba_dict/jieba_merged.ocd2");
+      if (!pluginParent.empty()) {
+        candidates.push_back(pluginParent + "/" + config +
+                             "/jieba_dict/jieba_merged.ocd2");
+      }
+    }
+#endif
+
+    for (const std::string& candidate : candidates) {
+      if (IsReadableFile(candidate)) {
+        return candidate;
+      }
+    }
+    return candidates.front();
+#endif
+  }
+
+  std::string JiebaModelPath() const {
+#ifdef BAZEL
+    return runfiles_->Rlocation(
+        "_main/plugins/jieba/deps/cppjieba/dict/hmm_model.utf8");
+#else
+    return std::string(CMAKE_SOURCE_DIR) +
+           "/plugins/jieba/deps/cppjieba/dict/hmm_model.utf8";
 #endif
   }
 
@@ -355,6 +432,68 @@ TEST_F(JiebaPluginIntegrationTest, ConvertFromJsonCases) {
   }
 }
 
+TEST_F(JiebaPluginIntegrationTest, ConvertWithMergedOcd2JiebaDictionary) {
+  const std::string inputFile = InputFile("s2twp_jieba_merged");
+  const std::string outputFile = OutputFile("s2twp_jieba_merged");
+  const std::string configFile = OutputDirectory() + "s2twp_jieba_merged.json";
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "生活着名为正敏的少女\n";
+  }
+
+  {
+    std::ofstream ofs(configFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "{\n"
+        << "  \"name\": \"merged jieba dict test\",\n"
+        << "  \"segmentation\": {\n"
+        << "    \"type\": \"jieba\",\n"
+        << "    \"resources\": {\n"
+        << "      \"dict_path\": " << JsonString(MergedJiebaDictPath()) << ",\n"
+        << "      \"model_path\": " << JsonString(JiebaModelPath()) << "\n"
+        << "    }\n"
+        << "  },\n"
+        << "  \"conversion_chain\": [{\n"
+        << "    \"dict\": {\n"
+        << "      \"type\": \"group\",\n"
+        << "      \"dicts\": [{\n"
+        << "        \"type\": \"ocd2\",\n"
+        << "        \"file\": \"STPhrases.ocd2\"\n"
+        << "      }, {\n"
+        << "        \"type\": \"ocd2\",\n"
+        << "        \"file\": \"STCharacters.ocd2\"\n"
+        << "      }]\n"
+        << "    }\n"
+        << "  }, {\n"
+        << "    \"dict\": {\n"
+        << "      \"type\": \"ocd2\",\n"
+        << "      \"file\": \"TWPhrases.ocd2\"\n"
+        << "    }\n"
+        << "  }, {\n"
+        << "    \"dict\": {\n"
+        << "      \"type\": \"ocd2\",\n"
+        << "      \"file\": \"TWVariants.ocd2\"\n"
+        << "    }\n"
+        << "  }]\n"
+        << "}\n";
+  }
+
+  ASSERT_EQ(0, RunCommandUtf8(BuildCommandWithPaths(
+                   configFile, inputFile, outputFile, DictionaryDirectory() + "/",
+                   PluginDirectory())));
+
+  std::ifstream ifs(outputFile, std::ios::binary);
+  ASSERT_TRUE(ifs.is_open());
+  std::string line;
+  ASSERT_TRUE(std::getline(ifs, line));
+  if (!line.empty() && line.back() == '\r') {
+    line.pop_back();
+  }
+  EXPECT_EQ("生活著名為正敏的少女", line);
+}
+
 #if defined(_WIN32) || defined(_WIN64)
 TEST_F(JiebaPluginIntegrationTest, ConvertFromUnicodePluginPath) {
   namespace fs = std::filesystem;
@@ -375,6 +514,7 @@ TEST_F(JiebaPluginIntegrationTest, ConvertFromUnicodePluginPath) {
       sourceConfig.parent_path().parent_path().parent_path();
   const fs::path sourceJiebaDict =
       sourcePluginRoot / "deps" / "cppjieba" / "dict";
+  const fs::path sourceMergedDict = fs::u8path(MergedJiebaDictPath());
   const fs::path sourcePluginDir = fs::u8path(PluginDirectory());
   const fs::path sourceOpenccExe = fs::u8path(OpenccCommand());
   const fs::path sourceBinDir = sourceOpenccExe.parent_path();
@@ -387,6 +527,8 @@ TEST_F(JiebaPluginIntegrationTest, ConvertFromUnicodePluginPath) {
   CopyRegularFiles(fs::u8path(DictionaryDirectory()), tempShareOpencc);
   fs::copy_file(sourceConfig, configFile, fs::copy_options::overwrite_existing);
   CopyRegularFiles(sourceJiebaDict, tempJiebaDict);
+  fs::copy_file(sourceMergedDict, tempJiebaDict / sourceMergedDict.filename(),
+                fs::copy_options::overwrite_existing);
   CopyRegularFiles(sourcePluginDir, tempPlugins);
 
   try {

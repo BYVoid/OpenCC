@@ -31,7 +31,9 @@ class JiebaSegmentation : public Segmentation {
 public:
   JiebaSegmentation(const std::string& dictPath,
                     const std::string& modelPath,
-                    const std::string& userDictPath = "");
+                    const std::string& userDictPath = "",
+                    const std::string& idfPath = "",
+                    const std::string& stopWordsPath = "");
 
   ~JiebaSegmentation() override;
 

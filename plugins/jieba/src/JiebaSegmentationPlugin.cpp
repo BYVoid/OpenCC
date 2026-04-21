@@ -218,6 +218,13 @@ std::string ResolveResourcePath(const std::string& rawPath,
     if (IsReadableFile(candidate)) {
       return candidate;
     }
+    const std::string pluginParent = ParentDir(pluginDir);
+    if (!pluginParent.empty()) {
+      const std::string parentCandidate = JoinPath(pluginParent, rawPath);
+      if (IsReadableFile(parentCandidate)) {
+        return parentCandidate;
+      }
+    }
   }
   const char* dataDir = std::getenv("OPENCC_DATA_DIR");
   if (dataDir != nullptr && *dataDir != '\0') {
@@ -276,7 +283,8 @@ std::string ResolveAuxPath(const std::string& dictPath,
 void FallbackToTextJiebaDictionaries(const std::string& requestedDictPath,
                                      const std::string& configDir,
                                      std::string* dictPath,
-                                     std::string* userDictPath) {
+                                     std::string* userDictPath,
+                                     bool hasExplicitUserDictPath) {
   if (dictPath == nullptr || userDictPath == nullptr) {
     return;
   }
@@ -306,7 +314,7 @@ void FallbackToTextJiebaDictionaries(const std::string& requestedDictPath,
   const std::string resolvedUserDict = ResolveResourcePath(userDictRaw, configDir);
 
   *dictPath = resolvedTextDict;
-  if (IsReadableFile(resolvedUserDict)) {
+  if (!hasExplicitUserDictPath && IsReadableFile(resolvedUserDict)) {
     *userDictPath = resolvedUserDict;
   }
 }
@@ -324,6 +332,9 @@ int CreateJiebaSegmentation(opencc_segmentation_create_args_t* args) {
   std::string dictPath;
   std::string modelPath;
   std::string userDictPath;
+  const bool hasExplicitUserDictPath =
+      ReadConfigValue(args->config, args->config_size, "user_dict_path", &userDictPath) &&
+      !userDictPath.empty();
   ReadConfigValue(args->config, args->config_size, "__config_dir", &configDir);
   if (!ReadConfigValue(args->config, args->config_size, "dict_path", &dictPath) ||
       dictPath.empty()) {
@@ -337,14 +348,13 @@ int CreateJiebaSegmentation(opencc_segmentation_create_args_t* args) {
              "Required resource missing: model_path");
     return -1;
   }
-  ReadConfigValue(args->config, args->config_size, "user_dict_path", &userDictPath);
 
   const std::string requestedDictPath = dictPath;
   dictPath = ResolveResourcePath(dictPath, configDir);
   modelPath = ResolveResourcePath(modelPath, configDir);
   userDictPath = userDictPath.empty() ? "" : ResolveResourcePath(userDictPath, configDir);
   FallbackToTextJiebaDictionaries(requestedDictPath, configDir, &dictPath,
-                                  &userDictPath);
+                                  &userDictPath, hasExplicitUserDictPath);
   const std::string idfPath =
       ResolveAuxPath(dictPath, modelPath, configDir, "idf.utf8");
   const std::string stopWordsPath =

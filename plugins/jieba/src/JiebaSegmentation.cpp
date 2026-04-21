@@ -126,6 +126,19 @@ bool ParsePositiveDouble(const std::string& text, double* value) {
   return true;
 }
 
+bool ParseNonNegativeDouble(const std::string& text, double* value) {
+  if (text.empty()) {
+    return false;
+  }
+  char* end = nullptr;
+  const double parsed = std::strtod(text.c_str(), &end);
+  if (end == text.c_str() || *end != '\0' || parsed < 0.0) {
+    return false;
+  }
+  *value = parsed;
+  return true;
+}
+
 struct RawMergedEntry {
   std::string word;
   std::string tag;
@@ -159,9 +172,12 @@ DictTrie::PrecomputedDict LoadMergedJiebaDict(const std::string& dictPath) {
         }
         raw.contributes_to_base_sum = true;
       } else if (values[2] == "user_freq") {
-        if (!ParsePositiveDouble(values[0], &raw.freq)) {
+        if (!ParseNonNegativeDouble(values[0], &raw.freq)) {
           throw std::runtime_error(
               "invalid merged jieba user frequency for: " + raw.word);
+        }
+        if (raw.freq == 0.0) {
+          raw.uses_default_weight = true;
         }
       } else if (values[2] == "user_default") {
         raw.uses_default_weight = true;

@@ -118,7 +118,8 @@ function(opencc_normalize_arch output_var input_value)
     set(_arch "X64")
   elseif (_arch STREQUAL "AARCH64")
     set(_arch "ARM64")
-  elseif (_arch MATCHES "^I[3-6]86$" OR _arch STREQUAL "X86")
+  elseif (_arch MATCHES "^I[3-6]86$" OR _arch STREQUAL "X86" OR
+          _arch STREQUAL "WIN32")
     set(_arch "X86")
   endif()
   set(${output_var} "${_arch}" PARENT_SCOPE)
@@ -272,7 +273,7 @@ endif()
 if (ENABLE_GTEST AND NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   file(GENERATE
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/generated/$<CONFIG>/JiebaPluginIntegrationTestConfig.hpp"
-    CONTENT "#pragma once\n#define OPENCC_JIEBA_MERGED_DICT_PATH \"$<SHELL_PATH:${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/jieba_dict/jieba_merged.ocd2>\"\n"
+    CONTENT "#pragma once\n#define OPENCC_JIEBA_MERGED_DICT_PATH \"${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/jieba_dict/jieba_merged.ocd2\"\n"
   )
 
   if (WIN32)
@@ -298,6 +299,9 @@ if (ENABLE_GTEST AND NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   )
   target_link_libraries(JiebaPluginIntegrationTest gtest gtest_main)
   add_dependencies(JiebaPluginIntegrationTest opencc opencc_jieba Dictionaries)
+  if (TARGET jieba_merged_dict)
+    add_dependencies(JiebaPluginIntegrationTest jieba_merged_dict)
+  endif()
   add_test(JiebaPluginIntegrationTest JiebaPluginIntegrationTest)
   set_tests_properties(
     JiebaPluginIntegrationTest

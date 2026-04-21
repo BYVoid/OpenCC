@@ -47,7 +47,7 @@ public:
    * On error returns 0.
    */
   static size_t NextCharLengthNoException(const char* str) {
-    char ch = *str;
+    const unsigned char ch = static_cast<unsigned char>(*str);
     if ((ch & 0xF0) == 0xE0) {
       return 3;
     } else if ((ch & 0x80) == 0x00) {
@@ -79,29 +79,20 @@ public:
    * Returns the length in byte for the previous UTF8 character.
    */
   static size_t PrevCharLength(const char* str) {
-    {
-      const size_t length = NextCharLengthNoException(str - 1);
-      if (length == 1) {
-        return length;
+    const char* candidate = str - 1;
+    size_t distance = 1;
+    while (distance < 6) {
+      const unsigned char ch = static_cast<unsigned char>(*candidate);
+      if ((ch & 0xC0) != 0x80) {
+        break;
       }
+      candidate--;
+      distance++;
     }
-    {
-      const size_t length = NextCharLengthNoException(str - 2);
-      if (length == 2) {
-        return length;
-      }
-    }
-    {
-      const size_t length = NextCharLengthNoException(str - 3);
-      if (length == 3) {
-        return length;
-      }
-    }
-    for (size_t i = 4; i <= 6; i++) {
-      const size_t length = NextCharLengthNoException(str - i);
-      if (length == i) {
-        return length;
-      }
+
+    const size_t length = NextCharLengthNoException(candidate);
+    if (length == distance) {
+      return length;
     }
     throw InvalidUTF8(str);
   }

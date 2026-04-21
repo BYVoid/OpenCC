@@ -86,6 +86,8 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     src/JiebaSegmentationPlugin.cpp
   )
   target_link_libraries(opencc_jieba PRIVATE OpenCC::OpenCC)
+  add_executable(cppjieba_dict tools/cppjieba_dict.cpp)
+  target_link_libraries(cppjieba_dict PRIVATE OpenCC::OpenCC)
 else()
   add_library(opencc_jieba SHARED
     src/JiebaSegmentation.cpp
@@ -97,6 +99,12 @@ else()
     ${PROJECT_BINARY_DIR}/src
   )
   target_link_libraries(opencc_jieba PRIVATE libopencc)
+  add_executable(cppjieba_dict tools/cppjieba_dict.cpp)
+  target_include_directories(cppjieba_dict PRIVATE
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_BINARY_DIR}/src
+  )
+  target_link_libraries(cppjieba_dict PRIVATE libopencc)
 endif()
 target_compile_definitions(opencc_jieba PRIVATE OPENCC_PLUGIN_BUILD)
 
@@ -130,6 +138,11 @@ if (BUILD_OPENCC_JIEBA_PLUGIN)
     LIBRARY DESTINATION ${DIR_PLUGIN}
     ARCHIVE DESTINATION ${DIR_PLUGIN}
     RUNTIME DESTINATION ${DIR_PLUGIN}
+  )
+
+  install(
+    TARGETS cppjieba_dict
+    RUNTIME DESTINATION bin
   )
 
   install(

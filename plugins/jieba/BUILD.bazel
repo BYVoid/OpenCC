@@ -42,6 +42,17 @@ cc_binary(
     ],
 )
 
+cc_binary(
+    name = "cppjieba_dict",
+    srcs = ["tools/cppjieba_dict.cpp"],
+    deps = [
+        "//src:dict",
+        "//src:dict_entry",
+        "//src:lexicon",
+        "//src:marisa_dict",
+    ],
+)
+
 cc_test(
     name = "jieba_plugin_integration_test",
     srcs = ["tests/JiebaPluginIntegrationTest.cpp"],

@@ -251,6 +251,9 @@ protected:
 #ifdef BAZEL
     return runfiles_->Rlocation("_main/plugins/jieba/jieba_dict/jieba_merged.ocd2");
 #else
+    if (IsReadableFile(OPENCC_JIEBA_MERGED_DICT_PATH)) {
+      return OPENCC_JIEBA_MERGED_DICT_PATH;
+    }
     const std::string pluginDir = PluginDirectory();
     const std::string candidate = pluginDir + "/jieba_dict/jieba_merged.ocd2";
     if (IsReadableFile(candidate)) {

@@ -282,6 +282,7 @@ if (ENABLE_GTEST AND NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   target_compile_definitions(JiebaPluginIntegrationTest PRIVATE
     OPENCC_TEST_COMMAND="$<TARGET_FILE:opencc>"
     OPENCC_PLUGIN_TEST_DIR="$<TARGET_FILE_DIR:opencc_jieba>"
+    OPENCC_JIEBA_MERGED_DICT_PATH="${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>/jieba_dict/jieba_merged.ocd2"
   )
   target_link_libraries(JiebaPluginIntegrationTest gtest gtest_main)
   add_dependencies(JiebaPluginIntegrationTest opencc opencc_jieba Dictionaries)

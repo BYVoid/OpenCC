@@ -25,7 +25,9 @@
 #include "gtest/gtest.h"
 #include "rapidjson/document.h"
 
+#ifndef BAZEL
 #include "JiebaPluginIntegrationTestConfig.hpp"
+#endif
 #include "test/PortableUtil.hpp"
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -252,19 +254,34 @@ protected:
 #ifdef BAZEL
     return runfiles_->Rlocation("_main/plugins/jieba/jieba_dict/jieba_merged.ocd2");
 #else
-    if (IsReadableFile(OPENCC_JIEBA_MERGED_DICT_PATH)) {
-      return OPENCC_JIEBA_MERGED_DICT_PATH;
-    }
     const std::string pluginDir = PluginDirectory();
-    const std::string candidate = pluginDir + "/jieba_dict/jieba_merged.ocd2";
-    if (IsReadableFile(candidate)) {
-      return candidate;
-    }
     const std::string pluginParent = ParentDirectory(pluginDir);
+
+    std::vector<std::string> candidates;
+    candidates.push_back(OPENCC_JIEBA_MERGED_DICT_PATH);
+    candidates.push_back(pluginDir + "/jieba_dict/jieba_merged.ocd2");
     if (!pluginParent.empty()) {
-      return pluginParent + "/jieba_dict/jieba_merged.ocd2";
+      candidates.push_back(pluginParent + "/jieba_dict/jieba_merged.ocd2");
     }
-    return candidate;
+#if defined(_WIN32) || defined(_WIN64)
+    const char* const configs[] = {"Debug", "Release", "RelWithDebInfo",
+                                   "MinSizeRel"};
+    for (const char* config : configs) {
+      candidates.push_back(pluginDir + "/" + config +
+                           "/jieba_dict/jieba_merged.ocd2");
+      if (!pluginParent.empty()) {
+        candidates.push_back(pluginParent + "/" + config +
+                             "/jieba_dict/jieba_merged.ocd2");
+      }
+    }
+#endif
+
+    for (const std::string& candidate : candidates) {
+      if (IsReadableFile(candidate)) {
+        return candidate;
+      }
+    }
+    return candidates.front();
 #endif
   }
 

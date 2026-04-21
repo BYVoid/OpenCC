@@ -112,7 +112,32 @@ set(JIEBA_MERGED_DICT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/jieba
 set(JIEBA_MERGED_DICT "${JIEBA_MERGED_DICT_DIR}/jieba_merged.ocd2")
 set(OPENCC_CAN_RUN_CPPJIEBA_DICT TRUE)
 
+function(opencc_normalize_arch output_var input_value)
+  string(TOUPPER "${input_value}" _arch)
+  if (_arch STREQUAL "AMD64" OR _arch STREQUAL "X86_64")
+    set(_arch "X64")
+  elseif (_arch STREQUAL "AARCH64")
+    set(_arch "ARM64")
+  elseif (_arch MATCHES "^I[3-6]86$" OR _arch STREQUAL "X86")
+    set(_arch "X86")
+  endif()
+  set(${output_var} "${_arch}" PARENT_SCOPE)
+endfunction()
+
+if (DEFINED CMAKE_VS_PLATFORM_NAME AND NOT CMAKE_VS_PLATFORM_NAME STREQUAL "")
+  set(_opencc_target_arch "${CMAKE_VS_PLATFORM_NAME}")
+else()
+  set(_opencc_target_arch "${CMAKE_SYSTEM_PROCESSOR}")
+endif()
+set(_opencc_host_arch "${CMAKE_HOST_SYSTEM_PROCESSOR}")
+opencc_normalize_arch(_opencc_target_arch "${_opencc_target_arch}")
+opencc_normalize_arch(_opencc_host_arch "${_opencc_host_arch}")
+
 if (CMAKE_CROSSCOMPILING)
+  set(OPENCC_CAN_RUN_CPPJIEBA_DICT FALSE)
+endif()
+if (WIN32 AND _opencc_target_arch AND _opencc_host_arch AND
+    NOT _opencc_target_arch STREQUAL _opencc_host_arch)
   set(OPENCC_CAN_RUN_CPPJIEBA_DICT FALSE)
 endif()
 

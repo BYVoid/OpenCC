@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   build-deb:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
@@ -26,6 +26,33 @@ jobs:
 
       - name: Install packaging dependencies
         run: |
+          sudo rm -f /etc/apt/sources.list
+          sudo find /etc/apt/sources.list.d -maxdepth 1 \
+            \( -name '*.list' -o -name '*.sources' \) \
+            -exec rm -f {} +
+          cat <<'EOF' | sudo tee /etc/apt/sources.list.d/opencc-cross.sources >/dev/null
+          Types: deb
+          URIs: http://archive.ubuntu.com/ubuntu
+          Suites: noble noble-updates noble-backports
+          Components: main restricted universe multiverse
+          Architectures: amd64
+          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+
+          Types: deb
+          URIs: http://security.ubuntu.com/ubuntu
+          Suites: noble-security
+          Components: main restricted universe multiverse
+          Architectures: amd64
+          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+
+          Types: deb
+          URIs: http://ports.ubuntu.com/ubuntu-ports
+          Suites: noble noble-updates noble-backports noble-security
+          Components: main restricted universe multiverse
+          Architectures: arm64
+          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+          EOF
+          sudo dpkg --add-architecture arm64
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             cmake \
@@ -33,7 +60,16 @@ jobs:
             dpkg-dev \
             file \
             pkg-config \
-            python3
+            python3 \
+            gcc-aarch64-linux-gnu \
+            g++-aarch64-linux-gnu \
+            libc6-dev-arm64-cross \
+            libstdc++-11-dev-arm64-cross \
+            binutils-aarch64-linux-gnu \
+            libc6:arm64 \
+            libgcc-s1:arm64 \
+            libstdc++6:arm64 \
+            zlib1g:arm64
 
       - name: Resolve version
         id: version
@@ -51,18 +87,70 @@ jobs:
           echo "value=$VERSION" >> "$GITHUB_OUTPUT"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
-      - name: Build .deb packages
+      - name: Write ARM64 toolchain
+        shell: bash
+        run: |
+          cat >"${RUNNER_TEMP}/toolchain-arm64.cmake" <<'EOF'
+          set(CMAKE_SYSTEM_NAME Linux)
+          set(CMAKE_SYSTEM_PROCESSOR aarch64)
+          set(CMAKE_C_COMPILER aarch64-linux-gnu-gcc)
+          set(CMAKE_CXX_COMPILER aarch64-linux-gnu-g++)
+          set(CMAKE_FIND_ROOT_PATH /usr/aarch64-linux-gnu)
+          set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+          set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+          set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+          set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
+          EOF
+
+      - name: Build amd64 .deb packages
         shell: bash
         env:
-          MAINTAINER: OpenCC Contributors <opencc@users.noreply.github.com>
+          MAINTAINER: "OpenCC Contributors <opencc@users.noreply.github.com>"
+          WORK_DIR: ${{ github.workspace }}/build-deb-amd64
+          DIST_DIR: ${{ github.workspace }}/dist-amd64
         run: |
           bash scripts/build-deb-packages.sh "${VERSION}"
+          mkdir -p dist-all/amd64
+          cp "${DIST_DIR}"/*.deb dist-all/amd64/
 
-      - name: Inspect package metadata
+      - name: Inspect amd64 package metadata
         shell: bash
         run: |
-          dpkg-deb --info "dist/opencc_${VERSION}_$(dpkg --print-architecture).deb"
-          dpkg-deb --info "dist/opencc-jieba_${VERSION}_$(dpkg --print-architecture).deb"
+          dpkg-deb --info "dist-all/amd64/opencc_${VERSION}_amd64.deb"
+          dpkg-deb --info "dist-all/amd64/opencc-jieba_${VERSION}_amd64.deb"
+
+      - name: Build arm64 .deb packages
+        shell: bash
+        env:
+          MAINTAINER: "OpenCC Contributors <opencc@users.noreply.github.com>"
+          TARGET_ARCH: arm64
+          CMAKE_TOOLCHAIN_FILE: "${{ runner.temp }}/toolchain-arm64.cmake"
+          WORK_DIR: ${{ github.workspace }}/build-deb-arm64
+          DIST_DIR: ${{ github.workspace }}/dist-arm64
+          HOST_CORE_DICT_SOURCE_DIR: ${{ github.workspace }}/build-deb-amd64/pkgroot-opencc/usr/share/opencc
+          HOST_JIEBA_MERGED_DICT_SOURCE: ${{ github.workspace }}/build-deb-amd64/pkgroot-opencc-jieba/usr/share/opencc/jieba_dict/jieba_merged.ocd2
+        run: |
+          bash scripts/build-deb-packages.sh "${VERSION}"
+          mkdir -p dist-all/arm64
+          cp "${DIST_DIR}"/*.deb dist-all/arm64/
+
+      - name: Inspect arm64 package metadata
+        shell: bash
+        run: |
+          dpkg-deb --info "dist-all/arm64/opencc_${VERSION}_arm64.deb"
+          dpkg-deb --info "dist-all/arm64/opencc-jieba_${VERSION}_arm64.deb"
+
+      - name: Assemble final artifacts
+        shell: bash
+        run: |
+          rm -rf dist
+          mkdir -p dist
+          cp dist-all/amd64/*.deb dist/
+          cp dist-all/arm64/*.deb dist/
+          (
+            cd dist
+            sha256sum ./*.deb > SHA256SUMS
+          )
 
       - name: Upload .deb artifacts
         uses: actions/upload-artifact@v4

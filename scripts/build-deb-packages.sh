@@ -143,9 +143,14 @@ collect_shlib_deps() {
 copy_generated_core_dicts() {
   local source_build_dir="$1"
   local dest_build_dir="$2"
+  local source_dict_dir="$source_build_dir"
+
+  if [ -d "$source_build_dir/data" ]; then
+    source_dict_dir="$source_build_dir/data"
+  fi
 
   mkdir -p "$dest_build_dir/data"
-  find "$source_build_dir" -maxdepth 1 -name '*.ocd2' -exec cp {} "$dest_build_dir/data/" \;
+  find "$source_dict_dir" -maxdepth 1 -name '*.ocd2' -exec cp {} "$dest_build_dir/data/" \;
 }
 
 copy_generated_jieba_dict() {
@@ -239,7 +244,7 @@ main() {
     -DOpenCC_DIR="$opencc_package_dir" \
     "${cmake_cross_args[@]}"
   if [ "$is_cross_build" = TRUE ]; then
-    cmake --build "$plugin_build_dir" --target opencc_jieba
+    cmake --build "$plugin_build_dir" --target opencc_jieba cppjieba_dict
   else
     cmake --build "$plugin_build_dir"
   fi

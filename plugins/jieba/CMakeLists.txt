@@ -228,12 +228,12 @@ if (BUILD_OPENCC_JIEBA_PLUGIN)
     RUNTIME DESTINATION ${DIR_PLUGIN}
   )
 
-  if (OPENCC_CAN_RUN_CPPJIEBA_DICT)
-    install(
-      TARGETS cppjieba_dict
-      RUNTIME DESTINATION bin
-    )
+  install(
+    TARGETS cppjieba_dict
+    RUNTIME DESTINATION bin
+  )
 
+  if (OPENCC_CAN_RUN_CPPJIEBA_DICT)
     if (CMAKE_CONFIGURATION_TYPES)
       install(CODE
         "set(_jieba_merged_dict \"${CMAKE_CURRENT_BINARY_DIR}/\${CMAKE_INSTALL_CONFIG_NAME}/jieba_dict/jieba_merged.ocd2\")\n"

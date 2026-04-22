@@ -338,32 +338,6 @@ TEST_F(CommandLineConvertTest, SegmentationOutputIsJson) {
   EXPECT_FALSE(doc.HasMember("output"));
 }
 
-TEST_F(CommandLineConvertTest, SegmentationWithExplicitJsonFormat) {
-  const std::string config = "s2t";
-  const std::string inputFile = InputFile("segmentation_json_test");
-  const std::string outputFile = OutputFile("segmentation_json_test");
-
-  {
-    std::ofstream ofs(inputFile, std::ios::binary);
-    ASSERT_TRUE(ofs.is_open());
-    ofs << "\xe5\xbc\x80\xe6\x94\xbe\xe4\xb8\xad\xe6\x96\x87\xe8\xbd\xac\xe6"
-           "\x8d\xa2"  // 开放中文转换
-        << "\n";
-  }
-
-  ASSERT_EQ(0,
-            system(TestCommandWithFlags(config, inputFile, outputFile,
-                                        "--segmentation --inspect-format json")
-                       .c_str()));
-
-  const std::string content = GetFileContents(outputFile);
-  rapidjson::Document doc;
-  doc.Parse(content.c_str());
-  ASSERT_FALSE(doc.HasParseError());
-  ASSERT_TRUE(doc.IsObject());
-  ASSERT_TRUE(doc.HasMember("segments"));
-}
-
 TEST_F(CommandLineConvertTest, InspectOutputIsJson) {
   const std::string config = "s2t";
   const std::string inputFile = InputFile("inspect_test");
@@ -403,32 +377,6 @@ TEST_F(CommandLineConvertTest, InspectOutputIsJson) {
   }
 }
 
-TEST_F(CommandLineConvertTest, InspectWithExplicitJsonFormat) {
-  const std::string config = "s2t";
-  const std::string inputFile = InputFile("inspect_json_test");
-  const std::string outputFile = OutputFile("inspect_json_test");
-
-  {
-    std::ofstream ofs(inputFile, std::ios::binary);
-    ASSERT_TRUE(ofs.is_open());
-    ofs << "\xe5\xbc\x80\xe6\x94\xbe\xe4\xb8\xad\xe6\x96\x87\xe8\xbd\xac\xe6"
-           "\x8d\xa2"  // 开放中文转换
-        << "\n";
-  }
-
-  ASSERT_EQ(0,
-            system(TestCommandWithFlags(config, inputFile, outputFile,
-                                        "--inspect --inspect-format json")
-                       .c_str()));
-
-  const std::string content = GetFileContents(outputFile);
-  rapidjson::Document doc;
-  doc.Parse(content.c_str());
-  ASSERT_FALSE(doc.HasParseError());
-  ASSERT_TRUE(doc.IsObject());
-  ASSERT_TRUE(doc.HasMember("stages"));
-}
-
 TEST_F(CommandLineConvertTest, SegmentationAndInspectAreMutuallyExclusive) {
   const std::string config = "s2t";
   const std::string inputFile = InputFile("mutex_test");
@@ -444,44 +392,6 @@ TEST_F(CommandLineConvertTest, SegmentationAndInspectAreMutuallyExclusive) {
   const int exitCode =
       system(TestCommandWithFlags(config, inputFile, outputFile,
                                   "--segmentation --inspect")
-                 .c_str());
-  EXPECT_NE(0, exitCode);
-}
-
-TEST_F(CommandLineConvertTest, InspectFormatWithoutModeErrors) {
-  const std::string config = "s2t";
-  const std::string inputFile = InputFile("format_no_mode_test");
-  const std::string outputFile = OutputFile("format_no_mode_test");
-
-  {
-    std::ofstream ofs(inputFile, std::ios::binary);
-    ASSERT_TRUE(ofs.is_open());
-    ofs << "test\n";
-  }
-
-  // --inspect-format without --segmentation or --inspect should fail
-  const int exitCode =
-      system(TestCommandWithFlags(config, inputFile, outputFile,
-                                  "--inspect-format json")
-                 .c_str());
-  EXPECT_NE(0, exitCode);
-}
-
-TEST_F(CommandLineConvertTest, InvalidInspectFormatErrors) {
-  const std::string config = "s2t";
-  const std::string inputFile = InputFile("bad_format_test");
-  const std::string outputFile = OutputFile("bad_format_test");
-
-  {
-    std::ofstream ofs(inputFile, std::ios::binary);
-    ASSERT_TRUE(ofs.is_open());
-    ofs << "test\n";
-  }
-
-  // --inspect-format with unsupported value should fail
-  const int exitCode =
-      system(TestCommandWithFlags(config, inputFile, outputFile,
-                                  "--inspect --inspect-format xml")
                  .c_str());
   EXPECT_NE(0, exitCode);
 }

@@ -43,10 +43,6 @@ enum class OutputMode {
   Inspect,
 };
 
-enum class InspectFormat {
-  Json,
-};
-
 class OpenCCOutput : public CmdLineOutput {
 public:
   void usage(TCLAP::CmdLineInterface& cmd) override {
@@ -492,29 +488,12 @@ int main(int argc, const char* argv[]) {
         "Output full inspection result (segmentation + per-stage conversion + "
         "final output) as JSON.",
         cmd, false);
-    TCLAP::ValueArg<std::string> inspectFormatArg(
-        "", "inspect-format",
-        "Output format for --segmentation or --inspect. Only 'json' is "
-        "supported.",
-        false /* required */, "" /* default */, "format" /* type */, cmd);
     cmd.parse(argc, argv);
 
     // Validate mutual exclusion and dependencies
     if (segmentationArg.getValue() && inspectArg.getValue()) {
       std::cerr << "error: --segmentation and --inspect are mutually exclusive."
                 << std::endl;
-      return 1;
-    }
-    if (inspectFormatArg.isSet() && !segmentationArg.getValue() &&
-        !inspectArg.getValue()) {
-      std::cerr << "error: --inspect-format requires --segmentation or "
-                   "--inspect."
-                << std::endl;
-      return 1;
-    }
-    if (inspectFormatArg.isSet() &&
-        inspectFormatArg.getValue() != "json") {
-      std::cerr << "error: --inspect-format only supports 'json'." << std::endl;
       return 1;
     }
 

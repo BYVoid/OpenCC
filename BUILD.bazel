@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 cc_library(
     name = "opencc",
     hdrs = [
+        "//src:ConversionInspection.hpp",
         "//src:Export.hpp",
         "//src:SimpleConverter.hpp",
         "//src:opencc.h",

@@ -125,6 +125,7 @@ find_jieba_plugin_library() {
 collect_shlib_deps() {
   local package_name="$1"
   shift
+  local target_arch="$1"
   shift
 
   local files=("$@")
@@ -135,7 +136,7 @@ collect_shlib_deps() {
   trap 'rm -rf "$control_dir"' RETURN
   write_debian_control_stub "$control_dir/debian" "$package_name"
 
-  output="$(cd "$control_dir" && dpkg-shlibdeps -O "${files[@]}")"
+  output="$(cd "$control_dir" && DEB_HOST_ARCH="$target_arch" dpkg-shlibdeps -O "${files[@]}")"
   output="${output#shlibs:Depends=}"
   printf '%s\n' "$output"
 }

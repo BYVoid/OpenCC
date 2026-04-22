@@ -21,6 +21,7 @@ set(
   Config.hpp
   Conversion.hpp
   ConversionChain.hpp
+  ConversionInspection.hpp
   Converter.hpp
   Dict.hpp
   DictConverter.hpp
@@ -72,6 +73,7 @@ set(
 set(UNITTESTS
   ConfigTest
   ConversionChainTest
+  ConversionInspectionTest
   ConversionTest
   DictGroupTest
   LexiconAnnotationTest

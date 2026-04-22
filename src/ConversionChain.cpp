@@ -33,3 +33,15 @@ SegmentsPtr ConversionChain::Convert(const SegmentsPtr& input) const {
   }
   return output;
 }
+
+std::vector<SegmentsPtr>
+ConversionChain::ConvertWithTrace(const SegmentsPtr& input) const {
+  std::vector<SegmentsPtr> trace;
+  trace.reserve(conversions.size());
+  SegmentsPtr output = input;
+  for (auto conversion : conversions) {
+    output = conversion->Convert(output);
+    trace.push_back(output);
+  }
+  return trace;
+}

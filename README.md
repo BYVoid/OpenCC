@@ -118,6 +118,43 @@ int main() {
 * `opencc --help`
 * `opencc_dict --help`
 
+#### Segmentation and Inspection Modes
+
+OpenCC CLI supports two diagnostic modes that output JSON instead of converted text:
+
+**`--segmentation`** — Output segmentation result only (no conversion):
+
+```bash
+echo "开放中文转换" | opencc -c s2t.json --segmentation
+# {"input":"开放中文转换","segments":["开放中文","转换"]}
+```
+
+**`--inspect`** — Output full inspection result (segmentation + per-stage conversion + final output):
+
+```bash
+echo "开放中文转换" | opencc -c s2t.json --inspect
+# {"input":"开放中文转换","segments":["开放中文","转换"],"stages":[{"index":1,"segments":["開放中文","轉換"]}],"output":"開放中文轉換"}
+
+# Pretty-print with jq:
+echo "开放中文转换" | opencc -c s2t.json --inspect | jq .
+```
+
+**`--inspect-format json`** — Explicitly select JSON output format (default and only supported format):
+
+```bash
+echo "开放中文转换" | opencc -c s2t.json --segmentation --inspect-format json
+```
+
+These modes are useful for diagnosing conversion issues:
+
+1. Use `--segmentation` to verify that the input is segmented as expected.
+2. Use `--inspect` to see which conversion stage produces an unexpected result.
+
+Rules:
+- `--segmentation` and `--inspect` are mutually exclusive.
+- `--inspect-format` requires `--segmentation` or `--inspect`.
+- Only `json` is accepted as a format value.
+
 ### Other Ports (Unofficial)
 
 * Swift (iOS): [SwiftyOpenCC](https://github.com/XQS6LB3A/SwiftyOpenCC)

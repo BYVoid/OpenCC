@@ -7,6 +7,34 @@ DIST_DIR="${DIST_DIR:-$ROOT_DIR/dist}"
 WORK_DIR="${WORK_DIR:-$ROOT_DIR/build-deb}"
 INSTALL_PREFIX="${INSTALL_PREFIX:-/usr}"
 MAINTAINER="${MAINTAINER:-OpenCC Contributors <opencc@users.noreply.github.com>}"
+TARGET_ARCH="${TARGET_ARCH:-$(dpkg --print-architecture)}"
+CMAKE_TOOLCHAIN_FILE="${CMAKE_TOOLCHAIN_FILE:-}"
+HOST_CORE_DICT_SOURCE_DIR="${HOST_CORE_DICT_SOURCE_DIR:-}"
+HOST_JIEBA_MERGED_DICT_SOURCE="${HOST_JIEBA_MERGED_DICT_SOURCE:-}"
+
+build_host_tools_and_resources() {
+  local core_build_dir="$1"
+  local plugin_build_dir="$2"
+  local host_pkgroot="$3"
+
+  cmake -S "$ROOT_DIR" -B "$core_build_dir" -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DBUILD_OPENCC_JIEBA_PLUGIN=OFF \
+    -DUSE_SYSTEM_MARISA=OFF
+  cmake --build "$core_build_dir"
+  DESTDIR="$host_pkgroot" cmake --install "$core_build_dir"
+
+  local host_opencc_package_dir
+  host_opencc_package_dir="$(find_opencc_package_dir "$host_pkgroot")"
+
+  cmake -S "$ROOT_DIR/plugins/jieba" -B "$plugin_build_dir" -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
+    -DOpenCC_DIR="$host_opencc_package_dir"
+  cmake --build "$plugin_build_dir"
+}
 
 compute_version() {
   local raw_version
@@ -97,6 +125,7 @@ find_jieba_plugin_library() {
 collect_shlib_deps() {
   local package_name="$1"
   shift
+  shift
 
   local files=("$@")
   local output
@@ -111,32 +140,85 @@ collect_shlib_deps() {
   printf '%s\n' "$output"
 }
 
+copy_generated_core_dicts() {
+  local source_build_dir="$1"
+  local dest_build_dir="$2"
+
+  mkdir -p "$dest_build_dir/data"
+  find "$source_build_dir" -maxdepth 1 -name '*.ocd2' -exec cp {} "$dest_build_dir/data/" \;
+}
+
+copy_generated_jieba_dict() {
+  local merged_dict_path="$1"
+  local pkgroot="$2"
+
+  mkdir -p "$pkgroot${INSTALL_PREFIX}/share/opencc/jieba_dict"
+  cp "$merged_dict_path" "$pkgroot${INSTALL_PREFIX}/share/opencc/jieba_dict/jieba_merged.ocd2"
+}
+
+have_prebuilt_host_resources() {
+  [ -n "$HOST_CORE_DICT_SOURCE_DIR" ] &&
+  [ -d "$HOST_CORE_DICT_SOURCE_DIR" ] &&
+  [ -n "$HOST_JIEBA_MERGED_DICT_SOURCE" ] &&
+  [ -f "$HOST_JIEBA_MERGED_DICT_SOURCE" ]
+}
+
 main() {
-  local version architecture
+  local version architecture host_arch
   version="$(compute_version "${1:-}")"
-  architecture="$(dpkg --print-architecture)"
+  architecture="$TARGET_ARCH"
+  host_arch="$(dpkg --print-architecture)"
 
   local core_build_dir="$WORK_DIR/core"
   local plugin_build_dir="$WORK_DIR/jieba"
   local core_pkgroot="$WORK_DIR/pkgroot-opencc"
   local plugin_pkgroot="$WORK_DIR/pkgroot-opencc-jieba"
+  local host_core_build_dir="$WORK_DIR/host-core"
+  local host_plugin_build_dir="$WORK_DIR/host-jieba"
+  local host_pkgroot="$WORK_DIR/host-pkgroot-opencc"
+  local cmake_cross_args=()
+  local is_cross_build=FALSE
+
+  if [ "$architecture" != "$host_arch" ]; then
+    is_cross_build=TRUE
+    if [ -z "$CMAKE_TOOLCHAIN_FILE" ]; then
+      printf 'Cross-building for %s requires CMAKE_TOOLCHAIN_FILE to be set.\n' "$architecture" >&2
+      exit 1
+    fi
+    cmake_cross_args+=(-DCMAKE_TOOLCHAIN_FILE="$CMAKE_TOOLCHAIN_FILE")
+  fi
 
   rm -rf "$WORK_DIR" "$DIST_DIR"
   mkdir -p "$DIST_DIR" "$core_pkgroot/DEBIAN" "$plugin_pkgroot/DEBIAN"
+
+  if [ "$is_cross_build" = TRUE ] && ! have_prebuilt_host_resources; then
+    build_host_tools_and_resources "$host_core_build_dir" "$host_plugin_build_dir" "$host_pkgroot"
+  fi
 
   cmake -S "$ROOT_DIR" -B "$core_build_dir" -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
     -DBUILD_SHARED_LIBS=OFF \
     -DBUILD_OPENCC_JIEBA_PLUGIN=OFF \
-    -DUSE_SYSTEM_MARISA=OFF
-  cmake --build "$core_build_dir"
+    -DUSE_SYSTEM_MARISA=OFF \
+    "${cmake_cross_args[@]}"
+  if [ "$is_cross_build" = TRUE ]; then
+    cmake --build "$core_build_dir" --target libopencc opencc opencc_dict opencc_phrase_extract
+    if have_prebuilt_host_resources; then
+      copy_generated_core_dicts "$HOST_CORE_DICT_SOURCE_DIR" "$core_build_dir"
+    else
+      copy_generated_core_dicts "$host_core_build_dir" "$core_build_dir"
+    fi
+  else
+    cmake --build "$core_build_dir"
+  fi
   DESTDIR="$core_pkgroot" cmake --install "$core_build_dir"
   write_doc_files "$core_pkgroot" opencc
 
   local core_depends
   core_depends="$(collect_shlib_deps \
     "opencc" \
+    "$architecture" \
     "$core_pkgroot${INSTALL_PREFIX}/bin/opencc" \
     "$core_pkgroot${INSTALL_PREFIX}/bin/opencc_dict" \
     "$core_pkgroot${INSTALL_PREFIX}/bin/opencc_phrase_extract")"
@@ -154,9 +236,23 @@ main() {
   cmake -S "$ROOT_DIR/plugins/jieba" -B "$plugin_build_dir" -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="$INSTALL_PREFIX" \
-    -DOpenCC_DIR="$opencc_package_dir"
-  cmake --build "$plugin_build_dir"
+    -DOpenCC_DIR="$opencc_package_dir" \
+    "${cmake_cross_args[@]}"
+  if [ "$is_cross_build" = TRUE ]; then
+    cmake --build "$plugin_build_dir" --target opencc_jieba
+  else
+    cmake --build "$plugin_build_dir"
+  fi
   DESTDIR="$plugin_pkgroot" cmake --install "$plugin_build_dir"
+  if [ "$is_cross_build" = TRUE ]; then
+    if have_prebuilt_host_resources; then
+      copy_generated_jieba_dict "$HOST_JIEBA_MERGED_DICT_SOURCE" "$plugin_pkgroot"
+    else
+      copy_generated_jieba_dict \
+        "$host_plugin_build_dir/jieba_dict/jieba_merged.ocd2" \
+        "$plugin_pkgroot"
+    fi
+  fi
   write_doc_files "$plugin_pkgroot" opencc-jieba
 
   local jieba_plugin_library
@@ -164,6 +260,7 @@ main() {
   local plugin_depends
   plugin_depends="$(collect_shlib_deps \
     "opencc-jieba" \
+    "$architecture" \
     "$jieba_plugin_library")"
   plugin_depends="opencc (= ${version}), ${plugin_depends}"
   write_control_file \

@@ -36,7 +36,7 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 * [Fedora](https://packages.fedoraproject.org/pkgs/opencc/opencc/)
 * [Arch Linux](https://archlinux.org/packages/extra/x86_64/opencc/)
 * [macOS (Homebrew)](https://formulae.brew.sh/formula/opencc)
-* WinGet (`winget install BYVoid.OpenCC`) - WIP
+* WinGet (使用 `winget install BYVoid.OpenCC` 命令)
 * [Bazel](https://registry.bazel.build/modules/opencc)
 * [Node.js](https://npmjs.org/package/opencc)
 * [Python](https://pypi.org/project/OpenCC/)

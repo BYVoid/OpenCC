@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "opencc",
+    hdrs = ["ConversionInspection.hpp"],
     deps = [
         ":binary_dict",
         ":common",
@@ -164,10 +165,25 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "conversion_inspection_test",
+    size = "small",
+    srcs = ["ConversionInspectionTest.cpp"],
+    deps = [
+        ":config_test_base",
+        ":simple_converter",
+        ":test_utils_utf8",
+        "@googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "converter",
     srcs = ["Converter.cpp"],
-    hdrs = ["Converter.hpp"],
+    hdrs = [
+        "ConversionInspection.hpp",
+        "Converter.hpp",
+    ],
     deps = [
         ":common",
         ":conversion_chain",
@@ -459,6 +475,7 @@ cc_library(
     name = "simple_converter",
     srcs = ["SimpleConverter.cpp"],
     hdrs = [
+        "ConversionInspection.hpp",
         "SimpleConverter.hpp",
         "opencc.h",
     ],

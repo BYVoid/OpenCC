@@ -30,10 +30,18 @@
 #include "rapidjson/stringbuffer.h"
 #include "src/CmdLineOutput.hpp"
 #include "src/Config.hpp"
+#include "src/ConversionInspection.hpp"
 #include "src/Converter.hpp"
+#include "src/Segments.hpp"
 #include "src/UTF8Util.hpp"
 
 using namespace opencc;
+
+enum class OutputMode {
+  Convert,
+  Segmentation,
+  Inspect,
+};
 
 class OpenCCOutput : public CmdLineOutput {
 public:
@@ -91,6 +99,7 @@ Optional<std::string> outputFileName = Optional<std::string>::Null();
 Optional<std::string> measuredResultFileName = Optional<std::string>::Null();
 std::string configFileName;
 bool noFlush;
+OutputMode outputMode = OutputMode::Convert;
 Config config;
 ConverterPtr converter;
 
@@ -102,6 +111,7 @@ struct MeasurementResult {
   size_t inputBytes = 0;
   size_t outputBytes = 0;
   bool lineByLine = false;
+  OutputMode outputMode = OutputMode::Convert;
 };
 
 MeasurementResult measurement;
@@ -136,6 +146,18 @@ void WriteMeasuredResult() {
   }
   writer.Key("mode");
   writer.String(measurement.lineByLine ? "line_by_line" : "file");
+  writer.Key("output_mode");
+  switch (measurement.outputMode) {
+  case OutputMode::Segmentation:
+    writer.String("segmentation");
+    break;
+  case OutputMode::Inspect:
+    writer.String("inspect");
+    break;
+  default:
+    writer.String("convert");
+    break;
+  }
   writer.Key("load_ms");
   writer.Double(measurement.loadMs);
   writer.Key("convert_ms");
@@ -169,6 +191,84 @@ FILE* GetOutputStream() {
   }
 }
 
+// Serializes the segmentation-only view of an inspection result as a JSON
+// object with "input" and "segments" fields. Used with --segmentation mode.
+std::string SerializeSegmentationResultJson(
+    const ConversionInspectionResult& result) {
+  rapidjson::StringBuffer buffer;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+  writer.StartObject();
+  writer.Key("input");
+  writer.String(result.input.c_str());
+  writer.Key("segments");
+  writer.StartArray();
+  for (const auto& seg : result.segments) {
+    writer.String(seg.c_str());
+  }
+  writer.EndArray();
+  writer.EndObject();
+  return buffer.GetString();
+}
+
+// Serializes the full inspection result as a JSON object with "input",
+// "segments", "stages", and "output" fields. Used with --inspect mode.
+std::string SerializeInspectionResultJson(
+    const ConversionInspectionResult& result) {
+  rapidjson::StringBuffer buffer;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+  writer.StartObject();
+  writer.Key("input");
+  writer.String(result.input.c_str());
+  writer.Key("segments");
+  writer.StartArray();
+  for (const auto& seg : result.segments) {
+    writer.String(seg.c_str());
+  }
+  writer.EndArray();
+  writer.Key("stages");
+  writer.StartArray();
+  for (const auto& stage : result.stages) {
+    writer.StartObject();
+    writer.Key("index");
+    writer.Uint64(stage.index);
+    writer.Key("segments");
+    writer.StartArray();
+    for (const auto& seg : stage.segments) {
+      writer.String(seg.c_str());
+    }
+    writer.EndArray();
+    writer.EndObject();
+  }
+  writer.EndArray();
+  writer.Key("output");
+  writer.String(result.output.c_str());
+  writer.EndObject();
+  return buffer.GetString();
+}
+
+std::string ConvertLineByMode(const std::string& line) {
+  const auto convertStart = std::chrono::steady_clock::now();
+  std::string output;
+  if (outputMode == OutputMode::Segmentation) {
+    // True segmentation-only path: call the segmenter directly without
+    // running any conversion stage.
+    const SegmentsPtr& segments =
+        converter->GetSegmentation()->Segment(line);
+    ConversionInspectionResult result;
+    result.input = line;
+    result.segments = segments->ToVector();
+    output = SerializeSegmentationResultJson(result);
+  } else if (outputMode == OutputMode::Inspect) {
+    const ConversionInspectionResult& result = converter->Inspect(line);
+    output = SerializeInspectionResultJson(result);
+  } else {
+    output = converter->Convert(line);
+  }
+  measurement.convertMs += DurationToMilliseconds(
+      std::chrono::steady_clock::now() - convertStart);
+  return output;
+}
+
 void ConvertLineByLine() {
 #ifdef _WIN32
   if (_isatty(_fileno(stdin))) {
@@ -185,22 +285,18 @@ void ConvertLineByLine() {
   std::istream& inputStream = std::cin;
   FILE* fout = GetOutputStream();
   bool isFirstLine = true;
-  while (!inputStream.eof()) {
+  std::string line;
+  while (std::getline(inputStream, line)) {
     if (!isFirstLine) {
       fputs("\n", fout);
     } else {
       isFirstLine = false;
     }
-    std::string line;
-    std::getline(inputStream, line);
     measurement.inputBytes += line.size();
-    const auto convertStart = std::chrono::steady_clock::now();
-    const std::string& converted = converter->Convert(line);
-    measurement.convertMs += DurationToMilliseconds(
-        std::chrono::steady_clock::now() - convertStart);
-    measurement.outputBytes += converted.size();
+    const std::string& output = ConvertLineByMode(line);
+    measurement.outputBytes += output.size();
     const auto writeStart = std::chrono::steady_clock::now();
-    fputs(converted.c_str(), fout);
+    fputs(output.c_str(), fout);
     if (!noFlush) {
       // Flush every line if the output stream is stdout.
       fflush(fout);
@@ -267,6 +363,44 @@ void Convert(std::string fileName) {
     throw FileNotFound(fileName);
   }
   FILE* fout = GetOutputStream();
+
+  if (outputMode == OutputMode::Segmentation ||
+      outputMode == OutputMode::Inspect) {
+    // Inspect/segmentation modes process line by line using std::getline to
+    // handle arbitrarily long lines.
+    std::ifstream inputStream(fileName);
+    fclose(fin);
+    fin = nullptr;
+    bool isFirstLine = true;
+    std::string line;
+    while (std::getline(inputStream, line)) {
+      // Strip trailing \r for Windows line endings
+      if (!line.empty() && line.back() == '\r') {
+        line.pop_back();
+      }
+      measurement.inputBytes += line.size();
+      if (!isFirstLine) {
+        fputs("\n", fout);
+      } else {
+        isFirstLine = false;
+      }
+      const std::string& output = ConvertLineByMode(line);
+      measurement.outputBytes += output.size();
+      const auto writeStart = std::chrono::steady_clock::now();
+      fputs(output.c_str(), fout);
+      if (!noFlush) {
+        fflush(fout);
+      }
+      measurement.writeMs += DurationToMilliseconds(
+          std::chrono::steady_clock::now() - writeStart);
+    }
+    fclose(fout);
+    if (needToRemove) {
+      std::remove(fileName.c_str());
+    }
+    return;
+  }
+
   while (!feof(fin)) {
     size_t length = fread(bufferPtr, sizeof(char), bufferSizeAvailble, fin);
     measurement.inputBytes += length;
@@ -345,7 +479,32 @@ int main(int argc, const char* argv[]) {
         "", "measured_result",
         "Write measured timing results as JSON to <file>.", false /* required */,
         "" /* default */, "file" /* type */, cmd);
+    TCLAP::SwitchArg segmentationArg(
+        "", "segmentation",
+        "Output segmentation result as JSON instead of converted text.", cmd,
+        false);
+    TCLAP::SwitchArg inspectArg(
+        "", "inspect",
+        "Output full inspection result (segmentation + per-stage conversion + "
+        "final output) as JSON.",
+        cmd, false);
     cmd.parse(argc, argv);
+
+    // Validate mutual exclusion and dependencies
+    if (segmentationArg.getValue() && inspectArg.getValue()) {
+      std::cerr << "error: --segmentation and --inspect are mutually exclusive."
+                << std::endl;
+      return 1;
+    }
+
+    if (segmentationArg.getValue()) {
+      outputMode = OutputMode::Segmentation;
+    } else if (inspectArg.getValue()) {
+      outputMode = OutputMode::Inspect;
+    } else {
+      outputMode = OutputMode::Convert;
+    }
+
     configFileName = configArg.getValue();
     noFlush = noFlushArg.getValue();
     if (measuredResultArg.isSet()) {
@@ -365,6 +524,7 @@ int main(int argc, const char* argv[]) {
         DurationToMilliseconds(std::chrono::steady_clock::now() - loadStart);
     bool lineByLine = inputFileName.IsNull();
     measurement.lineByLine = lineByLine;
+    measurement.outputMode = outputMode;
     if (lineByLine) {
       ConvertLineByLine();
     } else {

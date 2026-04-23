@@ -118,6 +118,35 @@ int main() {
 * `opencc --help`
 * `opencc_dict --help`
 
+#### Segmentation and Inspection Modes
+
+OpenCC CLI supports two diagnostic modes that output JSON instead of converted text:
+
+**`--segmentation`** — Output segmentation result only (no conversion):
+
+```bash
+echo "他只看了几行日志，就一叶知秋，猜到整个系统是数据库连接池出了问题" | opencc -c s2twp.json --segmentation
+# {"input":"他只看了几行日志，就一叶知秋，猜到整个系统是数据库连接池出了问题","segments":["他","只看","了几行","日志","，就","一叶知秋","，猜到","整个","系统","是","数据库","连接池","出了","问题"]}
+```
+
+**`--inspect`** — Output full inspection result (segmentation + per-stage conversion + final output):
+
+```bash
+echo "他只看了几行日志，就一叶知秋，猜到整个系统是数据库连接池出了问题" | opencc -c s2twp.json --inspect
+# {"input":"他只看了几行日志，就一叶知秋，猜到整个系统是数据库连接池出了问题","segments":["他","只看","了几行","日志","，就","一叶知秋","，猜到","整个","系统","是","数据库","连接池","出了","问题"],"stages":[{"index":1,"segments":["他","只看","了幾行","日誌","，就","一葉知秋","，猜到","整個","系統","是","數據庫","連接池","出了","問題"]},{"index":2,"segments":["他","只看","了幾行","日誌","，就","一葉知秋","，猜到","整個","系統","是","資料庫","連線池","出了","問題"]},{"index":3,"segments":["他","只看","了幾行","日誌","，就","一葉知秋","，猜到","整個","系統","是","資料庫","連線池","出了","問題"]}],"output":"他只看了幾行日誌，就一葉知秋，猜到整個系統是資料庫連線池出了問題"}
+
+# Pretty-print with jq:
+echo "他只看了几行日志，就一叶知秋，猜到整个系统是数据库连接池出了问题" | opencc -c s2twp.json --inspect | jq .
+```
+
+These modes are useful for diagnosing conversion issues:
+
+1. Use `--segmentation` to verify that the input is segmented as expected.
+2. Use `--inspect` to see which conversion stage produces an unexpected result.
+
+Rules:
+- `--segmentation` and `--inspect` are mutually exclusive.
+
 ### Other Ports (Unofficial)
 
 * Swift (iOS): [SwiftyOpenCC](https://github.com/XQS6LB3A/SwiftyOpenCC)

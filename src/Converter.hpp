@@ -19,6 +19,7 @@
 #pragma once
 
 #include "Common.hpp"
+#include "ConversionInspection.hpp"
 #include "Segmentation.hpp"
 
 namespace opencc {
@@ -36,6 +37,8 @@ public:
   std::string Convert(const std::string& text) const;
 
   size_t Convert(const char* input, char* output) const;
+
+  ConversionInspectionResult Inspect(const std::string& text) const;
 
   const SegmentationPtr GetSegmentation() const { return segmentation; }
 

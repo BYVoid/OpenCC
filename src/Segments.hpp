@@ -107,6 +107,15 @@ public:
     return buffer.str();
   }
 
+  std::vector<std::string> ToVector() const {
+    std::vector<std::string> result;
+    result.reserve(indexes.size());
+    for (const char* segment : *this) {
+      result.emplace_back(segment);
+    }
+    return result;
+  }
+
 private:
   Segments(const Segments&) {}
 

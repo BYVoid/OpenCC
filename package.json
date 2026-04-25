@@ -16,18 +16,24 @@
   },
   "scripts": {
     "test": "mocha -R spec node/test.js",
-    "deploy": "node-pre-gyp package && (node-pre-gyp-github publish --release || exit 0)",
-    "install": "node-pre-gyp install --fallback-to-build || node-pre-gyp rebuild"
+    "prebuild": "prebuildify --napi --strip --postinstall \"node scripts/prepare-node-prebuild-artifacts.js\"",
+    "install": "node-gyp-build"
   },
   "engines": {
-    "node": ">=20 <=25"
+    "node": ">=20.17 <26"
   },
-  "binary": {
-    "module_name": "opencc",
-    "module_path": "./build/Release/",
-    "host": "https://github.com/BYVoid/OpenCC/releases/download/",
-    "remote_path": "{version}"
-  },
+  "files": [
+    "binding.gyp",
+    "data/config",
+    "data/dictionary",
+    "data/scripts/reverse.py",
+    "deps/marisa-0.3.1",
+    "deps/rapidjson-1.1.0",
+    "node",
+    "prebuilds",
+    "scripts/prepare-node-prebuild-artifacts.js",
+    "src"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BYVoid/OpenCC.git"
@@ -46,11 +52,12 @@
   ],
   "devDependencies": {
     "mocha": "^11.7.5",
-    "node-pre-gyp-github": "^2.0.0"
+    "prebuildify": "^6.0.1"
   },
   "dependencies": {
-    "@mapbox/node-pre-gyp": "^2.0.3",
-    "node-addon-api": "^8.7.0"
+    "node-addon-api": "^8.7.0",
+    "node-gyp": "^12.3.0",
+    "node-gyp-build": "^4.8.4"
   },
   "overrides": {
     "brace-expansion": "^2.0.3",

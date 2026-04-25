@@ -50,10 +50,11 @@
   },
   "dependencies": {
     "@mapbox/node-pre-gyp": "^2.0.3",
-    "nan": "^2.22.0"
+    "node-addon-api": "^8.7.0"
   },
   "overrides": {
+    "brace-expansion": "^2.0.3",
     "diff": "^8.0.3",
-    "serialize-javascript": "^7.0.3"
+    "serialize-javascript": "^7.0.5"
   }
 }

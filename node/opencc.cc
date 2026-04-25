@@ -1,5 +1,5 @@
-#include <iostream>
-#include <nan.h>
+#include <napi.h>
+#include <string>
 
 #include "Config.hpp"
 #include "Converter.hpp"
@@ -25,132 +25,119 @@
 
 using namespace opencc;
 
-std::string ToUtf8String(const v8::Local<v8::Value>& val) {
-  Nan::Utf8String utf8(val);
-  return std::string(*utf8);
+std::string ToUtf8String(const Napi::Value& val) {
+  return val.As<Napi::String>().Utf8Value();
 }
 
-class OpenccBinding : public Nan::ObjectWrap {
-  struct ConvertRequest {
-    OpenccBinding* instance;
-    std::string input;
-    std::string output;
-    Nan::Callback* callback;
-    Optional<opencc::Exception> ex;
+class OpenccBinding : public Napi::ObjectWrap<OpenccBinding> {
+  class ConvertWorker : public Napi::AsyncWorker {
+    OpenccBinding* instance_;
+    std::string input_;
+    std::string output_;
 
-    ConvertRequest()
-        : instance(nullptr), ex(Optional<opencc::Exception>::Null()) {}
+  public:
+    ConvertWorker(OpenccBinding* instance, const std::string& input,
+                  const Napi::Function& callback)
+        : Napi::AsyncWorker(callback, "opencc:convert-async-cb"),
+          instance_(instance), input_(input) {
+      instance_->Ref();
+    }
+
+    ~ConvertWorker() override {
+      instance_->Unref();
+    }
+
+    void Execute() override {
+      try {
+        output_ = instance_->Convert(input_);
+      } catch (opencc::Exception& e) {
+        SetError(e.what());
+      }
+    }
+
+    void OnOK() override {
+      Callback().Call({Env().Undefined(), Napi::String::New(Env(), output_)});
+    }
+
+    void OnError(const Napi::Error& e) override {
+      Callback().Call({Napi::String::New(Env(), e.Message()),
+                       Napi::String::New(Env(), "")});
+    }
   };
 
   Config config_;
-  const ConverterPtr converter_;
+  ConverterPtr converter_;
 
 public:
-  explicit OpenccBinding(const std::string configFileName)
-      : config_(), converter_(config_.NewFromFile(configFileName)) {}
+  explicit OpenccBinding(const Napi::CallbackInfo& info)
+      : Napi::ObjectWrap<OpenccBinding>(info), config_(), converter_() {
+    Napi::Env env = info.Env();
+    std::string configFile = "s2t.json";
+    if (info.Length() >= 1) {
+      if (!info[0].IsString()) {
+        Napi::TypeError::New(env, "Wrong arguments")
+            .ThrowAsJavaScriptException();
+        return;
+      }
+      configFile = ToUtf8String(info[0]);
+    }
 
-  virtual ~OpenccBinding() {}
+    try {
+      converter_ = config_.NewFromFile(configFile);
+    } catch (opencc::Exception& e) {
+      Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+    }
+  }
+
+  ~OpenccBinding() override {}
 
   std::string Convert(const std::string& input) {
     return converter_->Convert(input);
   }
 
-  static NAN_METHOD(Version) {
-    info.GetReturnValue().Set(Nan::New<v8::String>(VERSION).ToLocalChecked());
+  static Napi::Value Version(const Napi::CallbackInfo& info) {
+    return Napi::String::New(info.Env(), VERSION);
   }
 
-  static NAN_METHOD(New) {
-    OpenccBinding* instance;
-
-    try {
-      if (info.Length() >= 1 && info[0]->IsString()) {
-        const std::string configFile = ToUtf8String(info[0]);
-        instance = new OpenccBinding(configFile);
-      } else {
-        instance = new OpenccBinding("s2t.json");
-      }
-    } catch (opencc::Exception& e) {
-      Nan::ThrowError(e.what());
-      return;
+  Napi::Value Convert(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 2 || !info[0].IsString() || !info[1].IsFunction()) {
+      Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
+      return env.Undefined();
     }
 
-    instance->Wrap(info.This());
-    info.GetReturnValue().Set(info.This());
+    ConvertWorker* worker =
+        new ConvertWorker(this, ToUtf8String(info[0]),
+                          info[1].As<Napi::Function>());
+    worker->Queue();
+    return env.Undefined();
   }
 
-  static NAN_METHOD(Convert) {
-    if (info.Length() < 2 || !info[0]->IsString() || !info[1]->IsFunction()) {
-      Nan::ThrowTypeError("Wrong arguments");
-      return;
+  Napi::Value ConvertSync(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 1 || !info[0].IsString()) {
+      Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
+      return env.Undefined();
     }
-
-    ConvertRequest* conv_data = new ConvertRequest;
-    conv_data->instance = Nan::ObjectWrap::Unwrap<OpenccBinding>(info.This());
-    conv_data->input = ToUtf8String(info[0]);
-    conv_data->callback = new Nan::Callback(info[1].As<v8::Function>());
-    conv_data->ex = Optional<opencc::Exception>::Null();
-    uv_work_t* req = new uv_work_t;
-    req->data = conv_data;
-    uv_queue_work(uv_default_loop(), req, DoConvert,
-                  (uv_after_work_cb)AfterConvert);
-
-    return;
-  }
-
-  static void DoConvert(uv_work_t* req) {
-    ConvertRequest* conv_data = static_cast<ConvertRequest*>(req->data);
-    OpenccBinding* instance = conv_data->instance;
-    try {
-      conv_data->output = instance->Convert(conv_data->input);
-    } catch (opencc::Exception& e) {
-      conv_data->ex = Optional<opencc::Exception>(e);
-    }
-  }
-
-  static void AfterConvert(uv_work_t* req) {
-    Nan::HandleScope scope;
-    ConvertRequest* conv_data = static_cast<ConvertRequest*>(req->data);
-    v8::Local<v8::Value> err = Nan::Undefined();
-    v8::Local<v8::String> converted =
-        Nan::New(conv_data->output.c_str()).ToLocalChecked();
-    if (!conv_data->ex.IsNull()) {
-      err = Nan::New(conv_data->ex.Get().what()).ToLocalChecked();
-    }
-    const unsigned argc = 2;
-    v8::Local<v8::Value> argv[argc] = {err, converted};
-    Nan::AsyncResource resource("opencc:convert-async-cb");
-    conv_data->callback->Call(argc, argv, &resource);
-    delete conv_data;
-    delete req;
-  }
-
-  static NAN_METHOD(ConvertSync) {
-    if (info.Length() < 1 || !info[0]->IsString()) {
-      Nan::ThrowTypeError("Wrong arguments");
-      return;
-    }
-
-    OpenccBinding* instance =
-        Nan::ObjectWrap::Unwrap<OpenccBinding>(info.This());
 
     const std::string input = ToUtf8String(info[0]);
     std::string output;
     try {
-      output = instance->Convert(input);
+      output = Convert(input);
     } catch (opencc::Exception& e) {
-      Nan::ThrowError(e.what());
-      return;
+      Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+      return env.Undefined();
     }
 
-    v8::Local<v8::String> converted = Nan::New(output.c_str()).ToLocalChecked();
-    info.GetReturnValue().Set(converted);
+    return Napi::String::New(env, output);
   }
 
-  static NAN_METHOD(GenerateDict) {
-    if (info.Length() < 4 || !info[0]->IsString() || !info[1]->IsString() ||
-        !info[2]->IsString() || !info[3]->IsString()) {
-      Nan::ThrowTypeError("Wrong arguments");
-      return;
+  static Napi::Value GenerateDict(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 4 || !info[0].IsString() || !info[1].IsString() ||
+        !info[2].IsString() || !info[3].IsString()) {
+      Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
+      return env.Undefined();
     }
     const std::string inputFileName = ToUtf8String(info[0]);
     const std::string outputFileName = ToUtf8String(info[1]);
@@ -160,26 +147,27 @@ public:
       opencc::ConvertDictionary(inputFileName, outputFileName, formatFrom,
                                 formatTo);
     } catch (opencc::Exception& e) {
-      Nan::ThrowError(e.what());
+      Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
     }
+    return env.Undefined();
   }
 
-  static NAN_MODULE_INIT(Init) {
-    // Prepare constructor template
-    v8::Local<v8::FunctionTemplate> tpl =
-        Nan::New<v8::FunctionTemplate>(OpenccBinding::New);
-    tpl->SetClassName(Nan::New("Opencc").ToLocalChecked());
-    tpl->InstanceTemplate()->SetInternalFieldCount(1);
-    // Methods
-    Nan::SetMethod(tpl, "version", Version);
-    Nan::SetMethod(tpl, "generateDict", GenerateDict);
-    // Prototype
-    Nan::SetPrototypeMethod(tpl, "convert", Convert);
-    Nan::SetPrototypeMethod(tpl, "convertSync", ConvertSync);
-    // Constructor
-    v8::Local<v8::Function> cons = Nan::GetFunction(tpl).ToLocalChecked();
-    Nan::Set(target, Nan::New("Opencc").ToLocalChecked(), cons);
+  static Napi::Object Init(Napi::Env env, Napi::Object exports) {
+    Napi::Function cons = DefineClass(
+        env, "Opencc",
+        {
+            StaticMethod("version", &OpenccBinding::Version),
+            StaticMethod("generateDict", &OpenccBinding::GenerateDict),
+            InstanceMethod("convert", &OpenccBinding::Convert),
+            InstanceMethod("convertSync", &OpenccBinding::ConvertSync),
+        });
+    exports.Set("Opencc", cons);
+    return exports;
   }
 };
 
-NODE_MODULE(binding, OpenccBinding::Init);
+Napi::Object InitAll(Napi::Env env, Napi::Object exports) {
+  return OpenccBinding::Init(env, exports);
+}
+
+NODE_API_MODULE(opencc, InitAll);

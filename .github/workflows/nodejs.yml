@@ -18,9 +18,9 @@ jobs:
 
     strategy:
       matrix:
-        # Current stable line on latest hosted runners
+        # Supported Node.js versions on latest hosted runners
         os: [ubuntu-latest, macos-latest]
-        node-version: [24, 25]
+        node-version: [20, 22, 24, 25]
         # LTS coverage on macOS 14 (ARM64)
         include:
           - os: macos-14

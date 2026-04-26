@@ -10,3 +10,25 @@ build:linux --cxxopt=-std=c++17
 build:linux --host_cxxopt=-std=c++17
 build:macos --cxxopt=-std=c++17
 build:macos --host_cxxopt=-std=c++17
+
+# BuildBuddy.io
+build:buildbuddy --bes_results_url=https://app.buildbuddy.io/invocation/
+build:buildbuddy --bes_backend=grpcs://remote.buildbuddy.io
+build:buildbuddy --remote_cache=grpcs://remote.buildbuddy.io
+build:buildbuddy --noremote_upload_local_results # Uploads logs & artifacts without writing to cache
+build:buildbuddy --remote_timeout=10m
+build:buildbuddy --remote_executor=grpcs://remote.buildbuddy.io
+
+build:linux-x86_64-remote --config=buildbuddy
+build:linux-x86_64-remote --host_platform=@toolchains_buildbuddy//platforms:linux_x86_64
+build:linux-x86_64-remote --platforms=@toolchains_buildbuddy//platforms:linux_x86_64
+build:linux-x86_64-remote --extra_execution_platforms=@toolchains_buildbuddy//platforms:linux_x86_64
+build:linux-x86_64-remote --remote_download_minimal
+build:linux-x86_64-remote --define=EXECUTOR=remote
+
+build:linux-arm64-remote --config=buildbuddy
+build:linux-arm64-remote --host_platform=@toolchains_buildbuddy//platforms:linux_arm64
+build:linux-arm64-remote --platforms=@toolchains_buildbuddy//platforms:linux_arm64
+build:linux-arm64-remote --extra_execution_platforms=@toolchains_buildbuddy//platforms:linux_arm64
+build:linux-arm64-remote --remote_download_minimal
+build:linux-arm64-remote --define=EXECUTOR=remote

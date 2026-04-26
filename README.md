@@ -64,6 +64,16 @@ The npm package supports Node.js `>=20.17 <26`. It uses bundled Node-API
 prebuilds when available and falls back to a local `node-gyp` build when the
 current platform does not have a matching prebuild.
 
+To install the npm CLI:
+
+```sh
+npm install -g opencc
+opencc -c s2t.json -i input.txt -o output.txt
+```
+
+The npm CLI supports basic text conversion. Plugins, `--inspect`, and
+`--segmentation` require the native OpenCC CLI.
+
 ```ts
 import { OpenCC } from 'opencc';
 async function main() {

@@ -20,6 +20,7 @@ const BUILT_IN_CONFIGS = [
   ['t2jp.json', 'Traditional Chinese Characters (Kyujitai) to New Japanese Kanji (Shinjitai)'],
   ['jp2t.json', 'New Japanese Kanji (Shinjitai) to Traditional Chinese Characters (Kyujitai) (OpenCC Standard)'],
 ];
+const BUILT_IN_CONFIG_NAMES = new Set(BUILT_IN_CONFIGS.map(([name]) => name));
 
 function printHelp() {
   console.log(`Open Chinese Convert (OpenCC) npm Command Line Tool
@@ -57,6 +58,14 @@ function readOptionValue(args, index, option) {
   return value;
 }
 
+function readInlineOptionValue(arg, option) {
+  const value = arg.slice((option + '=').length);
+  if (!value) {
+    throw new Error(`Missing value for ${option}`);
+  }
+  return value;
+}
+
 function parseArgs(args) {
   const options = {
     config: 's2t.json',
@@ -76,17 +85,17 @@ function parseArgs(args) {
       options.config = readOptionValue(args, i, arg);
       i += 1;
     } else if (arg.startsWith('--config=')) {
-      options.config = arg.slice('--config='.length);
+      options.config = readInlineOptionValue(arg, '--config');
     } else if (arg === '-i' || arg === '--input') {
       options.input = readOptionValue(args, i, arg);
       i += 1;
     } else if (arg.startsWith('--input=')) {
-      options.input = arg.slice('--input='.length);
+      options.input = readInlineOptionValue(arg, '--input');
     } else if (arg === '-o' || arg === '--output') {
       options.output = readOptionValue(args, i, arg);
       i += 1;
     } else if (arg.startsWith('--output=')) {
-      options.output = arg.slice('--output='.length);
+      options.output = readInlineOptionValue(arg, '--output');
     } else if (arg === '--inspect' || arg === '--segmentation') {
       throw new Error(`${arg} is not supported by the npm CLI. Use the native OpenCC CLI instead.`);
     } else if (arg === '--path' || arg.startsWith('--path=')) {
@@ -116,6 +125,13 @@ function writeOutput(outputFileName, text) {
   }
 }
 
+function resolveConfigPath(config) {
+  if (BUILT_IN_CONFIG_NAMES.has(config) || path.isAbsolute(config)) {
+    return config;
+  }
+  return path.resolve(process.cwd(), config);
+}
+
 function main() {
   let options;
   try {
@@ -136,7 +152,7 @@ function main() {
   }
 
   try {
-    const converter = new OpenCC(options.config);
+    const converter = new OpenCC(resolveConfigPath(options.config));
     const input = readInput(options.input);
     const output = converter.convertSync(input);
     writeOutput(options.output, output);

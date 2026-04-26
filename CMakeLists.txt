@@ -44,7 +44,7 @@ set (PACKAGE_URL https://github.com/BYVoid/OpenCC)
 set (PACKAGE_BUGREPORT https://github.com/BYVoid/OpenCC/issues)
 
 # Derive version from Git tags (falls back to hardcoded default when Git is unavailable)
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 include(GitVersion)
 
 set(CPACK_SOURCE_PACKAGE_FILE_NAME
@@ -223,14 +223,14 @@ endif (NOT BUILD_SHARED_LIBS)
 if (ENABLE_GTEST)
   add_definitions(
     -DPROJECT_BINARY_DIR="${PROJECT_BINARY_DIR}"
-    -DCMAKE_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+    -DPROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
   )
 endif()
 
 if (ENABLE_BENCHMARK)
   add_definitions(
     -DPROJECT_BINARY_DIR="${PROJECT_BINARY_DIR}"
-    -DCMAKE_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+    -DPROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
   )
 endif()
 
@@ -269,7 +269,7 @@ add_subdirectory(test)
 
 if (ENABLE_BENCHMARK AND TARGET performance AND TARGET opencc_jieba)
   target_compile_definitions(performance PRIVATE
-    OPENCC_BENCHMARK_JIEBA_CONFIG_DIR="${CMAKE_SOURCE_DIR}/plugins/jieba/data/config"
+    OPENCC_BENCHMARK_JIEBA_CONFIG_DIR="${PROJECT_SOURCE_DIR}/plugins/jieba/data/config"
     OPENCC_BENCHMARK_JIEBA_PLUGIN_DIR="$<TARGET_FILE_DIR:opencc_jieba>"
   )
   add_dependencies(performance opencc_jieba)

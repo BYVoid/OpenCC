@@ -206,10 +206,10 @@ protected:
                                 ".json");
 #else
     if (config == "s2twp_jieba" || config == "tw2sp_jieba") {
-      return std::string(CMAKE_SOURCE_DIR) + "/plugins/jieba/data/config/" +
+      return std::string(PROJECT_SOURCE_DIR) + "/plugins/jieba/data/config/" +
              config + ".json";
     }
-    return std::string(CMAKE_SOURCE_DIR) + "/data/config/" + config + ".json";
+    return std::string(PROJECT_SOURCE_DIR) + "/data/config/" + config + ".json";
 #endif
   }
 
@@ -290,7 +290,7 @@ protected:
     return runfiles_->Rlocation(
         "_main/plugins/jieba/deps/cppjieba/dict/hmm_model.utf8");
 #else
-    return std::string(CMAKE_SOURCE_DIR) +
+    return std::string(PROJECT_SOURCE_DIR) +
            "/plugins/jieba/deps/cppjieba/dict/hmm_model.utf8";
 #endif
   }
@@ -395,7 +395,7 @@ TEST_F(JiebaPluginIntegrationTest, ConvertFromJsonCases) {
       runfiles_->Rlocation(
           "_main/plugins/jieba/tests/data/jieba_comparison_testcases.json")
 #else
-      std::string(CMAKE_SOURCE_DIR) +
+      std::string(PROJECT_SOURCE_DIR) +
       "/plugins/jieba/tests/data/jieba_comparison_testcases.json"
 #endif
   );

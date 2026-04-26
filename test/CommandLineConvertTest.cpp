@@ -47,7 +47,7 @@ protected:
     runfiles_.reset(Runfiles::CreateForTest());
 #else
     ASSERT_NE("", PROJECT_BINARY_DIR);
-    ASSERT_NE("", CMAKE_SOURCE_DIR);
+    ASSERT_NE("", PROJECT_SOURCE_DIR);
     ASSERT_EQ(0, portable_chdir(PROJECT_BINARY_DIR "/data"));
 #endif
   }
@@ -109,7 +109,7 @@ protected:
 #ifdef BAZEL
     return "";
 #else
-    return CMAKE_SOURCE_DIR "/data/config/";
+    return PROJECT_SOURCE_DIR "/data/config/";
 #endif
   }
 
@@ -226,7 +226,7 @@ TEST_F(CommandLineConvertTest, ConvertFromJson) {
   const std::string casesPath =
       runfiles_->Rlocation("_main/test/testcases/testcases.json");
 #else
-  const std::string casesPath = CMAKE_SOURCE_DIR "/test/testcases/testcases.json";
+  const std::string casesPath = PROJECT_SOURCE_DIR "/test/testcases/testcases.json";
 #endif
   const CasesByConfig cases = LoadCases(casesPath);
 

@@ -25,12 +25,14 @@ if(BUILD_DOCUMENTATION)
             ${PROJECT_BINARY_DIR}/doc/opencc.doxy
     )
 
+    if(OPENCC_ENABLE_INSTALL)
     install(
     	DIRECTORY
     		${PROJECT_BINARY_DIR}/doc/html
     	DESTINATION
     		${DIR_SHARE_OPENCC}/doc
     )
+    endif()
 
     set_directory_properties(
     	PROPERTIES

@@ -24,8 +24,29 @@ include (CTest)
 include(GNUInstallDirs)
 
 ######## Options
+
+# PROJECT_IS_TOP_LEVEL is available since CMake 3.21; provide a fallback.
+if(CMAKE_VERSION VERSION_LESS 3.21)
+  if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    set(PROJECT_IS_TOP_LEVEL TRUE)
+  else()
+    set(PROJECT_IS_TOP_LEVEL FALSE)
+  endif()
+endif()
+
+# When used via FetchContent / add_subdirectory, build a static library and
+# skip install rules by default.
+if(PROJECT_IS_TOP_LEVEL)
+  set(_OPENCC_DEFAULT_BUILD_SHARED_LIBS ON)
+  set(_OPENCC_DEFAULT_ENABLE_INSTALL ON)
+else()
+  set(_OPENCC_DEFAULT_BUILD_SHARED_LIBS OFF)
+  set(_OPENCC_DEFAULT_ENABLE_INSTALL OFF)
+endif()
+
 option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
-option(BUILD_SHARED_LIBS "Build opencc as shared library" ON)
+option(BUILD_SHARED_LIBS "Build opencc as shared library" ${_OPENCC_DEFAULT_BUILD_SHARED_LIBS})
+option(OPENCC_ENABLE_INSTALL "Generate install targets" ${_OPENCC_DEFAULT_ENABLE_INSTALL})
 option(ENABLE_GTEST "Build all tests." OFF)
 option(ENABLE_BENCHMARK "Build benchmark tests." OFF)
 option(ENABLE_DARTS "Build DartsDict (ocd format)." ON)
@@ -153,12 +174,14 @@ configure_file(
   @ONLY
 )
 
+if(OPENCC_ENABLE_INSTALL)
 install(
   FILES
     ${CMAKE_CURRENT_BINARY_DIR}/opencc.pc
   DESTINATION
     ${DIR_LIBRARY}/pkgconfig
 )
+endif()
 
 write_basic_package_version_file(
   OpenCCConfigVersion.cmake
@@ -173,6 +196,7 @@ configure_package_config_file(
   PATH_VARS DIR_INCLUDE DIR_PLUGIN DIR_SHARE_OPENCC
 )
 
+if(OPENCC_ENABLE_INSTALL)
 install(
   FILES
     ${CMAKE_CURRENT_BINARY_DIR}/OpenCCConfig.cmake
@@ -180,6 +204,7 @@ install(
   DESTINATION
     ${DIR_LIBRARY}/cmake/opencc
 )
+endif()
 
 ######## Compiler flags
 

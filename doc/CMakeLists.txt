@@ -27,7 +27,7 @@ if(BUILD_DOCUMENTATION)
 
     install(
     	DIRECTORY
-    		${CMAKE_BINARY_DIR}/doc/html
+    		${PROJECT_BINARY_DIR}/doc/html
     	DESTINATION
     		${DIR_SHARE_OPENCC}/doc
     )
@@ -35,6 +35,6 @@ if(BUILD_DOCUMENTATION)
     set_directory_properties(
     	PROPERTIES
     		ADDITIONAL_MAKE_CLEAN_FILES
-    			"${CMAKE_BINARY_DIR}/doc/html"
+    			"${PROJECT_BINARY_DIR}/doc/html"
     )
 endif()

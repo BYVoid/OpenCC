@@ -24,20 +24,47 @@ include (CTest)
 include(GNUInstallDirs)
 
 ######## Options
+
+# PROJECT_IS_TOP_LEVEL is available since CMake 3.21; provide a fallback.
+if(CMAKE_VERSION VERSION_LESS 3.21)
+  if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    set(PROJECT_IS_TOP_LEVEL TRUE)
+  else()
+    set(PROJECT_IS_TOP_LEVEL FALSE)
+  endif()
+endif()
+
+# When used via FetchContent / add_subdirectory, prefer static linking and
+# system libraries so that the parent project is not forced to build our
+# bundled dependencies.
+if(PROJECT_IS_TOP_LEVEL)
+  set(_OPENCC_DEFAULT_BUILD_SHARED_LIBS ON)
+  set(_OPENCC_DEFAULT_USE_SYSTEM_DARTS OFF)
+  set(_OPENCC_DEFAULT_USE_SYSTEM_MARISA OFF)
+  set(_OPENCC_DEFAULT_USE_SYSTEM_RAPIDJSON OFF)
+  set(_OPENCC_DEFAULT_USE_SYSTEM_TCLAP OFF)
+else()
+  set(_OPENCC_DEFAULT_BUILD_SHARED_LIBS OFF)
+  set(_OPENCC_DEFAULT_USE_SYSTEM_DARTS ON)
+  set(_OPENCC_DEFAULT_USE_SYSTEM_MARISA ON)
+  set(_OPENCC_DEFAULT_USE_SYSTEM_RAPIDJSON ON)
+  set(_OPENCC_DEFAULT_USE_SYSTEM_TCLAP ON)
+endif()
+
 option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
-option(BUILD_SHARED_LIBS "Build opencc as shared library" ON)
+option(BUILD_SHARED_LIBS "Build opencc as shared library" ${_OPENCC_DEFAULT_BUILD_SHARED_LIBS})
 option(ENABLE_GTEST "Build all tests." OFF)
 option(ENABLE_BENCHMARK "Build benchmark tests." OFF)
 option(ENABLE_DARTS "Build DartsDict (ocd format)." ON)
 option(BUILD_OPENCC_JIEBA_PLUGIN "Build Jieba segmentation as a loadable plugin." OFF)
 option(BUILD_PYTHON "Build python library" OFF)
-option(USE_SYSTEM_DARTS "Use system version of Darts" OFF)
+option(USE_SYSTEM_DARTS "Use system version of Darts" ${_OPENCC_DEFAULT_USE_SYSTEM_DARTS})
 option(USE_SYSTEM_GOOGLE_BENCHMARK "Use system version of Google Benchmark" OFF)
 option(USE_SYSTEM_GTEST "Use system version of GoogleTest" OFF)
-option(USE_SYSTEM_MARISA "Use system version of Marisa" OFF)
+option(USE_SYSTEM_MARISA "Use system version of Marisa" ${_OPENCC_DEFAULT_USE_SYSTEM_MARISA})
 option(USE_SYSTEM_PYBIND11 "Use system version of pybind11" OFF)
-option(USE_SYSTEM_RAPIDJSON "Use system version of RapidJSON" OFF)
-option(USE_SYSTEM_TCLAP "Use system version of TCLAP" OFF)
+option(USE_SYSTEM_RAPIDJSON "Use system version of RapidJSON" ${_OPENCC_DEFAULT_USE_SYSTEM_RAPIDJSON})
+option(USE_SYSTEM_TCLAP "Use system version of TCLAP" ${_OPENCC_DEFAULT_USE_SYSTEM_TCLAP})
 
 ######## Package information
 set (PACKAGE_URL https://github.com/BYVoid/OpenCC)

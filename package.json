@@ -8,14 +8,20 @@
   "types": "node/opencc.d.ts",
   "exports": {
     ".": {
-      "types": "./node/opencc.d.ts",
-      "require": "./node/opencc.js",
+      "import": {
+        "types": "./node/opencc.d.mts",
+        "default": "./node/opencc.mjs"
+      },
+      "require": {
+        "types": "./node/opencc.d.cts",
+        "default": "./node/opencc.js"
+      },
       "default": "./node/opencc.js"
     },
     "./package.json": "./package.json"
   },
   "scripts": {
-    "test": "mocha -R spec node/test.js",
+    "test": "mocha -R spec node/test.js && node node/esm-test.mjs",
     "prebuild": "prebuildify --napi --strip --postinstall \"node scripts/prepare-node-prebuild-artifacts.js\"",
     "install": "node-gyp-build"
   },

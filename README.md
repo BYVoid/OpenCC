@@ -60,6 +60,10 @@ https://opencc.js.org/converter?config=s2t
 
 `npm install opencc`
 
+The npm package supports Node.js `>=20.17 <26`. It uses bundled Node-API
+prebuilds when available and falls back to a local `node-gyp` build when the
+current platform does not have a matching prebuild.
+
 ```ts
 import { OpenCC } from 'opencc';
 async function main() {

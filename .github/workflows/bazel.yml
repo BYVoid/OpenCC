@@ -40,12 +40,12 @@ jobs:
         shell: bash
         env:
           MSYS_NO_PATHCONV: 1
-        run: bazel build //:opencc
+        run: bazel build //:opencc //src/tools/... //plugins/...
       - name: Test
         shell: bash
         env:
           MSYS_NO_PATHCONV: 1
-        run: bazel test --test_output=all //src/... //data/... //test/... //python/...
+        run: bazel test --test_output=all //src/... //data/... //test/... //python/... //plugins/...
       - name: upload artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4

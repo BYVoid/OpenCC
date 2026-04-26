@@ -27,10 +27,24 @@
  */
 
 const path = require('path');
-const bindingPath = require('@mapbox/node-pre-gyp').find(require.resolve('../package.json'));
+const fs = require('fs');
+const nodeGypBuild = require('node-gyp-build');
+const bindingPath = nodeGypBuild.path(path.join(__dirname, '..'));
 const binding = require(bindingPath);
 
-const assetsPath = path.dirname(bindingPath);
+const getAssetsPath = function (bindingPath) {
+  const bindingDir = path.dirname(bindingPath);
+  const prebuildsDir = path.dirname(bindingDir);
+  if (path.basename(prebuildsDir) === 'prebuilds') {
+    const sharedAssetsPath = path.join(prebuildsDir, 'assets');
+    if (fs.existsSync(sharedAssetsPath)) {
+      return sharedAssetsPath;
+    }
+  }
+  return bindingDir;
+};
+
+const assetsPath = getAssetsPath(bindingPath);
 const getConfigPath = function (config) {
   let configPath = config;
   if (config[0] !== '/' && config[1] !== ':') {

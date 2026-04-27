@@ -8,13 +8,11 @@ package(default_visibility = ["//visibility:public"])
 # cc_binary with linkshared=True on Linux produces "libopencc_clib.so";
 # on macOS it produces "libopencc_clib.dylib". We rename via genrule below.
 #
-# opencc_bazel.cc is a Bazel-only thin wrapper — it contains only the N-API
-# binding code without the unity-build .cpp includes that opencc.cc uses for
-# faster node-gyp compilation. This avoids ODR violations when linking against
-# //src:opencc as a proper cc_library.
+# node-gyp and Bazel both compile the same binding source. node-gyp lists the
+# OpenCC and marisa sources directly, while Bazel links against //src:opencc.
 cc_binary(
     name = "opencc_clib",
-    srcs = ["opencc_bazel.cc"],
+    srcs = ["opencc.cc"],
     copts = select({
         "@platforms//os:windows": ["/std:c++20"],
         "//conditions:default": ["-std=c++20"],
@@ -51,4 +49,3 @@ genrule(
     outs = ["opencc.node"],
     cmd = "cp $(location :opencc_clib) $@",
 )
-

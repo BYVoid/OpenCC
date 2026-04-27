@@ -17,6 +17,10 @@ bazel_dep(name = "rules_python", version = "1.9.0")
 bazel_dep(name = "tclap", version = "1.2.5.bcr.1")
 bazel_dep(name = "toolchains_buildbuddy", version = "0.0.4", dev_dependency = True)
 
+# Node.js native addon build dependencies (node-addon-api headers + Node.js 20 headers)
+node_deps = use_extension("//node:deps.bzl", "node_deps")
+use_repo(node_deps, "node_addon_api", "node_headers")
+
 buildbuddy = use_extension("@toolchains_buildbuddy//:extensions.bzl", "buildbuddy", dev_dependency = True)
 
 register_toolchains(

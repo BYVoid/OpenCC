@@ -1,0 +1,54 @@
+"""Bazel build rules for the OpenCC Node.js native addon (opencc.node)."""
+
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+# The shared library that becomes opencc.node.
+# cc_binary with linkshared=True on Linux produces "libopencc_clib.so";
+# on macOS it produces "libopencc_clib.dylib". We rename via genrule below.
+#
+# opencc_bazel.cc is a Bazel-only thin wrapper — it contains only the N-API
+# binding code without the unity-build .cpp includes that opencc.cc uses for
+# faster node-gyp compilation. This avoids ODR violations when linking against
+# //src:opencc as a proper cc_library.
+cc_binary(
+    name = "opencc_clib",
+    srcs = ["opencc_bazel.cc"],
+    copts = select({
+        "@platforms//os:windows": ["/std:c++20"],
+        "//conditions:default": ["-std=c++20"],
+    }),
+    defines = [
+        'VERSION=\\"1.3.1\\"',
+        "NAPI_DISABLE_CPP_EXCEPTIONS",
+        "Opencc_BUILT_AS_STATIC",
+    ],
+    includes = [".", "src"],
+    linkopts = select({
+        "@platforms//os:macos": ["-undefined", "dynamic_lookup", "-Wl,-S"],
+        "//conditions:default": ["-Wl,-s"],
+    }),
+    linkshared = True,
+    deps = [
+        "@node_addon_api//:node_addon_api",
+        "@node_headers//:node_headers",
+        "//src:opencc",
+        # Explicit sub-library deps for headers not in //src:opencc's hdrs:
+        "//src:config",       # Config.hpp
+        "//src:converter",    # Converter.hpp, ConversionInspection.hpp
+        "//src:dict_converter",  # DictConverter.hpp
+        "//src:exception",    # Exception.hpp
+    ],
+)
+
+# ----------------------------------------------------------------
+# Rename the platform-specific shared library to "opencc.node"
+# ----------------------------------------------------------------
+genrule(
+    name = "opencc_node",
+    srcs = [":opencc_clib"],
+    outs = ["opencc.node"],
+    cmd = "cp $(location :opencc_clib) $@",
+)
+

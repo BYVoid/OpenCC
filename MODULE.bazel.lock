@@ -212,6 +212,42 @@
   },
   "selectedYankedVersions": {},
   "moduleExtensions": {
+    "//node:deps.bzl%node_deps": {
+      "general": {
+        "bzlTransitiveDigest": "zqCDqHm637XRRIBua9d5ECIObeCBaOffqJyMYzqPZIU=",
+        "usagesDigest": "2f5unakILV8g4rLQT+ZcnuYj4ujOhgcFvNxvEoXS/pc=",
+        "recordedFileInputs": {},
+        "recordedDirentsInputs": {},
+        "envVariables": {},
+        "generatedRepoSpecs": {
+          "node_addon_api": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://registry.npmjs.org/node-addon-api/-/node-addon-api-8.7.0.tgz",
+              "sha256": "06cdc368599c65b996003ac5d71fe594a78d3d94fc51600b2085d5a325a3d930",
+              "strip_prefix": "package",
+              "build_file": "@@//node:node_addon_api.BUILD"
+            }
+          },
+          "node_headers": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://nodejs.org/dist/v20.20.2/node-v20.20.2-headers.tar.gz",
+              "sha256": "6de0e836efa9f32512e61db3dfd08b3d97a015b7e828d1a5efdf281a56a692d9",
+              "strip_prefix": "node-v20.20.2",
+              "build_file": "@@//node:node_headers.BUILD"
+            }
+          }
+        },
+        "recordedRepoMappingEntries": [
+          [
+            "",
+            "bazel_tools",
+            "bazel_tools"
+          ]
+        ]
+      }
+    },
     "@@rules_kotlin+//src/main/starlark/core/repositories:bzlmod_setup.bzl%rules_kotlin_extensions": {
       "general": {
         "bzlTransitiveDigest": "rL/34P1aFDq2GqVC2zCFgQ8nTuOC6ziogocpvG50Qz8=",

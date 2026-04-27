@@ -32,3 +32,12 @@ build:linux-arm64-remote --platforms=@toolchains_buildbuddy//platforms:linux_arm
 build:linux-arm64-remote --extra_execution_platforms=@toolchains_buildbuddy//platforms:linux_arm64
 build:linux-arm64-remote --remote_download_minimal
 build:linux-arm64-remote --define=EXECUTOR=remote
+
+# ── Node.js opencc.node prebuild configs ──────────────────────────────────────
+# Build opencc.node for Linux x64 using BuildBuddy remote execution.
+# Usage: bazel build --config=node-linux-x64 //node:opencc_node
+build:node-linux-x64 --config=linux-x86_64-remote
+
+# Build opencc.node for Linux arm64 using BuildBuddy remote execution.
+# Usage: bazel build --config=node-linux-arm64 //node:opencc_node
+build:node-linux-arm64 --config=linux-arm64-remote

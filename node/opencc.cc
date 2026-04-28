@@ -1,27 +1,10 @@
 #include <napi.h>
 #include <string>
 
-#include "Config.hpp"
-#include "Converter.hpp"
-#include "DictConverter.hpp"
-
-// For faster build
-#include "Config.cpp"
-#include "Conversion.cpp"
-#include "ConversionChain.cpp"
-#include "Converter.cpp"
-#include "Dict.cpp"
-#include "DictConverter.cpp"
-#include "DictEntry.cpp"
-#include "DictGroup.cpp"
-#include "Lexicon.cpp"
-#include "MarisaDict.cpp"
-#include "MaxMatchSegmentation.cpp"
-#include "PluginSegmentation.cpp"
-#include "Segmentation.cpp"
-#include "SerializedValues.cpp"
-#include "TextDict.cpp"
-#include "UTF8Util.cpp"
+#include "src/Config.hpp"
+#include "src/Converter.hpp"
+#include "src/DictConverter.hpp"
+#include "src/Exception.hpp"
 
 using namespace opencc;
 

@@ -35,6 +35,7 @@ cc_binary(
     includes = ["include"],
     linkopts = select({
         "@platforms//os:macos": ["-Wl,-S"],
+        "@platforms//os:windows": [],
         "//conditions:default": ["-Wl,-s"],
     }),
     linkshared = True,

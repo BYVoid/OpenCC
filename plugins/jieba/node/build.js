@@ -36,12 +36,12 @@ try {
 }
 
 // Dynamically resolve exact output paths using cquery
-const libPathCmd = `bazel cquery ${bazelFlags} --output=files //plugins/jieba:opencc-jieba 2>/dev/null`;
-const libSrcRaw = execSync(libPathCmd, { encoding: 'utf8' }).trim().split('\n').pop();
+const libPathCmd = `bazel cquery ${bazelFlags} --output=files //plugins/jieba:opencc-jieba`;
+const libSrcRaw = execSync(libPathCmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] }).trim().split('\n').pop();
 const libSrc = path.join(rootDir, libSrcRaw);
 
-const dictPathCmd = `bazel cquery ${bazelFlags} --output=files //plugins/jieba:jieba_merged_dict 2>/dev/null`;
-const dictSrcRaw = execSync(dictPathCmd, { encoding: 'utf8' }).trim().split('\n').pop();
+const dictPathCmd = `bazel cquery ${bazelFlags} --output=files //plugins/jieba:jieba_merged_dict`;
+const dictSrcRaw = execSync(dictPathCmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] }).trim().split('\n').pop();
 const mergedOcd2 = path.join(rootDir, dictSrcRaw);
 
 const prebuildDir = path.join(__dirname, 'prebuilds', `${platform}-${arch}`);

@@ -55,6 +55,21 @@ public:
   explicit OpenccBinding(const Napi::CallbackInfo& info)
       : Napi::ObjectWrap<OpenccBinding>(info), config_(), converter_() {
     Napi::Env env = info.Env();
+
+    if (info.Length() >= 2 && info[0].IsString() && info[1].IsString()) {
+      // Two-argument mode: NewFromString(jsonString, configDirectory)
+      // Used by the JS layer to pass patched JSON with absolute paths.
+      const std::string json = ToUtf8String(info[0]);
+      const std::string configDir = ToUtf8String(info[1]);
+      try {
+        converter_ = config_.NewFromString(json, configDir);
+      } catch (opencc::Exception& e) {
+        Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+      }
+      return;
+    }
+
+    // Single-argument mode: NewFromFile(configFilePath)
     std::string configFile = "s2t.json";
     if (info.Length() >= 1) {
       if (!info[0].IsString()) {

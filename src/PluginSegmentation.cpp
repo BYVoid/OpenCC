@@ -380,6 +380,24 @@ public:
                     "' not found. Searched: " + attempted.str());
   }
 
+  std::shared_ptr<PluginLibrary> LoadByPath(const std::string& path,
+                                            const std::string& type) {
+    if (IsTruthy(std::getenv("OPENCC_DISABLE_PLUGINS"))) {
+      throw Exception("Segmentation plugin loading is disabled.");
+    }
+
+    std::lock_guard<std::mutex> lock(mutex_);
+    // Use the explicit path as cache key (not type) to avoid collisions
+    // when the same plugin type is loaded from different library paths.
+    auto it = cache_.find(path);
+    if (it != cache_.end()) {
+      return it->second;
+    }
+    std::shared_ptr<PluginLibrary> plugin = LoadFromPath(path, type);
+    cache_[path] = plugin;
+    return plugin;
+  }
+
 private:
   static std::vector<std::string> GetPluginFileNames(const std::string& type) {
 #if defined(_WIN32) || defined(_WIN64)
@@ -454,7 +472,20 @@ PluginManager& GetPluginManager() {
 
 SegmentationPtr CreatePluginSegmentation(const std::string& type,
                                          const PluginConfigPairs& configPairs) {
-  std::shared_ptr<PluginLibrary> plugin = GetPluginManager().LoadByType(type);
+  // Allow explicit plugin library path via __plugin_library config pair,
+  // bypassing search-based discovery (used by language bindings to bundle
+  // plugins as optional packages with deterministic paths).
+  std::string pluginLibraryPath;
+  for (const auto& pair : configPairs) {
+    if (pair.first == "__plugin_library") {
+      pluginLibraryPath = pair.second;
+      break;
+    }
+  }
+  std::shared_ptr<PluginLibrary> plugin =
+      pluginLibraryPath.empty()
+          ? GetPluginManager().LoadByType(type)
+          : GetPluginManager().LoadByPath(pluginLibraryPath, type);
   std::vector<opencc_kv_pair_t> rawConfig;
   rawConfig.reserve(configPairs.size());
   for (const auto& pair : configPairs) {

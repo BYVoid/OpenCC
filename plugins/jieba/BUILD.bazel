@@ -33,6 +33,11 @@ cc_binary(
     ],
     defines = ["OPENCC_PLUGIN_BUILD"],
     includes = ["include"],
+    linkopts = select({
+        "@platforms//os:macos": ["-Wl,-S"],
+        "@platforms//os:windows": [],
+        "//conditions:default": ["-Wl,-s"],
+    }),
     linkshared = True,
     deps = [
         "//plugins/jieba/deps/cppjieba:cppjieba",

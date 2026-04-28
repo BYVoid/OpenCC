@@ -6,7 +6,6 @@
 /.mypy_cache
 /bazel-*
 /build
-/plugins/*/build
 /other
 /doc/html
 /dist
@@ -16,6 +15,6 @@
 /test/dict.bin
 /xcode
 /node_modules
-/prebuilds
+prebuilds/
 /*.egg-info
 /.venv/

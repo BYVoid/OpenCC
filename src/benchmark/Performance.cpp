@@ -151,14 +151,14 @@ std::string ResolveConfigPath(const std::string& config_name) {
            ".json";
   }
 #endif
-  return std::string(CMAKE_SOURCE_DIR) + "/data/config/" + config_name + ".json";
+  return std::string(PROJECT_SOURCE_DIR) + "/data/config/" + config_name + ".json";
 }
 
 std::string ResolveTextDictionaryPath(const std::string& dict_file_name) {
   const std::string text_file_name =
       ReplaceSuffix(dict_file_name, ".ocd2", ".txt");
   const std::string source_path =
-      std::string(CMAKE_SOURCE_DIR) + "/data/dictionary/" + text_file_name;
+      std::string(PROJECT_SOURCE_DIR) + "/data/dictionary/" + text_file_name;
   if (IsRegularFile(source_path)) {
     return source_path;
   }
@@ -193,7 +193,7 @@ std::string ResolveSegmentationResourcePath(
       return plugin_parent_path;
     }
     const std::string source_jieba_path =
-        std::string(CMAKE_SOURCE_DIR) + "/plugins/jieba/deps/cppjieba/dict/" +
+        std::string(PROJECT_SOURCE_DIR) + "/plugins/jieba/deps/cppjieba/dict/" +
         basename;
     if (IsRegularFile(source_jieba_path)) {
       return source_jieba_path;
@@ -462,7 +462,7 @@ std::string OpenccBinaryPath() {
 }
 
 std::string SourceConfigDirectory() {
-  return std::string(CMAKE_SOURCE_DIR) + "/data/config";
+  return std::string(PROJECT_SOURCE_DIR) + "/data/config";
 }
 
 std::string BuildDataDirectory() {
@@ -755,7 +755,7 @@ void SetCommandLineCounters(benchmark::State& state, size_t total_input_bytes,
 }
 
 std::string ReadText(const std::string& filename) {
-  const std::string benchmark_data_dir = CMAKE_SOURCE_DIR "/test/benchmark/";
+  const std::string benchmark_data_dir = PROJECT_SOURCE_DIR "/test/benchmark/";
   const std::string data_path = benchmark_data_dir + filename;
   std::ifstream stream(data_path.c_str());
   return std::string((std::istreambuf_iterator<char>(stream)),

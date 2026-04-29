@@ -26,13 +26,13 @@
 
 namespace opencc {
 
-#ifdef CMAKE_SOURCE_DIR
+#ifdef PROJECT_SOURCE_DIR
 class ConfigTestBase : public ::testing::Test {
 protected:
   ConfigTestBase()
-      : CONFIG_TEST_JSON_PATH(CMAKE_SOURCE_DIR
+      : CONFIG_TEST_JSON_PATH(PROJECT_SOURCE_DIR
                               "/test/config_test/config_test.json"),
-        CONFIG_TEST_DIR_PATH(CMAKE_SOURCE_DIR "/test/config_test") {}
+        CONFIG_TEST_DIR_PATH(PROJECT_SOURCE_DIR "/test/config_test") {}
 
   const std::string CONFIG_TEST_JSON_PATH;
   const std::string CONFIG_TEST_DIR_PATH;

@@ -182,6 +182,7 @@ else()
   set(INSTALL_TARGETS libopencc marisa)
 endif()
 
+if(OPENCC_ENABLE_INSTALL)
 install(
   TARGETS ${INSTALL_TARGETS} EXPORT ${OPENCC_TARGETS_EXPORT_NAME}
   LIBRARY DESTINATION ${DIR_LIBRARY}
@@ -205,6 +206,7 @@ install(
   FILES plugin/OpenCCPlugin.h
   DESTINATION ${DIR_INCLUDE}/opencc/plugin
 )
+endif()
 
 # Gtest
 

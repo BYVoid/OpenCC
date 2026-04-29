@@ -52,7 +52,9 @@ endif()
 
 # Installation
 
+if(OPENCC_ENABLE_INSTALL)
 install(
   TARGETS opencc opencc_dict opencc_phrase_extract
   RUNTIME DESTINATION bin
 )
+endif()

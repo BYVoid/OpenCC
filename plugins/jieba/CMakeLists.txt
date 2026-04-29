@@ -4,6 +4,7 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   project(opencc_jieba)
   set(CMAKE_CXX_STANDARD 17)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  option(OPENCC_ENABLE_INSTALL "Generate install targets" ON)
 
   find_package(OpenCC REQUIRED)
 
@@ -220,7 +221,7 @@ target_include_directories(opencc_jieba PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/deps/limonp/include
 )
 
-if (BUILD_OPENCC_JIEBA_PLUGIN)
+if (BUILD_OPENCC_JIEBA_PLUGIN AND OPENCC_ENABLE_INSTALL)
   install(
     TARGETS opencc_jieba
     LIBRARY DESTINATION ${DIR_PLUGIN}

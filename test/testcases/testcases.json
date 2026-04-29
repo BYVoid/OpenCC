@@ -620,6 +620,16 @@
         "s2twp": "念佛",
         "s2hk": "念佛"
       }
+    },
+    {
+      "id": "t2s_place_name_qian_an_xian",
+      "input": "乾安縣",
+      "expected": {
+        "t2s": "乾安县",
+        "hk2s": "乾安县",
+        "tw2s": "乾安县",
+        "tw2sp": "乾安县"
+      }
     }
   ]
 }

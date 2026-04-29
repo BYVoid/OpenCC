@@ -160,6 +160,16 @@
         "s2twp": "城堡計程車兵已經出發",
         "s2twp_jieba": "城堡的士兵已經出發"
       }
+    },
+    {
+      "id": "jieba_s2t_011",
+      "description": "一百/年历 is incorrect mmseg result; sourced from https://ayaka.shn.hk/s2tfont/hant/",
+      "input": "拥有一百年历史",
+      "expected_segmentation": "拥有/一百年/历史",
+      "expected": {
+        "s2twp": "擁有一百年曆史",
+        "s2twp_jieba": "擁有一百年歷史"
+      }
     }
   ]
 }

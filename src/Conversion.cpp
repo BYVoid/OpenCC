@@ -22,12 +22,14 @@
 using namespace opencc;
 
 std::string Conversion::Convert(const char* phrase) const {
-  std::ostringstream buffer;
   // Calculate string end to prevent reading beyond null terminator
   const char* phraseEnd = phrase;
   while (*phraseEnd != '\0') {
     phraseEnd++;
   }
+  const size_t phraseLength = phraseEnd - phrase;
+  std::string buffer;
+  buffer.reserve(phraseLength + phraseLength / 5);
 
   for (const char* pstr = phrase; *pstr != '\0';) {
     size_t remainingLength = phraseEnd - pstr;
@@ -39,7 +41,7 @@ std::string Conversion::Convert(const char* phrase) const {
       if (matchedLength > remainingLength) {
         matchedLength = remainingLength;
       }
-      buffer << UTF8Util::FromSubstr(pstr, matchedLength);
+      buffer.append(pstr, matchedLength);
     } else {
       matchedLength = matched.Get()->KeyLength();
       // Defensive: ensure dictionary key length does not exceed remaining input
@@ -47,11 +49,11 @@ std::string Conversion::Convert(const char* phrase) const {
       if (matchedLength > remainingLength) {
         matchedLength = remainingLength;
       }
-      buffer << matched.Get()->GetDefault();
+      buffer.append(matched.Get()->GetDefault());
     }
     pstr += matchedLength;
   }
-  return buffer.str();
+  return buffer;
 }
 
 std::string Conversion::Convert(const std::string& phrase) const {

@@ -55,7 +55,7 @@ class Runfiles:
                     if not line:
                         continue
                     key, value = self._parse_manifest_line(line)
-                    if value:
+                    if key:
                         self.manifest[key] = value
 
         self.runfiles_dirs = [
@@ -80,7 +80,7 @@ class Runfiles:
     def _parse_manifest_line(line: str) -> tuple[str, str]:
         if not line.startswith(" "):
             key, _, value = line.partition(" ")
-            return key, value
+            return key, value or key
 
         parts = []
         current = []
@@ -121,6 +121,9 @@ class Runfiles:
         for candidate in candidates:
             if candidate in self.manifest:
                 return Path(self.manifest[candidate])
+            path = self._lookup_manifest_prefix(candidate)
+            if path is not None:
+                return path
 
         for runfiles_dir in self.runfiles_dirs:
             for candidate in candidates:
@@ -133,6 +136,16 @@ class Runfiles:
             return source_path
 
         raise FileNotFoundError(f"Could not locate runfile: {relative_path}")
+
+    def _lookup_manifest_prefix(self, candidate: str) -> Path | None:
+        current = candidate
+        suffix_parts = []
+        while "/" in current:
+            current, _, suffix = current.rpartition("/")
+            suffix_parts.append(suffix)
+            if current in self.manifest:
+                return Path(self.manifest[current]).joinpath(*reversed(suffix_parts))
+        return None
 
 
 def _default_opencc_command(runfiles: Runfiles) -> Path:
@@ -357,6 +370,26 @@ class PathResolutionTest(unittest.TestCase):
         )
         self.assertEqual("_main/src/tools/command_line.exe", key)
         self.assertEqual(r"C:\tmp\path with spaces\bin\command_line.exe", value)
+
+    def test_parse_manifest_line_self_maps_single_token_entries(self) -> None:
+        key, value = Runfiles._parse_manifest_line("_main/data/config")
+        self.assertEqual("_main/data/config", key)
+        self.assertEqual("_main/data/config", value)
+
+    def test_rlocation_resolves_files_under_manifest_directory_entries(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            config_dir = Path(temp_dir) / "config"
+            runfiles = Runfiles()
+            runfiles.manifest = {
+                "_main/data/config": str(config_dir),
+            }
+            runfiles.runfiles_dirs = []
+            runfiles.workspace_names = ["_main"]
+
+            self.assertEqual(
+                config_dir / "s2t.json",
+                runfiles.rlocation("data/config/s2t.json"),
+            )
 
     def test_default_jieba_plugin_dir_accepts_windows_bazel_bin_fallback(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:

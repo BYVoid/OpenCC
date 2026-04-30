@@ -24,6 +24,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 
 
 CONFIGS = [
@@ -103,13 +104,25 @@ def _default_opencc_command(runfiles: Runfiles) -> Path:
     if env_value:
         return Path(env_value)
 
-    try:
-        return runfiles.rlocation("src/tools/command_line")
-    except FileNotFoundError:
-        command = _workspace_root() / "bazel-bin/src/tools/command_line"
+    for candidate in [
+        "src/tools/command_line.exe",
+        "src/tools/command_line",
+    ]:
+        try:
+            command = runfiles.rlocation(candidate)
+        except FileNotFoundError:
+            continue
+        if command.is_file():
+            return command
+
+    for command in [
+        _workspace_root() / "bazel-bin/src/tools/command_line.exe",
+        _workspace_root() / "bazel-bin/src/tools/command_line",
+    ]:
         if command.exists():
             return command
-        raise
+
+    raise FileNotFoundError("Could not locate command_line executable")
 
 
 def _default_dict_dir(runfiles: Runfiles) -> Path:
@@ -282,6 +295,22 @@ class GoldenConvertTest(unittest.TestCase):
                                 )
                             )
                             self.fail(diff)
+
+
+class PathResolutionTest(unittest.TestCase):
+    def test_default_opencc_command_accepts_windows_exe_runfile(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            command = Path(temp_dir) / "command_line.exe"
+            command.write_text("", encoding="utf-8")
+            runfiles = Runfiles()
+            runfiles.manifest = {
+                "_main/src/tools/command_line.exe": str(command),
+            }
+            runfiles.runfiles_dirs = []
+            runfiles.workspace_names = ["_main"]
+
+            with mock.patch.dict(os.environ, {}, clear=True):
+                self.assertEqual(command, _default_opencc_command(runfiles))
 
 
 def update_outputs() -> None:

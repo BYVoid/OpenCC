@@ -210,6 +210,9 @@ def _default_jieba_plugin_dir(runfiles: Runfiles) -> Path:
     for candidate in [
         _workspace_root() / "bazel-bin/plugins/jieba/libopencc-jieba.dylib",
         _workspace_root() / "bazel-bin/plugins/jieba/libopencc-jieba.so",
+        _workspace_root() / "bazel-bin/plugins/jieba/opencc-jieba.dll",
+        _workspace_root() / "bazel-bin/plugins/jieba/opencc-jieba.exe",
+        _workspace_root() / "bazel-bin/plugins/jieba/opencc-jieba",
     ]:
         if candidate.is_file():
             return candidate.parent
@@ -354,6 +357,24 @@ class PathResolutionTest(unittest.TestCase):
         )
         self.assertEqual("_main/src/tools/command_line.exe", key)
         self.assertEqual(r"C:\tmp\path with spaces\bin\command_line.exe", value)
+
+    def test_default_jieba_plugin_dir_accepts_windows_bazel_bin_fallback(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            workspace = Path(temp_dir)
+            plugin = workspace / "bazel-bin/plugins/jieba/opencc-jieba.dll"
+            plugin.parent.mkdir(parents=True)
+            plugin.write_text("", encoding="utf-8")
+            runfiles = Runfiles()
+            runfiles.manifest = {}
+            runfiles.runfiles_dirs = []
+            runfiles.workspace_names = ["_main"]
+
+            with mock.patch.dict(os.environ, {}, clear=True):
+                with mock.patch(
+                    __name__ + "._workspace_root",
+                    return_value=workspace,
+                ):
+                    self.assertEqual(plugin.parent, _default_jieba_plugin_dir(runfiles))
 
 
 def update_outputs() -> None:

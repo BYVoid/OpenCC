@@ -54,7 +54,7 @@ class Runfiles:
                     line = line.rstrip("\n")
                     if not line:
                         continue
-                    key, _, value = line.partition(" ")
+                    key, value = self._parse_manifest_line(line)
                     if value:
                         self.manifest[key] = value
 
@@ -75,6 +75,42 @@ class Runfiles:
             )
             if name
         ]
+
+    @staticmethod
+    def _parse_manifest_line(line: str) -> tuple[str, str]:
+        if not line.startswith(" "):
+            key, _, value = line.partition(" ")
+            return key, value
+
+        parts = []
+        current = []
+        escaped = False
+        for char in line[1:]:
+            if escaped:
+                current.append("\\" + char)
+                escaped = False
+                continue
+            if char == "\\":
+                escaped = True
+                continue
+            if char == " " and len(parts) == 0:
+                parts.append("".join(current))
+                current = []
+                continue
+            current.append(char)
+        parts.append("".join(current))
+
+        if len(parts) != 2:
+            return "", ""
+        return tuple(Runfiles._unescape_manifest_field(part) for part in parts)
+
+    @staticmethod
+    def _unescape_manifest_field(value: str) -> str:
+        return (
+            value.replace("\\s", " ")
+            .replace("\\n", "\n")
+            .replace("\\b", "\\")
+        )
 
     def rlocation(self, relative_path: str) -> Path:
         candidates = []
@@ -311,6 +347,13 @@ class PathResolutionTest(unittest.TestCase):
 
             with mock.patch.dict(os.environ, {}, clear=True):
                 self.assertEqual(command, _default_opencc_command(runfiles))
+
+    def test_parse_manifest_line_unescapes_escaped_entries(self) -> None:
+        key, value = Runfiles._parse_manifest_line(
+            r" _main/src/tools/command_line.exe C:\btmp\bpath\swith\sspaces\bbin\bcommand_line.exe"
+        )
+        self.assertEqual("_main/src/tools/command_line.exe", key)
+        self.assertEqual(r"C:\tmp\path with spaces\bin\command_line.exe", value)
 
 
 def update_outputs() -> None:

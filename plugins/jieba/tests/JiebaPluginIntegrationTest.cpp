@@ -205,7 +205,8 @@ protected:
     return runfiles_->Rlocation("_main/plugins/jieba/data/config/" + config +
                                 ".json");
 #else
-    if (config == "s2twp_jieba" || config == "tw2sp_jieba") {
+    if (config.size() >= 6 &&
+        config.compare(config.size() - 6, 6, "_jieba") == 0) {
       return std::string(PROJECT_SOURCE_DIR) + "/plugins/jieba/data/config/" +
              config + ".json";
     }
@@ -373,7 +374,8 @@ protected:
           continue;
         }
         const std::string config = itr->name.GetString();
-        if (config != "s2twp_jieba" && config != "tw2sp_jieba") {
+        if (config.size() < 6 ||
+            config.compare(config.size() - 6, 6, "_jieba") != 0) {
           continue;
         }
         cases[config].push_back({input, itr->value.GetString()});

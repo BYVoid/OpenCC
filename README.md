@@ -205,11 +205,13 @@ OPENCC_DATA_DIR=/path/to/your/config/dir opencc --help
 ### Experimental Plugins 試驗性插件
 
 OpenCC 現已支援外部 C++ 分詞插件。當前第一個插件為 `opencc-jieba`，
-可通過 `s2twp_jieba.json`、`tw2sp_jieba.json` 等插件配置啓用。
+可通過 `s2t_jieba.json`、`s2tw_jieba.json`、`s2hk_jieba.json`、
+`s2twp_jieba.json`、`tw2sp_jieba.json` 等插件配置啓用。
 
 OpenCC now supports external C++ segmentation plugins. The first plugin is
 `opencc-jieba`, which can be enabled through plugin-backed configs such as
-`s2twp_jieba.json` and `tw2sp_jieba.json`.
+`s2t_jieba.json`, `s2tw_jieba.json`, `s2hk_jieba.json`,
+`s2twp_jieba.json`, and `tw2sp_jieba.json`.
 
 注意：
 

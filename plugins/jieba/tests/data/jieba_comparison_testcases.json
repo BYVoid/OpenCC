@@ -67,6 +67,9 @@
       "input": "这个软件的用户体验很好",
       "expected_segmentation": "这个/软件/的/用户/体验/很/好",
       "expected": {
+        "s2t_jieba": "這個軟件的用戶體驗很好",
+        "s2tw_jieba": "這個軟件的用戶體驗很好",
+        "s2hk_jieba": "這個軟件的用户體驗很好",
         "s2twp": "這個軟體的使用者體驗很好",
         "s2twp_jieba": "這個軟體的使用者體驗很好"
       }

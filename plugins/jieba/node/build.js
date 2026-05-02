@@ -73,7 +73,13 @@ if (fs.existsSync(libSrc)) {
 
 // Copy config JSON files
 const configSrcDir = path.join(rootDir, 'plugins/jieba/data/config');
-const configs = ['s2twp_jieba.json', 'tw2sp_jieba.json'];
+const configs = [
+  's2hk_jieba.json',
+  's2t_jieba.json',
+  's2tw_jieba.json',
+  's2twp_jieba.json',
+  'tw2sp_jieba.json',
+];
 configs.forEach(config => {
   copyForce(path.join(configSrcDir, config), path.join(dataDir, config));
   console.log(`Copied ${config} to data/`);

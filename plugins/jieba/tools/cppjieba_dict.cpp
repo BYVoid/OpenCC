@@ -9,13 +9,7 @@
 #include <vector>
 
 #if defined(__has_include)
-#if __has_include(<opencc/Dict.hpp>)
-#include <opencc/Dict.hpp>
-#include <opencc/DictEntry.hpp>
-#include <opencc/Lexicon.hpp>
-#include <opencc/MarisaDict.hpp>
-#include <opencc/SerializableDict.hpp>
-#elif __has_include("src/Dict.hpp")
+#if __has_include("src/Dict.hpp")
 #include "src/Dict.hpp"
 #include "src/DictEntry.hpp"
 #include "src/Lexicon.hpp"
@@ -27,6 +21,12 @@
 #include "Lexicon.hpp"
 #include "MarisaDict.hpp"
 #include "SerializableDict.hpp"
+#elif __has_include(<opencc/Dict.hpp>)
+#include <opencc/Dict.hpp>
+#include <opencc/DictEntry.hpp>
+#include <opencc/Lexicon.hpp>
+#include <opencc/MarisaDict.hpp>
+#include <opencc/SerializableDict.hpp>
 #else
 #error "Unable to locate OpenCC headers"
 #endif

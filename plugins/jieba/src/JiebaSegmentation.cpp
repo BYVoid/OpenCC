@@ -27,11 +27,7 @@
 #include "cppjieba/Jieba.hpp"
 
 #if defined(__has_include)
-#if __has_include(<opencc/MarisaDict.hpp>)
-#include <opencc/Lexicon.hpp>
-#include <opencc/MarisaDict.hpp>
-#include <opencc/SerializableDict.hpp>
-#elif __has_include("MarisaDict.hpp")
+#if __has_include("MarisaDict.hpp")
 #include "Lexicon.hpp"
 #include "MarisaDict.hpp"
 #include "SerializableDict.hpp"
@@ -39,6 +35,10 @@
 #include "src/Lexicon.hpp"
 #include "src/MarisaDict.hpp"
 #include "src/SerializableDict.hpp"
+#elif __has_include(<opencc/MarisaDict.hpp>)
+#include <opencc/Lexicon.hpp>
+#include <opencc/MarisaDict.hpp>
+#include <opencc/SerializableDict.hpp>
 #else
 #error "Unable to locate OpenCC dictionary headers"
 #endif

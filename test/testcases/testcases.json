@@ -652,14 +652,14 @@
       }
     },
     {
-      "id": "BYVoid_OpenCC_Issue_default_s2twp",
-      "input": "缺省",
+      "id": "BYVoid_OpenCC_Issue_933_s2twp",
+      "input": "缺省 默认 预设",
       "expected": {
-        "s2twp": "預設"
+        "s2twp": "預設 預設 預設"
       }
     },
     {
-      "id": "BYVoid_OpenCC_Issue_default_tw2sp",
+      "id": "BYVoid_OpenCC_Issue_933_tw2sp",
       "input": "預設",
       "expected": {
         "tw2sp": "预设"

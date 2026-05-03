@@ -5,6 +5,7 @@
 /.vscode
 /.mypy_cache
 /bazel-*
+/.bazelrc.user
 /build
 /other
 /doc/html

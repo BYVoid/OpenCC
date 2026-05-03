@@ -12,7 +12,9 @@ build:macos --cxxopt=-std=c++17
 build:macos --host_cxxopt=-std=c++17
 
 # BuildBuddy.io: BES + remote cache (safe to use on any platform).
-# Pass the API key with: --remote_header=x-buildbuddy-api-key=$BUILDBUDDY_API_KEY
+# Pass the API key with both:
+#   --remote_header=x-buildbuddy-api-key=$BUILDBUDDY_API_KEY  (remote cache/exec)
+#   --bes_header=x-buildbuddy-api-key=$BUILDBUDDY_API_KEY     (build event stream)
 build:buildbuddy --bes_results_url=https://app.buildbuddy.io/invocation/
 build:buildbuddy --bes_backend=grpcs://remote.buildbuddy.io
 build:buildbuddy --remote_cache=grpcs://remote.buildbuddy.io

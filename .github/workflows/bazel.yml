@@ -43,7 +43,11 @@ jobs:
         shell: bash
         run: |
           if [ -n "${BUILDBUDDY_API_KEY}" ]; then
-            echo "build --config=buildbuddy --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.user
+            {
+              echo "build --config=buildbuddy"
+              echo "build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
+              echo "build --bes_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
+            } >> .bazelrc.user
             echo "BuildBuddy enabled."
           else
             echo "BUILDBUDDY_API_KEY not set; skipping BuildBuddy config (fork PR or missing secret)."

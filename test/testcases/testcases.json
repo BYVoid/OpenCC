@@ -650,6 +650,20 @@
         "s2tw": "本次會議一致通過。",
         "s2twp": "本次會議一致通過。"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_default_s2twp",
+      "input": "缺省",
+      "expected": {
+        "s2twp": "預設"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_default_tw2sp",
+      "input": "預設",
+      "expected": {
+        "tw2sp": "预设"
+      }
     }
   ]
 }

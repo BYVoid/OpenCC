@@ -44,6 +44,7 @@ cc_binary(
         "//src:common",
         "//src:exception",
         "//src:marisa_dict",
+        "//src:public_headers",
         "//src:plugin_api",
         "//src:segmentation",
         "//src:segments",
@@ -70,6 +71,7 @@ cc_binary(
         "//src:dict_entry",
         "//src:lexicon",
         "//src:marisa_dict",
+        "//src:public_headers",
     ],
 )
 

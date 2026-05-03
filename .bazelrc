@@ -18,7 +18,7 @@ build:macos --host_cxxopt=-std=c++17
 build:buildbuddy --bes_results_url=https://app.buildbuddy.io/invocation/
 build:buildbuddy --bes_backend=grpcs://remote.buildbuddy.io
 build:buildbuddy --remote_cache=grpcs://remote.buildbuddy.io
-build:buildbuddy --noremote_upload_local_results # Uploads logs & artifacts without writing to cache
+build:buildbuddy --remote_cache_compression
 build:buildbuddy --remote_timeout=10m
 build:buildbuddy --build_metadata=VISIBILITY=PUBLIC
 

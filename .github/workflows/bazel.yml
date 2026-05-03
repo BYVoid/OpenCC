@@ -53,7 +53,7 @@ jobs:
             echo "BUILDBUDDY_API_KEY not set; skipping BuildBuddy config (fork PR or missing secret)."
           fi
       - name: Build
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' || runner.os == 'macOS'
         shell: bash
         env:
           MSYS_NO_PATHCONV: 1

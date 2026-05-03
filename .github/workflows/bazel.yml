@@ -19,6 +19,9 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
 
+    env:
+      BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -36,6 +39,15 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Configure BuildBuddy
+        shell: bash
+        run: |
+          if [ -n "${BUILDBUDDY_API_KEY}" ]; then
+            echo "build --config=buildbuddy --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}" >> .bazelrc.user
+            echo "BuildBuddy enabled."
+          else
+            echo "BUILDBUDDY_API_KEY not set; skipping BuildBuddy config (fork PR or missing secret)."
+          fi
       - name: Build
         if: runner.os == 'Linux'
         shell: bash

@@ -671,6 +671,20 @@
       "expected": {
         "s2twp": "司法程序、訴訟程序、正當程序"
       }
+    },
+    {
+      "id": "s2twp_mendelssohn",
+      "input": "门德尔松",
+      "expected": {
+        "s2twp": "孟德爾頌"
+      }
+    },
+    {
+      "id": "tw2sp_mendelssohn",
+      "input": "孟德爾頌",
+      "expected": {
+        "tw2sp": "门德尔松"
+      }
     }
   ]
 }

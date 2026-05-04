@@ -671,6 +671,13 @@
       "expected": {
         "s2twp": "孟德爾頌"
       }
+    },
+    {
+      "id": "tw2sp_mendelssohn",
+      "input": "孟德爾頌",
+      "expected": {
+        "tw2sp": "门德尔松"
+      }
     }
   ]
 }

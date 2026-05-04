@@ -31,7 +31,7 @@
     "install": "node-gyp-build"
   },
   "engines": {
-    "node": ">=20.17 <26"
+    "node": ">=20.17"
   },
   "files": [
     "binding.gyp",

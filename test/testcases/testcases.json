@@ -666,6 +666,13 @@
       }
     },
     {
+      "id": "procedural_chengxu_not_converted_to_chengshi",
+      "input": "司法程序、诉讼程序、正当程序",
+      "expected": {
+        "s2twp": "司法程序、訴訟程序、正當程序"
+      }
+    },
+    {
       "id": "s2twp_mendelssohn",
       "input": "门德尔松",
       "expected": {

@@ -685,6 +685,20 @@
       "expected": {
         "tw2sp": "门德尔松"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1174_s2twp",
+      "input": "第三范式 范式转移 巴科斯范式",
+      "expected": {
+        "s2twp": "第三範式 範式轉移 巴科斯範式"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1174_tw2sp",
+      "input": "第三正規化 第三範式 範式轉移 巴科斯範式",
+      "expected": {
+        "tw2sp": "第三范式 第三范式 范式转移 巴科斯范式"
+      }
     }
   ]
 }

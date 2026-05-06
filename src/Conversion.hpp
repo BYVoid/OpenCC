@@ -22,7 +22,7 @@
 #include "Segmentation.hpp"
 
 namespace opencc {
-class LinearMatchDict;
+class PrefixMatch;
 
 /**
  * Conversion interface
@@ -48,6 +48,6 @@ public:
 
 private:
   const DictPtr dict;
-  const std::shared_ptr<LinearMatchDict> linearDict;
+  const std::shared_ptr<PrefixMatch> prefixMatch;
 };
 } // namespace opencc

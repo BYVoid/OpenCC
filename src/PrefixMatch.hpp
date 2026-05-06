@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
+ * Copyright 2010-2026 Carbo Kuo and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,26 +19,29 @@
 #pragma once
 
 #include "Common.hpp"
-#include "Segmentation.hpp"
 
 namespace opencc {
-class PrefixMatch;
-/**
- * Implementation of maximal match segmentation
- * @ingroup opencc_cpp_api
- */
-class OPENCC_EXPORT MaxMatchSegmentation : public Segmentation {
+
+class PrefixMatch {
 public:
-  MaxMatchSegmentation(const DictPtr _dict);
+  struct Match {
+    bool matched;
+    size_t keyLength;
+    const std::string* key;
+    const std::string* value;
+  };
 
-  virtual ~MaxMatchSegmentation() {}
+  explicit PrefixMatch(const DictPtr& dict);
+  ~PrefixMatch();
 
-  virtual SegmentsPtr Segment(const std::string& text) const;
-
-  const DictPtr GetDict() const { return dict; }
+  Match MatchPrefix(const char* word, size_t len) const;
 
 private:
-  const DictPtr dict;
-  const std::shared_ptr<PrefixMatch> prefixMatch;
+  class Table;
+
+  void AddDict(const DictPtr& dict);
+
+  std::vector<std::unique_ptr<Table>> tables;
 };
+
 } // namespace opencc

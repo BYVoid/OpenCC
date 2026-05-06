@@ -21,6 +21,7 @@
 #include "Lexicon.hpp"
 
 #include <algorithm>
+#include <cstdint>
 #include <cstring>
 #include <unordered_map>
 

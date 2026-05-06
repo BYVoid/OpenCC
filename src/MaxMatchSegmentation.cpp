@@ -17,8 +17,14 @@
  */
 
 #include "MaxMatchSegmentation.hpp"
+#include "PrefixMatch.hpp"
+#include "Segments.hpp"
+#include "UTF8Util.hpp"
 
 using namespace opencc;
+
+MaxMatchSegmentation::MaxMatchSegmentation(const DictPtr _dict)
+    : dict(_dict), prefixMatch(new PrefixMatch(_dict)) {}
 
 SegmentsPtr MaxMatchSegmentation::Segment(const std::string& text) const {
   SegmentsPtr segments(new Segments);
@@ -33,9 +39,10 @@ SegmentsPtr MaxMatchSegmentation::Segment(const std::string& text) const {
   const char* textEnd = text.c_str() + text.length();
   for (const char* pstr = text.c_str(); *pstr != '\0';) {
     size_t remainingLength = textEnd - pstr;
-    const Optional<const DictEntry*>& matched = dict->MatchPrefix(pstr, remainingLength);
+    const PrefixMatch::Match matched =
+        prefixMatch->MatchPrefix(pstr, remainingLength);
     size_t matchedLength;
-    if (matched.IsNull()) {
+    if (!matched.matched) {
       matchedLength = UTF8Util::NextCharLength(pstr);
       // Ensure we don't advance beyond the string boundary
       if (matchedLength > remainingLength) {
@@ -44,8 +51,8 @@ SegmentsPtr MaxMatchSegmentation::Segment(const std::string& text) const {
       segLength += matchedLength;
     } else {
       clearBuffer();
-      matchedLength = matched.Get()->KeyLength();
-      segments->AddSegment(matched.Get()->Key());
+      matchedLength = matched.keyLength;
+      segments->AddSegment(*matched.key);
       segStart = pstr + matchedLength;
     }
     pstr += matchedLength;

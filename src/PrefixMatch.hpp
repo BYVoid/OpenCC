@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
+ * Copyright 2010-2026 Carbo Kuo and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,26 +19,34 @@
 #pragma once
 
 #include "Common.hpp"
-#include "Segmentation.hpp"
 
 namespace opencc {
-class PrefixMatch;
-/**
- * Implementation of maximal match segmentation
- * @ingroup opencc_cpp_api
- */
-class OPENCC_EXPORT MaxMatchSegmentation : public Segmentation {
+
+class PrefixMatch {
 public:
-  MaxMatchSegmentation(const DictPtr _dict);
+  class Tables;
 
-  virtual ~MaxMatchSegmentation() {}
+  struct Match {
+    bool matched;
+    size_t keyLength;
+    const std::string* key;
+    const std::string* value;
+  };
 
-  virtual SegmentsPtr Segment(const std::string& text) const;
+  explicit PrefixMatch(const DictPtr& dict);
+  ~PrefixMatch();
 
-  const DictPtr GetDict() const { return dict; }
+  Match MatchPrefix(const char* word, size_t len) const;
 
 private:
-  const DictPtr dict;
-  const std::shared_ptr<PrefixMatch> prefixMatch;
+  class Table;
+
+  void AddDict(const DictPtr& dict, Tables* output);
+  static void AppendCacheKey(const DictPtr& dict, std::string* output);
+  static void CollectLeafDicts(const DictPtr& dict,
+                               std::vector<std::weak_ptr<const Dict>>* output);
+
+  std::shared_ptr<const Tables> tables;
 };
+
 } // namespace opencc

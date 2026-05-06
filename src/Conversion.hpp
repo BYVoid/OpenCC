@@ -22,19 +22,24 @@
 #include "Segmentation.hpp"
 
 namespace opencc {
+class PrefixMatch;
+
 /**
  * Conversion interface
  * @ingroup opencc_cpp_api
  */
 class OPENCC_EXPORT Conversion {
 public:
-  Conversion(DictPtr _dict) : dict(_dict) {}
+  Conversion(DictPtr _dict);
 
   // Convert single phrase
   std::string Convert(const std::string& phrase) const;
 
   // Convert single phrase
   std::string Convert(const char* phrase) const;
+
+  // Convert single phrase and append it to output.
+  void AppendConverted(const char* phrase, std::string* output) const;
 
   // Convert segmented text
   SegmentsPtr Convert(const SegmentsPtr& input) const;
@@ -43,5 +48,6 @@ public:
 
 private:
   const DictPtr dict;
+  const std::shared_ptr<PrefixMatch> prefixMatch;
 };
 } // namespace opencc

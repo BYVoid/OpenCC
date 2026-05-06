@@ -27,8 +27,12 @@ using namespace opencc;
 
 std::string Converter::Convert(const std::string& text) const {
   const SegmentsPtr& segments = segmentation->Segment(text);
-  const SegmentsPtr& converted = conversionChain->Convert(segments);
-  return converted->ToString();
+  std::string converted;
+  converted.reserve(text.length() + text.length() / 5);
+  for (const char* segment : *segments) {
+    conversionChain->AppendConvertedSegment(segment, &converted);
+  }
+  return converted;
 }
 
 size_t Converter::Convert(const char* input, char* output) const {

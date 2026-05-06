@@ -34,6 +34,32 @@ SegmentsPtr ConversionChain::Convert(const SegmentsPtr& input) const {
   return output;
 }
 
+void ConversionChain::AppendConvertedSegment(const char* segment,
+                                             std::string* output) const {
+  if (conversions.empty()) {
+    output->append(segment);
+    return;
+  }
+
+  auto conversion = conversions.begin();
+  auto lastConversion = conversions.end();
+  --lastConversion;
+  if (conversion == lastConversion) {
+    (*conversion)->AppendConverted(segment, output);
+    return;
+  }
+
+  std::string converted;
+  (*conversion)->AppendConverted(segment, &converted);
+  ++conversion;
+  for (; conversion != lastConversion; ++conversion) {
+    std::string next;
+    (*conversion)->AppendConverted(converted.c_str(), &next);
+    converted.swap(next);
+  }
+  (*lastConversion)->AppendConverted(converted.c_str(), output);
+}
+
 std::vector<SegmentsPtr>
 ConversionChain::ConvertWithTrace(const SegmentsPtr& input) const {
   std::vector<SegmentsPtr> trace;

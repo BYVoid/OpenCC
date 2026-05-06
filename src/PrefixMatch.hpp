@@ -24,6 +24,8 @@ namespace opencc {
 
 class PrefixMatch {
 public:
+  class Tables;
+
   struct Match {
     bool matched;
     size_t keyLength;
@@ -38,10 +40,11 @@ public:
 
 private:
   class Table;
-  class Tables;
 
   void AddDict(const DictPtr& dict, Tables* output);
   static void AppendCacheKey(const DictPtr& dict, std::string* output);
+  static void CollectLeafDicts(const DictPtr& dict,
+                               std::vector<std::weak_ptr<const Dict>>* output);
 
   std::shared_ptr<const Tables> tables;
 };

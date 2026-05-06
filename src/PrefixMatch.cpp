@@ -52,6 +52,42 @@ public:
   std::vector<std::unique_ptr<Table>> tables;
 };
 
+namespace {
+
+struct CacheEntry {
+  std::vector<std::weak_ptr<const Dict>> dicts;
+  std::shared_ptr<const PrefixMatch::Tables> tables;
+};
+
+bool SameOwner(const std::weak_ptr<const Dict>& cached,
+               const std::weak_ptr<const Dict>& current) {
+  return !cached.owner_before(current) && !current.owner_before(cached);
+}
+
+bool SameDicts(const CacheEntry& cached,
+               const std::vector<std::weak_ptr<const Dict>>& current) {
+  if (cached.dicts.size() != current.size()) {
+    return false;
+  }
+  for (size_t i = 0; i < current.size(); i++) {
+    if (cached.dicts[i].expired() || !SameOwner(cached.dicts[i], current[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
+bool HasExpiredDict(const CacheEntry& cached) {
+  for (const std::weak_ptr<const Dict>& dict : cached.dicts) {
+    if (dict.expired()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+} // namespace
+
 class PrefixMatch::Table {
 public:
   explicit Table(const DictPtr& dict) {
@@ -123,17 +159,23 @@ private:
 
 PrefixMatch::PrefixMatch(const DictPtr& dict) {
   static std::mutex cacheMutex;
-  static std::unordered_map<std::string, std::shared_ptr<const Tables>> cache;
+  static std::unordered_map<std::string, std::vector<CacheEntry>> cache;
 
   std::string cacheKey;
   AppendCacheKey(dict, &cacheKey);
+  std::vector<std::weak_ptr<const Dict>> leafDicts;
+  CollectLeafDicts(dict, &leafDicts);
 
   {
     std::lock_guard<std::mutex> lock(cacheMutex);
     const auto cached = cache.find(cacheKey);
     if (cached != cache.end()) {
-      tables = cached->second;
-      return;
+      for (const CacheEntry& entry : cached->second) {
+        if (SameDicts(entry, leafDicts)) {
+          tables = entry.tables;
+          return;
+        }
+      }
     }
   }
 
@@ -141,13 +183,23 @@ PrefixMatch::PrefixMatch(const DictPtr& dict) {
   AddDict(dict, built.get());
 
   std::lock_guard<std::mutex> lock(cacheMutex);
-  const auto cached = cache.find(cacheKey);
-  if (cached == cache.end()) {
-    tables = built;
-    cache[cacheKey] = tables;
-  } else {
-    tables = cached->second;
+  std::vector<CacheEntry>& entries = cache[cacheKey];
+  for (std::vector<CacheEntry>::iterator it = entries.begin();
+       it != entries.end();) {
+    if (HasExpiredDict(*it)) {
+      it = entries.erase(it);
+    } else if (SameDicts(*it, leafDicts)) {
+      tables = it->tables;
+      return;
+    } else {
+      ++it;
+    }
   }
+  tables = built;
+  CacheEntry entry;
+  entry.dicts = std::move(leafDicts);
+  entry.tables = tables;
+  entries.push_back(std::move(entry));
 }
 
 PrefixMatch::~PrefixMatch() {}
@@ -188,4 +240,16 @@ void PrefixMatch::AppendCacheKey(const DictPtr& dict, std::string* output) {
   const uintptr_t dictKey = reinterpret_cast<uintptr_t>(dict.get());
   output->append(reinterpret_cast<const char*>(&dictKey), sizeof(dictKey));
   output->push_back(';');
+}
+
+void PrefixMatch::CollectLeafDicts(
+    const DictPtr& dict, std::vector<std::weak_ptr<const Dict>>* output) {
+  const std::list<DictPtr>* dictGroupItems = dict->GetDictGroupItems();
+  if (dictGroupItems != nullptr) {
+    for (const DictPtr& child : *dictGroupItems) {
+      CollectLeafDicts(child, output);
+    }
+    return;
+  }
+  output->push_back(dict);
 }

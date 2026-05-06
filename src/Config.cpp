@@ -62,9 +62,12 @@ std::unordered_map<std::string, DictPtr>& DictCache() {
 }
 
 bool GetFileCacheKey(const std::string& path, std::string* cacheKey) {
-#ifdef _MSC_VER
-  struct _stat64 statBuf;
-  if (_wstat64(UTF8Util::GetPlatformString(path).c_str(), &statBuf) != 0) {
+#if defined(_WIN32) || defined(_WIN64)
+  WIN32_FILE_ATTRIBUTE_DATA fileInfo;
+  const std::wstring widePath = internal::WideFromUtf8(path);
+  if (widePath.empty() ||
+      !GetFileAttributesExW(widePath.c_str(), GetFileExInfoStandard,
+                            &fileInfo)) {
     return false;
   }
 #else
@@ -75,9 +78,36 @@ bool GetFileCacheKey(const std::string& path, std::string* cacheKey) {
 #endif
   *cacheKey = path;
   cacheKey->push_back('\n');
+#if defined(_WIN32) || defined(_WIN64)
+  cacheKey->append(
+      std::to_string(static_cast<unsigned long long>(
+          fileInfo.ftLastWriteTime.dwHighDateTime)));
+  cacheKey->push_back('.');
+  cacheKey->append(
+      std::to_string(static_cast<unsigned long long>(
+          fileInfo.ftLastWriteTime.dwLowDateTime)));
+  cacheKey->push_back('\n');
+  cacheKey->append(
+      std::to_string(static_cast<unsigned long long>(fileInfo.nFileSizeHigh)));
+  cacheKey->push_back('.');
+  cacheKey->append(
+      std::to_string(static_cast<unsigned long long>(fileInfo.nFileSizeLow)));
+#else
   cacheKey->append(std::to_string(static_cast<long long>(statBuf.st_mtime)));
+  cacheKey->push_back('.');
+#if defined(__APPLE__) && defined(__MACH__)
+  cacheKey->append(
+      std::to_string(static_cast<long long>(statBuf.st_mtimespec.tv_nsec)));
+#elif defined(st_mtime_nsec)
+  cacheKey->append(
+      std::to_string(static_cast<long long>(statBuf.st_mtime_nsec)));
+#else
+  cacheKey->append(
+      std::to_string(static_cast<long long>(statBuf.st_mtim.tv_nsec)));
+#endif
   cacheKey->push_back('\n');
   cacheKey->append(std::to_string(static_cast<long long>(statBuf.st_size)));
+#endif
   return true;
 }
 

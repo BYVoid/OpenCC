@@ -38,10 +38,12 @@ public:
 
 private:
   class Table;
+  class Tables;
 
-  void AddDict(const DictPtr& dict);
+  void AddDict(const DictPtr& dict, Tables* output);
+  static void AppendCacheKey(const DictPtr& dict, std::string* output);
 
-  std::vector<std::unique_ptr<Table>> tables;
+  std::shared_ptr<const Tables> tables;
 };
 
 } // namespace opencc

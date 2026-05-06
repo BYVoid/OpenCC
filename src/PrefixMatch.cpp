@@ -22,6 +22,7 @@
 #include "UTF8Util.hpp"
 
 #include <cstdint>
+#include <mutex>
 #include <unordered_map>
 
 using namespace opencc;
@@ -45,6 +46,11 @@ uint32_t Utf8CharKey(const char* str, size_t charLen) {
 }
 
 } // namespace
+
+class PrefixMatch::Tables {
+public:
+  std::vector<std::unique_ptr<Table>> tables;
+};
 
 class PrefixMatch::Table {
 public:
@@ -115,13 +121,40 @@ private:
   Node root;
 };
 
-PrefixMatch::PrefixMatch(const DictPtr& dict) { AddDict(dict); }
+PrefixMatch::PrefixMatch(const DictPtr& dict) {
+  static std::mutex cacheMutex;
+  static std::unordered_map<std::string, std::shared_ptr<const Tables>> cache;
+
+  std::string cacheKey;
+  AppendCacheKey(dict, &cacheKey);
+
+  {
+    std::lock_guard<std::mutex> lock(cacheMutex);
+    const auto cached = cache.find(cacheKey);
+    if (cached != cache.end()) {
+      tables = cached->second;
+      return;
+    }
+  }
+
+  std::shared_ptr<Tables> built(new Tables);
+  AddDict(dict, built.get());
+
+  std::lock_guard<std::mutex> lock(cacheMutex);
+  const auto cached = cache.find(cacheKey);
+  if (cached == cache.end()) {
+    tables = built;
+    cache[cacheKey] = tables;
+  } else {
+    tables = cached->second;
+  }
+}
 
 PrefixMatch::~PrefixMatch() {}
 
 PrefixMatch::Match PrefixMatch::MatchPrefix(const char* word,
                                             size_t len) const {
-  for (const std::unique_ptr<Table>& table : tables) {
+  for (const std::unique_ptr<Table>& table : tables->tables) {
     const Match match = table->MatchPrefix(word, len);
     if (match.matched) {
       return match;
@@ -130,13 +163,29 @@ PrefixMatch::Match PrefixMatch::MatchPrefix(const char* word,
   return Match{false, 0, nullptr, nullptr};
 }
 
-void PrefixMatch::AddDict(const DictPtr& dict) {
+void PrefixMatch::AddDict(const DictPtr& dict, Tables* output) {
   const std::list<DictPtr>* dictGroupItems = dict->GetDictGroupItems();
   if (dictGroupItems != nullptr) {
     for (const DictPtr& child : *dictGroupItems) {
-      AddDict(child);
+      AddDict(child, output);
     }
     return;
   }
-  tables.emplace_back(new Table(dict));
+  output->tables.emplace_back(new Table(dict));
+}
+
+void PrefixMatch::AppendCacheKey(const DictPtr& dict, std::string* output) {
+  const std::list<DictPtr>* dictGroupItems = dict->GetDictGroupItems();
+  if (dictGroupItems != nullptr) {
+    output->push_back('[');
+    for (const DictPtr& child : *dictGroupItems) {
+      AppendCacheKey(child, output);
+    }
+    output->push_back(']');
+    return;
+  }
+
+  const uintptr_t dictKey = reinterpret_cast<uintptr_t>(dict.get());
+  output->append(reinterpret_cast<const char*>(&dictKey), sizeof(dictKey));
+  output->push_back(';');
 }

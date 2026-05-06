@@ -128,7 +128,7 @@ cc_library(
     deps = [
         ":common",
         ":dict",
-        ":dict_group",
+        ":lexicon",
         ":segmentation",
     ],
 )

@@ -18,7 +18,6 @@
 
 #include "Conversion.hpp"
 #include "Dict.hpp"
-#include "DictGroup.hpp"
 #include "Lexicon.hpp"
 
 #include <algorithm>
@@ -113,9 +112,9 @@ private:
   };
 
   void AddDict(const DictPtr& dict) {
-    const DictGroupPtr dictGroup = std::dynamic_pointer_cast<DictGroup>(dict);
-    if (dictGroup != nullptr) {
-      for (const DictPtr& child : dictGroup->GetDicts()) {
+    const std::list<DictPtr>* dictGroupItems = dict->GetDictGroupItems();
+    if (dictGroupItems != nullptr) {
+      for (const DictPtr& child : *dictGroupItems) {
         AddDict(child);
       }
       return;

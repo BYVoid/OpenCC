@@ -56,9 +56,22 @@ std::mutex& DictCacheMutex() {
   return mutex;
 }
 
-std::unordered_map<std::string, DictPtr>& DictCache() {
-  static std::unordered_map<std::string, DictPtr> cache;
+std::unordered_map<std::string, std::weak_ptr<Dict>>& DictCache() {
+  static std::unordered_map<std::string, std::weak_ptr<Dict>> cache;
   return cache;
+}
+
+void PruneExpiredDictCache() {
+  std::unordered_map<std::string, std::weak_ptr<Dict>>& cache = DictCache();
+  for (std::unordered_map<std::string, std::weak_ptr<Dict>>::iterator it =
+           cache.begin();
+       it != cache.end();) {
+    if (it->second.expired()) {
+      it = cache.erase(it);
+    } else {
+      ++it;
+    }
+  }
 }
 
 bool GetFileCacheKey(const std::string& path, std::string* cacheKey) {
@@ -258,20 +271,27 @@ public:
       }
       {
         std::lock_guard<std::mutex> lock(DictCacheMutex());
+        PruneExpiredDictCache();
         const auto cached = DictCache().find(cacheKey);
         if (cached != DictCache().end()) {
-          return cached->second;
+          DictPtr dict = cached->second.lock();
+          if (dict != nullptr) {
+            return dict;
+          }
         }
       }
 
       std::shared_ptr<DICT> dict;
       if (SerializableDict::TryLoadFromFile<DICT>(path, &dict)) {
         std::lock_guard<std::mutex> lock(DictCacheMutex());
-        DictPtr& cached = DictCache()[cacheKey];
-        if (cached == nullptr) {
+        PruneExpiredDictCache();
+        std::weak_ptr<Dict>& cached = DictCache()[cacheKey];
+        DictPtr cachedDict = cached.lock();
+        if (cachedDict == nullptr) {
           cached = dict;
+          return dict;
         }
-        return cached;
+        return cachedDict;
       }
     }
     throw FileNotFound(fileName);

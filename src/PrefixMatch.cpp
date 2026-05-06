@@ -56,7 +56,7 @@ namespace {
 
 struct CacheEntry {
   std::vector<std::weak_ptr<const Dict>> dicts;
-  std::shared_ptr<const PrefixMatch::Tables> tables;
+  std::weak_ptr<const PrefixMatch::Tables> tables;
 };
 
 bool SameOwner(const std::weak_ptr<const Dict>& cached,
@@ -78,12 +78,37 @@ bool SameDicts(const CacheEntry& cached,
 }
 
 bool HasExpiredDict(const CacheEntry& cached) {
+  if (cached.tables.expired()) {
+    return true;
+  }
   for (const std::weak_ptr<const Dict>& dict : cached.dicts) {
     if (dict.expired()) {
       return true;
     }
   }
   return false;
+}
+
+void PruneExpiredPrefixMatchCache(
+    std::unordered_map<std::string, std::vector<CacheEntry>>* cache) {
+  for (std::unordered_map<std::string, std::vector<CacheEntry>>::iterator it =
+           cache->begin();
+       it != cache->end();) {
+    std::vector<CacheEntry>& entries = it->second;
+    for (std::vector<CacheEntry>::iterator entry = entries.begin();
+         entry != entries.end();) {
+      if (HasExpiredDict(*entry)) {
+        entry = entries.erase(entry);
+      } else {
+        ++entry;
+      }
+    }
+    if (entries.empty()) {
+      it = cache->erase(it);
+    } else {
+      ++it;
+    }
+  }
 }
 
 } // namespace
@@ -168,12 +193,15 @@ PrefixMatch::PrefixMatch(const DictPtr& dict) {
 
   {
     std::lock_guard<std::mutex> lock(cacheMutex);
+    PruneExpiredPrefixMatchCache(&cache);
     const auto cached = cache.find(cacheKey);
     if (cached != cache.end()) {
       for (const CacheEntry& entry : cached->second) {
         if (SameDicts(entry, leafDicts)) {
-          tables = entry.tables;
-          return;
+          tables = entry.tables.lock();
+          if (tables != nullptr) {
+            return;
+          }
         }
       }
     }
@@ -183,14 +211,18 @@ PrefixMatch::PrefixMatch(const DictPtr& dict) {
   AddDict(dict, built.get());
 
   std::lock_guard<std::mutex> lock(cacheMutex);
+  PruneExpiredPrefixMatchCache(&cache);
   std::vector<CacheEntry>& entries = cache[cacheKey];
   for (std::vector<CacheEntry>::iterator it = entries.begin();
        it != entries.end();) {
     if (HasExpiredDict(*it)) {
       it = entries.erase(it);
     } else if (SameDicts(*it, leafDicts)) {
-      tables = it->tables;
-      return;
+      tables = it->tables.lock();
+      if (tables != nullptr) {
+        return;
+      }
+      it = entries.erase(it);
     } else {
       ++it;
     }

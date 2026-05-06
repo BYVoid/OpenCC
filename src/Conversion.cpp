@@ -20,20 +20,22 @@
 #include "Dict.hpp"
 #include "Lexicon.hpp"
 
-#include <algorithm>
 #include <cstdint>
-#include <cstring>
 #include <unordered_map>
 
 using namespace opencc;
 
 namespace {
 
-uint32_t FirstUtf8CharKey(const char* str, size_t len) {
+size_t Utf8CharLength(const char* str, size_t len) {
   if (len == 0) {
     return 0;
   }
-  const size_t charLen = (std::min)(UTF8Util::NextCharLength(str), len);
+  const size_t charLen = UTF8Util::NextCharLength(str);
+  return charLen <= len ? charLen : 0;
+}
+
+uint32_t Utf8CharKey(const char* str, size_t charLen) {
   uint32_t key = static_cast<uint32_t>(charLen);
   for (size_t i = 0; i < charLen; i++) {
     key = (key << 8) | static_cast<unsigned char>(str[i]);
@@ -74,42 +76,65 @@ private:
     explicit Table(const DictPtr& dict) {
       const LexiconPtr lexicon = dict->GetLexicon();
       for (const std::unique_ptr<DictEntry>& item : *lexicon) {
-        Entry entry;
-        entry.key = item->Key();
-        entry.value = item->GetDefault();
-        const uint32_t firstCharKey =
-            FirstUtf8CharKey(entry.key.c_str(), entry.key.length());
-        buckets[firstCharKey].push_back(std::move(entry));
-      }
-
-      for (auto& bucket : buckets) {
-        std::sort(bucket.second.begin(), bucket.second.end(),
-                  [](const Entry& a, const Entry& b) {
-                    return a.key.length() > b.key.length();
-                  });
+        AddEntry(item->Key(), item->GetDefault());
       }
     }
 
     Match MatchPrefix(const char* word, size_t len) const {
-      const auto bucket = buckets.find(FirstUtf8CharKey(word, len));
-      if (bucket == buckets.end()) {
-        return Match{false, 0, nullptr};
+      const Node* node = &root;
+      const std::string* matchedValue = nullptr;
+      size_t matchedLength = 0;
+      for (const char* pstr = word; pstr < word + len;) {
+        const size_t remainingLength = word + len - pstr;
+        const size_t charLength = Utf8CharLength(pstr, remainingLength);
+        if (charLength == 0) {
+          break;
+        }
+        const auto child = node->children.find(Utf8CharKey(pstr, charLength));
+        if (child == node->children.end()) {
+          break;
+        }
+        pstr += charLength;
+        node = child->second.get();
+        if (node->keyLength > 0) {
+          matchedLength = node->keyLength;
+          matchedValue = &node->value;
+        }
       }
-
-      for (const Entry& entry : bucket->second) {
-        const size_t keyLength = entry.key.length();
-        if (keyLength > len) {
-          continue;
-        }
-        if (std::memcmp(word, entry.key.data(), keyLength) == 0) {
-          return Match{true, keyLength, &entry.value};
-        }
+      if (matchedValue != nullptr) {
+        return Match{true, matchedLength, matchedValue};
       }
       return Match{false, 0, nullptr};
     }
 
   private:
-    std::unordered_map<uint32_t, std::vector<Entry>> buckets;
+    struct Node {
+      size_t keyLength = 0;
+      std::string value;
+      std::unordered_map<uint32_t, std::unique_ptr<Node>> children;
+    };
+
+    void AddEntry(const std::string& key, const std::string& value) {
+      Node* node = &root;
+      for (const char* pstr = key.c_str(); *pstr != '\0';) {
+        const size_t remainingLength = key.c_str() + key.length() - pstr;
+        const size_t charLength = Utf8CharLength(pstr, remainingLength);
+        if (charLength == 0) {
+          break;
+        }
+        std::unique_ptr<Node>& child =
+            node->children[Utf8CharKey(pstr, charLength)];
+        if (child == nullptr) {
+          child.reset(new Node);
+        }
+        node = child.get();
+        pstr += charLength;
+      }
+      node->keyLength = key.length();
+      node->value = value;
+    }
+
+    Node root;
   };
 
   void AddDict(const DictPtr& dict) {

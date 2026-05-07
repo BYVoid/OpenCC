@@ -20,6 +20,12 @@ def test_init_delete_converter():
         del converter
 
 
+def test_jieba_configs_are_not_exposed():
+    import opencc
+
+    assert all('jieba' not in config for config in opencc.CONFIGS)
+
+
 def test_conversion():
     import opencc
 

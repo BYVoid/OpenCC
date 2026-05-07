@@ -89,6 +89,10 @@ See [demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js) and [ts
 
 `pip install opencc` (Windows, Linux, macOS)
 
+The Python package uses the pure Python implementation and supports the built-in
+mmseg-based configs. Jieba plugin configs are not supported by the Python
+package.
+
 ```python
 import opencc
 converter = opencc.OpenCC('s2t.json')

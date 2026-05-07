@@ -7,11 +7,7 @@ jobs:
   release-pypi:
     permissions:
       contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, ubuntu-22.04-arm, macos-15-intel, macos-15, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
@@ -31,23 +27,8 @@ jobs:
       with:
         python-version: "3.12"
 
-    - name: Build package and upload (Linux)
-      if: runner.os == 'Linux'
+    - name: Build package and upload
       run: bash release-pypi-linux.sh
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-
-    - name: Build package and upload (macOS)
-      if: runner.os == 'macOS'
-      run: bash release-pypi-macos.sh
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-
-    - name: Build package and upload (Windows)
-      if: runner.os == 'Windows'
-      run: ./release-pypi-windows.cmd
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}

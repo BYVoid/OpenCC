@@ -210,8 +210,10 @@ def _find_dict_txt(filename: str, config_dir: str = ''):
             stem = stem[: -len(ext)]
             break
 
-    if os.path.isabs(filename) and os.path.isfile(filename):
-        return filename, False
+    if os.path.isabs(filename):
+        path = stem + '.txt'
+        if os.path.isfile(path):
+            return path, False
 
     search_dirs = (
         config_dir,
@@ -247,7 +249,7 @@ def _parse_dict_lines(path: str):
     Comment lines (starting with ``#``) and blank lines are skipped.
     ``candidates`` is a list of one or more whitespace-separated values.
     """
-    with open(path, encoding='utf-8') as f:
+    with open(path, encoding='utf-8-sig') as f:
         for line in f:
             line = line.strip()
             if not line or line.startswith('#') or '\t' not in line:

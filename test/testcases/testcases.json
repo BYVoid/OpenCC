@@ -699,6 +699,20 @@
       "expected": {
         "tw2sp": "第三范式 第三范式 范式转移 巴科斯范式"
       }
+    },
+    {
+      "id": "ethernet_s2twp",
+      "input": "以太网",
+      "expected": {
+        "s2twp": "乙太網路"
+      }
+    },
+    {
+      "id": "ethernet_tw2sp",
+      "input": "乙太網路 乙太網",
+      "expected": {
+        "tw2sp": "以太网 以太网"
+      }
     }
   ]
 }

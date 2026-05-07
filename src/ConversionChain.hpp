@@ -35,6 +35,8 @@ public:
 
   SegmentsPtr Convert(const SegmentsPtr& input) const;
 
+  void AppendConvertedSegment(const char* segment, std::string* output) const;
+
   std::vector<SegmentsPtr> ConvertWithTrace(const SegmentsPtr& input) const;
 
   const std::list<ConversionPtr> GetConversions() const { return conversions; }

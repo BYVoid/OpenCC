@@ -17,6 +17,7 @@
         "../src/MarisaDict.cpp",
         "../src/MaxMatchSegmentation.cpp",
         "../src/PluginSegmentation.cpp",
+        "../src/PrefixMatch.cpp",
         "../src/Segmentation.cpp",
         "../src/SerializedValues.cpp",
         "../src/TextDict.cpp",

@@ -19,6 +19,7 @@
 #include <sys/stat.h>
 #include <fstream>
 #include <list>
+#include <mutex>
 #include <unordered_map>
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -36,6 +37,7 @@
 #include "MaxMatchSegmentation.hpp"
 #include "PluginSegmentation.hpp"
 #include "TextDict.hpp"
+#include "UTF8Util.hpp"
 
 #ifdef ENABLE_DARTS
 #include "DartsDict.hpp"
@@ -48,6 +50,79 @@ namespace opencc {
 namespace {
 
 std::string GetParentDirectory(const std::string& path);
+
+std::mutex& DictCacheMutex() {
+  static std::mutex mutex;
+  return mutex;
+}
+
+std::unordered_map<std::string, std::weak_ptr<Dict>>& DictCache() {
+  static std::unordered_map<std::string, std::weak_ptr<Dict>> cache;
+  return cache;
+}
+
+void PruneExpiredDictCache() {
+  std::unordered_map<std::string, std::weak_ptr<Dict>>& cache = DictCache();
+  for (std::unordered_map<std::string, std::weak_ptr<Dict>>::iterator it =
+           cache.begin();
+       it != cache.end();) {
+    if (it->second.expired()) {
+      it = cache.erase(it);
+    } else {
+      ++it;
+    }
+  }
+}
+
+bool GetFileCacheKey(const std::string& path, std::string* cacheKey) {
+#if defined(_WIN32) || defined(_WIN64)
+  WIN32_FILE_ATTRIBUTE_DATA fileInfo;
+  const std::wstring widePath = internal::WideFromUtf8(path);
+  if (widePath.empty() ||
+      !GetFileAttributesExW(widePath.c_str(), GetFileExInfoStandard,
+                            &fileInfo)) {
+    return false;
+  }
+#else
+  struct stat statBuf;
+  if (stat(path.c_str(), &statBuf) != 0) {
+    return false;
+  }
+#endif
+  *cacheKey = path;
+  cacheKey->push_back('\n');
+#if defined(_WIN32) || defined(_WIN64)
+  cacheKey->append(
+      std::to_string(static_cast<unsigned long long>(
+          fileInfo.ftLastWriteTime.dwHighDateTime)));
+  cacheKey->push_back('.');
+  cacheKey->append(
+      std::to_string(static_cast<unsigned long long>(
+          fileInfo.ftLastWriteTime.dwLowDateTime)));
+  cacheKey->push_back('\n');
+  cacheKey->append(
+      std::to_string(static_cast<unsigned long long>(fileInfo.nFileSizeHigh)));
+  cacheKey->push_back('.');
+  cacheKey->append(
+      std::to_string(static_cast<unsigned long long>(fileInfo.nFileSizeLow)));
+#else
+  cacheKey->append(std::to_string(static_cast<long long>(statBuf.st_mtime)));
+  cacheKey->push_back('.');
+#if defined(__APPLE__) && defined(__MACH__)
+  cacheKey->append(
+      std::to_string(static_cast<long long>(statBuf.st_mtimespec.tv_nsec)));
+#elif defined(st_mtime_nsec)
+  cacheKey->append(
+      std::to_string(static_cast<long long>(statBuf.st_mtime_nsec)));
+#else
+  cacheKey->append(
+      std::to_string(static_cast<long long>(statBuf.st_mtim.tv_nsec)));
+#endif
+  cacheKey->push_back('\n');
+  cacheKey->append(std::to_string(static_cast<long long>(statBuf.st_size)));
+#endif
+  return true;
+}
 
 #if defined(_WIN32) || defined(_WIN64)
 using internal::Utf8FromWide;
@@ -180,16 +255,43 @@ public:
   }
 
   template <typename DICT>
-  DictPtr LoadDictWithPaths(const std::string& fileName) {
-    // Working directory
-    std::shared_ptr<DICT> dict;
-    if (SerializableDict::TryLoadFromFile<DICT>(fileName, &dict)) {
-      return dict;
-    }
+  DictPtr LoadDictWithPaths(const std::string& cachePrefix,
+                            const std::string& fileName) {
+    std::vector<std::string> candidates;
+    candidates.push_back(fileName);
     for (const std::string& dirPath : paths) {
-      std::string path = dirPath + '/' + fileName;
+      candidates.push_back(dirPath + '/' + fileName);
+    }
+
+    for (const std::string& path : candidates) {
+      std::string cacheKey = cachePrefix;
+      cacheKey.push_back('\n');
+      if (!GetFileCacheKey(path, &cacheKey)) {
+        continue;
+      }
+      {
+        std::lock_guard<std::mutex> lock(DictCacheMutex());
+        PruneExpiredDictCache();
+        const auto cached = DictCache().find(cacheKey);
+        if (cached != DictCache().end()) {
+          DictPtr dict = cached->second.lock();
+          if (dict != nullptr) {
+            return dict;
+          }
+        }
+      }
+
+      std::shared_ptr<DICT> dict;
       if (SerializableDict::TryLoadFromFile<DICT>(path, &dict)) {
-        return dict;
+        std::lock_guard<std::mutex> lock(DictCacheMutex());
+        PruneExpiredDictCache();
+        std::weak_ptr<Dict>& cached = DictCache()[cacheKey];
+        DictPtr cachedDict = cached.lock();
+        if (cachedDict == nullptr) {
+          cached = dict;
+          return dict;
+        }
+        return cachedDict;
       }
     }
     throw FileNotFound(fileName);
@@ -198,16 +300,16 @@ public:
   DictPtr LoadDictFromFile(const std::string& type,
                            const std::string& fileName) {
     if (type == "text") {
-      DictPtr dict = LoadDictWithPaths<TextDict>(fileName);
+      DictPtr dict = LoadDictWithPaths<TextDict>("text", fileName);
       return MarisaDict::NewFromDict(*dict.get());
     }
 #ifdef ENABLE_DARTS
     if (type == "ocd") {
-      return LoadDictWithPaths<DartsDict>(fileName);
+      return LoadDictWithPaths<DartsDict>("ocd", fileName);
     }
 #endif
     if (type == "ocd2") {
-      return LoadDictWithPaths<MarisaDict>(fileName);
+      return LoadDictWithPaths<MarisaDict>("ocd2", fileName);
     }
     throw InvalidFormat("Unknown dictionary type: " + type);
     return nullptr;

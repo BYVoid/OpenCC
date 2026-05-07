@@ -127,7 +127,7 @@ cc_library(
     hdrs = ["Conversion.hpp"],
     deps = [
         ":common",
-        ":dict",
+        ":prefix_match",
         ":segmentation",
     ],
 )
@@ -340,7 +340,20 @@ cc_library(
     deps = [
         ":common",
         ":dict_group",
+        ":prefix_match",
         ":segmentation",
+    ],
+)
+
+cc_library(
+    name = "prefix_match",
+    srcs = ["PrefixMatch.cpp"],
+    hdrs = ["PrefixMatch.hpp"],
+    deps = [
+        ":common",
+        ":dict",
+        ":lexicon",
+        ":utf8_util",
     ],
 )
 

@@ -1,0 +1,94 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "config",
+    srcs = glob(["data/config/*.json"]),
+)
+
+filegroup(
+    name = "resources",
+    srcs = [
+        "//plugins/jieba/deps/cppjieba:dict",
+        ":jieba_merged_dict",
+    ],
+)
+
+filegroup(
+    name = "testcases",
+    srcs = ["tests/data/jieba_comparison_testcases.json"],
+)
+
+cc_binary(
+    name = "opencc-jieba",
+    srcs = [
+        "include/JiebaSegmentation.hpp",
+        "src/JiebaSegmentation.cpp",
+        "src/JiebaSegmentationPlugin.cpp",
+    ],
+    copts = [
+        "-Iplugins/jieba/include",
+        "-Isrc",
+    ],
+    defines = ["OPENCC_PLUGIN_BUILD"],
+    includes = ["include"],
+    linkopts = select({
+        "@platforms//os:macos": ["-Wl,-S"],
+        "@platforms//os:windows": [],
+        "//conditions:default": ["-Wl,-s"],
+    }),
+    linkshared = True,
+    deps = [
+        "//plugins/jieba/deps/cppjieba:cppjieba",
+        "//src:common",
+        "//src:exception",
+        "//src:marisa_dict",
+        "//src:plugin_api",
+        "//src:segmentation",
+        "//src:segments",
+        "//src:utf8_util",
+    ],
+)
+
+genrule(
+    name = "jieba_merged_dict",
+    srcs = [
+        "//plugins/jieba/deps/cppjieba:dict/jieba.dict.utf8",
+        "//plugins/jieba/deps/cppjieba:dict/user.dict.utf8",
+    ],
+    outs = ["jieba_dict/jieba_merged.ocd2"],
+    cmd = "$(location :cppjieba_dict) -i $(location //plugins/jieba/deps/cppjieba:dict/jieba.dict.utf8) -i $(location //plugins/jieba/deps/cppjieba:dict/user.dict.utf8) -o $@",
+    tools = [":cppjieba_dict"],
+)
+
+cc_binary(
+    name = "cppjieba_dict",
+    srcs = ["tools/cppjieba_dict.cpp"],
+    deps = [
+        "//src:dict",
+        "//src:dict_entry",
+        "//src:lexicon",
+        "//src:marisa_dict",
+    ],
+)
+
+cc_test(
+    name = "jieba_plugin_integration_test",
+    srcs = ["tests/JiebaPluginIntegrationTest.cpp"],
+    data = [
+        ":config",
+        ":opencc-jieba",
+        ":resources",
+        ":testcases",
+        "//data/dictionary:binary_dictionaries",
+        "//src/tools:command_line",
+    ],
+    defines = ["BAZEL"],
+    deps = [
+        "//test:portable_util",
+        "@bazel_tools//tools/cpp/runfiles",
+        "@googletest//:gtest_main",
+        "@rapidjson",
+    ],
+)

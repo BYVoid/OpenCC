@@ -5,7 +5,7 @@
  * @license
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2026 Carbo Kuo and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,36 @@
  * Node.js language binding
  */
 
-var path = require('path');
-var bindingPath = require('node-pre-gyp').find(require.resolve('../package.json'));
-var binding = require(bindingPath);
+const path = require('path');
+const fs = require('fs');
+const nodeGypBuild = require('node-gyp-build');
+const bindingPath = nodeGypBuild.path(path.join(__dirname, '..'));
+const binding = require(bindingPath);
 
-var assetsPath = path.dirname(bindingPath);
-var getConfigPath = function (config) {
-  var configPath = config;
+const getAssetsPath = function (bindingPath) {
+  const bindingDir = path.dirname(bindingPath);
+  const prebuildsDir = path.dirname(bindingDir);
+  if (path.basename(prebuildsDir) === 'prebuilds') {
+    const sharedAssetsPath = path.join(prebuildsDir, 'assets');
+    if (fs.existsSync(sharedAssetsPath)) {
+      return sharedAssetsPath;
+    }
+  }
+  return bindingDir;
+};
+
+// Detect optional opencc-jieba plugin package.
+// When installed, jieba-based configs (e.g. s2twp_jieba.json) become available.
+let jiebaInfo = null;
+try {
+  jiebaInfo = require('opencc-jieba');
+} catch (e) {
+  // opencc-jieba not installed — jieba configs won't be available.
+}
+
+const assetsPath = getAssetsPath(bindingPath);
+const getConfigPath = function (config) {
+  let configPath = config;
   if (config[0] !== '/' && config[1] !== ':') {
     // Resolve relative path
     configPath = path.join(assetsPath, config);
@@ -41,19 +64,88 @@ var getConfigPath = function (config) {
 };
 
 /**
+ * Recursively resolve all dict "file" paths in a config object to absolute
+ * paths under the given base directory.
+ * @param {Object} dict - A dict node from the config JSON.
+ * @param {string} baseDir - Directory to resolve relative paths against.
+ */
+function patchDictPaths(dict, baseDir) {
+  if (!dict) return;
+  if (dict.type === 'group' && Array.isArray(dict.dicts)) {
+    for (const d of dict.dicts) {
+      patchDictPaths(d, baseDir);
+    }
+  } else if (dict.file && !path.isAbsolute(dict.file)) {
+    dict.file = path.join(baseDir, dict.file);
+  }
+}
+
+/**
+ * Patch all relative paths in a config JSON object to absolute paths.
+ *
+ * - segmentation resources + __plugin_library → jieba package
+ * - conversion_chain dict files → main opencc package assets
+ *
+ * @param {Object} config - Parsed config JSON object (modified in-place).
+ * @param {Object} jieba - Info from the opencc-jieba package.
+ * @param {string} mainAssetsDir - Main opencc package assets directory.
+ */
+function patchConfigPaths(config, jieba, mainAssetsDir) {
+  // Inject explicit plugin library path (skips dlopen search in C++)
+  if (config.segmentation) {
+    config.segmentation.__plugin_library = jieba.pluginLibrary;
+    // Absolutify segmentation resource paths (dict_path, model_path, etc.)
+    if (config.segmentation.resources) {
+      const res = config.segmentation.resources;
+      for (const key of Object.keys(res)) {
+        if (!path.isAbsolute(res[key])) {
+          res[key] = path.join(jieba.dataDir, res[key]);
+        }
+      }
+    }
+  }
+  // Absolutify conversion_chain dict file paths
+  if (Array.isArray(config.conversion_chain)) {
+    for (const step of config.conversion_chain) {
+      patchDictPaths(step.dict, mainAssetsDir);
+    }
+  }
+}
+
+/**
  * OpenCC Node.js API
  *
  * @class OpenCC
  * @constructor
  * @ingroup node_api
  */
-var OpenCC = module.exports = function (config) {
+const OpenCC = module.exports = function (config) {
   if (!config) {
     config = 's2t.json';
   }
+
+  // When opencc-jieba is installed, check if the requested config is a jieba
+  // config. If so, load its JSON, patch all paths to absolute, and pass the
+  // patched JSON string directly to the C++ layer via NewFromString.
+  if (jiebaInfo && config[0] !== '/' && config[1] !== ':') {
+    const jiebaConfigPath = path.join(jiebaInfo.dataDir, config);
+    if (fs.existsSync(jiebaConfigPath)) {
+      const raw = JSON.parse(fs.readFileSync(jiebaConfigPath, 'utf-8'));
+      patchConfigPaths(raw, jiebaInfo, assetsPath);
+      this.handler = new binding.Opencc(
+        JSON.stringify(raw),
+        jiebaInfo.dataDir + '/'
+      );
+      return;
+    }
+  }
+
   config = getConfigPath(config);
   this.handler = new binding.Opencc(config);
 };
+
+// This is to support both CommonJS and ES module.
+OpenCC.OpenCC = OpenCC;
 
 /**
  * The version of OpenCC library.
@@ -73,13 +165,12 @@ OpenCC.version = binding.Opencc.version();
  * @param outputFileName Output dictionary filename.
  * @param formatFrom Input dictionary format.
  * @param formatTo Input dictionary format.
- * @return Converted text.
  * @ingroup node_api
  */
-OpenCC.generateDict = function(inputFileName, outputFileName,
-    formatFrom, formatTo) {
+OpenCC.generateDict = function (inputFileName, outputFileName,
+  formatFrom, formatTo) {
   return binding.Opencc.generateDict(inputFileName, outputFileName,
-    formatFrom, formatTo); 
+    formatFrom, formatTo);
 }
 
 /**
@@ -119,8 +210,8 @@ OpenCC.prototype.convertSync = function (input) {
  */
 OpenCC.prototype.convertPromise = function (input) {
   const self = this;
-  return new Promise(function(resolve, reject) {
-    self.handler.convert(input.toString(), function(err, text) {
+  return new Promise(function (resolve, reject) {
+    self.handler.convert(input.toString(), function (err, text) {
       if (err) reject(err);
       else resolve(text);
     });

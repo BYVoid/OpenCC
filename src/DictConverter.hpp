@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2017 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2017 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,11 @@
 
 namespace opencc {
 /**
-* Converts a dictionary from a format to another.
-* @ingroup opencc_cpp_api
-*/
-OPENCC_EXPORT void ConvertDictionary(const string inputFileName, const string outputFileName,
-                       const string formatFrom, const string formatTo);
-}
+ * Converts a dictionary from a format to another.
+ * @ingroup opencc_cpp_api
+ */
+OPENCC_EXPORT void ConvertDictionary(const std::string& inputFileName,
+                                     const std::string& outputFileName,
+                                     const std::string& formatFrom,
+                                     const std::string& formatTo);
+} // namespace opencc

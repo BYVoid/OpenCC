@@ -1,0 +1,50 @@
+name: Windows CI
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+  pull_request:
+    types: [opened, synchronize]
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cmake:
+    name: CMake - MSVC ${{ matrix.platform }}
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        platform: [x64, Win32]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Build in Release Mode
+        continue-on-error: true
+        run: |
+          cmake -S . -B Release -A ${{ matrix.platform }}
+          cmake --build Release --config Release
+
+      - name: Build in Debug Mode
+        run: |
+          cmake -S. -B Debug `
+            -A ${{ matrix.platform }} `
+            -DENABLE_ASAN=ON `
+            -DENABLE_UBSAN=ON
+          cmake --build Debug --config Debug
+
+      - name: Run Tests (Debug)
+        run: ctest --test-dir Debug --build-config Debug --output-on-failure

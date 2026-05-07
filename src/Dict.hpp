@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2020 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,64 +18,84 @@
 
 #pragma once
 
+#include <list>
+
 #include "Common.hpp"
 #include "DictEntry.hpp"
 
 namespace opencc {
 /**
-* Abstract class of dictionary
-* @ingroup opencc_cpp_api
-*/
+ * Abstract class of dictionary
+ * @ingroup opencc_cpp_api
+ */
 class OPENCC_EXPORT Dict {
 public:
   /**
-  * Matches a word exactly and returns the DictEntry or Optional::Null().
-  */
-  virtual Optional<const DictEntry*> Match(const char* word) const = 0;
+   * Matches a word exactly and returns the DictEntry or Optional::Null().
+   */
+  virtual Optional<const DictEntry*> Match(const char* word,
+                                           size_t len) const = 0;
 
   /**
-  * Matches a word exactly and returns the DictEntry or Optional::Null().
-  */
-  Optional<const DictEntry*> Match(const string& word) const {
-    return Match(word.c_str());
+   * Matches a word exactly and returns the DictEntry or Optional::Null().
+   */
+  Optional<const DictEntry*> Match(const std::string& word) const {
+    return Match(word.c_str(), word.length());
   }
 
   /**
-  * Matches the longest matched prefix of a word.
-  * For example given a dictionary having "a", "an", "b", "ba", "ban", "bana",
-  * the longest prefix of "banana" matched is "bana".
-  */
-  virtual Optional<const DictEntry*> MatchPrefix(const char* word) const;
+   * Matches the longest matched prefix of a word.
+   * For example given a dictionary having "a", "an", "b", "ba", "ban", "bana",
+   * the longest prefix of "banana" matched is "bana".
+   */
+  virtual Optional<const DictEntry*> MatchPrefix(const char* word,
+                                                 size_t len) const;
 
   /**
-  * Matches the longest matched prefix of a word.
-  */
-  Optional<const DictEntry*> MatchPrefix(const string& word) const {
-    return MatchPrefix(word.c_str());
+   * Matches the longest matched prefix of a word.
+   */
+  Optional<const DictEntry*> MatchPrefix(const char* word) const {
+    return MatchPrefix(word, KeyMaxLength());
   }
 
   /**
-  * Returns all matched prefixes of a word, sorted by the length (desc).
-  * For example given a dictionary having "a", "an", "b", "ba", "ban", "bana",
-  * all the matched prefixes of "banana" are "bana", "ban", "ba", "b".
-  */
-  virtual vector<const DictEntry*> MatchAllPrefixes(const char* word) const;
-
-  /**
-  * Returns all matched prefixes of a word, sorted by the length (desc).
-  */
-  vector<const DictEntry*> MatchAllPrefixes(const string& word) const {
-    return MatchAllPrefixes(word.c_str());
+   * Matches the longest matched prefix of a word.
+   */
+  Optional<const DictEntry*> MatchPrefix(const std::string& word) const {
+    return MatchPrefix(word.c_str(), word.length());
   }
 
   /**
-  * Returns the length of the longest key in the dictionary.
-  */
+   * Returns all matched prefixes of a word, sorted by the length (desc).
+   * For example given a dictionary having "a", "an", "b", "ba", "ban", "bana",
+   * all the matched prefixes of "banana" are "bana", "ban", "ba", "b".
+   */
+  virtual std::vector<const DictEntry*> MatchAllPrefixes(const char* word,
+                                                         size_t len) const;
+
+  /**
+   * Returns all matched prefixes of a word, sorted by the length (desc).
+   */
+  std::vector<const DictEntry*>
+  MatchAllPrefixes(const std::string& word) const {
+    return MatchAllPrefixes(word.c_str(), word.length());
+  }
+
+  /**
+   * Returns the length of the longest key in the dictionary.
+   */
   virtual size_t KeyMaxLength() const = 0;
 
   /**
-  * Returns all entries in the dictionary.
-  */
+   * Returns all entries in the dictionary.
+   */
   virtual LexiconPtr GetLexicon() const = 0;
+
+  /**
+   * Returns child dictionaries when this dictionary is a group.
+   */
+  virtual const std::list<DictPtr>* GetDictGroupItems() const {
+    return nullptr;
+  }
 };
-}
+} // namespace opencc

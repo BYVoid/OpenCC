@@ -1,0 +1,54 @@
+name: CMake
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    permissions:
+      contents: read
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, macos-14]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compute version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(bash scripts/compute-version.sh)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Computed version: $VERSION"
+      - name: make build
+        run: make build VERBOSE=1 REL_BUILD_DOCUMENTATION=OFF
+      - name: make test
+        run: make test VERBOSE=1
+      - name: make benchmark
+        run: make benchmark VERBOSE=1
+      - name: Test standalone plugin build
+        run: |
+          make PREFIX=$PWD/install install VERBOSE=1
+          cmake -S plugins/jieba -B build-standalone \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DOpenCC_DIR=$PWD/install/lib/cmake/opencc
+          cmake --build build-standalone
+      - name: upload artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencc-${{ env.VERSION }}-cmake-${{ matrix.os }}
+          path: |
+            build/rel/**
+            build/dbg/**
+            build/perf/**

@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,12 @@
 
 namespace opencc {
 /**
-* Abstract segmentation
-* @ingroup opencc_cpp_api
-*/
+ * Abstract segmentation
+ * @ingroup opencc_cpp_api
+ */
 class OPENCC_EXPORT Segmentation {
 public:
-  virtual SegmentsPtr Segment(const string& text) const = 0;
+  virtual ~Segmentation() {}
+  virtual SegmentsPtr Segment(const std::string& text) const = 0;
 };
-}
+} // namespace opencc

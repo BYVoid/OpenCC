@@ -1,0 +1,81 @@
+name: Windows Release for WinGet
+
+on:
+  push:
+    tags:
+      - "ver.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version or tag, for example 1.2.0, 1.2.1-rc1, 1.2.1-alpha1, or ver.1.2.0"
+        required: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64
+
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.version }}
+          GIT_REF_TYPE: ${{ github.ref_type }}
+          GIT_REF_NAME: ${{ github.ref_name }}
+        run: |
+          $value = $env:INPUT_VERSION
+          if (-not $value -and $env:GIT_REF_TYPE -eq "tag") {
+            $value = $env:GIT_REF_NAME
+          }
+          if ($value.StartsWith("ver.")) {
+            $clean = $value.Substring(4)
+          } elseif ($value.StartsWith("v")) {
+            $clean = $value.Substring(1)
+          } else {
+            $clean = $value
+          }
+          "value=$clean" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Build portable release and WinGet manifests
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
+          GITHUB_REPO: ${{ github.repository }}
+        run: |
+          ./scripts/release-windows-winget.ps1 `
+            -Version "$env:RELEASE_VERSION" `
+            -OutputDir release `
+            -GitHubRepository "$env:GITHUB_REPO" `
+            -PackageIdentifier "BYVoid.OpenCC" `
+            -Publisher "BYVoid"
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencc-winget-release-${{ steps.version.outputs.value }}
+          path: |
+            release/*.zip
+            release/*.sha256
+            release/winget-manifests/**
+
+      - name: Publish GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            release/*.zip
+            release/*.sha256
+          generate_release_notes: true

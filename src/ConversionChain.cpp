@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2026 Carbo Kuo and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
  * limitations under the License.
  */
 
+#include <list>
+
 #include "ConversionChain.hpp"
 #include "Segments.hpp"
 
 using namespace opencc;
 
-ConversionChain::ConversionChain(const list<ConversionPtr> _conversions)
+ConversionChain::ConversionChain(const std::list<ConversionPtr> _conversions)
     : conversions(_conversions) {}
 
 SegmentsPtr ConversionChain::Convert(const SegmentsPtr& input) const {
@@ -30,4 +32,42 @@ SegmentsPtr ConversionChain::Convert(const SegmentsPtr& input) const {
     output = conversion->Convert(output);
   }
   return output;
+}
+
+void ConversionChain::AppendConvertedSegment(const char* segment,
+                                             std::string* output) const {
+  if (conversions.empty()) {
+    output->append(segment);
+    return;
+  }
+
+  auto conversion = conversions.begin();
+  auto lastConversion = conversions.end();
+  --lastConversion;
+  if (conversion == lastConversion) {
+    (*conversion)->AppendConverted(segment, output);
+    return;
+  }
+
+  std::string converted;
+  (*conversion)->AppendConverted(segment, &converted);
+  ++conversion;
+  for (; conversion != lastConversion; ++conversion) {
+    std::string next;
+    (*conversion)->AppendConverted(converted.c_str(), &next);
+    converted.swap(next);
+  }
+  (*lastConversion)->AppendConverted(converted.c_str(), output);
+}
+
+std::vector<SegmentsPtr>
+ConversionChain::ConvertWithTrace(const SegmentsPtr& input) const {
+  std::vector<SegmentsPtr> trace;
+  trace.reserve(conversions.size());
+  SegmentsPtr output = input;
+  for (auto conversion : conversions) {
+    output = conversion->Convert(output);
+    trace.push_back(output);
+  }
+  return trace;
 }

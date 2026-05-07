@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 BYVoid <byvoid@byvoid.com>
+ * Copyright 2015-2026 Carbo Kuo and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#include "TestUtils.hpp"
 #include "UTF8StringSlice.hpp"
+#include "TestUtils.hpp"
 
 namespace opencc {
 
@@ -26,7 +26,7 @@ protected:
   UTF8StringSliceTest()
       : text("天行健，君子以自強不息。地勢坤，君子以厚德載物。"), empty(""){};
 
-  const UTF8StringSlice text;
+  UTF8StringSlice text;
   const UTF8StringSlice empty;
 };
 
@@ -62,7 +62,6 @@ TEST_F(UTF8StringSliceTest, Compare) {
 }
 
 TEST_F(UTF8StringSliceTest, MoveRight) {
-  UTF8StringSlice text = this->text;
   text.MoveRight();
   EXPECT_EQ(UTF8StringSlice("行健，君子以自強不息。地勢坤，君子以厚德載物。"),
             text);
@@ -75,7 +74,6 @@ TEST_F(UTF8StringSliceTest, MoveRight) {
 }
 
 TEST_F(UTF8StringSliceTest, MoveLeft) {
-  UTF8StringSlice text = this->text;
   text.MoveLeft();
   EXPECT_EQ(UTF8StringSlice("天行健，君子以自強不息。地勢坤，君子以厚德載物"),
             text);

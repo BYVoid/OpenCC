@@ -1,0 +1,48 @@
+version: "{build}"
+skip_branch_with_pr: true
+skip_tags: true
+build: off
+
+os: Visual Studio 2019
+
+environment:
+  matrix:
+    # Build Node.js
+    - nodejs_version: stable
+    - nodejs_version: 22
+
+    # Build plain C++
+    - nodejs_version: none
+
+platform:
+  - x64
+
+for:
+- matrix:
+    except:
+      - nodejs_version: none
+  install:
+    - ps: Install-Product node $env:nodejs_version $env:platform
+    - npm -g i npm@latest
+  build_script:
+    - appveyor-retry call npm install --build-from-source
+  test_script:
+    - npm test
+
+- matrix:
+    only:
+      - nodejs_version: none
+  build_script:
+    - SET arch=%platform%
+    - IF "%platform%"=="x86" SET arch=Win32
+
+    - cmake -A%arch% -S. -Bbuild -DCMAKE_INSTALL_PREFIX:PATH=. -DENABLE_GTEST:BOOL=ON -DENABLE_BENCHMARK:BOOL=ON -DCMAKE_BUILD_TYPE=Release
+    - cmake --build build --config Release --target install
+  test_script:
+    - cd build
+    - ctest --verbose -C Release
+  after_build:
+    - 7z a OpenCC.zip build/bin build/include build/lib build/share
+  artifacts:
+  - path: OpenCC.zip
+    name: OpenCC

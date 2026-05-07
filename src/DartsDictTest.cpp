@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 BYVoid <byvoid@byvoid.com>
+ * Copyright 2015-2026 Carbo Kuo and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 #include "DartsDict.hpp"
+#include "TestUtilsUTF8.hpp"
 #include "TextDictTestBase.hpp"
 
 namespace opencc {
@@ -27,8 +28,19 @@ protected:
       : dartsDict(DartsDict::NewFromDict(*textDict.get())),
         fileName("dict.ocd"){};
 
+  // Write a crafted OCD file with controllable dartsSize.
+  static std::string WriteMalformedDartsFile(size_t dartsSize) {
+    const std::string path = "malformed_darts.ocd";
+    FILE* fp = fopen(path.c_str(), "wb");
+    const char* header = "OPENCCDARTS1";
+    fwrite(header, sizeof(char), strlen(header), fp);
+    fwrite(&dartsSize, sizeof(size_t), 1, fp);
+    fclose(fp);
+    return path;
+  }
+
   const DartsDictPtr dartsDict;
-  const string fileName;
+  const std::string fileName;
 };
 
 TEST_F(DartsDictTest, DictTest) { TestDict(dartsDict); }
@@ -40,18 +52,38 @@ TEST_F(DartsDictTest, Serialization) {
 TEST_F(DartsDictTest, Deserialization) {
   const DartsDictPtr& deserialized =
       SerializableDict::NewFromFile<DartsDict>(fileName);
+  TestDict(deserialized);
+
   const LexiconPtr& lex1 = dartsDict->GetLexicon();
   const LexiconPtr& lex2 = deserialized->GetLexicon();
 
   // Compare every entry
   EXPECT_EQ(lex1->Length(), lex2->Length());
   for (size_t i = 0; i < lex1->Length(); i++) {
-    EXPECT_EQ(string(lex1->At(i)->Key()), lex2->At(i)->Key());
+    EXPECT_EQ(lex1->At(i)->Key(), lex2->At(i)->Key());
     EXPECT_EQ(lex1->At(i)->NumValues(), lex2->At(i)->NumValues());
   }
 
   const TextDictPtr deserializedTextDict(new TextDict(lex2));
   TestDict(deserializedTextDict);
+}
+
+TEST_F(DartsDictTest, ExactMatch) {
+  auto there = dartsDict->Match("積羽沉舟", 12);
+  EXPECT_FALSE(there.IsNull());
+  auto dictEntry = there.Get();
+  EXPECT_EQ(1, dictEntry->NumValues());
+  EXPECT_EQ(utf8("羣輕折軸"), dictEntry->GetDefault());
+
+  auto nowhere = dartsDict->Match("積羽沉舟衆口鑠金", 24);
+  EXPECT_TRUE(nowhere.IsNull());
+}
+
+// Test that dartsSize exceeding file size triggers InvalidFormat (#816).
+TEST_F(DartsDictTest, RejectsHugeDartsSize) {
+  std::string path = WriteMalformedDartsFile(0x1300000000000000ULL);
+  EXPECT_THROW(SerializableDict::NewFromFile<DartsDict>(path), InvalidFormat);
+  std::remove(path.c_str());
 }
 
 } // namespace opencc

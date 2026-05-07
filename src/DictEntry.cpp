@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2026 Carbo Kuo and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@
 
 using namespace opencc;
 
-string MultiValueDictEntry::ToString() const {
+std::string MultiValueDictEntry::ToString() const {
   // TODO escape space
   size_t i = 0;
   size_t length = Values().size();
   std::ostringstream buffer;
   buffer << Key() << '\t';
-  for (const char* value : Values()) {
+  for (const std::string& value : Values()) {
     buffer << value;
     if (i < length - 1) {
       buffer << ' ';

@@ -1,7 +1,7 @@
 #
 # Open Chinese Convert
 #
-# Copyright 2010-2015 BYVoid <byvoid@byvoid.com>
+# Copyright 2010-2020 Carbo Kuo <byvoid@byvoid.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,18 +17,31 @@
 #
 
 PREFIX = /usr
+REL_BUILD_DOCUMENTATION ?= OFF
 
-.PHONY: build clean node test xcode-build
+.PHONY: bazel build clean doc node test xcode-build
 
 build:
 	mkdir -p build/rel
 	(cd build/rel; cmake \
-	-DBUILD_DOCUMENTATION:BOOL=ON \
+	-DBUILD_DOCUMENTATION:BOOL=${REL_BUILD_DOCUMENTATION} \
 	-DENABLE_GTEST:BOOL=OFF \
+	-DENABLE_BENCHMARK:BOOL=OFF \
 	-DCMAKE_BUILD_TYPE=Release \
 	-DCMAKE_INSTALL_PREFIX=${PREFIX} \
 	../..)
 	make -C build/rel VERBOSE=${VERBOSE} PREFIX=${PREFIX}
+
+doc:
+	mkdir -p build/doc
+	(cd build/doc; cmake \
+	-DBUILD_DOCUMENTATION:BOOL=ON \
+	-DENABLE_GTEST:BOOL=OFF \
+	-DENABLE_BENCHMARK:BOOL=OFF \
+	-DCMAKE_BUILD_TYPE=Release \
+	-DCMAKE_INSTALL_PREFIX=${PREFIX} \
+	../..)
+	make -C build/doc apidoc VERBOSE=${VERBOSE} PREFIX=${PREFIX}
 
 package: build
 	make -C build/rel package_source VERBOSE=${VERBOSE}
@@ -39,12 +52,26 @@ test:
 	(cd build/dbg; cmake \
 	-DBUILD_DOCUMENTATION:BOOL=OFF \
 	-DENABLE_GTEST:BOOL=ON \
+	-DENABLE_BENCHMARK:BOOL=OFF \
 	-DCMAKE_BUILD_TYPE=Debug \
 	-DCMAKE_INSTALL_PREFIX=`pwd`/root \
 	../..)
 	make -C build/dbg VERBOSE=${VERBOSE}
 	(cd build/dbg; ctest --verbose)
 	make -C build/dbg install VERBOSE=${VERBOSE}
+
+benchmark:
+	mkdir -p build/perf
+	(cd build/perf; cmake \
+	-DBUILD_DOCUMENTATION:BOOL=OFF \
+	-DENABLE_GTEST:BOOL=OFF \
+	-DENABLE_BENCHMARK:BOOL=ON \
+	-DBUILD_OPENCC_JIEBA_PLUGIN:BOOL=ON \
+	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+	-DCMAKE_INSTALL_PREFIX=`pwd`/root \
+	../..)
+	make -C build/perf VERBOSE=${VERBOSE} PREFIX=${PREFIX}
+	(cd build/perf; ctest --verbose)
 
 node:
 	node-gyp configure
@@ -59,13 +86,38 @@ xcode-build:
 	-G "Xcode" \
 	-DBUILD_DOCUMENTATION:BOOL=OFF \
 	-DENABLE_GTEST:BOOL=ON \
+	-DENABLE_BENCHMARK:BOOL=ON \
 	..; \
 	xcodebuild build)
 
-test-all: test node-test
+python-build:
+	echo "No need to build"
+
+python-install: python-build
+	python -m pip install .
+
+python-dist: python-build
+	python -m build
+
+python-test: python-build
+	cd python; pytest .
+
+test-all: test node-test python-test
+
+format:
+	find "src" "node" "test" -iname "*.hpp" -o -iname "*.cpp" -o -iname "*.cc" \
+	-o -iname "*.c" -o -iname "*.h" \
+	| xargs clang-format -i
 
 clean:
-	rm -rf build xcode
+	rm -rf build xcode python/opencc/clib *.egg-info bazel-*
 
 install: build
 	make -C build/rel install VERBOSE=${VERBOSE} PREFIX=${PREFIX}
+
+bazel:
+	bazel build //:opencc
+	bazel test --test_output=all //src/... //data/... //test/...
+
+bazel-clean:
+	bazel clean --expunge

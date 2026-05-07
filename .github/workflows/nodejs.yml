@@ -1,0 +1,68 @@
+name: Node.js
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    permissions:
+      contents: read
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        # Supported Node.js versions on latest hosted runners
+        os: [ubuntu-latest, macos-latest]
+        node-version: [20, 22, 24, 25]
+        # LTS coverage on macOS 14 (ARM64)
+        include:
+          - os: macos-14
+            node-version: 22
+          - os: windows-latest
+            node-version: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compute version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(bash scripts/compute-version.sh)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Computed version: $VERSION"
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm test
+      - name: Build Node.js prebuild
+        if: ${{ matrix.node-version == 22 }}
+        run: npm run prebuild
+      - name: Verify Node.js prebuild layout
+        if: ${{ matrix.node-version == 22 }}
+        run: |
+          node -e "const fs=require('fs'); const path=require('path'); const dirs=fs.readdirSync('prebuilds',{withFileTypes:true}).filter((entry)=>entry.isDirectory()).map((entry)=>entry.name); if(!dirs.includes('assets')) throw new Error('missing prebuilds/assets'); const platformDirs=dirs.filter((name)=>name!=='assets'); if(platformDirs.length!==1) throw new Error('expected one platform prebuild directory, found '+platformDirs.join(',')); const addon=path.join('prebuilds', platformDirs[0], 'opencc.node'); if(!fs.existsSync(addon)) throw new Error('missing '+addon); console.log('Verified '+addon+' with shared assets');"
+      - name: Test Node.js prebuild
+        if: ${{ matrix.node-version == 22 }}
+        env:
+          PREBUILDS_ONLY: 1
+        run: npm test
+      - name: upload artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencc-${{ env.VERSION }}-nodejs-${{ matrix.os }}-node-${{ matrix.node-version }}
+          path: |
+            node/build/**
+            prebuilds/**
+            **/npm-debug.log

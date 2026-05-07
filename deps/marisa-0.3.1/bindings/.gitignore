@@ -1,0 +1,10 @@
+*/sample.dic
+perl/MYMETA.*
+perl/blib/
+perl/marisa.bs
+perl/pm_to_blib
+python*/__pycache__/
+python*/build/
+python*/dist/
+python*/marisa.egg-info/
+ruby/.sitearchdir.time

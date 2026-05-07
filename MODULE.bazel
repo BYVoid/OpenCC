@@ -1,0 +1,44 @@
+"Open Chinese Convert"
+
+module(
+    name = "opencc",
+    version = "1.3.1",
+    compatibility_level = 1,
+)
+
+bazel_dep(name = "darts-clone", version = "0.32")
+bazel_dep(name = "googletest", version = "1.17.0.bcr.2", dev_dependency = True)
+bazel_dep(name = "marisa-trie", version = "0.3.1.bcr.1")
+bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "pybind11_bazel", version = "3.0.1")
+bazel_dep(name = "rapidjson", version = "1.1.0.bcr.20250205")
+bazel_dep(name = "rules_cc", version = "0.2.17")
+bazel_dep(name = "rules_python", version = "1.9.0")
+bazel_dep(name = "tclap", version = "1.2.5.bcr.1")
+bazel_dep(name = "toolchains_buildbuddy", version = "0.0.4", dev_dependency = True)
+
+# Node.js native addon build dependencies (node-addon-api headers + Node.js 20 headers)
+node_deps = use_extension("//node:deps.bzl", "node_deps")
+use_repo(node_deps, "node_addon_api", "node_headers")
+
+buildbuddy = use_extension("@toolchains_buildbuddy//:extensions.bzl", "buildbuddy", dev_dependency = True)
+
+register_toolchains(
+    "@toolchains_buildbuddy//toolchains/cc:ubuntu_gcc_arm64",
+    "@toolchains_buildbuddy//toolchains/cc:ubuntu_gcc_x86_64",
+    dev_dependency = True,
+)
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    python_version = "3.12",
+)
+use_repo(python, "python_3_12", "pythons_hub")
+register_toolchains("@pythons_hub//:all")
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "pip",
+    python_version = "3.12",
+    requirements_lock = "//python/tests:requirements_lock.txt",
+)
+use_repo(pip, "pip")

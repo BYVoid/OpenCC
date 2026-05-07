@@ -1,0 +1,51 @@
+# Automatically apply platform-specific config sections (e.g. build:windows)
+common --enable_platform_specific_config
+
+# Enable C++17 for MSVC on Windows
+build:windows --cxxopt=/std:c++17
+build:windows --host_cxxopt=/std:c++17
+
+# Enable C++17 for GCC/Clang on Linux and macOS
+build:linux --cxxopt=-std=c++17
+build:linux --host_cxxopt=-std=c++17
+build:macos --cxxopt=-std=c++17
+build:macos --host_cxxopt=-std=c++17
+
+# BuildBuddy.io: BES + remote cache (safe to use on any platform).
+# Pass the API key with both:
+#   --remote_header=x-buildbuddy-api-key=$BUILDBUDDY_API_KEY  (remote cache/exec)
+#   --bes_header=x-buildbuddy-api-key=$BUILDBUDDY_API_KEY     (build event stream)
+build:buildbuddy --bes_results_url=https://app.buildbuddy.io/invocation/
+build:buildbuddy --bes_backend=grpcs://remote.buildbuddy.io
+build:buildbuddy --remote_cache=grpcs://remote.buildbuddy.io
+build:buildbuddy --remote_cache_compression
+build:buildbuddy --remote_timeout=10m
+build:buildbuddy --build_metadata=VISIBILITY=PUBLIC
+
+build:linux-x86_64-remote --config=buildbuddy
+build:linux-x86_64-remote --remote_executor=grpcs://remote.buildbuddy.io
+build:linux-x86_64-remote --host_platform=@toolchains_buildbuddy//platforms:linux_x86_64
+build:linux-x86_64-remote --platforms=@toolchains_buildbuddy//platforms:linux_x86_64
+build:linux-x86_64-remote --extra_execution_platforms=@toolchains_buildbuddy//platforms:linux_x86_64
+build:linux-x86_64-remote --remote_download_minimal
+build:linux-x86_64-remote --define=EXECUTOR=remote
+
+build:linux-arm64-remote --config=buildbuddy
+build:linux-arm64-remote --remote_executor=grpcs://remote.buildbuddy.io
+build:linux-arm64-remote --host_platform=@toolchains_buildbuddy//platforms:linux_arm64
+build:linux-arm64-remote --platforms=@toolchains_buildbuddy//platforms:linux_arm64
+build:linux-arm64-remote --extra_execution_platforms=@toolchains_buildbuddy//platforms:linux_arm64
+build:linux-arm64-remote --remote_download_minimal
+build:linux-arm64-remote --define=EXECUTOR=remote
+
+# ── Node.js opencc.node prebuild configs ──────────────────────────────────────
+# Build opencc.node for Linux x64 using BuildBuddy remote execution.
+# Usage: bazel build --config=node-linux-x64 //node:opencc_node
+build:node-linux-x64 --config=linux-x86_64-remote
+
+# Build opencc.node for Linux arm64 using BuildBuddy remote execution.
+# Usage: bazel build --config=node-linux-arm64 //node:opencc_node
+build:node-linux-arm64 --config=linux-arm64-remote
+
+# Optional user/CI overrides (e.g. injecting BuildBuddy API key in CI).
+try-import %workspace%/.bazelrc.user

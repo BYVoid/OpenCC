@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2026 Carbo Kuo and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,28 +17,56 @@
  */
 
 #include "Conversion.hpp"
-#include "Dict.hpp"
+#include "PrefixMatch.hpp"
+#include "Segments.hpp"
+#include "UTF8Util.hpp"
 
 using namespace opencc;
 
-string Conversion::Convert(const char* phrase) const {
-  std::ostringstream buffer;
+Conversion::Conversion(DictPtr _dict)
+    : dict(_dict), prefixMatch(new PrefixMatch(_dict)) {}
+
+std::string Conversion::Convert(const char* phrase) const {
+  std::string buffer;
+  AppendConverted(phrase, &buffer);
+  return buffer;
+}
+
+void Conversion::AppendConverted(const char* phrase, std::string* output) const {
+  // Calculate string end to prevent reading beyond null terminator
+  const char* phraseEnd = phrase;
+  while (*phraseEnd != '\0') {
+    phraseEnd++;
+  }
+  const size_t phraseLength = phraseEnd - phrase;
+  output->reserve(output->size() + phraseLength + phraseLength / 5);
+
   for (const char* pstr = phrase; *pstr != '\0';) {
-    Optional<const DictEntry*> matched = dict->MatchPrefix(pstr);
+    size_t remainingLength = phraseEnd - pstr;
+    const PrefixMatch::Match matched =
+        prefixMatch->MatchPrefix(pstr, remainingLength);
     size_t matchedLength;
-    if (matched.IsNull()) {
+    if (!matched.matched) {
       matchedLength = UTF8Util::NextCharLength(pstr);
-      buffer << UTF8Util::FromSubstr(pstr, matchedLength);
+      // Ensure we don't read beyond the null terminator
+      if (matchedLength > remainingLength) {
+        matchedLength = remainingLength;
+      }
+      output->append(pstr, matchedLength);
     } else {
-      matchedLength = matched.Get()->KeyLength();
-      buffer << matched.Get()->GetDefault();
+      matchedLength = matched.keyLength;
+      // Defensive: ensure dictionary key length does not exceed remaining input
+      // (MatchPrefix should already guarantee this, but defense in depth)
+      if (matchedLength > remainingLength) {
+        matchedLength = remainingLength;
+      }
+      output->append(*matched.value);
     }
     pstr += matchedLength;
   }
-  return buffer.str();
 }
 
-string Conversion::Convert(const string& phrase) const {
+std::string Conversion::Convert(const std::string& phrase) const {
   return Convert(phrase.c_str());
 }
 

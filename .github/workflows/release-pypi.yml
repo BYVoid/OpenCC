@@ -1,0 +1,53 @@
+name: Build and upload python package to PyPI
+
+on:
+  workflow_dispatch
+
+jobs:
+  release-pypi:
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-22.04-arm, macos-15-intel, macos-15, windows-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Compute version
+      id: version
+      shell: bash
+      run: |
+        VERSION=$(bash scripts/compute-version.sh)
+        echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+        echo "Computed version: $VERSION"
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Build package and upload (Linux)
+      if: runner.os == 'Linux'
+      run: bash release-pypi-linux.sh
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+
+    - name: Build package and upload (macOS)
+      if: runner.os == 'macOS'
+      run: bash release-pypi-macos.sh
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+
+    - name: Build package and upload (Windows)
+      if: runner.os == 'Windows'
+      run: ./release-pypi-windows.cmd
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}

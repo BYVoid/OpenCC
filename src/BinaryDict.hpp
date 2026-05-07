@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@
 
 namespace opencc {
 /**
-* Binary dictionary for faster deserialization
-* @ingroup opencc_cpp_api
-*/
+ * Binary dictionary for faster deserialization
+ * @ingroup opencc_cpp_api
+ */
 class OPENCC_EXPORT BinaryDict : public SerializableDict {
 public:
   BinaryDict(const LexiconPtr& _lexicon) : lexicon(_lexicon) {}
@@ -42,12 +42,12 @@ public:
 
 private:
   LexiconPtr lexicon;
-  string keyBuffer;
-  string valueBuffer;
+  std::string keyBuffer;
+  std::string valueBuffer;
 
-  void ConstructBuffer(string& keyBuffer, vector<size_t>& keyOffset,
-                       size_t& keyTotalLength, string& valueBuffer,
-                       vector<size_t>& valueOffset,
+  void ConstructBuffer(std::string& keyBuffer, std::vector<size_t>& keyOffset,
+                       size_t& keyTotalLength, std::string& valueBuffer,
+                       std::vector<size_t>& valueOffset,
                        size_t& valueTotalLength) const;
 };
-}
+} // namespace opencc

@@ -1,0 +1,14 @@
+# Open Chinese Convert (OpenCC) Dictionary
+# File: JPShinjitaiCharacters.txt
+# Format: key	value(s) (values separated by spaces)
+# License: Apache-2.0 (see LICENSE)
+# Source: https://github.com/ByVoid/OpenCC
+# Used in configs: jp2t.json
+
+両	兩 輛
+弁	辨 辯 瓣 辦 弁
+御	御 禦
+欠	缺 欠
+浜	濱 浜
+糸	絲 糸
+芸	藝 芸

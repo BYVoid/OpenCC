@@ -1,0 +1,73 @@
+name: Bazel
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    permissions:
+      contents: read
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    env:
+      BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compute version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(bash scripts/compute-version.sh)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Computed version: $VERSION"
+      - uses: bazelbuild/setup-bazelisk@v3
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Configure BuildBuddy
+        shell: bash
+        run: |
+          if [ -n "${BUILDBUDDY_API_KEY}" ]; then
+            {
+              echo "build --config=buildbuddy"
+              echo "build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
+              echo "build --bes_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
+            } >> .bazelrc.user
+            echo "BuildBuddy enabled."
+          else
+            echo "BUILDBUDDY_API_KEY not set; skipping BuildBuddy config (fork PR or missing secret)."
+          fi
+      - name: Build
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        shell: bash
+        env:
+          MSYS_NO_PATHCONV: 1
+        run: bazel build //:opencc //src/tools/... //plugins/...
+      - name: Test
+        shell: bash
+        env:
+          MSYS_NO_PATHCONV: 1
+        run: bazel test --test_output=all //src/... //data/... //test/... //python/... //plugins/...
+      - name: upload artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencc-${{ env.VERSION }}-bazel-${{ matrix.os }}
+          path: |
+            bazel-testlogs/**/*.log
+            bazel-testlogs/**

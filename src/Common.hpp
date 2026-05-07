@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,43 +23,26 @@
 #pragma warning(disable : 4251 4266 4350 4503 4512 4514 4710 4820)
 #endif
 
-#include <algorithm>
-#include <fstream>
-#include <functional>
-#include <iostream>
-#include <list>
-#include <map>
+#include <cstddef>
 #include <memory>
-#include <sstream>
 #include <string>
 #include <vector>
 
-#include <cassert>
-#include <cstddef>
-#include <cstdio>
-#include <cstring>
-#include <ctime>
-
-#include "Exception.hpp"
 #include "Export.hpp"
 #include "Optional.hpp"
-
-using std::list;
-using std::string;
-using std::vector;
+#include "opencc_config.h"
 
 // Forward decalarations and alias
 namespace opencc {
-class BinaryDict;
 class Config;
 class Conversion;
 class ConversionChain;
 class Converter;
-class DartsDict;
 class Dict;
 class DictEntry;
 class DictGroup;
 class Lexicon;
+class MarisaDict;
 class MultiValueDictEntry;
 class NoValueDictEntry;
 class Segmentation;
@@ -67,25 +50,39 @@ class Segments;
 class SerializableDict;
 class SingleValueDictEntry;
 class TextDict;
-typedef std::shared_ptr<BinaryDict> BinaryDictPtr;
 typedef std::shared_ptr<Conversion> ConversionPtr;
 typedef std::shared_ptr<ConversionChain> ConversionChainPtr;
 typedef std::shared_ptr<Converter> ConverterPtr;
-typedef std::shared_ptr<DartsDict> DartsDictPtr;
 typedef std::shared_ptr<Dict> DictPtr;
 typedef std::shared_ptr<DictGroup> DictGroupPtr;
 typedef std::shared_ptr<Lexicon> LexiconPtr;
+typedef std::shared_ptr<MarisaDict> MarisaDictPtr;
 typedef std::shared_ptr<Segmentation> SegmentationPtr;
 typedef std::shared_ptr<Segments> SegmentsPtr;
 typedef std::shared_ptr<SerializableDict> SerializableDictPtr;
 typedef std::shared_ptr<TextDict> TextDictPtr;
-}
+
+#ifdef OPENCC_ENABLE_DARTS
+class BinaryDict;
+class DartsDict;
+typedef std::shared_ptr<BinaryDict> BinaryDictPtr;
+typedef std::shared_ptr<DartsDict> DartsDictPtr;
+#endif
+
+} // namespace opencc
 
 #ifndef PKGDATADIR
-const string PACKAGE_DATA_DIRECTORY = "";
-#else // ifndef PKGDATADIR
-const string PACKAGE_DATA_DIRECTORY = PKGDATADIR "/";
+const std::string PACKAGE_DATA_DIRECTORY = "";
+#else  // ifndef PKGDATADIR
+const std::string PACKAGE_DATA_DIRECTORY = PKGDATADIR "/";
 #endif // ifndef PKGDATADIR
+
+#ifndef OPENCC_SEGMENTATION_PLUGIN_DIR
+const std::string PACKAGE_SEGMENTATION_PLUGIN_DIRECTORY = "";
+#else
+const std::string PACKAGE_SEGMENTATION_PLUGIN_DIRECTORY =
+    OPENCC_SEGMENTATION_PLUGIN_DIR "/";
+#endif
 
 #ifndef VERSION
 #define VERSION "1.0.*"

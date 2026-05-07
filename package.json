@@ -1,28 +1,58 @@
 {
   "name": "opencc",
-  "version": "1.0.5",
+  "version": "1.3.1",
   "description": "Conversion between Traditional and Simplified Chinese",
-  "author": "BYVoid <byvoid@byvoid.com>",
+  "author": "Carbo Kuo <byvoid@byvoid.com>",
   "license": "Apache-2.0",
   "main": "node/opencc.js",
+  "types": "node/opencc.d.ts",
+  "bin": {
+    "opencc": "./node/cli.js"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./node/opencc.d.mts",
+        "default": "./node/opencc.mjs"
+      },
+      "require": {
+        "types": "./node/opencc.d.cts",
+        "default": "./node/opencc.js"
+      },
+      "default": "./node/opencc.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
-    "test": "mocha -R spec node/test.js",
-    "deploy": "node-pre-gyp package && (node-pre-gyp-github publish --release || exit 0)",
-    "install": "node-pre-gyp install --fallback-to-build || node-pre-gyp rebuild"
+    "test": "mocha -R spec node/test.js && node node/esm-test.mjs",
+    "prebuild": "prebuildify --napi --strip --postinstall \"node scripts/prepare-node-prebuild-artifacts.js\"",
+    "prebuild:linux": "bash ./scripts/build-node-prebuild-bazel.sh",
+    "prebuild:all": "npm run prebuild && npm run prebuild:linux",
+    "install": "node-gyp-build"
   },
-  "binary": {
-    "module_name": "opencc",
-    "module_path": "./build/Release/",
-    "host": "https://github.com/BYVoid/OpenCC/releases/download/",
-    "remote_path": "{version}"
+  "engines": {
+    "node": ">=20.17"
   },
+  "files": [
+    "binding.gyp",
+    "data/config",
+    "data/dictionary",
+    "data/scripts/reverse.py",
+    "deps/marisa-0.3.1",
+    "deps/rapidjson-1.1.0",
+    "node",
+    "prebuilds",
+    "scripts/prepare-node-prebuild-artifacts.js",
+    "src"
+  ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/BYVoid/OpenCC.git"
+    "url": "git+https://github.com/BYVoid/OpenCC.git"
   },
   "bugs": {
-    "url": "https://github.com/BYVoid/Opencc/issues"
+    "url": "https://github.com/BYVoid/OpenCC/issues"
   },
+  "homepage": "https://github.com/BYVoid/OpenCC#readme",
   "keywords": [
     "opencc",
     "Chinese",
@@ -32,11 +62,17 @@
     "Traditional Chinese"
   ],
   "devDependencies": {
-    "mocha": "^3.5.0",
-    "node-pre-gyp-github": "^1.3.1"
+    "mocha": "^11.7.5",
+    "prebuildify": "^6.0.1"
   },
   "dependencies": {
-    "nan": "^2.7.0",
-    "node-pre-gyp": "^0.6.36"
+    "node-addon-api": "^8.7.0",
+    "node-gyp": "^12.3.0",
+    "node-gyp-build": "^4.8.4"
+  },
+  "overrides": {
+    "brace-expansion": "^2.0.3",
+    "diff": "^8.0.3",
+    "serialize-javascript": "^7.0.5"
   }
 }

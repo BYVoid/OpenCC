@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2026 Carbo Kuo and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,13 @@
  * limitations under the License.
  */
 
+#include <algorithm>
+#include <cstring>
+
 #include "BinaryDict.hpp"
 #include "DartsDict.hpp"
-#include "darts.h"
 #include "Lexicon.hpp"
+#include "darts.h"
 
 using namespace opencc;
 
@@ -49,11 +52,15 @@ DartsDict::~DartsDict() { delete internal; }
 
 size_t DartsDict::KeyMaxLength() const { return maxLength; }
 
-Optional<const DictEntry*> DartsDict::Match(const char* word) const {
+Optional<const DictEntry*> DartsDict::Match(const char* word,
+                                            size_t len) const {
+  if (len > maxLength) {
+    return Optional<const DictEntry*>::Null();
+  }
   Darts::DoubleArray& dict = *internal->doubleArray;
   Darts::DoubleArray::result_pair_type result;
 
-  dict.exactMatchSearch(word, result);
+  dict.exactMatchSearch(word, result, len);
   if (result.value != -1) {
     return Optional<const DictEntry*>(
         lexicon->At(static_cast<size_t>(result.value)));
@@ -62,13 +69,14 @@ Optional<const DictEntry*> DartsDict::Match(const char* word) const {
   }
 }
 
-Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word) const {
+Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word,
+                                                  size_t len) const {
   const size_t DEFAULT_NUM_ENTRIES = 64;
   Darts::DoubleArray& dict = *internal->doubleArray;
   Darts::DoubleArray::value_type results[DEFAULT_NUM_ENTRIES];
   Darts::DoubleArray::value_type maxMatchedResult;
-  size_t numMatched =
-      dict.commonPrefixSearch(word, results, DEFAULT_NUM_ENTRIES);
+  size_t numMatched = dict.commonPrefixSearch(
+      word, results, DEFAULT_NUM_ENTRIES, (std::min)(maxLength, len));
   if (numMatched == 0) {
     return Optional<const DictEntry*>::Null();
   } else if ((numMatched > 0) && (numMatched < DEFAULT_NUM_ENTRIES)) {
@@ -76,7 +84,8 @@ Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word) const {
   } else {
     Darts::DoubleArray::value_type* rematchedResults =
         new Darts::DoubleArray::value_type[numMatched];
-    numMatched = dict.commonPrefixSearch(word, rematchedResults, numMatched);
+    numMatched = dict.commonPrefixSearch(word, rematchedResults, numMatched,
+                                         (std::min)(maxLength, len));
     maxMatchedResult = rematchedResults[numMatched - 1];
     delete[] rematchedResults;
   }
@@ -102,10 +111,24 @@ DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
   }
   free(buffer);
 
+  // Get remaining file size for validation
+  long currentOffset = ftell(fp);
+  fseek(fp, 0L, SEEK_END);
+  long fileEnd = ftell(fp);
+  fseek(fp, currentOffset, SEEK_SET);
+  size_t remainingSize =
+      (fileEnd > currentOffset)
+          ? static_cast<size_t>(fileEnd - currentOffset)
+          : 0;
+
   size_t dartsSize;
   bytesRead = fread(&dartsSize, sizeof(size_t), 1, fp);
   if (bytesRead * sizeof(size_t) != sizeof(size_t)) {
     throw InvalidFormat("Invalid OpenCC dictionary header (dartsSize)");
+  }
+  if (dartsSize > remainingSize) {
+    throw InvalidFormat(
+        "Invalid OpenCC dictionary (dartsSize exceeds file size)");
   }
   buffer = malloc(dartsSize);
   bytesRead = fread(buffer, 1, dartsSize, fp);
@@ -127,17 +150,20 @@ DartsDictPtr DartsDict::NewFromDict(const Dict& thatDict) {
   DartsDictPtr dict(new DartsDict());
 
   Darts::DoubleArray* doubleArray = new Darts::DoubleArray();
-  vector<const char*> keys;
+  std::vector<std::string> keys;
+  std::vector<const char*> keys_cstr;
   size_t maxLength = 0;
   const LexiconPtr& lexicon = thatDict.GetLexicon();
   size_t lexiconCount = lexicon->Length();
   keys.resize(lexiconCount);
+  keys_cstr.resize(lexiconCount);
   for (size_t i = 0; i < lexiconCount; i++) {
     const DictEntry* entry = lexicon->At(i);
     keys[i] = entry->Key();
+    keys_cstr[i] = keys[i].c_str();
     maxLength = (std::max)(entry->KeyLength(), maxLength);
   }
-  doubleArray->build(lexicon->Length(), &keys[0]);
+  doubleArray->build(lexicon->Length(), &keys_cstr[0]);
   dict->lexicon = lexicon;
   dict->maxLength = maxLength;
   auto internal = dict->internal;

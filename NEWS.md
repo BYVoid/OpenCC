@@ -1,5 +1,135 @@
 # Change History of OpenCC
 
+## Version 1.3.0
+
+2026年4月17日
+
+* **實驗性 Jieba 分詞插件**：新增可載入式 Jieba 分詞插件（`libopencc_jieba`），並支援獨立打包發佈；插件 ABI 採用碼點長度；`winget` 可攜包一併包含插件（[#1091](https://github.com/BYVoid/OpenCC/pull/1091), [#1092](https://github.com/BYVoid/OpenCC/pull/1092), [#1093](https://github.com/BYVoid/OpenCC/pull/1093), [#1099](https://github.com/BYVoid/OpenCC/pull/1099), [#1103](https://github.com/BYVoid/OpenCC/pull/1103), [#1105](https://github.com/BYVoid/OpenCC/pull/1105), [#1111](https://github.com/BYVoid/OpenCC/pull/1111)）。
+* **詞典與詞條更新**：新增臺灣 IT 用語及「巨集」術語、距離量詞繁體對應、「奥巴馬↔歐巴馬」、「公元→西元」、「福建面」等詞條；修正「乾/干/余/系/面」等字轉換、「移動資料→行動資料」錯誤、「倒霉→倒黴」錯誤、「文本→文字」過度轉換、「控制台」不應轉換、「背包→揹包」錯誤及「念佛→唸佛」錯誤；修正「星露谷物語」在 `s2twp` 模式下的錯誤分詞（[#1075](https://github.com/BYVoid/OpenCC/pull/1075), [#1079](https://github.com/BYVoid/OpenCC/pull/1079), [#1080](https://github.com/BYVoid/OpenCC/pull/1080), [#1088](https://github.com/BYVoid/OpenCC/pull/1088), [#1089](https://github.com/BYVoid/OpenCC/pull/1089), [#1090](https://github.com/BYVoid/OpenCC/pull/1090), [#1094](https://github.com/BYVoid/OpenCC/pull/1094), [#1096](https://github.com/BYVoid/OpenCC/pull/1096), [#1097](https://github.com/BYVoid/OpenCC/pull/1097), [#1100](https://github.com/BYVoid/OpenCC/pull/1100), [#1106](https://github.com/BYVoid/OpenCC/pull/1106), [#1110](https://github.com/BYVoid/OpenCC/pull/1110), [#1117](https://github.com/BYVoid/OpenCC/pull/1117), [#1122](https://github.com/BYVoid/OpenCC/pull/1122), [#1123](https://github.com/BYVoid/OpenCC/pull/1123)）。
+* **安全與穩定性修復**：修復 `UTF8Util` 堆越界讀取（[#794](https://github.com/BYVoid/OpenCC/issues/794), [#799](https://github.com/BYVoid/OpenCC/issues/799)）、二進制字典值邊界檢查、`const_cast` 未定義行為；轉換失敗時返回非零退出碼（[#1072](https://github.com/BYVoid/OpenCC/pull/1072), [#1073](https://github.com/BYVoid/OpenCC/pull/1073), [#1083](https://github.com/BYVoid/OpenCC/pull/1083), [#1098](https://github.com/BYVoid/OpenCC/pull/1098)）。
+* **Windows 支援改善**：配置文件改用寬字符路徑檢查；Jieba 插件在 Windows 使用 Unicode 安全文件讀取；修復 Windows Bazel 構建與測試（[#1082](https://github.com/BYVoid/OpenCC/pull/1082), [#1084](https://github.com/BYVoid/OpenCC/pull/1084), [#1086](https://github.com/BYVoid/OpenCC/pull/1086), [#1087](https://github.com/BYVoid/OpenCC/pull/1087), [#1102](https://github.com/BYVoid/OpenCC/pull/1102), [#1104](https://github.com/BYVoid/OpenCC/pull/1104)）。
+* **構建與依賴更新**：MARISA 升級至 0.3.1、更新 Bazel BCR 依賴、抑制第三方頭文件編譯警告、新增 Debian 包發佈工作流（[#1078](https://github.com/BYVoid/OpenCC/pull/1078), [#1081](https://github.com/BYVoid/OpenCC/pull/1081), [#1113](https://github.com/BYVoid/OpenCC/pull/1113), [#1116](https://github.com/BYVoid/OpenCC/pull/1116)）。
+* **平台與 CI 調整**：移除 EOL Python 3.9 支援；Node.js CI 矩陣移除 Node 20、新增 Node 25；修復 CI 工作流權限設置；更新 README（[#1074](https://github.com/BYVoid/OpenCC/pull/1074), [#1076](https://github.com/BYVoid/OpenCC/pull/1076), [#1109](https://github.com/BYVoid/OpenCC/pull/1109), [#1114](https://github.com/BYVoid/OpenCC/pull/1114), [#1120](https://github.com/BYVoid/OpenCC/pull/1120)）。
+
+## Version 1.2.0
+
+2026年1月22日
+
+* 詞典與詞條更新：STPhrases/TWPhrases整合與修訂，新增醫療術語若干、Nvidia譯名、日文「兔/兎」等詞彙，並補充測試（[#948](https://github.com/BYVoid/OpenCC/pull/948), [#1007](https://github.com/BYVoid/OpenCC/pull/1007), [#1009](https://github.com/BYVoid/OpenCC/pull/1009), [#1011](https://github.com/BYVoid/OpenCC/pull/1011), [#1012](https://github.com/BYVoid/OpenCC/pull/1012), [#1023](https://github.com/BYVoid/OpenCC/pull/1023), [#992](https://github.com/BYVoid/OpenCC/pull/992)）。
+* 修正`tw2sp`/`s2twp`配置導致的與詞條錯誤（[#1013](https://github.com/BYVoid/OpenCC/pull/1013), [#1024](https://github.com/BYVoid/OpenCC/pull/1024), [#1025](https://github.com/BYVoid/OpenCC/pull/1025)）。
+* `txt`詞典新增註釋語法與排序規則；`TWPhrasesRev`改爲直接納入倉庫並加入一致性測試（[#1016](https://github.com/BYVoid/OpenCC/pull/1016), [#1012](https://github.com/BYVoid/OpenCC/pull/1012)）。
+* 測試用例改用JSON格式（[#1006](https://github.com/BYVoid/OpenCC/pull/1006)）。
+* 修正截斷UTF-8處理的越界讀取問題（[#1005](https://github.com/BYVoid/OpenCC/pull/1005)）。
+* 構建與依賴更新：Bazel 8.5.1、C++17 + marisa 0.3.0、`nan`升級，修復GCC 15與C++17棄用警告（[#1021](https://github.com/BYVoid/OpenCC/pull/1021), [#968](https://github.com/BYVoid/OpenCC/pull/968)）。
+* 語言與平台支持調整：移除Python 2殘留、註冊hermetic Python 3.12工具鏈、更新Node.js測試矩陣並移除Node 18與Windows x86（[#946](https://github.com/BYVoid/OpenCC/pull/946), [#1010](https://github.com/BYVoid/OpenCC/pull/1010), [#999](https://github.com/BYVoid/OpenCC/pull/999), [#960](https://github.com/BYVoid/OpenCC/pull/960)）。
+* CI、發佈腳本與文檔完善：macOS 14支持、制品上傳與任務取消、README補充Bazel測試/貢獻者說明、繁體中文貢獻指南與opencc-wasm列表、PyPI腳本修復（[#1022](https://github.com/BYVoid/OpenCC/pull/1022), [#973](https://github.com/BYVoid/OpenCC/pull/973), [#1019](https://github.com/BYVoid/OpenCC/pull/1019), [#1017](https://github.com/BYVoid/OpenCC/pull/1017), [#1020](https://github.com/BYVoid/OpenCC/pull/1020)）。
+
+## Version 1.1.9
+
+2024年8月3日
+
+* 恢復`Config::NewFromFile`單參數接口以保持ABI兼容性。
+* 增加Bazel Python庫與測試（[#882](https://github.com/BYVoid/OpenCC/pull/882)）。
+* 構建與腳本切換至Python 3。
+* 修正`rapidjson`補丁與`npmignore`配置。
+* 補充安裝文檔與調整Bazel依賴配置（`googletest`改爲`dev_dependency`）。
+* 此版本爲維護性更新，詞典無顯著改動。
+
+## Version 1.1.8
+
+2024年7月27日
+
+* 修正Node新版本編譯的問題（[#782](https://github.com/BYVoid/OpenCC/issues/782), [#798](https://github.com/BYVoid/OpenCC/issues/798)）。
+* 進一步修正Python包生成腳本（[#875](https://github.com/BYVoid/OpenCC/pull/875)）。
+* 引入Bazel構建系統以及CI（[#879](https://github.com/BYVoid/OpenCC/pull/879)）。
+* 引入Github MSVC CI（[#880](https://github.com/BYVoid/OpenCC/pull/880)）。
+* 爲`opencc`命令行工具添加了字典和配置的路徑`--path`參數。
+* 更新附帶的`googletest`版本到1.15，`pybind11`到2.13.1，`tclap`到1.2.5。
+* 若干轉換字詞修正（[#609](https://github.com/BYVoid/OpenCC/pull/609), [#698](https://github.com/BYVoid/OpenCC/pull/698), [#707](https://github.com/BYVoid/OpenCC/pull/707), [#760](https://github.com/BYVoid/OpenCC/pull/760), [#779](https://github.com/BYVoid/OpenCC/pull/779), [#786](https://github.com/BYVoid/OpenCC/pull/786), [#792](https://github.com/BYVoid/OpenCC/pull/792), [#806](https://github.com/BYVoid/OpenCC/pull/806), [#808](https://github.com/BYVoid/OpenCC/pull/808), [#810](https://github.com/BYVoid/OpenCC/pull/810), [#825](https://github.com/BYVoid/OpenCC/pull/825), [#826](https://github.com/BYVoid/OpenCC/pull/826), [#837](https://github.com/BYVoid/OpenCC/pull/837), [#864](https://github.com/BYVoid/OpenCC/pull/864), [#865](https://github.com/BYVoid/OpenCC/pull/865), [#870](https://github.com/BYVoid/OpenCC/pull/870), [#877](https://github.com/BYVoid/OpenCC/pull/877), [#878](https://github.com/BYVoid/OpenCC/pull/878)）。
+
+## Version 1.1.7
+
+2023年10月15日
+
+* 添加提交時 python 包重建以驗證包生成 ([#822](https://github.com/BYVoid/OpenCC/pull/822))。
+* 支持Python 3.12 和 Node 20，移除針對Python 3.7和Node 16的構建 ([#820](https://github.com/BYVoid/OpenCC/pull/820))。
+* add mingw-w64 ci ([#802](https://github.com/BYVoid/OpenCC/pull/802))。
+* Add support of CMake config modules ([#763](https://github.com/BYVoid/OpenCC/pull/763))。
+* 若干其他小修復。
+
+## Version 1.1.6
+
+2022年12月08日
+
+* 修復python3.11 macos構建 ([#744](https://github.com/BYVoid/OpenCC/pull/744))。
+* Bump gtest 和 benchmark 以與最新的 github runners 一起工作 ([#747](https://github.com/BYVoid/OpenCC/pull/747))。
+
+## Version 1.1.5
+
+2022年12月03日
+
+* 支持Python 3.11 ([#728](https://github.com/BYVoid/OpenCC/pull/728))。
+* Automatically name SO files ([#708](https://github.com/BYVoid/OpenCC/pull/708))
+* Add support for Apple silicon build tag ([#716](https://github.com/BYVoid/OpenCC/pull/716))
+* 若干其他小修復。
+
+## Version 1.1.4
+
+2022年6月4日
+
+* 支持Python 3.10（[#637](https://github.com/BYVoid/OpenCC/issues/637)）。
+* 移除針對Python 2.7、3.5、3.6和Node 10的構建（[#690](https://github.com/BYVoid/OpenCC/issues/690), [#691](https://github.com/BYVoid/OpenCC/issues/691)）。
+* 若干其他小修復。
+
+## Version 1.1.3
+
+2021年9月3日
+
+* 修復部分頭文件不能單獨使用的問題（#550）。
+* 修復引入系統pybind11的方法（#566）。
+* 支持Node.js 16（#597）。
+* 支持Python 3.9（#603）。
+* 修正轉換錯誤。
+* 若干其他小修復。
+
+## Version 1.1.2
+
+2021年3月2日
+
+* 新增香港繁體轉換。
+* 根據《通用漢字規範表》修正大量簡體異體字轉換。調整臺灣標準，避免過度轉換。
+* 修正編譯兼容性問題，包括並行編譯。
+* 修正1.1.0以來引入的性能嚴重下降問題。
+
+## Version 1.1.1
+
+2020年5月22日
+
+* 正式提供[Python](https://pypi.org/project/OpenCC/)接口和TypeScript類型標註。
+* 更新動態鏈接庫`SOVERSION`到`1.1`，由於C++內部接口發生變更。
+* 進一步改進與Windows MSVC的兼容性。
+* 簡化頭文件結構，加快編譯速度。刪除不必要的`using`。
+* 修復部分香港標準字。
+
+## Version 1.1.0
+
+2020年5月10日
+
+* 新辭典格式`ocd2`，基於Marisa Trie 0.2.5。辭典大小大幅減少。`STPhrases.ocd`從4.3MB減少到`STPhrases.ocd2`的924KB。
+* 升級依賴的rapidjson版本到1.1.0，tclap到1.2.2，gtest到1.11.0。
+* 更改「涌/湧」的默認轉換，修正多個詞組轉換。
+* 提供Windows的預編譯版本下載（AppVeyor）。
+* 增加基準測試結果。
+
+## Version 1.0.6
+
+2020年4月13日
+
+* 正式支持日本語新字體轉換。
+* 升級Node.js依賴，改進兼容性。
+* 修復多處多平臺編譯和兼容性問題。
+* 修正大量轉換錯誤。
+
 ## Version 1.0.5
 
 2017年2月6日

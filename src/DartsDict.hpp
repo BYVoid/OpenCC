@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 BYVoid <byvoid@byvoid.com>
+ * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,26 +23,27 @@
 
 namespace opencc {
 /**
-* Darts dictionary
-* @ingroup opencc_cpp_api
-*/
+ * Darts dictionary
+ * @ingroup opencc_cpp_api
+ */
 class OPENCC_EXPORT DartsDict : public Dict, public SerializableDict {
 public:
   virtual ~DartsDict();
 
   virtual size_t KeyMaxLength() const;
 
-  virtual Optional<const DictEntry*> Match(const char* word) const;
+  virtual Optional<const DictEntry*> Match(const char* word, size_t len) const;
 
-  virtual Optional<const DictEntry*> MatchPrefix(const char* word) const;
+  virtual Optional<const DictEntry*> MatchPrefix(const char* word,
+                                                 size_t len) const;
 
   virtual LexiconPtr GetLexicon() const;
 
   virtual void SerializeToFile(FILE* fp) const;
 
   /**
-  * Constructs a DartsDict from another dictionary.
-  */
+   * Constructs a DartsDict from another dictionary.
+   */
   static DartsDictPtr NewFromDict(const Dict& thatDict);
 
   static DartsDictPtr NewFromFile(FILE* fp);
@@ -56,4 +57,4 @@ private:
   class DartsInternal;
   DartsInternal* internal;
 };
-}
+} // namespace opencc

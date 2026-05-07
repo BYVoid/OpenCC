@@ -1,0 +1,9 @@
+filegroup(
+    name = "config_test",
+    srcs = [
+        "config_test.json",
+        "config_test_characters.txt",
+        "config_test_phrases.txt",
+    ],
+    visibility = ["//visibility:public"],
+)

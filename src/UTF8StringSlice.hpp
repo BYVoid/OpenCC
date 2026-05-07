@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 BYVoid <byvoid@byvoid.com>
+ * Copyright 2015 Carbo Kuo <byvoid@byvoid.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <cstring>
 
 #include "Common.hpp"
 #include "UTF8Util.hpp"
@@ -105,13 +107,13 @@ public:
     }
   }
 
-  string ToString() const { return string(str, str + byteLength); }
+  std::string ToString() const { return std::string(str, str + byteLength); }
 
   const char* CString() const { return str; }
 
   LengthType CommonPrefixLength(const UTF8StringSliceBase& that) const {
     if (str == that.str) {
-      return std::min(utf8Length, that.utf8Length);
+      return (std::min)(utf8Length, that.utf8Length);
     } else {
       const char* pstr1 = str;
       const char* pstr2 = that.str;
@@ -149,13 +151,13 @@ public:
   int ReverseCompare(const UTF8StringSliceBase& that) const {
     const char* pstr1 = str + byteLength;
     const char* pstr2 = that.str + that.byteLength;
-    const size_t length = std::min(utf8Length, that.utf8Length);
+    const size_t length = (std::min)(utf8Length, that.utf8Length);
     for (size_t i = 0; i < length; i++) {
       const size_t charLen1 = UTF8Util::PrevCharLength(pstr1);
       const size_t charLen2 = UTF8Util::PrevCharLength(pstr2);
       pstr1 -= charLen1;
       pstr2 -= charLen2;
-      const int cmp = strncmp(pstr1, pstr2, std::min(charLen1, charLen2));
+      const int cmp = strncmp(pstr1, pstr2, (std::min)(charLen1, charLen2));
       if (cmp < 0) {
         return -1;
       } else if (cmp > 0) {
@@ -207,7 +209,7 @@ public:
 
 private:
   inline int Compare(const UTF8StringSliceBase& that) const {
-    int cmp = strncmp(str, that.str, std::min(byteLength, that.byteLength));
+    int cmp = strncmp(str, that.str, (std::min)(byteLength, that.byteLength));
     if (cmp == 0) {
       if (utf8Length < that.utf8Length) {
         cmp = -1;

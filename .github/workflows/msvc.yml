@@ -1,0 +1,126 @@
+name: MSVC
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    permissions:
+      contents: read
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            cmake_arch: x64
+            package_suffix: x64
+            can_run_binaries: true
+          - arch: amd64_x86
+            cmake_arch: Win32
+            package_suffix: x86
+            can_run_binaries: true
+          - arch: amd64_arm64
+            cmake_arch: ARM64
+            package_suffix: arm64
+            can_run_binaries: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compute version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(bash scripts/compute-version.sh)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Computed version: $VERSION"
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
+
+      - name: Build release package tree
+        if: ${{ matrix.can_run_binaries }}
+        shell: pwsh
+        run: |
+          cmake -S . -B build-release `
+            -A "${{ matrix.cmake_arch }}" `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DBUILD_OPENCC_JIEBA_PLUGIN=ON `
+            -DCMAKE_INSTALL_PREFIX:PATH="${{ github.workspace }}\dist\opencc-msvc-${{ matrix.package_suffix }}"
+          cmake --build build-release --config Release --target install
+
+      - name: Build ARM64 compile-only targets
+        if: ${{ !matrix.can_run_binaries }}
+        shell: pwsh
+        run: |
+          cmake -S . -B build-release `
+            -A "${{ matrix.cmake_arch }}" `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DBUILD_OPENCC_JIEBA_PLUGIN=ON
+          cmake --build build-release --config Release --target libopencc opencc opencc_dict opencc_phrase_extract opencc_jieba
+
+      - name: Build and test debug
+        if: ${{ matrix.can_run_binaries }}
+        shell: pwsh
+        run: |
+          cmake -S . -B build-debug `
+            -A "${{ matrix.cmake_arch }}" `
+            -DCMAKE_BUILD_TYPE=Debug `
+            -DBUILD_OPENCC_JIEBA_PLUGIN=ON `
+            -DENABLE_GTEST:BOOL=ON
+          cmake --build build-debug --config Debug
+          ctest --test-dir build-debug --build-config Debug --output-on-failure | Tee-Object -FilePath build-debug\ctest.log
+
+      - name: Create portable zip artifact
+        if: ${{ matrix.can_run_binaries }}
+        shell: pwsh
+        run: |
+          $packageRoot = "dist\opencc-msvc-${{ matrix.package_suffix }}"
+          $zipPath = "dist\OpenCC-msvc-${{ matrix.package_suffix }}.zip"
+          if (Test-Path $zipPath) { Remove-Item -Force $zipPath }
+          Compress-Archive -Path $packageRoot -DestinationPath $zipPath -CompressionLevel Optimal
+
+      - name: Test standalone plugin build
+        if: ${{ matrix.can_run_binaries }}
+        shell: pwsh
+        run: |
+          cmake -S plugins\jieba -B build-standalone `
+            -A "${{ matrix.cmake_arch }}" `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DOpenCC_DIR="${{ github.workspace }}\dist\opencc-msvc-${{ matrix.package_suffix }}\lib\cmake\opencc"
+          cmake --build build-standalone --config Release
+
+      - name: List packaged files
+        if: ${{ always() }}
+        shell: pwsh
+        run: |
+          Write-Host "=== Contents of dist package root ==="
+          if (Test-Path "dist\opencc-msvc-${{ matrix.package_suffix }}") {
+            Get-ChildItem "dist\opencc-msvc-${{ matrix.package_suffix }}" -Recurse | Select-Object FullName
+          }
+          Write-Host "`n=== Contents of build-debug Testing directory ==="
+          if (Test-Path build-debug\Testing) { Get-ChildItem build-debug\Testing -Recurse | Select-Object FullName }
+          Write-Host "`n=== Contents of build-release output directories ==="
+          if (Test-Path build-release\src) { Get-ChildItem build-release\src -Recurse | Select-Object FullName }
+
+      - name: upload artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencc-${{ env.VERSION }}-msvc-${{ matrix.arch }}
+          path: |
+            dist/OpenCC-msvc-${{ matrix.package_suffix }}.zip
+            dist/opencc-msvc-${{ matrix.package_suffix }}/**
+            build-release/src/Release/**
+            build-release/src/tools/Release/**
+            build-debug/ctest.log
+            build-debug/Testing/**

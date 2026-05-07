@@ -6,6 +6,7 @@ import sys
 _this_dir = os.path.dirname(os.path.abspath(__file__))
 _opencc_rootdir = os.path.abspath(os.path.join(_this_dir, '..', '..'))
 _testcases_path = os.path.join(_opencc_rootdir, 'test', 'testcases', 'testcases.json')
+_config_test_path = os.path.join(_opencc_rootdir, 'test', 'config_test', 'config_test.json')
 
 
 def test_import():
@@ -24,6 +25,15 @@ def test_jieba_configs_are_not_exposed():
     import opencc
 
     assert all('jieba' not in config for config in opencc.CONFIGS)
+
+
+def test_custom_config_resolves_local_dictionaries():
+    import opencc
+
+    converter = opencc.OpenCC(_config_test_path)
+
+    assert converter.convert('燕燕于飞，之子于归。') == '燕燕于飛，之子于歸。'
+    assert converter.convert('远') == '遠'
 
 
 def test_conversion():

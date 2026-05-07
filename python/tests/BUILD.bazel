@@ -6,7 +6,25 @@ py_test(
     size = "small",
     srcs = ["test_opencc.py"],
     data = [
+        "//test/config_test",
         "//test/testcases",
+    ],
+    imports = [".."],
+    deps = [
+        "//python/opencc",
+        requirement("pytest"),
+        requirement("pygments"),
+        requirement("exceptiongroup"),
+    ],
+)
+
+py_test(
+    name = "test_opencc_golden",
+    size = "medium",
+    srcs = ["test_opencc_golden.py"],
+    data = [
+        "//test/golden:golden_inputs",
+        "//test/golden:golden_outputs",
     ],
     imports = [".."],
     deps = [

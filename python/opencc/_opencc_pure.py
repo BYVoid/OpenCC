@@ -38,6 +38,7 @@ Algorithm overview (mirrors the C++ reference implementation):
 
 import json
 import os
+from pathlib import Path
 
 __all__ = ['OpenCC']
 
@@ -50,6 +51,20 @@ _pkg_dict_dir = os.path.join(_this_dir, 'dictionary')
 
 
 _MAX_PARENT_TRAVERSAL_DEPTH = 8
+
+
+def _runfile_dir(relative_path: str) -> str:
+    runfiles_root = os.environ.get('RUNFILES_DIR')
+    workspace = os.environ.get('TEST_WORKSPACE', '_main')
+    if not runfiles_root:
+        return ''
+
+    for candidate in (
+            Path(runfiles_root) / workspace / relative_path,
+            Path(runfiles_root) / relative_path):
+        if candidate.is_dir():
+            return str(candidate)
+    return ''
 
 
 def _find_repo_root() -> str:
@@ -76,6 +91,8 @@ def _find_repo_root() -> str:
 _repo_root = _find_repo_root()
 _repo_config_dir = os.path.join(_repo_root, 'data', 'config') if _repo_root else ''
 _repo_dict_dir = os.path.join(_repo_root, 'data', 'dictionary') if _repo_root else ''
+_runfiles_config_dir = _runfile_dir('data/config')
+_runfiles_dict_dir = _runfile_dir('data/dictionary')
 
 
 # Trie
@@ -171,14 +188,15 @@ class _GroupMatcher:
 _trie_cache: dict = {}  # (absolute_path, reversed: bool) -> _Trie
 
 
-def _find_dict_txt(filename: str):
+def _find_dict_txt(filename: str, config_dir: str = ''):
     """
     Resolve a dictionary filename (typically ``Foo.ocd2``) to a
     ``(txt_path, needs_reverse)`` tuple.
 
     Resolution:
     1. Strip the extension (``Foo.ocd2`` → ``Foo``).
-    2. Look for ``<stem>.txt`` in the bundled pkg dir, then the repo dir.
+    2. Look for ``<stem>.txt`` next to a custom config, in the bundled pkg
+       dir, then in Bazel runfiles and the repo dir.
     3. If the stem ends with ``Rev`` (e.g. ``HKVariantsRev``), look for
        the forward dict (``HKVariants.txt``) and mark it for reversal.
        These reversed dicts are generated on-the-fly from the forward file,
@@ -192,7 +210,17 @@ def _find_dict_txt(filename: str):
             stem = stem[: -len(ext)]
             break
 
-    for search_dir in (_pkg_dict_dir, _repo_dict_dir):
+    if os.path.isabs(filename) and os.path.isfile(filename):
+        return filename, False
+
+    search_dirs = (
+        config_dir,
+        _pkg_dict_dir,
+        _runfiles_dict_dir,
+        _repo_dict_dir,
+    )
+
+    for search_dir in search_dirs:
         if not search_dir:
             continue
         path = os.path.join(search_dir, stem + '.txt')
@@ -202,7 +230,7 @@ def _find_dict_txt(filename: str):
     # Try reversed dict: strip the trailing "Rev" and reverse the forward file.
     if stem.endswith('Rev'):
         forward_stem = stem[:-3]
-        for search_dir in (_pkg_dict_dir, _repo_dict_dir):
+        for search_dir in search_dirs:
             if not search_dir:
                 continue
             path = os.path.join(search_dir, forward_stem + '.txt')
@@ -264,15 +292,15 @@ def _load_trie(path: str, reverse: bool) -> _Trie:
     return trie
 
 
-def _get_trie(filename: str) -> _Trie:
+def _get_trie(filename: str, config_dir: str = '') -> _Trie:
     """Resolve ``filename`` to a txt path and return the loaded trie."""
-    path, needs_reverse = _find_dict_txt(filename)
+    path, needs_reverse = _find_dict_txt(filename, config_dir)
     return _load_trie(path, needs_reverse)
 
 
 # Config parsing
 
-def _parse_dict_node(d: dict) -> _GroupMatcher:
+def _parse_dict_node(d: dict, config_dir: str = '') -> _GroupMatcher:
     """
     Recursively parse a JSON dict-config node and return a :class:`_GroupMatcher`.
 
@@ -285,13 +313,13 @@ def _parse_dict_node(d: dict) -> _GroupMatcher:
     if dtype == 'group':
         tries = []
         for sub in d['dicts']:
-            sub_matcher = _parse_dict_node(sub)
+            sub_matcher = _parse_dict_node(sub, config_dir)
             # Flatten: extend with the sub-group's ordered tries list.
             tries.extend(sub_matcher.tries)
         return _GroupMatcher(tries)
 
     if dtype in ('ocd2', 'ocd', 'txt', 'text'):
-        trie = _get_trie(d['file'])
+        trie = _get_trie(d['file'], config_dir)
         return _GroupMatcher([trie])
 
     raise ValueError(f'Unknown dict type: {dtype!r}')
@@ -363,7 +391,7 @@ def _find_config(config_name: str) -> str:
     ``data/config`` directory as a fallback.
     """
     filename = config_name if config_name.endswith('.json') else config_name + '.json'
-    for search_dir in (_pkg_config_dir, _repo_config_dir):
+    for search_dir in (_pkg_config_dir, _runfiles_config_dir, _repo_config_dir):
         if not search_dir:
             continue
         path = os.path.join(search_dir, filename)
@@ -389,7 +417,7 @@ def list_configs() -> list:
     """
     configs = []
     seen = set()
-    for search_dir in (_pkg_config_dir, _repo_config_dir):
+    for search_dir in (_pkg_config_dir, _runfiles_config_dir, _repo_config_dir):
         if not search_dir or not os.path.isdir(search_dir):
             continue
         for fname in os.listdir(search_dir):
@@ -440,10 +468,11 @@ class OpenCC:
             )
 
         self._segmenter: _GroupMatcher = _parse_dict_node(
-            cfg['segmentation']['dict']
+            cfg['segmentation']['dict'],
+            os.path.dirname(config_path),
         )
         self._chain: list = [
-            _parse_dict_node(step['dict'])
+            _parse_dict_node(step['dict'], os.path.dirname(config_path))
             for step in cfg['conversion_chain']
         ]
 

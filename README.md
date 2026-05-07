@@ -93,6 +93,13 @@ The Python package uses the pure Python implementation and supports the built-in
 mmseg-based configs. Jieba plugin configs are not supported by the Python
 package.
 
+The pure Python implementation loads text dictionaries. Built-in configs keep
+their standard `.ocd2` dictionary references, and the Python loader resolves
+those references to bundled same-stem `.txt` dictionaries when possible. Custom
+configs that reference `.ocd` or `.ocd2` dictionaries must also provide matching
+text dictionary files; binary dictionary files are not parsed by the Python
+package.
+
 ```python
 import opencc
 converter = opencc.OpenCC('s2t.json')

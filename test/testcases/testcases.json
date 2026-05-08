@@ -709,9 +709,9 @@
     },
     {
       "id": "BYVoid_OpenCC_Issue_935_ethernet_tw2sp",
-      "input": "乙太網 乙太網路 乙太網絡",
+      "input": "乙太網 乙太網路 乙太網絡 乙太網路由器",
       "expected": {
-        "tw2sp": "以太网 以太网 以太网络"
+        "tw2sp": "以太网 以太网路 以太网络 以太网路由器"
       }
     }
   ]

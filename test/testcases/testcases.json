@@ -708,6 +708,13 @@
       }
     },
     {
+      "id": "ethernet_network_s2twp",
+      "input": "以太网络",
+      "expected": {
+        "s2twp": "乙太網路"
+      }
+    },
+    {
       "id": "ethernet_tw2sp",
       "input": "乙太網路 乙太網",
       "expected": {

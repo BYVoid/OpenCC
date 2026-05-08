@@ -699,6 +699,20 @@
       "expected": {
         "tw2sp": "第三范式 第三范式 范式转移 巴科斯范式"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_935_ethernet_s2twp",
+      "input": "以太网 以太网络 以太网路",
+      "expected": {
+        "s2twp": "乙太網路 乙太網路 乙太網路"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_935_ethernet_tw2sp",
+      "input": "乙太網 乙太網路 乙太網絡 乙太網路由器",
+      "expected": {
+        "tw2sp": "以太网 以太网路 以太网络 以太网路由器"
+      }
     }
   ]
 }

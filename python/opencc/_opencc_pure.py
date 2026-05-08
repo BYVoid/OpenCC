@@ -594,8 +594,11 @@ class OpenCC:
         config_name = config[:-5] if config.endswith('.json') else config
 
         # Allow custom config paths, matching the previous Python wrapper.
+        suffixed_config = config if config.endswith('.json') else f'{config}.json'
         if os.path.isfile(config):
             config_path = config
+        elif os.path.isfile(suffixed_config):
+            config_path = suffixed_config
         else:
             config_path = _find_config(config_name)
 

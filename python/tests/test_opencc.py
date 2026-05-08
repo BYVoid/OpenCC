@@ -78,6 +78,14 @@ def test_custom_config_resolves_local_dictionaries():
     assert converter.convert('远') == '遠'
 
 
+def test_custom_config_path_accepts_suffixless_json_path():
+    import opencc
+
+    converter = opencc.OpenCC(_config_test_path[:-5])
+
+    assert converter.convert('燕燕于飞，之子于归。') == '燕燕于飛，之子于歸。'
+
+
 def test_custom_config_resolves_absolute_ocd2_path_to_text_dictionary(tmp_path):
     import opencc
 

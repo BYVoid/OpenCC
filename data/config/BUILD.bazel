@@ -1,8 +1,18 @@
 package(default_visibility = ["//visibility:public"])
 
+CONFIGS = glob(
+    ["*.json"],
+    exclude = ["*.schema.json"],
+)
+
 filegroup(
     name = "config",
-    srcs = glob(["*.json"]),
+    srcs = CONFIGS,
+)
+
+filegroup(
+    name = "config_schema",
+    srcs = ["opencc_config.schema.json"],
 )
 
 cc_test(
@@ -19,5 +29,35 @@ cc_test(
         "@bazel_tools//tools/cpp/runfiles",
         "@googletest//:gtest_main",
         "@rapidjson",
+    ],
+)
+
+[
+    cc_test(
+        name = "config_schema_validation_" + config[:-5],
+        size = "small",
+        srcs = ["ConfigSchemaValidationTest.cpp"],
+        local_defines = [
+            "BAZEL",
+            "OPENCC_CONFIG_SCHEMA_TEST_FILE=\\\"" + config + "\\\"",
+        ],
+        data = [
+            config,
+            ":config_schema",
+        ],
+        deps = [
+            "@bazel_tools//tools/cpp/runfiles",
+            "@googletest//:gtest_main",
+            "@rapidjson",
+        ],
+    )
+    for config in CONFIGS
+]
+
+test_suite(
+    name = "config_schema_validation_test",
+    tests = [
+        ":config_schema_validation_" + config[:-5]
+        for config in CONFIGS
     ],
 )

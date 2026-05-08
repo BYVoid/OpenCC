@@ -38,6 +38,7 @@ Algorithm overview (mirrors the C++ reference implementation):
 
 import json
 import os
+import importlib.util
 from pathlib import Path
 
 __all__ = ['OpenCC']
@@ -48,6 +49,7 @@ _this_dir = os.path.dirname(os.path.abspath(__file__))
 # ``pip install .`` and the data files are included as package_data).
 _pkg_config_dir = os.path.join(_this_dir, 'config')
 _pkg_dict_dir = os.path.join(_this_dir, 'dictionary')
+_pkg_jieba_dict_dir = os.path.join(_this_dir, 'jieba_dict')
 
 
 _MAX_PARENT_TRAVERSAL_DEPTH = 8
@@ -91,8 +93,12 @@ def _find_repo_root() -> str:
 _repo_root = _find_repo_root()
 _repo_config_dir = os.path.join(_repo_root, 'data', 'config') if _repo_root else ''
 _repo_dict_dir = os.path.join(_repo_root, 'data', 'dictionary') if _repo_root else ''
+_repo_jieba_config_dir = os.path.join(_repo_root, 'plugins', 'jieba', 'data', 'config') if _repo_root else ''
+_repo_jieba_dict_dir = os.path.join(_repo_root, 'plugins', 'jieba', 'deps', 'cppjieba', 'dict') if _repo_root else ''
 _runfiles_config_dir = _runfile_dir('data/config')
 _runfiles_dict_dir = _runfile_dir('data/dictionary')
+_runfiles_jieba_config_dir = _runfile_dir('plugins/jieba/data/config')
+_runfiles_jieba_dict_dir = _runfile_dir('plugins/jieba/deps/cppjieba/dict')
 
 
 # Trie
@@ -181,6 +187,111 @@ class _GroupMatcher:
             if length > 0:
                 return length, value
         return 0, None
+
+
+# Jieba segmentation
+
+_jieba_tokenizer_cache: dict = {}
+
+
+class _JiebaSegmenter:
+    """
+    Optional Jieba segmenter backed by the ``jieba`` Python package.
+
+    The dependency is intentionally lazy: importing ``opencc`` and using the
+    normal mmseg configs never imports or requires ``jieba``.
+    """
+
+    __slots__ = ('tokenizer',)
+
+    def __init__(self, resources: dict, config_dir: str = ''):
+        try:
+            import jieba
+        except ImportError as exc:
+            raise ImportError(
+                "Config uses Jieba segmentation. Install the optional "
+                "dependency with `pip install jieba` to use *_jieba configs."
+            ) from exc
+
+        dict_path = _find_jieba_resource(
+            resources.get('dict_path', ''),
+            config_dir,
+            'jieba.dict.utf8',
+        )
+        user_dict_path = _find_jieba_resource(
+            resources.get('user_dict_path', ''),
+            config_dir,
+            'user.dict.utf8',
+            required=False,
+        )
+
+        cache_key = (dict_path, user_dict_path)
+        tokenizer = _jieba_tokenizer_cache.get(cache_key)
+        if tokenizer is None:
+            tokenizer = jieba.Tokenizer(dictionary=dict_path)
+            tokenizer.initialize()
+            if user_dict_path:
+                tokenizer.load_userdict(user_dict_path)
+            _jieba_tokenizer_cache[cache_key] = tokenizer
+        self.tokenizer = tokenizer
+
+    def segment(self, text: str) -> list:
+        return list(self.tokenizer.cut(text, HMM=True))
+
+
+def _jieba_available() -> bool:
+    return importlib.util.find_spec('jieba') is not None
+
+
+def _find_jieba_resource(raw_path: str,
+                         config_dir: str,
+                         fallback_name: str,
+                         required: bool = True) -> str:
+    """
+    Resolve Jieba resources for the pure Python optional backend.
+
+    Plugin configs point at ``jieba_merged.ocd2`` for the C++ plugin.  Python
+    ``jieba`` consumes cppjieba's text dictionaries directly, so that request
+    is mapped to ``jieba.dict.utf8`` plus ``user.dict.utf8``.
+    """
+    candidates = []
+
+    if raw_path:
+        if raw_path.endswith('jieba_merged.ocd2'):
+            candidates.append(raw_path[:-len('jieba_merged.ocd2')] + fallback_name)
+            candidates.append(fallback_name)
+        else:
+            candidates.append(raw_path)
+            candidates.append(os.path.join(os.path.dirname(raw_path), fallback_name))
+            candidates.append(fallback_name)
+    else:
+        candidates.append(fallback_name)
+
+    search_dirs = (
+        '',
+        config_dir,
+        os.path.dirname(config_dir) if config_dir else '',
+        _pkg_jieba_dict_dir,
+        _runfiles_jieba_dict_dir,
+        _repo_jieba_dict_dir,
+    )
+
+    seen = set()
+    for candidate in candidates:
+        for search_dir in search_dirs:
+            if not candidate:
+                continue
+            path = candidate if os.path.isabs(candidate) or not search_dir else os.path.join(search_dir, candidate)
+            norm = os.path.abspath(path)
+            if norm in seen:
+                continue
+            seen.add(norm)
+            if os.path.isfile(path):
+                return path
+
+    if required:
+        raise FileNotFoundError(f'Jieba resource not found: {fallback_name!r}')
+    return ''
 
 
 # Dictionary loading
@@ -393,7 +504,12 @@ def _find_config(config_name: str) -> str:
     ``data/config`` directory as a fallback.
     """
     filename = config_name if config_name.endswith('.json') else config_name + '.json'
-    for search_dir in (_pkg_config_dir, _runfiles_config_dir, _repo_config_dir):
+    for search_dir in (
+            _pkg_config_dir,
+            _runfiles_config_dir,
+            _repo_config_dir,
+            _runfiles_jieba_config_dir,
+            _repo_jieba_config_dir):
         if not search_dir:
             continue
         path = os.path.join(search_dir, filename)
@@ -412,21 +528,47 @@ def _is_mmseg_config(config_path: str) -> bool:
         return False
 
 
+def _is_supported_config(config_path: str) -> bool:
+    """Return True if the pure Python backend can use this config now."""
+    try:
+        with open(config_path, encoding='utf-8') as f:
+            cfg = json.load(f)
+        seg_type = cfg.get('segmentation', {}).get('type')
+        if seg_type == 'mmseg':
+            return True
+        if seg_type == 'jieba':
+            if not _jieba_available():
+                return False
+            resources = cfg.get('segmentation', {}).get('resources', {})
+            config_dir = os.path.dirname(config_path)
+            _find_jieba_resource(resources.get('dict_path', ''), config_dir, 'jieba.dict.utf8')
+            return True
+        return False
+    except Exception:
+        return False
+
+
 def list_configs() -> list:
     """
     Return a sorted list of ``.json`` config filenames available to the
-    pure Python converter (mmseg-based configs only).
+    pure Python converter.  Jieba configs are listed only when the optional
+    ``jieba`` package and dictionary data are available.
     """
     configs = []
     seen = set()
-    for search_dir in (_pkg_config_dir, _runfiles_config_dir, _repo_config_dir):
+    for search_dir in (
+            _pkg_config_dir,
+            _runfiles_config_dir,
+            _repo_config_dir,
+            _runfiles_jieba_config_dir,
+            _repo_jieba_config_dir):
         if not search_dir or not os.path.isdir(search_dir):
             continue
         for fname in os.listdir(search_dir):
             if not fname.endswith('.json') or fname in seen:
                 continue
             path = os.path.join(search_dir, fname)
-            if _is_mmseg_config(path):
+            if _is_supported_config(path):
                 configs.append(fname)
                 seen.add(fname)
     return sorted(configs)
@@ -462,25 +604,33 @@ class OpenCC:
 
         self.config = config if config.endswith('.json') else f'{config}.json'
 
-        seg_type = cfg.get('segmentation', {}).get('type', '')
-        if seg_type != 'mmseg':
+        config_dir = os.path.dirname(config_path)
+        segmentation = cfg.get('segmentation', {})
+        seg_type = segmentation.get('type', '')
+        if seg_type == 'mmseg':
+            self._segmenter = _parse_dict_node(segmentation['dict'], config_dir)
+        elif seg_type == 'jieba':
+            self._segmenter = _JiebaSegmenter(
+                segmentation.get('resources', {}),
+                config_dir,
+            )
+        else:
             raise ValueError(
                 f"Config {config_name!r} uses segmentation type {seg_type!r} "
                 f"which is not supported by the pure Python backend."
             )
 
-        self._segmenter: _GroupMatcher = _parse_dict_node(
-            cfg['segmentation']['dict'],
-            os.path.dirname(config_path),
-        )
         self._chain: list = [
-            _parse_dict_node(step['dict'], os.path.dirname(config_path))
+            _parse_dict_node(step['dict'], config_dir)
             for step in cfg['conversion_chain']
         ]
 
     def convert(self, text: str) -> str:
         """Convert *text* and return the result."""
-        segments = _segment(text, self._segmenter)
+        if isinstance(self._segmenter, _JiebaSegmenter):
+            segments = self._segmenter.segment(text)
+        else:
+            segments = _segment(text, self._segmenter)
         result = []
         for seg in segments:
             converted = seg

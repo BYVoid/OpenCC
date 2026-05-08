@@ -11,6 +11,9 @@ py_library(
     data = [
         "//data/config",
         "//data/dictionary:text_dictionaries",
+        "//plugins/jieba:config",
+        "//plugins/jieba/deps/cppjieba:dict/jieba.dict.utf8",
+        "//plugins/jieba/deps/cppjieba:dict/user.dict.utf8",
     ],
     imports = [".."],
 )

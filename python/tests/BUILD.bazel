@@ -6,6 +6,7 @@ py_test(
     size = "small",
     srcs = ["test_opencc.py"],
     data = [
+        "//plugins/jieba:testcases",
         "//test/config_test",
         "//test/testcases",
     ],

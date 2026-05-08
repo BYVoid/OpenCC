@@ -103,9 +103,12 @@ class BuildPyCommand(setuptools.command.build_py.build_py, object):
     def _copy_opencc_data(self):
         src_config = os.path.join(_this_dir, 'data', 'config')
         src_dict = os.path.join(_this_dir, 'data', 'dictionary')
+        src_jieba_config = os.path.join(_this_dir, 'plugins', 'jieba', 'data', 'config')
+        src_jieba_dict = os.path.join(_this_dir, 'plugins', 'jieba', 'deps', 'cppjieba', 'dict')
         dst_base = os.path.join(self.build_lib, 'opencc')
         dst_config = os.path.join(dst_base, 'config')
         dst_dict = os.path.join(dst_base, 'dictionary')
+        dst_jieba_dict = os.path.join(dst_base, 'jieba_dict')
 
         os.makedirs(dst_config, exist_ok=True)
         for fname in os.listdir(src_config):
@@ -117,6 +120,13 @@ class BuildPyCommand(setuptools.command.build_py.build_py, object):
             if config.get('segmentation', {}).get('type') != 'mmseg':
                 continue
             shutil.copy2(src_config_path, os.path.join(dst_config, fname))
+        if os.path.isdir(src_jieba_config):
+            for fname in os.listdir(src_jieba_config):
+                if fname.endswith('.json'):
+                    shutil.copy2(
+                        os.path.join(src_jieba_config, fname),
+                        os.path.join(dst_config, fname),
+                    )
 
         os.makedirs(dst_dict, exist_ok=True)
         for fname in os.listdir(src_dict):
@@ -125,6 +135,11 @@ class BuildPyCommand(setuptools.command.build_py.build_py, object):
                     os.path.join(src_dict, fname),
                     os.path.join(dst_dict, fname),
                 )
+        os.makedirs(dst_jieba_dict, exist_ok=True)
+        for fname in ('jieba.dict.utf8', 'user.dict.utf8'):
+            src_path = os.path.join(src_jieba_dict, fname)
+            if os.path.isfile(src_path):
+                shutil.copy2(src_path, os.path.join(dst_jieba_dict, fname))
 
 
 packages = ['opencc']
@@ -145,7 +160,7 @@ setuptools.setup(
     packages=packages,
     package_dir={'opencc': 'python/opencc'},
     package_data={
-        'opencc': ['py.typed', 'config/*.json', 'dictionary/*.txt'],
+        'opencc': ['py.typed', 'config/*.json', 'dictionary/*.txt', 'jieba_dict/*.utf8'],
     },
     cmdclass={
         'build_py': BuildPyCommand,

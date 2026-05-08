@@ -1,4 +1,5 @@
 import json
+import importlib.util
 import os
 import pytest
 import sys
@@ -7,6 +8,18 @@ _this_dir = os.path.dirname(os.path.abspath(__file__))
 _opencc_rootdir = os.path.abspath(os.path.join(_this_dir, '..', '..'))
 _testcases_path = os.path.join(_opencc_rootdir, 'test', 'testcases', 'testcases.json')
 _config_test_path = os.path.join(_opencc_rootdir, 'test', 'config_test', 'config_test.json')
+_jieba_testcases_path = os.path.join(
+    _opencc_rootdir,
+    'plugins',
+    'jieba',
+    'tests',
+    'data',
+    'jieba_comparison_testcases.json',
+)
+
+
+def _has_jieba():
+    return importlib.util.find_spec('jieba') is not None
 
 
 def test_import():
@@ -21,10 +34,39 @@ def test_init_delete_converter():
         del converter
 
 
-def test_jieba_configs_are_not_exposed():
+def test_jieba_configs_are_exposed_only_when_optional_dependency_is_available():
     import opencc
 
-    assert all('jieba' not in config for config in opencc.CONFIGS)
+    if _has_jieba():
+        assert any('jieba' in config for config in opencc.CONFIGS)
+    else:
+        assert all('jieba' not in config for config in opencc.CONFIGS)
+
+
+def test_jieba_config_requires_optional_dependency_when_missing():
+    if _has_jieba():
+        pytest.skip('jieba is installed')
+
+    import opencc
+
+    with pytest.raises(ImportError, match='pip install jieba'):
+        opencc.OpenCC('s2t_jieba')
+
+
+@pytest.mark.skipif(not _has_jieba(), reason='jieba optional dependency is not installed')
+def test_jieba_configs_match_plugin_comparison_cases():
+    import opencc
+
+    with open(_jieba_testcases_path, 'r', encoding='utf-8') as f:
+        parsed = json.load(f)
+
+    for case in parsed['cases']:
+        for cfg, ans in case.get('expected', {}).items():
+            if not cfg.endswith('_jieba'):
+                continue
+            converter = opencc.OpenCC(f'{cfg}.json')
+            assert converter.convert(case['input']) == ans, \
+                'Failed to convert {} for {} -> {}'.format(cfg, case['input'], ans)
 
 
 def test_custom_config_resolves_local_dictionaries():

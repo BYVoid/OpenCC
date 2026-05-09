@@ -22,6 +22,15 @@ TEXT_DICTS = glob(["*.txt"]) + [
     "JPVariantsRev.txt",
 ]
 
+NON_BMP_TEXT_DICTS = [
+    txt
+    for txt in TEXT_DICTS
+    if txt not in [
+        "STCharacters.txt",
+        "TSCharacters.txt",
+    ]
+]
+
 [
     genrule(
         name = "generate_bin_" + txt[:-4],
@@ -47,19 +56,77 @@ filegroup(
     srcs = [txt.replace(".txt", ".ocd2") for txt in TEXT_DICTS],
 )
 
+[
+    cc_test(
+        name = "dictionary_" + txt[:-4] + "_test",
+        size = "small",
+        srcs = ["DictionaryTest.cpp"],
+        local_defines = [
+            "OPENCC_DICTIONARY_TEST_FILE=\\\"" + txt + "\\\"",
+        ],
+        data = [
+            txt,
+            txt.replace(".txt", ".ocd2"),
+        ],
+        deps = [
+            "//src:lexicon",
+            "//src:marisa_dict",
+            "//src:utf8_util",
+            "@bazel_tools//tools/cpp/runfiles",
+            "@googletest//:gtest_main",
+        ],
+    )
+    for txt in TEXT_DICTS
+]
+
 cc_test(
-    name = "dictionary_test",
+    name = "dictionary_TWPhrases_reverse_mapping_test",
     size = "small",
-    srcs = ["DictionaryTest.cpp"],
+    srcs = ["DictionaryReverseMappingTest.cpp"],
     data = [
-        ":binary_dictionaries",
-        ":text_dictionaries",
+        "TWPhrases.txt",
+        "TWPhrasesRev.txt",
     ],
     deps = [
         "//src:lexicon",
-        "//src:marisa_dict",
         "//src:utf8_util",
         "@bazel_tools//tools/cpp/runfiles",
         "@googletest//:gtest_main",
+    ],
+)
+
+test_suite(
+    name = "dictionary_test",
+    tests = [
+        ":dictionary_" + txt[:-4] + "_test"
+        for txt in TEXT_DICTS
+    ] + [
+        ":dictionary_TWPhrases_reverse_mapping_test",
+    ],
+)
+
+[
+    cc_test(
+        name = "dictionary_non_bmp_" + txt[:-4] + "_test",
+        size = "small",
+        srcs = ["DictionaryNonBmpTest.cpp"],
+        local_defines = [
+            "OPENCC_DICTIONARY_NON_BMP_TEST_FILE=\\\"" + txt + "\\\"",
+        ],
+        data = [txt],
+        deps = [
+            "//src:utf8_util",
+            "@bazel_tools//tools/cpp/runfiles",
+            "@googletest//:gtest_main",
+        ],
+    )
+    for txt in NON_BMP_TEXT_DICTS
+]
+
+test_suite(
+    name = "dictionary_non_bmp_test",
+    tests = [
+        ":dictionary_non_bmp_" + txt[:-4] + "_test"
+        for txt in NON_BMP_TEXT_DICTS
     ],
 )

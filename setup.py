@@ -1,18 +1,14 @@
+import json
 import os
 import re
 import shutil
 import subprocess
-import sys
-import warnings
 
 import setuptools
-import setuptools.command.build_ext
-import wheel.bdist_wheel
+import setuptools.command.build_py
 
 _this_dir = os.path.dirname(os.path.abspath(__file__))
-_build_dir = os.path.join(_this_dir, 'build', 'python')
 
-_cmake_file = os.path.join(_this_dir, 'CMakeLists.txt')
 _author_file = os.path.join(_this_dir, 'AUTHORS')
 _readme_file = os.path.join(_this_dir, 'README.md')
 _fallback_version = '1.3.1'
@@ -97,109 +93,59 @@ def get_long_description():
         return f.read().decode('utf-8')
 
 
-def build_libopencc(output_path):
-    print('building libopencc into %s' % _build_dir)
+class BuildPyCommand(setuptools.command.build_py.build_py, object):
+    """Bundle OpenCC's JSON configs and text dictionaries into the package."""
 
-    is_windows = sys.platform == 'win32'
+    def run(self):
+        super(BuildPyCommand, self).run()
+        self._copy_opencc_data()
 
-    # Make build directories
-    os.makedirs(_build_dir, exist_ok=True)
+    def _copy_opencc_data(self):
+        src_config = os.path.join(_this_dir, 'data', 'config')
+        src_dict = os.path.join(_this_dir, 'data', 'dictionary')
+        src_jieba_config = os.path.join(_this_dir, 'plugins', 'jieba', 'data', 'config')
+        src_jieba_dict = os.path.join(_this_dir, 'plugins', 'jieba', 'deps', 'cppjieba', 'dict')
+        dst_base = os.path.join(self.build_lib, 'opencc')
+        dst_config = os.path.join(dst_base, 'config')
+        dst_dict = os.path.join(dst_base, 'dictionary')
+        dst_jieba_dict = os.path.join(dst_base, 'jieba_dict')
 
-    # Configure
-    cmake_args = [
-        '-DBUILD_DOCUMENTATION:BOOL=OFF',
-        '-DBUILD_SHARED_LIBS:BOOL=OFF',
-        '-DENABLE_GTEST:BOOL=OFF',
-        '-DENABLE_BENCHMARK:BOOL=OFF',
-        '-DBUILD_PYTHON:BOOL=ON',
-        '-DCMAKE_BUILD_TYPE=Release',
-        '-DCMAKE_INSTALL_PREFIX={}'.format(output_path),
-        '-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}'.format(output_path),
-        '-DPYTHON_EXECUTABLE={}'.format(sys.executable),
-    ]
+        os.makedirs(dst_config, exist_ok=True)
+        for fname in os.listdir(src_config):
+            if not fname.endswith('.json'):
+                continue
+            src_config_path = os.path.join(src_config, fname)
+            with open(src_config_path, encoding='utf-8') as f:
+                config = json.load(f)
+            if config.get('segmentation', {}).get('type') != 'mmseg':
+                continue
+            shutil.copy2(src_config_path, os.path.join(dst_config, fname))
+        if os.path.isdir(src_jieba_config):
+            for fname in os.listdir(src_jieba_config):
+                if fname.endswith('.json'):
+                    shutil.copy2(
+                        os.path.join(src_jieba_config, fname),
+                        os.path.join(dst_config, fname),
+                    )
 
-    if is_windows:
-        cmake_args += \
-            ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE={}'.format(output_path)]
-        if sys.maxsize > 2**32:
-            cmake_args += ['-A', 'x64']
-
-    cmd = ['cmake', '-B', _build_dir] + cmake_args
-    errno = subprocess.call(cmd)
-    assert errno == 0, 'Configure failed'
-
-    # Build
-    cmd = [
-        'cmake', '--build', _build_dir,
-        '--config', 'Release',
-        '--target', 'install'
-    ]
-    errno = subprocess.call(cmd)
-    assert errno == 0, 'Build failed'
-
-
-class OpenCCExtension(setuptools.Extension, object):
-    def __init__(self, name, sourcedir=''):
-        setuptools.Extension.__init__(self, name, sources=[])
-        self.sourcedir = os.path.abspath(sourcedir)
-
-
-class BuildExtCommand(setuptools.command.build_ext.build_ext, object):
-    def build_extension(self, ext):
-        if self.inplace:
-            output_path = os.path.join(_this_dir, 'python', 'opencc', 'clib')
-        else:
-            output_path = os.path.abspath(os.path.join(self.build_lib, 'opencc', 'clib'))
-        if isinstance(ext, OpenCCExtension):
-            build_libopencc(output_path)
-        else:
-            super(BuildExtCommand, self).build_extension(ext)
+        os.makedirs(dst_dict, exist_ok=True)
+        for fname in os.listdir(src_dict):
+            if fname.endswith('.txt'):
+                shutil.copy2(
+                    os.path.join(src_dict, fname),
+                    os.path.join(dst_dict, fname),
+                )
+        os.makedirs(dst_jieba_dict, exist_ok=True)
+        for fname in ('jieba.dict.utf8', 'user.dict.utf8'):
+            src_path = os.path.join(src_jieba_dict, fname)
+            if os.path.isfile(src_path):
+                shutil.copy2(src_path, os.path.join(dst_jieba_dict, fname))
 
 
-class BDistWheelCommand(wheel.bdist_wheel.bdist_wheel, object):
-    """Custom bdsit_wheel command that will change
-    default plat-name based on PEP 425 and PEP 513
-    """
-
-    @staticmethod
-    def _determine_platform_tag():
-        if sys.platform == 'win32':
-            if 'amd64' in sys.version.lower():
-                return 'win-amd64'
-            return sys.platform
-
-        if sys.platform == 'darwin':
-            _, _, _, _, machine = os.uname()
-            if machine == 'x86_64':
-                return 'macosx-10.9-{}'.format(machine)
-            if machine == 'arm64':
-                return 'macosx-11.0-{}'.format(machine)
-            else:
-                raise NotImplementedError
-
-        if os.name == 'posix':
-            _, _, _, _, machine = os.uname()
-            return 'manylinux2014-{}'.format(machine)
-
-        warnings.warn(
-            'Windows macos and linux are all not detected, '
-            'Proper distribution name cannot be determined.')
-        from distutils.util import get_platform
-        return get_platform()
-
-    def initialize_options(self):
-        super(BDistWheelCommand, self).initialize_options()
-        self.plat_name = self._determine_platform_tag()
-
-
-packages = ['opencc', 'opencc.clib']
+packages = ['opencc']
 
 version_info = get_version_info()
 author_info = get_author_info()
-
-setup_requires = []
-if not shutil.which('cmake'):
-    setup_requires.append('cmake')
 
 setuptools.setup(
     name='OpenCC',
@@ -213,12 +159,12 @@ setuptools.setup(
 
     packages=packages,
     package_dir={'opencc': 'python/opencc'},
-    ext_modules=[OpenCCExtension('opencc.clib.opencc_clib', 'python')],
-    cmdclass={
-        'build_ext': BuildExtCommand,
-        'bdist_wheel': BDistWheelCommand,
+    package_data={
+        'opencc': ['py.typed', 'config/*.json', 'dictionary/*.txt', 'jieba_dict/*.utf8'],
     },
-    setup_requires=setup_requires,
+    cmdclass={
+        'build_py': BuildPyCommand,
+    },
 
     classifiers=[
         'Development Status :: 5 - Production/Stable',

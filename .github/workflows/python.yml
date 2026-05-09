@@ -61,12 +61,7 @@ jobs:
   test-pypi:
     permissions:
       contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, macos-14, windows-latest]
-        python-build: ["cp312"]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -87,19 +82,16 @@ jobs:
           python-version: "3.12"
 
       - name: Build and test wheel
-        uses: pypa/cibuildwheel@v3.2.1
-        env:
-          CIBW_BUILD: ${{ matrix.python-build }}-*
-          CIBW_SKIP: "*-musllinux_*"
-          CIBW_ARCHS_WINDOWS: "AMD64"
-          CIBW_MANYLINUX_X86_64_IMAGE: "manylinux2014"
-          CIBW_TEST_REQUIRES: "pytest"
-          CIBW_TEST_COMMAND: "pytest {project}/python/tests"
+        run: |
+          python -m pip install --upgrade pip build pytest
+          python -m build --wheel --outdir wheelhouse
+          python -m pip install wheelhouse/*.whl
+          pytest python/tests
 
       - name: upload artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: opencc-${{ env.VERSION }}-pypi-${{ matrix.os }}-${{ matrix.python-build }}
+          name: opencc-${{ env.VERSION }}-pypi
           path: |
             wheelhouse/*.whl

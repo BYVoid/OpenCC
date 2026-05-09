@@ -4,12 +4,16 @@ package(default_visibility = ["//visibility:public"])
 
 py_library(
     name = "opencc",
-    srcs = ["__init__.py"],
+    srcs = [
+        "__init__.py",
+        "_opencc_pure.py",
+    ],
     data = [
         "//data/config",
-        "//data/dictionary:binary_dictionaries",
         "//data/dictionary:text_dictionaries",
+        "//plugins/jieba:config",
+        "//plugins/jieba/deps/cppjieba:dict/jieba.dict.utf8",
+        "//plugins/jieba/deps/cppjieba:dict/user.dict.utf8",
     ],
     imports = [".."],
-    deps = ["//src:py_opencc"],
 )

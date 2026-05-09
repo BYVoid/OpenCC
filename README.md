@@ -89,6 +89,20 @@ See [demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js) and [ts
 
 `pip install opencc` (Windows, Linux, macOS)
 
+The Python package uses the pure Python implementation and supports the built-in
+mmseg-based configs. Jieba configs are optional: install `jieba` manually with
+`pip install jieba` to use configs such as `s2t_jieba` or `s2twp_jieba`.
+Installing `opencc` does not install `jieba` automatically. The Python package
+does not load the C++ `opencc-jieba` plugin; it uses the optional Python
+`jieba` package with bundled Jieba text dictionaries.
+
+The pure Python implementation loads text dictionaries. Built-in configs keep
+their standard `.ocd2` dictionary references, and the Python loader resolves
+those references to bundled same-stem `.txt` dictionaries when possible. Custom
+configs that reference `.ocd` or `.ocd2` dictionaries must also provide matching
+text dictionary files; binary dictionary files are not parsed by the Python
+package.
+
 ```python
 import opencc
 converter = opencc.OpenCC('s2t.json')
@@ -218,6 +232,8 @@ OpenCC now supports external C++ segmentation plugins. The first plugin is
 - 該插件機制目前仍為試驗性功能。
 - `jieba` 插件是可選組件，預設 OpenCC 構建、Python 套件和 Node.js 套件都不要求它。
 - `opencc-jieba` 額外依賴 `cppjieba` 及其配套詞典資源，這些依賴僅在構建或分發該插件時需要。
+- Python 套件不載入此 C++ 插件；安裝 Python `jieba` 套件後，Python 版會使用純 Python
+  後端與打包的 Jieba 文字詞典支援 `*_jieba` 配置。
 - 在下一次正式發布版本之前，插件 ABI 仍可能發生變化，不應視為穩定介面。
 - 我們預計從下一次正式發布版本開始，將插件 ABI 視為穩定介面。
 - Windows 下插件必須與宿主 OpenCC 二進位使用 ABI 相容的工具鏈／執行時構建；MSVC 與 MinGW 產物不支援混用。
@@ -230,6 +246,9 @@ Notes:
 - `opencc-jieba` additionally depends on `cppjieba` and its dictionary
   resources. These dependencies are only needed when building or distributing
   the plugin itself.
+- The Python package does not load this C++ plugin. If the Python `jieba`
+  package is installed manually, the pure Python backend supports `*_jieba`
+  configs with packaged Jieba text dictionaries.
 - The plugin ABI may still change before the next formal OpenCC release and
   should not yet be treated as stable.
 - We expect to treat the plugin ABI as stable starting with the next formal
@@ -288,7 +307,8 @@ bazel test --test_output=all //src/... //data/... //python/... //test/...
 make benchmark
 ```
 
-Example results (from Github CI, commit ID 9e80d5d, 2026-04-16, CMake macos-latest):
+Example results (from Github CI, commit ID 9e80d5d, 2026-04-16, CMake macos-latest).
+These are C++ core/plugin benchmarks, not Python package benchmarks:
 
 ```
 -------------------------------------------------------------------------
@@ -353,6 +373,9 @@ Apache License 2.0
 * [cppjieba](https://github.com/yanyiwu/cppjieba) MIT License
   - Optional dependency used by the experimental `opencc-jieba` plugin.
   - 試驗性 `opencc-jieba` 插件使用的可選依賴。
+* [jieba](https://github.com/fxsjy/jieba) MIT License
+  - Optional runtime dependency for Python `*_jieba` configs; not installed by default.
+  - Python `*_jieba` 配置的可選執行時依賴；預設不安裝。
 
 ## Change History 版本歷史
 

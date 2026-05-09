@@ -21,6 +21,9 @@ const BUILT_IN_CONFIGS = [
   ['jp2t.json', 'New Japanese Kanji (Shinjitai) to Traditional Chinese Characters (Kyujitai) (OpenCC Standard)'],
 ];
 const BUILT_IN_CONFIG_NAMES = new Set(BUILT_IN_CONFIGS.map(([name]) => name));
+const BUILT_IN_CONFIG_STEMS = new Set(
+  BUILT_IN_CONFIGS.map(([name]) => name.replace(/\.json$/, ''))
+);
 
 function printHelp() {
   console.log(`Open Chinese Convert (OpenCC) npm Command Line Tool
@@ -129,6 +132,11 @@ function resolveConfigPath(config) {
   if (BUILT_IN_CONFIG_NAMES.has(config) || path.isAbsolute(config)) {
     return config;
   }
+
+  if (!config.endsWith('.json') && BUILT_IN_CONFIG_STEMS.has(config)) {
+    return config + '.json';
+  }
+
   return path.resolve(process.cwd(), config);
 }
 

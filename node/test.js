@@ -87,6 +87,15 @@ describe('npm CLI', function () {
     assert.equal(result.stdout, '漢字');
   });
 
+  it('appends .json to built-in config names', function () {
+    const result = childProcess.spawnSync(process.execPath, [cli, '-c', 's2t'], {
+      input: '汉字',
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, '漢字');
+  });
+
   it('converts input file to output file', function () {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'opencc-node-cli-'));
     const input = path.join(dir, 'input.txt');
@@ -120,6 +129,22 @@ describe('npm CLI', function () {
     });
     assert.equal(result.status, 0, result.stderr);
     assert.equal(result.stdout, '漢字');
+  });
+
+  it('does not append .json to custom relative config paths', function () {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'opencc-node-cli-config-stem-'));
+    const assetsPath = getAssetsPath();
+    fs.copyFileSync(path.join(assetsPath, 's2t.json'), path.join(dir, 'custom-s2t.json'));
+    fs.copyFileSync(path.join(assetsPath, 'STPhrases.ocd2'), path.join(dir, 'STPhrases.ocd2'));
+    fs.copyFileSync(path.join(assetsPath, 'STCharacters.ocd2'), path.join(dir, 'STCharacters.ocd2'));
+
+    const result = childProcess.spawnSync(process.execPath, [cli, '-c', './custom-s2t'], {
+      cwd: dir,
+      input: '汉字',
+      encoding: 'utf8',
+    });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /custom-s2t/);
   });
 
   it('prints help', function () {

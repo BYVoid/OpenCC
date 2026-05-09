@@ -77,6 +77,7 @@ set +e
   -I"$napi_include_dir" \
   "${sources[@]}" \
   "$node_import_lib" \
+  -Wl,--strip-all \
   -Wl,--build-id=sha1 \
   -o "$output" \
   2>"$zig_log"

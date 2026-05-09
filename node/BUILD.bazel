@@ -4,6 +4,28 @@ load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 package(default_visibility = ["//visibility:public"])
 
+NODE_OPENCC_SOURCES = [
+    "opencc.cc",
+    "//src:BinaryDict.cpp",
+    "//src:Config.cpp",
+    "//src:Conversion.cpp",
+    "//src:ConversionChain.cpp",
+    "//src:Converter.cpp",
+    "//src:Dict.cpp",
+    "//src:DictConverter.cpp",
+    "//src:DictEntry.cpp",
+    "//src:DictGroup.cpp",
+    "//src:Lexicon.cpp",
+    "//src:MarisaDict.cpp",
+    "//src:MaxMatchSegmentation.cpp",
+    "//src:PluginSegmentation.cpp",
+    "//src:PrefixMatch.cpp",
+    "//src:Segmentation.cpp",
+    "//src:SerializedValues.cpp",
+    "//src:TextDict.cpp",
+    "//src:UTF8Util.cpp",
+]
+
 # The shared library that becomes opencc.node.
 # cc_binary with linkshared=True on Linux produces "libopencc_clib.so";
 # on macOS it produces "libopencc_clib.dylib". We rename via genrule below.
@@ -49,4 +71,31 @@ genrule(
     srcs = [":opencc_clib"],
     outs = ["opencc.node"],
     cmd = "cp $(location :opencc_clib) $@",
+)
+
+genrule(
+    name = "opencc_node_windows_zig",
+    srcs = NODE_OPENCC_SOURCES + [
+        "//deps/marisa-0.3.1:all_files",
+        "//deps/rapidjson-1.1.0:all_files",
+        "//src:all_files",
+        "@node_addon_api//:all_files",
+        "@node_headers//:all_files",
+    ],
+    outs = ["windows-x64/opencc.node"],
+    cmd = (
+        "bash $(location //scripts:build_node_windows_zig) " +
+        "$@ " +
+        "$(location @node_headers//:node_api_header) " +
+        "$(location @node_addon_api//:napi_header) " +
+        "$(location @node_win_x64_lib//file)"
+    ),
+    tools = [
+        "//scripts:build_node_windows_zig",
+        "@node_addon_api//:all_files",
+        "@node_addon_api//:napi_header",
+        "@node_headers//:all_files",
+        "@node_headers//:node_api_header",
+        "@node_win_x64_lib//file",
+    ],
 )

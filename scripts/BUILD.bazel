@@ -1,0 +1,6 @@
+package(default_visibility = ["//visibility:public"])
+
+sh_binary(
+    name = "build_node_windows_zig",
+    srcs = ["build-node-windows-zig.sh"],
+)

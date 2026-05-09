@@ -10,6 +10,7 @@ process.chdir(rootDir);
 let platform = os.platform();
 let arch = os.arch();
 let bazelFlags = '-c opt';
+let libTarget = '//plugins/jieba:opencc-jieba';
 
 // E.g., node build.js linux-arm64
 if (process.argv[2]) {
@@ -20,6 +21,8 @@ if (process.argv[2]) {
     if (platform === 'linux') {
       const configArch = arch === 'x64' ? 'x86_64' : arch;
       bazelFlags += ` --config=linux-${configArch}-remote`;
+    } else if (platform === 'win32' && arch === 'x64') {
+      libTarget = '//plugins/jieba:opencc_jieba_windows_zig';
     }
   }
 }
@@ -29,14 +32,14 @@ bazelFlags += ' --remote_download_toplevel';
 
 console.log(`Building native addon and dictionary via Bazel for ${platform}-${arch}...`);
 try {
-  execSync(`bazel build ${bazelFlags} //plugins/jieba:opencc-jieba //plugins/jieba:jieba_merged_dict`, { stdio: 'inherit' });
+  execSync(`bazel build ${bazelFlags} ${libTarget} //plugins/jieba:jieba_merged_dict`, { stdio: 'inherit' });
 } catch (err) {
   console.error('Bazel build failed.', err);
   process.exit(1);
 }
 
 // Dynamically resolve exact output paths using cquery
-const libPathCmd = `bazel cquery ${bazelFlags} --output=files //plugins/jieba:opencc-jieba`;
+const libPathCmd = `bazel cquery ${bazelFlags} --output=files ${libTarget}`;
 const libSrcRaw = execSync(libPathCmd, { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] }).trim().split('\n').pop();
 const libSrc = path.join(rootDir, libSrcRaw);
 

@@ -11,6 +11,29 @@ const { prepareArtifacts } = require('../scripts/prepare-node-prebuild-artifacts
 
 const cases = JSON.parse(fs.readFileSync('test/testcases/testcases.json', 'utf-8')).cases || [];
 
+function createLocalInstalledShape() {
+  const rootDir = path.resolve(__dirname, '..');
+  const jiebaPackageDir = path.join(rootDir, 'plugins', 'jieba', 'node');
+  const libName = os.platform() === 'win32' ? 'opencc-jieba.dll'
+    : os.platform() === 'darwin' ? 'libopencc-jieba.dylib'
+      : 'libopencc-jieba.so';
+  const requiredFiles = [
+    path.join(jiebaPackageDir, 'index.js'),
+    path.join(jiebaPackageDir, 'data', 's2twp_jieba.json'),
+    path.join(jiebaPackageDir, 'data', 'jieba_dict', 'jieba_merged.ocd2'),
+    path.join(jiebaPackageDir, 'prebuilds', `${os.platform()}-${os.arch()}`, libName),
+  ];
+  if (!requiredFiles.every((file) => fs.existsSync(file))) {
+    return null;
+  }
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'opencc-node-jieba-'));
+  const nodeModulesDir = path.join(root, 'node_modules');
+  fs.mkdirSync(nodeModulesDir, { recursive: true });
+  fs.symlinkSync(rootDir, path.join(nodeModulesDir, 'opencc'), 'dir');
+  fs.symlinkSync(jiebaPackageDir, path.join(nodeModulesDir, 'opencc-jieba'), 'dir');
+  return root;
+}
+
 const testSync = function (tc, cfg, expected, done) {
   const opencc = new OpenCC(cfg + '.json');
   const converted = opencc.convertSync(tc.input);
@@ -157,7 +180,6 @@ describe('npm CLI', function () {
     assert.match(result.stdout, /Unsupported in the npm CLI:/);
     assert.match(result.stdout, /--inspect/);
     assert.match(result.stdout, /--segmentation/);
-    assert.match(result.stdout, /plugins/);
   });
 
   it('prints version', function () {
@@ -191,6 +213,44 @@ describe('npm CLI', function () {
       assert.notEqual(result.status, 0);
       assert.match(result.stderr, /Missing value/);
     }
+  });
+});
+
+describe('Optional opencc-jieba package integration', function () {
+  it('loads jieba configs by mode name in the JavaScript API', function () {
+    const installRoot = createLocalInstalledShape();
+    if (!installRoot) this.skip();
+
+    const script = [
+      "const OpenCC = require('opencc');",
+      "const converter = new OpenCC('s2twp_jieba');",
+      "process.stdout.write(converter.convertSync('云计算'));",
+    ].join('');
+    const result = childProcess.spawnSync(process.execPath, ['-e', script], {
+      cwd: installRoot,
+      env: { ...process.env },
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, '雲端計算');
+  });
+
+  it('loads jieba configs by mode name in the npm CLI', function () {
+    const installRoot = createLocalInstalledShape();
+    if (!installRoot) this.skip();
+
+    const result = childProcess.spawnSync(process.execPath, [
+      path.join(installRoot, 'node_modules', 'opencc', 'node', 'cli.js'),
+      '-c',
+      's2twp_jieba',
+    ], {
+      cwd: installRoot,
+      env: { ...process.env },
+      input: '云计算',
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, '雲端計算');
   });
 });
 

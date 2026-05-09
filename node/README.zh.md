@@ -185,17 +185,23 @@ CLI 的相對配置路徑會從目前工作目錄解析。在 JavaScript API 中
 npm install opencc opencc-jieba
 ```
 
-安裝 `opencc-jieba` 後，JavaScript API 可以自動載入其中的配置：
+安裝 `opencc-jieba` 後，JavaScript API 與 npm `opencc` CLI 可以自動
+載入其中的配置：
 
 ```js
 import OpenCC from 'opencc';
 
-const converter = new OpenCC('s2twp_jieba.json');
+const converter = new OpenCC('s2twp_jieba');
 console.log(converter.convertSync('软件鼠标'));
 ```
 
-npm `opencc` CLI 不支援插件分詞。這類工作流程請使用 JavaScript API
-或原生 OpenCC CLI。
+npm CLI 也可使用相同配置名稱進行文字轉換：
+
+```bash
+opencc -c s2twp_jieba
+```
+
+`--inspect`、`--segmentation` 等診斷模式仍請使用原生 OpenCC CLI。
 
 ## 相關 npm 套件
 
@@ -231,4 +237,3 @@ npm test
 
 若要為發布建置預編譯原生 addon，請參考
 [`node/PUBLISHING.md`](./PUBLISHING.md)。
-

@@ -24,6 +24,16 @@ const BUILT_IN_CONFIG_NAMES = new Set(BUILT_IN_CONFIGS.map(([name]) => name));
 const BUILT_IN_CONFIG_STEMS = new Set(
   BUILT_IN_CONFIGS.map(([name]) => name.replace(/\.json$/, ''))
 );
+const OPTIONAL_JIEBA_CONFIGS = new Set([
+  's2hk_jieba.json',
+  's2t_jieba.json',
+  's2tw_jieba.json',
+  's2twp_jieba.json',
+  'tw2sp_jieba.json',
+]);
+const OPTIONAL_JIEBA_CONFIG_STEMS = new Set(
+  Array.from(OPTIONAL_JIEBA_CONFIGS).map((name) => name.replace(/\.json$/, ''))
+);
 
 function printHelp() {
   console.log(`Open Chinese Convert (OpenCC) npm Command Line Tool
@@ -41,7 +51,6 @@ Options:
 Unsupported in the npm CLI:
   --inspect            Use the native OpenCC CLI for inspection output.
   --segmentation       Use the native OpenCC CLI for segmentation output.
-  plugins              Plugin-backed segmentation is not supported by this npm CLI.
 
 Built-in Configurations:
 ${BUILT_IN_CONFIGS.map(([name, description]) => `  ${name.padEnd(11)} ${description}`).join('\n')}
@@ -129,11 +138,15 @@ function writeOutput(outputFileName, text) {
 }
 
 function resolveConfigPath(config) {
-  if (BUILT_IN_CONFIG_NAMES.has(config) || path.isAbsolute(config)) {
+  if (BUILT_IN_CONFIG_NAMES.has(config) || OPTIONAL_JIEBA_CONFIGS.has(config) || path.isAbsolute(config)) {
     return config;
   }
 
   if (!config.endsWith('.json') && BUILT_IN_CONFIG_STEMS.has(config)) {
+    return config + '.json';
+  }
+
+  if (!config.endsWith('.json') && OPTIONAL_JIEBA_CONFIG_STEMS.has(config)) {
     return config + '.json';
   }
 

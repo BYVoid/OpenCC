@@ -189,18 +189,24 @@ Some OpenCC configurations use jieba segmentation. Install the optional
 npm install opencc opencc-jieba
 ```
 
-When `opencc-jieba` is installed, the JavaScript API can load its configs
-automatically:
+When `opencc-jieba` is installed, the JavaScript API and npm `opencc` CLI can
+load its configs automatically:
 
 ```js
 import OpenCC from 'opencc';
 
-const converter = new OpenCC('s2twp_jieba.json');
+const converter = new OpenCC('s2twp_jieba');
 console.log(converter.convertSync('软件鼠标'));
 ```
 
-The npm `opencc` CLI does not support plugin-backed segmentation. Use the
-JavaScript API or the native OpenCC CLI for those workflows.
+The npm CLI also accepts the same config names for text conversion:
+
+```bash
+opencc -c s2twp_jieba
+```
+
+Use the native OpenCC CLI for diagnostic modes such as `--inspect` and
+`--segmentation`.
 
 ## Related npm Packages
 

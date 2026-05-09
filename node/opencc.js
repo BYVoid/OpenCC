@@ -44,19 +44,34 @@ const getAssetsPath = function (bindingPath) {
   return bindingDir;
 };
 
-// Detect optional opencc-jieba plugin package.
-// When installed, jieba-based configs (e.g. s2twp_jieba.json) become available.
-let jiebaInfo = null;
-try {
-  jiebaInfo = require('opencc-jieba');
-} catch (e) {
-  // opencc-jieba not installed — jieba configs won't be available.
+function requireOptionalPeer(packageName) {
+  const searchPaths = [
+    process.cwd(),
+    path.join(__dirname, '..'),
+    __dirname,
+  ];
+  for (const searchPath of searchPaths) {
+    try {
+      return require(require.resolve(packageName, { paths: [searchPath] }));
+    } catch (e) {
+      // Try the next search path.
+    }
+  }
+  return null;
 }
 
+// Detect optional opencc-jieba plugin package.
+// When installed, jieba-based configs (e.g. s2twp_jieba.json) become available.
+const jiebaInfo = requireOptionalPeer('opencc-jieba');
+
 const assetsPath = getAssetsPath(bindingPath);
+const isAbsolutePath = function (filePath) {
+  return path.isAbsolute(filePath) || /^[A-Za-z]:[\\/]/.test(filePath);
+};
+
 const getConfigPath = function (config) {
   let configPath = config;
-  if (config[0] !== '/' && config[1] !== ':') {
+  if (!isAbsolutePath(config)) {
     // Resolve relative path
     configPath = path.join(assetsPath, config);
   }
@@ -112,6 +127,29 @@ function patchConfigPaths(config, jieba, mainAssetsDir) {
   }
 }
 
+function resolveJiebaConfigPath(config, jieba) {
+  if (!jieba || isAbsolutePath(config)) {
+    return null;
+  }
+  if (typeof jieba.resolveConfigPath === 'function') {
+    return jieba.resolveConfigPath(config);
+  }
+  const candidates = [config];
+  if (!config.endsWith('.json')) {
+    candidates.push(config + '.json');
+  }
+  for (const candidate of candidates) {
+    if (candidate.includes('/') || candidate.includes('\\')) {
+      continue;
+    }
+    const configPath = path.join(jieba.dataDir, candidate);
+    if (fs.existsSync(configPath)) {
+      return configPath;
+    }
+  }
+  return null;
+}
+
 /**
  * OpenCC Node.js API
  *
@@ -127,17 +165,15 @@ const OpenCC = module.exports = function (config) {
   // When opencc-jieba is installed, check if the requested config is a jieba
   // config. If so, load its JSON, patch all paths to absolute, and pass the
   // patched JSON string directly to the C++ layer via NewFromString.
-  if (jiebaInfo && config[0] !== '/' && config[1] !== ':') {
-    const jiebaConfigPath = path.join(jiebaInfo.dataDir, config);
-    if (fs.existsSync(jiebaConfigPath)) {
-      const raw = JSON.parse(fs.readFileSync(jiebaConfigPath, 'utf-8'));
-      patchConfigPaths(raw, jiebaInfo, assetsPath);
-      this.handler = new binding.Opencc(
-        JSON.stringify(raw),
-        jiebaInfo.dataDir + '/'
-      );
-      return;
-    }
+  const jiebaConfigPath = resolveJiebaConfigPath(config, jiebaInfo);
+  if (jiebaConfigPath) {
+    const raw = JSON.parse(fs.readFileSync(jiebaConfigPath, 'utf-8'));
+    patchConfigPaths(raw, jiebaInfo, assetsPath);
+    this.handler = new binding.Opencc(
+      JSON.stringify(raw),
+      jiebaInfo.dataDir + '/'
+    );
+    return;
   }
 
   config = getConfigPath(config);

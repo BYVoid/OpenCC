@@ -63,6 +63,7 @@ genrule(
     ],
     outs = ["windows-x64/opencc-jieba.dll"],
     cmd = "bash $(location //scripts:build_jieba_windows_zig) $@",
+    tags = ["manual"],
     tools = ["//scripts:build_jieba_windows_zig"],
 )
 

@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "build": "node build.js",
-    "build:all": "npm run build && npm run build linux-x64 && npm run build linux-arm64",
+    "build:all": "npm run build && npm run build linux-x64 && npm run build linux-arm64 && npm run build win32-x64",
     "prepack": "npm run build:all"
   }
 }

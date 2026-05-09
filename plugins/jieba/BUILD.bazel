@@ -52,6 +52,21 @@ cc_binary(
 )
 
 genrule(
+    name = "opencc_jieba_windows_zig",
+    srcs = [
+        "//deps/marisa-0.3.1:all_files",
+        "//plugins/jieba/deps/cppjieba:all_files",
+        "//src:all_files",
+        "include/JiebaSegmentation.hpp",
+        "src/JiebaSegmentation.cpp",
+        "src/JiebaSegmentationPlugin.cpp",
+    ],
+    outs = ["windows-x64/opencc-jieba.dll"],
+    cmd = "bash $(location //scripts:build_jieba_windows_zig) $@",
+    tools = ["//scripts:build_jieba_windows_zig"],
+)
+
+genrule(
     name = "jieba_merged_dict",
     srcs = [
         "//plugins/jieba/deps/cppjieba:dict/jieba.dict.utf8",

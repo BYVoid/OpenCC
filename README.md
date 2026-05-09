@@ -36,19 +36,21 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 * [Fedora](https://packages.fedoraproject.org/pkgs/opencc/opencc/)
 * [Arch Linux](https://archlinux.org/packages/extra/x86_64/opencc/)
 * [macOS (Homebrew)](https://formulae.brew.sh/formula/opencc)
-* WinGet (使用 `winget install BYVoid.OpenCC` 命令)
+* [WinGet](https://github.com/microsoft/winget-pkgs/tree/master/manifests/b/BYVoid/OpenCC)
+    * 使用 `winget install BYVoid.OpenCC` 命令可直接安裝 opencc.exe 應用程式
 * [Bazel](https://registry.bazel.build/modules/opencc)
 * [Node.js](https://npmjs.org/package/opencc)
+    * 使用 `npm install -g opencc` 命令可直接安裝 OpenCC Node CLI 工具 
 * [Python](https://pypi.org/project/OpenCC/)
 * [More (Repology)](https://repology.org/project/opencc/versions)
 
 ### Prebuilt 預編譯
 
-* Windows (x86_64): [OpenCC-1.3.0](https://github.com/BYVoid/OpenCC/releases/download/ver.1.3.0/OpenCC-1.3.0-windows-x64-portable.zip) ([SHA-256](https://github.com/BYVoid/OpenCC/releases/download/ver.1.3.0/OpenCC-1.3.0-windows-x64-portable.zip.sha256))
+* Windows (x86_64): [OpenCC-1.3.1](https://github.com/BYVoid/OpenCC/releases/download/ver.1.3.1/OpenCC-1.3.1-windows-x64-portable.zip) ([SHA-256](https://github.com/BYVoid/OpenCC/releases/download/ver.1.3.1/OpenCC-1.3.1-windows-x64-portable.zip.sha256))
     This is a Windows release intended for WinGet distribution. For details, see [doc/windows-winget-release.md](doc/windows-winget-release.md).
 * Debian/Ubuntu (amd64):
-    * [opencc_1.3.0_amd64.deb](https://github.com/BYVoid/OpenCC/releases/download/ver.1.3.0/opencc_1.3.0_amd64.deb)
-    * [opencc-jieba_1.3.0_amd64.deb](https://github.com/BYVoid/OpenCC/releases/download/ver.1.3.0/opencc-jieba_1.3.0_amd64.deb)
+    * [opencc_1.3.1_amd64.deb](https://github.com/BYVoid/OpenCC/releases/download/ver.1.3.1/opencc_1.3.1_amd64.deb)
+    * [opencc-jieba_1.3.1_amd64.deb](https://github.com/BYVoid/OpenCC/releases/download/ver.1.3.1/opencc-jieba_1.3.1_amd64.deb)
 
 ## Usage 使用
 
@@ -169,6 +171,7 @@ Rules:
 * Android: [android-opencc](https://github.com/qichuan/android-opencc)
 * PHP: [opencc4php](https://github.com/nauxliu/opencc4php)
 * Pure JavaScript: [opencc-js](https://github.com/nk2028/opencc-js)
+    * See [notes about different OpenCC NPM packages](#links-%E7%9B%B8%E9%97%9C%E9%8F%88%E6%8E%A5) below.
 * WebAssembly:
     * [opencc-wasm](https://www.npmjs.com/package/opencc-wasm) ([website](https://opencc.js.org/))
     * [wasm-opencc](https://github.com/oyyd/wasm-opencc)
@@ -361,7 +364,9 @@ Apache License 2.0
 ### Links 相關鏈接
 
 * Introduction 詳細介紹 https://github.com/BYVoid/OpenCC/wiki/%E7%B7%A3%E7%94%B1
-* 現代漢語常用簡繁一對多字義辨析表 http://ytenx.org/byohlyuk/KienxPyan
+* 現代漢語常用簡繁一對多字義辨析表 https://ytenx.org/byohlyuk/KienxPyan
+* 關於 [`opencc`](https://www.npmjs.com/package/opencc), [`opencc-js`](https://www.npmjs.com/package/opencc-js) 与 [`opencc-wasm`](https://www.npmjs.com/package/opencc-wasm) 三个 NPM packages 區別的說明
+  https://github.com/nk2028/opencc-js/blob/HEAD/README-zh-TW.md#%E8%88%87-opencc-npm-package-%E7%9A%84%E5%8D%80%E5%88%A5
 
 ## Contributors 貢獻者
 

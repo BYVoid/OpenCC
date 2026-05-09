@@ -24,7 +24,8 @@ cc_binary(
     ],
     includes = [".", "src"],
     linkopts = select({
-        "@platforms//os:macos": ["-undefined", "dynamic_lookup", "-Wl,-S"],
+        "@platforms//os:macos": ["-undefined", "dynamic_lookup", "-Wl,-S", "-Wl,-no_uuid"],
+        "@platforms//os:linux": ["-Wl,-s", "-Wl,--build-id=sha1"],
         "//conditions:default": ["-Wl,-s"],
     }),
     linkshared = True,

@@ -38,6 +38,7 @@
     "binding.gyp",
     "data/config/*.json",
     "data/dictionary/*.txt",
+    "data/scripts/common.py",
     "data/scripts/reverse.py",
     "deps/marisa-0.3.1/include",
     "deps/marisa-0.3.1/lib",

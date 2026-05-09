@@ -36,9 +36,11 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 * [Fedora](https://packages.fedoraproject.org/pkgs/opencc/opencc/)
 * [Arch Linux](https://archlinux.org/packages/extra/x86_64/opencc/)
 * [macOS (Homebrew)](https://formulae.brew.sh/formula/opencc)
-* WinGet (使用 `winget install BYVoid.OpenCC` 命令)
+* [WinGet](https://github.com/microsoft/winget-pkgs/tree/master/manifests/b/BYVoid/OpenCC)
+    * 使用 `winget install BYVoid.OpenCC` 命令可直接安裝 opencc.exe 應用程式
 * [Bazel](https://registry.bazel.build/modules/opencc)
 * [Node.js](https://npmjs.org/package/opencc)
+    * 使用 `npm install -g opencc` 命令可直接安裝 OpenCC Node CLI 工具 
 * [Python](https://pypi.org/project/OpenCC/)
 * [More (Repology)](https://repology.org/project/opencc/versions)
 

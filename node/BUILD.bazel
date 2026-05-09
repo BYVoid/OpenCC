@@ -4,28 +4,6 @@ load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 package(default_visibility = ["//visibility:public"])
 
-NODE_OPENCC_SOURCES = [
-    "opencc.cc",
-    "//src:BinaryDict.cpp",
-    "//src:Config.cpp",
-    "//src:Conversion.cpp",
-    "//src:ConversionChain.cpp",
-    "//src:Converter.cpp",
-    "//src:Dict.cpp",
-    "//src:DictConverter.cpp",
-    "//src:DictEntry.cpp",
-    "//src:DictGroup.cpp",
-    "//src:Lexicon.cpp",
-    "//src:MarisaDict.cpp",
-    "//src:MaxMatchSegmentation.cpp",
-    "//src:PluginSegmentation.cpp",
-    "//src:PrefixMatch.cpp",
-    "//src:Segmentation.cpp",
-    "//src:SerializedValues.cpp",
-    "//src:TextDict.cpp",
-    "//src:UTF8Util.cpp",
-]
-
 # The shared library that becomes opencc.node.
 # cc_binary with linkshared=True on Linux produces "libopencc_clib.so";
 # on macOS it produces "libopencc_clib.dylib". We rename via genrule below.
@@ -75,7 +53,8 @@ genrule(
 
 genrule(
     name = "opencc_node_windows_zig",
-    srcs = NODE_OPENCC_SOURCES + [
+    srcs = [
+        "opencc.cc",
         "//deps/marisa-0.3.1:all_files",
         "//deps/rapidjson-1.1.0:all_files",
         "//src:all_files",

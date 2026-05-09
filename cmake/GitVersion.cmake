@@ -13,7 +13,7 @@
 #
 
 set(_OPENCC_FALLBACK_MAJOR 1)
-set(_OPENCC_FALLBACK_MINOR 2)
+set(_OPENCC_FALLBACK_MINOR 3)
 set(_OPENCC_FALLBACK_REVISION 1)
 
 find_package(Git QUIET)
@@ -24,7 +24,7 @@ if(GIT_FOUND)
   # Try git describe --tags --long --always
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" describe --tags --long --always
-    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
     OUTPUT_VARIABLE _git_raw
     ERROR_QUIET
     OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -36,12 +36,12 @@ if(GIT_FOUND)
     set(_dirty_suffix "")
     execute_process(
       COMMAND "${GIT_EXECUTABLE}" diff --quiet
-      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+      WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
       RESULT_VARIABLE _diff_result
     )
     execute_process(
       COMMAND "${GIT_EXECUTABLE}" diff --cached --quiet
-      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+      WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
       RESULT_VARIABLE _diff_cached_result
     )
     if(NOT _diff_result EQUAL 0 OR NOT _diff_cached_result EQUAL 0)

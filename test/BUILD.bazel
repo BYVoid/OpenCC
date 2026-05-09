@@ -1,5 +1,16 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "portable_util",
+    hdrs = ["PortableUtil.hpp"],
+    includes = ["."],
+)
+
 cc_test(
     name = "bazel_opencc_test",
+    size = "small",
     srcs = [
         "BazelOpenccTest.cpp",
         "PortableUtil.hpp",
@@ -18,6 +29,7 @@ cc_test(
 
 cc_test(
     name = "command_line_converter_test",
+    size = "small",
     srcs = [
         "CommandLineConvertTest.cpp",
         "PortableUtil.hpp",

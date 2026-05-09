@@ -1,47 +1,16 @@
 #!/bin/sh
 set -e
 
-# Different to release-pypi-win.cmd and release-pypi-osx.sh,
-# this script has to be ran from a clean dockerfile
+python -m pip install --upgrade pip cibuildwheel twine
 
-# Download and init conda
-# Detect architecture and set appropriate Miniconda filename
-ARCH=$(uname -m)
-if [ "$ARCH" = "arm64" ]; then
-    MINICONDA_FILENAME=Miniconda3-latest-MacOSX-arm64.sh
-else
-    MINICONDA_FILENAME=Miniconda3-latest-MacOSX-x86_64.sh
-fi
+export CIBW_BUILD="cp310-* cp311-* cp312-* cp313-* cp314-*"
+export CIBW_ENVIRONMENT="VERSION=\"${VERSION}\""
+export CIBW_TEST_REQUIRES="pytest"
+export CIBW_TEST_COMMAND="pytest {project}/python/tests"
 
-curl -L -o $MINICONDA_FILENAME \
-    "https://repo.continuum.io/miniconda/$MINICONDA_FILENAME"
-bash ${MINICONDA_FILENAME} -b -f -p $HOME/miniconda3
-export PATH=$HOME/miniconda3/bin:$PATH
-eval "$(conda shell.bash hook)"
-
-# Accept conda Terms of Service for required channels
-conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
-conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
-
-for PYTHON_VERSION in 3.9 3.10 3.11 3.12 3.13 3.14; do
-    # Create and activate environment
-    conda config --add channels conda-forge
-    conda config --set channel_priority strict
-    conda create -y -n py$PYTHON_VERSION python=$PYTHON_VERSION
-    conda activate py$PYTHON_VERSION
-
-    # Build and package
-    pip install --no-cache-dir build
-    python -m build --wheel
-
-    # Cleanup
-    conda deactivate
-    rm -rf build OpenCC.egg-info
-done
+python -m cibuildwheel --output-dir wheelhouse
 
 if [ "$1" != "testonly" ]; then
     # Upload to PyPI
-    conda activate py3.9
-    python -m pip install twine
-    python -m twine upload dist/*
+    python -m twine upload wheelhouse/*.whl
 fi

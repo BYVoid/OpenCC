@@ -111,10 +111,24 @@ DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
   }
   free(buffer);
 
+  // Get remaining file size for validation
+  long currentOffset = ftell(fp);
+  fseek(fp, 0L, SEEK_END);
+  long fileEnd = ftell(fp);
+  fseek(fp, currentOffset, SEEK_SET);
+  size_t remainingSize =
+      (fileEnd > currentOffset)
+          ? static_cast<size_t>(fileEnd - currentOffset)
+          : 0;
+
   size_t dartsSize;
   bytesRead = fread(&dartsSize, sizeof(size_t), 1, fp);
   if (bytesRead * sizeof(size_t) != sizeof(size_t)) {
     throw InvalidFormat("Invalid OpenCC dictionary header (dartsSize)");
+  }
+  if (dartsSize > remainingSize) {
+    throw InvalidFormat(
+        "Invalid OpenCC dictionary (dartsSize exceeds file size)");
   }
   buffer = malloc(dartsSize);
   bytesRead = fread(buffer, 1, dartsSize, fp);

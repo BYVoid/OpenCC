@@ -204,6 +204,7 @@ try {
     cmake -S . -B $resolvedBuildDir -A x64 `
         -DCMAKE_BUILD_TYPE=Release `
         -DBUILD_SHARED_LIBS:BOOL=OFF `
+        -DBUILD_OPENCC_JIEBA_PLUGIN:BOOL=ON `
         -DCMAKE_INSTALL_PREFIX:PATH=$installRoot `
         -DENABLE_GTEST:BOOL=OFF `
         -DENABLE_BENCHMARK:BOOL=OFF
@@ -215,11 +216,13 @@ try {
     }
 
     New-Item -ItemType Directory -Force -Path (Join-Path $stagingRoot "bin") | Out-Null
+    New-Item -ItemType Directory -Force -Path (Join-Path $stagingRoot "bin\plugins") | Out-Null
     New-Item -ItemType Directory -Force -Path (Join-Path $stagingRoot "share\opencc") | Out-Null
 
     Copy-Item -Path (Join-Path $installRoot "bin\opencc.exe") -Destination (Join-Path $stagingRoot "bin\opencc.exe")
     Copy-Item -Path (Join-Path $installRoot "bin\opencc_dict.exe") -Destination (Join-Path $stagingRoot "bin\opencc_dict.exe")
     Copy-Item -Path (Join-Path $installRoot "bin\opencc_phrase_extract.exe") -Destination (Join-Path $stagingRoot "bin\opencc_phrase_extract.exe")
+    Copy-Item -Path (Join-Path $installRoot "bin\plugins\*.dll") -Destination (Join-Path $stagingRoot "bin\plugins")
     Copy-Item -Path (Join-Path $installRoot "share\opencc\*") -Destination (Join-Path $stagingRoot "share\opencc") -Recurse
     Copy-Item -Path LICENSE -Destination (Join-Path $stagingRoot "LICENSE.txt")
     Copy-Item -Path README.md -Destination (Join-Path $stagingRoot "README.md")

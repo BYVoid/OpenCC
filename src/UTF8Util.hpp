@@ -47,7 +47,7 @@ public:
    * On error returns 0.
    */
   static size_t NextCharLengthNoException(const char* str) {
-    char ch = *str;
+    const unsigned char ch = static_cast<unsigned char>(*str);
     if ((ch & 0xF0) == 0xE0) {
       return 3;
     } else if ((ch & 0x80) == 0x00) {
@@ -79,29 +79,20 @@ public:
    * Returns the length in byte for the previous UTF8 character.
    */
   static size_t PrevCharLength(const char* str) {
-    {
-      const size_t length = NextCharLengthNoException(str - 3);
-      if (length == 3) {
-        return length;
+    const char* candidate = str - 1;
+    size_t distance = 1;
+    while (distance < 6) {
+      const unsigned char ch = static_cast<unsigned char>(*candidate);
+      if ((ch & 0xC0) != 0x80) {
+        break;
       }
+      candidate--;
+      distance++;
     }
-    {
-      const size_t length = NextCharLengthNoException(str - 1);
-      if (length == 1) {
-        return length;
-      }
-    }
-    {
-      const size_t length = NextCharLengthNoException(str - 2);
-      if (length == 2) {
-        return length;
-      }
-    }
-    for (size_t i = 4; i <= 6; i++) {
-      const size_t length = NextCharLengthNoException(str - i);
-      if (length == i) {
-        return length;
-      }
+
+    const size_t length = NextCharLengthNoException(candidate);
+    if (length == distance) {
+      return length;
     }
     throw InvalidUTF8(str);
   }
@@ -121,13 +112,30 @@ public:
   }
 
   /**
-   * Returns the UTF8 length of a valid UTF8 std::string.
+   * Returns the UTF8 length of a null-terminated string.
+   * Throws InvalidUTF8 for invalid or truncated byte sequences.
+   * The truncated-sequence check reads only up to the null terminator, so it
+   * does not read out of bounds (issue #799 fix).
    */
   static size_t Length(const char* str) {
     size_t length = 0;
     while (*str != '\0') {
-      str = NextChar(str);
-      length++;
+      const size_t charLen = NextCharLengthNoException(str);
+      if (charLen == 0) {
+        throw InvalidUTF8(str);
+      }
+      // Verify all continuation bytes are present before the null terminator.
+      // Use a while loop (not a for-with-return) to avoid complex control flow
+      // that triggers MSVC LTCG code-generator bugs.
+      size_t i = 1;
+      while (i < charLen && str[i] != '\0') {
+        ++i;
+      }
+      if (i < charLen) {
+        throw InvalidUTF8(str); // Truncated sequence: throw, don't silently skip
+      }
+      str += charLen;
+      ++length;
     }
     return length;
   }

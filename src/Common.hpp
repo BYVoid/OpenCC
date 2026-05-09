@@ -77,6 +77,13 @@ const std::string PACKAGE_DATA_DIRECTORY = "";
 const std::string PACKAGE_DATA_DIRECTORY = PKGDATADIR "/";
 #endif // ifndef PKGDATADIR
 
+#ifndef OPENCC_SEGMENTATION_PLUGIN_DIR
+const std::string PACKAGE_SEGMENTATION_PLUGIN_DIRECTORY = "";
+#else
+const std::string PACKAGE_SEGMENTATION_PLUGIN_DIRECTORY =
+    OPENCC_SEGMENTATION_PLUGIN_DIR "/";
+#endif
+
 #ifndef VERSION
 #define VERSION "1.0.*"
 #endif // ifndef VERSION

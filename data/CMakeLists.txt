@@ -128,12 +128,14 @@ foreach(DICT ${DICTS})
       ${DICT_${DICT}_INPUT}
   )
 
+  if(OPENCC_ENABLE_INSTALL)
   install(
     FILES
       ${DICT_GENERATED_DIR}/${DICT}.ocd2
     DESTINATION
       ${DIR_SHARE_OPENCC}
   )
+  endif()
 
   set_directory_properties(
     PROPERTIES
@@ -159,9 +161,11 @@ set(CONFIG_FILES
   config/tw2t.json
 )
 
+if(OPENCC_ENABLE_INSTALL)
 install(
   FILES
     ${CONFIG_FILES}
   DESTINATION
     ${DIR_SHARE_OPENCC}
 )
+endif()

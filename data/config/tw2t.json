@@ -1,5 +1,5 @@
 {
-  "name": "Traditional Chinese (Taiwan standard) to Traditional Chinese",
+  "name": "Traditional Chinese (Taiwan Standard) to Traditional Chinese (OpenCC Standard)",
   "segmentation": {
     "type": "mmseg",
     "dict": {

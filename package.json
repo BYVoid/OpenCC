@@ -1,25 +1,50 @@
 {
   "name": "opencc",
-  "version": "1.2.1",
+  "version": "1.3.1",
   "description": "Conversion between Traditional and Simplified Chinese",
   "author": "Carbo Kuo <byvoid@byvoid.com>",
   "license": "Apache-2.0",
   "main": "node/opencc.js",
   "types": "node/opencc.d.ts",
+  "bin": {
+    "opencc": "./node/cli.js"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./node/opencc.d.mts",
+        "default": "./node/opencc.mjs"
+      },
+      "require": {
+        "types": "./node/opencc.d.cts",
+        "default": "./node/opencc.js"
+      },
+      "default": "./node/opencc.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
-    "test": "mocha -R spec node/test.js",
-    "deploy": "node-pre-gyp package && (node-pre-gyp-github publish --release || exit 0)",
-    "install": "node-pre-gyp install --fallback-to-build || node-pre-gyp rebuild"
+    "test": "mocha -R spec node/test.js && node node/esm-test.mjs",
+    "prebuild": "prebuildify --napi --strip --postinstall \"node scripts/prepare-node-prebuild-artifacts.js\"",
+    "prebuild:linux": "bash ./scripts/build-node-prebuild-bazel.sh",
+    "prebuild:all": "npm run prebuild && npm run prebuild:linux",
+    "install": "node-gyp-build"
   },
   "engines": {
-    "node": ">=20 <25"
+    "node": ">=20.17"
   },
-  "binary": {
-    "module_name": "opencc",
-    "module_path": "./build/Release/",
-    "host": "https://github.com/BYVoid/OpenCC/releases/download/",
-    "remote_path": "{version}"
-  },
+  "files": [
+    "binding.gyp",
+    "data/config",
+    "data/dictionary",
+    "data/scripts/reverse.py",
+    "deps/marisa-0.3.1",
+    "deps/rapidjson-1.1.0",
+    "node",
+    "prebuilds",
+    "scripts/prepare-node-prebuild-artifacts.js",
+    "src"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BYVoid/OpenCC.git"
@@ -38,14 +63,16 @@
   ],
   "devDependencies": {
     "mocha": "^11.7.5",
-    "node-pre-gyp-github": "^2.0.0"
+    "prebuildify": "^6.0.1"
   },
   "dependencies": {
-    "@mapbox/node-pre-gyp": "^2.0.3",
-    "nan": "^2.22.0"
+    "node-addon-api": "^8.7.0",
+    "node-gyp": "^12.3.0",
+    "node-gyp-build": "^4.8.4"
   },
   "overrides": {
+    "brace-expansion": "^2.0.3",
     "diff": "^8.0.3",
-    "serialize-javascript": "^7.0.3"
+    "serialize-javascript": "^7.0.5"
   }
 }

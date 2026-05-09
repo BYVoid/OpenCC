@@ -4,13 +4,13 @@ include_directories("${PROJECT_BINARY_DIR}/src")
 include_directories("${PROJECT_SOURCE_DIR}/src")
 
 if(NOT USE_SYSTEM_MARISA)
-  include_directories(../deps/marisa-0.3.1/include)
+  include_directories(SYSTEM ../deps/marisa-0.3.1/include)
 endif()
 if(NOT USE_SYSTEM_RAPIDJSON)
-  include_directories(../deps/rapidjson-1.1.0)
+  include_directories(SYSTEM ../deps/rapidjson-1.1.0)
 endif()
 if(NOT USE_SYSTEM_TCLAP)
-  include_directories(../deps/tclap-1.2.5)
+  include_directories(SYSTEM ../deps/tclap-1.2.5)
 endif()
 
 # Library
@@ -21,6 +21,7 @@ set(
   Config.hpp
   Conversion.hpp
   ConversionChain.hpp
+  ConversionInspection.hpp
   Converter.hpp
   Dict.hpp
   DictConverter.hpp
@@ -32,7 +33,9 @@ set(
   MarisaDict.hpp
   MaxMatchSegmentation.hpp
   Optional.hpp
+  PluginSegmentation.hpp
   PhraseExtract.hpp
+  PrefixMatch.hpp
   Segmentation.hpp
   Segments.hpp
   SerializableDict.hpp
@@ -58,7 +61,9 @@ set(
   Lexicon.cpp
   MarisaDict.cpp
   MaxMatchSegmentation.cpp
+  PluginSegmentation.cpp
   PhraseExtract.cpp
+  PrefixMatch.cpp
   SerializedValues.cpp
   SimpleConverter.cpp
   Segmentation.cpp
@@ -70,6 +75,7 @@ set(
 set(UNITTESTS
   ConfigTest
   ConversionChainTest
+  ConversionInspectionTest
   ConversionTest
   DictGroupTest
   LexiconAnnotationTest
@@ -86,7 +92,7 @@ set(UNITTESTS
 if (ENABLE_DARTS)
   set(OPENCC_ENABLE_DARTS 1)
   if(NOT USE_SYSTEM_DARTS)
-    include_directories(../deps/darts-clone-0.32)
+    include_directories(SYSTEM ../deps/darts-clone-0.32)
   endif()
   set(
     LIBOPENCC_HEADERS
@@ -130,6 +136,18 @@ add_library(OpenCC::OpenCC ALIAS libopencc)
 set_target_properties(libopencc PROPERTIES POSITION_INDEPENDENT_CODE ON)
 source_group(libopencc FILES ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
 target_link_libraries(libopencc marisa)
+if (NOT BUILD_SHARED_LIBS)
+  target_compile_definitions(libopencc PUBLIC Opencc_BUILT_AS_STATIC)
+endif()
+# PluginSegmentation.cpp uses LoadLibrary on _WIN32 (MSVC and MinGW).
+# Only non-Windows targets may need libdl for dlopen.
+if (NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  include(CheckLibraryExists)
+  check_library_exists(dl dlopen "" HAVE_LIBDL)
+  if (HAVE_LIBDL)
+    target_link_libraries(libopencc dl)
+  endif ()
+endif ()
 target_include_directories(libopencc PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:${DIR_INCLUDE}/opencc>
@@ -166,16 +184,17 @@ else()
   set(INSTALL_TARGETS libopencc marisa)
 endif()
 
+if(OPENCC_ENABLE_INSTALL)
 install(
-  TARGETS ${INSTALL_TARGETS} EXPORT ${targets_export_name}
+  TARGETS ${INSTALL_TARGETS} EXPORT ${OPENCC_TARGETS_EXPORT_NAME}
   LIBRARY DESTINATION ${DIR_LIBRARY}
   ARCHIVE DESTINATION ${DIR_LIBRARY}
   RUNTIME DESTINATION bin
 )
 
 install(
-  EXPORT ${targets_export_name}
-  FILE ${targets_export_name}.cmake
+  EXPORT ${OPENCC_TARGETS_EXPORT_NAME}
+  FILE ${OPENCC_TARGETS_EXPORT_NAME}.cmake
   DESTINATION ${DIR_LIBRARY}/cmake/opencc
   NAMESPACE OpenCC::
 )
@@ -184,6 +203,12 @@ install(
   FILES ${LIBOPENCC_HEADERS}
   DESTINATION ${DIR_INCLUDE}/opencc
 )
+
+install(
+  FILES plugin/OpenCCPlugin.h
+  DESTINATION ${DIR_INCLUDE}/opencc/plugin
+)
+endif()
 
 # Gtest
 

@@ -122,6 +122,16 @@ size_t SimpleConverter::Convert(const char* input, size_t length,
   }
 }
 
+ConversionInspectionResult
+SimpleConverter::Inspect(const std::string& input) const {
+  try {
+    const InternalData* data = (InternalData*)internalData;
+    return data->converter->Inspect(input);
+  } catch (Exception& ex) {
+    throw std::runtime_error(ex.what());
+  }
+}
+
 static std::string cError;
 
 opencc_t opencc_open_internal(const char* configFileName) {

@@ -42,7 +42,7 @@ protected:
     FILE* fp = fopen(path.c_str(), "wb");
     fwrite(&numItems, sizeof(uint32_t), 1, fp);
     fwrite(&valueTotalLength, sizeof(uint32_t), 1, fp);
-    fwrite(valueBuffer.data(), sizeof(char), valueTotalLength, fp);
+    fwrite(valueBuffer.data(), sizeof(char), valueBuffer.size(), fp);
     for (const auto& item : itemValueBytes) {
       uint16_t numValues = static_cast<uint16_t>(item.size());
       fwrite(&numValues, sizeof(uint16_t), 1, fp);
@@ -131,6 +131,16 @@ TEST_F(SerializedValuesTest, AcceptsWellFormedFile) {
   const auto deserialized =
       SerializableDict::NewFromFile<SerializedValues>(path);
   EXPECT_EQ(deserialized->GetLexicon()->Length(), 2);
+  std::remove(path.c_str());
+}
+
+// Test that valueTotalLength exceeding file size triggers InvalidFormat (#812).
+TEST_F(SerializedValuesTest, RejectsHugeValueTotalLength) {
+  // File only has a few bytes, but claims valueTotalLength = 0xFFFFFFFF.
+  std::string path =
+      WriteMalformedFile(1, 0xFFFFFFFF, "", {});
+  EXPECT_THROW(SerializableDict::NewFromFile<SerializedValues>(path),
+               InvalidFormat);
   std::remove(path.c_str());
 }
 

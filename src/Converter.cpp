@@ -19,6 +19,7 @@
 #include <cstring>
 
 #include "ConversionChain.hpp"
+#include "ConversionInspection.hpp"
 #include "Converter.hpp"
 #include "Segments.hpp"
 
@@ -26,12 +27,43 @@ using namespace opencc;
 
 std::string Converter::Convert(const std::string& text) const {
   const SegmentsPtr& segments = segmentation->Segment(text);
-  const SegmentsPtr& converted = conversionChain->Convert(segments);
-  return converted->ToString();
+  std::string converted;
+  converted.reserve(text.length() + text.length() / 5);
+  for (const char* segment : *segments) {
+    conversionChain->AppendConvertedSegment(segment, &converted);
+  }
+  return converted;
 }
 
 size_t Converter::Convert(const char* input, char* output) const {
   const std::string& converted = Convert(input);
   strcpy(output, converted.c_str());
   return converted.length();
+}
+
+ConversionInspectionResult Converter::Inspect(const std::string& text) const {
+  ConversionInspectionResult result;
+  result.input = text;
+
+  const SegmentsPtr& initialSegments = segmentation->Segment(text);
+  result.segments = initialSegments->ToVector();
+
+  const std::vector<SegmentsPtr> trace =
+      conversionChain->ConvertWithTrace(initialSegments);
+
+  result.stages.reserve(trace.size());
+  for (size_t i = 0; i < trace.size(); i++) {
+    ConversionInspectionStage stage;
+    stage.index = i + 1;
+    stage.segments = trace[i]->ToVector();
+    result.stages.push_back(std::move(stage));
+  }
+
+  if (!trace.empty()) {
+    result.output = trace.back()->ToString();
+  } else {
+    result.output = initialSegments->ToString();
+  }
+
+  return result;
 }

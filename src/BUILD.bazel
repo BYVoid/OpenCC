@@ -6,6 +6,7 @@ package(default_visibility = ["//visibility:public"])
 
 cc_library(
     name = "opencc",
+    hdrs = ["ConversionInspection.hpp"],
     deps = [
         ":binary_dict",
         ":common",
@@ -22,6 +23,7 @@ cc_library(
         ":lexicon",
         ":marisa_dict",
         ":max_match_segmentation",
+        ":plugin_segmentation",
         ":phrase_extract",
         ":segmentation",
         ":segments",
@@ -46,6 +48,7 @@ cc_library(
 
 cc_test(
     name = "binary_dict_test",
+    size = "small",
     srcs = ["BinaryDictTest.cpp"],
     deps = [
         ":binary_dict",
@@ -86,6 +89,7 @@ cc_library(
         ":dict_group",
         ":marisa_dict",
         ":max_match_segmentation",
+        ":plugin_segmentation",
         ":text_dict",
         "@rapidjson",
     ],
@@ -93,6 +97,7 @@ cc_library(
 
 cc_test(
     name = "config_test",
+    size = "small",
     srcs = ["ConfigTest.cpp"],
     deps = [
         ":common",
@@ -122,13 +127,14 @@ cc_library(
     hdrs = ["Conversion.hpp"],
     deps = [
         ":common",
-        ":dict",
+        ":prefix_match",
         ":segmentation",
     ],
 )
 
 cc_test(
     name = "conversion_test",
+    size = "small",
     srcs = ["ConversionTest.cpp"],
     deps = [
         ":conversion",
@@ -150,6 +156,7 @@ cc_library(
 
 cc_test(
     name = "conversion_chain_test",
+    size = "small",
     srcs = ["ConversionChainTest.cpp"],
     deps = [
         ":conversion_chain",
@@ -158,10 +165,25 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "conversion_inspection_test",
+    size = "small",
+    srcs = ["ConversionInspectionTest.cpp"],
+    deps = [
+        ":config_test_base",
+        ":simple_converter",
+        ":test_utils_utf8",
+        "@googletest//:gtest_main",
+    ],
+)
+
 cc_library(
     name = "converter",
     srcs = ["Converter.cpp"],
-    hdrs = ["Converter.hpp"],
+    hdrs = [
+        "ConversionInspection.hpp",
+        "Converter.hpp",
+    ],
     deps = [
         ":common",
         ":conversion_chain",
@@ -185,6 +207,7 @@ cc_library(
 
 cc_test(
     name = "darts_dict_test",
+    size = "small",
     srcs = ["DartsDictTest.cpp"],
     deps = [
         ":darts_dict",
@@ -240,6 +263,7 @@ cc_library(
 
 cc_test(
     name = "dict_group_test",
+    size = "small",
     srcs = ["DictGroupTest.cpp"],
     deps = [
         ":dict_group_test_base",
@@ -277,6 +301,7 @@ cc_library(
 
 cc_test(
     name = "lexicon_annotation_test",
+    size = "small",
     srcs = ["LexiconAnnotationTest.cpp"],
     deps = [
         ":text_dict",
@@ -299,6 +324,7 @@ cc_library(
 
 cc_test(
     name = "marisa_dict_test",
+    size = "small",
     srcs = ["MarisaDictTest.cpp"],
     deps = [
         ":marisa_dict",
@@ -314,12 +340,26 @@ cc_library(
     deps = [
         ":common",
         ":dict_group",
+        ":prefix_match",
         ":segmentation",
+    ],
+)
+
+cc_library(
+    name = "prefix_match",
+    srcs = ["PrefixMatch.cpp"],
+    hdrs = ["PrefixMatch.hpp"],
+    deps = [
+        ":common",
+        ":dict",
+        ":lexicon",
+        ":utf8_util",
     ],
 )
 
 cc_test(
     name = "max_match_segmentation_test",
+    size = "small",
     srcs = ["MaxMatchSegmentationTest.cpp"],
     deps = [
         ":dict_group_test_base",
@@ -343,8 +383,37 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "plugin_api",
+    hdrs = ["plugin/OpenCCPlugin.h"],
+)
+
+cc_library(
+    name = "plugin_segmentation",
+    srcs = ["PluginSegmentation.cpp"],
+    hdrs = [
+        "PluginSegmentation.hpp",
+        "WinUtil.hpp",
+    ],
+    linkopts = select({
+        "@platforms//os:linux": ["-ldl"],
+        "@platforms//os:osx": [],
+        "@platforms//os:windows": [],
+        "//conditions:default": ["-ldl"],
+    }),
+    deps = [
+        ":common",
+        ":exception",
+        ":plugin_api",
+        ":segmentation",
+        ":segments",
+        ":utf8_util",
+    ],
+)
+
 cc_test(
     name = "phrase_extract_test",
+    size = "small",
     srcs = ["PhraseExtractTest.cpp"],
     deps = [
         ":phrase_extract",
@@ -406,6 +475,7 @@ cc_library(
 
 cc_test(
     name = "serialized_values_test",
+    size = "small",
     srcs = ["SerializedValuesTest.cpp"],
     deps = [
         ":serialized_values",
@@ -418,6 +488,7 @@ cc_library(
     name = "simple_converter",
     srcs = ["SimpleConverter.cpp"],
     hdrs = [
+        "ConversionInspection.hpp",
         "SimpleConverter.hpp",
         "opencc.h",
     ],
@@ -433,6 +504,7 @@ cc_library(
 
 cc_test(
     name = "simple_converter_test",
+    size = "small",
     srcs = ["SimpleConverterTest.cpp"],
     deps = [
         ":config_test_base",
@@ -470,6 +542,7 @@ cc_library(
 
 cc_test(
     name = "text_dict_test",
+    size = "small",
     srcs = ["TextDictTest.cpp"],
     deps = [
         ":text_dict",
@@ -502,6 +575,7 @@ cc_library(
 
 cc_test(
     name = "utf8_string_slice_test",
+    size = "small",
     srcs = ["UTF8StringSliceTest.cpp"],
     deps = [
         ":test_utils",
@@ -522,6 +596,7 @@ cc_library(
 
 cc_test(
     name = "utf8_util_test",
+    size = "small",
     srcs = ["UTF8UtilTest.cpp"],
     deps = [
         ":test_utils",

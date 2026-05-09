@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <list>
+
 #include "Common.hpp"
 #include "DictEntry.hpp"
 
@@ -88,5 +90,12 @@ public:
    * Returns all entries in the dictionary.
    */
   virtual LexiconPtr GetLexicon() const = 0;
+
+  /**
+   * Returns child dictionaries when this dictionary is a group.
+   */
+  virtual const std::list<DictPtr>* GetDictGroupItems() const {
+    return nullptr;
+  }
 };
 } // namespace opencc

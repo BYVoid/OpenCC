@@ -1,54 +1,25 @@
 #!/bin/sh
 set -e
 
-# Different to release-pypi-win.cmd and release-pypi-osx.sh,
-# this script has to be ran from a clean dockerfile
+# Linux wheels are built inside manylinux2014 containers managed by cibuildwheel.
+python -m pip install --upgrade pip cibuildwheel twine build
 
-# Random note: The reason why this script is being ran from within a container
-# is to ensure glibc compatibility. From what I've seen so far, it appears
-# that having multiple glibc versions is a somewhat convoluted process
-# and I don't trust myself to be able to manage them well.
+export CIBW_BUILD="cp310-* cp311-* cp312-* cp313-* cp314-*"
+export CIBW_SKIP="*-musllinux_*"
+export CIBW_MANYLINUX_X86_64_IMAGE="manylinux2014"
+export CIBW_MANYLINUX_AARCH64_IMAGE="manylinux2014"
+export CIBW_ENVIRONMENT="VERSION=\"${VERSION}\""
+export CIBW_TEST_REQUIRES="pytest"
+export CIBW_TEST_COMMAND="pytest {project}/python/tests"
 
-# Download dependenciess
-export DEBIAN_FRONTEND=noninteractive
-apt update
-apt upgrade -y
-apt install -y g++ make curl
+python -m cibuildwheel --output-dir wheelhouse
 
-cd /opt/OpenCC
-
-# Download and init conda
-MINICONDA_FILENAME=Miniconda3-latest-Linux-x86_64.sh
-curl -L -o $MINICONDA_FILENAME \
-    "https://repo.continuum.io/miniconda/$MINICONDA_FILENAME"
-bash ${MINICONDA_FILENAME} -b -f -p $HOME/miniconda3
-export PATH=$HOME/miniconda3/bin:$PATH
-eval "$(conda shell.bash hook)"
-
-# Accept conda Terms of Service for required channels
-conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
-conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
-
-for PYTHON_VERSION in 3.9 3.10 3.11 3.12 3.13 3.14; do
-    # Create and activate environment
-    conda config --add channels conda-forge
-    conda config --set channel_priority strict
-    conda create -y -n py$PYTHON_VERSION python=$PYTHON_VERSION
-    conda activate py$PYTHON_VERSION
-
-    # Build and package
-    pip install --no-cache-dir build
-    python -m build \
-        -C--plat-name="manylinux2014_$(uname --machine)"
-
-    # Cleanup
-    conda deactivate
-    rm -rf build OpenCC.egg-info
-done
+if [ "$(uname -m)" = "x86_64" ]; then
+    # Build sdist only once, to avoid duplicate uploads from matrix jobs.
+    python -m build --sdist --outdir wheelhouse
+fi
 
 if [ "$1" != "testonly" ]; then
     # Upload to PyPI
-    conda activate py3.9
-    python -m pip install twine
-    python -m twine upload dist/*
+    python -m twine upload wheelhouse/*
 fi

@@ -95,6 +95,22 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "dictionary_TWPhrases_segmentation_test",
+    size = "small",
+    srcs = ["DictionaryTaiwanPhraseSegmentationTest.cpp"],
+    data = [
+        "STPhrases.txt",
+        "TWPhrases.txt",
+    ],
+    deps = [
+        "//src:lexicon",
+        "//src:utf8_util",
+        "@bazel_tools//tools/cpp/runfiles",
+        "@googletest//:gtest_main",
+    ],
+)
+
 test_suite(
     name = "dictionary_test",
     tests = [
@@ -102,6 +118,7 @@ test_suite(
         for txt in TEXT_DICTS
     ] + [
         ":dictionary_TWPhrases_reverse_mapping_test",
+        ":dictionary_TWPhrases_segmentation_test",
     ],
 )
 

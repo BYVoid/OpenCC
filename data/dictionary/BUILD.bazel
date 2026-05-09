@@ -22,6 +22,15 @@ TEXT_DICTS = glob(["*.txt"]) + [
     "JPVariantsRev.txt",
 ]
 
+NON_BMP_TEXT_DICTS = [
+    txt
+    for txt in TEXT_DICTS
+    if txt not in [
+        "STCharacters.txt",
+        "TSCharacters.txt",
+    ]
+]
+
 [
     genrule(
         name = "generate_bin_" + txt[:-4],
@@ -61,5 +70,31 @@ cc_test(
         "//src:utf8_util",
         "@bazel_tools//tools/cpp/runfiles",
         "@googletest//:gtest_main",
+    ],
+)
+
+[
+    cc_test(
+        name = "dictionary_non_bmp_" + txt[:-4] + "_test",
+        size = "small",
+        srcs = ["DictionaryNonBmpTest.cpp"],
+        local_defines = [
+            "OPENCC_DICTIONARY_NON_BMP_TEST_FILE=\\\"" + txt + "\\\"",
+        ],
+        data = [txt],
+        deps = [
+            "//src:utf8_util",
+            "@bazel_tools//tools/cpp/runfiles",
+            "@googletest//:gtest_main",
+        ],
+    )
+    for txt in NON_BMP_TEXT_DICTS
+]
+
+test_suite(
+    name = "dictionary_non_bmp_test",
+    tests = [
+        ":dictionary_non_bmp_" + txt[:-4] + "_test"
+        for txt in NON_BMP_TEXT_DICTS
     ],
 )

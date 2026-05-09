@@ -47,5 +47,10 @@ build:node-linux-x64 --config=linux-x86_64-remote
 # Usage: bazel build --config=node-linux-arm64 //node:opencc_node
 build:node-linux-arm64 --config=linux-arm64-remote
 
+# Build Windows x64 opencc.node locally on macOS/Linux using Zig.
+# Requires zig in PATH, or pass --action_env=ZIG=/path/to/zig.
+# Usage: bazel build --config=node-windows-x64-zig //node:opencc_node_windows_zig
+build:node-windows-x64-zig --action_env=ZIG
+
 # Optional user/CI overrides (e.g. injecting BuildBuddy API key in CI).
 try-import %workspace%/.bazelrc.user

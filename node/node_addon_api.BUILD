@@ -8,3 +8,13 @@ cc_library(
     includes = ["."],
     defines = ["NAPI_DISABLE_CPP_EXCEPTIONS"],
 )
+
+filegroup(
+    name = "all_files",
+    srcs = glob(["*.h"]),
+)
+
+filegroup(
+    name = "napi_header",
+    srcs = ["napi.h"],
+)

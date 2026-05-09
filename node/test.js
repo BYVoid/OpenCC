@@ -7,6 +7,7 @@ const path = require('path');
 const util = require('util');
 
 const OpenCC = require('./opencc');
+const { prepareArtifacts } = require('../scripts/prepare-node-prebuild-artifacts');
 
 const cases = JSON.parse(fs.readFileSync('test/testcases/testcases.json', 'utf-8')).cases || [];
 
@@ -87,6 +88,15 @@ describe('npm CLI', function () {
     assert.equal(result.stdout, '漢字');
   });
 
+  it('appends .json to built-in config names', function () {
+    const result = childProcess.spawnSync(process.execPath, [cli, '-c', 's2t'], {
+      input: '汉字',
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, '漢字');
+  });
+
   it('converts input file to output file', function () {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'opencc-node-cli-'));
     const input = path.join(dir, 'input.txt');
@@ -120,6 +130,22 @@ describe('npm CLI', function () {
     });
     assert.equal(result.status, 0, result.stderr);
     assert.equal(result.stdout, '漢字');
+  });
+
+  it('does not append .json to custom relative config paths', function () {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'opencc-node-cli-config-stem-'));
+    const assetsPath = getAssetsPath();
+    fs.copyFileSync(path.join(assetsPath, 's2t.json'), path.join(dir, 'custom-s2t.json'));
+    fs.copyFileSync(path.join(assetsPath, 'STPhrases.ocd2'), path.join(dir, 'STPhrases.ocd2'));
+    fs.copyFileSync(path.join(assetsPath, 'STCharacters.ocd2'), path.join(dir, 'STCharacters.ocd2'));
+
+    const result = childProcess.spawnSync(process.execPath, [cli, '-c', './custom-s2t'], {
+      cwd: dir,
+      input: '汉字',
+      encoding: 'utf8',
+    });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /custom-s2t/);
   });
 
   it('prints help', function () {
@@ -165,5 +191,28 @@ describe('npm CLI', function () {
       assert.notEqual(result.status, 0);
       assert.match(result.stderr, /Missing value/);
     }
+  });
+});
+
+describe('Node prebuild assets', function () {
+  it('collects only runtime json and ocd2 assets', function () {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'opencc-prebuild-assets-'));
+    const releaseDir = path.join(root, 'build', 'Release');
+    const assetsDir = path.join(root, 'prebuilds', 'assets');
+
+    fs.mkdirSync(releaseDir, { recursive: true });
+    fs.mkdirSync(assetsDir, { recursive: true });
+    fs.writeFileSync(path.join(releaseDir, 's2t.json'), '{}');
+    fs.writeFileSync(path.join(releaseDir, 'STCharacters.ocd2'), 'dict');
+    fs.writeFileSync(path.join(releaseDir, 'STCharacters.txt'), 'source');
+    fs.writeFileSync(path.join(releaseDir, 'README.md'), 'docs');
+    fs.writeFileSync(path.join(assetsDir, 'stale.txt'), 'stale');
+
+    prepareArtifacts(root);
+
+    assert.deepEqual(fs.readdirSync(assetsDir).sort(), [
+      'STCharacters.ocd2',
+      's2t.json',
+    ]);
   });
 });

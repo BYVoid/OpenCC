@@ -24,7 +24,8 @@ cc_binary(
     ],
     includes = [".", "src"],
     linkopts = select({
-        "@platforms//os:macos": ["-undefined", "dynamic_lookup", "-Wl,-S"],
+        "@platforms//os:macos": ["-undefined", "dynamic_lookup", "-Wl,-S", "-Wl,-no_uuid"],
+        "@platforms//os:linux": ["-Wl,-s", "-Wl,--build-id=sha1"],
         "//conditions:default": ["-Wl,-s"],
     }),
     linkshared = True,
@@ -48,4 +49,32 @@ genrule(
     srcs = [":opencc_clib"],
     outs = ["opencc.node"],
     cmd = "cp $(location :opencc_clib) $@",
+)
+
+genrule(
+    name = "opencc_node_windows_zig",
+    srcs = [
+        "opencc.cc",
+        "//deps/marisa-0.3.1:all_files",
+        "//deps/rapidjson-1.1.0:all_files",
+        "//src:all_files",
+        "@node_addon_api//:all_files",
+        "@node_headers//:all_files",
+    ],
+    outs = ["windows-x64/opencc.node"],
+    cmd = (
+        "bash $(location //scripts:build_node_windows_zig) " +
+        "$@ " +
+        "$(location @node_headers//:node_api_header) " +
+        "$(location @node_addon_api//:napi_header) " +
+        "$(location @node_win_x64_lib//file)"
+    ),
+    tools = [
+        "//scripts:build_node_windows_zig",
+        "@node_addon_api//:all_files",
+        "@node_addon_api//:napi_header",
+        "@node_headers//:all_files",
+        "@node_headers//:node_api_header",
+        "@node_win_x64_lib//file",
+    ],
 )

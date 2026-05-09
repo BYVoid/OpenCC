@@ -4,6 +4,15 @@ load("@rules_python//python:py_library.bzl", "py_library")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "all_files",
+    srcs = glob([
+        "**/*.cpp",
+        "**/*.h",
+        "**/*.hpp",
+    ]),
+)
+
 cc_library(
     name = "opencc",
     hdrs = ["ConversionInspection.hpp"],

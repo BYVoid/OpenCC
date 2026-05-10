@@ -100,7 +100,7 @@ cc_library(
         ":max_match_segmentation",
         ":plugin_segmentation",
         ":text_dict",
-        "@rapidjson",
+        "//deps/rapidjson-1.1.0:rapidjson",
     ],
 )
 

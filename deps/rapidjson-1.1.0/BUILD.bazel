@@ -1,5 +1,11 @@
 package(default_visibility = ["//visibility:public"])
 
+cc_library(
+    name = "rapidjson",
+    hdrs = glob(["rapidjson/**/*.h"]),
+    includes = ["."],
+)
+
 filegroup(
     name = "all_files",
     srcs = glob(["rapidjson/**/*.h"]),

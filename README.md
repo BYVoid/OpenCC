@@ -291,43 +291,7 @@ bazel test --test_output=all //src/... //data/... //python/... //test/...
 make benchmark
 ```
 
-Example results (from Github CI, commit ID 9e80d5d, 2026-04-16, CMake macos-latest):
-
-```
--------------------------------------------------------------------------
-Benchmark                               Time             CPU   Iterations
--------------------------------------------------------------------------
-BM_Initialization/hk2s                868 us          868 us          665
-BM_Initialization/hk2t                139 us          139 us         5059
-BM_Initialization/jp2t                203 us          203 us         3448
-BM_Initialization/s2hk              26201 us        26200 us           27
-BM_Initialization/s2t               26385 us        26382 us           27
-BM_Initialization/s2tw              27108 us        27108 us           27
-BM_Initialization/s2twp             26446 us        26445 us           25
-BM_Initialization/s2twp_jieba      142754 us       141974 us            5
-BM_Initialization/t2hk               66.7 us         66.7 us        10519
-BM_Initialization/t2jp                166 us          166 us         4215
-BM_Initialization/t2s                 797 us          797 us          883
-BM_Initialization/t2tw               58.1 us         58.1 us        12075
-BM_Initialization/tw2s                845 us          845 us          831
-BM_Initialization/tw2sp              1004 us         1004 us          697
-BM_Initialization/tw2t               93.3 us         93.3 us         7492
-BM_ConvertLongText/s2t                327 ms          327 ms            2 bytes_per_second=5.45069M/s
-BM_ConvertLongText/s2twp              554 ms          554 ms            1 bytes_per_second=3.21299M/s
-BM_ConvertLongText/s2twp_jieba        742 ms          741 ms            1 bytes_per_second=2.40096M/s
-BM_Convert/s2t_100                  0.649 ms        0.649 ms         1083 bytes_per_second=6.15628M/s
-BM_Convert/s2t_1000                  6.64 ms         6.64 ms          106 bytes_per_second=6.16118M/s
-BM_Convert/s2t_10000                 68.1 ms         68.1 ms           10 bytes_per_second=6.14608M/s
-BM_Convert/s2t_100000                 718 ms          717 ms            1 bytes_per_second=5.96785M/s
-BM_Convert/s2twp_100                 1.20 ms         1.20 ms          552 bytes_per_second=3.32407M/s
-BM_Convert/s2twp_1000                12.3 ms         12.3 ms           57 bytes_per_second=3.32311M/s
-BM_Convert/s2twp_10000                126 ms          126 ms            6 bytes_per_second=3.31205M/s
-BM_Convert/s2twp_100000              1296 ms         1296 ms            1 bytes_per_second=3.3027M/s
-BM_Convert/s2twp_jieba_100           1.51 ms         1.49 ms          495 bytes_per_second=2.67698M/s
-BM_Convert/s2twp_jieba_1000          15.0 ms         15.0 ms           48 bytes_per_second=2.72292M/s
-BM_Convert/s2twp_jieba_10000          153 ms          153 ms            5 bytes_per_second=2.73681M/s
-BM_Convert/s2twp_jieba_100000        1728 ms         1728 ms            1 bytes_per_second=2.47784M/s
-```
+詳情見 [doc/benchmark.md](doc/benchmark.md) 檔案。
 
 ## Projects using OpenCC 使用 OpenCC 的項目
 

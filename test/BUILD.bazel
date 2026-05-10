@@ -46,6 +46,6 @@ cc_test(
         "//src:common",
         "@bazel_tools//tools/cpp/runfiles",
         "@googletest//:gtest_main",
-        "@rapidjson",
+        "//deps/rapidjson-1.1.0:rapidjson",
     ],
 )

@@ -139,7 +139,8 @@ protected:
 #ifdef BAZEL
     const std::string dictFile =
         runfiles_->Rlocation("_main/data/dictionary/STCharacters.ocd2");
-    const std::string dictDir = dictFile.substr(0, dictFile.find_last_of("/\\"));
+    const std::string dictDir =
+        dictFile.substr(0, dictFile.find_last_of("/\\"));
     const std::string configFile =
         runfiles_->Rlocation("_main/data/config/s2t.json");
     const std::string configDir =
@@ -166,6 +167,31 @@ protected:
       const {
     return TestCommand(config, inputFile, outputFile, measuredResultFile,
                        extraFlags);
+  }
+
+  std::string TestStdinCommand(const std::string& config,
+                               const std::string& inputFile,
+                               const std::string& outputFile) const {
+    std::string cmd = QuotePath(OpenccCommand()) + " -c " +
+                      QuotePath(ConfigurationDirectory() + config + ".json");
+#ifdef BAZEL
+    const std::string dictFile =
+        runfiles_->Rlocation("_main/data/dictionary/STCharacters.ocd2");
+    const std::string dictDir =
+        dictFile.substr(0, dictFile.find_last_of("/\\"));
+    const std::string configFile =
+        runfiles_->Rlocation("_main/data/config/s2t.json");
+    const std::string configDir =
+        configFile.substr(0, configFile.find_last_of("/\\"));
+    cmd += " --path " + QuotePath(dictDir + "/") +
+           " --path " + QuotePath(configDir + "/");
+#endif
+    cmd += " < " + QuotePath(inputFile) + " > " + QuotePath(outputFile);
+#ifdef _WIN32
+    return "\"" + cmd + "\"";
+#else
+    return cmd;
+#endif
   }
 
   char* originalWorkingDirectory;
@@ -263,6 +289,33 @@ TEST_F(CommandLineConvertTest, ConvertFromJson) {
     }
     EXPECT_EQ(idx, entry.second.size()) << "config=" << config;
   }
+}
+
+TEST_F(CommandLineConvertTest, StdinPreservesTrailingNewline) {
+  const std::string config = "s2t";
+  const std::string inputWithNewline = InputFile("stdin_with_newline");
+  const std::string outputWithNewline = OutputFile("stdin_with_newline");
+  const std::string inputWithoutNewline = InputFile("stdin_without_newline");
+  const std::string outputWithoutNewline = OutputFile("stdin_without_newline");
+
+  {
+    std::ofstream ofs(inputWithNewline, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "123\n";
+  }
+  {
+    std::ofstream ofs(inputWithoutNewline, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "123";
+  }
+
+  ASSERT_EQ(0, system(TestStdinCommand(config, inputWithNewline,
+                                       outputWithNewline).c_str()));
+  EXPECT_EQ("123\n", GetFileContents(outputWithNewline));
+
+  ASSERT_EQ(0, system(TestStdinCommand(config, inputWithoutNewline,
+                                       outputWithoutNewline).c_str()));
+  EXPECT_EQ("123", GetFileContents(outputWithoutNewline));
 }
 
 TEST_F(CommandLineConvertTest, WritesMeasuredResultJson) {

@@ -285,6 +285,7 @@ void ConvertLineByLine() {
   std::istream& inputStream = std::cin;
   FILE* fout = GetOutputStream();
   bool isFirstLine = true;
+  bool inputEndedWithNewline = false;
   std::string line;
   while (std::getline(inputStream, line)) {
     if (!isFirstLine) {
@@ -292,6 +293,7 @@ void ConvertLineByLine() {
     } else {
       isFirstLine = false;
     }
+    inputEndedWithNewline = !inputStream.eof();
     measurement.inputBytes += line.size();
     const std::string& output = ConvertLineByMode(line);
     measurement.outputBytes += output.size();
@@ -303,6 +305,12 @@ void ConvertLineByLine() {
     }
     measurement.writeMs += DurationToMilliseconds(
         std::chrono::steady_clock::now() - writeStart);
+  }
+  if (inputEndedWithNewline) {
+    fputs("\n", fout);
+    if (!noFlush) {
+      fflush(fout);
+    }
   }
   fclose(fout);
 }

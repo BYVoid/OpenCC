@@ -747,6 +747,15 @@
       }
     },
     {
+      "id": "BYVoid_OpenCC_Issue_neijuan_s2t",
+      "input": "内卷",
+      "expected": {
+        "s2t": "內捲",
+        "s2tw": "內捲",
+        "s2hk": "內捲"
+      }
+    },
+    {
       "id": "zipper_s2t",
       "input": "拉链 拉链工程",
       "expected": {

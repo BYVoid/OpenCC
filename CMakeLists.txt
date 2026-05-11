@@ -217,20 +217,20 @@ add_definitions(
 
 set(CMAKE_CXX_STANDARD 17) # default C++ version for new target afterward
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  add_definitions(
+  add_compile_options(
     -Wall
   )
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
   if (CMAKE_BUILD_TYPE MATCHES Debug)
-    add_definitions(-O0 -g3)
+    add_compile_options(-O0 -g3)
   endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  add_definitions(
+  add_compile_options(
     -Wall
   )
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
   if (CMAKE_BUILD_TYPE MATCHES Debug)
-    add_definitions(-O0 -g3)
+    add_compile_options(-O0 -g3)
   endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   add_definitions(

@@ -53,7 +53,6 @@ protected:
 std::unique_ptr<Runfiles> DictionaryTest::runfiles_;
 
 TEST_F(DictionaryTest, UniqueSortedTest) {
-  const std::string dictionary = OPENCC_DICTIONARY_TEST_FILE;
   const std::string dictionaryFileName =
       runfiles_->Rlocation("_main/data/dictionary/" + dictionary);
   FILE* fp = OpenFile(dictionaryFileName);

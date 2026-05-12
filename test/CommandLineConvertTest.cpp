@@ -55,7 +55,7 @@ protected:
   virtual void TearDown() { ASSERT_EQ(0, portable_chdir(originalWorkingDirectory)); }
 
   std::string GetFileContents(const std::string& fileName) const {
-    std::ifstream fs(fileName);
+    std::ifstream fs(fileName, std::ios::binary);
     EXPECT_TRUE(fs.is_open()) << fileName;
     const std::string content((std::istreambuf_iterator<char>(fs)),
                               (std::istreambuf_iterator<char>()));
@@ -291,31 +291,19 @@ TEST_F(CommandLineConvertTest, ConvertFromJson) {
   }
 }
 
-TEST_F(CommandLineConvertTest, StdinPreservesTrailingNewline) {
+TEST_F(CommandLineConvertTest, StdinPreservesLineEndingsAndUnknownCharacters) {
   const std::string config = "s2t";
-  const std::string inputWithNewline = InputFile("stdin_with_newline");
-  const std::string outputWithNewline = OutputFile("stdin_with_newline");
-  const std::string inputWithoutNewline = InputFile("stdin_without_newline");
-  const std::string outputWithoutNewline = OutputFile("stdin_without_newline");
+  const std::string inputFile = InputFile("stdin_line_endings");
+  const std::string outputFile = OutputFile("stdin_line_endings");
 
   {
-    std::ofstream ofs(inputWithNewline, std::ios::binary);
+    std::ofstream ofs(inputFile, std::ios::binary);
     ASSERT_TRUE(ofs.is_open());
-    ofs << "123\n";
-  }
-  {
-    std::ofstream ofs(inputWithoutNewline, std::ios::binary);
-    ASSERT_TRUE(ofs.is_open());
-    ofs << "123";
+    ofs << "鼠标=mouse\r\n123\n未登录";
   }
 
-  ASSERT_EQ(0, system(TestStdinCommand(config, inputWithNewline,
-                                       outputWithNewline).c_str()));
-  EXPECT_EQ("123\n", GetFileContents(outputWithNewline));
-
-  ASSERT_EQ(0, system(TestStdinCommand(config, inputWithoutNewline,
-                                       outputWithoutNewline).c_str()));
-  EXPECT_EQ("123", GetFileContents(outputWithoutNewline));
+  ASSERT_EQ(0, system(TestStdinCommand(config, inputFile, outputFile).c_str()));
+  EXPECT_EQ("鼠標=mouse\r\n123\n未登錄", GetFileContents(outputFile));
 }
 
 TEST_F(CommandLineConvertTest, WritesMeasuredResultJson) {
@@ -584,4 +572,131 @@ TEST_F(CommandLineConvertTest, SegmentationNoSpuriousEofRecord) {
   EXPECT_FALSE(d2.HasParseError()) << "Second record invalid JSON: " << rest;
   EXPECT_TRUE(d2.IsObject());
 }
+  TEST_F(CommandLineConvertTest, PreservesLineEnding_LF) {
+    const std::string config = "s2t";
+    const std::string inputFile = InputFile("lf_input");
+    const std::string outputFile = OutputFile("lf_output");
+
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open());
+      ofs << "第一行\n第二行\n第三行\n";
+    }
+
+    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+
+    // Read output in binary mode to check line endings
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open());
+    std::string content((std::istreambuf_iterator<char>(ifs)),
+                              (std::istreambuf_iterator<char>()));
+    ifs.close();
+
+    // Should contain LF (0a) but not CR (0d)
+    ASSERT_NE(std::string::npos, content.find('\n'));
+    ASSERT_EQ(std::string::npos, content.find('\r'));
+  }
+
+  TEST_F(CommandLineConvertTest, PreservesLineEnding_CRLF) {
+    const std::string config = "s2t";
+    const std::string inputFile = InputFile("crlf_input");
+    const std::string outputFile = OutputFile("crlf_output");
+
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open());
+      ofs << "第一行\r\n第二行\r\n第三行\r\n";
+    }
+
+    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+
+    // Read output in binary mode to check line endings
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open());
+    std::string content((std::istreambuf_iterator<char>(ifs)),
+                              (std::istreambuf_iterator<char>()));
+    ifs.close();
+
+    // Should contain both CR (0d) and LF (0a)
+    ASSERT_NE(std::string::npos, content.find('\r'));
+    ASSERT_NE(std::string::npos, content.find('\n'));
+  }
+
+  TEST_F(CommandLineConvertTest, PreservesLineEnding_CRLF_ASCII) {
+    const std::string config = "s2t";
+    const std::string inputFile = InputFile("crlf_ascii_input");
+    const std::string outputFile = OutputFile("crlf_ascii_output");
+
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open());
+      ofs << "hello\r\nworld\r\n";
+    }
+
+    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+
+    // Read output in binary mode
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open());
+    std::string content((std::istreambuf_iterator<char>(ifs)),
+                              (std::istreambuf_iterator<char>()));
+    ifs.close();
+
+    // Should preserve CRLF
+    ASSERT_NE(std::string::npos, content.find('\r'));
+    ASSERT_NE(std::string::npos, content.find('\n'));
+  }
+
+  TEST_F(CommandLineConvertTest, PreservesLineEnding_NoTrailingNewline_LF) {
+    const std::string config = "s2t";
+    const std::string inputFile = InputFile("no_trailing_lf_input");
+    const std::string outputFile = OutputFile("no_trailing_lf_output");
+
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open());
+      ofs << "第一行\n第二行";  // No trailing newline
+    }
+
+    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+
+    // Read output in binary mode
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open());
+    std::string content((std::istreambuf_iterator<char>(ifs)),
+                              (std::istreambuf_iterator<char>()));
+    ifs.close();
+
+    // Should have LF but no CR, and no trailing newline
+    ASSERT_NE(std::string::npos, content.find('\n'));
+    ASSERT_EQ(std::string::npos, content.find('\r'));
+    ASSERT_NE('\n', content.back());
+  }
+
+  TEST_F(CommandLineConvertTest, PreservesLineEnding_NoTrailingNewline_CRLF) {
+    const std::string config = "s2t";
+    const std::string inputFile = InputFile("no_trailing_crlf_input");
+    const std::string outputFile = OutputFile("no_trailing_crlf_output");
+
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open());
+      ofs << "第一行\r\n第二行";  // No trailing newline
+    }
+
+    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+
+    // Read output in binary mode
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open());
+    std::string content((std::istreambuf_iterator<char>(ifs)),
+                              (std::istreambuf_iterator<char>()));
+    ifs.close();
+
+    // Should preserve CRLF but no trailing newline
+    ASSERT_NE(std::string::npos, content.find('\r'));
+    ASSERT_NE(std::string::npos, content.find('\n'));
+    ASSERT_NE('\r', content.back());
+    ASSERT_NE('\n', content.back());
+  }
 } // namespace opencc

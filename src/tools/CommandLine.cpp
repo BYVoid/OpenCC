@@ -21,6 +21,7 @@
 #include <fstream>
 
 #ifdef _WIN32
+#include <fcntl.h>
 #include <io.h>
 #else
 #include <unistd.h>
@@ -116,6 +117,14 @@ struct MeasurementResult {
 
 MeasurementResult measurement;
 
+void SetBinaryMode(FILE* fp) {
+#ifdef _WIN32
+  _setmode(_fileno(fp), _O_BINARY);
+#else
+  (void)fp;
+#endif
+}
+
 double DurationToMilliseconds(
     const std::chrono::steady_clock::duration& duration) {
   return std::chrono::duration<double, std::milli>(duration).count();
@@ -181,9 +190,10 @@ void WriteMeasuredResult() {
 
 FILE* GetOutputStream() {
   if (outputFileName.IsNull()) {
+    SetBinaryMode(stdout);
     return stdout;
   } else {
-    FILE* fp = fopen(outputFileName.Get().c_str(), "w");
+    FILE* fp = fopen(outputFileName.Get().c_str(), "wb");
     if (!fp) {
       throw FileNotWritable(outputFileName.Get());
     }
@@ -269,6 +279,62 @@ std::string ConvertLineByMode(const std::string& line) {
   return output;
 }
 
+void ConvertStream(FILE* fin, FILE* fout) {
+  const int BUFFER_SIZE = 1024 * 1024;
+  std::string buffer(BUFFER_SIZE + 1, '\0');
+  char* bufferBegin = &buffer[0];
+  const char* bufferEnd = bufferBegin + BUFFER_SIZE;
+  char* bufferPtr = bufferBegin;
+  size_t bufferSizeAvailble = BUFFER_SIZE;
+
+  while (!feof(fin)) {
+    size_t length = fread(bufferPtr, sizeof(char), bufferSizeAvailble, fin);
+    if (length == 0) {
+      break;
+    }
+    measurement.inputBytes += length;
+    bufferPtr[length] = '\0';
+    size_t remainingLength = 0;
+    std::string remainingTemp;
+    if (length == bufferSizeAvailble) {
+      // fread may break a UTF-8 character. Keep the partial character for the
+      // next chunk and convert only complete characters.
+      char* lastChPtr = bufferBegin;
+      while (lastChPtr < bufferEnd) {
+        size_t nextCharLen = UTF8Util::NextCharLength(lastChPtr);
+        if (lastChPtr + nextCharLen > bufferEnd) {
+          break;
+        }
+        lastChPtr += nextCharLen;
+      }
+      remainingLength = bufferEnd - lastChPtr;
+      if (remainingLength > 0) {
+        remainingTemp = UTF8Util::FromSubstr(lastChPtr, remainingLength);
+        *lastChPtr = '\0';
+      }
+    }
+
+    const auto convertStart = std::chrono::steady_clock::now();
+    const std::string& converted = converter->Convert(bufferBegin);
+    measurement.convertMs += DurationToMilliseconds(
+        std::chrono::steady_clock::now() - convertStart);
+    measurement.outputBytes += converted.size();
+    const auto writeStart = std::chrono::steady_clock::now();
+    fputs(converted.c_str(), fout);
+    if (!noFlush) {
+      fflush(fout);
+    }
+    measurement.writeMs += DurationToMilliseconds(
+        std::chrono::steady_clock::now() - writeStart);
+
+    bufferPtr = bufferBegin + remainingLength;
+    bufferSizeAvailble = BUFFER_SIZE - remainingLength;
+    if (remainingLength > 0) {
+      strncpy(bufferBegin, remainingTemp.c_str(), remainingLength);
+    }
+  }
+}
+
 void ConvertLineByLine() {
 #ifdef _WIN32
   if (_isatty(_fileno(stdin))) {
@@ -285,7 +351,6 @@ void ConvertLineByLine() {
   std::istream& inputStream = std::cin;
   FILE* fout = GetOutputStream();
   bool isFirstLine = true;
-  bool inputEndedWithNewline = false;
   std::string line;
   while (std::getline(inputStream, line)) {
     if (!isFirstLine) {
@@ -293,7 +358,6 @@ void ConvertLineByLine() {
     } else {
       isFirstLine = false;
     }
-    inputEndedWithNewline = !inputStream.eof();
     measurement.inputBytes += line.size();
     const std::string& output = ConvertLineByMode(line);
     measurement.outputBytes += output.size();
@@ -306,32 +370,10 @@ void ConvertLineByLine() {
     measurement.writeMs += DurationToMilliseconds(
         std::chrono::steady_clock::now() - writeStart);
   }
-  if (inputEndedWithNewline) {
-    fputs("\n", fout);
-    if (!noFlush) {
-      fflush(fout);
-    }
-  }
   fclose(fout);
 }
 
-void Convert(std::string fileName) {
-  const int BUFFER_SIZE = 1024 * 1024;
-  static bool bufferInitialized = false;
-  static std::string buffer;
-  static char* bufferBegin;
-  static const char* bufferEnd;
-  static char* bufferPtr;
-  static size_t bufferSizeAvailble;
-  if (!bufferInitialized) {
-    bufferInitialized = true;
-    buffer.resize(BUFFER_SIZE + 1);
-    bufferBegin = const_cast<char*>(buffer.c_str());
-    bufferEnd = buffer.c_str() + BUFFER_SIZE;
-    bufferPtr = bufferBegin;
-    bufferSizeAvailble = BUFFER_SIZE;
-  }
-
+void ConvertFile(std::string fileName) {
   bool needToRemove = false;
   if (!outputFileName.IsNull() && fileName == outputFileName.Get()) {
     // Special case: input == output
@@ -366,7 +408,7 @@ void Convert(std::string fileName) {
     needToRemove = true;
   }
 
-  FILE* fin = fopen(fileName.c_str(), "r");
+  FILE* fin = fopen(fileName.c_str(), "rb");
   if (!fin) {
     throw FileNotFound(fileName);
   }
@@ -376,13 +418,12 @@ void Convert(std::string fileName) {
       outputMode == OutputMode::Inspect) {
     // Inspect/segmentation modes process line by line using std::getline to
     // handle arbitrarily long lines.
-    std::ifstream inputStream(fileName);
+    std::ifstream inputStream(fileName, std::ios::binary);
     fclose(fin);
     fin = nullptr;
     bool isFirstLine = true;
     std::string line;
     while (std::getline(inputStream, line)) {
-      // Strip trailing \r for Windows line endings
       if (!line.empty() && line.back() == '\r') {
         line.pop_back();
       }
@@ -409,55 +450,20 @@ void Convert(std::string fileName) {
     return;
   }
 
-  while (!feof(fin)) {
-    size_t length = fread(bufferPtr, sizeof(char), bufferSizeAvailble, fin);
-    measurement.inputBytes += length;
-    bufferPtr[length] = '\0';
-    size_t remainingLength = 0;
-    std::string remainingTemp;
-    if (length == bufferSizeAvailble) {
-      // fread may breaks UTF8 character
-      // Find the end of last character
-      char* lastChPtr = bufferBegin;
-      while (lastChPtr < bufferEnd) {
-        size_t nextCharLen = UTF8Util::NextCharLength(lastChPtr);
-        if (lastChPtr + nextCharLen > bufferEnd) {
-          break;
-        }
-        lastChPtr += nextCharLen;
-      }
-      remainingLength = bufferEnd - lastChPtr;
-      if (remainingLength > 0) {
-        remainingTemp = UTF8Util::FromSubstr(lastChPtr, remainingLength);
-        *lastChPtr = '\0';
-      }
-    }
-    // Perform conversion
-    const auto convertStart = std::chrono::steady_clock::now();
-    const std::string& converted = converter->Convert(buffer);
-    measurement.convertMs += DurationToMilliseconds(
-        std::chrono::steady_clock::now() - convertStart);
-    measurement.outputBytes += converted.size();
-    const auto writeStart = std::chrono::steady_clock::now();
-    fputs(converted.c_str(), fout);
-    if (!noFlush) {
-      // Flush every line if the output stream is stdout.
-      fflush(fout);
-    }
-    measurement.writeMs += DurationToMilliseconds(
-        std::chrono::steady_clock::now() - writeStart);
-    // Reset pointer
-    bufferPtr = bufferBegin + remainingLength;
-    bufferSizeAvailble = BUFFER_SIZE - remainingLength;
-    if (remainingLength > 0) {
-      strncpy(bufferBegin, remainingTemp.c_str(), remainingLength);
-    }
-  }
+  ConvertStream(fin, fout);
+  fclose(fin);
   fclose(fout);
   if (needToRemove) {
     // Remove temporary file.
     std::remove(fileName.c_str());
   }
+}
+
+void ConvertStdin() {
+  SetBinaryMode(stdin);
+  FILE* fout = GetOutputStream();
+  ConvertStream(stdin, fout);
+  fclose(fout);
 }
 
 int main(int argc, const char* argv[]) {
@@ -533,10 +539,12 @@ int main(int argc, const char* argv[]) {
     bool lineByLine = inputFileName.IsNull();
     measurement.lineByLine = lineByLine;
     measurement.outputMode = outputMode;
-    if (lineByLine) {
+    if (lineByLine && outputMode == OutputMode::Convert) {
+      ConvertStdin();
+    } else if (lineByLine) {
       ConvertLineByLine();
     } else {
-      Convert(inputFileName.Get());
+      ConvertFile(inputFileName.Get());
     }
     measurement.totalMs +=
         DurationToMilliseconds(std::chrono::steady_clock::now() - totalStart);

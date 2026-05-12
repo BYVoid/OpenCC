@@ -124,14 +124,14 @@ function parseArgs(args) {
 
 function readInput(inputFileName) {
   if (inputFileName) {
-    return fs.readFileSync(inputFileName, 'utf8');
+    return fs.readFileSync(inputFileName).toString('utf8');
   }
-  return fs.readFileSync(0, 'utf8');
+  return fs.readFileSync(0).toString('utf8');
 }
 
 function writeOutput(outputFileName, text) {
   if (outputFileName) {
-    fs.writeFileSync(outputFileName, text, 'utf8');
+    fs.writeFileSync(outputFileName, Buffer.from(text, 'utf8'));
   } else {
     process.stdout.write(text);
   }

@@ -111,6 +111,15 @@ describe('npm CLI', function () {
     assert.equal(result.stdout, '漢字');
   });
 
+  it('preserves stdin line endings and unknown characters', function () {
+    const input = Buffer.from('鼠标=mouse\r\n123\n未登录', 'utf8');
+    const result = childProcess.spawnSync(process.execPath, [cli, '-c', 's2t.json'], {
+      input,
+    });
+    assert.equal(result.status, 0, result.stderr.toString('utf8'));
+    assert.deepEqual(result.stdout, Buffer.from('鼠標=mouse\r\n123\n未登錄', 'utf8'));
+  });
+
   it('appends .json to built-in config names', function () {
     const result = childProcess.spawnSync(process.execPath, [cli, '-c', 's2t'], {
       input: '汉字',
@@ -137,6 +146,28 @@ describe('npm CLI', function () {
     });
     assert.equal(result.status, 0, result.stderr);
     assert.equal(fs.readFileSync(output, 'utf8'), '漢字');
+  });
+
+  it('preserves input file line endings and unknown characters', function () {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'opencc-node-cli-'));
+    const input = path.join(dir, 'input.txt');
+    const output = path.join(dir, 'output.txt');
+    fs.writeFileSync(input, Buffer.from('鼠标=mouse\r\n123\n未登录', 'utf8'));
+    const result = childProcess.spawnSync(process.execPath, [
+      cli,
+      '--config=s2t.json',
+      '--input',
+      input,
+      '--output',
+      output,
+    ], {
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.deepEqual(
+      fs.readFileSync(output),
+      Buffer.from('鼠標=mouse\r\n123\n未登錄', 'utf8')
+    );
   });
 
   it('resolves custom relative config paths from cwd', function () {
@@ -213,6 +244,108 @@ describe('npm CLI', function () {
       assert.notEqual(result.status, 0);
       assert.match(result.stderr, /Missing value/);
     }
+  });
+
+  describe('Line ending preservation', function () {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'opencc-line-'));
+
+    function hasCRLF(filePath) {
+      const content = fs.readFileSync(filePath, 'utf8');
+      // Check for CRLF pattern in the file
+      return /\r\n/.test(content);
+    }
+
+    function hasLFOnly(filePath) {
+      const content = fs.readFileSync(filePath, 'utf8');
+      // Check for LF without CR
+      return /\n/.test(content) && !/\r/.test(content);
+    }
+
+    after(function () {
+      // Cleanup temp directory
+      try {
+        const entries = fs.readdirSync(tempDir);
+        for (const entry of entries) {
+          fs.rmSync(path.join(tempDir, entry), { recursive: true, force: true });
+        }
+        fs.rmdirSync(tempDir);
+      } catch (e) {
+        // Ignore cleanup errors
+      }
+    });
+
+    it('preserves LF line ending', function () {
+      const input = path.join(tempDir, 'input_lf.txt');
+      const output = path.join(tempDir, 'output_lf.txt');
+      fs.writeFileSync(input, '第一行\n第二行\n', 'utf8');
+
+      const result = childProcess.spawnSync(process.execPath, [
+        cli,
+        '-c', 's2t.json',
+        '--input', input,
+        '--output', output,
+      ], {
+        encoding: 'utf8',
+      });
+
+      assert.equal(result.status, 0, result.stderr);
+      assert(hasLFOnly(output), 'LF line ending should be preserved');
+    });
+
+    it('preserves CRLF line ending', function () {
+      const input = path.join(tempDir, 'input_crlf.txt');
+      const output = path.join(tempDir, 'output_crlf.txt');
+      fs.writeFileSync(input, '第一行\r\n第二行\r\n', 'utf8');
+
+      const result = childProcess.spawnSync(process.execPath, [
+        cli,
+        '-c', 's2t.json',
+        '--input', input,
+        '--output', output,
+      ], {
+        encoding: 'utf8',
+      });
+
+      assert.equal(result.status, 0, result.stderr);
+      assert(hasCRLF(output), 'CRLF line ending should be preserved');
+    });
+
+    it('preserves CRLF with ASCII content', function () {
+      const input = path.join(tempDir, 'input_ascii_crlf.txt');
+      const output = path.join(tempDir, 'output_ascii_crlf.txt');
+      fs.writeFileSync(input, 'hello\r\nworld\r\n', 'utf8');
+
+      const result = childProcess.spawnSync(process.execPath, [
+        cli,
+        '-c', 's2t.json',
+        '--input', input,
+        '--output', output,
+      ], {
+        encoding: 'utf8',
+      });
+
+      assert.equal(result.status, 0, result.stderr);
+      assert(hasCRLF(output), 'CRLF line ending should be preserved for ASCII');
+    });
+
+    it('preserves LF when no trailing newline', function () {
+      const input = path.join(tempDir, 'input_no_trailing.txt');
+      const output = path.join(tempDir, 'output_no_trailing.txt');
+      fs.writeFileSync(input, '第一行\n第二行', 'utf8');
+
+      const result = childProcess.spawnSync(process.execPath, [
+        cli,
+        '-c', 's2t.json',
+        '--input', input,
+        '--output', output,
+      ], {
+        encoding: 'utf8',
+      });
+
+      assert.equal(result.status, 0, result.stderr);
+      // Input had LF, so output should have LF (no CR)
+      assert(!/\r/.test(fs.readFileSync(output, 'utf8')), 'No CR in output');
+    });
   });
 });
 

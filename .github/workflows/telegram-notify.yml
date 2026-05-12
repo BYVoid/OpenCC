@@ -1,0 +1,58 @@
+name: Telegram Notify
+
+on:
+  # pull_request_target runs in the context of the *target* repo, so Secrets
+  # are always available even when the PR comes from a fork.
+  # Safe here because we never checkout untrusted code — we only read event metadata.
+  pull_request_target:
+    types:
+      - opened
+  issues:
+    types:
+      - opened
+
+# This workflow only sends notifications; no repo permissions needed.
+# Restricting to empty permissions limits blast radius if the workflow is exploited.
+permissions: {}
+
+jobs:
+  notify:
+    if: github.repository == 'BYVoid/OpenCC'  # Only run in the official repo; forks lack the required Secrets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+
+    steps:
+      - name: Build message and send to Telegram
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          EVENT_NAME: ${{ github.event_name }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
+          # PR fields (empty string when event is 'issues')
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          # Issue fields (empty string when event is 'pull_request_target')
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request_target" ]; then
+            TEXT="$(printf 'New PR in %s\n#%s %s\nby @%s\n%s' \
+              "$REPO" "$PR_NUMBER" "$PR_TITLE" "$ACTOR" "$PR_URL")"
+          else
+            TEXT="$(printf 'New Issue in %s\n#%s %s\nby @%s\n%s' \
+              "$REPO" "$ISSUE_NUMBER" "$ISSUE_TITLE" "$ACTOR" "$ISSUE_URL")"
+          fi
+
+          RESPONSE=$(curl -s \
+            -X POST \
+            "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${CHAT_ID}" \
+            --data-urlencode "text=${TEXT}" \
+            --data-urlencode "disable_web_page_preview=true")
+
+          echo "$RESPONSE"
+          echo "$RESPONSE" | jq -e '.ok == true' > /dev/null || \
+            { echo "Telegram API error: $RESPONSE"; exit 1; }

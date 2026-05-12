@@ -281,6 +281,7 @@ std::string ConvertLineByMode(const std::string& line) {
 
 void ConvertStream(FILE* fin, FILE* fout) {
   const int BUFFER_SIZE = 1024 * 1024;
+  const size_t MAX_KEEP_CHARS = 16;
   std::string buffer(BUFFER_SIZE + 1, '\0');
   char* bufferBegin = &buffer[0];
   const char* bufferEnd = bufferBegin + BUFFER_SIZE;
@@ -289,11 +290,12 @@ void ConvertStream(FILE* fin, FILE* fout) {
 
   while (!feof(fin)) {
     size_t length = fread(bufferPtr, sizeof(char), bufferSizeAvailble, fin);
-    if (length == 0) {
+    if (length == 0 && bufferPtr == bufferBegin) {
       break;
     }
     measurement.inputBytes += length;
     bufferPtr[length] = '\0';
+    size_t convertLength = (bufferPtr - bufferBegin) + length;
     size_t remainingLength = 0;
     std::string remainingTemp;
     if (length == bufferSizeAvailble) {
@@ -307,12 +309,27 @@ void ConvertStream(FILE* fin, FILE* fout) {
         }
         lastChPtr += nextCharLen;
       }
-      remainingLength = bufferEnd - lastChPtr;
+
+      // Also keep up to MAX_KEEP_CHARS complete characters before the boundary
+      // to preserve multi-character phrases that may span across buffer
+      // boundaries for correct longest-prefix segmentation.
+      char* keepStart = lastChPtr;
+      size_t charsKept = 0;
+      while (keepStart > bufferBegin && charsKept < MAX_KEEP_CHARS) {
+        size_t prevCharLen = UTF8Util::PrevCharLength(keepStart);
+        keepStart -= prevCharLen;
+        charsKept++;
+      }
+
+      convertLength = keepStart - bufferBegin;
+      remainingLength = bufferEnd - keepStart;
       if (remainingLength > 0) {
-        remainingTemp = UTF8Util::FromSubstr(lastChPtr, remainingLength);
-        *lastChPtr = '\0';
+        remainingTemp = UTF8Util::FromSubstr(keepStart, remainingLength);
       }
     }
+
+    // Null-terminate the portion to convert
+    bufferBegin[convertLength] = '\0';
 
     const auto convertStart = std::chrono::steady_clock::now();
     const std::string& converted = converter->Convert(bufferBegin);
@@ -330,7 +347,7 @@ void ConvertStream(FILE* fin, FILE* fout) {
     bufferPtr = bufferBegin + remainingLength;
     bufferSizeAvailble = BUFFER_SIZE - remainingLength;
     if (remainingLength > 0) {
-      strncpy(bufferBegin, remainingTemp.c_str(), remainingLength);
+      memcpy(bufferBegin, remainingTemp.c_str(), remainingLength);
     }
   }
 }

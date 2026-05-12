@@ -699,4 +699,65 @@ TEST_F(CommandLineConvertTest, SegmentationNoSpuriousEofRecord) {
     ASSERT_NE('\r', content.back());
     ASSERT_NE('\n', content.back());
   }
+
+  TEST_F(CommandLineConvertTest, ChunkingBoundaryTruncationFix) {
+    const std::string config = "s2t";
+    const std::string inputFile = InputFile("chunk_boundary_test");
+    const std::string outputFile = OutputFile("chunk_boundary_test");
+
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open());
+      // Create exactly 1MB - 3 bytes of padding. 
+      // This forces the "头" character (3 bytes) to end exactly at the 1MB 
+      // chunk boundary, while "发尾巴" falls into the next read chunk.
+      std::string padding(1048576 - 3, 'a');
+      ofs << padding << "头发尾巴";
+    }
+
+    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+
+    // Read output in binary mode
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open());
+    std::string content((std::istreambuf_iterator<char>(ifs)),
+                        (std::istreambuf_iterator<char>()));
+    ifs.close();
+
+    // 1. Verify EOF truncation bug is fixed (the output shouldn't be truncated)
+    // 2. Verify Semantic-safe chunking (the word shouldn't be split into 頭發)
+    const std::string expectedEnd = "頭髮尾巴";
+    ASSERT_GE(content.size(), expectedEnd.size());
+    EXPECT_EQ(expectedEnd, content.substr(content.size() - expectedEnd.size()));
+  }
+  
+  TEST_F(CommandLineConvertTest, ExactChunkSizeDoesNotTruncate) {
+    const std::string config = "s2t";
+    const std::string inputFile = InputFile("exact_chunk_test");
+    const std::string outputFile = OutputFile("exact_chunk_test");
+
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open());
+      // Create EXACTLY 1MB of data (1048576 bytes).
+      // This triggers the bug where fread reads exactly bufferSizeAvailable,
+      // defers MAX_KEEP_CHARS to the next iteration, and then the next fread
+      // returns 0. If the loop breaks immediately on fread returning 0, the
+      // deferred tail is lost.
+      std::string padding(1048576, 'a');
+      ofs << padding;
+    }
+
+    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+
+    // Read output in binary mode
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open());
+    std::string content((std::istreambuf_iterator<char>(ifs)),
+                        (std::istreambuf_iterator<char>()));
+    ifs.close();
+
+    // Verify output length is exactly 1MB.
+    EXPECT_EQ(1048576, content.size());
+  }
 } // namespace opencc

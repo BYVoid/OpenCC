@@ -819,16 +819,16 @@
     },
     {
       "id": "georgia_state_country_s2twp",
-      "input": "佐治亚州 格鲁吉亚共和国",
+      "input": "佐治亚 佐治亚州 格鲁吉亚 格鲁吉亚共和国",
       "expected": {
-        "s2twp": "喬治亞州 喬治亞共和國"
+        "s2twp": "喬治亞 喬治亞州 喬治亞 喬治亞共和國"
       }
     },
     {
       "id": "georgia_state_country_tw2sp",
-      "input": "喬治亞州 喬治亞共和國",
+      "input": "喬治亞州 喬治亞共和國 喬治亞",
       "expected": {
-        "tw2sp": "佐治亚州 格鲁吉亚共和国"
+        "tw2sp": "佐治亚州 格鲁吉亚共和国 乔治亚"
       }
     }
   ]

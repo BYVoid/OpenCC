@@ -1,0 +1,16 @@
+diff --git a/lib/marisa/grimoire/vector/flat-vector.h b/lib/marisa/grimoire/vector/flat-vector.h
+index 3b9d361..fab5dab 100644
+--- a/lib/marisa/grimoire/vector/flat-vector.h
++++ b/lib/marisa/grimoire/vector/flat-vector.h
+@@ -117,10 +117,7 @@ class FlatVector {
+       num_units += num_units % (64 / MARISA_WORD_SIZE);
+     }
+ 
+-    units_.resize(num_units);
+-    if (num_units > 0) {
+-      units_.back() = 0;
+-    }
++    units_.resize(num_units, 0);
+ 
+     value_size_ = value_size;
+     if (value_size != 0) {

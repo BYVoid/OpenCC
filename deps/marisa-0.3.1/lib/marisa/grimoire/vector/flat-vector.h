@@ -117,10 +117,7 @@ class FlatVector {
       num_units += num_units % (64 / MARISA_WORD_SIZE);
     }
 
-    units_.resize(num_units);
-    if (num_units > 0) {
-      units_.back() = 0;
-    }
+    units_.resize(num_units, 0);
 
     value_size_ = value_size;
     if (value_size != 0) {

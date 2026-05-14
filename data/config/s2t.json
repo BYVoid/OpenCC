@@ -1,5 +1,5 @@
 {
-  "name": "Simplified Chinese to Traditional Chinese",
+  "name": "Simplified Chinese to Traditional Chinese (OpenCC Standard)",
   "segmentation": {
     "type": "mmseg",
     "dict": {

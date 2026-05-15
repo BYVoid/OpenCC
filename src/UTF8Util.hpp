@@ -22,7 +22,7 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
-#include <Windows.h>
+#include <windows.h>
 #endif // _MSC_VER
 
 #include <cstring>

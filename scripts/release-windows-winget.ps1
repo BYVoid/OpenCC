@@ -50,6 +50,27 @@ function Write-Utf8File {
     [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
 }
 
+function Invoke-Native {
+    param(
+        [Parameter(Mandatory = $true)][string]$FilePath,
+        [string[]]$Arguments = @()
+    )
+
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        & $FilePath @Arguments
+        $exitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+
+    if ($exitCode -ne 0) {
+        throw "$FilePath exited with code $exitCode."
+    }
+}
+
 function Normalize-ReleaseVersion {
     param(
         [Parameter(Mandatory = $true)][string]$RawVersion
@@ -209,18 +230,21 @@ try {
     New-Item -ItemType Directory -Force -Path $installRoot | Out-Null
     New-Item -ItemType Directory -Force -Path $stagingRoot | Out-Null
 
-    cmake -S . -B $resolvedBuildDir -A x64 `
-        -DCMAKE_BUILD_TYPE=Release `
-        -DBUILD_SHARED_LIBS:BOOL=OFF `
-        -DBUILD_OPENCC_JIEBA_PLUGIN:BOOL=ON `
-        -DCMAKE_INSTALL_PREFIX:PATH=$installRoot `
-        -DENABLE_GTEST:BOOL=OFF `
-        -DENABLE_BENCHMARK:BOOL=OFF
+    Invoke-Native cmake @(
+        "-S", ".",
+        "-B", $resolvedBuildDir,
+        "-A", "x64",
+        "-DBUILD_SHARED_LIBS:BOOL=OFF",
+        "-DBUILD_OPENCC_JIEBA_PLUGIN:BOOL=ON",
+        "-DCMAKE_INSTALL_PREFIX:PATH=$installRoot",
+        "-DENABLE_GTEST:BOOL=OFF",
+        "-DENABLE_BENCHMARK:BOOL=OFF"
+    )
 
-    cmake --build $resolvedBuildDir --config Release --target install
+    Invoke-Native cmake @("--build", $resolvedBuildDir, "--config", "Release", "--target", "install")
 
     if (-not $SkipTests) {
-        ctest --test-dir $resolvedBuildDir --build-config Release --output-on-failure
+        Invoke-Native ctest @("--test-dir", $resolvedBuildDir, "--build-config", "Release", "--output-on-failure")
     }
 
     New-Item -ItemType Directory -Force -Path (Join-Path $stagingRoot "bin") | Out-Null

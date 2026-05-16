@@ -80,6 +80,7 @@ sources=(
   src/PhraseExtract.cpp
   src/PrefixMatch.cpp
   src/Segmentation.cpp
+  src/SerializableDict.cpp
   src/SerializedValues.cpp
   src/SimpleConverter.cpp
   src/TextDict.cpp

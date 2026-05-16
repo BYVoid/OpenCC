@@ -465,6 +465,7 @@ cc_library(
 
 cc_library(
     name = "serializable_dict",
+    srcs = ["SerializableDict.cpp"],
     hdrs = ["SerializableDict.hpp"],
     deps = [
         ":dict",

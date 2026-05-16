@@ -41,6 +41,7 @@ sources=(
   src/PluginSegmentation.cpp
   src/PrefixMatch.cpp
   src/Segmentation.cpp
+  src/SerializableDict.cpp
   src/SerializedValues.cpp
   src/TextDict.cpp
   src/UTF8Util.cpp

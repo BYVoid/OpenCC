@@ -64,6 +64,7 @@ set(
   PluginSegmentation.cpp
   PhraseExtract.cpp
   PrefixMatch.cpp
+  SerializableDict.cpp
   SerializedValues.cpp
   SimpleConverter.cpp
   Segmentation.cpp

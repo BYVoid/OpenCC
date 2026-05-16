@@ -1,7 +1,7 @@
-find_package(PythonInterp REQUIRED)
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
 set(OPENCC_DICT_BIN opencc_dict)
-set(DICT_REVERSE_BIN "${PYTHON_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/reverse.py")
+set(DICT_REVERSE_BIN "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/reverse.py")
 set(DICT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dictionary)
 set(DICT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR})
 

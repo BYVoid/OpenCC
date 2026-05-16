@@ -234,7 +234,6 @@ try {
         "-S", ".",
         "-B", $resolvedBuildDir,
         "-A", "x64",
-        "-DCMAKE_BUILD_TYPE=Release",
         "-DBUILD_SHARED_LIBS:BOOL=OFF",
         "-DBUILD_OPENCC_JIEBA_PLUGIN:BOOL=ON",
         "-DCMAKE_INSTALL_PREFIX:PATH=$installRoot",

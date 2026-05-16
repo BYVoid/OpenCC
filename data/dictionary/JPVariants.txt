@@ -4,6 +4,7 @@
 # License: Apache-2.0 (see LICENSE)
 # Source: https://github.com/ByVoid/OpenCC
 # Used in configs: t2jp.json
+# This dictionary only includes characters in the Unicode BMP.
 
 乘	乗
 亂	乱
@@ -31,6 +32,7 @@
 勸	勧
 勻	匀
 區	区
+卮	巵
 卷	巻
 卻	却
 參	参
@@ -228,6 +230,8 @@
 穰	穣
 竈	竃
 竊	窃
+箋	䇳
+粵	粤
 粹	粋
 糉	粽
 絕	絶
@@ -274,6 +278,7 @@
 萬	万
 蔣	蒋
 蔥	葱
+蕭	䔥
 薰	薫
 藏	蔵
 藝	芸
@@ -320,6 +325,7 @@
 遲	遅
 邊	辺
 鄉	郷
+鄰	隣
 酢	醋
 醉	酔
 醫	医
@@ -355,6 +361,7 @@
 驛	駅
 髓	髄
 體	体
+髡	髠
 髮	髪
 鬥	闘
 鱉	鼈

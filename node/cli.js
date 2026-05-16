@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { Transform, pipeline } = require('stream');
 const OpenCC = require('./opencc');
 
 const BUILT_IN_CONFIGS = [
@@ -122,21 +123,6 @@ function parseArgs(args) {
   return options;
 }
 
-function readInput(inputFileName) {
-  if (inputFileName) {
-    return fs.readFileSync(inputFileName).toString('utf8');
-  }
-  return fs.readFileSync(0).toString('utf8');
-}
-
-function writeOutput(outputFileName, text) {
-  if (outputFileName) {
-    fs.writeFileSync(outputFileName, Buffer.from(text, 'utf8'));
-  } else {
-    process.stdout.write(text);
-  }
-}
-
 function resolveConfigPath(config) {
   if (BUILT_IN_CONFIG_NAMES.has(config) || OPTIONAL_JIEBA_CONFIGS.has(config) || path.isAbsolute(config)) {
     return config;
@@ -151,6 +137,44 @@ function resolveConfigPath(config) {
   }
 
   return path.resolve(process.cwd(), config);
+}
+
+function createConverterStream(converter) {
+  const nativeStream = converter._createConverterStream();
+  let pendingChunk = null;
+
+  return new Transform({
+    transform(chunk, encoding, callback) {
+      try {
+        const input = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk, encoding);
+        if (pendingChunk === null) {
+          pendingChunk = Buffer.from(input);
+          callback();
+          return;
+        }
+        const output = nativeStream.convertChunk(pendingChunk);
+        pendingChunk = Buffer.from(input);
+        callback(null, output);
+      } catch (error) {
+        callback(error);
+      }
+    },
+    flush(callback) {
+      try {
+        callback(null, pendingChunk === null
+          ? nativeStream.finish()
+          : nativeStream.finish(pendingChunk));
+      } catch (error) {
+        callback(error);
+      }
+    },
+  });
+}
+
+function convertStream(converter, options, callback) {
+  const input = options.input ? fs.createReadStream(options.input) : process.stdin;
+  const output = options.output ? fs.createWriteStream(options.output) : process.stdout;
+  pipeline(input, createConverterStream(converter), output, callback);
 }
 
 function main() {
@@ -174,9 +198,12 @@ function main() {
 
   try {
     const converter = new OpenCC(resolveConfigPath(options.config));
-    const input = readInput(options.input);
-    const output = converter.convertSync(input);
-    writeOutput(options.output, output);
+    convertStream(converter, options, (error) => {
+      if (error) {
+        const message = error && error.message ? error.message : String(error);
+        fail(path.basename(process.argv[1]) + ': ' + message);
+      }
+    });
   } catch (error) {
     const message = error && error.message ? error.message : String(error);
     fail(path.basename(process.argv[1]) + ': ' + message);

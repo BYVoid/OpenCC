@@ -170,6 +170,25 @@ describe('npm CLI', function () {
     );
   });
 
+  it('preserves phrase conversion across stream chunk boundaries', function () {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'opencc-node-cli-boundary-'));
+    const input = path.join(dir, 'input.txt');
+    const output = path.join(dir, 'output.txt');
+    fs.writeFileSync(input, 'a'.repeat(65535) + '后台老板', 'utf8');
+    const result = childProcess.spawnSync(process.execPath, [
+      cli,
+      '--config=s2t.json',
+      '--input',
+      input,
+      '--output',
+      output,
+    ], {
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(fs.readFileSync(output, 'utf8'), 'a'.repeat(65535) + '後臺老闆');
+  });
+
   it('resolves custom relative config paths from cwd', function () {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'opencc-node-cli-config-'));
     const assetsPath = getAssetsPath();

@@ -35,23 +35,14 @@
 #include "Lexicon.hpp"
 #include "MarisaDict.hpp"
 #include "SerializableDict.hpp"
-#if defined(_WIN32) || defined(_WIN64)
-#include "WinUtil.hpp"
-#endif
 #elif __has_include("src/MarisaDict.hpp")
 #include "src/Lexicon.hpp"
 #include "src/MarisaDict.hpp"
 #include "src/SerializableDict.hpp"
-#if defined(_WIN32) || defined(_WIN64)
-#include "src/WinUtil.hpp"
-#endif
 #elif __has_include(<opencc/MarisaDict.hpp>)
 #include <opencc/Lexicon.hpp>
 #include <opencc/MarisaDict.hpp>
 #include <opencc/SerializableDict.hpp>
-#if defined(_WIN32) || defined(_WIN64)
-#include <opencc/WinUtil.hpp>
-#endif
 #else
 #error "Unable to locate OpenCC dictionary headers"
 #endif
@@ -59,9 +50,6 @@
 #include "Lexicon.hpp"
 #include "MarisaDict.hpp"
 #include "SerializableDict.hpp"
-#if defined(_WIN32) || defined(_WIN64)
-#include "WinUtil.hpp"
-#endif
 #endif
 
 using namespace opencc;
@@ -74,6 +62,23 @@ using opencc::LexiconPtr;
 using opencc::MarisaDict;
 using opencc::SerializableDict;
 
+#if defined(_WIN32) || defined(_WIN64)
+std::wstring LocalWideFromUtf8(const std::string& text) {
+  if (text.empty()) {
+    return L"";
+  }
+  const int size = MultiByteToWideChar(CP_UTF8, 0, text.c_str(), -1, nullptr,
+                                       0);
+  if (size <= 1) {
+    return L"";
+  }
+  std::wstring wide(static_cast<size_t>(size), L'\0');
+  MultiByteToWideChar(CP_UTF8, 0, text.c_str(), -1, &wide[0], size);
+  wide.resize(static_cast<size_t>(size - 1));
+  return wide;
+}
+#endif
+
 std::string ParentDir(const std::string& path) {
   std::string::size_type pos = path.find_last_of("/\\");
   if (pos == std::string::npos) {
@@ -84,8 +89,7 @@ std::string ParentDir(const std::string& path) {
 
 bool IsRegularFile(const std::string& path) {
 #if defined(_WIN32) || defined(_WIN64)
-  const DWORD attributes =
-      GetFileAttributesW(opencc::internal::WideFromUtf8(path).c_str());
+  const DWORD attributes = GetFileAttributesW(LocalWideFromUtf8(path).c_str());
   return attributes != INVALID_FILE_ATTRIBUTES &&
          (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
 #else

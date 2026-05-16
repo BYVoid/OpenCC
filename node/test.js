@@ -170,6 +170,25 @@ describe('npm CLI', function () {
     );
   });
 
+  it('rejects converting an input file onto itself', function () {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'opencc-node-cli-same-file-'));
+    const input = path.join(dir, 'input.txt');
+    fs.writeFileSync(input, '汉字', 'utf8');
+    const result = childProcess.spawnSync(process.execPath, [
+      cli,
+      '--config=s2t.json',
+      '--input',
+      input,
+      '--output',
+      input,
+    ], {
+      encoding: 'utf8',
+    });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /same file/);
+    assert.equal(fs.readFileSync(input, 'utf8'), '汉字');
+  });
+
   it('preserves phrase conversion across stream chunk boundaries', function () {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'opencc-node-cli-boundary-'));
     const input = path.join(dir, 'input.txt');

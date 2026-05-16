@@ -171,7 +171,26 @@ function createConverterStream(converter) {
   });
 }
 
+function isSameFile(inputFileName, outputFileName) {
+  if (!inputFileName || !outputFileName) {
+    return false;
+  }
+
+  try {
+    const inputStat = fs.statSync(inputFileName);
+    const outputStat = fs.statSync(outputFileName);
+    return inputStat.dev === outputStat.dev && inputStat.ino === outputStat.ino;
+  } catch (error) {
+    return path.resolve(process.cwd(), inputFileName) ===
+      path.resolve(process.cwd(), outputFileName);
+  }
+}
+
 function convertStream(converter, options, callback) {
+  if (isSameFile(options.input, options.output)) {
+    throw new Error('Input and output refer to the same file.');
+  }
+
   const input = options.input ? fs.createReadStream(options.input) : process.stdin;
   const output = options.output ? fs.createWriteStream(options.output) : process.stdout;
   pipeline(input, createConverterStream(converter), output, callback);

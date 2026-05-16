@@ -2,12 +2,18 @@
 
 感謝您對 OpenCC 專案的貢獻！本文件說明如何為 OpenCC 貢獻詞典條目、撰寫測試並確保程式碼品質。
 
+## 授權
+
+OpenCC 以 [Apache License 2.0](LICENSE) 釋出。提交 Pull Request、issue/comment、郵件 patch、詞典條目、測試案例或其他形式的貢獻，即表示您確認自己有權提交這些內容，並同意您的貢獻也依 Apache License 2.0 授權釋出。
+
 ## 目錄
 
+- [授權](#授權)
 - [新增詞典條目](#新增詞典條目)
 - [排序詞典](#排序詞典)
 - [執行測試](#執行測試)
 - [撰寫測試案例](#撰寫測試案例)
+- [Jieba 插件測試](#jieba-插件測試)
 - [簡轉繁轉換的特殊注意事項](#簡轉繁轉換的特殊注意事項)
 
 ## 新增詞典條目
@@ -104,7 +110,7 @@ STPhrases is not sorted.
 
 ## 執行測試
 
-OpenCC 使用 [Bazel](https://bazel.build/) 作為建置系統。
+OpenCC 同時維護 CMake、Bazel 與 Node.js 建置/測試流程。詞典與轉換行為修改通常至少需要跑 Bazel 測試；C++ CLI、插件或包裝相關修改也應跑對應的 CMake 或 npm 測試。
 
 ### 安裝 Bazel
 
@@ -126,24 +132,58 @@ sudo apt install bazel
 
 請參考 [Bazel 安裝文件](https://bazel.build/install) 獲取適合您系統的安裝方式。
 
-### 執行所有測試
+### Bazel 測試
 
 ```bash
-bazel test --test_output=all //src/... //data/... //test/... //python/...
+bazel test --test_output=errors //src/... //data/... //test/... //python/...
 ```
 
-### 執行特定測試
-
-僅測試詞典：
+如果修改了 jieba 插件或 golden 輸出，也請加入相關目標：
 
 ```bash
-bazel test //data/dictionary:dictionary_test
+bazel test --test_output=errors //plugins/jieba/... //test/golden:golden_convert_test
 ```
 
-僅測試轉換案例：
+常用的特定測試：
 
 ```bash
+bazel test //data/dictionary/...
 bazel test //data/config:config_dict_validation_test
+bazel test //test:command_line_converter_test
+```
+
+### CMake 測試
+
+本地 C++ 開發可使用 CMake：
+
+```bash
+cmake -S . -B build -DENABLE_GTEST=ON
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
+如需測試 optional jieba plugin：
+
+```bash
+cmake -S . -B build -DENABLE_GTEST=ON -DBUILD_OPENCC_JIEBA_PLUGIN=ON
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
+### Node.js 測試
+
+Node.js binding 與 npm CLI 修改請執行：
+
+```bash
+npm install
+npm test
+```
+
+驗證 npm prebuild 佈局時：
+
+```bash
+npm run prebuild
+PREBUILDS_ONLY=1 npm test
 ```
 
 ### 測試輸出
@@ -209,6 +249,31 @@ bazel test //data/config:config_dict_validation_test
 - `t2hk` - OpenCC 標準繁體到香港繁體
 - `jp2t` - 日文新字體到舊字體
 - `t2jp` - 日文舊字體到新字體
+
+### Golden 測試
+
+較長文本或多配置輸出可放在 `test/golden/input/` 與 `test/golden/output/`。更新 golden 輸出時可使用：
+
+```bash
+python3 test/golden/golden_convert_test.py --update
+```
+
+提交前請檢查 golden diff，確認變更符合預期。
+
+## Jieba 插件測試
+
+`opencc-jieba` 是可選插件，配置位於 `plugins/jieba/data/config/`，測試案例位於：
+
+- `plugins/jieba/tests/data/jieba_comparison_testcases.json`
+- `test/golden/` 中的 `_jieba` 配置輸出
+
+修改 jieba 分詞、插件載入、或 `*_jieba.json` 配置時，請至少執行：
+
+```bash
+bazel test --test_output=errors //plugins/jieba/... //test/golden:golden_convert_test
+```
+
+npm 插件包位於 `plugins/jieba/node/`。若修改 npm integration，請同時安裝測試 `opencc` 與 `opencc-jieba`，確認 `s2twp_jieba` 等模式可由 JavaScript API 與 npm CLI 載入。
 
 ### 範例
 
@@ -283,7 +348,8 @@ bazel test //data/config:config_dict_validation_test
 - [ ] 詞典檔案已正確排序（執行 `sort.py` 或 `sort_all.py`）
 - [ ] 已新增對應的測試案例到 `testcases.json`
 - [ ] 修改前測試案例失敗，修改後測試通過
-- [ ] 所有測試通過（`bazel test --test_output=all //src/... //data/... //test/...`）
+- [ ] 所有相關 Bazel/CMake/npm 測試通過
+- [ ] 如修改 release packaging，已檢查相關腳本（例如 `scripts/release-windows-winget.ps1`、npm prebuild/package 腳本）
 
 符合以上條件後，即可提交 Pull Request。
 

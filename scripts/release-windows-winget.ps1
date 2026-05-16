@@ -13,15 +13,23 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 function Get-ProjectVersion {
-    $cmakeFile = Join-Path $PSScriptRoot "..\CMakeLists.txt"
-    $content = Get-Content -Path $cmakeFile -Raw
+    $packageJsonFile = Join-Path $PSScriptRoot "..\package.json"
+    if (Test-Path $packageJsonFile) {
+        $packageJson = Get-Content -Path $packageJsonFile -Raw | ConvertFrom-Json
+        if ($packageJson.version) {
+            return [string]$packageJson.version
+        }
+    }
 
-    $major = [regex]::Match($content, 'OPENCC_VERSION_MAJOR\s+(\d+)').Groups[1].Value
-    $minor = [regex]::Match($content, 'OPENCC_VERSION_MINOR\s+(\d+)').Groups[1].Value
-    $revision = [regex]::Match($content, 'OPENCC_VERSION_REVISION\s+(\d+)').Groups[1].Value
+    $gitVersionFile = Join-Path $PSScriptRoot "..\cmake\GitVersion.cmake"
+    $content = Get-Content -Path $gitVersionFile -Raw
+
+    $major = [regex]::Match($content, '_OPENCC_FALLBACK_MAJOR\s+(\d+)').Groups[1].Value
+    $minor = [regex]::Match($content, '_OPENCC_FALLBACK_MINOR\s+(\d+)').Groups[1].Value
+    $revision = [regex]::Match($content, '_OPENCC_FALLBACK_REVISION\s+(\d+)').Groups[1].Value
 
     if (-not $major -or -not $minor -or -not $revision) {
-        throw "Failed to parse version from CMakeLists.txt."
+        throw "Failed to parse version from package.json or cmake/GitVersion.cmake."
     }
 
     return "$major.$minor.$revision"

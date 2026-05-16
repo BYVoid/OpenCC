@@ -18,6 +18,9 @@
 
 #pragma once
 
+#include <cstddef>
+#include <string>
+
 #include "Common.hpp"
 #include "ConversionInspection.hpp"
 #include "Segmentation.hpp"
@@ -50,5 +53,22 @@ private:
   const std::string name;
   const SegmentationPtr segmentation;
   const ConversionChainPtr conversionChain;
+};
+
+class OPENCC_EXPORT ConverterStream {
+public:
+  explicit ConverterStream(ConverterPtr _converter, size_t _maxKeepChars = 16)
+      : converter(_converter), maxKeepChars(_maxKeepChars) {}
+
+  std::string ConvertChunk(const char* input, size_t length);
+
+  std::string Finish();
+
+  std::string Finish(const char* input, size_t length);
+
+private:
+  ConverterPtr converter;
+  size_t maxKeepChars;
+  std::string pending;
 };
 } // namespace opencc

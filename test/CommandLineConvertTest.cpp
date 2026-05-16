@@ -241,6 +241,29 @@ protected:
 #endif
   }
 
+#ifndef _WIN32
+  std::string TestPipeCommand(const std::string& config,
+                              const std::string& outputFile) const {
+    std::string cmd = "(printf '后台'; sleep 0.1; printf '老板') | " +
+                      QuotePath(OpenccCommand()) + " -c " +
+                      QuotePath(ConfigurationDirectory() + config + ".json");
+#ifdef BAZEL
+    const std::string dictFile =
+        runfiles_->Rlocation("_main/data/dictionary/STCharacters.ocd2");
+    const std::string dictDir =
+        dictFile.substr(0, dictFile.find_last_of("/\\"));
+    const std::string configFile =
+        runfiles_->Rlocation("_main/data/config/s2t.json");
+    const std::string configDir =
+        configFile.substr(0, configFile.find_last_of("/\\"));
+    cmd += " --path " + QuotePath(dictDir + "/") +
+           " --path " + QuotePath(configDir + "/");
+#endif
+    cmd += " > " + QuotePath(outputFile);
+    return cmd;
+  }
+#endif
+
   char* originalWorkingDirectory;
 
 #ifdef BAZEL
@@ -352,6 +375,16 @@ TEST_F(CommandLineConvertTest, StdinPreservesLineEndingsAndUnknownCharacters) {
   ASSERT_EQ(0, system(TestStdinCommand(config, inputFile, outputFile).c_str()));
   EXPECT_EQ("鼠標=mouse\r\n123\n未登錄", GetFileContents(outputFile));
 }
+
+#ifndef _WIN32
+TEST_F(CommandLineConvertTest, PipeShortReadContinuesUntilEof) {
+  const std::string outputFile = OutputFile("pipe_short_read");
+
+  ASSERT_EQ(0, system(TestPipeCommand("s2t", outputFile).c_str()));
+
+  ASSERT_EQ("後臺老闆", GetFileContents(outputFile));
+}
+#endif
 
 TEST_F(CommandLineConvertTest, ConvertsFilesWithUnicodePaths) {
   const fs::path unicodeDir =

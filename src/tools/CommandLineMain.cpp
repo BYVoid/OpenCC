@@ -322,9 +322,10 @@ void ConvertStream(FILE* fin, FILE* fout) {
     measurement.inputBytes += length;
 
     const auto convertStart = std::chrono::steady_clock::now();
+    const bool isFinalChunk = length < buffer.size() && feof(fin);
     const std::string& converted =
-        length == buffer.size() ? stream.ConvertChunk(buffer.data(), length)
-                                : stream.Finish(buffer.data(), length);
+        isFinalChunk ? stream.Finish(buffer.data(), length)
+                     : stream.ConvertChunk(buffer.data(), length);
     measurement.convertMs += DurationToMilliseconds(
         std::chrono::steady_clock::now() - convertStart);
     measurement.outputBytes += converted.size();
@@ -335,7 +336,7 @@ void ConvertStream(FILE* fin, FILE* fout) {
     }
     measurement.writeMs += DurationToMilliseconds(
         std::chrono::steady_clock::now() - writeStart);
-    if (length < buffer.size()) {
+    if (isFinalChunk) {
       return;
     }
   }

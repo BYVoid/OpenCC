@@ -19,6 +19,9 @@
 #pragma once
 
 #include "Dict.hpp"
+#if defined(_WIN32) || defined(_WIN64)
+#include "WinUtil.hpp"
+#endif
 
 namespace opencc {
 /**
@@ -36,7 +39,11 @@ public:
    * Serializes the dictionary and writes in to a file.
    */
   virtual void SerializeToFile(const std::string& fileName) const {
+#if defined(_WIN32) || defined(_WIN64)
+    FILE* fp = _wfopen(internal::WideFromUtf8(fileName).c_str(), L"wb");
+#else
     FILE* fp = fopen(fileName.c_str(), "wb");
+#endif
     if (fp == NULL) {
       throw FileNotWritable(fileName);
     }
@@ -47,14 +54,12 @@ public:
   template <typename DICT>
   static bool TryLoadFromFile(const std::string& fileName,
                               std::shared_ptr<DICT>* dict) {
-    FILE* fp =
-#ifdef _MSC_VER
-        // well, the 'GetPlatformString' shall return a 'wstring'
-        _wfopen(UTF8Util::GetPlatformString(fileName).c_str(), L"rb")
+    FILE* fp = nullptr;
+#if defined(_WIN32) || defined(_WIN64)
+    fp = _wfopen(internal::WideFromUtf8(fileName).c_str(), L"rb");
 #else
-        fopen(UTF8Util::GetPlatformString(fileName).c_str(), "rb")
-#endif // _MSC_VER
-        ;
+    fp = fopen(fileName.c_str(), "rb");
+#endif
 
     if (fp == NULL) {
       return false;

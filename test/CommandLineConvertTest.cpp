@@ -18,6 +18,8 @@
 
 #include <fstream>
 #include <iostream>
+#include <cstdlib>
+#include <filesystem>
 #include <map>
 #include <sstream>
 #include <unordered_map>
@@ -29,12 +31,40 @@
 #include "rapidjson/document.h"
 #include "gtest/gtest.h"
 
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#else
+#include <sys/stat.h>
+#endif
+
 #ifdef BAZEL
 #include "tools/cpp/runfiles/runfiles.h"
 using bazel::tools::cpp::runfiles::Runfiles;
 #endif
 
 namespace opencc {
+
+namespace fs = std::filesystem;
+
+#ifdef _WIN32
+std::wstring WideFromUtf8(const std::string& utf8) {
+  if (utf8.empty()) {
+    return L"";
+  }
+  const int required =
+      MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, nullptr, 0);
+  if (required <= 1) {
+    return L"";
+  }
+  std::wstring wide(static_cast<size_t>(required), L'\0');
+  MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, wide.data(), required);
+  wide.resize(static_cast<size_t>(required - 1));
+  return wide;
+}
+#endif
 
 class CommandLineConvertTest : public ::testing::Test {
 protected:
@@ -60,6 +90,15 @@ protected:
     const std::string content((std::istreambuf_iterator<char>(fs)),
                               (std::istreambuf_iterator<char>()));
     fs.close();
+    return content;
+  }
+
+  std::string GetFileContents(const fs::path& fileName) const {
+    std::ifstream stream(fileName, std::ios::binary);
+    EXPECT_TRUE(stream.is_open()) << fileName.u8string();
+    const std::string content((std::istreambuf_iterator<char>(stream)),
+                              (std::istreambuf_iterator<char>()));
+    stream.close();
     return content;
   }
 
@@ -156,6 +195,14 @@ protected:
     return "\"" + cmd + "\"";
 #else
     return cmd;
+#endif
+  }
+
+  static int RunCommand(const std::string& cmd) {
+#ifdef _WIN32
+    return _wsystem(WideFromUtf8(cmd).c_str());
+#else
+    return system(cmd.c_str());
 #endif
   }
 
@@ -304,6 +351,190 @@ TEST_F(CommandLineConvertTest, StdinPreservesLineEndingsAndUnknownCharacters) {
 
   ASSERT_EQ(0, system(TestStdinCommand(config, inputFile, outputFile).c_str()));
   EXPECT_EQ("鼠標=mouse\r\n123\n未登錄", GetFileContents(outputFile));
+}
+
+TEST_F(CommandLineConvertTest, ConvertsFilesWithUnicodePaths) {
+  const fs::path unicodeDir =
+      fs::u8path(OutputDirectory()) / fs::u8path("opencc-中文路径-cli-😀-𠮷");
+  fs::create_directories(unicodeDir);
+
+  const fs::path inputFile = unicodeDir / fs::u8path("输入 文件.txt");
+  const fs::path outputFile = unicodeDir / fs::u8path("輸出 文件.txt");
+  const fs::path measuredResultFile =
+      unicodeDir / fs::u8path("測量 結果.json");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << inputFile.u8string();
+    ofs << "开放中文转换";
+  }
+
+  ASSERT_EQ(0, RunCommand(TestCommand("s2t", inputFile.u8string(),
+                                      outputFile.u8string(),
+                                      measuredResultFile.u8string())));
+  EXPECT_EQ("開放中文轉換", GetFileContents(outputFile));
+
+  const std::string measured = GetFileContents(measuredResultFile);
+  rapidjson::Document doc;
+  doc.Parse(measured.c_str());
+  ASSERT_FALSE(doc.HasParseError()) << measured;
+  ASSERT_TRUE(doc.IsObject());
+  ASSERT_TRUE(doc.HasMember("input"));
+  EXPECT_EQ(inputFile.u8string(), std::string(doc["input"].GetString()));
+}
+
+TEST_F(CommandLineConvertTest, ConvertsInPlaceWithUnicodePath) {
+  const fs::path unicodeDir =
+      fs::u8path(OutputDirectory()) / fs::u8path("opencc-就地转换-cli-😀");
+  fs::create_directories(unicodeDir);
+
+  const fs::path file = unicodeDir / fs::u8path("输入输出同一文件.txt");
+
+  {
+    std::ofstream ofs(file, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << file.u8string();
+    ofs << "开放中文转换";
+  }
+
+  ASSERT_EQ(0, RunCommand(TestCommand("s2t", file.u8string(), file.u8string(),
+                                      "", "--in-place")));
+  EXPECT_EQ("開放中文轉換", GetFileContents(file));
+}
+
+TEST_F(CommandLineConvertTest, RejectsInPlaceConversionWithoutFlag) {
+  const fs::path unicodeDir =
+      fs::u8path(OutputDirectory()) / fs::u8path("opencc-拒绝就地转换-cli");
+  fs::create_directories(unicodeDir);
+
+  const fs::path file = unicodeDir / fs::u8path("输入输出同一文件.txt");
+
+  {
+    std::ofstream ofs(file, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << file.u8string();
+    ofs << "开放中文转换";
+  }
+
+  EXPECT_NE(0, RunCommand(TestCommand("s2t", file.u8string(), file.u8string())));
+  EXPECT_EQ("开放中文转换", GetFileContents(file));
+}
+
+TEST_F(CommandLineConvertTest, MissingInputDoesNotTruncateOutput) {
+  const fs::path unicodeDir =
+      fs::u8path(OutputDirectory()) / fs::u8path("opencc-缺失输入-cli");
+  fs::create_directories(unicodeDir);
+
+  const fs::path inputFile = unicodeDir / fs::u8path("不存在.txt");
+  const fs::path outputFile = unicodeDir / fs::u8path("已有输出.txt");
+
+  {
+    std::ofstream ofs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << outputFile.u8string();
+    ofs << "existing output";
+  }
+
+  EXPECT_NE(0, RunCommand(TestCommand("s2t", inputFile.u8string(),
+                                      outputFile.u8string())));
+  EXPECT_EQ("existing output", GetFileContents(outputFile));
+}
+
+TEST_F(CommandLineConvertTest, ConvertsInPlaceWithDifferentPathSpellings) {
+  const fs::path unicodeDir =
+      fs::u8path(OutputDirectory()) / fs::u8path("opencc-同文件不同路径-cli");
+  fs::create_directories(unicodeDir);
+
+  const fs::path file = unicodeDir / fs::u8path("输入输出同一文件.txt");
+
+  {
+    std::ofstream ofs(file, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << file.u8string();
+    ofs << "开放中文转换";
+  }
+
+  const fs::path spelledDifferently = unicodeDir / fs::u8path(".") /
+                                      fs::u8path("输入输出同一文件.txt");
+  ASSERT_EQ(0, RunCommand(TestCommand("s2t", file.u8string(),
+                                      spelledDifferently.u8string(), "",
+                                      "--in-place")));
+  EXPECT_EQ("開放中文轉換", GetFileContents(file));
+}
+
+#ifndef _WIN32
+TEST_F(CommandLineConvertTest, InPlaceConversionPreservesFileMode) {
+  const fs::path unicodeDir =
+      fs::u8path(OutputDirectory()) / fs::u8path("opencc-保留权限-cli");
+  fs::create_directories(unicodeDir);
+
+  const fs::path file = unicodeDir / fs::u8path("输入输出同一文件.txt");
+
+  {
+    std::ofstream ofs(file, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << file.u8string();
+    ofs << "开放中文转换";
+  }
+  ASSERT_EQ(0, chmod(file.c_str(), 0644));
+
+  ASSERT_EQ(0, RunCommand(TestCommand("s2t", file.u8string(), file.u8string(),
+                                      "", "--in-place")));
+  EXPECT_EQ("開放中文轉換", GetFileContents(file));
+
+  struct stat info;
+  ASSERT_EQ(0, stat(file.c_str(), &info));
+  EXPECT_EQ(0644, info.st_mode & 07777);
+}
+
+TEST_F(CommandLineConvertTest, InPlaceConversionRejectsHardLinks) {
+  const fs::path unicodeDir =
+      fs::u8path(OutputDirectory()) / fs::u8path("opencc-拒绝硬链接-cli");
+  fs::create_directories(unicodeDir);
+
+  const fs::path file = unicodeDir / fs::u8path("真实输入输出.txt");
+  const fs::path hardLink = unicodeDir / fs::u8path("硬链接输出.txt");
+
+  {
+    std::ofstream ofs(file, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << file.u8string();
+    ofs << "开放中文转换";
+  }
+
+  std::error_code error;
+  fs::remove(hardLink, error);
+  fs::create_hard_link(file, hardLink, error);
+  if (error) {
+    GTEST_SKIP() << "Hard-link creation failed: " << error.message();
+  }
+
+  EXPECT_NE(0, RunCommand(TestCommand("s2t", file.u8string(),
+                                      hardLink.u8string(), "",
+                                      "--in-place")));
+  EXPECT_EQ("开放中文转换", GetFileContents(file));
+  EXPECT_EQ("开放中文转换", GetFileContents(hardLink));
+}
+#endif
+
+TEST_F(CommandLineConvertTest, ConvertsInPlaceThroughSymlink) {
+  const fs::path unicodeDir =
+      fs::u8path(OutputDirectory()) / fs::u8path("opencc-符号链接-cli");
+  fs::create_directories(unicodeDir);
+
+  const fs::path file = unicodeDir / fs::u8path("真实输入输出.txt");
+  const fs::path symlink = unicodeDir / fs::u8path("符号链接输出.txt");
+
+  {
+    std::ofstream ofs(file, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << file.u8string();
+    ofs << "开放中文转换";
+  }
+
+  std::error_code error;
+  fs::remove(symlink, error);
+  fs::create_symlink(file.filename(), symlink, error);
+  if (error) {
+    GTEST_SKIP() << "Symlink creation failed: " << error.message();
+  }
+
+  ASSERT_EQ(0, RunCommand(TestCommand("s2t", file.u8string(),
+                                      symlink.u8string(), "", "--in-place")));
+  EXPECT_EQ("開放中文轉換", GetFileContents(file));
 }
 
 TEST_F(CommandLineConvertTest, WritesMeasuredResultJson) {

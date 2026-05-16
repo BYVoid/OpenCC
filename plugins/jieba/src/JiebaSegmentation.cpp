@@ -22,7 +22,11 @@
 #include <algorithm>
 #include <cstdlib>
 #include <stdexcept>
+#if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+#else
 #include <sys/stat.h>
+#endif
 
 #include "cppjieba/Jieba.hpp"
 
@@ -31,14 +35,23 @@
 #include "Lexicon.hpp"
 #include "MarisaDict.hpp"
 #include "SerializableDict.hpp"
+#if defined(_WIN32) || defined(_WIN64)
+#include "WinUtil.hpp"
+#endif
 #elif __has_include("src/MarisaDict.hpp")
 #include "src/Lexicon.hpp"
 #include "src/MarisaDict.hpp"
 #include "src/SerializableDict.hpp"
+#if defined(_WIN32) || defined(_WIN64)
+#include "src/WinUtil.hpp"
+#endif
 #elif __has_include(<opencc/MarisaDict.hpp>)
 #include <opencc/Lexicon.hpp>
 #include <opencc/MarisaDict.hpp>
 #include <opencc/SerializableDict.hpp>
+#if defined(_WIN32) || defined(_WIN64)
+#include <opencc/WinUtil.hpp>
+#endif
 #else
 #error "Unable to locate OpenCC dictionary headers"
 #endif
@@ -46,6 +59,9 @@
 #include "Lexicon.hpp"
 #include "MarisaDict.hpp"
 #include "SerializableDict.hpp"
+#if defined(_WIN32) || defined(_WIN64)
+#include "WinUtil.hpp"
+#endif
 #endif
 
 using namespace opencc;
@@ -67,11 +83,18 @@ std::string ParentDir(const std::string& path) {
 }
 
 bool IsRegularFile(const std::string& path) {
+#if defined(_WIN32) || defined(_WIN64)
+  const DWORD attributes =
+      GetFileAttributesW(opencc::internal::WideFromUtf8(path).c_str());
+  return attributes != INVALID_FILE_ATTRIBUTES &&
+         (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
+#else
   struct stat info;
   if (stat(path.c_str(), &info) != 0) {
     return false;
   }
   return (info.st_mode & S_IFMT) == S_IFREG;
+#endif
 }
 
 std::string ResolveAuxPath(const std::string& dictPath,

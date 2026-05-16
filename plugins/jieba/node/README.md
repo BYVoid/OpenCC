@@ -12,7 +12,7 @@ By leveraging this standalone NPM package, users do not need to manually install
 npm install opencc-jieba
 ```
 
-> **Note**: This package is intended to be used alongside the `opencc` npm package (`>= 1.3.1`).
+> **Note**: This package is intended to be used alongside the `opencc` npm package (`>= 1.3.2`).
 
 ## Usage
 

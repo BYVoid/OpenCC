@@ -40,24 +40,24 @@ inline std::string Utf8FromWide(const std::wstring& wide) {
   if (required <= 1) {
     return "";
   }
-  std::string utf8(static_cast<size_t>(required), '\0');
-  WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), -1, utf8.data(), required,
+  std::string text(static_cast<size_t>(required), '\0');
+  WideCharToMultiByte(CP_UTF8, 0, wide.c_str(), -1, text.data(), required,
                       nullptr, nullptr);
-  utf8.resize(static_cast<size_t>(required - 1));
-  return utf8;
+  text.resize(static_cast<size_t>(required - 1));
+  return text;
 }
 
-inline std::wstring WideFromUtf8(const std::string& utf8) {
-  if (utf8.empty()) {
+inline std::wstring WideFromUtf8(const std::string& text) {
+  if (text.empty()) {
     return L"";
   }
   const int required =
-      MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, nullptr, 0);
+      MultiByteToWideChar(CP_UTF8, 0, text.c_str(), -1, nullptr, 0);
   if (required <= 1) {
     return L"";
   }
   std::wstring wide(static_cast<size_t>(required), L'\0');
-  MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, wide.data(), required);
+  MultiByteToWideChar(CP_UTF8, 0, text.c_str(), -1, wide.data(), required);
   wide.resize(static_cast<size_t>(required - 1));
   return wide;
 }

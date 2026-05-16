@@ -223,8 +223,8 @@ bool IsSameFileUtf8(const std::string& first, const std::string& second) {
     return false;
   }
 
-  BY_HANDLE_FILE_INFORMATION firstInfo;
-  BY_HANDLE_FILE_INFORMATION secondInfo;
+  BY_HANDLE_FILE_INFORMATION firstInfo = {};
+  BY_HANDLE_FILE_INFORMATION secondInfo = {};
   const bool success =
       GetFileInformationByHandle(firstHandle, &firstInfo) != 0 &&
       GetFileInformationByHandle(secondHandle, &secondInfo) != 0;
@@ -258,6 +258,9 @@ int PreserveMetadataUtf8(const std::string& source,
 #else
   struct stat sourceStat;
   if (stat(source.c_str(), &sourceStat) != 0) {
+    return -1;
+  }
+  if (chown(target.c_str(), sourceStat.st_uid, sourceStat.st_gid) != 0) {
     return -1;
   }
   if (chmod(target.c_str(), sourceStat.st_mode & 07777) != 0) {

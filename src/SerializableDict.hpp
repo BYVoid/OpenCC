@@ -21,6 +21,10 @@
 #include "Dict.hpp"
 
 namespace opencc {
+
+OPENCC_EXPORT FILE* OpenSerializableFileUtf8(const std::string& fileName,
+                                             const char* mode);
+
 /**
  * Serializable dictionary interface
  * @ingroup opencc_cpp_api
@@ -36,7 +40,7 @@ public:
    * Serializes the dictionary and writes in to a file.
    */
   virtual void SerializeToFile(const std::string& fileName) const {
-    FILE* fp = fopen(fileName.c_str(), "wb");
+    FILE* fp = OpenSerializableFileUtf8(fileName, "wb");
     if (fp == NULL) {
       throw FileNotWritable(fileName);
     }
@@ -47,14 +51,7 @@ public:
   template <typename DICT>
   static bool TryLoadFromFile(const std::string& fileName,
                               std::shared_ptr<DICT>* dict) {
-    FILE* fp =
-#ifdef _MSC_VER
-        // well, the 'GetPlatformString' shall return a 'wstring'
-        _wfopen(UTF8Util::GetPlatformString(fileName).c_str(), L"rb")
-#else
-        fopen(UTF8Util::GetPlatformString(fileName).c_str(), "rb")
-#endif // _MSC_VER
-        ;
+    FILE* fp = OpenSerializableFileUtf8(fileName, "rb");
 
     if (fp == NULL) {
       return false;

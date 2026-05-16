@@ -465,6 +465,10 @@ cc_library(
 
 cc_library(
     name = "serializable_dict",
+    srcs = [
+        "SerializableDict.cpp",
+        "WinUtil.hpp",
+    ],
     hdrs = ["SerializableDict.hpp"],
     deps = [
         ":dict",

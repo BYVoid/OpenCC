@@ -22,7 +22,11 @@
 #include <algorithm>
 #include <cstdlib>
 #include <stdexcept>
+#if defined(_WIN32) || defined(_WIN64)
+#include <windows.h>
+#else
 #include <sys/stat.h>
+#endif
 
 #include "cppjieba/Jieba.hpp"
 
@@ -58,6 +62,23 @@ using opencc::LexiconPtr;
 using opencc::MarisaDict;
 using opencc::SerializableDict;
 
+#if defined(_WIN32) || defined(_WIN64)
+std::wstring LocalWideFromUtf8(const std::string& text) {
+  if (text.empty()) {
+    return L"";
+  }
+  const int size = MultiByteToWideChar(CP_UTF8, 0, text.c_str(), -1, nullptr,
+                                       0);
+  if (size <= 1) {
+    return L"";
+  }
+  std::wstring wide(static_cast<size_t>(size), L'\0');
+  MultiByteToWideChar(CP_UTF8, 0, text.c_str(), -1, &wide[0], size);
+  wide.resize(static_cast<size_t>(size - 1));
+  return wide;
+}
+#endif
+
 std::string ParentDir(const std::string& path) {
   std::string::size_type pos = path.find_last_of("/\\");
   if (pos == std::string::npos) {
@@ -67,11 +88,17 @@ std::string ParentDir(const std::string& path) {
 }
 
 bool IsRegularFile(const std::string& path) {
+#if defined(_WIN32) || defined(_WIN64)
+  const DWORD attributes = GetFileAttributesW(LocalWideFromUtf8(path).c_str());
+  return attributes != INVALID_FILE_ATTRIBUTES &&
+         (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
+#else
   struct stat info;
   if (stat(path.c_str(), &info) != 0) {
     return false;
   }
   return (info.st_mode & S_IFMT) == S_IFREG;
+#endif
 }
 
 std::string ResolveAuxPath(const std::string& dictPath,

@@ -24,6 +24,7 @@ sources=(
   src/Lexicon.cpp
   src/MarisaDict.cpp
   src/Segmentation.cpp
+  src/SerializableDict.cpp
   src/SerializedValues.cpp
   src/UTF8Util.cpp
   deps/marisa-0.3.1/lib/marisa/agent.cc

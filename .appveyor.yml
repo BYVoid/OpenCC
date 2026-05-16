@@ -5,11 +5,16 @@ build: off
 
 os: Visual Studio 2019
 
+init:
+  - echo APPVEYOR_YAML_MARKER=pr-1222-smoke-packaging-v2
+  - echo APPVEYOR_REPO_BRANCH=%APPVEYOR_REPO_BRANCH%
+  - echo APPVEYOR_REPO_COMMIT=%APPVEYOR_REPO_COMMIT%
+  - echo APPVEYOR_PULL_REQUEST_NUMBER=%APPVEYOR_PULL_REQUEST_NUMBER%
+
 environment:
   matrix:
     # Build Node.js
     - nodejs_version: stable
-    - nodejs_version: 22
 
     # Build plain C++
     - nodejs_version: none
@@ -28,21 +33,88 @@ for:
     - appveyor-retry call npm install --build-from-source
   test_script:
     - npm test
+  after_test:
+    - chcp 65001
+    - echo [opencc npm package] building opencc win32-x64 prebuild
+    - if exist prebuilds rmdir /S /Q prebuilds
+    - npm run prebuild
+    - if exist prebuilds\darwin-arm64 exit /B 1
+    - if exist prebuilds\linux-x64 exit /B 1
+    - if exist prebuilds\linux-arm64 exit /B 1
+    - if not exist prebuilds\win32-x64\opencc.node exit /B 1
+    - echo [opencc npm package] packing opencc
+    - npm pack
+    - for %%F in (opencc-*.tgz) do set OPENCC_TGZ=%%~fF
+    - echo [opencc npm package] building opencc-jieba win32-x64 package files
+    - cmake -A%platform% -S. -Bbuild-npm-jieba -DCMAKE_INSTALL_PREFIX:PATH=%CD%\build-npm-jieba-install -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_OPENCC_JIEBA_PLUGIN:BOOL=ON -DENABLE_GTEST:BOOL=OFF -DENABLE_BENCHMARK:BOOL=OFF
+    - cmake --build build-npm-jieba --config Release --target install
+    - mkdir plugins\jieba\node\prebuilds\win32-x64
+    - mkdir plugins\jieba\node\data
+    - copy build-npm-jieba-install\share\opencc\*jieba.json plugins\jieba\node\data\
+    - xcopy /E /I /Y build-npm-jieba-install\share\opencc\jieba_dict plugins\jieba\node\data\jieba_dict
+    - copy build-npm-jieba-install\bin\plugins\opencc-jieba.dll plugins\jieba\node\prebuilds\win32-x64\opencc-jieba.dll
+    - echo [opencc npm package] packing opencc-jieba
+    - npm pack plugins\jieba\node --ignore-scripts
+    - for %%F in (opencc-jieba-*.tgz) do set OPENCC_JIEBA_TGZ=%%~fF
+    - mkdir npm-smoke
+    - echo [opencc npm smoke] installing packed packages
+    - npm --prefix npm-smoke install "%OPENCC_TGZ%" "%OPENCC_JIEBA_TGZ%"
+    - .\npm-smoke\node_modules\.bin\opencc.cmd --version
+    - .\npm-smoke\node_modules\.bin\opencc.cmd --help >nul
+    - mkdir npm-smoke\測試
+    - echo 勇敢的士兵 > npm-smoke\測試\輸入.txt
+    - echo [opencc npm smoke] input
+    - type npm-smoke\測試\輸入.txt
+    - .\npm-smoke\node_modules\.bin\opencc.cmd -i npm-smoke\測試\輸入.txt -o npm-smoke\測試\輸出.s2twp.txt -c s2twp
+    - echo [opencc npm smoke] s2twp file output
+    - type npm-smoke\測試\輸出.s2twp.txt
+    - .\npm-smoke\node_modules\.bin\opencc.cmd -i npm-smoke\測試\輸入.txt -o npm-smoke\測試\輸出.s2twp_jieba.txt -c s2twp_jieba
+    - echo [opencc npm smoke] s2twp_jieba file output
+    - type npm-smoke\測試\輸出.s2twp_jieba.txt
+    - type npm-smoke\測試\輸入.txt | .\npm-smoke\node_modules\.bin\opencc.cmd -c s2twp > npm-smoke\測試\管線.s2twp.txt
+    - echo [opencc npm smoke] s2twp pipe output
+    - type npm-smoke\測試\管線.s2twp.txt
+    - type npm-smoke\測試\輸入.txt | .\npm-smoke\node_modules\.bin\opencc.cmd -c s2twp_jieba > npm-smoke\測試\管線.s2twp_jieba.txt
+    - echo [opencc npm smoke] s2twp_jieba pipe output
+    - type npm-smoke\測試\管線.s2twp_jieba.txt
+  artifacts:
+  - path: opencc-*.tgz
+    name: OpenCCNpmPackage
+  - path: opencc-jieba-*.tgz
+    name: OpenCCJiebaNpmPackage
 
 - matrix:
     only:
       - nodejs_version: none
   build_script:
-    - SET arch=%platform%
-    - IF "%platform%"=="x86" SET arch=Win32
-
-    - cmake -A%arch% -S. -Bbuild -DCMAKE_INSTALL_PREFIX:PATH=. -DENABLE_GTEST:BOOL=ON -DENABLE_BENCHMARK:BOOL=ON -DCMAKE_BUILD_TYPE=Release
-    - cmake --build build --config Release --target install
+    - ps: .\scripts\release-windows-winget.ps1 -SkipTests
   test_script:
-    - cd build
-    - ctest --verbose -C Release
-  after_build:
-    - 7z a OpenCC.zip build/bin build/include build/lib build/share
+    - chcp 65001
+    - dist\winget-x64\staging\bin\opencc.exe --version
+    - dist\winget-x64\staging\bin\opencc.exe --help >nul
+    - mkdir 測試
+    - echo 勇敢的士兵 > 測試\輸入.txt
+    - echo [opencc smoke] input
+    - type 測試\輸入.txt
+    - dist\winget-x64\staging\bin\opencc.exe -i 測試\輸入.txt -o 測試\輸出.s2twp.txt -c s2twp
+    - echo [opencc smoke] s2twp file output
+    - type 測試\輸出.s2twp.txt
+    - dist\winget-x64\staging\bin\opencc.exe -i 測試\輸入.txt -o 測試\輸出.s2twp_jieba.txt -c s2twp_jieba
+    - echo [opencc smoke] s2twp_jieba file output
+    - type 測試\輸出.s2twp_jieba.txt
+    - type 測試\輸入.txt | dist\winget-x64\staging\bin\opencc.exe -c s2twp > 測試\管線.s2twp.txt
+    - echo [opencc smoke] s2twp pipe output
+    - type 測試\管線.s2twp.txt
+    - type 測試\輸入.txt | dist\winget-x64\staging\bin\opencc.exe -c s2twp_jieba > 測試\管線.s2twp_jieba.txt
+    - echo [opencc smoke] s2twp_jieba pipe output
+    - type 測試\管線.s2twp_jieba.txt
+    - 7z a opencc-smoke-output.zip 測試\*.txt
   artifacts:
-  - path: OpenCC.zip
-    name: OpenCC
+  - path: dist\winget-x64\OpenCC-*-windows-x64-portable.zip
+    name: OpenCCWindowsCLI
+  - path: dist\winget-x64\OpenCC-*-windows-x64-portable.zip.sha256
+    name: OpenCCWindowsCLISha256
+  - path: dist\winget-x64\winget-manifests\**
+    name: OpenCCWinGetManifests
+  - path: opencc-smoke-output.zip
+    name: OpenCCSmokeOutput

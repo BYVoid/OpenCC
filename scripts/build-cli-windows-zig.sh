@@ -48,7 +48,7 @@ if [[ -z "$version" ]]; then
       MODULE.bazel | head -n 1
   )"
 fi
-version="${version:-1.3.1}"
+version="${version:-1.3.2}"
 
 export ZIG_LOCAL_CACHE_DIR="${ZIG_LOCAL_CACHE_DIR:-$ROOT_DIR/.zig-local-cache}"
 export ZIG_GLOBAL_CACHE_DIR="${ZIG_GLOBAL_CACHE_DIR:-$ROOT_DIR/.zig-global-cache}"

@@ -29,9 +29,13 @@ struct NonBmpException {
   const char* character;
 };
 
-constexpr std::array<NonBmpException, 3> kAllowedNonBmpCharacters = {{
+constexpr std::array<NonBmpException, 7> kAllowedNonBmpCharacters = {{
+    {"STPhrases", "\xF0\xA3\xA8\xBC"}, // U+23A3C
     {"STPhrases", "\xF0\xAA\xA2\xAE"}, // U+2A8AE
+    {"STPhrases", "\xF0\xAB\x96\xAE"}, // U+2B5AE
     {"STPhrases", "\xF0\xAB\x97\xA7"}, // U+2B5E7
+    {"STPhrases", "\xF0\xAB\x9B\xAD"}, // U+2B6ED
+    {"STPhrases", "\xF0\xAC\xB4\x83"}, // U+2CD03
     {"TSPhrases", "\xF0\xAB\xAB\x87"}, // U+2BAC7
 }};
 

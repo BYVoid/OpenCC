@@ -16,6 +16,15 @@ package(default_visibility = ["//visibility:public"])
     ]
 ]
 
+genrule(
+    name = "generate_TSCharactersExt",
+    srcs = ["TSCharacters.txt"],
+    outs = ["TSCharactersExt.txt"],
+    cmd = "$(location //data/scripts:extract_tofu_risk) " +
+          "$(SRCS) $(OUTS)",
+    tools = ["//data/scripts:extract_tofu_risk"],
+)
+
 TEXT_DICTS = glob(["*.txt"]) + [
     "TWVariantsRev.txt",
     "HKVariantsRev.txt",

@@ -25,19 +25,10 @@ cc_library(
     ],
 )
 
-cc_library(
-    name = "command_line_main_src_lib",
-    srcs = ["CommandLine.cpp"],
-    deps = [
-        ":command_line_main_lib",
-        ":platform_io_lib",
-    ],
-)
-
 cc_binary(
     name = "command_line",
+    srcs = ["CommandLine.cpp"],
     deps = [
-        ":command_line_main_src_lib",
         ":command_line_main_lib",
         ":platform_io_lib",
         "//src:cmd_line_output_lib",
@@ -51,8 +42,8 @@ cc_binary(
     }),
 )
 
-cc_library(
-    name = "dict_converter_main_lib",
+cc_binary(
+    name = "dict_converter",
     srcs = ["DictConverter.cpp"],
     deps = [
         "//src:cmd_line_output_lib",
@@ -62,27 +53,9 @@ cc_library(
 )
 
 cc_binary(
-    name = "dict_converter",
-    deps = [
-        ":dict_converter_main_lib",
-        "//src:cmd_line_output_lib",
-        "//src:dict_converter_lib",
-    ],
-)
-
-cc_library(
-    name = "phrase_extract_main_lib",
+    name = "phrase_extract",
     srcs = ["PhraseExtract.cpp"],
     deps = [
-        "//src:cmd_line_output_lib",
-        "//src:phrase_extract_lib",
-    ],
-)
-
-cc_binary(
-    name = "phrase_extract",
-    deps = [
-        ":phrase_extract_main_lib",
         "//src:cmd_line_output_lib",
         "//src:phrase_extract_lib",
     ],

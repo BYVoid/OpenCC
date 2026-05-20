@@ -30,7 +30,7 @@ filegroup(
             "//test/testcases",
         ],
         deps = [
-            "//src:simple_converter",
+            "//src:simple_converter_lib",
             "@bazel_tools//tools/cpp/runfiles",
             "@googletest//:gtest_main",
             "//deps/rapidjson-1.1.0:rapidjson",

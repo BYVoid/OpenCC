@@ -9,7 +9,7 @@ package(default_visibility = ["//visibility:public"])
 # on macOS it produces "libopencc_clib.dylib". We rename via genrule below.
 #
 # node-gyp and Bazel both compile the same binding source. node-gyp lists the
-# OpenCC and marisa sources directly, while Bazel links against //src:opencc.
+# OpenCC and marisa sources directly, while Bazel links against //src:opencc_lib.
 cc_binary(
     name = "opencc_clib",
     srcs = ["opencc.cc"],
@@ -32,12 +32,12 @@ cc_binary(
     deps = [
         "@node_addon_api//:node_addon_api",
         "@node_headers//:node_headers",
-        "//src:opencc",
-        # Explicit sub-library deps for headers not in //src:opencc's hdrs:
-        "//src:config",       # Config.hpp
-        "//src:converter",    # Converter.hpp, ConversionInspection.hpp
-        "//src:dict_converter",  # DictConverter.hpp
-        "//src:exception",    # Exception.hpp
+        "//src:opencc_lib",
+        # Explicit sub-library deps for headers not in //src:opencc_lib's hdrs:
+        "//src:config_lib",       # Config.hpp
+        "//src:converter_lib",    # Converter.hpp, ConversionInspection.hpp
+        "//src:dict_converter_lib",  # DictConverter.hpp
+        "//src:exception_lib",    # Exception.hpp
     ],
 )
 

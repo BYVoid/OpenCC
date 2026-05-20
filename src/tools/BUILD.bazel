@@ -1,19 +1,49 @@
 package(default_visibility = ["//visibility:public"])
 
+cc_library(
+    name = "platform_io_lib",
+    srcs = ["PlatformIO.cpp"],
+    hdrs = ["PlatformIO.hpp"],
+    deps = [
+        "//src:win_util_lib",
+    ],
+)
+
+cc_library(
+    name = "command_line_main_lib",
+    srcs = ["CommandLineMain.cpp"],
+    hdrs = ["CommandLineMain.hpp"],
+    deps = [
+        ":platform_io_lib",
+        "//deps/rapidjson-1.1.0:rapidjson",
+        "//src:cmd_line_output_lib",
+        "//src:config_lib",
+        "//src:conversion_inspection_lib",
+        "//src:converter_lib",
+        "//src:exception_lib",
+        "//src:segments_lib",
+    ],
+)
+
+cc_library(
+    name = "command_line_main_src_lib",
+    srcs = ["CommandLine.cpp"],
+    deps = [
+        ":command_line_main_lib",
+        ":platform_io_lib",
+    ],
+)
+
 cc_binary(
     name = "command_line",
-    srcs = [
-        "CommandLine.cpp",
-        "CommandLineMain.cpp",
-        "CommandLineMain.hpp",
-        "PlatformIO.cpp",
-        "PlatformIO.hpp",
-    ],
     deps = [
-        "//src:cmd_line_output",
-        "//src:config",
-        "//src:converter",
-        "//src:utf8_util",
+        ":command_line_main_src_lib",
+        ":command_line_main_lib",
+        ":platform_io_lib",
+        "//src:cmd_line_output_lib",
+        "//src:config_lib",
+        "//src:converter_lib",
+        "//src:utf8_util_lib",
     ],
     linkopts = select({
         "@platforms//os:windows": ["Shell32.lib"],
@@ -21,20 +51,39 @@ cc_binary(
     }),
 )
 
-cc_binary(
-    name = "dict_converter",
+cc_library(
+    name = "dict_converter_main_lib",
     srcs = ["DictConverter.cpp"],
     deps = [
-        "//src:cmd_line_output",
-        "//src:dict_converter",
+        "//src:cmd_line_output_lib",
+        "//src:dict_converter_lib",
+        "//src:exception_lib",
+    ],
+)
+
+cc_binary(
+    name = "dict_converter",
+    deps = [
+        ":dict_converter_main_lib",
+        "//src:cmd_line_output_lib",
+        "//src:dict_converter_lib",
+    ],
+)
+
+cc_library(
+    name = "phrase_extract_main_lib",
+    srcs = ["PhraseExtract.cpp"],
+    deps = [
+        "//src:cmd_line_output_lib",
+        "//src:phrase_extract_lib",
     ],
 )
 
 cc_binary(
     name = "phrase_extract",
-    srcs = ["PhraseExtract.cpp"],
     deps = [
-        "//src:cmd_line_output",
-        "//src:phrase_extract",
+        ":phrase_extract_main_lib",
+        "//src:cmd_line_output_lib",
+        "//src:phrase_extract_lib",
     ],
 )

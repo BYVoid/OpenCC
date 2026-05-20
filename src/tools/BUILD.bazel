@@ -2,13 +2,23 @@ package(default_visibility = ["//visibility:public"])
 
 cc_binary(
     name = "command_line",
-    srcs = ["CommandLine.cpp"],
+    srcs = [
+        "CommandLine.cpp",
+        "CommandLineMain.cpp",
+        "CommandLineMain.hpp",
+        "PlatformIO.cpp",
+        "PlatformIO.hpp",
+    ],
     deps = [
         "//src:cmd_line_output",
         "//src:config",
         "//src:converter",
         "//src:utf8_util",
     ],
+    linkopts = select({
+        "@platforms//os:windows": ["Shell32.lib"],
+        "//conditions:default": [],
+    }),
 )
 
 cc_binary(

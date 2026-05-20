@@ -9,3 +9,8 @@ sh_binary(
     name = "build_jieba_windows_zig",
     srcs = ["build-jieba-windows-zig.sh"],
 )
+
+sh_binary(
+    name = "build_cli_windows_zig",
+    srcs = ["build-cli-windows-zig.sh"],
+)

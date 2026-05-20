@@ -1,5 +1,5 @@
 {
-  "name": "Simplified Chinese to Traditional Chinese (Taiwan standard, with phrases)",
+  "name": "Simplified Chinese to Traditional Chinese (Taiwan Standard, with Taiwan Phrases)",
   "segmentation": {
     "type": "mmseg",
     "dict": {

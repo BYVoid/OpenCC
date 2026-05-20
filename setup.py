@@ -15,7 +15,7 @@ _build_dir = os.path.join(_this_dir, 'build', 'python')
 _cmake_file = os.path.join(_this_dir, 'CMakeLists.txt')
 _author_file = os.path.join(_this_dir, 'AUTHORS')
 _readme_file = os.path.join(_this_dir, 'README.md')
-_fallback_version = '1.3.1'
+_fallback_version = '1.3.2'
 
 
 def _get_version_from_git():

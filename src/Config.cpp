@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-#include <sys/stat.h>
-#include <fstream>
+#include <cstdio>
 #include <list>
 #include <mutex>
+#include <sys/stat.h>
 #include <unordered_map>
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -122,6 +122,49 @@ bool GetFileCacheKey(const std::string& path, std::string* cacheKey) {
   cacheKey->append(std::to_string(static_cast<long long>(statBuf.st_size)));
 #endif
   return true;
+}
+
+FILE* OpenFileUtf8(const std::string& path, const char* mode) {
+#if defined(_WIN32) || defined(_WIN64)
+  return _wfopen(internal::WideFromUtf8(path).c_str(),
+                 internal::WideFromUtf8(mode).c_str());
+#else
+  return fopen(path.c_str(), mode);
+#endif
+}
+
+bool CanOpenFileUtf8(const std::string& path) {
+  FILE* fp = OpenFileUtf8(path, "rb");
+  if (fp == nullptr) {
+    return false;
+  }
+  fclose(fp);
+  return true;
+}
+
+std::string ReadFileUtf8(const std::string& path) {
+  FILE* fp = OpenFileUtf8(path, "rb");
+  if (fp == nullptr) {
+    throw FileNotFound(path);
+  }
+
+  std::string content;
+  char buffer[4096];
+  for (;;) {
+    const size_t read = fread(buffer, 1, sizeof(buffer), fp);
+    if (read > 0) {
+      content.append(buffer, read);
+    }
+    if (read < sizeof(buffer)) {
+      if (ferror(fp)) {
+        fclose(fp);
+        throw FileNotFound(path);
+      }
+      break;
+    }
+  }
+  fclose(fp);
+  return content;
 }
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -401,31 +444,25 @@ public:
   }
 
   std::string FindConfigFile(std::string fileName) {
-    std::ifstream ifs;
-
     // Working directory
-    ifs.open(UTF8Util::GetPlatformString(fileName).c_str());
-    if (ifs.is_open()) {
+    if (CanOpenFileUtf8(fileName)) {
       return fileName;
     }
     // Package data directory
     if (PACKAGE_DATA_DIRECTORY != "") {
       std::string prefixedFileName = PACKAGE_DATA_DIRECTORY + fileName;
-      ifs.open(UTF8Util::GetPlatformString(prefixedFileName).c_str());
-      if (ifs.is_open()) {
+      if (CanOpenFileUtf8(prefixedFileName)) {
         return prefixedFileName;
       }
       prefixedFileName += ".json";
-      ifs.open(UTF8Util::GetPlatformString(prefixedFileName).c_str());
-      if (ifs.is_open()) {
+      if (CanOpenFileUtf8(prefixedFileName)) {
         return prefixedFileName;
       }
     }
 
     for (const std::string& dirPath : paths) {
       std::string path = dirPath + '/' + fileName;
-      ifs.open(UTF8Util::GetPlatformString(path).c_str());
-      if (ifs.is_open()) {
+      if (CanOpenFileUtf8(path)) {
         return path;
       }
     }
@@ -433,8 +470,7 @@ public:
     const char* envPath = std::getenv("OPENCC_DATA_DIR");
     if (envPath != nullptr) {
       auto path = std::string(envPath) + '/' + fileName;
-      ifs.open(UTF8Util::GetPlatformString(path).c_str());
-      if (ifs.is_open()) {
+      if (CanOpenFileUtf8(path)) {
         return path;
       }
     }
@@ -500,11 +536,10 @@ ConverterPtr Config::NewFromFile(const std::string& fileName,
     impl->paths.push_back(PACKAGE_DATA_DIRECTORY);
   }
   std::string prefixedFileName = impl->FindConfigFile(fileName);
-  if (!isRegularFile(prefixedFileName))
-      throw FileNotFound(prefixedFileName);
-  std::ifstream ifs(UTF8Util::GetPlatformString(prefixedFileName));
-  std::string content(std::istreambuf_iterator<char>(ifs),
-                      (std::istreambuf_iterator<char>()));
+  if (!isRegularFile(prefixedFileName)) {
+    throw FileNotFound(prefixedFileName);
+  }
+  std::string content = ReadFileUtf8(prefixedFileName);
 
 #if defined(_WIN32) || defined(_WIN64)
   UTF8Util::ReplaceAll(prefixedFileName, "\\", "/");

@@ -363,7 +363,7 @@
     "@@toolchains_buildbuddy+//:extensions.bzl%buildbuddy": {
       "general": {
         "bzlTransitiveDigest": "YThiSErJv+jiCHJzZIEyk0yegQRS/x+T/ce309eGTvA=",
-        "usagesDigest": "Nc8QOHcGGFpn5QhHimP8XFS+WV1Ej75OvKX7/6iZTTs=",
+        "usagesDigest": "YPaAq0mPxb4otHDx47pPkoFOyhKaBLU/gt3wcKGZY9o=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},

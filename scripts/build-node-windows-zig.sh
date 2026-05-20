@@ -41,6 +41,7 @@ sources=(
   src/PluginSegmentation.cpp
   src/PrefixMatch.cpp
   src/Segmentation.cpp
+  src/SerializableDict.cpp
   src/SerializedValues.cpp
   src/TextDict.cpp
   src/UTF8Util.cpp
@@ -64,7 +65,7 @@ set +e
   -w \
   -Wno-nullability-completeness \
   -DNDEBUG \
-  '-DVERSION="1.3.1"' \
+  '-DVERSION="1.3.2"' \
   -DNAPI_DISABLE_CPP_EXCEPTIONS \
   -DOpencc_BUILT_AS_STATIC \
   -I. \

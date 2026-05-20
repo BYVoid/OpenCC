@@ -253,3 +253,7 @@ OpenCC.prototype.convertPromise = function (input) {
     });
   });
 };
+
+OpenCC.prototype._createConverterStream = function () {
+  return new binding.OpenccStream(this.handler);
+};

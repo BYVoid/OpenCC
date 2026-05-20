@@ -63,6 +63,7 @@ genrule(
     ],
     outs = ["windows-x64/opencc.node"],
     cmd = (
+        "ZIG=$(ZIG_BIN) " +
         "bash $(location //scripts:build_node_windows_zig) " +
         "$@ " +
         "$(location @node_headers//:node_api_header) " +
@@ -77,4 +78,5 @@ genrule(
         "@node_headers//:node_api_header",
         "@node_win_x64_lib//file",
     ],
+    toolchains = ["@rules_zig//zig:toolchain_type"],
 )

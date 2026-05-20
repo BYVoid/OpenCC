@@ -99,7 +99,7 @@ def sort_items(input_filename, output_filename):
             attached = None
             if current:
                 has_empty = False
-                for j in range(i - 1, -1, -1):
+                for j in range(i - 1, header_end, -1):
                     if parsed[j]["type"] == "entry":
                         break
                     if parsed[j]["type"] == "empty":

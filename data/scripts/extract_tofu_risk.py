@@ -20,7 +20,13 @@ def extract_tofu_risk(input_path, output_path):
         mapping = lines[index + 1]
         if not mapping.strip() or mapping.startswith("#"):
             raise ValueError(f"Expected mapping after {TOFU_RISK_PREFIX} at line {index + 1}")
-        extracted.append(mapping)
+        key, values_text = mapping.rstrip("\n").split("\t", 1)
+        values = values_text.split()
+        if values and values[0] == key:
+            values = values[1:]
+        if not values:
+            raise ValueError(f"Expected extension mapping after {TOFU_RISK_PREFIX} at line {index + 1}")
+        extracted.append(f"{key}\t{' '.join(values)}\n")
 
     with open(output_path, "w", encoding="utf-8") as output_file:
         output_file.writelines(extracted)

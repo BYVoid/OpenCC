@@ -15,6 +15,9 @@
         "file": "TSPhrases.ocd2"
       }, {
         "type": "ocd2",
+        "file": "TSCharactersExt.ocd2"
+      }, {
+        "type": "ocd2",
         "file": "TSCharacters.ocd2"
       }]
     }

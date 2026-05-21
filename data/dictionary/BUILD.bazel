@@ -26,6 +26,7 @@ genrule(
 )
 
 TEXT_DICTS = glob(["*.txt"]) + [
+    "TSCharactersExt.txt",
     "TWVariantsRev.txt",
     "HKVariantsRev.txt",
     "JPVariantsRev.txt",
@@ -37,6 +38,7 @@ NON_BMP_TEXT_DICTS = [
     if txt not in [
         "STCharacters.txt",
         "TSCharacters.txt",
+        "TSCharactersExt.txt",
     ]
 ]
 

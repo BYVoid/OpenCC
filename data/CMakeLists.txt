@@ -2,6 +2,7 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
 set(OPENCC_DICT_BIN opencc_dict)
 set(DICT_REVERSE_BIN "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/reverse.py")
+set(DICT_EXTRACT_TOFU_RISK_BIN "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/extract_tofu_risk.py")
 set(DICT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dictionary)
 set(DICT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -24,6 +25,7 @@ set(
 
 set(
   DICTS_GENERATED
+  TSCharactersExt
   TWVariantsRev
   HKVariantsRev
   JPVariantsRev
@@ -49,6 +51,15 @@ endforeach(DICT)
 foreach(DICT ${DICTS_GENERATED})
   set(DICT_${DICT}_INPUT ${DICT_GENERATED_DIR}/${DICT}.txt)
 endforeach(DICT)
+
+set(
+  DICT_TSCharactersExt_GENERATING_INPUT
+  ${DICT_DIR}/TSCharacters.txt
+)
+set(
+  DICT_TSCharactersExt_GENERATING_COMMAND
+  ${DICT_EXTRACT_TOFU_RISK_BIN} ${DICT_TSCharactersExt_GENERATING_INPUT} TSCharactersExt.txt
+)
 
 set(
   DICT_TWVariantsRev_GENERATING_INPUT

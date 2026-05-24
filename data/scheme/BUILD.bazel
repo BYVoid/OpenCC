@@ -1,0 +1,6 @@
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "st_multi",
+    srcs = ["st_multi.txt"],
+)

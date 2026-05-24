@@ -886,6 +886,28 @@
         "tw2s": "葡萄干 芒果干 香蕉干 苹果干 草莓干 凤梨干 柿干 桃干 杏干 洋李干 梅干 无花果干 龙眼干 荔枝干 橄榄干 金桔干 山楂干 椰子干 榴梿干 奇异果干 百香果干 冻干猫粮",
         "tw2sp": "葡萄干 芒果干 香蕉干 苹果干 草莓干 凤梨干 柿干 桃干 杏干 洋李干 梅干 无花果干 龙眼干 荔枝干 橄榄干 金桔干 山楂干 椰子干 榴莲干 奇异果干 百香果干 冻干猫粮"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1246_hk_variant_reverse_phrases",
+      "input": "才智 核心 方針 肥皂 香皂 接續香煙",
+      "expected": {
+        "hk2t": "才智 核心 方針 肥皂 香皂 接續香煙"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1246_tw_variant_reverse_phrases",
+      "input": "才智 核心 方針 肥皂 香皂 參考",
+      "expected": {
+        "tw2t": "才智 核心 方針 肥皂 香皂 參考"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1246_core_reverse_phrase",
+      "input": "核心",
+      "expected": {
+        "hk2t": "核心",
+        "tw2t": "核心"
+      }
     }
   ]
 }

@@ -142,11 +142,14 @@ std::unordered_set<std::string> LoadExpectedPhraseExceptions(
       continue;
     }
     const std::string values = line.substr(tab + 1);
-    for (const std::string& value : SplitValues(values)) {
-      if (UTF8Util::Length(value.c_str()) >= 2 &&
-          ContainsAny(value, exceptionChars)) {
-        expected.insert(value);
-      }
+    const std::vector<std::string> valueList = SplitValues(values);
+    if (valueList.empty()) {
+      continue;
+    }
+    const std::string& preferredValue = valueList.front();
+    if (UTF8Util::Length(preferredValue.c_str()) >= 2 &&
+        ContainsAny(preferredValue, exceptionChars)) {
+      expected.insert(preferredValue);
     }
   }
   return expected;

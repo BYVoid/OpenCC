@@ -122,6 +122,25 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "dictionary_variant_rev_phrases_test",
+    size = "small",
+    srcs = ["DictionaryVariantRevPhrasesTest.cpp"],
+    data = [
+        "HKVariants.txt",
+        "HKVariantsRevPhrases.txt",
+        "STPhrases.txt",
+        "TWVariants.txt",
+        "TWVariantsRevPhrases.txt",
+        "//data/scheme:st_multi",
+    ],
+    deps = [
+        "//src:utf8_util_lib",
+        "@bazel_tools//tools/cpp/runfiles",
+        "@googletest//:gtest_main",
+    ],
+)
+
 test_suite(
     name = "dictionary_test",
     tests = [
@@ -130,6 +149,7 @@ test_suite(
     ] + [
         ":dictionary_TWPhrases_reverse_mapping_test",
         ":dictionary_TWPhrases_segmentation_test",
+        ":dictionary_variant_rev_phrases_test",
     ],
 )
 

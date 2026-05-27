@@ -5,10 +5,23 @@ import sys
 
 
 def sort_items(input_filename, output_filename):
+    with open(input_filename, "rb") as raw_input_file:
+        input_bytes = raw_input_file.read()
+    input_ends_with_newline = input_bytes.endswith((b"\n", b"\r"))
+
     input_file = codecs.open(input_filename, "r", encoding="utf-8")
 
     lines = [line.rstrip("\r\n") for line in input_file]
     input_file.close()
+
+    def close_output_file(output_file):
+        if not input_ends_with_newline:
+            position = output_file.tell()
+            if position > 0:
+                output_file.seek(position - 1)
+                if output_file.read(1) == b"\n":
+                    output_file.truncate(position - 1)
+        output_file.close()
 
     def line_type(line):
         if line == "" or line.strip() == "":
@@ -37,15 +50,13 @@ def sort_items(input_filename, output_filename):
         if current:
             header_blocks.append(list(current))
 
-        output_file = open(output_filename, "wb")
+        output_file = open(output_filename, "w+b")
         for idx, block in enumerate(header_blocks):
             for line in block:
                 output_file.write((line + "\n").encode("utf-8"))
             if idx < len(header_blocks) - 1:
                 output_file.write(b"\n")
-        if header_blocks:
-            output_file.write(b"\n")
-        output_file.close()
+        close_output_file(output_file)
         return
 
     first_entry = entry_lines[0]
@@ -137,7 +148,7 @@ def sort_items(input_filename, output_filename):
     for block in floating_blocks:
         floating_by_anchor.setdefault(block["anchor"], []).append(block["lines"])
 
-    output_file = open(output_filename, "wb")
+    output_file = open(output_filename, "w+b")
 
     for idx, block in enumerate(header_blocks):
         for line in block:
@@ -175,7 +186,7 @@ def sort_items(input_filename, output_filename):
             if idx < len(footer_blocks) - 1:
                 output_file.write(b"\n")
 
-    output_file.close()
+    close_output_file(output_file)
 
 
 def reverse_items(input_filename, output_filename):

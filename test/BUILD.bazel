@@ -1,15 +1,39 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "portable_util_lib",
+    hdrs = ["PortableUtil.hpp"],
+    includes = ["."],
+)
+
 cc_test(
     name = "bazel_opencc_test",
-    srcs = ["BazelOpenccTest.cpp"],
+    size = "small",
+    srcs = [
+        "BazelOpenccTest.cpp",
+        "PortableUtil.hpp",
+    ],
+    data = [
+        "//data/config",
+        "//data/dictionary:binary_dictionaries",
+    ],
+    defines = ["BAZEL"],
     deps = [
-        "//:opencc",
+        "//:opencc_lib",
+        "@bazel_tools//tools/cpp/runfiles",
         "@googletest//:gtest_main",
     ],
 )
 
 cc_test(
     name = "command_line_converter_test",
-    srcs = ["CommandLineConvertTest.cpp"],
+    size = "small",
+    srcs = [
+        "CommandLineConvertTest.cpp",
+        "PortableUtil.hpp",
+    ],
     data = [
         "//data/config",
         "//data/dictionary:binary_dictionaries",
@@ -19,9 +43,9 @@ cc_test(
     ],
     defines = ["BAZEL"],
     deps = [
-        "//src:common",
+        "//src:common_lib",
         "@bazel_tools//tools/cpp/runfiles",
         "@googletest//:gtest_main",
-        "@rapidjson",
+        "//deps/rapidjson-1.1.0:rapidjson",
     ],
 )

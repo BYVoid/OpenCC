@@ -1,0 +1,5 @@
+@PACKAGE_INIT@
+
+check_required_components(Marisa)
+
+include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")

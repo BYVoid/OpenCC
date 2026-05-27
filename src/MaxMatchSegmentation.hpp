@@ -19,17 +19,17 @@
 #pragma once
 
 #include "Common.hpp"
-#include "DictGroup.hpp"
 #include "Segmentation.hpp"
 
 namespace opencc {
+class PrefixMatch;
 /**
  * Implementation of maximal match segmentation
  * @ingroup opencc_cpp_api
  */
 class OPENCC_EXPORT MaxMatchSegmentation : public Segmentation {
 public:
-  MaxMatchSegmentation(const DictPtr _dict) : dict(_dict) {}
+  MaxMatchSegmentation(const DictPtr _dict);
 
   virtual ~MaxMatchSegmentation() {}
 
@@ -39,5 +39,6 @@ public:
 
 private:
   const DictPtr dict;
+  const std::shared_ptr<PrefixMatch> prefixMatch;
 };
 } // namespace opencc

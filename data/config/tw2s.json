@@ -1,5 +1,5 @@
 {
-  "name": "Traditional Chinese (Taiwan standard) to Simplified Chinese",
+  "name": "Traditional Chinese (Taiwan Standard) to Simplified Chinese",
   "segmentation": {
     "type": "mmseg",
     "dict": {
@@ -24,6 +24,9 @@
       "dicts": [{
         "type": "ocd2",
         "file": "TSPhrases.ocd2"
+      }, {
+        "type": "ocd2",
+        "file": "TSCharactersExt.ocd2"
       }, {
         "type": "ocd2",
         "file": "TSCharacters.ocd2"

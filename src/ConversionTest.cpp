@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 Carbo Kuo <byvoid@byvoid.com>
+ * Copyright 2015-2026 Carbo Kuo and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,22 @@ TEST_F(ConversionTest, ConvertString) {
 TEST_F(ConversionTest, ConvertCString) {
   const std::string converted = conversion->Convert(input.c_str());
   EXPECT_EQ(expected, converted);
+}
+
+TEST_F(ConversionTest, PreserveDictGroupPriority) {
+  LexiconPtr firstLexicon(new Lexicon);
+  firstLexicon->Add(DictEntryFactory::New("a", "X"));
+  firstLexicon->Sort();
+  LexiconPtr secondLexicon(new Lexicon);
+  secondLexicon->Add(DictEntryFactory::New("ab", "Y"));
+  secondLexicon->Sort();
+
+  DictPtr firstDict(new TextDict(firstLexicon));
+  DictPtr secondDict(new TextDict(secondLexicon));
+  DictPtr dictGroup(new DictGroup(std::list<DictPtr>{firstDict, secondDict}));
+  Conversion groupConversion(dictGroup);
+
+  EXPECT_EQ("Xbc", groupConversion.Convert("abc"));
 }
 
 TEST_F(ConversionTest, TruncatedUtf8Sequence) {

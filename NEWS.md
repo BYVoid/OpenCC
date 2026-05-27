@@ -1,5 +1,28 @@
 # Change History of OpenCC
 
+## Version 1.3.1
+
+2026年5月9日
+
+* **辭典與詞條更新**：新增古典音樂人物專有名詞譯名轉換近百名；修正「里、制、岩、净、炼、铲斗」、「拉链 / 拉鏈」、「以太网 / 乙太網路」等轉換問題；補充「汉坦病毒 / 漢他病毒」、「二𫫇英 / 戴奧辛」等新詞彙；修正所有「査 (U+67FB)」詞條為「查 (U+67E5)」；修正「乾安县」等錯誤轉換；並移除或調整「通过 / 透過」、「范式 / 正規化」、「程序 / 程式」、「缺省 / 預設」等若干會造成語義偏移的過度轉換。合計 `.txt` 詞典：共新增 294 行，刪除 72 行（[#1140](https://github.com/BYVoid/OpenCC/pull/1140), [#1155](https://github.com/BYVoid/OpenCC/pull/1155), [#1157](https://github.com/BYVoid/OpenCC/pull/1157), [#1162](https://github.com/BYVoid/OpenCC/pull/1162), [#1168](https://github.com/BYVoid/OpenCC/pull/1168), [#1171](https://github.com/BYVoid/OpenCC/pull/1171), [#1173](https://github.com/BYVoid/OpenCC/pull/1173), [#1177](https://github.com/BYVoid/OpenCC/pull/1177), [#1181](https://github.com/BYVoid/OpenCC/pull/1181), [#1184](https://github.com/BYVoid/OpenCC/pull/1184), [#1185](https://github.com/BYVoid/OpenCC/pull/1185), [#1189](https://github.com/BYVoid/OpenCC/pull/1189), [#1191](https://github.com/BYVoid/OpenCC/pull/1191)）。
+* **`s2twp` 分詞修復**：修復因分詞邊界導致 `s2twp` 未能正確轉換的 33 個詞組，例如「云计算 / 雲端計算」等（[#1193](https://github.com/BYVoid/OpenCC/pull/1193)）。
+* **轉換算法更新**：重寫核心轉換算法，典型長文本基準測試中轉換速度提升 3-10 倍（[#1130](https://github.com/BYVoid/OpenCC/pull/1130), [#1156](https://github.com/BYVoid/OpenCC/pull/1156), [#1180](https://github.com/BYVoid/OpenCC/pull/1180)）。
+* **npm package 全新升級**：Node.js 原生模組改用 N-API 重寫，提升跨 Node.js 版本兼容性；新增可選 Jieba 分詞支持，提供簡易 `opencc` CLI，並更新預編譯包打包方式（[#1142](https://github.com/BYVoid/OpenCC/pull/1142), [#1145](https://github.com/BYVoid/OpenCC/pull/1145), [#1149](https://github.com/BYVoid/OpenCC/pull/1149), [#1151](https://github.com/BYVoid/OpenCC/pull/1151), [#1153](https://github.com/BYVoid/OpenCC/pull/1153), [#1195](https://github.com/BYVoid/OpenCC/pull/1195)）。
+* **構建與發佈基礎設施更新**：新增 golden test 覆蓋轉換結果回歸；加固 Python PyPI release 流程；更新 Node.js、Bazel 與跨平台 prebuild/release 流程（[#1043](https://github.com/BYVoid/OpenCC/pull/1043), [#1128](https://github.com/BYVoid/OpenCC/pull/1128), [#1158](https://github.com/BYVoid/OpenCC/pull/1158), [#1159](https://github.com/BYVoid/OpenCC/pull/1159), [#1166](https://github.com/BYVoid/OpenCC/pull/1166), [#1169](https://github.com/BYVoid/OpenCC/pull/1169), [#1190](https://github.com/BYVoid/OpenCC/pull/1190)）。
+* **文檔更新**：新增「[OpenCC 設計思想](https://github.com/BYVoid/OpenCC/blob/master/DESIGN_PRINCIPLES.md)」等說明文件，明確「避免過度轉換」等詞典維護原則（[#1152](https://github.com/BYVoid/OpenCC/pull/1152)）。
+* **下游協作**：與 [`opencc-js`](https://www.npmjs.com/package/opencc-js) 建立數據同步協作機制，提升 OpenCC 不同實作間的一致性。
+
+## Version 1.3.0
+
+2026年4月17日
+
+* **實驗性 Jieba 分詞插件**：新增可載入式 Jieba 分詞插件（`libopencc_jieba`），並支援獨立打包發佈；插件 ABI 採用碼點長度；`winget` 可攜包一併包含插件（[#1091](https://github.com/BYVoid/OpenCC/pull/1091), [#1092](https://github.com/BYVoid/OpenCC/pull/1092), [#1093](https://github.com/BYVoid/OpenCC/pull/1093), [#1099](https://github.com/BYVoid/OpenCC/pull/1099), [#1103](https://github.com/BYVoid/OpenCC/pull/1103), [#1105](https://github.com/BYVoid/OpenCC/pull/1105), [#1111](https://github.com/BYVoid/OpenCC/pull/1111)）。
+* **詞典與詞條更新**：新增臺灣 IT 用語及「巨集」術語、距離量詞繁體對應、「奥巴馬↔歐巴馬」、「公元→西元」、「福建面」等詞條；修正「乾/干/余/系/面」等字轉換、「移動資料→行動資料」錯誤、「倒霉→倒黴」錯誤、「文本→文字」過度轉換、「控制台」不應轉換、「背包→揹包」錯誤及「念佛→唸佛」錯誤；修正「星露谷物語」在 `s2twp` 模式下的錯誤分詞（[#1075](https://github.com/BYVoid/OpenCC/pull/1075), [#1079](https://github.com/BYVoid/OpenCC/pull/1079), [#1080](https://github.com/BYVoid/OpenCC/pull/1080), [#1088](https://github.com/BYVoid/OpenCC/pull/1088), [#1089](https://github.com/BYVoid/OpenCC/pull/1089), [#1090](https://github.com/BYVoid/OpenCC/pull/1090), [#1094](https://github.com/BYVoid/OpenCC/pull/1094), [#1096](https://github.com/BYVoid/OpenCC/pull/1096), [#1097](https://github.com/BYVoid/OpenCC/pull/1097), [#1100](https://github.com/BYVoid/OpenCC/pull/1100), [#1106](https://github.com/BYVoid/OpenCC/pull/1106), [#1110](https://github.com/BYVoid/OpenCC/pull/1110), [#1117](https://github.com/BYVoid/OpenCC/pull/1117), [#1122](https://github.com/BYVoid/OpenCC/pull/1122), [#1123](https://github.com/BYVoid/OpenCC/pull/1123)）。
+* **安全與穩定性修復**：修復 `UTF8Util` 堆越界讀取（[#794](https://github.com/BYVoid/OpenCC/issues/794), [#799](https://github.com/BYVoid/OpenCC/issues/799)）、二進制字典值邊界檢查、`const_cast` 未定義行為；轉換失敗時返回非零退出碼（[#1072](https://github.com/BYVoid/OpenCC/pull/1072), [#1073](https://github.com/BYVoid/OpenCC/pull/1073), [#1083](https://github.com/BYVoid/OpenCC/pull/1083), [#1098](https://github.com/BYVoid/OpenCC/pull/1098)）。
+* **Windows 支援改善**：配置文件改用寬字符路徑檢查；Jieba 插件在 Windows 使用 Unicode 安全文件讀取；修復 Windows Bazel 構建與測試（[#1082](https://github.com/BYVoid/OpenCC/pull/1082), [#1084](https://github.com/BYVoid/OpenCC/pull/1084), [#1086](https://github.com/BYVoid/OpenCC/pull/1086), [#1087](https://github.com/BYVoid/OpenCC/pull/1087), [#1102](https://github.com/BYVoid/OpenCC/pull/1102), [#1104](https://github.com/BYVoid/OpenCC/pull/1104)）。
+* **構建與依賴更新**：MARISA 升級至 0.3.1、更新 Bazel BCR 依賴、抑制第三方頭文件編譯警告、新增 Debian 包發佈工作流（[#1078](https://github.com/BYVoid/OpenCC/pull/1078), [#1081](https://github.com/BYVoid/OpenCC/pull/1081), [#1113](https://github.com/BYVoid/OpenCC/pull/1113), [#1116](https://github.com/BYVoid/OpenCC/pull/1116)）。
+* **平台與 CI 調整**：移除 EOL Python 3.9 支援；Node.js CI 矩陣移除 Node 20、新增 Node 25；修復 CI 工作流權限設置；更新 README（[#1074](https://github.com/BYVoid/OpenCC/pull/1074), [#1076](https://github.com/BYVoid/OpenCC/pull/1076), [#1109](https://github.com/BYVoid/OpenCC/pull/1109), [#1114](https://github.com/BYVoid/OpenCC/pull/1114), [#1120](https://github.com/BYVoid/OpenCC/pull/1120)）。
+
 ## Version 1.2.0
 
 2026年1月22日

@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2020 Carbo Kuo <byvoid@byvoid.com>
+ * Copyright 2020-2026 Carbo Kuo and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,17 @@ template <typename INT_TYPE> INT_TYPE ReadInteger(FILE* fp) {
   if (unitsRead != 1) {
     throw InvalidFormat("Invalid OpenCC binary dictionary.");
   }
+  return num;
+}
+
+template <typename INT_TYPE>
+INT_TYPE ReadIntegerFromBuffer(const char* data, size_t size, size_t* offset) {
+  if (size - *offset < sizeof(INT_TYPE)) {
+    throw InvalidFormat("Invalid OpenCC binary dictionary.");
+  }
+  INT_TYPE num;
+  memcpy(&num, data + *offset, sizeof(INT_TYPE));
+  *offset += sizeof(INT_TYPE);
   return num;
 }
 
@@ -74,32 +85,66 @@ void SerializedValues::SerializeToFile(FILE* fp) const {
 }
 
 std::shared_ptr<SerializedValues> SerializedValues::NewFromFile(FILE* fp) {
+  long savedOffset = ftell(fp);
+  fseek(fp, 0L, SEEK_END);
+  long fileEnd = ftell(fp);
+  fseek(fp, savedOffset, SEEK_SET);
+  size_t remainingSize =
+      (fileEnd > savedOffset) ? static_cast<size_t>(fileEnd - savedOffset) : 0;
+
+  std::string buffer;
+  buffer.resize(remainingSize);
+  size_t unitsRead = fread(const_cast<char*>(buffer.c_str()), sizeof(char),
+                           remainingSize, fp);
+  if (unitsRead != remainingSize) {
+    throw InvalidFormat("Invalid OpenCC binary dictionary.");
+  }
+
+  size_t bytesRead = 0;
+  return NewFromBuffer(buffer.data(), buffer.size(), &bytesRead);
+}
+
+std::shared_ptr<SerializedValues> SerializedValues::NewFromBuffer(
+    const char* data, size_t size, size_t* bytesRead) {
   std::shared_ptr<SerializedValues> dict(
       new SerializedValues(LexiconPtr(new Lexicon)));
+  size_t offset = 0;
 
   // Number of items
-  uint32_t numItems = ReadInteger<uint32_t>(fp);
+  uint32_t numItems = ReadIntegerFromBuffer<uint32_t>(data, size, &offset);
 
   // Values
-  uint32_t valueTotalLength = ReadInteger<uint32_t>(fp);
+  uint32_t valueTotalLength =
+      ReadIntegerFromBuffer<uint32_t>(data, size, &offset);
+  if (valueTotalLength > size - offset) {
+    throw InvalidFormat(
+        "Invalid OpenCC binary dictionary (valueTotalLength exceeds file size)");
+  }
   std::string valueBuffer;
   valueBuffer.resize(valueTotalLength);
-  size_t unitsRead = fread(const_cast<char*>(valueBuffer.c_str()), sizeof(char),
-                           valueTotalLength, fp);
-  if (unitsRead != valueTotalLength) {
-    throw InvalidFormat("Invalid OpenCC binary dictionary (valueBuffer)");
-  }
+  memcpy(valueBuffer.data(), data + offset, valueTotalLength);
+  offset += valueTotalLength;
 
   // Offsets
   const char* pValueBuffer = valueBuffer.c_str();
+  const char* pValueBufferEnd = pValueBuffer + valueTotalLength;
   for (uint32_t i = 0; i < numItems; i++) {
     // Number of values
-    uint16_t numValues = ReadInteger<uint16_t>(fp);
+    uint16_t numValues = ReadIntegerFromBuffer<uint16_t>(data, size, &offset);
     // Value offset
     std::vector<std::string> values;
     for (uint16_t j = 0; j < numValues; j++) {
+      uint16_t numValueBytes =
+          ReadIntegerFromBuffer<uint16_t>(data, size, &offset);
+      if (numValueBytes == 0 || pValueBuffer + numValueBytes > pValueBufferEnd) {
+        throw InvalidFormat(
+            "Invalid OpenCC binary dictionary (value offset out of bounds)");
+      }
+      if (pValueBuffer[numValueBytes - 1] != '\0') {
+        throw InvalidFormat(
+            "Invalid OpenCC binary dictionary (value not null-terminated)");
+      }
       const char* value = pValueBuffer;
-      uint16_t numValueBytes = ReadInteger<uint16_t>(fp);
       pValueBuffer += numValueBytes;
       values.push_back(value);
     }
@@ -107,6 +152,9 @@ std::shared_ptr<SerializedValues> SerializedValues::NewFromFile(FILE* fp) {
     dict->lexicon->Add(entry);
   }
 
+  if (bytesRead != nullptr) {
+    *bytesRead = offset;
+  }
   return dict;
 }
 
@@ -123,7 +171,7 @@ void SerializedValues::ConstructBuffer(std::string* valueBuffer,
   }
   // Write values to the buffer.
   valueBuffer->resize(*valueTotalLength, '\0');
-  char* pValueBuffer = const_cast<char*>(valueBuffer->c_str());
+  char* pValueBuffer = valueBuffer->data();
   for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
     for (const auto& value : entry->Values()) {
       strcpy(pValueBuffer, value.c_str());
@@ -131,5 +179,5 @@ void SerializedValues::ConstructBuffer(std::string* valueBuffer,
       pValueBuffer += value.length() + 1;
     }
   }
-  assert(valueBuffer->c_str() + *valueTotalLength == pValueBuffer);
+  assert(valueBuffer->data() + *valueTotalLength == pValueBuffer);
 }

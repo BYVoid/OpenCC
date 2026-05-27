@@ -23,6 +23,8 @@
 #ifndef __OPENCC_SIMPLECONVERTER_HPP_
 #define __OPENCC_SIMPLECONVERTER_HPP_
 
+#include "ConversionInspection.hpp"
+
 /**
  * @defgroup opencc_simple_api OpenCC C++ Simple API
  *
@@ -103,6 +105,14 @@ public:
    * @return       Length of converted text.
    */
   size_t Convert(const char* input, size_t length, char* output) const;
+
+  /**
+   * Inspects the conversion process for a given text.
+   * Returns the segmentation result, per-stage conversion outputs, and final
+   * output string.
+   * @param input Text to be inspected.
+   */
+  ConversionInspectionResult Inspect(const std::string& input) const;
 
 private:
   const void* internalData;

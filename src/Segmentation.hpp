@@ -27,6 +27,7 @@ namespace opencc {
  */
 class OPENCC_EXPORT Segmentation {
 public:
+  virtual ~Segmentation() {}
   virtual SegmentsPtr Segment(const std::string& text) const = 0;
 };
 } // namespace opencc

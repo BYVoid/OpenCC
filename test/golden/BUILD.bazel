@@ -1,0 +1,29 @@
+load("@rules_python//python:py_test.bzl", "py_test")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "golden_inputs",
+    srcs = glob(["input/*.txt"]),
+)
+
+filegroup(
+    name = "golden_outputs",
+    srcs = glob(["output/*.txt"]),
+)
+
+py_test(
+    name = "golden_convert_test",
+    size = "small",
+    srcs = ["golden_convert_test.py"],
+    data = [
+        ":golden_inputs",
+        ":golden_outputs",
+        "//data/config",
+        "//data/dictionary:binary_dictionaries",
+        "//plugins/jieba:config",
+        "//plugins/jieba:opencc-jieba",
+        "//plugins/jieba:resources",
+        "//src/tools:command_line",
+    ],
+)

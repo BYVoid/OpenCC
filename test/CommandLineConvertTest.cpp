@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015-2024 Carbo Kuo <byvoid@byvoid.com>
+ * Copyright 2015-2026 Carbo Kuo and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,27 @@
 
 #include <fstream>
 #include <iostream>
+#include <cstdlib>
+#include <filesystem>
 #include <map>
 #include <sstream>
 #include <unordered_map>
 #include <vector>
 
+#include "test/PortableUtil.hpp"
+
 #include "src/Common.hpp"
 #include "rapidjson/document.h"
 #include "gtest/gtest.h"
+
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+#else
+#include <sys/stat.h>
+#endif
 
 #ifdef BAZEL
 #include "tools/cpp/runfiles/runfiles.h"
@@ -33,6 +46,25 @@ using bazel::tools::cpp::runfiles::Runfiles;
 #endif
 
 namespace opencc {
+
+namespace fs = std::filesystem;
+
+#ifdef _WIN32
+std::wstring WideFromUtf8(const std::string& utf8) {
+  if (utf8.empty()) {
+    return L"";
+  }
+  const int required =
+      MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, nullptr, 0);
+  if (required <= 1) {
+    return L"";
+  }
+  std::wstring wide(static_cast<size_t>(required), L'\0');
+  MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, wide.data(), required);
+  wide.resize(static_cast<size_t>(required - 1));
+  return wide;
+}
+#endif
 
 class CommandLineConvertTest : public ::testing::Test {
 protected:
@@ -45,15 +77,15 @@ protected:
     runfiles_.reset(Runfiles::CreateForTest());
 #else
     ASSERT_NE("", PROJECT_BINARY_DIR);
-    ASSERT_NE("", CMAKE_SOURCE_DIR);
-    ASSERT_EQ(0, chdir(PROJECT_BINARY_DIR "/data"));
+    ASSERT_NE("", PROJECT_SOURCE_DIR);
+    ASSERT_EQ(0, portable_chdir(PROJECT_BINARY_DIR "/data"));
 #endif
   }
 
-  virtual void TearDown() { ASSERT_EQ(0, chdir(originalWorkingDirectory)); }
+  virtual void TearDown() { ASSERT_EQ(0, portable_chdir(originalWorkingDirectory)); }
 
   std::string GetFileContents(const std::string& fileName) const {
-    std::ifstream fs(fileName);
+    std::ifstream fs(fileName, std::ios::binary);
     EXPECT_TRUE(fs.is_open()) << fileName;
     const std::string content((std::istreambuf_iterator<char>(fs)),
                               (std::istreambuf_iterator<char>()));
@@ -61,13 +93,31 @@ protected:
     return content;
   }
 
+  std::string GetFileContents(const fs::path& fileName) const {
+    std::ifstream stream(fileName, std::ios::binary);
+    EXPECT_TRUE(stream.is_open()) << fileName.u8string();
+    const std::string content((std::istreambuf_iterator<char>(stream)),
+                              (std::istreambuf_iterator<char>()));
+    stream.close();
+    return content;
+  }
+
   void GetCurrentWorkingDirectory() {
-    originalWorkingDirectory = getcwd(nullptr, 0);
+    originalWorkingDirectory = portable_getcwd();
   }
 
   std::string OpenccCommand() const {
 #ifdef BAZEL
+#ifdef _WIN32
+    // On Windows, cc_binary executables have .exe extension in the runfiles manifest
+    std::string path = runfiles_->Rlocation("_main/src/tools/command_line.exe");
+    if (path.empty()) {
+      path = runfiles_->Rlocation("_main/src/tools/command_line");
+    }
+    return path;
+#else
     return runfiles_->Rlocation("_main/src/tools/command_line");
+#endif
 #else
 #ifndef _MSC_VER
     return PROJECT_BINARY_DIR "/src/tools/opencc";
@@ -79,6 +129,11 @@ protected:
 #endif
 #endif
 #endif
+  }
+
+  // Quote a path for use in a shell command, in case the path contains spaces.
+  static std::string QuotePath(const std::string& path) {
+    return "\"" + path + "\"";
   }
 
   std::string OutputDirectory() const {
@@ -93,7 +148,7 @@ protected:
 #ifdef BAZEL
     return "";
 #else
-    return CMAKE_SOURCE_DIR "/data/config/";
+    return PROJECT_SOURCE_DIR "/data/config/";
 #endif
   }
 
@@ -107,16 +162,107 @@ protected:
 
   std::string TestCommand(const std::string& config,
                           const std::string& inputFile,
-                          const std::string& outputFile) const {
-    std::string cmd = OpenccCommand() + " -i " + inputFile + " -o " +
-                      outputFile + " -c " + ConfigurationDirectory() + config +
-                      ".json";
+                          const std::string& outputFile,
+                          const std::string& measuredResultFile = "",
+                          const std::string& extraFlags = "") const {
+    std::string cmd = QuotePath(OpenccCommand()) + " -i " +
+                      QuotePath(inputFile) + " -o " +
+                      QuotePath(outputFile) + " -c " +
+                      QuotePath(ConfigurationDirectory() + config + ".json");
+    if (!extraFlags.empty()) {
+      cmd += " " + extraFlags;
+    }
+    if (!measuredResultFile.empty()) {
+      cmd += " --measured_result " + QuotePath(measuredResultFile);
+    }
 #ifdef BAZEL
-    cmd += " --path " + runfiles_->Rlocation("_main/data/dictionary") + "/" +
-           " --path " + runfiles_->Rlocation("_main/data/config") + "/";
+    const std::string dictFile =
+        runfiles_->Rlocation("_main/data/dictionary/STCharacters.ocd2");
+    const std::string dictDir =
+        dictFile.substr(0, dictFile.find_last_of("/\\"));
+    const std::string configFile =
+        runfiles_->Rlocation("_main/data/config/s2t.json");
+    const std::string configDir =
+        configFile.substr(0, configFile.find_last_of("/\\"));
+    cmd += " --path " + QuotePath(dictDir + "/") +
+           " --path " + QuotePath(configDir + "/");
 #endif
+#ifdef _WIN32
+    // On Windows, cmd.exe /C strips the first and last quote characters when
+    // the command starts with a quoted path, corrupting the command. Wrapping
+    // the entire command in an extra pair of outer quotes causes cmd.exe to
+    // strip only those outer quotes, leaving the inner quoted paths intact.
+    return "\"" + cmd + "\"";
+#else
+    return cmd;
+#endif
+  }
+
+  static int RunCommand(const std::string& cmd) {
+#ifdef _WIN32
+    return _wsystem(WideFromUtf8(cmd).c_str());
+#else
+    return system(cmd.c_str());
+#endif
+  }
+
+  std::string TestCommandWithFlags(const std::string& config,
+                                   const std::string& inputFile,
+                                   const std::string& outputFile,
+                                   const std::string& extraFlags,
+                                   const std::string& measuredResultFile = "")
+      const {
+    return TestCommand(config, inputFile, outputFile, measuredResultFile,
+                       extraFlags);
+  }
+
+  std::string TestStdinCommand(const std::string& config,
+                               const std::string& inputFile,
+                               const std::string& outputFile) const {
+    std::string cmd = QuotePath(OpenccCommand()) + " -c " +
+                      QuotePath(ConfigurationDirectory() + config + ".json");
+#ifdef BAZEL
+    const std::string dictFile =
+        runfiles_->Rlocation("_main/data/dictionary/STCharacters.ocd2");
+    const std::string dictDir =
+        dictFile.substr(0, dictFile.find_last_of("/\\"));
+    const std::string configFile =
+        runfiles_->Rlocation("_main/data/config/s2t.json");
+    const std::string configDir =
+        configFile.substr(0, configFile.find_last_of("/\\"));
+    cmd += " --path " + QuotePath(dictDir + "/") +
+           " --path " + QuotePath(configDir + "/");
+#endif
+    cmd += " < " + QuotePath(inputFile) + " > " + QuotePath(outputFile);
+#ifdef _WIN32
+    return "\"" + cmd + "\"";
+#else
+    return cmd;
+#endif
+  }
+
+#ifndef _WIN32
+  std::string TestPipeCommand(const std::string& config,
+                              const std::string& outputFile) const {
+    std::string cmd = "(printf '后台'; sleep 0.1; printf '老板') | " +
+                      QuotePath(OpenccCommand()) + " -c " +
+                      QuotePath(ConfigurationDirectory() + config + ".json");
+#ifdef BAZEL
+    const std::string dictFile =
+        runfiles_->Rlocation("_main/data/dictionary/STCharacters.ocd2");
+    const std::string dictDir =
+        dictFile.substr(0, dictFile.find_last_of("/\\"));
+    const std::string configFile =
+        runfiles_->Rlocation("_main/data/config/s2t.json");
+    const std::string configDir =
+        configFile.substr(0, configFile.find_last_of("/\\"));
+    cmd += " --path " + QuotePath(dictDir + "/") +
+           " --path " + QuotePath(configDir + "/");
+#endif
+    cmd += " > " + QuotePath(outputFile);
     return cmd;
   }
+#endif
 
   char* originalWorkingDirectory;
 
@@ -176,7 +322,7 @@ TEST_F(CommandLineConvertTest, ConvertFromJson) {
   const std::string casesPath =
       runfiles_->Rlocation("_main/test/testcases/testcases.json");
 #else
-  const std::string casesPath = CMAKE_SOURCE_DIR "/test/testcases/testcases.json";
+  const std::string casesPath = PROJECT_SOURCE_DIR "/test/testcases/testcases.json";
 #endif
   const CasesByConfig cases = LoadCases(casesPath);
 
@@ -215,4 +361,667 @@ TEST_F(CommandLineConvertTest, ConvertFromJson) {
   }
 }
 
+TEST_F(CommandLineConvertTest, StdinPreservesLineEndingsAndUnknownCharacters) {
+  const std::string config = "s2t";
+  const std::string inputFile = InputFile("stdin_line_endings");
+  const std::string outputFile = OutputFile("stdin_line_endings");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "鼠标=mouse\r\n123\n未登录";
+  }
+
+  ASSERT_EQ(0, system(TestStdinCommand(config, inputFile, outputFile).c_str()));
+  EXPECT_EQ("鼠標=mouse\r\n123\n未登錄", GetFileContents(outputFile));
+}
+
+#ifndef _WIN32
+TEST_F(CommandLineConvertTest, PipeShortReadContinuesUntilEof) {
+  const std::string outputFile = OutputFile("pipe_short_read");
+
+  ASSERT_EQ(0, system(TestPipeCommand("s2t", outputFile).c_str()));
+
+  ASSERT_EQ("後臺老闆", GetFileContents(outputFile));
+}
+#endif
+
+TEST_F(CommandLineConvertTest, ConvertsFilesWithUnicodePaths) {
+  const fs::path unicodeDir =
+      fs::u8path(OutputDirectory()) / fs::u8path("opencc-中文路径-cli-😀-𠮷");
+  fs::create_directories(unicodeDir);
+
+  const fs::path inputFile = unicodeDir / fs::u8path("输入 文件.txt");
+  const fs::path outputFile = unicodeDir / fs::u8path("輸出 文件.txt");
+  const fs::path measuredResultFile =
+      unicodeDir / fs::u8path("測量 結果.json");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << inputFile.u8string();
+    ofs << "开放中文转换";
+  }
+
+  ASSERT_EQ(0, RunCommand(TestCommand("s2t", inputFile.u8string(),
+                                      outputFile.u8string(),
+                                      measuredResultFile.u8string())));
+  EXPECT_EQ("開放中文轉換", GetFileContents(outputFile));
+
+  const std::string measured = GetFileContents(measuredResultFile);
+  rapidjson::Document doc;
+  doc.Parse(measured.c_str());
+  ASSERT_FALSE(doc.HasParseError()) << measured;
+  ASSERT_TRUE(doc.IsObject());
+  ASSERT_TRUE(doc.HasMember("input"));
+  EXPECT_EQ(inputFile.u8string(), std::string(doc["input"].GetString()));
+}
+
+TEST_F(CommandLineConvertTest, ConvertsInPlaceWithUnicodePath) {
+  const fs::path unicodeDir =
+      fs::u8path(OutputDirectory()) / fs::u8path("opencc-就地转换-cli-😀");
+  fs::create_directories(unicodeDir);
+
+  const fs::path file = unicodeDir / fs::u8path("输入输出同一文件.txt");
+
+  {
+    std::ofstream ofs(file, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << file.u8string();
+    ofs << "开放中文转换";
+  }
+
+  ASSERT_EQ(0, RunCommand(TestCommand("s2t", file.u8string(), file.u8string(),
+                                      "", "--in-place")));
+  EXPECT_EQ("開放中文轉換", GetFileContents(file));
+}
+
+TEST_F(CommandLineConvertTest, RejectsInPlaceConversionWithoutFlag) {
+  const fs::path unicodeDir =
+      fs::u8path(OutputDirectory()) / fs::u8path("opencc-拒绝就地转换-cli");
+  fs::create_directories(unicodeDir);
+
+  const fs::path file = unicodeDir / fs::u8path("输入输出同一文件.txt");
+
+  {
+    std::ofstream ofs(file, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << file.u8string();
+    ofs << "开放中文转换";
+  }
+
+  EXPECT_NE(0, RunCommand(TestCommand("s2t", file.u8string(), file.u8string())));
+  EXPECT_EQ("开放中文转换", GetFileContents(file));
+}
+
+TEST_F(CommandLineConvertTest, MissingInputDoesNotTruncateOutput) {
+  const fs::path unicodeDir =
+      fs::u8path(OutputDirectory()) / fs::u8path("opencc-缺失输入-cli");
+  fs::create_directories(unicodeDir);
+
+  const fs::path inputFile = unicodeDir / fs::u8path("不存在.txt");
+  const fs::path outputFile = unicodeDir / fs::u8path("已有输出.txt");
+
+  {
+    std::ofstream ofs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << outputFile.u8string();
+    ofs << "existing output";
+  }
+
+  EXPECT_NE(0, RunCommand(TestCommand("s2t", inputFile.u8string(),
+                                      outputFile.u8string())));
+  EXPECT_EQ("existing output", GetFileContents(outputFile));
+}
+
+TEST_F(CommandLineConvertTest, ConvertsInPlaceWithDifferentPathSpellings) {
+  const fs::path unicodeDir =
+      fs::u8path(OutputDirectory()) / fs::u8path("opencc-同文件不同路径-cli");
+  fs::create_directories(unicodeDir);
+
+  const fs::path file = unicodeDir / fs::u8path("输入输出同一文件.txt");
+
+  {
+    std::ofstream ofs(file, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << file.u8string();
+    ofs << "开放中文转换";
+  }
+
+  const fs::path spelledDifferently = unicodeDir / fs::u8path(".") /
+                                      fs::u8path("输入输出同一文件.txt");
+  ASSERT_EQ(0, RunCommand(TestCommand("s2t", file.u8string(),
+                                      spelledDifferently.u8string(), "",
+                                      "--in-place")));
+  EXPECT_EQ("開放中文轉換", GetFileContents(file));
+}
+
+#ifndef _WIN32
+TEST_F(CommandLineConvertTest, InPlaceConversionPreservesFileMode) {
+  const fs::path unicodeDir =
+      fs::u8path(OutputDirectory()) / fs::u8path("opencc-保留权限-cli");
+  fs::create_directories(unicodeDir);
+
+  const fs::path file = unicodeDir / fs::u8path("输入输出同一文件.txt");
+
+  {
+    std::ofstream ofs(file, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << file.u8string();
+    ofs << "开放中文转换";
+  }
+  ASSERT_EQ(0, chmod(file.c_str(), 0644));
+
+  ASSERT_EQ(0, RunCommand(TestCommand("s2t", file.u8string(), file.u8string(),
+                                      "", "--in-place")));
+  EXPECT_EQ("開放中文轉換", GetFileContents(file));
+
+  struct stat info;
+  ASSERT_EQ(0, stat(file.c_str(), &info));
+  EXPECT_EQ(0644, info.st_mode & 07777);
+}
+
+TEST_F(CommandLineConvertTest, InPlaceConversionRejectsHardLinks) {
+  const fs::path unicodeDir =
+      fs::u8path(OutputDirectory()) / fs::u8path("opencc-拒绝硬链接-cli");
+  fs::create_directories(unicodeDir);
+
+  const fs::path file = unicodeDir / fs::u8path("真实输入输出.txt");
+  const fs::path hardLink = unicodeDir / fs::u8path("硬链接输出.txt");
+
+  {
+    std::ofstream ofs(file, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << file.u8string();
+    ofs << "开放中文转换";
+  }
+
+  std::error_code error;
+  fs::remove(hardLink, error);
+  fs::create_hard_link(file, hardLink, error);
+  if (error) {
+    GTEST_SKIP() << "Hard-link creation failed: " << error.message();
+  }
+
+  EXPECT_NE(0, RunCommand(TestCommand("s2t", file.u8string(),
+                                      hardLink.u8string(), "",
+                                      "--in-place")));
+  EXPECT_EQ("开放中文转换", GetFileContents(file));
+  EXPECT_EQ("开放中文转换", GetFileContents(hardLink));
+}
+#endif
+
+TEST_F(CommandLineConvertTest, ConvertsInPlaceThroughSymlink) {
+  const fs::path unicodeDir =
+      fs::u8path(OutputDirectory()) / fs::u8path("opencc-符号链接-cli");
+  fs::create_directories(unicodeDir);
+
+  const fs::path file = unicodeDir / fs::u8path("真实输入输出.txt");
+  const fs::path symlink = unicodeDir / fs::u8path("符号链接输出.txt");
+
+  {
+    std::ofstream ofs(file, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << file.u8string();
+    ofs << "开放中文转换";
+  }
+
+  std::error_code error;
+  fs::remove(symlink, error);
+  fs::create_symlink(file.filename(), symlink, error);
+  if (error) {
+    GTEST_SKIP() << "Symlink creation failed: " << error.message();
+  }
+
+  ASSERT_EQ(0, RunCommand(TestCommand("s2t", file.u8string(),
+                                      symlink.u8string(), "", "--in-place")));
+  EXPECT_EQ("開放中文轉換", GetFileContents(file));
+}
+
+TEST_F(CommandLineConvertTest, WritesMeasuredResultJson) {
+  const std::string config = "s2t";
+  const std::string inputFile = InputFile(config.c_str()) + ".measured";
+  const std::string outputFile = OutputFile(config.c_str()) + ".measured";
+  const std::string measuredResultFile =
+      OutputDirectory() + config + ".measured_result.json";
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open()) << "Failed to open input file for writing: "
+                               << inputFile;
+    ofs << "开放中文转换" << std::endl;
+  }
+
+  ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile,
+                                  measuredResultFile).c_str()));
+
+  const std::string content = GetFileContents(measuredResultFile);
+  rapidjson::Document doc;
+  doc.Parse(content.c_str());
+  ASSERT_FALSE(doc.HasParseError());
+  ASSERT_TRUE(doc.IsObject());
+  ASSERT_TRUE(doc.HasMember("config"));
+  ASSERT_TRUE(doc["config"].IsString());
+  EXPECT_EQ(ConfigurationDirectory() + config + ".json",
+            std::string(doc["config"].GetString()));
+  ASSERT_TRUE(doc.HasMember("mode"));
+  EXPECT_STREQ("file", doc["mode"].GetString());
+  ASSERT_TRUE(doc.HasMember("load_ms"));
+  EXPECT_TRUE(doc["load_ms"].IsNumber());
+  ASSERT_TRUE(doc.HasMember("convert_ms"));
+  EXPECT_TRUE(doc["convert_ms"].IsNumber());
+  ASSERT_TRUE(doc.HasMember("write_ms"));
+  EXPECT_TRUE(doc["write_ms"].IsNumber());
+  ASSERT_TRUE(doc.HasMember("total_ms"));
+  EXPECT_TRUE(doc["total_ms"].IsNumber());
+  ASSERT_TRUE(doc.HasMember("input_bytes"));
+  EXPECT_TRUE(doc["input_bytes"].IsUint64());
+  ASSERT_TRUE(doc.HasMember("output_bytes"));
+  EXPECT_TRUE(doc["output_bytes"].IsUint64());
+}
+
+TEST_F(CommandLineConvertTest, SegmentationOutputIsJson) {
+  const std::string config = "s2t";
+  const std::string inputFile = InputFile("segmentation_test");
+  const std::string outputFile = OutputFile("segmentation_test");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "\xe5\xbc\x80\xe6\x94\xbe\xe4\xb8\xad\xe6\x96\x87\xe8\xbd\xac\xe6"
+           "\x8d\xa2"  // 开放中文转换
+        << "\n";
+  }
+
+  ASSERT_EQ(0, system(TestCommandWithFlags(config, inputFile, outputFile,
+                                           "--segmentation").c_str()));
+
+  const std::string content = GetFileContents(outputFile);
+  rapidjson::Document doc;
+  doc.Parse(content.c_str());
+  ASSERT_FALSE(doc.HasParseError()) << "Output is not valid JSON: " << content;
+  ASSERT_TRUE(doc.IsObject());
+  ASSERT_TRUE(doc.HasMember("input"));
+  ASSERT_TRUE(doc["input"].IsString());
+  ASSERT_TRUE(doc.HasMember("segments"));
+  ASSERT_TRUE(doc["segments"].IsArray());
+  EXPECT_FALSE(doc["segments"].GetArray().Empty());
+  // Should NOT have 'stages' or 'output' keys
+  EXPECT_FALSE(doc.HasMember("stages"));
+  EXPECT_FALSE(doc.HasMember("output"));
+}
+
+TEST_F(CommandLineConvertTest, InspectOutputIsJson) {
+  const std::string config = "s2t";
+  const std::string inputFile = InputFile("inspect_test");
+  const std::string outputFile = OutputFile("inspect_test");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "\xe5\xbc\x80\xe6\x94\xbe\xe4\xb8\xad\xe6\x96\x87\xe8\xbd\xac\xe6"
+           "\x8d\xa2"  // 开放中文转换
+        << "\n";
+  }
+
+  ASSERT_EQ(0, system(TestCommandWithFlags(config, inputFile, outputFile,
+                                           "--inspect").c_str()));
+
+  const std::string content = GetFileContents(outputFile);
+  rapidjson::Document doc;
+  doc.Parse(content.c_str());
+  ASSERT_FALSE(doc.HasParseError()) << "Output is not valid JSON: " << content;
+  ASSERT_TRUE(doc.IsObject());
+  ASSERT_TRUE(doc.HasMember("input"));
+  ASSERT_TRUE(doc["input"].IsString());
+  ASSERT_TRUE(doc.HasMember("segments"));
+  ASSERT_TRUE(doc["segments"].IsArray());
+  ASSERT_TRUE(doc.HasMember("stages"));
+  ASSERT_TRUE(doc["stages"].IsArray());
+  ASSERT_TRUE(doc.HasMember("output"));
+  ASSERT_TRUE(doc["output"].IsString());
+  // Validate stage schema
+  for (auto& stage : doc["stages"].GetArray()) {
+    ASSERT_TRUE(stage.IsObject());
+    ASSERT_TRUE(stage.HasMember("index"));
+    ASSERT_TRUE(stage["index"].IsUint64());
+    ASSERT_TRUE(stage.HasMember("segments"));
+    ASSERT_TRUE(stage["segments"].IsArray());
+  }
+}
+
+TEST_F(CommandLineConvertTest, SegmentationAndInspectAreMutuallyExclusive) {
+  const std::string config = "s2t";
+  const std::string inputFile = InputFile("mutex_test");
+  const std::string outputFile = OutputFile("mutex_test");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "test\n";
+  }
+
+  // Should fail with non-zero exit code
+  const int exitCode =
+      system(TestCommandWithFlags(config, inputFile, outputFile,
+                                  "--segmentation --inspect")
+                 .c_str());
+  EXPECT_NE(0, exitCode);
+}
+
+TEST_F(CommandLineConvertTest, MeasuredResultIncludesOutputMode) {
+  const std::string config = "s2t";
+  const std::string inputFile = InputFile("inspect_measured_test");
+  const std::string outputFile = OutputFile("inspect_measured_test");
+  const std::string measuredResultFile =
+      OutputDirectory() + "inspect_measured_result.json";
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "\xe5\xbc\x80\xe6\x94\xbe\xe4\xb8\xad\xe6\x96\x87\xe8\xbd\xac\xe6"
+           "\x8d\xa2"  // 开放中文转换
+        << "\n";
+  }
+
+  ASSERT_EQ(0,
+            system(TestCommandWithFlags(config, inputFile, outputFile,
+                                        "--inspect", measuredResultFile)
+                       .c_str()));
+
+  const std::string content = GetFileContents(measuredResultFile);
+  rapidjson::Document doc;
+  doc.Parse(content.c_str());
+  ASSERT_FALSE(doc.HasParseError());
+  ASSERT_TRUE(doc.IsObject());
+  ASSERT_TRUE(doc.HasMember("output_mode"));
+  ASSERT_TRUE(doc["output_mode"].IsString());
+  EXPECT_STREQ("inspect", doc["output_mode"].GetString());
+}
+
+// Verify --segmentation does NOT run the conversion chain: the segments in the
+// output must be the raw segmenter tokens, not post-conversion text.
+// With s2t.json on "开放中文转换", segmentation splits into simplified-Chinese
+// tokens; none of those tokens should already be Traditional Chinese unless
+// the conversion chain ran.
+TEST_F(CommandLineConvertTest, SegmentationDoesNotRunConversionChain) {
+  const std::string config = "s2t";
+  const std::string inputFile = InputFile("seg_no_convert_test");
+  const std::string outputFile = OutputFile("seg_no_convert_test");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    // 开放中文转换 — all simplified; after s2t conversion it would become
+    // 開放中文轉換.  --segmentation must return the simplified tokens.
+    ofs << "\xe5\xbc\x80\xe6\x94\xbe\xe4\xb8\xad\xe6\x96\x87\xe8\xbd\xac\xe6"
+           "\x8d\xa2"  // 开放中文转换
+        << "\n";
+  }
+
+  ASSERT_EQ(0, system(TestCommandWithFlags(config, inputFile, outputFile,
+                                           "--segmentation").c_str()));
+
+  const std::string content = GetFileContents(outputFile);
+  rapidjson::Document doc;
+  doc.Parse(content.c_str());
+  ASSERT_FALSE(doc.HasParseError());
+  ASSERT_TRUE(doc.IsObject());
+  ASSERT_TRUE(doc.HasMember("segments"));
+  ASSERT_TRUE(doc["segments"].IsArray());
+
+  // Reconstruct the concatenation of all segments.
+  std::string joined;
+  for (auto& seg : doc["segments"].GetArray()) {
+    ASSERT_TRUE(seg.IsString());
+    joined += seg.GetString();
+  }
+  // The joined segments must equal the *original* simplified input,
+  // not the converted traditional output.
+  const std::string simplified =
+      "\xe5\xbc\x80\xe6\x94\xbe\xe4\xb8\xad\xe6\x96\x87\xe8\xbd\xac\xe6"
+      "\x8d\xa2";  // 开放中文转换
+  EXPECT_EQ(simplified, joined)
+      << "Segments were converted — conversion chain must not run in "
+         "--segmentation mode";
+}
+
+// Verify that a multi-line input in --segmentation mode produces exactly one
+// JSON object per input line with no spurious extra record at EOF.
+TEST_F(CommandLineConvertTest, SegmentationNoSpuriousEofRecord) {
+  const std::string config = "s2t";
+  const std::string inputFile = InputFile("seg_eof_test");
+  const std::string outputFile = OutputFile("seg_eof_test");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    // Two lines, each terminated by \n (file ends with a newline).
+    ofs << "\xe5\xbc\x80\xe6\x94\xbe\xe4\xb8\xad\xe6\x96\x87\xe8\xbd\xac\xe6"
+           "\x8d\xa2\n"  // 开放中文转换
+        << "\xe6\xb1\x89\xe5\xad\x97\n";  // 汉字
+  }
+
+  ASSERT_EQ(0, system(TestCommandWithFlags(config, inputFile, outputFile,
+                                           "--segmentation").c_str()));
+
+  // Output should be exactly two JSON objects separated by a newline.
+  const std::string content = GetFileContents(outputFile);
+  // Count newlines — the format is "obj\nobj" so there should be exactly 1
+  // newline separator for 2 records.
+  size_t newlines = 0;
+  for (char c : content) {
+    if (c == '\n') {
+      ++newlines;
+    }
+  }
+  // Allow at most one trailing newline; the important thing is that we have
+  // exactly two JSON objects.
+  const size_t separators = (newlines > 0 && content.back() == '\n')
+                                ? newlines - 1
+                                : newlines;
+  EXPECT_EQ(1u, separators) << "Expected exactly 2 JSON records (1 separator),"
+                                " got extra records. Content: "
+                             << content;
+
+  // Also parse both records to confirm they're valid JSON.
+  // Records are separated by exactly one '\n' with no trailing newline in the
+  // payload itself.
+  size_t sep = content.find('\n');
+  ASSERT_NE(std::string::npos, sep) << "No separator found";
+  std::string first = content.substr(0, sep);
+  // skip trailing newline if present
+  std::string rest = content.substr(sep + 1);
+  if (!rest.empty() && rest.back() == '\n') {
+    rest.pop_back();
+  }
+
+  rapidjson::Document d1, d2;
+  d1.Parse(first.c_str());
+  EXPECT_FALSE(d1.HasParseError()) << "First record invalid JSON: " << first;
+  EXPECT_TRUE(d1.IsObject());
+  d2.Parse(rest.c_str());
+  EXPECT_FALSE(d2.HasParseError()) << "Second record invalid JSON: " << rest;
+  EXPECT_TRUE(d2.IsObject());
+}
+  TEST_F(CommandLineConvertTest, PreservesLineEnding_LF) {
+    const std::string config = "s2t";
+    const std::string inputFile = InputFile("lf_input");
+    const std::string outputFile = OutputFile("lf_output");
+
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open());
+      ofs << "第一行\n第二行\n第三行\n";
+    }
+
+    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+
+    // Read output in binary mode to check line endings
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open());
+    std::string content((std::istreambuf_iterator<char>(ifs)),
+                              (std::istreambuf_iterator<char>()));
+    ifs.close();
+
+    // Should contain LF (0a) but not CR (0d)
+    ASSERT_NE(std::string::npos, content.find('\n'));
+    ASSERT_EQ(std::string::npos, content.find('\r'));
+  }
+
+  TEST_F(CommandLineConvertTest, PreservesLineEnding_CRLF) {
+    const std::string config = "s2t";
+    const std::string inputFile = InputFile("crlf_input");
+    const std::string outputFile = OutputFile("crlf_output");
+
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open());
+      ofs << "第一行\r\n第二行\r\n第三行\r\n";
+    }
+
+    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+
+    // Read output in binary mode to check line endings
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open());
+    std::string content((std::istreambuf_iterator<char>(ifs)),
+                              (std::istreambuf_iterator<char>()));
+    ifs.close();
+
+    // Should contain both CR (0d) and LF (0a)
+    ASSERT_NE(std::string::npos, content.find('\r'));
+    ASSERT_NE(std::string::npos, content.find('\n'));
+  }
+
+  TEST_F(CommandLineConvertTest, PreservesLineEnding_CRLF_ASCII) {
+    const std::string config = "s2t";
+    const std::string inputFile = InputFile("crlf_ascii_input");
+    const std::string outputFile = OutputFile("crlf_ascii_output");
+
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open());
+      ofs << "hello\r\nworld\r\n";
+    }
+
+    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+
+    // Read output in binary mode
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open());
+    std::string content((std::istreambuf_iterator<char>(ifs)),
+                              (std::istreambuf_iterator<char>()));
+    ifs.close();
+
+    // Should preserve CRLF
+    ASSERT_NE(std::string::npos, content.find('\r'));
+    ASSERT_NE(std::string::npos, content.find('\n'));
+  }
+
+  TEST_F(CommandLineConvertTest, PreservesLineEnding_NoTrailingNewline_LF) {
+    const std::string config = "s2t";
+    const std::string inputFile = InputFile("no_trailing_lf_input");
+    const std::string outputFile = OutputFile("no_trailing_lf_output");
+
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open());
+      ofs << "第一行\n第二行";  // No trailing newline
+    }
+
+    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+
+    // Read output in binary mode
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open());
+    std::string content((std::istreambuf_iterator<char>(ifs)),
+                              (std::istreambuf_iterator<char>()));
+    ifs.close();
+
+    // Should have LF but no CR, and no trailing newline
+    ASSERT_NE(std::string::npos, content.find('\n'));
+    ASSERT_EQ(std::string::npos, content.find('\r'));
+    ASSERT_NE('\n', content.back());
+  }
+
+  TEST_F(CommandLineConvertTest, PreservesLineEnding_NoTrailingNewline_CRLF) {
+    const std::string config = "s2t";
+    const std::string inputFile = InputFile("no_trailing_crlf_input");
+    const std::string outputFile = OutputFile("no_trailing_crlf_output");
+
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open());
+      ofs << "第一行\r\n第二行";  // No trailing newline
+    }
+
+    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+
+    // Read output in binary mode
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open());
+    std::string content((std::istreambuf_iterator<char>(ifs)),
+                              (std::istreambuf_iterator<char>()));
+    ifs.close();
+
+    // Should preserve CRLF but no trailing newline
+    ASSERT_NE(std::string::npos, content.find('\r'));
+    ASSERT_NE(std::string::npos, content.find('\n'));
+    ASSERT_NE('\r', content.back());
+    ASSERT_NE('\n', content.back());
+  }
+
+  TEST_F(CommandLineConvertTest, ChunkingBoundaryTruncationFix) {
+    const std::string config = "s2t";
+    const std::string inputFile = InputFile("chunk_boundary_test");
+    const std::string outputFile = OutputFile("chunk_boundary_test");
+
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open());
+      // Create exactly 1MB - 3 bytes of padding. 
+      // This forces the "头" character (3 bytes) to end exactly at the 1MB 
+      // chunk boundary, while "发尾巴" falls into the next read chunk.
+      std::string padding(1048576 - 3, 'a');
+      ofs << padding << "头发尾巴";
+    }
+
+    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+
+    // Read output in binary mode
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open());
+    std::string content((std::istreambuf_iterator<char>(ifs)),
+                        (std::istreambuf_iterator<char>()));
+    ifs.close();
+
+    // 1. Verify EOF truncation bug is fixed (the output shouldn't be truncated)
+    // 2. Verify Semantic-safe chunking (the word shouldn't be split into 頭發)
+    const std::string expectedEnd = "頭髮尾巴";
+    ASSERT_GE(content.size(), expectedEnd.size());
+    EXPECT_EQ(expectedEnd, content.substr(content.size() - expectedEnd.size()));
+  }
+  
+  TEST_F(CommandLineConvertTest, ExactChunkSizeDoesNotTruncate) {
+    const std::string config = "s2t";
+    const std::string inputFile = InputFile("exact_chunk_test");
+    const std::string outputFile = OutputFile("exact_chunk_test");
+
+    {
+      std::ofstream ofs(inputFile, std::ios::binary);
+      ASSERT_TRUE(ofs.is_open());
+      // Create EXACTLY 1MB of data (1048576 bytes).
+      // This triggers the bug where fread reads exactly bufferSizeAvailable,
+      // defers MAX_KEEP_CHARS to the next iteration, and then the next fread
+      // returns 0. If the loop breaks immediately on fread returning 0, the
+      // deferred tail is lost.
+      std::string padding(1048576, 'a');
+      ofs << padding;
+    }
+
+    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+
+    // Read output in binary mode
+    std::ifstream ifs(outputFile, std::ios::binary);
+    ASSERT_TRUE(ifs.is_open());
+    std::string content((std::istreambuf_iterator<char>(ifs)),
+                        (std::istreambuf_iterator<char>()));
+    ifs.close();
+
+    // Verify output length is exactly 1MB.
+    EXPECT_EQ(1048576, content.size());
+  }
 } // namespace opencc

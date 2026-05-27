@@ -5,21 +5,38 @@ on:
 
 jobs:
   release-pypi:
+    permissions:
+      contents: read
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, macos-14, windows-latest]
+        os: [ubuntu-latest, ubuntu-22.04-arm, macos-15-intel, macos-15, windows-2022]
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v1
-
-    - name: Build package and upload from docker (Linux)
-      if: runner.os == 'Linux'
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Compute version
+      id: version
+      shell: bash
       run: |
-        docker run --rm -v "${PWD}:/opt/OpenCC" \
-          -e TWINE_USERNAME=__token__ \
-          -e TWINE_PASSWORD=${{ secrets.PYPI_TOKEN }} \
-          ubuntu:22.04 /bin/bash /opt/OpenCC/release-pypi-linux.sh
+        VERSION=$(bash scripts/compute-version.sh)
+        echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+        echo "Computed version: $VERSION"
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Build package and upload (Linux)
+      if: runner.os == 'Linux'
+      run: bash release-pypi-linux.sh
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
 
     - name: Build package and upload (macOS)
       if: runner.os == 'macOS'
@@ -30,9 +47,7 @@ jobs:
 
     - name: Build package and upload (Windows)
       if: runner.os == 'Windows'
-      run: |
-        C:\Miniconda/condabin/conda.bat init powershell
-        ./release-pypi-windows.cmd
+      run: ./release-pypi-windows.cmd
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}

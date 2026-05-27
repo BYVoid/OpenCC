@@ -1,0 +1,15 @@
+---
+BasedOnStyle: Google
+Language: Cpp
+# `AlignConsecutiveAssignments` controls all assignments.  We would like to
+# align just enum declarations, but it doesn't look like it's possible.
+# `AlignConsecutiveDeclarations: true` is good for typedefs, but bad for
+# member functions and variables.  Leave if off.
+AlignConsecutiveMacros: true
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+IndentPPDirectives: BeforeHash
+PPIndentWidth: 1
+PackConstructorInitializers: BinPack
+SpaceAfterCStyleCast: false
+...

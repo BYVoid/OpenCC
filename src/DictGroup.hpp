@@ -48,6 +48,10 @@ public:
 
   virtual LexiconPtr GetLexicon() const;
 
+  virtual const std::list<DictPtr>* GetDictGroupItems() const {
+    return &dicts;
+  }
+
   const std::list<DictPtr> GetDicts() const { return dicts; }
 
 private:

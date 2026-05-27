@@ -1,0 +1,246 @@
+@charset "utf-8";
+
+* {
+ line-height: 140%;
+ margin: 0px;
+ padding: 0px;
+}
+
+body {
+ background: lightgray;
+ color: #222;
+ margin: 10px 20px;
+}
+
+a {
+ color: inherit;
+ text-decoration: none;
+}
+a:link {
+ color: #066;
+ padding: 0px 2px;
+}
+a:link:after {
+ content: "†";
+}
+a:visited {
+ color: #057;
+ padding: 0px 2px;
+}
+a:visited:after {
+ content: "†";
+}
+a:hover {
+ text-decoration: underline;
+}
+a[name]:hover {
+ color: inherit;
+ text-decoration: none;
+}
+a:active {
+}
+a[name]:active {
+ color: inherit;
+ padding: 0px;
+}
+
+ol {
+ list-style-position: outside;
+ margin-left: 2em;
+}
+ol ol {
+ list-style-position: outside;
+ margin-left: 1em;
+}
+ul {
+ list-style-position: outside;
+ margin-left: 2em;
+}
+ul ul {
+ list-style-position: outside;
+ margin-left: 1em;
+}
+li {
+ margin: 5px 0px;
+}
+
+code {
+ color: darkblue;
+ font-family: sans-serif;
+ font-style: normal;
+ padding: 0px 2px;
+}
+kbd {
+ color: darkgreen;
+ font-family: sans-serif;
+ font-style: normal;
+ padding: 0px 2px;
+ white-space: nowrap;
+}
+var {
+ color: darkred;
+ font-family: sans-serif;
+ font-style: normal;
+ padding: 0px 2px;
+}
+sup {
+ font-size: 75%;
+}
+
+div#header {
+ font-family: "Times New Roman";
+ padding: 5px 10px;
+}
+div#header div.left {
+ float: left;
+}
+div#header div.right {
+ float: right;
+}
+div#header div.end {
+ clear: both;
+}
+
+div#body {
+ background: white;
+ border: 1px solid black;
+ box-shadow: 1px 1px 5px gray;
+ -webkit-box-shadow: 1px 1px 5px gray;
+ -moz-box-shadow: 1px 1px 5px gray;
+ padding: 20px;
+}
+
+div#body h1 {
+ font-size: 150%;
+ margin: 10px;
+ text-align: center;
+}
+
+div#body p#authors {
+ font-weight: bold;
+ margin: 10px;
+ text-align: center;
+}
+div#body p#authors span.author {
+ margin: 0px 1em;
+}
+
+div#body p#abstract {
+ margin: 15px auto;
+ text-align: auto;
+ width: 75%;
+}
+div#body p#abstract span#heading {
+ font-family: "Times New Roman";
+ font-style: italic;
+ font-weight: bold;
+ margin-right: 0.5em;
+}
+
+div#body div.section {
+ clear: both;
+ margin: 5px 0px;
+}
+div#body div.section h2 {
+ background: honeydew;
+ border-bottom: 1px dashed darkgray;
+ color: #353;
+ font-size: 125%;
+ margin-top: 15px;
+ padding: 5px;
+}
+
+div#body div.section p {
+ margin: 5px 0px;
+ text-indent: 1em;
+}
+
+div#body div.section div.float {
+ box-shadow: 1px 1px 5px gray;
+ -webkit-box-shadow: 1px 1px 5px gray;
+ -moz-box-shadow: 1px 1px 5px gray;
+ clear: both;
+ float: right;
+ margin: 5px 0px 5px 10px;
+ max-width: 75%;
+}
+div#body div.section pre.code {
+ background: whitesmoke;
+ color: darkblue;
+ line-height: 125%;
+ overflow: auto;
+ padding: 5px 10px;
+}
+div#body div.section pre.console {
+ background: darkslategray;
+ color: white;
+ line-height: 125%;
+ overflow: auto;
+ padding: 5px 10px;
+}
+
+div#body div.section table {
+ background: whitesmoke;
+ border-collapse: separate;
+ border-spacing: 5px;
+ empty-cells: hide;
+ padding: 5px 10px;
+}
+div#body div.section table caption {
+ background: inherit;
+ padding-top: 5px;
+}
+div#body div.section table th {
+ background: white;
+ box-shadow: 1px 1px 3px gray;
+ -webkit-box-shadow: 1px 1px 3px gray;
+ -moz-box-shadow: 1px 1px 3px gray;
+ font-weight: normal;
+ padding: 0px 5px;
+}
+div#body div.section table td {
+ background: white;
+ box-shadow: 1px 1px 2px gray;
+ -webkit-box-shadow: 1px 1px 2px gray;
+ -moz-box-shadow: 1px 1px 2px gray;
+ padding: 0px 3px;
+}
+
+div#body div.section div.subsection {
+ clear: both;
+ margin: 5px 0px;
+}
+div#body div.section div.subsection h3 {
+ background: aliceblue;
+ border-bottom: 1px dashed lightgray;
+ color: #336;
+ font-size: 100%;
+ margin-top: 10px;
+ padding: 3px 5px;
+}
+
+div#body div.section div.subsubsection {
+ margin: 5px;
+}
+div#body div.section div.subsubsection h4 {
+ background: lavenderblush;
+ border-bottom: 1px dashed lightgray;
+ color: #336;
+ font-size: 100%;
+ margin-top: 10px;
+ padding: 3px 5px;
+}
+
+div#footer {
+ font-family: "Times New Roman";
+ padding: 5px 10px;
+}
+div#footer div.left {
+ float: left;
+}
+div#footer div.right {
+ float: right;
+}
+div#footer div.end {
+ clear: both;
+}

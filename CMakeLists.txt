@@ -17,18 +17,40 @@
 #
 
 ######## Project settings
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.12)
 set (PACKAGE_NAME opencc)
 project (${PACKAGE_NAME} CXX)
 include (CTest)
 include(GNUInstallDirs)
 
 ######## Options
+
+# PROJECT_IS_TOP_LEVEL is available since CMake 3.21; provide a fallback.
+if(CMAKE_VERSION VERSION_LESS 3.21)
+  if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    set(PROJECT_IS_TOP_LEVEL TRUE)
+  else()
+    set(PROJECT_IS_TOP_LEVEL FALSE)
+  endif()
+endif()
+
+# When used via FetchContent / add_subdirectory, build a static library and
+# skip install rules by default.
+if(PROJECT_IS_TOP_LEVEL)
+  set(_OPENCC_DEFAULT_BUILD_SHARED_LIBS ON)
+  set(_OPENCC_DEFAULT_ENABLE_INSTALL ON)
+else()
+  set(_OPENCC_DEFAULT_BUILD_SHARED_LIBS OFF)
+  set(_OPENCC_DEFAULT_ENABLE_INSTALL OFF)
+endif()
+
 option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
-option(BUILD_SHARED_LIBS "Build opencc as shared library" ON)
+option(BUILD_SHARED_LIBS "Build opencc as shared library" ${_OPENCC_DEFAULT_BUILD_SHARED_LIBS})
+option(OPENCC_ENABLE_INSTALL "Generate install targets" ${_OPENCC_DEFAULT_ENABLE_INSTALL})
 option(ENABLE_GTEST "Build all tests." OFF)
 option(ENABLE_BENCHMARK "Build benchmark tests." OFF)
 option(ENABLE_DARTS "Build DartsDict (ocd format)." ON)
+option(BUILD_OPENCC_JIEBA_PLUGIN "Build Jieba segmentation as a loadable plugin." OFF)
 option(BUILD_PYTHON "Build python library" OFF)
 option(USE_SYSTEM_DARTS "Use system version of Darts" OFF)
 option(USE_SYSTEM_GOOGLE_BENCHMARK "Use system version of Google Benchmark" OFF)
@@ -41,18 +63,10 @@ option(USE_SYSTEM_TCLAP "Use system version of TCLAP" OFF)
 ######## Package information
 set (PACKAGE_URL https://github.com/BYVoid/OpenCC)
 set (PACKAGE_BUGREPORT https://github.com/BYVoid/OpenCC/issues)
-set (OPENCC_VERSION_MAJOR 1)
-set (OPENCC_VERSION_MINOR 2)
-set (OPENCC_VERSION_REVISION 0)
 
-if (CMAKE_BUILD_TYPE MATCHES Debug)
-  set (version_suffix .Debug)
-endif (CMAKE_BUILD_TYPE MATCHES Debug)
-
-set (
-  OPENCC_VERSION
-  ${OPENCC_VERSION_MAJOR}.${OPENCC_VERSION_MINOR}.${OPENCC_VERSION_REVISION}${version_suffix}
-)
+# Derive version from Git tags (falls back to hardcoded default when Git is unavailable)
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+include(GitVersion)
 
 set(CPACK_SOURCE_PACKAGE_FILE_NAME
   "${PACKAGE_NAME}-${OPENCC_VERSION_MAJOR}.${OPENCC_VERSION_MINOR}.${OPENCC_VERSION_REVISION}"
@@ -78,17 +92,33 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif()
 
 ######## Directory
+# Installation directories follow GNU Coding Standards via CMake's GNUInstallDirs module:
+# https://cmake.org/cmake/help/latest/module/GNUInstallDirs.html
+#
+# Default values and parity with previously hardcoded paths
+# (shown for CMAKE_INSTALL_PREFIX=/usr/local and /usr):
+#
+#   CMAKE_INSTALL_INCLUDEDIR     "include"  -> /usr/local/include  or  /usr/include
+#     (replaces: ${CMAKE_INSTALL_PREFIX}/include)
+#
+#   CMAKE_INSTALL_SYSCONFDIR     "etc"      -> /usr/local/etc      or  /etc
+#     (replaces: ${CMAKE_INSTALL_PREFIX}/etc)
+#     NOTE: when prefix is /usr the full path is /etc per GNU Coding Standards,
+#           whereas the old code would have produced /usr/etc.
+#
+#   CMAKE_INSTALL_LIBDIR         "lib"      -> /usr/local/lib      or  /usr/lib
+#     (also resolves to lib64 or lib/<multiarch> on applicable platforms)
+#     (replaces: ${CMAKE_INSTALL_PREFIX}/lib[64])
+#
+#   CMAKE_INSTALL_DATAROOTDIR    "share"    -> /usr/local/share    or  /usr/share
+#     (replaces: ${CMAKE_INSTALL_PREFIX}/share)
 
-set(LIB_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}" CACHE PATH "")
-if(CMAKE_INSTALL_LIBDIR MATCHES "lib64$")
-  set(LIB_SUFFIX 64)
-endif()
-
-set (DIR_PREFIX ${CMAKE_INSTALL_PREFIX})
-set (DIR_INCLUDE ${DIR_PREFIX}/include)
-set (DIR_SHARE ${DIR_PREFIX}/share)
-set (DIR_ETC ${DIR_PREFIX}/etc)
-set (DIR_LIBRARY ${DIR_PREFIX}/lib${LIB_SUFFIX})
+# All DIR_* variables use relative paths so that install() destinations and
+# CMake package config files remain relocatable.
+set (DIR_INCLUDE ${CMAKE_INSTALL_INCLUDEDIR})
+set (DIR_ETC ${CMAKE_INSTALL_SYSCONFDIR})
+set (DIR_LIBRARY ${CMAKE_INSTALL_LIBDIR})
+set (DIR_SHARE ${CMAKE_INSTALL_DATAROOTDIR})
 
 if (DEFINED SHARE_INSTALL_PREFIX)
   set (DIR_SHARE ${SHARE_INSTALL_PREFIX})
@@ -107,13 +137,36 @@ if (DEFINED LIB_INSTALL_DIR)
 endif (DEFINED LIB_INSTALL_DIR)
 
 set (DIR_SHARE_OPENCC ${DIR_SHARE}/opencc)
-set (DIR_SHARE_LOCALE ${DIR_SHARE}/locale)
+if (WIN32)
+  set (DIR_PLUGIN bin/plugins)
+else ()
+  set (DIR_PLUGIN ${DIR_LIBRARY}/opencc/plugins)
+endif ()
+
+# Compute absolute paths needed for compile-time macros (PKGDATADIR/LOCALEDIR)
+# and for the pkg-config file.  We must handle both the GNUInstallDirs relative
+# defaults and user-supplied absolute override paths (SHARE_INSTALL_PREFIX etc.).
+foreach (_gnu_dir SHARE INCLUDE LIBRARY)
+  if (IS_ABSOLUTE "${DIR_${_gnu_dir}}")
+    set (DIR_${_gnu_dir}_FULL "${DIR_${_gnu_dir}}")
+  else ()
+    set (DIR_${_gnu_dir}_FULL "${CMAKE_INSTALL_PREFIX}/${DIR_${_gnu_dir}}")
+  endif ()
+endforeach ()
+
+set (DIR_SHARE_OPENCC_FULL ${DIR_SHARE_FULL}/opencc)
+set (DIR_SHARE_LOCALE_FULL ${DIR_SHARE_FULL}/locale)
+if (IS_ABSOLUTE "${DIR_PLUGIN}")
+  set (DIR_PLUGIN_FULL "${DIR_PLUGIN}")
+else ()
+  set (DIR_PLUGIN_FULL "${CMAKE_INSTALL_PREFIX}/${DIR_PLUGIN}")
+endif ()
 
 ######## Configuration
 
 include(CMakePackageConfigHelpers)
 
-set(targets_export_name OpenCCTargets)
+set(OPENCC_TARGETS_EXPORT_NAME OpenCCTargets)
 
 configure_file(
   opencc.pc.in
@@ -121,12 +174,14 @@ configure_file(
   @ONLY
 )
 
+if(OPENCC_ENABLE_INSTALL)
 install(
   FILES
     ${CMAKE_CURRENT_BINARY_DIR}/opencc.pc
   DESTINATION
     ${DIR_LIBRARY}/pkgconfig
 )
+endif()
 
 write_basic_package_version_file(
   OpenCCConfigVersion.cmake
@@ -138,9 +193,10 @@ configure_package_config_file(
   OpenCCConfig.cmake.in
   ${CMAKE_CURRENT_BINARY_DIR}/OpenCCConfig.cmake
   INSTALL_DESTINATION ${DIR_LIBRARY}/cmake/opencc
-  PATH_VARS DIR_INCLUDE
+  PATH_VARS DIR_INCLUDE DIR_PLUGIN DIR_SHARE_OPENCC
 )
 
+if(OPENCC_ENABLE_INSTALL)
 install(
   FILES
     ${CMAKE_CURRENT_BINARY_DIR}/OpenCCConfig.cmake
@@ -148,32 +204,33 @@ install(
   DESTINATION
     ${DIR_LIBRARY}/cmake/opencc
 )
+endif()
 
 ######## Compiler flags
 
 add_definitions(
-  -DPKGDATADIR="${DIR_SHARE_OPENCC}"
-  -DLOCALEDIR="${DIR_SHARE_LOCALE}"
+  -DPKGDATADIR="${DIR_SHARE_OPENCC_FULL}"
+  -DLOCALEDIR="${DIR_SHARE_LOCALE_FULL}"
   -DVERSION="${OPENCC_VERSION}"
   -DPACKAGE_NAME="${PACKAGE_NAME}"
 )
 
 set(CMAKE_CXX_STANDARD 17) # default C++ version for new target afterward
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  add_definitions(
+  add_compile_options(
     -Wall
   )
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
   if (CMAKE_BUILD_TYPE MATCHES Debug)
-    add_definitions(-O0 -g3)
+    add_compile_options(-O0 -g3)
   endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  add_definitions(
+  add_compile_options(
     -Wall
   )
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
   if (CMAKE_BUILD_TYPE MATCHES Debug)
-    add_definitions(-O0 -g3)
+    add_compile_options(-O0 -g3)
   endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   add_definitions(
@@ -191,14 +248,14 @@ endif (NOT BUILD_SHARED_LIBS)
 if (ENABLE_GTEST)
   add_definitions(
     -DPROJECT_BINARY_DIR="${PROJECT_BINARY_DIR}"
-    -DCMAKE_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+    -DPROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
   )
 endif()
 
 if (ENABLE_BENCHMARK)
   add_definitions(
     -DPROJECT_BINARY_DIR="${PROJECT_BINARY_DIR}"
-    -DCMAKE_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+    -DPROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
   )
 endif()
 
@@ -208,12 +265,16 @@ if (ENABLE_DARTS)
   )
 endif()
 
+add_definitions(
+  -DOPENCC_SEGMENTATION_PLUGIN_DIR="${DIR_PLUGIN_FULL}"
+)
+
 
 ######## Dependencies
 
 if(NOT USE_SYSTEM_MARISA)
   message(STATUS "Use bundled marisa library.")
-  add_subdirectory(deps/marisa-0.2.6)
+  add_subdirectory(deps/marisa-0.3.1)
 else()
   find_library(LIBMARISA NAMES marisa)
   if (LIBMARISA)
@@ -228,7 +289,24 @@ endif()
 add_subdirectory(src)
 add_subdirectory(doc)
 add_subdirectory(data)
+add_subdirectory(plugins)
 add_subdirectory(test)
+
+if (ENABLE_BENCHMARK AND TARGET performance AND TARGET opencc_jieba)
+  target_compile_definitions(performance PRIVATE
+    OPENCC_BENCHMARK_JIEBA_CONFIG_DIR="${PROJECT_SOURCE_DIR}/plugins/jieba/data/config"
+    OPENCC_BENCHMARK_JIEBA_PLUGIN_DIR="$<TARGET_FILE_DIR:opencc_jieba>"
+  )
+  add_dependencies(performance opencc_jieba)
+  if (WIN32)
+    add_custom_target(
+      copy_opencc_jieba_to_benchmark
+      ${CMAKE_COMMAND} -E copy $<TARGET_FILE:opencc_jieba> ${PROJECT_BINARY_DIR}/src/benchmark
+      COMMENT "Copying opencc_jieba to src/benchmark"
+    )
+    add_dependencies(performance copy_opencc_jieba_to_benchmark)
+  endif()
+endif()
 
 ######## Testing
 

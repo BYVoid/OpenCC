@@ -1,0 +1,24 @@
+name: Close Stale Issues
+
+on:
+  schedule:
+    - cron: '0 10 1 1 *'  # Run yearly on January 1st at 10:00 UTC
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+    - uses: actions/stale@v5
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        stale-issue-message: 'This issue has not been updated for over a year and will be marked as stale. If the issue still exists, please comment or update the issue, otherwise it will be closed after 7 days.'
+        close-issue-message: 'This issue has been automatically closed due to inactivity. If the issue still exists, please reopen it.'
+        days-before-issue-stale: 365
+        days-before-issue-close: 7
+        stale-issue-label: 'Stale'
+        exempt-issue-labels: 'pinned,security'
+        operations-per-run: 100

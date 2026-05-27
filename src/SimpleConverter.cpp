@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2010-2014 Carbo Kuo <byvoid@byvoid.com>
+ * Copyright 2010-2026 Carbo Kuo and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,6 +122,16 @@ size_t SimpleConverter::Convert(const char* input, size_t length,
   }
 }
 
+ConversionInspectionResult
+SimpleConverter::Inspect(const std::string& input) const {
+  try {
+    const InternalData* data = (InternalData*)internalData;
+    return data->converter->Inspect(input);
+  } catch (Exception& ex) {
+    throw std::runtime_error(ex.what());
+  }
+}
+
 static std::string cError;
 
 opencc_t opencc_open_internal(const char* configFileName) {
@@ -190,7 +200,7 @@ char* opencc_convert_utf8(opencc_t opencc, const char* input, size_t length) {
     SimpleConverter* instance = reinterpret_cast<SimpleConverter*>(opencc);
     std::string converted = instance->Convert(input, length);
     char* output = new char[converted.length() + 1];
-    strncpy(output, converted.c_str(), converted.length());
+    memcpy(output, converted.c_str(), converted.length());
     output[converted.length()] = '\0';
     return output;
   } catch (std::runtime_error& ex) {

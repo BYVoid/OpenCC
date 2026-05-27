@@ -12,13 +12,24 @@ concurrency:
 
 jobs:
   build:
-    runs-on: windows-latest
+    permissions:
+      contents: read
+    runs-on: windows-2022
     defaults:
       run:
         shell: msys2 {0}
     steps:
       - uses: msys2/setup-msys2@v2
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compute version
+        id: version
+        run: |
+          VERSION=$(bash scripts/compute-version.sh)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Computed version: $VERSION"
       - name: Install dependencies
         run: pacman -S --noconfirm base-devel mingw-w64-x86_64-toolchain cmake ninja python
       - name: Build with mingw-w64
@@ -28,6 +39,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX=$PWD/install \
             -DENABLE_GTEST=ON \
+            -DBUILD_OPENCC_JIEBA_PLUGIN=ON \
             -DBUILD_SHARED_LIBS=OFF
           cmake --build build
           cmake --install build
@@ -35,6 +47,13 @@ jobs:
         run: |
           cd build
           ctest
+      - name: Test standalone plugin build
+        run: |
+          CC=/mingw64/bin/cc CXX=/mingw64/bin/c++ cmake \
+            -S plugins/jieba -B build-standalone -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DOpenCC_DIR=$PWD/install/lib/cmake/opencc
+          cmake --build build-standalone
       - name: list installed files
         if: ${{ always() }}
         run: |
@@ -48,7 +67,7 @@ jobs:
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: opencc-mingw
+          name: opencc-${{ env.VERSION }}-mingw
           path: |
             install/**
             build/src/tools/*.exe

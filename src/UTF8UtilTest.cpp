@@ -1,7 +1,7 @@
 /*
  * Open Chinese Convert
  *
- * Copyright 2015 Carbo Kuo <byvoid@byvoid.com>
+ * Copyright 2015-2026 Carbo Kuo and contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,23 @@ TEST_F(UTF8UtilTest, PrevCharLength) {
   EXPECT_EQ(4, UTF8Util::PrevCharLength(text + length - 4));
   EXPECT_EQ(3, UTF8Util::PrevCharLength(text + length - 8));
   EXPECT_THROW(EXPECT_EQ(3, UTF8Util::PrevCharLength(text + 1)), InvalidUTF8);
+}
+
+TEST(UTF8UtilASCIITest, PrevCharLengthASCII) {
+  // Heap-allocated ASCII string to catch issue #794 (OOB read with ASCII input)
+  const std::string asciiStr = "abc";
+  EXPECT_EQ(1,
+            UTF8Util::PrevCharLength(asciiStr.c_str() + asciiStr.size()));
+  EXPECT_EQ(1, UTF8Util::PrevCharLength(asciiStr.c_str() + 2));
+  EXPECT_EQ(1, UTF8Util::PrevCharLength(asciiStr.c_str() + 1));
+}
+
+TEST(UTF8UtilTruncatedTest, LengthTruncatedSequence) {
+  // Length() must throw InvalidUTF8 for truncated sequences instead of
+  // reading past the null terminator (issue #799 fix).
+  EXPECT_THROW(UTF8Util::Length("\xE0"), InvalidUTF8);   // incomplete 3-byte sequence
+  EXPECT_THROW(UTF8Util::Length("\xF0"), InvalidUTF8);   // incomplete 4-byte sequence
+  EXPECT_THROW(UTF8Util::Length("\xE0\xBF"), InvalidUTF8); // still incomplete 3-byte
 }
 
 TEST_F(UTF8UtilTest, Length) {

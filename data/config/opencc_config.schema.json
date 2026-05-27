@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "https://opencc.byvoid.com/schema/opencc_config.schema.json",
+  "title": "OpenCC configuration",
+  "type": "object",
+  "required": [
+    "segmentation",
+    "conversion_chain"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "segmentation": {
+      "$ref": "#/definitions/segmentation"
+    },
+    "conversion_chain": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/conversion"
+      }
+    }
+  },
+  "definitions": {
+    "segmentation": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/mmseg_segmentation"
+        },
+        {
+          "$ref": "#/definitions/plugin_segmentation"
+        }
+      ]
+    },
+    "mmseg_segmentation": {
+      "type": "object",
+      "required": [
+        "type",
+        "dict"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "mmseg"
+          ]
+        },
+        "dict": {
+          "$ref": "#/definitions/dict"
+        }
+      }
+    },
+    "plugin_segmentation": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "not": {
+        "properties": {
+          "type": {
+            "enum": [
+              "mmseg"
+            ]
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resources": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "conversion": {
+      "type": "object",
+      "required": [
+        "dict"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "dict": {
+          "$ref": "#/definitions/dict"
+        }
+      }
+    },
+    "dict": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/file_dict"
+        },
+        {
+          "$ref": "#/definitions/group_dict"
+        }
+      ]
+    },
+    "file_dict": {
+      "type": "object",
+      "required": [
+        "type",
+        "file"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "text",
+            "ocd",
+            "ocd2"
+          ]
+        },
+        "file": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "group_dict": {
+      "type": "object",
+      "required": [
+        "type",
+        "dicts"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "group"
+          ]
+        },
+        "dicts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/dict"
+          }
+        }
+      }
+    }
+  }
+}

@@ -5,6 +5,7 @@
 /.vscode
 /.mypy_cache
 /bazel-*
+/.bazelrc.user
 /build
 /other
 /doc/html
@@ -15,5 +16,6 @@
 /test/dict.bin
 /xcode
 /node_modules
+prebuilds/
 /*.egg-info
 /.venv/

@@ -1,0 +1,88 @@
+name: Documentation Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version or tag, for example 1.3.0 or ver.1.3.0"
+        required: false
+  push:
+    tags:
+      - "ver.*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-doc:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install documentation dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ca-certificates graphviz tar wget zip
+
+      - name: Install Doxygen 1.16.1
+        shell: bash
+        run: |
+          DOXYGEN_VERSION=1.16.1
+          DOXYGEN_FILE="doxygen-${DOXYGEN_VERSION}.linux.bin.tar.gz"
+          DOXYGEN_URL="https://sourceforge.net/projects/doxygen/files/rel-${DOXYGEN_VERSION}/${DOXYGEN_FILE}/download"
+          DOXYGEN_SHA256="a56f885d37e3aae08a99f638d17bbb381224c03a878d9e2dda4f9fa4baf1d8bd"
+          wget -O "/tmp/${DOXYGEN_FILE}" "${DOXYGEN_URL}"
+          echo "${DOXYGEN_SHA256}  /tmp/${DOXYGEN_FILE}" | sha256sum -c -
+          tar -xzf "/tmp/${DOXYGEN_FILE}" -C /tmp
+          sudo install -m 0755 "/tmp/doxygen-${DOXYGEN_VERSION}/bin/doxygen" /usr/local/bin/doxygen
+          doxygen --version
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.version }}
+          GIT_REF_TYPE: ${{ github.ref_type }}
+          GIT_REF_NAME: ${{ github.ref_name }}
+        run: |
+          value="${INPUT_VERSION:-}"
+          if [ -z "$value" ] && [ "${GIT_REF_TYPE:-}" = "tag" ]; then
+            value="${GIT_REF_NAME}"
+          fi
+          if [ -z "$value" ]; then
+            value="$(bash scripts/compute-version.sh)"
+          fi
+          value="${value#ver.}"
+          value="${value#v}"
+          echo "value=$value" >> "$GITHUB_OUTPUT"
+          echo "VERSION=$value" >> "$GITHUB_ENV"
+
+      - name: Build documentation
+        run: make doc
+
+      - name: Package documentation
+        shell: bash
+        run: |
+          test -d build/doc/doc/html
+          mkdir -p dist
+          (cd build/doc/doc && zip -r "../../../dist/opencc-${VERSION}-doc.zip" html)
+
+      - name: Upload documentation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencc-doc-${{ steps.version.outputs.value }}
+          path: dist/opencc-${{ steps.version.outputs.value }}-doc.zip
+
+      - name: Upload assets to existing GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            "dist/opencc-${VERSION}-doc.zip" \
+            --clobber

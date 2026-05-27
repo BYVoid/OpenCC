@@ -1,0 +1,111 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_test")
+
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "config",
+    srcs = glob(["data/config/*.json"]),
+)
+
+filegroup(
+    name = "resources",
+    srcs = [
+        "//plugins/jieba/deps/cppjieba:dict",
+        ":jieba_merged_dict",
+    ],
+)
+
+filegroup(
+    name = "testcases",
+    srcs = ["tests/data/jieba_comparison_testcases.json"],
+)
+
+cc_binary(
+    name = "opencc-jieba",
+    srcs = [
+        "include/JiebaSegmentation.hpp",
+        "src/JiebaSegmentation.cpp",
+        "src/JiebaSegmentationPlugin.cpp",
+    ],
+    copts = [
+        "-Iplugins/jieba/include",
+        "-Isrc",
+    ],
+    defines = ["OPENCC_PLUGIN_BUILD"],
+    includes = ["include"],
+    linkopts = select({
+        "@platforms//os:macos": ["-Wl,-S"],
+        "@platforms//os:windows": [],
+        "//conditions:default": ["-Wl,-s"],
+    }),
+    linkshared = True,
+    deps = [
+        "//plugins/jieba/deps/cppjieba:cppjieba",
+        "//src:common_lib",
+        "//src:exception_lib",
+        "//src:marisa_dict_lib",
+        "//src:plugin_api_lib",
+        "//src:segmentation_lib",
+        "//src:segments_lib",
+        "//src:utf8_util_lib",
+    ],
+)
+
+genrule(
+    name = "opencc_jieba_windows_zig",
+    srcs = [
+        "//deps/marisa-0.3.1:all_files",
+        "//plugins/jieba/deps/cppjieba:all_files",
+        "//src:all_files",
+        "include/JiebaSegmentation.hpp",
+        "src/JiebaSegmentation.cpp",
+        "src/JiebaSegmentationPlugin.cpp",
+    ],
+    outs = ["windows-x64/opencc-jieba.dll"],
+    cmd = "ZIG=$(ZIG_BIN) bash $(location //scripts:build_jieba_windows_zig) $@",
+    tags = ["manual"],
+    tools = ["//scripts:build_jieba_windows_zig"],
+    toolchains = ["@rules_zig//zig:toolchain_type"],
+)
+
+genrule(
+    name = "jieba_merged_dict",
+    srcs = [
+        "//plugins/jieba/deps/cppjieba:dict/jieba.dict.utf8",
+        "//plugins/jieba/deps/cppjieba:dict/user.dict.utf8",
+    ],
+    outs = ["jieba_dict/jieba_merged.ocd2"],
+    cmd = "$(location :cppjieba_dict) -i $(location //plugins/jieba/deps/cppjieba:dict/jieba.dict.utf8) -i $(location //plugins/jieba/deps/cppjieba:dict/user.dict.utf8) -o $@",
+    tools = [":cppjieba_dict"],
+)
+
+cc_binary(
+    name = "cppjieba_dict",
+    srcs = ["tools/cppjieba_dict.cpp"],
+    deps = [
+        "//src:dict_lib",
+        "//src:dict_entry_lib",
+        "//src:lexicon_lib",
+        "//src:marisa_dict_lib",
+    ],
+)
+
+cc_test(
+    name = "jieba_plugin_integration_test",
+    srcs = ["tests/JiebaPluginIntegrationTest.cpp"],
+    data = [
+        ":config",
+        ":opencc-jieba",
+        ":resources",
+        ":testcases",
+        "//data/dictionary:binary_dictionaries",
+        "//src/tools:command_line",
+    ],
+    defines = ["BAZEL"],
+    deps = [
+        "//test:portable_util_lib",
+        "@bazel_tools//tools/cpp/runfiles",
+        "@googletest//:gtest_main",
+        "//deps/rapidjson-1.1.0:rapidjson",
+    ],
+)

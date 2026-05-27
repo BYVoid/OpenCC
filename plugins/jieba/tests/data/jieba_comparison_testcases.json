@@ -1,0 +1,178 @@
+{
+  "description": "Test cases comparing Jieba segmentation vs mmseg for Chinese conversion",
+  "cases": [
+    {
+      "id": "jieba_s2t_001",
+      "description": "Ambiguous case: 的/士兵 vs 的士/兵",
+      "input": "勇敢的士兵",
+      "expected_segmentation": "勇敢/的/士兵",
+      "expected": {
+        "s2twp": "勇敢計程車兵",
+        "s2twp_jieba": "勇敢的士兵"
+      }
+    },
+    {
+      "id": "jieba_t2s_001",
+      "description": "Traditional to Simplified: 著名/為 conversion 这个有问题",
+      "input": "生活著名為正敏的少女",
+      "expected_segmentation": "生活/著名/為/正敏/的/少女",
+      "expected": {
+        "tw2sp": "生活著名为正敏的少女",
+        "tw2sp_jieba": "生活著名为正敏的少女"
+      }
+    },
+    {
+      "id": "jieba_s2t_002",
+      "description": "Compound words: 中学生 (middle school student) and 中等身材 (medium build)",
+      "input": "一个中学生，一个中等身材的人",
+      "expected_segmentation": "一个/中学生/，/一个/中等/身材/的/人",
+      "expected": {
+        "s2twp": "一箇中學生，一箇中等身材的人",
+        "s2twp_jieba": "一個中學生，一個中等身材的人"
+      }
+    },
+    {
+      "id": "jieba_t2s_002",
+      "description": "Traditional to Simplified: Compound words 中學生, 中等身材",
+      "input": "一個中學生，一個中等身材的人",
+      "expected_segmentation": "一個/中學生/，/一個/中等/身材/的/人",
+      "expected": {
+        "tw2sp": "一个中学生，一个中等身材的人",
+        "tw2sp_jieba": "一个中学生，一个中等身材的人"
+      }
+    },
+    {
+      "id": "jieba_s2t_003",
+      "description": "Proper nouns: 北京清华大学, 自然语言处理",
+      "input": "我来到北京清华大学学习自然语言处理",
+      "expected_segmentation": "我/来到/北京/清华大学/学习/自然语言/处理",
+      "expected": {
+        "s2twp": "我來到北京清華大學學習自然語言處理",
+        "s2twp_jieba": "我來到北京清華大學學習自然語言處理"
+      }
+    },
+    {
+      "id": "jieba_t2s_003",
+      "description": "Complex traditional: 來到/學習/語言/處理",
+      "input": "我來到北京清華大學學習自然語言處理",
+      "expected_segmentation": "我來/到/北京/清華大學/學習/自然/語言/處理",
+      "expected": {
+        "tw2sp": "我来到北京清华大学学习自然语言处理",
+        "tw2sp_jieba": "我来到北京清华大学学习自然语言处理"
+      }
+    },
+    {
+      "id": "jieba_s2t_004",
+      "description": "Modern terms: 软件, 用户体验",
+      "input": "这个软件的用户体验很好",
+      "expected_segmentation": "这个/软件/的/用户/体验/很/好",
+      "expected": {
+        "s2t_jieba": "這個軟件的用戶體驗很好",
+        "s2tw_jieba": "這個軟件的用戶體驗很好",
+        "s2hk_jieba": "這個軟件的用户體驗很好",
+        "s2twp": "這個軟體的使用者體驗很好",
+        "s2twp_jieba": "這個軟體的使用者體驗很好"
+      }
+    },
+    {
+      "id": "jieba_t2s_004",
+      "description": "Taiwan term: 軟體 -> 软件",
+      "input": "這個軟體的功能很強大",
+      "expected_segmentation": "這個/軟體/的/功能/很強/大",
+      "expected": {
+        "tw2sp": "这个软件的功能很强大",
+        "tw2sp_jieba": "这个软件的功能很强大"
+      }
+    },
+    {
+      "id": "jieba_s2t_005",
+      "description": "Mixed content: English + Chinese",
+      "input": "OpenCC是一个开源的中文简繁转换项目",
+      "expected_segmentation": "OpenCC/是/一个/开源/的/中文/简繁转换/项目",
+      "expected": {
+        "s2twp": "OpenCC是一個開源的中文簡繁轉換專案",
+        "s2twp_jieba": "OpenCC是一個開源的中文簡繁轉換專案"
+      }
+    },
+    {
+      "id": "jieba_s2t_006",
+      "description": "Ambiguous: 的确 (indeed) vs 的/确实 (possessive + really)",
+      "input": "他说的确实在理",
+      "expected_segmentation": "他/说/的/确实/在理",
+      "expected": {
+        "s2twp": "他說的確實在理",
+        "s2twp_jieba": "他說的確實在理"
+      }
+    },
+    {
+      "id": "jieba_s2t_007",
+      "description": "Multiple ambiguities: 研究生/命 vs 研究/生命",
+      "input": "研究生命科学的重要性",
+      "expected_segmentation": "研究/生命科学/的/重要性",
+      "expected": {
+        "s2twp": "研究生命科學的重要性",
+        "s2twp_jieba": "研究生命科學的重要性"
+      }
+    },
+    {
+      "id": "jieba_s2t_008",
+      "description": "Taiwan term: 软体 (software - Taiwan usage)",
+      "input": "这个软体的功能很强大",
+      "expected_segmentation": "这个/软体/的/功能/很/强大",
+      "expected": {
+        "s2twp": "這個軟體的功能很強大",
+        "s2twp_jieba": "這個軟體的功能很強大"
+      }
+    },
+    {
+      "id": "jieba_s2t_009",
+      "description": "Long compounds: 人工智能, 医疗保健",
+      "input": "人工智能技术在医疗保健领域的应用",
+      "expected_segmentation": "人工智能/技术/在/医疗保健/领域/的/应用",
+      "expected": {
+        "s2twp": "人工智慧技術在醫療保健領域的應用",
+        "s2twp_jieba": "人工智慧技術在醫療保健領域的應用"
+      }
+    },
+    {
+      "id": "jieba_s2t_010",
+      "description": "Classical Chinese proverb",
+      "input": "温故而知新，可以为师矣",
+      "expected_segmentation": "温故而知新/，/可以/为师/矣",
+      "expected": {
+        "s2twp": "溫故而知新，可以為師矣",
+        "s2twp_jieba": "溫故而知新，可以為師矣"
+      }
+    },
+    {
+      "id": "jieba_s2t_BYVoid_OpenCC_Issue767",
+      "description": "验证繁转简 慰藉 是否被正确当成一个词",
+      "input": "奶茶店慰藉著旅者的味蕾",
+      "expected_segmentation": "奶茶/店/慰藉/著/旅者/的/味蕾",
+      "expected": {
+        "tw2sp": "奶茶店慰借着旅者的味蕾",
+        "tw2sp_jieba": "奶茶店慰藉着旅者的味蕾"
+      }
+    },
+    {
+      "id": "jieba_s2t_BYVoid_OpenCC_Issue664",
+      "description": "Longer XX的士兵 sentence should keep 士兵 as a phrase instead of converting 的士",
+      "input": "城堡的士兵已经出发",
+      "expected_segmentation": "城堡/的/士兵/已经/出发",
+      "expected": {
+        "s2twp": "城堡計程車兵已經出發",
+        "s2twp_jieba": "城堡的士兵已經出發"
+      }
+    },
+    {
+      "id": "jieba_s2t_011",
+      "description": "一百/年历 is incorrect mmseg result; sourced from https://ayaka.shn.hk/s2tfont/hant/",
+      "input": "拥有一百年历史",
+      "expected_segmentation": "拥有/一百年/历史",
+      "expected": {
+        "s2twp": "擁有一百年曆史",
+        "s2twp_jieba": "擁有一百年歷史"
+      }
+    }
+  ]
+}

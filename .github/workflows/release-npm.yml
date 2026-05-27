@@ -1,0 +1,83 @@
+name: Publish npm package
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      package_version:
+        description: Version to write to package.json before publishing, for example 1.3.2-beta.0 or 1.3.2-next.1
+        required: false
+        type: string
+      dry_run:
+        description: Run npm publish with --dry-run
+        required: true
+        type: boolean
+        default: true
+
+jobs:
+  publish-npm:
+    runs-on: macos-15
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org/
+
+      - uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Prepare package version
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.package_version != '' }}
+        shell: bash
+        env:
+          PACKAGE_VERSION: ${{ inputs.package_version }}
+        run: |
+          npm version "$PACKAGE_VERSION" --no-git-tag-version --allow-same-version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Node.js prebuilds
+        run: npm run prebuild:all
+
+      - name: Verify Node.js prebuilds
+        run: |
+          test -f prebuilds/assets/s2t.json
+          test -f prebuilds/darwin-arm64/opencc.node
+          test -f prebuilds/linux-x64/opencc.node
+          test -f prebuilds/linux-arm64/opencc.node
+
+      - name: Test
+        env:
+          PREBUILDS_ONLY: 1
+        run: npm test
+
+      - name: Determine npm dist-tag
+        id: npm_metadata
+        shell: bash
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          tag="$(node -e "const version = process.argv[1]; const match = version.match(/-([0-9A-Za-z-]+)(?:[.+]|$)/); console.log(match ? match[1] : 'latest');" "$version")"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Publishing opencc@$version with npm dist-tag '$tag'"
+
+      - name: Publish
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          NPM_TAG: ${{ steps.npm_metadata.outputs.tag }}
+        run: |
+          publish_args=(--provenance)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$DRY_RUN" = "true" ]; then
+            publish_args+=(--dry-run)
+          fi
+          npm publish --tag "$NPM_TAG" "${publish_args[@]}"

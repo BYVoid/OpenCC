@@ -4,3 +4,6 @@
 # License: Apache-2.0 (see LICENSE)
 # Source: https://github.com/ByVoid/OpenCC
 # Used in configs: s2hk.json, t2hk.json
+
+牛驥同一皁	牛驥同一皁
+牛驥同皁	牛驥同皁

@@ -517,6 +517,20 @@
       }
     },
     {
+      "id": "BYVoid_OpenCC_PR_1035_s2t",
+      "input": "想象 想象力 富于想象 想像水一样",
+      "expected": {
+        "s2t": "想像 想像力 富於想像 想像水一樣"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_PR_1035_t2s",
+      "input": "想像 想像力 富於想像 想像水一樣",
+      "expected": {
+        "t2s": "想像 想像力 富于想像 想像水一样"
+      }
+    },
+    {
       "id": "BYVoid_OpenCC_Issue_988",
       "input": "上下数千年，纵横几万里",
       "expected": {

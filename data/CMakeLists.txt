@@ -14,8 +14,10 @@ set(
   TSPhrases
   TWPhrases
   TWPhrasesRev
+  TWVariantsPhrases
   TWVariants
   TWVariantsRevPhrases
+  HKVariantsPhrases
   HKVariants
   HKVariantsRevPhrases
   JPVariants

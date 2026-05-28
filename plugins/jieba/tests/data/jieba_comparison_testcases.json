@@ -165,6 +165,17 @@
       }
     },
     {
+      "id": "jieba_s2t_BYVoid_OpenCC_PR1248",
+      "description": "Jieba configs should apply regional variant phrase exceptions before per-character 皁 -> 皂 variants",
+      "input": "牛骥同皁 牛骥同皂 牛骥同一皁 牛骥同一皂",
+      "expected_segmentation": "牛骥同皁/ /牛骥同皂/ /牛骥同一皁/ /牛骥同一皂",
+      "expected": {
+        "s2tw_jieba": "牛驥同皁 牛驥同皁 牛驥同一皁 牛驥同一皁",
+        "s2hk_jieba": "牛驥同皁 牛驥同皁 牛驥同一皁 牛驥同一皁",
+        "s2twp_jieba": "牛驥同皁 牛驥同皁 牛驥同一皁 牛驥同一皁"
+      }
+    },
+    {
       "id": "jieba_s2t_011",
       "description": "一百/年历 is incorrect mmseg result; sourced from https://ayaka.shn.hk/s2tfont/hant/",
       "input": "拥有一百年历史",

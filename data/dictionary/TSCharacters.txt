@@ -1053,6 +1053,7 @@
 # @tofu-risk: not covered by PingFang/Source Han baseline: 𪭧 U+2AB67
 擟	擟 𪭧
 擠	挤
+擡	抬
 擣	捣 𢭏
 # @tofu-risk: not covered by PingFang/Source Han baseline: 𢬍 U+22B0D
 擫	擫 𢬍

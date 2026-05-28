@@ -6,4 +6,6 @@
 # Used in configs: s2tw.json, s2twp.json, t2tw.json
 
 喫茶小舖	喫茶小舖
+牛驥同一皁	牛驥同一皁
+牛驥同皁	牛驥同皁
 純喫茶	純喫茶

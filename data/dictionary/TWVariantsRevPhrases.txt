@@ -4,6 +4,16 @@
 # License: Apache-2.0 (see LICENSE)
 # Source: https://github.com/ByVoid/OpenCC
 # Used in configs: tw2s.json, tw2sp.json, tw2t.json
+#
+# Notes:
+# - This file contains phrase-level exceptions for reverse Taiwan variant
+#   conversion. When a phrase here is matched, that span is converted by this
+#   entry and is not affected by the character-level TWVariantsRev.txt mappings.
+# - It is related to TWVariantsPhrases.txt, but the two files are not required
+#   to be exact reverse mappings. Reverse variant conversion often needs
+#   identity phrase exceptions that have no corresponding forward phrase entry.
+# - Use TWPhrases.txt/TWPhrasesRev.txt for Taiwan regional vocabulary
+#   mappings that should be maintained as bidirectional phrase pairs.
 
 一口吃個	一口喫個
 一口吃成	一口喫成

@@ -6,7 +6,7 @@
 
 Integrating the Jieba segmentation plugin into Node.js previously faced two major pain points:
 1. **Environment Variable Dependency**: The C++ core library relied on environment variables (like `OPENCC_SEGMENTATION_PLUGIN_PATH` and `OPENCC_DATA_DIR`) to locate dynamic libraries and dictionary files. This approach is prone to global pollution and is unsuitable for an independent NPM module.
-2. **Binary Artifact Management**: Committing large cross-platform build artifacts (`.dylib`, `.so`, `.dll`) and dictionary data directly into the Git repository causes uncontrollable repository bloat and severe merge conflicts during CI workflows and collaborative development.
+2. **Binary Artifact Management**: Committing large cross-platform build artifacts (`.dylib`, `.so`, `.dll`) and dictionary data directly into the Git repository causes uncontrollable repository bloat and severe merge conflicts during CI workflows and collaborative development. Publishing every platform binary in the main npm package also makes installs larger than necessary.
 
 To resolve these issues, we refactored `opencc-jieba` into a **fully self-contained, deterministic, and artifact-free** modern NPM package.
 
@@ -28,7 +28,7 @@ std::shared_ptr<PluginLibrary> plugin =
 ```
 
 **[Node.js Integration]**
-On the Node.js side, `plugins/jieba/node/index.js` now exports the exact absolute paths to the platform-specific dynamic library (`pluginLibrary`) and the data directory (`dataDir`).
+On the Node.js side, `plugins/jieba/node/index.js` now exports the exact absolute paths to the platform-specific dynamic library (`pluginLibrary`) and the data directory (`dataDir`). It first resolves the matching optional scoped package (`@opencc/opencc-jieba-<platform>-<arch>`), then falls back to the local `prebuilds/<platform>-<arch>/` directory for development builds.
 When the upper-level Node.js wrapper (e.g., the `opencc` npm package) parses user-specified JSON configurations, it dynamically injects these **absolute paths** into the `__plugin_library` field. This guarantees 100% stable plugin discovery, completely unaffected by environment variables.
 
 ### 2.2 Separation of Artifacts and Source Code
@@ -44,8 +44,11 @@ To ensure a seamless NPM publishing experience, we introduced `plugins/jieba/nod
    - Copies the upstream raw dictionaries and the compiled `.ocd2` binary dictionary into `data/jieba_dict/`.
    - Copies segmentation-specific JSON configurations into `data/`.
 
+**[Scoped Binary Package Preparation: `scripts/prepare-scoped-packages.js`]**
+The main `opencc-jieba` package now ships JavaScript and data only. `scripts/prepare-scoped-packages.js` converts the local `prebuilds/<platform>-<arch>/` tree into publishable packages under `dist/scoped-packages/@opencc/opencc-jieba-<platform>-<arch>/`. These packages contain only `index.js`, `package.json`, and the native library for that platform.
+
 **[Automated NPM Hooks: `package.json`]**
-We configured `"prepack": "npm run build"` in the `scripts` section of `package.json`. This ensures that whether running `npm pack` locally or `npm publish` in CI, NPM will automatically invoke `build.js` to populate the latest artifact directories. End users running `npm install` simply download the prebuilt package without needing to compile from source or install Bazel.
+We configured `"prepack": "npm run build:all"` in the `scripts` section of `package.json`. This ensures that whether running `npm pack` locally or `npm publish` in CI, NPM will automatically invoke `build.js` to populate the latest artifact directories. Before publishing, maintainers can run `npm run prepare:scoped-packages` and publish each generated scoped package first; end users install only the platform package selected by npm optional dependency resolution.
 
 ### 2.3 Highly Optimized Cross-Platform Compilation
 

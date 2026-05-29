@@ -14,6 +14,8 @@
 #   exceptions needed by its own conversion direction.
 
 喫茶小舖	喫茶小舖
+無線新聞	無綫新聞
+無線新聞台	無綫新聞台
 牛驥同一皁	牛驥同一皁
 牛驥同皁	牛驥同皁
 純喫茶	純喫茶

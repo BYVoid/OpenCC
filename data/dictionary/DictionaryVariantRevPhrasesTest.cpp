@@ -188,10 +188,11 @@ void ExpectRevPhrasesComplete(const std::string& variantsName) {
   std::unique_ptr<Runfiles> runfiles(Runfiles::CreateForTest());
   ASSERT_NE(nullptr, runfiles);
 
+  const std::string revPhrasesName = variantsName + "RevPhrases.txt";
   const std::string variantsPath =
       runfiles->Rlocation("_main/data/dictionary/" + variantsName + ".txt");
   const std::string phrasesPath = runfiles->Rlocation(
-      "_main/data/dictionary/" + variantsName + "RevPhrases.txt");
+      "_main/data/dictionary/" + revPhrasesName);
   const std::string schemePath =
       runfiles->Rlocation("_main/data/scheme/st_multi.txt");
   const std::string stPhrasesPath =
@@ -214,7 +215,7 @@ void ExpectRevPhrasesComplete(const std::string& variantsName) {
   }
 
   EXPECT_TRUE(missing.str().empty())
-      << variantsName << " missing reverse phrase identity exceptions:\n"
+      << revPhrasesName << " missing reverse phrase identity exceptions:\n"
       << missing.str();
 }
 

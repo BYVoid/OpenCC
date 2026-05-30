@@ -478,7 +478,7 @@
 # @tofu-risk: not covered by PingFang/Source Han baseline: 𠛅 U+206C5
 剾	剾 𠛅
 劃	划 㓰
-劄	劄 札
+劄	札 劄
 劇	剧
 劉	刘
 劊	刽
@@ -1825,6 +1825,7 @@
 箇	个
 箋	笺
 箏	筝
+箚	札 劄
 節	节
 範	范
 築	筑

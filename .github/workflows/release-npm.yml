@@ -59,15 +59,15 @@ jobs:
         shell: bash
         env:
           PACKAGE_VERSION: ${{ inputs.package_version }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          if [ -z "$PACKAGE_VERSION" ]; then
-            exit 0
-          fi
-          node - "$PACKAGE_VERSION" <<'NODE'
+          node - "$PACKAGE_VERSION" "$RELEASE_TAG" <<'NODE'
           const fs = require('fs');
-          const version = process.argv[2];
+          const requestedVersion = (process.argv[2] || process.argv[3] || '')
+            .replace(/^v(?=\d)/, '');
           function updatePackage(file, optionalPrefix) {
             const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
+            const version = requestedVersion || pkg.version;
             pkg.version = version;
             if (pkg.optionalDependencies) {
               for (const name of Object.keys(pkg.optionalDependencies)) {
@@ -159,15 +159,15 @@ jobs:
         shell: bash
         env:
           PACKAGE_VERSION: ${{ inputs.package_version }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          if [ -z "$PACKAGE_VERSION" ]; then
-            exit 0
-          fi
-          node - "$PACKAGE_VERSION" <<'NODE'
+          node - "$PACKAGE_VERSION" "$RELEASE_TAG" <<'NODE'
           const fs = require('fs');
-          const version = process.argv[2];
+          const requestedVersion = (process.argv[2] || process.argv[3] || '')
+            .replace(/^v(?=\d)/, '');
           const file = 'plugins/jieba/node/package.json';
           const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const version = requestedVersion || pkg.version;
           pkg.version = version;
           for (const name of Object.keys(pkg.optionalDependencies || {})) {
             if (name.startsWith('@opencc/opencc-jieba-')) {
@@ -259,15 +259,15 @@ jobs:
         shell: bash
         env:
           PACKAGE_VERSION: ${{ inputs.package_version }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          if [ -z "$PACKAGE_VERSION" ]; then
-            exit 0
-          fi
-          node - "$PACKAGE_VERSION" <<'NODE'
+          node - "$PACKAGE_VERSION" "$RELEASE_TAG" <<'NODE'
           const fs = require('fs');
-          const version = process.argv[2];
+          const requestedVersion = (process.argv[2] || process.argv[3] || '')
+            .replace(/^v(?=\d)/, '');
           const file = 'package.json';
           const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const version = requestedVersion || pkg.version;
           pkg.version = version;
           for (const name of Object.keys(pkg.optionalDependencies || {})) {
             if (name.startsWith('@opencc/opencc-')) {
@@ -351,15 +351,15 @@ jobs:
         shell: bash
         env:
           PACKAGE_VERSION: ${{ inputs.package_version }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          if [ -z "$PACKAGE_VERSION" ]; then
-            exit 0
-          fi
-          node - "$PACKAGE_VERSION" <<'NODE'
+          node - "$PACKAGE_VERSION" "$RELEASE_TAG" <<'NODE'
           const fs = require('fs');
-          const version = process.argv[2];
+          const requestedVersion = (process.argv[2] || process.argv[3] || '')
+            .replace(/^v(?=\d)/, '');
           const file = 'package.json';
           const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const version = requestedVersion || pkg.version;
           pkg.version = version;
           for (const name of Object.keys(pkg.optionalDependencies || {})) {
             if (name.startsWith('@opencc/opencc-')) {

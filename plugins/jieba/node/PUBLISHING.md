@@ -24,9 +24,11 @@ opencc-jieba
 @opencc/opencc-jieba-win32-x64
 ```
 
-The versions must stay in sync. For example, when publishing
-`opencc-jieba@1.3.2-next1`, every scoped binary package should also be published
-as `1.3.2-next1`.
+The main package can either point at newly built scoped binary package versions
+or reuse an already published compatible binary package version. For example,
+`opencc-jieba@1.3.2-next2` can depend on
+`@opencc/opencc-jieba-<platform>-<arch>@1.3.2-next1` if the JavaScript/data
+change does not require rebuilding the native plugin binaries.
 
 ## Prerequisites
 
@@ -104,11 +106,20 @@ prebuilds/<platform>-<arch>/<native-library>
 Dry-run the main package without running `prepack` again:
 
 ```sh
-npm pack --dry-run --ignore-scripts
+npm pack --dry-run
 ```
 
 The main package tarball should contain `index.js`, `README.md`, `package.json`,
 and `data/`, but not `prebuilds/`.
+
+`prepack` only verifies that the main package files are already present. It does
+not build the scoped binary packages. If this verification fails, run
+`npm run build:all` again before publishing.
+
+The main package also has a `prepublishOnly` check. During `npm publish`, it
+queries the npm registry and verifies that every
+`@opencc/opencc-jieba-<platform>-<arch>` optional dependency exists at the exact
+version declared by `package.json`.
 
 Dry-run each scoped package:
 
@@ -147,6 +158,10 @@ npm publish dist/scoped-packages/@opencc/opencc-jieba-linux-x64 --access public
 npm publish dist/scoped-packages/@opencc/opencc-jieba-win32-x64 --access public
 npm publish
 ```
+
+The final `npm publish` command runs the verification-only `prepack` script. It
+also runs `prepublishOnly`, which verifies that the four scoped binary packages
+have already been published. It should not rebuild the four platform binaries.
 
 `--access public` is required for the first publish of scoped public packages.
 It is harmless to keep using it for later publishes.

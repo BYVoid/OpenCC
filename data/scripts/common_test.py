@@ -70,6 +70,10 @@ class CommonScriptTest(unittest.TestCase):
         out = self.run_file_op(sort_items, b"b\tB\r\na\tA\r\n")
         self.assertEqual(out, b"a\tA\nb\tB\n")
 
+    def test_sort_normalizes_cr_input(self):
+        out = self.run_file_op(sort_items, b"b\tB\ra\tA\r")
+        self.assertEqual(out, b"a\tA\nb\tB\n")
+
     def test_reverse_items(self):
         out = self.run_file_op(reverse_items, "A\tx y\nB\tx\n")
         self.assertEqual(

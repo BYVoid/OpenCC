@@ -9,7 +9,7 @@ class BaseDict:
         for i, line in enumerate(self._iter(file)):
             if line.startswith('#') or not line.strip():
                 continue
-            key, value = line.rstrip('\r\n').split('\t', 1)
+            key, value = line.rstrip('\n').split('\t', 1)
             yield {
                 'key': key,
                 'values': value.split(' '),
@@ -58,7 +58,7 @@ class RichDict(Dict):
         block = []
         _line = ''
         for i, _line in enumerate(self._iter(file)):
-            line = _line.rstrip('\r\n')
+            line = _line.rstrip('\n')
             if self.get_line_type(line) == 'entry':
                 entry_index = len(entries)
 

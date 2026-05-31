@@ -4,6 +4,7 @@ const os = require('os');
 const platform = os.platform();
 const arch = os.arch();
 const prebuildDir = path.join(__dirname, 'prebuilds', `${platform}-${arch}`);
+const scopedPackageName = `@opencc/opencc-jieba-${platform}-${arch}`;
 
 // Platform-specific plugin library filename
 const libName = platform === 'win32' ? 'opencc-jieba.dll'
@@ -12,6 +13,23 @@ const libName = platform === 'win32' ? 'opencc-jieba.dll'
 
 const dataDir = path.join(__dirname, 'data');
 const configDir = dataDir;
+
+function requireOptionalPackage(packageName) {
+  try {
+    return require(packageName);
+  } catch (error) {
+    if (error && error.code === 'MODULE_NOT_FOUND') {
+      return null;
+    }
+    throw error;
+  }
+}
+
+const scopedPackage = requireOptionalPackage(scopedPackageName);
+const pluginLibrary = scopedPackage && scopedPackage.pluginLibrary
+  ? scopedPackage.pluginLibrary
+  : path.join(prebuildDir, libName);
+const pluginDir = path.dirname(pluginLibrary);
 
 function resolveConfigPath(config) {
   if (typeof config !== 'string' || path.isAbsolute(config)) {
@@ -35,9 +53,9 @@ function resolveConfigPath(config) {
 
 module.exports = {
   /** Directory containing the prebuilt libopencc-jieba shared library. */
-  pluginDir: prebuildDir,
+  pluginDir,
   /** Absolute path to the platform-specific plugin shared library. */
-  pluginLibrary: path.join(prebuildDir, libName),
+  pluginLibrary,
   /** Root data directory (config files and jieba_dict/ live here). */
   dataDir,
   /** Directory containing jieba-backed OpenCC configuration JSON files. */

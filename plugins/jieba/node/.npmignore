@@ -1,2 +1,4 @@
 NPM_PACKAGE_DESIGN.md
 build.js
+scripts/
+dist/

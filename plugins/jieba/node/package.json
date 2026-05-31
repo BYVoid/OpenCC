@@ -16,6 +16,7 @@
   },
   "files": [
     "index.js",
+    "PUBLISHING.md",
     "data"
   ],
   "scripts": {

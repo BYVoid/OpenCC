@@ -53,7 +53,7 @@ jobs:
       - uses: bazelbuild/setup-bazelisk@v3
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --omit=optional
 
       - name: Prepare package versions
         shell: bash
@@ -153,7 +153,7 @@ jobs:
       - uses: bazelbuild/setup-bazelisk@v3
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --omit=optional
 
       - name: Prepare package versions
         shell: bash
@@ -253,7 +253,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --omit=optional
 
       - name: Prepare package versions
         shell: bash
@@ -345,7 +345,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --omit=optional
 
       - name: Prepare package versions
         shell: bash

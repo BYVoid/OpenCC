@@ -29,10 +29,32 @@
 const path = require('path');
 const fs = require('fs');
 const nodeGypBuild = require('node-gyp-build');
-const bindingPath = nodeGypBuild.path(path.join(__dirname, '..'));
+
+function requireOptionalPackage(packageName) {
+  try {
+    return require(packageName);
+  } catch (error) {
+    if (error && error.code === 'MODULE_NOT_FOUND') {
+      return null;
+    }
+    throw error;
+  }
+}
+
+const scopedBinaryPackage = requireOptionalPackage(
+  `@opencc/opencc-${process.platform}-${process.arch}`
+);
+const bindingPath = scopedBinaryPackage && scopedBinaryPackage.binaryPath
+  ? scopedBinaryPackage.binaryPath
+  : nodeGypBuild.path(path.join(__dirname, '..'));
 const binding = require(bindingPath);
 
 const getAssetsPath = function (bindingPath) {
+  const packageAssetsPath = path.join(__dirname, '..', 'prebuilds', 'assets');
+  if (fs.existsSync(packageAssetsPath)) {
+    return packageAssetsPath;
+  }
+
   const bindingDir = path.dirname(bindingPath);
   const prebuildsDir = path.dirname(bindingDir);
   if (path.basename(prebuildsDir) === 'prebuilds') {

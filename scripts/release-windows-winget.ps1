@@ -83,8 +83,8 @@ function Normalize-ReleaseVersion {
         $value = $value.Substring(1)
     }
 
-    if ($value -notmatch '^\d+\.\d+\.\d+(-(alpha|rc)\d+)?$') {
-        throw "Invalid version '$RawVersion'. Expected x.y.z, x.y.z-alphaN, or x.y.z-rcN."
+    if ($value -notmatch '^\d+\.\d+\.\d+(-(alpha|rc|next)\d+)?$') {
+        throw "Invalid version '$RawVersion'. Expected x.y.z, x.y.z-alphaN, x.y.z-rcN, or x.y.z-nextN."
     }
 
     return $value

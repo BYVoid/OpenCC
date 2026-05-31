@@ -11,17 +11,16 @@ from common import find_target_items, reverse_items, sort_items
 
 
 class CommonScriptTest(unittest.TestCase):
-    def run_file_op(self, func, input_text, *, input_bytes=None):
+    def run_file_op(self, func, input_text_or_bytes):
         with tempfile.TemporaryDirectory() as tmpdir:
             src = os.path.join(tmpdir, "in.txt")
             dst = os.path.join(tmpdir, "out.txt")
 
-            if input_bytes is not None:
-                with open(src, "wb") as f:
-                    f.write(input_bytes)
-            else:
-                with open(src, "w", encoding="utf-8") as f:
-                    f.write(input_text)
+            with open(src, **(
+                {"mode": "wb"} if isinstance(input_text_or_bytes, bytes) else
+                {"mode": "w", "encoding": "utf-8"}
+            )) as f:
+                f.write(input_text_or_bytes)
 
             func(src, dst)
 
@@ -64,19 +63,11 @@ class CommonScriptTest(unittest.TestCase):
         )
 
     def test_sort_preserves_missing_final_newline(self):
-        out = self.run_file_op(
-            sort_items,
-            "",
-            input_bytes=b"b\tB\na\tA",
-        )
+        out = self.run_file_op(sort_items, b"b\tB\na\tA")
         self.assertEqual(out, b"a\tA\nb\tB")
 
     def test_sort_normalizes_crlf_input(self):
-        out = self.run_file_op(
-            sort_items,
-            "",
-            input_bytes=b"b\tB\r\na\tA\r\n",
-        )
+        out = self.run_file_op(sort_items, b"b\tB\r\na\tA\r\n")
         self.assertEqual(out, b"a\tA\nb\tB\n")
 
     def test_reverse_items(self):

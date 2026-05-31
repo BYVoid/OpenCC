@@ -86,7 +86,7 @@ function preparePackage(dirname) {
 
   const packageName = `@opencc/opencc-jieba-${dirname}`;
   const packageDir = path.join(outputRoot, packageName);
-  const relativeLibraryPath = path.join('prebuilds', dirname, libraryName);
+  const relativeLibraryPath = path.posix.join('prebuilds', dirname, libraryName);
 
   fs.rmSync(packageDir, { recursive: true, force: true });
   fs.mkdirSync(packageDir, { recursive: true });

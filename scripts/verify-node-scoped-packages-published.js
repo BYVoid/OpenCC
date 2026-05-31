@@ -7,6 +7,13 @@ const packageRoot = path.resolve(__dirname, '..');
 const packageJson = require(path.join(packageRoot, 'package.json'));
 const optionalDependencies = packageJson.optionalDependencies || {};
 
+if (process.env.OPENCC_NPM_PUBLISH_DRY_RUN === 'true') {
+  console.log(
+    'Skipping published optional dependency checks during npm publish dry-run.'
+  );
+  process.exit(0);
+}
+
 function npmViewVersion(packageName, version) {
   const spec = `${packageName}@${version}`;
   try {

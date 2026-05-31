@@ -1,21 +1,25 @@
 #!/usr/bin/env node
 
 const childProcess = require('child_process');
+const fs = require('fs');
 const path = require('path');
 
 const packageRoot = path.resolve(__dirname, '..');
 const scopedPackageName = `@opencc/opencc-${process.platform}-${process.arch}`;
+const isSourceCheckout = fs.existsSync(path.join(packageRoot, '.git'));
 
-try {
-  const scopedPackage = require(require.resolve(scopedPackageName, {
-    paths: [packageRoot],
-  }));
-  if (scopedPackage && scopedPackage.binaryPath) {
-    process.exit(0);
-  }
-} catch (error) {
-  if (!error || error.code !== 'MODULE_NOT_FOUND') {
-    throw error;
+if (!isSourceCheckout) {
+  try {
+    const scopedPackage = require(require.resolve(scopedPackageName, {
+      paths: [packageRoot],
+    }));
+    if (scopedPackage && scopedPackage.binaryPath) {
+      process.exit(0);
+    }
+  } catch (error) {
+    if (!error || error.code !== 'MODULE_NOT_FOUND') {
+      throw error;
+    }
   }
 }
 

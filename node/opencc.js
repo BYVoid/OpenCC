@@ -29,6 +29,7 @@
 const path = require('path');
 const fs = require('fs');
 const nodeGypBuild = require('node-gyp-build');
+const packageRoot = path.join(__dirname, '..');
 
 function requireOptionalPackage(packageName) {
   try {
@@ -41,16 +42,25 @@ function requireOptionalPackage(packageName) {
   }
 }
 
-const scopedBinaryPackage = requireOptionalPackage(
-  `@opencc/opencc-${process.platform}-${process.arch}`
-);
-const bindingPath = scopedBinaryPackage && scopedBinaryPackage.binaryPath
-  ? scopedBinaryPackage.binaryPath
-  : nodeGypBuild.path(path.join(__dirname, '..'));
+function resolveBindingPath() {
+  try {
+    return nodeGypBuild.path(packageRoot);
+  } catch (error) {
+    const scopedBinaryPackage = requireOptionalPackage(
+      `@opencc/opencc-${process.platform}-${process.arch}`
+    );
+    if (scopedBinaryPackage && scopedBinaryPackage.binaryPath) {
+      return scopedBinaryPackage.binaryPath;
+    }
+    throw error;
+  }
+}
+
+const bindingPath = resolveBindingPath();
 const binding = require(bindingPath);
 
 const getAssetsPath = function (bindingPath) {
-  const packageAssetsPath = path.join(__dirname, '..', 'prebuilds', 'assets');
+  const packageAssetsPath = path.join(packageRoot, 'prebuilds', 'assets');
   if (fs.existsSync(packageAssetsPath)) {
     return packageAssetsPath;
   }

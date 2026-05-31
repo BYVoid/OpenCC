@@ -34,6 +34,36 @@ function writeJson(filePath, value) {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
 }
 
+function writeReadme(packageDir, packageName, dirname, libraryName) {
+  fs.writeFileSync(path.join(packageDir, 'README.md'), [
+    `# ${packageName}`,
+    '',
+    `Native Jieba segmentation plugin binary for OpenCC on \`${dirname}\`.`,
+    '',
+    'This package is installed automatically as an optional dependency of',
+    '`opencc-jieba`. Most users should install `opencc-jieba` instead of',
+    'installing this package directly.',
+    '',
+    '## Contents',
+    '',
+    '```text',
+    `prebuilds/${dirname}/${libraryName}`,
+    '```',
+    '',
+    '## Usage',
+    '',
+    '```javascript',
+    `const binary = require('${packageName}');`,
+    'console.log(binary.pluginLibrary);',
+    '```',
+    '',
+    '## License',
+    '',
+    `${parentPackage.license}`,
+    '',
+  ].join('\n'));
+}
+
 function preparePackage(dirname) {
   const parsed = parsePlatformArch(dirname);
   if (!parsed) {
@@ -77,6 +107,7 @@ function preparePackage(dirname) {
     cpu: [arch],
     files: [
       'index.js',
+      'README.md',
       relativeLibraryPath,
     ],
   });
@@ -93,6 +124,7 @@ function preparePackage(dirname) {
     '',
   ].join('\n'));
 
+  writeReadme(packageDir, packageName, dirname, libraryName);
   copyFile(sourceLibrary, path.join(packageDir, relativeLibraryPath));
   return packageDir;
 }

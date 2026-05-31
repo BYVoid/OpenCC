@@ -95,6 +95,7 @@ Each generated package contains only:
 ```text
 index.js
 package.json
+README.md
 prebuilds/<platform>-<arch>/<native-library>
 ```
 
@@ -118,7 +119,8 @@ npm pack --dry-run dist/scoped-packages/@opencc/opencc-jieba-linux-x64
 npm pack --dry-run dist/scoped-packages/@opencc/opencc-jieba-win32-x64
 ```
 
-Each scoped tarball should contain one native library for its own platform.
+Each scoped tarball should contain one native library for its own platform plus
+a short package-specific README.
 
 ## Publish order
 

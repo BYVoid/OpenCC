@@ -15,8 +15,8 @@ npm install opencc-jieba
 > **Note**: This package is intended to be used alongside the `opencc` npm package (`>= 1.3.2`).
 > npm installs the matching optional `@opencc/opencc-jieba-<platform>-<arch>` package automatically on supported platforms.
 
-Maintainers should follow [PUBLISHING.md](PUBLISHING.md) for the split-package
-build and release flow.
+Maintainers should follow the repository publishing guide at
+`plugins/jieba/node/PUBLISHING.md` for the split-package build and release flow.
 
 ## Usage
 

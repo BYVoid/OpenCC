@@ -22,7 +22,7 @@ class BaseDict:
     def dump(self, file):
         with open(file, 'wb') as fh:
             for entry in self.entries:
-                fh.write(self.get_line(entry).encode('utf-8'))
+                fh.write(self.get_entry_line(entry).encode('utf-8'))
 
     @classmethod
     def from_file(cls, file):
@@ -31,7 +31,7 @@ class BaseDict:
         return table
 
     @staticmethod
-    def get_line(entry):
+    def get_entry_line(entry):
         return entry['key'] + '\t' + ' '.join(entry['values']) + '\n'
 
 
@@ -106,7 +106,7 @@ class RichDict(Dict):
                 fh.write((line + '\n').encode('utf-8'))
 
         def write_entry(fh, entry):
-            fh.write(self.get_line(entry).encode('utf-8'))
+            fh.write(self.get_entry_line(entry).encode('utf-8'))
 
         index_map = {-1: -1, None: None}
         for i, e in enumerate(self.entries):
@@ -157,4 +157,4 @@ def find_target_items(input_filename, keyword):
     for entry in Dict().iter(input_filename):
         for value in entry['values']:
             if keyword in value:
-                print(Dict.get_line(entry), end='')
+                print(Dict.get_entry_line(entry), end='')

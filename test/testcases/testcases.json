@@ -1007,21 +1007,21 @@
       }
     },
     {
-      "id": "BYVoid_OpenCC_HK_proper_noun_variants_s2hk",
+      "id": "BYVoid_OpenCC_PR_1267_HK_proper_noun_variants_s2hk",
       "input": "张卫健 白腊 冼靖峰 温兆伦",
       "expected": {
         "s2hk": "張衛健 白腊 冼靖峰 溫兆倫"
       }
     },
     {
-      "id": "BYVoid_OpenCC_HK_proper_noun_variants_t2hk",
+      "id": "BYVoid_OpenCC_PR_1267_HK_proper_noun_variants_t2hk",
       "input": "張衛健 張衞健 白臘 冼靖峯 温兆倫 溫兆倫",
       "expected": {
         "t2hk": "張衛健 張衛健 白腊 冼靖峰 溫兆倫 溫兆倫"
       }
     },
     {
-      "id": "BYVoid_OpenCC_HK_proper_noun_variants_heng_lines",
+      "id": "BYVoid_OpenCC_PR_1267_HK_proper_noun_variants_heng_lines",
       "input": "恒生大学 恒生指数 观塘线 港岛线 恆生大學 恆生指數 觀塘線 港島線",
       "expected": {
         "s2hk": "恒生大學 恒生指數 觀塘綫 港島綫 恒生大學 恒生指數 觀塘綫 港島綫",

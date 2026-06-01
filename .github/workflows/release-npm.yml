@@ -64,6 +64,7 @@ jobs:
           node - "$PACKAGE_VERSION" "$RELEASE_TAG" <<'NODE'
           const fs = require('fs');
           const requestedVersion = (process.argv[2] || process.argv[3] || '')
+            .replace(/^ver\./, '')
             .replace(/^v(?=\d)/, '');
           function updatePackage(file, optionalPrefix) {
             const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -164,6 +165,7 @@ jobs:
           node - "$PACKAGE_VERSION" "$RELEASE_TAG" <<'NODE'
           const fs = require('fs');
           const requestedVersion = (process.argv[2] || process.argv[3] || '')
+            .replace(/^ver\./, '')
             .replace(/^v(?=\d)/, '');
           const file = 'plugins/jieba/node/package.json';
           const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -264,6 +266,7 @@ jobs:
           node - "$PACKAGE_VERSION" "$RELEASE_TAG" <<'NODE'
           const fs = require('fs');
           const requestedVersion = (process.argv[2] || process.argv[3] || '')
+            .replace(/^ver\./, '')
             .replace(/^v(?=\d)/, '');
           const file = 'package.json';
           const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -356,6 +359,7 @@ jobs:
           node - "$PACKAGE_VERSION" "$RELEASE_TAG" <<'NODE'
           const fs = require('fs');
           const requestedVersion = (process.argv[2] || process.argv[3] || '')
+            .replace(/^ver\./, '')
             .replace(/^v(?=\d)/, '');
           const file = 'package.json';
           const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));

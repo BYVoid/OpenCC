@@ -129,10 +129,10 @@ cc_test(
     data = [
         "HKVariants.txt",
         "HKVariantsRevPhrases.txt",
+        "STCharacters.txt",
         "STPhrases.txt",
         "TWVariants.txt",
         "TWVariantsRevPhrases.txt",
-        "//data/scheme:st_multi",
     ],
     deps = [
         "//src:utf8_util_lib",

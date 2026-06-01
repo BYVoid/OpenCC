@@ -150,8 +150,8 @@ npm CLI 僅支援文字轉換。若需要 inspect、segmentation 輸出、自訂
 | `tw2s.json` | Traditional Chinese (Taiwan Standard) to Simplified Chinese / 台灣正體到簡體 |
 | `s2hk.json` | Simplified Chinese to Traditional Chinese (Hong Kong variant) / 簡體到香港繁體 |
 | `hk2s.json` | Traditional Chinese (Hong Kong variant) to Simplified Chinese / 香港繁體到簡體 |
-| `s2twp.json` | Simplified Chinese to Traditional Chinese (Taiwan Standard) with Taiwanese idiom / 簡體到台灣正體，並轉換為台灣常用詞彙 |
-| `tw2sp.json` | Traditional Chinese (Taiwan Standard) to Simplified Chinese with Mainland Chinese idiom / 台灣正體到簡體，並轉換為中國大陸常用詞彙 |
+| `s2twp.json` | Simplified Chinese to Traditional Chinese (Taiwan Standard, with Taiwan Phrases) / 簡體到台灣正體（含台灣常用詞彙） |
+| `tw2sp.json` | Traditional Chinese (Taiwan Standard) to Simplified Chinese (Mainland China Phrases) / 台灣正體到簡體（含中國大陸常用詞彙） |
 | `t2tw.json` | Traditional Chinese (OpenCC Standard) to Traditional Chinese (Taiwan Standard) / OpenCC 標準繁體到台灣正體 |
 | `tw2t.json` | Traditional Chinese (Taiwan Standard) to Traditional Chinese (OpenCC Standard) / 台灣正體到 OpenCC 標準繁體 |
 | `t2hk.json` | Traditional Chinese (OpenCC Standard) to Traditional Chinese (Hong Kong variant) / OpenCC 標準繁體到香港繁體 |
@@ -187,6 +187,9 @@ npm install opencc opencc-jieba
 
 安裝 `opencc-jieba` 後，JavaScript API 與 npm `opencc` CLI 可以自動
 載入其中的配置：
+
+可用的插件配置包含 `s2t_jieba.json`、`s2tw_jieba.json`、
+`s2hk_jieba.json`、`s2twp_jieba.json` 與 `tw2sp_jieba.json`。
 
 ```js
 import OpenCC from 'opencc';

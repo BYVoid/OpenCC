@@ -1,4 +1,4 @@
-name: Publish npm package
+name: Publish npm packages
 
 on:
   release:
@@ -16,7 +16,125 @@ on:
         default: true
 
 jobs:
-  publish-npm:
+  publish-jieba-binaries:
+    name: Publish opencc-jieba binary (${{ matrix.target }})
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: darwin-arm64
+            runner: macos-15
+            library: libopencc-jieba.dylib
+          - target: linux-arm64
+            runner: ubuntu-24.04-arm
+            library: libopencc-jieba.so
+          - target: linux-x64
+            runner: ubuntu-24.04
+            library: libopencc-jieba.so
+          - target: win32-x64
+            runner: windows-2025
+            library: opencc-jieba.dll
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org/
+
+      - uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Install dependencies
+        run: npm ci --omit=optional
+
+      - name: Prepare package versions
+        shell: bash
+        env:
+          PACKAGE_VERSION: ${{ inputs.package_version }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          node - "$PACKAGE_VERSION" "$RELEASE_TAG" <<'NODE'
+          const fs = require('fs');
+          const requestedVersion = (process.argv[2] || process.argv[3] || '')
+            .replace(/^ver\./, '')
+            .replace(/^v(?=\d)/, '');
+          function updatePackage(file, optionalPrefix) {
+            const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
+            const version = requestedVersion || pkg.version;
+            pkg.version = version;
+            if (pkg.optionalDependencies) {
+              for (const name of Object.keys(pkg.optionalDependencies)) {
+                if (name.startsWith(optionalPrefix)) {
+                  pkg.optionalDependencies[name] = version;
+                }
+              }
+            }
+            fs.writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
+          }
+          updatePackage('plugins/jieba/node/package.json', '@opencc/opencc-jieba-');
+          NODE
+
+      - name: Build opencc-jieba binary
+        shell: bash
+        run: |
+          cd plugins/jieba/node
+          npm run build -- "${{ matrix.target }}"
+          test -f "prebuilds/${{ matrix.target }}/${{ matrix.library }}"
+
+      - name: Prepare scoped package
+        shell: bash
+        run: |
+          cd plugins/jieba/node
+          npm run prepare:scoped-packages
+          npm pack --dry-run "dist/scoped-packages/@opencc/opencc-jieba-${{ matrix.target }}"
+
+      - name: Pack scoped package
+        shell: bash
+        run: |
+          mkdir -p plugins/jieba/node/dist/npm-artifacts
+          npm pack "plugins/jieba/node/dist/scoped-packages/@opencc/opencc-jieba-${{ matrix.target }}" \
+            --pack-destination plugins/jieba/node/dist/npm-artifacts
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-opencc-jieba-binary-${{ matrix.target }}
+          path: plugins/jieba/node/dist/npm-artifacts/*.tgz
+          if-no-files-found: error
+
+      - name: Determine npm dist-tag
+        id: npm_metadata
+        shell: bash
+        run: |
+          version="$(node -p "require('./plugins/jieba/node/package.json').version")"
+          tag="$(node -e "const version = process.argv[1]; const match = version.match(/-([0-9A-Za-z-]+)(?:[.+]|$)/); console.log(match ? match[1] : 'latest');" "$version")"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Publishing @opencc/opencc-jieba-${{ matrix.target }}@$version with npm dist-tag '$tag'"
+
+      - name: Publish scoped package
+        shell: bash
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          NPM_TAG: ${{ steps.npm_metadata.outputs.tag }}
+        run: |
+          publish_args=(--access public --provenance)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$DRY_RUN" = "true" ]; then
+            publish_args+=(--dry-run)
+          fi
+          npm publish "plugins/jieba/node/dist/scoped-packages/@opencc/opencc-jieba-${{ matrix.target }}" --tag "$NPM_TAG" "${publish_args[@]}"
+
+  publish-jieba:
+    name: Publish opencc-jieba
+    needs: publish-jieba-binaries
     runs-on: macos-15
     permissions:
       contents: read
@@ -35,31 +153,245 @@ jobs:
 
       - uses: bazelbuild/setup-bazelisk@v3
 
-      - name: Prepare package version
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.package_version != '' }}
+      - name: Install dependencies
+        run: npm ci --omit=optional
+
+      - name: Prepare package versions
         shell: bash
         env:
           PACKAGE_VERSION: ${{ inputs.package_version }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          npm version "$PACKAGE_VERSION" --no-git-tag-version --allow-same-version
+          node - "$PACKAGE_VERSION" "$RELEASE_TAG" <<'NODE'
+          const fs = require('fs');
+          const requestedVersion = (process.argv[2] || process.argv[3] || '')
+            .replace(/^ver\./, '')
+            .replace(/^v(?=\d)/, '');
+          const file = 'plugins/jieba/node/package.json';
+          const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const version = requestedVersion || pkg.version;
+          pkg.version = version;
+          for (const name of Object.keys(pkg.optionalDependencies || {})) {
+            if (name.startsWith('@opencc/opencc-jieba-')) {
+              pkg.optionalDependencies[name] = version;
+            }
+          }
+          fs.writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
+          NODE
+
+      - name: Build opencc-jieba data
+        shell: bash
+        run: |
+          cd plugins/jieba/node
+          npm run build -- darwin-arm64
+
+      - name: Pack opencc-jieba
+        shell: bash
+        run: |
+          cd plugins/jieba/node
+          mkdir -p dist/npm-artifacts
+          npm pack --pack-destination dist/npm-artifacts
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-opencc-jieba
+          path: plugins/jieba/node/dist/npm-artifacts/*.tgz
+          if-no-files-found: error
+
+      - name: Determine npm dist-tag
+        id: npm_metadata
+        shell: bash
+        run: |
+          version="$(node -p "require('./plugins/jieba/node/package.json').version")"
+          tag="$(node -e "const version = process.argv[1]; const match = version.match(/-([0-9A-Za-z-]+)(?:[.+]|$)/); console.log(match ? match[1] : 'latest');" "$version")"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Publishing opencc-jieba@$version with npm dist-tag '$tag'"
+
+      - name: Publish opencc-jieba
+        shell: bash
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          NPM_TAG: ${{ steps.npm_metadata.outputs.tag }}
+          OPENCC_NPM_PUBLISH_DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          publish_args=(--provenance)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$DRY_RUN" = "true" ]; then
+            publish_args+=(--dry-run)
+          fi
+          cd plugins/jieba/node
+          npm publish --tag "$NPM_TAG" "${publish_args[@]}"
+
+  publish-opencc-binaries:
+    name: Publish opencc binary (${{ matrix.target }})
+    needs: publish-jieba
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: darwin-arm64
+            runner: macos-15
+          - target: linux-arm64
+            runner: ubuntu-24.04-arm
+          - target: linux-x64
+            runner: ubuntu-24.04
+          - target: win32-x64
+            runner: windows-2025
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org/
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --omit=optional
 
-      - name: Build Node.js prebuilds
-        run: npm run prebuild:all
-
-      - name: Verify Node.js prebuilds
+      - name: Prepare package versions
+        shell: bash
+        env:
+          PACKAGE_VERSION: ${{ inputs.package_version }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          test -f prebuilds/assets/s2t.json
-          test -f prebuilds/darwin-arm64/opencc.node
-          test -f prebuilds/linux-x64/opencc.node
-          test -f prebuilds/linux-arm64/opencc.node
+          node - "$PACKAGE_VERSION" "$RELEASE_TAG" <<'NODE'
+          const fs = require('fs');
+          const requestedVersion = (process.argv[2] || process.argv[3] || '')
+            .replace(/^ver\./, '')
+            .replace(/^v(?=\d)/, '');
+          const file = 'package.json';
+          const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const version = requestedVersion || pkg.version;
+          pkg.version = version;
+          for (const name of Object.keys(pkg.optionalDependencies || {})) {
+            if (name.startsWith('@opencc/opencc-')) {
+              pkg.optionalDependencies[name] = version;
+            }
+          }
+          fs.writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
+          NODE
+
+      - name: Build opencc binary
+        shell: bash
+        run: |
+          npm run prebuild
+          test -f "prebuilds/${{ matrix.target }}/opencc.node"
+
+      - name: Prepare scoped package
+        shell: bash
+        run: |
+          npm run prepare:scoped-packages
+          npm pack --dry-run "dist/scoped-packages/@opencc/opencc-${{ matrix.target }}"
+
+      - name: Pack scoped package
+        shell: bash
+        run: |
+          mkdir -p dist/npm-artifacts
+          npm pack "dist/scoped-packages/@opencc/opencc-${{ matrix.target }}" \
+            --pack-destination dist/npm-artifacts
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-opencc-binary-${{ matrix.target }}
+          path: dist/npm-artifacts/*.tgz
+          if-no-files-found: error
+
+      - name: Determine npm dist-tag
+        id: npm_metadata
+        shell: bash
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          tag="$(node -e "const version = process.argv[1]; const match = version.match(/-([0-9A-Za-z-]+)(?:[.+]|$)/); console.log(match ? match[1] : 'latest');" "$version")"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Publishing @opencc/opencc-${{ matrix.target }}@$version with npm dist-tag '$tag'"
+
+      - name: Publish scoped package
+        shell: bash
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+          NPM_TAG: ${{ steps.npm_metadata.outputs.tag }}
+        run: |
+          publish_args=(--access public --provenance)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$DRY_RUN" = "true" ]; then
+            publish_args+=(--dry-run)
+          fi
+          npm publish "dist/scoped-packages/@opencc/opencc-${{ matrix.target }}" --tag "$NPM_TAG" "${publish_args[@]}"
+
+  publish-opencc:
+    name: Publish opencc
+    needs: publish-opencc-binaries
+    runs-on: macos-15
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install dependencies
+        run: npm ci --omit=optional
+
+      - name: Prepare package versions
+        shell: bash
+        env:
+          PACKAGE_VERSION: ${{ inputs.package_version }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          node - "$PACKAGE_VERSION" "$RELEASE_TAG" <<'NODE'
+          const fs = require('fs');
+          const requestedVersion = (process.argv[2] || process.argv[3] || '')
+            .replace(/^ver\./, '')
+            .replace(/^v(?=\d)/, '');
+          const file = 'package.json';
+          const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
+          const version = requestedVersion || pkg.version;
+          pkg.version = version;
+          for (const name of Object.keys(pkg.optionalDependencies || {})) {
+            if (name.startsWith('@opencc/opencc-')) {
+              pkg.optionalDependencies[name] = version;
+            }
+          }
+          fs.writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
+          NODE
+
+      - name: Build opencc package assets
+        run: npm run prebuild
 
       - name: Test
         env:
           PREBUILDS_ONLY: 1
         run: npm test
+
+      - name: Pack opencc
+        run: |
+          mkdir -p dist/npm-artifacts
+          npm pack --pack-destination dist/npm-artifacts
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-opencc
+          path: dist/npm-artifacts/*.tgz
+          if-no-files-found: error
 
       - name: Determine npm dist-tag
         id: npm_metadata
@@ -71,10 +403,11 @@ jobs:
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "Publishing opencc@$version with npm dist-tag '$tag'"
 
-      - name: Publish
+      - name: Publish opencc
         env:
           DRY_RUN: ${{ inputs.dry_run }}
           NPM_TAG: ${{ steps.npm_metadata.outputs.tag }}
+          OPENCC_NPM_PUBLISH_DRY_RUN: ${{ inputs.dry_run }}
         run: |
           publish_args=(--provenance)
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$DRY_RUN" = "true" ]; then

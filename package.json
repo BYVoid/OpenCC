@@ -1,6 +1,6 @@
 {
   "name": "opencc",
-  "version": "1.3.2-next1",
+  "version": "1.3.2-next2",
   "description": "Conversion between Traditional and Simplified Chinese",
   "author": "Carbo Kuo <byvoid@byvoid.com>",
   "license": "Apache-2.0",
@@ -29,7 +29,10 @@
     "prebuild:linux": "bash ./scripts/build-node-prebuild-bazel.sh",
     "prebuild:windows": "bash ./scripts/build-node-windows-prebuild-zig.sh",
     "prebuild:all": "npm run prebuild && npm run prebuild:linux && npm run prebuild:windows",
-    "install": "node-gyp-build"
+    "prepare:scoped-packages": "node scripts/prepare-node-scoped-packages.js",
+    "prepack": "node scripts/verify-node-main-package.js",
+    "prepublishOnly": "node scripts/verify-node-scoped-packages-published.js",
+    "install": "node scripts/install.js"
   },
   "engines": {
     "node": ">=20.17"
@@ -57,10 +60,13 @@
     "node/opencc.js",
     "node/opencc.mjs",
     "node/opencc_config.h",
-    "prebuilds/*/opencc.node",
     "prebuilds/assets/*.json",
     "prebuilds/assets/*.ocd2",
     "scripts/prepare-node-prebuild-artifacts.js",
+    "scripts/install.js",
+    "scripts/prepare-node-scoped-packages.js",
+    "scripts/verify-node-main-package.js",
+    "scripts/verify-node-scoped-packages-published.js",
     "src/BinaryDict.cpp",
     "src/BinaryDict.hpp",
     "src/CmdLineOutput.hpp",
@@ -142,6 +148,12 @@
     "node-addon-api": "^8.7.0",
     "node-gyp": "^12.3.0",
     "node-gyp-build": "^4.8.4"
+  },
+  "optionalDependencies": {
+    "@opencc/opencc-darwin-arm64": "1.3.2-next1",
+    "@opencc/opencc-linux-arm64": "1.3.2-next1",
+    "@opencc/opencc-linux-x64": "1.3.2-next1",
+    "@opencc/opencc-win32-x64": "1.3.2-next1"
   },
   "overrides": {
     "brace-expansion": "^2.0.3",

@@ -29,6 +29,9 @@ function npmViewVersion(packageName, version) {
 let hasError = false;
 
 for (const [packageName, version] of Object.entries(optionalDependencies)) {
+  if (!packageName.startsWith('@opencc/opencc-')) {
+    continue;
+  }
   const publishedVersion = npmViewVersion(packageName, version);
   if (publishedVersion !== version) {
     console.error(
@@ -39,13 +42,11 @@ for (const [packageName, version] of Object.entries(optionalDependencies)) {
 }
 
 if (hasError) {
-  console.error(
-    'Publish the scoped binary packages before publishing opencc-jieba.'
-  );
+  console.error('Publish the scoped binary packages before publishing opencc.');
   process.exit(1);
 }
 
 console.log(
-  `All optional binary packages for opencc-jieba@${packageJson.version} ` +
+  `All optional binary packages for opencc@${packageJson.version} ` +
   'are published.'
 );

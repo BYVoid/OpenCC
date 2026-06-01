@@ -42,9 +42,13 @@ for:
     - if exist prebuilds\linux-x64 exit /B 1
     - if exist prebuilds\linux-arm64 exit /B 1
     - if not exist prebuilds\win32-x64\opencc.node exit /B 1
+    - npm run prepare:scoped-packages
     - echo [opencc npm package] packing opencc
     - npm pack
     - for %%F in (opencc-*.tgz) do set OPENCC_TGZ=%%~fF
+    - echo [opencc npm package] packing opencc win32-x64 scoped binary package
+    - npm pack dist\scoped-packages\@opencc\opencc-win32-x64
+    - for %%F in (opencc-opencc-win32-x64-*.tgz) do set OPENCC_WIN32_TGZ=%%~fF
     - echo [opencc npm package] building opencc-jieba win32-x64 package files
     - cmake -A%platform% -S. -Bbuild-npm-jieba -DCMAKE_INSTALL_PREFIX:PATH=%CD%\build-npm-jieba-install -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_OPENCC_JIEBA_PLUGIN:BOOL=ON -DENABLE_GTEST:BOOL=OFF -DENABLE_BENCHMARK:BOOL=OFF
     - cmake --build build-npm-jieba --config Release --target install
@@ -62,7 +66,7 @@ for:
     - for %%F in (opencc-jieba-*.tgz) do set OPENCC_JIEBA_TGZ=%%~fF
     - mkdir npm-smoke
     - echo [opencc npm smoke] installing packed packages
-    - npm --prefix npm-smoke install "%OPENCC_TGZ%" "%OPENCC_JIEBA_TGZ%" "%OPENCC_JIEBA_WIN32_TGZ%"
+    - npm --prefix npm-smoke install "%OPENCC_TGZ%" "%OPENCC_WIN32_TGZ%" "%OPENCC_JIEBA_TGZ%" "%OPENCC_JIEBA_WIN32_TGZ%"
     - .\npm-smoke\node_modules\.bin\opencc.cmd --version
     - .\npm-smoke\node_modules\.bin\opencc.cmd --help >nul
     - mkdir npm-smoke\測試
@@ -84,6 +88,8 @@ for:
   artifacts:
   - path: opencc-*.tgz
     name: OpenCCNpmPackage
+  - path: opencc-opencc-win32-x64-*.tgz
+    name: OpenCCWin32NpmPackage
   - path: opencc-jieba-*.tgz
     name: OpenCCJiebaNpmPackage
   - path: opencc-opencc-jieba-win32-x64-*.tgz

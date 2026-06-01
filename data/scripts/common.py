@@ -73,6 +73,32 @@ class Table(BaseTable):
 
         self.data = data
 
+    def add(self, key, values):
+        if isinstance(values, str):
+            values = (values,)
+        else:
+            values = dict.fromkeys(values)
+
+        if key in self.data:
+            vv = self.data[key]
+            vv.extend(v for v in values if v not in vv)
+        else:
+            entry = UserList(values)
+            entry.key = key
+            self.data[key] = entry
+
+    def delete(self, key, values):
+        if isinstance(values, str):
+            values = (values,)
+
+        if key in self.data:
+            self.data[key][:] = (v for v in self.data[key] if v not in values)
+            if not self.data[key]:
+                del self.data[key]
+
+    def remove(self, key):
+        self.data.pop(key, None)
+
 
 class RichTable(Table):
     def __init__(self, *args, **kwargs):

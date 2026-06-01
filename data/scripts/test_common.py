@@ -63,6 +63,123 @@ class BaseTableTest(BaseTest):
 class TableTest(BaseTableTest):
     table_cls = Table
 
+    def test_add_to_exist_key_simple(self):
+        def func(input_filename, output_filename):
+            table = self.table_cls.from_file(input_filename)
+            table.add('a', 'A2')
+            table.dump(output_filename)
+
+        out = self.run_file_op(func, "a\tA\nb\tB\n")
+        self.assertEqual(out.decode("utf-8"), "a\tA A2\nb\tB\n")
+
+    def test_add_to_exist_key_multi(self):
+        def func(input_filename, output_filename):
+            table = self.table_cls.from_file(input_filename)
+            table.add('a', ['A2', 'A3'])
+            table.dump(output_filename)
+
+        out = self.run_file_op(func, "a\tA\nb\tB\n")
+        self.assertEqual(out.decode("utf-8"), "a\tA A2 A3\nb\tB\n")
+
+    def test_add_to_exist_key_skip_dups(self):
+        def func(input_filename, output_filename):
+            table = self.table_cls.from_file(input_filename)
+            table.add('a', ['A', 'A2'])
+            table.dump(output_filename)
+
+        out = self.run_file_op(func, "a\tA\nb\tB\n")
+        self.assertEqual(out.decode("utf-8"), "a\tA A2\nb\tB\n")
+
+    def test_add_to_new_key_simple(self):
+        def func(input_filename, output_filename):
+            table = self.table_cls.from_file(input_filename)
+            table.add('c', 'C1')
+            table.dump(output_filename)
+
+        out = self.run_file_op(func, "a\tA\nb\tB\n")
+        self.assertEqual(out.decode("utf-8"), "a\tA\nb\tB\nc\tC1\n")
+
+    def test_add_to_new_key_multi(self):
+        def func(input_filename, output_filename):
+            table = self.table_cls.from_file(input_filename)
+            table.add('c', ['C', 'C2'])
+            table.dump(output_filename)
+
+        out = self.run_file_op(func, "a\tA\nb\tB\n")
+        self.assertEqual(out.decode("utf-8"), "a\tA\nb\tB\nc\tC C2\n")
+
+    def test_add_to_new_key_skip_dups(self):
+        def func(input_filename, output_filename):
+            table = self.table_cls.from_file(input_filename)
+            table.add('c', ['C', 'C2', 'C'])
+            table.dump(output_filename)
+
+        out = self.run_file_op(func, "a\tA\nb\tB\n")
+        self.assertEqual(out.decode("utf-8"), "a\tA\nb\tB\nc\tC C2\n")
+
+    def test_delete_simple(self):
+        def func(input_filename, output_filename):
+            table = self.table_cls.from_file(input_filename)
+            table.delete('a', 'A1')
+            table.dump(output_filename)
+
+        out = self.run_file_op(func, "a\tA1 A2 A3\nb\tB\n")
+        self.assertEqual(out.decode("utf-8"), "a\tA2 A3\nb\tB\n")
+
+    def test_delete_multi(self):
+        def func(input_filename, output_filename):
+            table = self.table_cls.from_file(input_filename)
+            table.delete('a', ['A1', 'A3'])
+            table.dump(output_filename)
+
+        out = self.run_file_op(func, "a\tA1 A2 A3\nb\tB\n")
+        self.assertEqual(out.decode("utf-8"), "a\tA2\nb\tB\n")
+
+    def test_delete_remove_empty_entry(self):
+        def func(input_filename, output_filename):
+            table = self.table_cls.from_file(input_filename)
+            table.delete('a', ['A1', 'A2', 'A3'])
+            table.dump(output_filename)
+
+        out = self.run_file_op(func, "a\tA1 A2 A3\nb\tB\n")
+        self.assertEqual(out.decode("utf-8"), "b\tB\n")
+
+    def test_delete_skip_nonexist_values(self):
+        def func(input_filename, output_filename):
+            table = self.table_cls.from_file(input_filename)
+            table.delete('a', ['A3', 'A4'])
+            table.dump(output_filename)
+
+        out = self.run_file_op(func, "a\tA1 A2 A3\nb\tB\n")
+        self.assertEqual(out.decode("utf-8"), "a\tA1 A2\nb\tB\n")
+
+    def test_delete_skip_nonexist_key(self):
+        def func(input_filename, output_filename):
+            table = self.table_cls.from_file(input_filename)
+            table.delete('C', ['C'])
+            table.dump(output_filename)
+
+        out = self.run_file_op(func, "a\tA1 A2\nb\tB\n")
+        self.assertEqual(out.decode("utf-8"), "a\tA1 A2\nb\tB\n")
+
+    def test_remove_basic(self):
+        def func(input_filename, output_filename):
+            table = self.table_cls.from_file(input_filename)
+            table.remove('a')
+            table.dump(output_filename)
+
+        out = self.run_file_op(func, "a\tA1 A2 A3\nb\tB\n")
+        self.assertEqual(out.decode("utf-8"), "b\tB\n")
+
+    def test_remove_skip_nonexist_key(self):
+        def func(input_filename, output_filename):
+            table = self.table_cls.from_file(input_filename)
+            table.remove('c')
+            table.dump(output_filename)
+
+        out = self.run_file_op(func, "a\tA1 A2 A3\nb\tB\n")
+        self.assertEqual(out.decode("utf-8"), "a\tA1 A2 A3\nb\tB\n")
+
 
 class RichTableTest(BaseTableTest):
     table_cls = RichTable

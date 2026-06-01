@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 class BaseDict:
+    def __init__(self):
+        self.entries = []
+
     def _iter(self, file):
         with open(file, 'r', encoding='utf-8') as fh:
             yield from fh
@@ -52,6 +55,11 @@ class Dict(BaseDict):
 
 
 class RichDict(Dict):
+    def __init__(self):
+        super().__init__()
+        self.blocks = {}
+        self.final_newline = True
+
     def load(self, file):
         entries = []
         block_map = {}
@@ -94,9 +102,9 @@ class RichDict(Dict):
                 block_map[None] = block
             final_newline = _line.endswith('\n')
 
-        self.final_newline = final_newline
         self.entries = entries
         self.blocks = block_map
+        self.final_newline = final_newline
 
     def dump(self, file):
         def write_block(fh, block):

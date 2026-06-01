@@ -332,7 +332,7 @@ Apache License 2.0
 ### Links 相關鏈接
 
 * Introduction 詳細介紹 https://github.com/BYVoid/OpenCC/wiki/%E7%B7%A3%E7%94%B1
-* 現代漢語常用簡繁一對多字義辨析表 https://ytenx.org/byohlyuk/KienxPyan
+* [現代漢語常用簡繁一對多字義辨析表](https://github.com/BYVoid/OpenCC/blob/master/doc/characters-easy-to-misuse.md)
 * 關於 [`opencc`](https://www.npmjs.com/package/opencc), [`opencc-js`](https://www.npmjs.com/package/opencc-js) 与 [`opencc-wasm`](https://www.npmjs.com/package/opencc-wasm) 三个 NPM packages 區別的說明
   https://github.com/nk2028/opencc-js/blob/HEAD/README-zh-TW.md#%E8%88%87-opencc-npm-package-%E7%9A%84%E5%8D%80%E5%88%A5
 

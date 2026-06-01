@@ -34,14 +34,14 @@ binary refresh, publish all scoped packages at the same version as `opencc`.
 
 - npm account access to publish `opencc`.
 - npm organization access to publish public packages under `@opencc`.
-- BuildBuddy or another Bazel remote execution environment configured for the
-  Linux prebuild steps.
-- For the current local all-in-one flow, an ARM64 macOS development machine.
+- Node.js, npm, Python, and a native C++ build toolchain for the target
+  platform.
+- GitHub Actions or another set of machines covering each supported target
+  platform.
 
-At the moment, maintainers are assumed to run this release process from an
-ARM64 macOS development machine. In the future, the per-platform build and
-publish steps should move to GitHub Actions so the release process no longer
-depends on the maintainer's local platform.
+At the moment, maintainers are assumed to run the full multi-platform release
+process through GitHub Actions. A local machine can still build and publish the
+scoped package for its own platform.
 
 ## Build
 
@@ -49,7 +49,7 @@ From the repository root:
 
 ```sh
 npm install
-npm run prebuild:all
+npm run prebuild
 ```
 
 This creates:
@@ -57,11 +57,12 @@ This creates:
 ```text
 prebuilds/assets/*.json
 prebuilds/assets/*.ocd2
-prebuilds/darwin-arm64/opencc.node
-prebuilds/linux-arm64/opencc.node
-prebuilds/linux-x64/opencc.node
-prebuilds/win32-x64/opencc.node
+prebuilds/<current-platform>-<current-arch>/opencc.node
 ```
+
+The release workflow runs this command separately on macOS ARM64, Linux ARM64,
+Linux x64, and Windows x64 runners. It no longer depends on Bazel remote
+execution to cross-build npm binaries.
 
 ## Prepare scoped binary packages
 

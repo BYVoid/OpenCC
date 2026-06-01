@@ -26,9 +26,7 @@
   "scripts": {
     "test": "mocha -R spec node/test.js && node node/esm-test.mjs",
     "prebuild": "prebuildify --napi --strip --postinstall \"node scripts/prepare-node-prebuild-artifacts.js\"",
-    "prebuild:linux": "bash ./scripts/build-node-prebuild-bazel.sh",
-    "prebuild:windows": "bash ./scripts/build-node-windows-prebuild-zig.sh",
-    "prebuild:all": "npm run prebuild && npm run prebuild:linux && npm run prebuild:windows",
+    "prebuild:all": "npm run prebuild",
     "prepare:scoped-packages": "node scripts/prepare-node-scoped-packages.js",
     "prepack": "node scripts/verify-node-main-package.js",
     "prepublishOnly": "node scripts/verify-node-scoped-packages-published.js",

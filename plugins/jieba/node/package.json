@@ -20,7 +20,7 @@
   ],
   "scripts": {
     "build": "node build.js",
-    "build:all": "npm run build && npm run build linux-x64 && npm run build linux-arm64 && npm run build win32-x64",
+    "build:all": "npm run build",
     "prepare:scoped-packages": "node scripts/prepare-scoped-packages.js",
     "prepack": "node scripts/verify-main-package.js",
     "prepublishOnly": "node scripts/verify-scoped-packages-published.js"

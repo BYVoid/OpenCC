@@ -50,8 +50,6 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org/
 
-      - uses: bazelbuild/setup-bazelisk@v3
-
       - name: Install dependencies
         run: npm ci --omit=optional
 
@@ -150,8 +148,6 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org/
-
-      - uses: bazelbuild/setup-bazelisk@v3
 
       - name: Install dependencies
         run: npm ci --omit=optional

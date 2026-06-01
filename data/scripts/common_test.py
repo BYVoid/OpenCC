@@ -7,10 +7,10 @@ import tempfile
 import unittest
 from contextlib import redirect_stdout
 
-from common import find_target_items, reverse_items, sort_items
+from common import BaseDict, Dict, RichDict, find_target_items, reverse_items, sort_items
 
 
-class CommonScriptTest(unittest.TestCase):
+class BaseTest(unittest.TestCase):
     def run_file_op(self, func, input_text_or_bytes):
         with tempfile.TemporaryDirectory() as tmpdir:
             src = os.path.join(tmpdir, "in.txt")
@@ -27,6 +27,30 @@ class CommonScriptTest(unittest.TestCase):
             with open(dst, "rb") as f:
                 return f.read()
 
+
+class BaseDictTest(BaseTest):
+    dict_cls = BaseDict
+
+    def test_init(self):
+        table = self.dict_cls()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            dst = os.path.join(tmpdir, "out.txt")
+            table.dump(dst)
+            with open(dst, "rb") as f:
+                result = f.read()
+
+        self.assertEqual(result, b"")
+
+
+class DictTest(BaseDictTest):
+    dict_cls = Dict
+
+
+class RichDictTest(BaseDictTest):
+    dict_cls = RichDict
+
+
+class CommonScriptTest(BaseTest):
     def test_sort_entries(self):
         out = self.run_file_op(sort_items, "b\tB\na\tA\n")
         self.assertEqual(out.decode("utf-8"), "a\tA\nb\tB\n")

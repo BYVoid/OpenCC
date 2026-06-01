@@ -11,6 +11,20 @@ from common import BaseTable, Table, RichTable, find_target_items, reverse_items
 
 
 class BaseTest(unittest.TestCase):
+    def table_from(self, input_text_or_bytes):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            src = os.path.join(tmpdir, "in.txt")
+
+            with open(src, **(
+                {"mode": "wb"} if isinstance(input_text_or_bytes, bytes) else
+                {"mode": "w", "encoding": "utf-8"}
+            )) as f:
+                f.write(input_text_or_bytes)
+
+            table = self.table_cls.from_file(src)
+
+        return table
+
     def run_file_op(self, func, input_text_or_bytes):
         with tempfile.TemporaryDirectory() as tmpdir:
             src = os.path.join(tmpdir, "in.txt")
@@ -40,6 +54,10 @@ class BaseTableTest(BaseTest):
                 result = f.read()
 
         self.assertEqual(result, b"")
+
+    def test_raise_on_dup_key(self):
+        with self.assertRaisesRegex(ValueError, "Duplicated key 'a' at line 2"):
+            self.table_from("a\tA\na\tA\n")
 
 
 class TableTest(BaseTableTest):

@@ -85,7 +85,22 @@ jobs:
           updatePackage('plugins/jieba/node/package.json', '@opencc/opencc-jieba-');
           NODE
 
+      - name: Check published package version
+        id: publish_check
+        shell: bash
+        run: |
+          package="@opencc/opencc-jieba-${{ matrix.target }}"
+          version="$(node -p "require('./plugins/jieba/node/package.json').version")"
+          published="$(npm view "$package@$version" version 2>/dev/null || true)"
+          if [ "$published" = "$version" ]; then
+            echo "$package@$version is already published; skipping build and publish."
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build opencc-jieba binary
+        if: steps.publish_check.outputs.published != 'true'
         shell: bash
         run: |
           cd plugins/jieba/node
@@ -93,6 +108,7 @@ jobs:
           test -f "prebuilds/${{ matrix.target }}/${{ matrix.library }}"
 
       - name: Prepare scoped package
+        if: steps.publish_check.outputs.published != 'true'
         shell: bash
         run: |
           cd plugins/jieba/node
@@ -100,6 +116,7 @@ jobs:
           npm pack --dry-run "dist/scoped-packages/@opencc/opencc-jieba-${{ matrix.target }}"
 
       - name: Pack scoped package
+        if: steps.publish_check.outputs.published != 'true'
         shell: bash
         run: |
           mkdir -p plugins/jieba/node/dist/npm-artifacts
@@ -107,6 +124,7 @@ jobs:
             --pack-destination plugins/jieba/node/dist/npm-artifacts
 
       - name: Upload package artifact
+        if: steps.publish_check.outputs.published != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: npm-opencc-jieba-binary-${{ matrix.target }}
@@ -124,11 +142,18 @@ jobs:
           echo "Publishing @opencc/opencc-jieba-${{ matrix.target }}@$version with npm dist-tag '$tag'"
 
       - name: Publish scoped package
+        if: steps.publish_check.outputs.published != 'true'
         shell: bash
         env:
           DRY_RUN: ${{ inputs.dry_run }}
           NPM_TAG: ${{ steps.npm_metadata.outputs.tag }}
         run: |
+          package="@opencc/opencc-jieba-${{ matrix.target }}"
+          version="${{ steps.npm_metadata.outputs.version }}"
+          if [ "$(npm view "$package@$version" version 2>/dev/null || true)" = "$version" ]; then
+            echo "$package@$version is already published; skipping."
+            exit 0
+          fi
           publish_args=(--access public --provenance --loglevel verbose)
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$DRY_RUN" = "true" ]; then
             publish_args+=(--dry-run)
@@ -205,13 +230,29 @@ jobs:
           fs.writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
           NODE
 
+      - name: Check published package version
+        id: publish_check
+        shell: bash
+        run: |
+          package="opencc-jieba"
+          version="$(node -p "require('./plugins/jieba/node/package.json').version")"
+          published="$(npm view "$package@$version" version 2>/dev/null || true)"
+          if [ "$published" = "$version" ]; then
+            echo "$package@$version is already published; skipping build and publish."
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build opencc-jieba data
+        if: steps.publish_check.outputs.published != 'true'
         shell: bash
         run: |
           cd plugins/jieba/node
           npm run build -- darwin-arm64
 
       - name: Pack opencc-jieba
+        if: steps.publish_check.outputs.published != 'true'
         shell: bash
         run: |
           cd plugins/jieba/node
@@ -219,6 +260,7 @@ jobs:
           npm pack --pack-destination dist/npm-artifacts
 
       - name: Upload package artifact
+        if: steps.publish_check.outputs.published != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: npm-opencc-jieba
@@ -236,12 +278,19 @@ jobs:
           echo "Publishing opencc-jieba@$version with npm dist-tag '$tag'"
 
       - name: Publish opencc-jieba
+        if: steps.publish_check.outputs.published != 'true'
         shell: bash
         env:
           DRY_RUN: ${{ inputs.dry_run }}
           NPM_TAG: ${{ steps.npm_metadata.outputs.tag }}
           OPENCC_NPM_PUBLISH_DRY_RUN: ${{ inputs.dry_run }}
         run: |
+          package="opencc-jieba"
+          version="${{ steps.npm_metadata.outputs.version }}"
+          if [ "$(npm view "$package@$version" version 2>/dev/null || true)" = "$version" ]; then
+            echo "$package@$version is already published; skipping."
+            exit 0
+          fi
           publish_args=(--provenance --loglevel verbose)
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$DRY_RUN" = "true" ]; then
             publish_args+=(--dry-run)
@@ -331,19 +380,36 @@ jobs:
           fs.writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
           NODE
 
+      - name: Check published package version
+        id: publish_check
+        shell: bash
+        run: |
+          package="@opencc/opencc-${{ matrix.target }}"
+          version="$(node -p "require('./package.json').version")"
+          published="$(npm view "$package@$version" version 2>/dev/null || true)"
+          if [ "$published" = "$version" ]; then
+            echo "$package@$version is already published; skipping build and publish."
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build opencc binary
+        if: steps.publish_check.outputs.published != 'true'
         shell: bash
         run: |
           npm run prebuild
           test -f "prebuilds/${{ matrix.target }}/opencc.node"
 
       - name: Prepare scoped package
+        if: steps.publish_check.outputs.published != 'true'
         shell: bash
         run: |
           npm run prepare:scoped-packages
           npm pack --dry-run "dist/scoped-packages/@opencc/opencc-${{ matrix.target }}"
 
       - name: Pack scoped package
+        if: steps.publish_check.outputs.published != 'true'
         shell: bash
         run: |
           mkdir -p dist/npm-artifacts
@@ -351,6 +417,7 @@ jobs:
             --pack-destination dist/npm-artifacts
 
       - name: Upload package artifact
+        if: steps.publish_check.outputs.published != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: npm-opencc-binary-${{ matrix.target }}
@@ -368,11 +435,18 @@ jobs:
           echo "Publishing @opencc/opencc-${{ matrix.target }}@$version with npm dist-tag '$tag'"
 
       - name: Publish scoped package
+        if: steps.publish_check.outputs.published != 'true'
         shell: bash
         env:
           DRY_RUN: ${{ inputs.dry_run }}
           NPM_TAG: ${{ steps.npm_metadata.outputs.tag }}
         run: |
+          package="@opencc/opencc-${{ matrix.target }}"
+          version="${{ steps.npm_metadata.outputs.version }}"
+          if [ "$(npm view "$package@$version" version 2>/dev/null || true)" = "$version" ]; then
+            echo "$package@$version is already published; skipping."
+            exit 0
+          fi
           publish_args=(--access public --provenance --loglevel verbose)
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$DRY_RUN" = "true" ]; then
             publish_args+=(--dry-run)
@@ -449,20 +523,38 @@ jobs:
           fs.writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
           NODE
 
+      - name: Check published package version
+        id: publish_check
+        shell: bash
+        run: |
+          package="opencc"
+          version="$(node -p "require('./package.json').version")"
+          published="$(npm view "$package@$version" version 2>/dev/null || true)"
+          if [ "$published" = "$version" ]; then
+            echo "$package@$version is already published; skipping build and publish."
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build opencc package assets
+        if: steps.publish_check.outputs.published != 'true'
         run: npm run prebuild
 
       - name: Test
+        if: steps.publish_check.outputs.published != 'true'
         env:
           PREBUILDS_ONLY: 1
         run: npm test
 
       - name: Pack opencc
+        if: steps.publish_check.outputs.published != 'true'
         run: |
           mkdir -p dist/npm-artifacts
           npm pack --pack-destination dist/npm-artifacts
 
       - name: Upload package artifact
+        if: steps.publish_check.outputs.published != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: npm-opencc
@@ -480,11 +572,18 @@ jobs:
           echo "Publishing opencc@$version with npm dist-tag '$tag'"
 
       - name: Publish opencc
+        if: steps.publish_check.outputs.published != 'true'
         env:
           DRY_RUN: ${{ inputs.dry_run }}
           NPM_TAG: ${{ steps.npm_metadata.outputs.tag }}
           OPENCC_NPM_PUBLISH_DRY_RUN: ${{ inputs.dry_run }}
         run: |
+          package="opencc"
+          version="${{ steps.npm_metadata.outputs.version }}"
+          if [ "$(npm view "$package@$version" version 2>/dev/null || true)" = "$version" ]; then
+            echo "$package@$version is already published; skipping."
+            exit 0
+          fi
           publish_args=(--provenance --loglevel verbose)
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$DRY_RUN" = "true" ]; then
             publish_args+=(--dry-run)

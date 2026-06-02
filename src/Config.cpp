@@ -264,6 +264,7 @@ class ConfigInternal {
 public:
   std::vector<std::string> paths;
   std::string configDirectory;
+  ConfigLoadOptions options;
 
   const JSONValue& GetProperty(const JSONValue& doc, const char* name) {
     if (!doc.HasMember(name)) {
@@ -295,6 +296,17 @@ public:
                           std::string(name));
     }
     return obj.GetString();
+  }
+
+  bool GetOptionalBoolProperty(const JSONValue& doc, const char* name,
+                               bool defaultValue) {
+    if (!doc.HasMember(name)) {
+      return defaultValue;
+    }
+    if (!doc[name].IsBool()) {
+      throw InvalidFormat("Property must be a bool: " + std::string(name));
+    }
+    return doc[name].GetBool();
   }
 
   template <typename DICT>
@@ -358,7 +370,13 @@ public:
     return nullptr;
   }
 
-  DictPtr ParseDict(const JSONValue& doc) {
+  DictPtr ParseDict(const JSONValue& doc, bool includeTofuRiskDictionaries) {
+    const bool mayOutputTofu =
+        GetOptionalBoolProperty(doc, "mayOutputTofu", false);
+    if (mayOutputTofu && !includeTofuRiskDictionaries) {
+      return DictPtr();
+    }
+
     // Required: type
     std::string type = GetStringProperty(doc, "type");
 
@@ -367,11 +385,16 @@ public:
       const JSONValue& docs = GetArrayProperty(doc, "dicts");
       for (rapidjson::SizeType i = 0; i < docs.Size(); i++) {
         if (docs[i].IsObject()) {
-          DictPtr dict = ParseDict(docs[i]);
-          dicts.push_back(dict);
+          DictPtr dict = ParseDict(docs[i], includeTofuRiskDictionaries);
+          if (dict != nullptr) {
+            dicts.push_back(dict);
+          }
         } else {
           throw InvalidFormat("Element of the array must be an object");
         }
+      }
+      if (dicts.empty()) {
+        return DictPtr();
       }
       return DictGroupPtr(new DictGroup(dicts));
     } else {
@@ -388,7 +411,7 @@ public:
     std::string type = GetStringProperty(doc, "type");
     if (type == "mmseg") {
       // Required: dict
-      DictPtr dict = ParseDict(GetObjectProperty(doc, "dict"));
+      DictPtr dict = ParseDict(GetObjectProperty(doc, "dict"), true);
       segmentation = SegmentationPtr(new MaxMatchSegmentation(dict));
     } else {
       PluginConfigPairs configPairs;
@@ -423,7 +446,11 @@ public:
 
   ConversionPtr ParseConversion(const JSONValue& doc) {
     // Required: dict
-    DictPtr dict = ParseDict(GetObjectProperty(doc, "dict"));
+    DictPtr dict = ParseDict(GetObjectProperty(doc, "dict"),
+                             options.includeTofuRiskDictionaries);
+    if (dict == nullptr) {
+      return ConversionPtr();
+    }
     ConversionPtr conversion(new Conversion(dict));
 
     return conversion;
@@ -435,7 +462,9 @@ public:
       const JSONValue& doc = docs[i];
       if (doc.IsObject()) {
         ConversionPtr conversion = ParseConversion(doc);
-        conversions.push_back(conversion);
+        if (conversion != nullptr) {
+          conversions.push_back(conversion);
+        }
       } else {
       }
     }
@@ -517,7 +546,15 @@ ConverterPtr Config::NewFromFile(const std::string& fileName) {
 ConverterPtr Config::NewFromFile(const std::string& fileName,
                                  const std::vector<std::string>& paths,
                                  const char* argv0) {
+  return NewFromFile(fileName, paths, argv0, ConfigLoadOptions());
+}
+
+ConverterPtr Config::NewFromFile(const std::string& fileName,
+                                 const std::vector<std::string>& paths,
+                                 const char* argv0,
+                                 const ConfigLoadOptions& options) {
   ConfigInternal* impl = reinterpret_cast<ConfigInternal*>(internal);
+  impl->options = options;
   impl->paths = paths;
   if (argv0 != nullptr) {
     std::string parent = GetParentDirectory(argv0);
@@ -553,7 +590,7 @@ ConverterPtr Config::NewFromFile(const std::string& fileName,
     impl->paths.push_back(configDirectory);
   }
   impl->configDirectory = configDirectory;
-  return NewFromString(content, impl->paths);
+  return NewFromString(content, impl->paths, options);
 }
 
 ConverterPtr Config::NewFromString(const std::string& json,
@@ -571,6 +608,12 @@ ConverterPtr Config::NewFromString(const std::string& json,
 
 ConverterPtr Config::NewFromString(const std::string& json,
                                    const std::vector<std::string>& paths) {
+  return NewFromString(json, paths, ConfigLoadOptions());
+}
+
+ConverterPtr Config::NewFromString(const std::string& json,
+                                   const std::vector<std::string>& paths,
+                                   const ConfigLoadOptions& options) {
   rapidjson::Document doc;
 
   doc.ParseInsitu<0>(const_cast<char*>(json.c_str()));
@@ -588,6 +631,7 @@ ConverterPtr Config::NewFromString(const std::string& json,
   }
 
   ConfigInternal* impl = reinterpret_cast<ConfigInternal*>(internal);
+  impl->options = options;
   impl->paths = paths;
   if (impl->configDirectory.empty()) {
     impl->configDirectory = paths.empty() ? "" : paths.front();

@@ -46,6 +46,8 @@ Options:
   -c, --config <file>  Configuration file. Defaults to s2t.json.
   -i, --input <file>   Read original text from <file>. Defaults to stdin.
   -o, --output <file>  Write converted text to <file>. Defaults to stdout.
+  --include-tofu-risk-dictionaries
+                       Include dictionaries that may output tofu.
   -v, --version        Print OpenCC version.
   -h, --help           Print this help.
 
@@ -84,6 +86,7 @@ function parseArgs(args) {
     config: 's2t.json',
     input: null,
     output: null,
+    includeTofuRiskDictionaries: false,
     help: false,
     version: false,
   };
@@ -109,6 +112,8 @@ function parseArgs(args) {
       i += 1;
     } else if (arg.startsWith('--output=')) {
       options.output = readInlineOptionValue(arg, '--output');
+    } else if (arg === '--include-tofu-risk-dictionaries') {
+      options.includeTofuRiskDictionaries = true;
     } else if (arg === '--inspect' || arg === '--segmentation') {
       throw new Error(`${arg} is not supported by the npm CLI. Use the native OpenCC CLI instead.`);
     } else if (arg === '--path' || arg.startsWith('--path=')) {
@@ -216,7 +221,9 @@ function main() {
   }
 
   try {
-    const converter = new OpenCC(resolveConfigPath(options.config));
+    const converter = new OpenCC(resolveConfigPath(options.config), {
+      includeTofuRiskDictionaries: options.includeTofuRiskDictionaries,
+    });
     convertStream(converter, options, (error) => {
       if (error) {
         const message = error && error.message ? error.message : String(error);

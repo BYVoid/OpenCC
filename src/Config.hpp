@@ -21,6 +21,13 @@
 #include "Common.hpp"
 
 namespace opencc {
+
+struct OPENCC_EXPORT ConfigLoadOptions {
+  ConfigLoadOptions() : includeTofuRiskDictionaries(true) {}
+
+  bool includeTofuRiskDictionaries;
+};
+
 /**
  * Configuration loader
  * @ingroup opencc_cpp_api
@@ -37,11 +44,20 @@ public:
   ConverterPtr NewFromString(const std::string& json,
                              const std::vector<std::string>& paths);
 
+  ConverterPtr NewFromString(const std::string& json,
+                             const std::vector<std::string>& paths,
+                             const ConfigLoadOptions& options);
+
   ConverterPtr NewFromFile(const std::string& fileName);
 
   ConverterPtr NewFromFile(const std::string& fileName,
                            const std::vector<std::string>& paths,
                            const char* argv0);
+
+  ConverterPtr NewFromFile(const std::string& fileName,
+                           const std::vector<std::string>& paths,
+                           const char* argv0,
+                           const ConfigLoadOptions& options);
 
 private:
   void* internal;

@@ -538,6 +538,11 @@ int CommandLineMain(std::vector<std::string> args) {
         "Output full inspection result (segmentation + per-stage conversion + "
         "final output) as JSON.",
         cmd, false);
+    TCLAP::SwitchArg includeTofuRiskDictionariesArg(
+        "", "include-tofu-risk-dictionaries",
+        "Include dictionaries marked as possibly outputting tofu. By default, "
+        "the command line tool skips these dictionaries.",
+        cmd, false);
     const std::string argv0String = args.empty() ? std::string() : args[0];
     cmd.parse(args);
 
@@ -572,7 +577,12 @@ int CommandLineMain(std::vector<std::string> args) {
     }
     const auto loadStart = std::chrono::steady_clock::now();
     const char* argv0 = argv0String.empty() ? nullptr : argv0String.c_str();
-    converter = config.NewFromFile(configFileName, pathArg.getValue(), argv0);
+    ConfigLoadOptions configOptions;
+    configOptions.includeTofuRiskDictionaries =
+        includeTofuRiskDictionariesArg.getValue();
+    converter =
+        config.NewFromFile(configFileName, pathArg.getValue(), argv0,
+                           configOptions);
     measurement.loadMs +=
         DurationToMilliseconds(std::chrono::steady_clock::now() - loadStart);
     bool lineByLine = inputFileName.IsNull();

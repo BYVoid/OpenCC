@@ -22,6 +22,15 @@
       }
     },
     {
+      "id": "jieba_t2s_tofu_001",
+      "description": "Tofu-risk dictionary is skipped by default in CLI",
+      "input": "㑮",
+      "expected_segmentation": "㑮",
+      "expected": {
+        "tw2sp_jieba": "㑮"
+      }
+    },
+    {
       "id": "jieba_s2t_002",
       "description": "Compound words: 中学生 (middle school student) and 中等身材 (medium build)",
       "input": "一个中学生，一个中等身材的人",

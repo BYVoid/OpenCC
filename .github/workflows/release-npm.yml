@@ -14,6 +14,11 @@ on:
         required: true
         type: boolean
         default: true
+      upload_npm_debug_logs:
+        description: Upload sanitized npm debug logs when a job fails; logs may still contain sensitive data
+        required: true
+        type: boolean
+        default: false
 
 jobs:
   publish-jieba-binaries:
@@ -124,11 +129,36 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run }}
           NPM_TAG: ${{ steps.npm_metadata.outputs.tag }}
         run: |
-          publish_args=(--access public --provenance)
+          publish_args=(--access public --provenance --loglevel verbose)
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$DRY_RUN" = "true" ]; then
             publish_args+=(--dry-run)
           fi
           npm publish "plugins/jieba/node/dist/scoped-packages/@opencc/opencc-jieba-${{ matrix.target }}" --tag "$NPM_TAG" "${publish_args[@]}"
+
+      - name: Collect npm debug logs
+        if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.upload_npm_debug_logs }}
+        shell: bash
+        run: |
+          cache_dir="$(npm config get cache)"
+          mkdir -p npm-debug-logs
+          if [ -d "$cache_dir/_logs" ]; then
+            for log in "$cache_dir/_logs"/*-debug-*.log; do
+              [ -f "$log" ] || continue
+              sed -E \
+                -e 's#(//[^[:space:]]+:_authToken=).+#\1[REDACTED]#g' \
+                -e 's/(Authorization: Bearer )[A-Za-z0-9._~+\/=-]+/\1[REDACTED]/g' \
+                -e 's/(npm_[A-Za-z0-9]{20,})/[REDACTED]/g' \
+                "$log" > "npm-debug-logs/$(basename "$log")"
+            done
+          fi
+
+      - name: Upload npm debug logs
+        if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.upload_npm_debug_logs }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-debug-logs-opencc-jieba-binary-${{ matrix.target }}
+          path: npm-debug-logs/*.log
+          if-no-files-found: warn
 
   publish-jieba:
     name: Publish opencc-jieba
@@ -212,12 +242,37 @@ jobs:
           NPM_TAG: ${{ steps.npm_metadata.outputs.tag }}
           OPENCC_NPM_PUBLISH_DRY_RUN: ${{ inputs.dry_run }}
         run: |
-          publish_args=(--provenance)
+          publish_args=(--provenance --loglevel verbose)
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$DRY_RUN" = "true" ]; then
             publish_args+=(--dry-run)
           fi
           cd plugins/jieba/node
           npm publish --tag "$NPM_TAG" "${publish_args[@]}"
+
+      - name: Collect npm debug logs
+        if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.upload_npm_debug_logs }}
+        shell: bash
+        run: |
+          cache_dir="$(npm config get cache)"
+          mkdir -p npm-debug-logs
+          if [ -d "$cache_dir/_logs" ]; then
+            for log in "$cache_dir/_logs"/*-debug-*.log; do
+              [ -f "$log" ] || continue
+              sed -E \
+                -e 's#(//[^[:space:]]+:_authToken=).+#\1[REDACTED]#g' \
+                -e 's/(Authorization: Bearer )[A-Za-z0-9._~+\/=-]+/\1[REDACTED]/g' \
+                -e 's/(npm_[A-Za-z0-9]{20,})/[REDACTED]/g' \
+                "$log" > "npm-debug-logs/$(basename "$log")"
+            done
+          fi
+
+      - name: Upload npm debug logs
+        if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.upload_npm_debug_logs }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-debug-logs-opencc-jieba
+          path: npm-debug-logs/*.log
+          if-no-files-found: warn
 
   publish-opencc-binaries:
     name: Publish opencc binary (${{ matrix.target }})
@@ -318,11 +373,36 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run }}
           NPM_TAG: ${{ steps.npm_metadata.outputs.tag }}
         run: |
-          publish_args=(--access public --provenance)
+          publish_args=(--access public --provenance --loglevel verbose)
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$DRY_RUN" = "true" ]; then
             publish_args+=(--dry-run)
           fi
           npm publish "dist/scoped-packages/@opencc/opencc-${{ matrix.target }}" --tag "$NPM_TAG" "${publish_args[@]}"
+
+      - name: Collect npm debug logs
+        if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.upload_npm_debug_logs }}
+        shell: bash
+        run: |
+          cache_dir="$(npm config get cache)"
+          mkdir -p npm-debug-logs
+          if [ -d "$cache_dir/_logs" ]; then
+            for log in "$cache_dir/_logs"/*-debug-*.log; do
+              [ -f "$log" ] || continue
+              sed -E \
+                -e 's#(//[^[:space:]]+:_authToken=).+#\1[REDACTED]#g' \
+                -e 's/(Authorization: Bearer )[A-Za-z0-9._~+\/=-]+/\1[REDACTED]/g' \
+                -e 's/(npm_[A-Za-z0-9]{20,})/[REDACTED]/g' \
+                "$log" > "npm-debug-logs/$(basename "$log")"
+            done
+          fi
+
+      - name: Upload npm debug logs
+        if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.upload_npm_debug_logs }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-debug-logs-opencc-binary-${{ matrix.target }}
+          path: npm-debug-logs/*.log
+          if-no-files-found: warn
 
   publish-opencc:
     name: Publish opencc
@@ -405,8 +485,33 @@ jobs:
           NPM_TAG: ${{ steps.npm_metadata.outputs.tag }}
           OPENCC_NPM_PUBLISH_DRY_RUN: ${{ inputs.dry_run }}
         run: |
-          publish_args=(--provenance)
+          publish_args=(--provenance --loglevel verbose)
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "$DRY_RUN" = "true" ]; then
             publish_args+=(--dry-run)
           fi
           npm publish --tag "$NPM_TAG" "${publish_args[@]}"
+
+      - name: Collect npm debug logs
+        if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.upload_npm_debug_logs }}
+        shell: bash
+        run: |
+          cache_dir="$(npm config get cache)"
+          mkdir -p npm-debug-logs
+          if [ -d "$cache_dir/_logs" ]; then
+            for log in "$cache_dir/_logs"/*-debug-*.log; do
+              [ -f "$log" ] || continue
+              sed -E \
+                -e 's#(//[^[:space:]]+:_authToken=).+#\1[REDACTED]#g' \
+                -e 's/(Authorization: Bearer )[A-Za-z0-9._~+\/=-]+/\1[REDACTED]/g' \
+                -e 's/(npm_[A-Za-z0-9]{20,})/[REDACTED]/g' \
+                "$log" > "npm-debug-logs/$(basename "$log")"
+            done
+          fi
+
+      - name: Upload npm debug logs
+        if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.upload_npm_debug_logs }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-debug-logs-opencc
+          path: npm-debug-logs/*.log
+          if-no-files-found: warn

@@ -26,14 +26,26 @@ When a conversion error is discovered (e.g., A is incorrectly converted to B):
 If the error originates from segmentation logic (as in the example above), the most robust fix is to **add an Explicit Mapping**.
 
 1.  **Select the correct dictionary file**:
-    - For s2twp and tw2sp: `TWPhrases.txt`
+    - For Simplified-to-Traditional base phrase conversion and segmentation: `STPhrases.txt`.
+    - For Taiwan regional vocabulary / terminology choices used by `s2twp` and `tw2sp`: `TWPhrases.txt` and `TWPhrasesRev.txt`.
+    - For Taiwan character-variant phrase exceptions used by `s2tw`, `s2twp`, and `t2tw`: `TWVariantsPhrases.txt`.
+    - Do **not** put word-level regional vocabulary translations in `TWVariantsPhrases.txt`; that file is for phrase-level overrides to character variant conversion. Example: US state or territory names such as `特拉華 -> 德拉瓦`, `新澤西 -> 紐澤西`, and `美屬維爾京羣島 -> 美屬維京群島` belong in `TWPhrases.txt`.
+    - For `s2twp`, the conversion chain is `STPhrases/STCharacters -> TWPhrases -> TWVariantsPhrases/TWVariants`. If the Simplified input must survive as one phrase until the `TWPhrases` stage, add the needed Simplified-to-Traditional entry in `STPhrases.txt` for segmentation.
 
 2.  **Add the mapping**:
     Map the vocabulary to itself to prevent incorrect segmentation or conversion.
     ```text
     方程式	方程式
     ```
-    *Note*: Maintain dictionary alphabetical sorting (if applicable).
+    *Note*: Maintain bidirectional consistency for `TWPhrases.txt` and `TWPhrasesRev.txt` when adding regional vocabulary mappings.
+
+3.  **Sort edited dictionaries**:
+    Use the project script instead of hand-sorting.
+    ```bash
+    python3 data/scripts/sort.py data/dictionary/TWPhrases.txt data/dictionary/TWPhrases.txt
+    python3 data/scripts/sort.py data/dictionary/TWPhrasesRev.txt data/dictionary/TWPhrasesRev.txt
+    python3 data/scripts/sort.py data/dictionary/STPhrases.txt data/dictionary/STPhrases.txt
+    ```
 
 ## 3. Test-Driven (Test Cases)
 
@@ -50,6 +62,7 @@ Before the modification takes effect, create test cases to ensure the fix and pr
       }
     }
     ```
+    Test the config that actually uses the dictionary. `TWPhrases.txt` mappings should normally be asserted under `s2twp` / `tw2sp`, not `s2tw`.
 
 ## 4. Build and Verify
 
@@ -70,7 +83,15 @@ OpenCC uses the CMake/Make system to build dictionaries.
     ```
 
 3.  **Automated testing** (optional but recommended):
-    Run `make test` or `ctest`.
+    Run focused dictionary and command-line tests. For Bazel:
+    ```bash
+    bazel test //data/dictionary:dictionary_TWPhrases_test \
+      //data/dictionary:dictionary_TWPhrasesRev_test \
+      //data/dictionary:dictionary_TWPhrases_reverse_mapping_test \
+      //data/dictionary:dictionary_STPhrases_test \
+      //test:command_line_converter_test
+    ```
+    Use the relevant subset when only some dictionaries changed.
 
 
 ## 5. Commit

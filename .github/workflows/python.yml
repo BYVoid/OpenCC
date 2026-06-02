@@ -64,7 +64,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, macos-14, windows-latest]
+        os: [ubuntu-latest, macos-latest, macos-14, windows-2022]
         python-build: ["cp312"]
     runs-on: ${{ matrix.os }}
 

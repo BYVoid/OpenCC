@@ -33,8 +33,15 @@ if (WIN32)
 endif()
 
 ## opencc
-add_executable(opencc CommandLine.cpp)
+add_executable(opencc
+  CommandLine.cpp
+  CommandLineMain.cpp
+  PlatformIO.cpp
+)
 target_link_libraries(opencc libopencc)
+if (WIN32)
+  target_link_libraries(opencc shell32)
+endif()
 
 ## opencc_dict
 add_executable(opencc_dict DictConverter.cpp)

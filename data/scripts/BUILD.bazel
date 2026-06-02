@@ -1,5 +1,6 @@
 load("@rules_python//python:py_binary.bzl", "py_binary")
 load("@rules_python//python:py_library.bzl", "py_library")
+load("@rules_python//python:py_test.bzl", "py_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -11,6 +12,19 @@ py_library(
 py_binary(
     name = "reverse",
     srcs = ["reverse.py"],
+    imports = ["."],
+    deps = [":common"],
+)
+
+py_binary(
+    name = "extract_tofu_risk",
+    srcs = ["extract_tofu_risk.py"],
+)
+
+py_test(
+    name = "common_test",
+    size = "small",
+    srcs = ["common_test.py"],
     imports = ["."],
     deps = [":common"],
 )

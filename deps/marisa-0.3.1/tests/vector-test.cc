@@ -231,6 +231,22 @@ void TestFlatVector() {
   ASSERT(vec.io_size() == (sizeof(std::uint64_t) * 4));
   ASSERT(vec[0] == 0);
 
+  {
+    std::stringstream stream;
+    {
+      marisa::grimoire::Writer writer;
+      writer.open(stream);
+      vec.write(writer);
+    }
+    const std::string data = stream.str();
+    ASSERT(data.size() == vec.io_size());
+    ASSERT(data.size() >= (sizeof(std::uint64_t) * 2));
+    for (std::size_t i = sizeof(std::uint64_t);
+         i < (sizeof(std::uint64_t) * 2); ++i) {
+      ASSERT(data[i] == '\0');
+    }
+  }
+
   values.push_back(255);
   vec.build(values);
 

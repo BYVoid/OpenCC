@@ -1,0 +1,21 @@
+# Open Chinese Convert (OpenCC) Dictionary
+# File: HKVariantsPhrases.txt
+# Format: key	value(s) (values separated by spaces)
+# License: Apache-2.0 (see LICENSE)
+# Source: https://github.com/ByVoid/OpenCC
+# Used in configs: s2hk.json, t2hk.json
+#
+# Notes:
+# - This file contains phrase-level exceptions for forward Hong Kong variant
+#   conversion. When a phrase here is matched, that span is converted by this
+#   entry and is not affected by the character-level HKVariants.txt mappings.
+# - It is related to HKVariantsRevPhrases.txt, but the two files are not
+#   required to be exact reverse mappings. Each file should cover the phrase
+#   exceptions needed by its own conversion direction.
+
+喫茶小舖	喫茶小舖
+無線新聞	無綫新聞
+無線新聞台	無綫新聞台
+牛驥同一皁	牛驥同一皁
+牛驥同皁	牛驥同皁
+純喫茶	純喫茶

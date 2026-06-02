@@ -8,3 +8,13 @@ cc_library(
     includes = ["include/node"],
     strip_include_prefix = "include/node",
 )
+
+filegroup(
+    name = "all_files",
+    srcs = glob(["include/node/**/*.h"]),
+)
+
+filegroup(
+    name = "node_api_header",
+    srcs = ["include/node/node_api.h"],
+)

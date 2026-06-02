@@ -22,6 +22,7 @@
 #include "ConversionInspection.hpp"
 #include "Converter.hpp"
 #include "Segments.hpp"
+#include "UTF8Util.hpp"
 
 using namespace opencc;
 
@@ -66,4 +67,55 @@ ConversionInspectionResult Converter::Inspect(const std::string& text) const {
   }
 
   return result;
+}
+
+std::string ConverterStream::ConvertChunk(const char* input, size_t length) {
+  if (length > 0) {
+    pending.append(input, length);
+  }
+  if (pending.empty()) {
+    return std::string();
+  }
+
+  const char* bufferBegin = pending.data();
+  const char* bufferEnd = bufferBegin + pending.size();
+  const char* completeEnd = bufferBegin;
+  while (completeEnd < bufferEnd) {
+    const size_t nextCharLen = UTF8Util::NextCharLength(completeEnd);
+    if (completeEnd + nextCharLen > bufferEnd) {
+      break;
+    }
+    completeEnd += nextCharLen;
+  }
+
+  const char* keepStart = completeEnd;
+  size_t charsKept = 0;
+  while (keepStart > bufferBegin && charsKept < maxKeepChars) {
+    const size_t prevCharLen = UTF8Util::PrevCharLength(keepStart);
+    keepStart -= prevCharLen;
+    charsKept++;
+  }
+
+  if (keepStart == bufferBegin) {
+    return std::string();
+  }
+
+  const std::string output = converter->Convert(
+      std::string(bufferBegin, static_cast<size_t>(keepStart - bufferBegin)));
+  pending.erase(0, static_cast<size_t>(keepStart - bufferBegin));
+  return output;
+}
+
+std::string ConverterStream::Finish() {
+  const std::string output = pending.empty() ? std::string()
+                                             : converter->Convert(pending);
+  pending.clear();
+  return output;
+}
+
+std::string ConverterStream::Finish(const char* input, size_t length) {
+  if (length > 0) {
+    pending.append(input, length);
+  }
+  return Finish();
 }

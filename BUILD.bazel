@@ -4,7 +4,7 @@ load("@rules_python//python:py_library.bzl", "py_library")
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-    name = "opencc",
+    name = "opencc_lib",
     hdrs = [
         "//src:ConversionInspection.hpp",
         "//src:Export.hpp",
@@ -18,8 +18,13 @@ cc_library(
     ],
     strip_include_prefix = "src",
     deps = [
-        "//src:opencc",
+        "//src:opencc_lib",
     ],
+)
+
+alias(
+    name = "opencc",
+    actual = ":opencc_lib",
 )
 
 py_library(

@@ -25,7 +25,7 @@ jobs:
         include:
           - os: macos-14
             node-version: 22
-          - os: windows-latest
+          - os: windows-2022
             node-version: 22
     steps:
       - uses: actions/checkout@v4

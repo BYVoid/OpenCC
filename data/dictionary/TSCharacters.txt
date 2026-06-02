@@ -4,205 +4,362 @@
 # License: Apache-2.0 (see LICENSE)
 # Source: https://github.com/ByVoid/OpenCC
 # Used in configs: hk2s.json, t2s.json, tw2s.json, tw2sp.json
+#
+# Audit notes for rare inferred simplified forms:
+# Lines tagged @tofu-risk keep the original character as the default candidate.
+# Their rare inferred simplified forms may render as tofu on mainstream default
+# fonts, so they are generated into TSCharactersExt.txt as a separate table.
 
-㑮	𫝈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫝈 U+2B748
+㑮	㑮 𫝈
 㑯	㑔
 㑳	㑇
 㑶	㐹
-㒓	𠉂
-㓄	𪠟
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠉂 U+20242
+㒓	㒓 𠉂
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪠟 U+2A81F
+㓄	㓄 𪠟
 㓨	刾
-㔋	𪟎
-㖮	𪠵
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪟎 U+2A7CE
+㔋	㔋 𪟎
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪠵 U+2A835
+㖮	㖮 𪠵
 㗲	𠵾
-㗿	𪡛
-㘉	𠰱
-㘓	𪢌
-㘔	𫬐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪡛 U+2A85B
+㗿	㗿 𪡛
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠰱 U+20C31
+㘉	㘉 𠰱
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪢌 U+2A88C
+㘓	㘓 𪢌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫬐 U+2BB10
+㘔	㘔 𫬐
 㘚	㘎
-㛝	𫝦
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫝦 U+2B766
+㛝	㛝 𫝦
 㜄	㚯
 㜏	㛣
-㜐	𫝧
-㜗	𡞋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫝧 U+2B767
+㜐	㜐 𫝧
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𡞋 U+2178B
+㜗	㜗 𡞋
 㜢	𡞱
-㜷	𡝠
-㞞	𪨊
-㟺	𪩇
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𡝠 U+21760
+㜷	㜷 𡝠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪨊 U+2AA0A
+㞞	㞞 𪨊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪩇 U+2AA47
+㟺	㟺 𪩇
 㠏	㟆
 㠣	𫵷
-㢗	𪪑
-㢝	𢋈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪪑 U+2AA91
+㢗	㢗 𪪑
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𢋈 U+222C8
+㢝	㢝 𢋈
 㥮	㤘
-㦎	𢛯
-㦛	𢗓
-㦞	𪫷
-㨻	𪮃
-㩋	𪮋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𢛯 U+226EF
+㦎	㦎 𢛯
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𢗓 U+225D3
+㦛	㦛 𢗓
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪫷 U+2AAF7
+㦞	㦞 𪫷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪮃 U+2AB83
+㨻	㨻 𪮃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪮋 U+2AB8B
+㩋	㩋 𪮋
 㩜	㨫
 㩳	㧐
 㩵	擜
-㪎	𪯋
-㯤	𣘐
-㰙	𣗙
-㵗	𣳆
-㵾	𪷍
-㶆	𫞛
-㷍	𤆢
-㷿	𤈷
-㸇	𤎺
-㹽	𫞣
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪯋 U+2ABCB
+㪎	㪎 𪯋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣘐 U+23610
+㯤	㯤 𣘐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣗙 U+235D9
+㰙	㰙 𣗙
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣳆 U+23CC6
+㵗	㵗 𣳆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪷍 U+2ADCD
+㵾	㵾 𪷍
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫞛 U+2B79B
+㶆	㶆 𫞛
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤆢 U+241A2
+㷍	㷍 𤆢
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤈷 U+24237
+㷿	㷿 𤈷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤎺 U+243BA
+㸇	㸇 𤎺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫞣 U+2B7A3
+㹽	㹽 𫞣
 㺏	𤠋
-㺜	𪺻
-㻶	𪼋
-㿖	𪽮
-㿗	𤻊
-㿧	𤽯
-䀉	𥁢
-䀹	𥅴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪺻 U+2AEBB
+㺜	㺜 𪺻
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪼋 U+2AF0B
+㻶	㻶 𪼋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪽮 U+2AF6E
+㿖	㿖 𪽮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤻊 U+24ECA
+㿗	㿗 𤻊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤽯 U+24F6F
+㿧	㿧 𤽯
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥁢 U+25062
+䀉	䀉 𥁢
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥅴 U+25174
+䀹	䀹 𥅴
 䁪	𥇢
 䁻	䀥
-䂎	𥎝
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥎝 U+2539D
+䂎	䂎 𥎝
 䃮	鿎
-䅐	𫀨
-䅳	𫀬
-䆉	𫁂
-䉑	𫁲
-䉙	𥬀
-䉬	𫂈
-䉲	𥮜
-䉶	𫁷
-䊭	𥺅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫀨 U+2B028
+䅐	䅐 𫀨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫀬 U+2B02C
+䅳	䅳 𫀬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫁂 U+2B042
+䆉	䆉 𫁂
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫁲 U+2B072
+䉑	䉑 𫁲
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥬀 U+25B00
+䉙	䉙 𥬀
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫂈 U+2B088
+䉬	䉬 𫂈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥮜 U+25B9C
+䉲	䉲 𥮜
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫁷 U+2B077
+䉶	䉶 𫁷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥺅 U+25E85
+䊭	䊭 𥺅
 䊷	䌶
-䊺	𫄚
-䋃	𫄜
-䋔	𫄞
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄚 U+2B11A
+䊺	䊺 𫄚
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄜 U+2B11C
+䋃	䋃 𫄜
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄞 U+2B11E
+䋔	䋔 𫄞
 䋙	䌺
 䋚	䌻
-䋦	𫄩
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄩 U+2B129
+䋦	䋦 𫄩
 䋹	䌿
 䋻	䌾
-䋼	𫄮
-䋿	𦈓
-䌈	𦈖
-䌋	𦈘
-䌖	𦈜
-䌝	𦈟
-䌟	𦈞
-䌥	𦈠
-䌰	𦈙
-䍤	𫅅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄮 U+2B12E
+䋼	䋼 𫄮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈓 U+26213
+䋿	䋿 𦈓
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈖 U+26216
+䌈	䌈 𦈖
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈘 U+26218
+䌋	䌋 𦈘
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈜 U+2621C
+䌖	䌖 𦈜
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈟 U+2621F
+䌝	䌝 𦈟
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈞 U+2621E
+䌟	䌟 𦈞
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈠 U+26220
+䌥	䌥 𦈠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈙 U+26219
+䌰	䌰 𦈙
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫅅 U+2B145
+䍤	䍤 𫅅
 䍦	䍠
-䍽	𦍠
-䎙	𫅭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦍠 U+26360
+䍽	䍽 𦍠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫅭 U+2B16D
+䎙	䎙 𫅭
 䎱	䎬
 䓣	𬜯
-䕤	𫟕
-䕳	𦰴
-䖅	𫟑
-䗅	𫊪
-䗿	𧉞
-䙔	𫋲
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟕 U+2B7D5
+䕤	䕤 𫟕
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦰴 U+26C34
+䕳	䕳 𦰴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟑 U+2B7D1
+䖅	䖅 𫟑
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫊪 U+2B2AA
+䗅	䗅 𫊪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𧉞 U+2725E
+䗿	䗿 𧉞
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫋲 U+2B2F2
+䙔	䙔 𫋲
 䙡	䙌
-䙱	𧜭
-䚩	𫌯
-䛄	𫍠
-䛳	𫍫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𧜭 U+2772D
+䙱	䙱 𧜭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫌯 U+2B32F
+䚩	䚩 𫌯
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍠 U+2B360
+䛄	䛄 𫍠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍫 U+2B36B
+䛳	䛳 𫍫
 䜀	䜧
-䜖	𫟢
-䝭	𫎧
-䝻	𧹕
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟢 U+2B7E2
+䜖	䜖 𫟢
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫎧 U+2B3A7
+䝭	䝭 𫎧
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𧹕 U+27E55
+䝻	䝻 𧹕
 䝼	䞍
-䞈	𧹑
-䞋	𫎪
-䞓	𫎭
-䟃	𫎺
-䟆	𫎳
-䟐	𫎱
-䠆	𫏃
-䠱	𨅛
-䡐	𫟤
-䡩	𫟥
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𧹑 U+27E51
+䞈	䞈 𧹑
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫎪 U+2B3AA
+䞋	䞋 𫎪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫎭 U+2B3AD
+䞓	䞓 𫎭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫎺 U+2B3BA
+䟃	䟃 𫎺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫎳 U+2B3B3
+䟆	䟆 𫎳
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫎱 U+2B3B1
+䟐	䟐 𫎱
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫏃 U+2B3C3
+䠆	䠆 𫏃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨅛 U+2815B
+䠱	䠱 𨅛
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟤 U+2B7E4
+䡐	䡐 𫟤
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟥 U+2B7E5
+䡩	䡩 𫟥
 䡵	𫟦
-䢨	𨑹
-䤤	𫟺
-䥄	𫠀
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨑹 U+28479
+䢨	䢨 𨑹
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟺 U+2B7FA
+䤤	䤤 𫟺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫠀 U+2B800
+䥄	䥄 𫠀
 䥇	䦂
 䥑	鿏
 䥕	𬭯
-䥗	𫔋
-䥩	𨱖
-䥯	𫔆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔋 U+2B50B
+䥗	䥗 𫔋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱖 U+28C56
+䥩	䥩 𨱖
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔆 U+2B506
+䥯	䥯 𫔆
 䥱	䥾
-䦘	𨸄
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨸄 U+28E04
+䦘	䦘 𨸄
 䦛	䦶
 䦟	䦷
-䦯	𫔵
-䦳	𨷿
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔵 U+2B535
+䦯	䦯 𫔵
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨷿 U+28DFF
+䦳	䦳 𨷿
 䧢	𨸟
-䪊	𫖅
-䪏	𩏼
-䪗	𩐀
-䪘	𩏿
-䪴	𫖫
-䪾	𫖬
-䫀	𫖱
-䫂	𫖰
-䫟	𫖲
-䫴	𩖗
-䫶	𫖺
-䫻	𫗇
-䫾	𫠈
-䬓	𫗊
-䬘	𩙮
-䬝	𩙯
-䬞	𩙧
-䬧	𫗟
-䭀	𩠇
-䭃	𩠈
-䭑	𫗱
-䭔	𫗰
-䭿	𩧭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖅 U+2B585
+䪊	䪊 𫖅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩏼 U+293FC
+䪏	䪏 𩏼
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩐀 U+29400
+䪗	䪗 𩐀
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩏿 U+293FF
+䪘	䪘 𩏿
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖫 U+2B5AB
+䪴	䪴 𫖫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖬 U+2B5AC
+䪾	䪾 𫖬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖱 U+2B5B1
+䫀	䫀 𫖱
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖰 U+2B5B0
+䫂	䫂 𫖰
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖲 U+2B5B2
+䫟	䫟 𫖲
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩖗 U+29597
+䫴	䫴 𩖗
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖺 U+2B5BA
+䫶	䫶 𫖺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗇 U+2B5C7
+䫻	䫻 𫗇
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫠈 U+2B808
+䫾	䫾 𫠈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗊 U+2B5CA
+䬓	䬓 𫗊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩙮 U+2966E
+䬘	䬘 𩙮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩙯 U+2966F
+䬝	䬝 𩙯
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩙧 U+29667
+䬞	䬞 𩙧
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗟 U+2B5DF
+䬧	䬧 𫗟
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩠇 U+29807
+䭀	䭀 𩠇
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩠈 U+29808
+䭃	䭃 𩠈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗱 U+2B5F1
+䭑	䭑 𫗱
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗰 U+2B5F0
+䭔	䭔 𫗰
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧭 U+299ED
+䭿	䭿 𩧭
 䮄	𫠊
-䮝	𩧰
-䮞	𩨁
-䮠	𩧿
-䮫	𩨇
-䮰	𫘮
-䮳	𩨏
-䮾	𩧪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧰 U+299F0
+䮝	䮝 𩧰
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩨁 U+29A01
+䮞	䮞 𩨁
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧿 U+299FF
+䮠	䮠 𩧿
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩨇 U+29A07
+䮫	䮫 𩨇
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫘮 U+2B62E
+䮰	䮰 𫘮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩨏 U+29A0F
+䮳	䮳 𩨏
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧪 U+299EA
+䮾	䮾 𩧪
 䯀	䯅
-䯤	𩩈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩩈 U+29A48
+䯤	䯤 𩩈
 䰾	鲃
-䱀	𫚐
-䱁	𫚏
-䱙	𩾈
-䱧	𫚠
-䱬	𩾊
-䱰	𩾋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚐 U+2B690
+䱀	䱀 𫚐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚏 U+2B68F
+䱁	䱁 𫚏
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩾈 U+29F88
+䱙	䱙 𩾈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚠 U+2B6A0
+䱧	䱧 𫚠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩾊 U+29F8A
+䱬	䱬 𩾊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩾋 U+29F8B
+䱰	䱰 𩾋
 䱷	䲣
-䱸	𫠑
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫠑 U+2B811
+䱸	䱸 𫠑
 䱽	䲝
 䲁	鳚
-䲅	𫚜
-䲖	𩾂
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚜 U+2B69C
+䲅	䲅 𫚜
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩾂 U+29F82
+䲖	䲖 𩾂
 䲘	鳤
-䲰	𪉂
-䳜	𫛬
-䳢	𫛰
-䳤	𫛮
-䳧	𫛺
-䳫	𫛼
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉂 U+2A242
+䲰	䲰 𪉂
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛬 U+2B6EC
+䳜	䳜 𫛬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛰 U+2B6F0
+䳢	䳢 𫛰
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛮 U+2B6EE
+䳤	䳤 𫛮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛺 U+2B6FA
+䳧	䳧 𫛺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛼 U+2B6FC
+䳫	䳫 𫛼
 䴉	鹮
-䴋	𫜅
-䴬	𪎈
-䴱	𫜒
-䴴	𪎋
-䴽	𫜔
-䵳	𪑅
-䵴	𫜙
-䶕	𫜨
-䶲	𫜳
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜅 U+2B705
+䴋	䴋 𫜅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪎈 U+2A388
+䴬	䴬 𪎈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜒 U+2B712
+䴱	䴱 𫜒
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪎋 U+2A38B
+䴴	䴴 𪎋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜔 U+2B714
+䴽	䴽 𫜔
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪑅 U+2A445
+䵳	䵳 𪑅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜙 U+2B719
+䵴	䵴 𫜙
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜨 U+2B728
+䶕	䶕 𫜨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜳 U+2B733
+䶲	䶲 𫜳
 丟	丢
 並	并
 乾	干 乾
@@ -219,7 +376,8 @@
 侷	局
 俁	俣
 係	系
-俓	𠇹
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠇹 U+201F9
+俓	俓 𠇹
 俔	伣
 俠	侠
 俥	伡
@@ -274,9 +432,11 @@
 儕	侪
 儘	尽 侭
 償	偿
-儣	𠆲
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠆲 U+201B2
+儣	儣 𠆲
 優	优
-儭	𠋆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠋆 U+202C6
+儭	儭 𠋆
 儲	储
 儷	俪
 儸	㑩
@@ -294,7 +454,8 @@
 冪	幂
 凈	净
 凍	冻
-凙	𪞝
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪞝 U+2A79D
+凙	凙 𪞝
 凜	凛
 凱	凯
 別	别
@@ -310,7 +471,8 @@
 剴	剀
 創	创
 剷	铲
-剾	𠛅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠛅 U+206C5
+剾	剾 𠛅
 劃	划 㓰
 劇	剧
 劉	刘
@@ -321,7 +483,8 @@
 劑	剂
 劚	㔉
 勁	劲
-勑	𠡠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠡠 U+20860
+勑	勑 𠡠
 動	动
 務	务
 勛	勋
@@ -358,9 +521,11 @@
 呂	吕
 咼	呙
 員	员
-哯	𠯟
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠯟 U+20BDF
+哯	哯 𠯟
 唄	呗
-唓	𪠳
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪠳 U+2A833
+唓	唓 𪠳
 唸	念
 問	问
 啓	启
@@ -382,7 +547,8 @@
 嗩	唢
 嗰	𠮶
 嗶	哔
-嗹	𪡏
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪡏 U+2A84F
+嗹	嗹 𪡏
 嘆	叹
 嘍	喽
 嘓	啯
@@ -391,21 +557,26 @@
 嘗	尝
 嘜	唛
 嘩	哗
-嘪	𪡃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪡃 U+2A843
+嘪	嘪 𪡃
 嘮	唠
 嘯	啸
 嘰	叽
-嘳	𪡞
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪡞 U+2A85E
+嘳	嘳 𪡞
 嘵	哓
 嘸	呒
-嘺	𪡀
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪡀 U+2A840
+嘺	嘺 𪡀
 嘽	啴
 噁	恶 𫫇
-噅	𠯠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠯠 U+20BE0
+噅	噅 𠯠
 噓	嘘
 噚	㖊
 噝	咝
-噞	𪡋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪡋 U+2A84B
+噞	噞 𪡋
 噠	哒
 噥	哝
 噦	哕
@@ -420,7 +591,8 @@
 嚐	尝
 嚕	噜
 嚙	啮
-嚛	𪠸
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪠸 U+2A838
+嚛	嚛 𪠸
 嚥	咽
 嚦	呖
 嚧	𠰷
@@ -430,17 +602,20 @@
 嚳	喾
 嚴	严
 嚶	嘤
-嚽	𪢕
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪢕 U+2A895
+嚽	嚽 𪢕
 囀	啭
 囁	嗫
 囂	嚣
-囃	𠱞
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠱞 U+20C5E
+囃	囃 𠱞
 囅	冁
 囈	呓
 囉	啰
 囌	苏
 囑	嘱
-囒	𪢠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪢠 U+2A8A0
+囒	囒 𪢠
 囪	囱
 圇	囵
 國	国
@@ -449,17 +624,21 @@
 圓	圆
 圖	图
 團	团
-圞	𪢮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪢮 U+2A8AE
+圞	圞 𪢮
+坏	坯
 垻	坝
 埡	垭
 埨	𫭢
-埬	𪣆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪣆 U+2A8C6
+埬	埬 𪣆
 埰	采
 執	执
 堅	坚
 堊	垩
 堖	垴
-堚	𪣒
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪣒 U+2A8D2
+堚	堚 𪣒
 堝	埚
 堯	尧
 報	报
@@ -481,13 +660,15 @@
 墠	𫮃
 墮	堕
 墰	坛
-墲	𪢸
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪢸 U+2A8B8
+墲	墲 𪢸
 墳	坟
 墶	垯
 墻	墙
 墾	垦
 壇	坛
-壈	𡒄
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𡒄 U+21484
+壈	壈 𡒄
 壋	垱
 壎	埙
 壓	压
@@ -500,7 +681,8 @@
 壟	垄
 壠	垅
 壢	坜
-壣	𪤚
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪤚 U+2A91A
+壣	壣 𪤚
 壩	坝
 壪	塆
 壯	壮
@@ -524,10 +706,12 @@
 娙	𫰛
 娛	娱
 婁	娄
-婡	𫝫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫝫 U+2B76B
+婡	婡 𫝫
 婦	妇
 婭	娅
-媈	𫝨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫝨 U+2B768
+媈	媈 𫝨
 媧	娲
 媯	妫
 媰	㛀
@@ -541,34 +725,44 @@
 嫿	婳
 嬀	妫
 嬃	媭
-嬇	𫝬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫝬 U+2B76C
+嬇	嬇 𫝬
 嬈	娆
 嬋	婵
 嬌	娇
 嬙	嫱
 嬡	嫒
-嬣	𪥰
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪥰 U+2A970
+嬣	嬣 𪥰
 嬤	嬷
-嬦	𫝩
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫝩 U+2B769
+嬦	嬦 𫝩
 嬪	嫔
 嬰	婴
 嬸	婶
-嬻	𪥿
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪥿 U+2A97F
+嬻	嬻 𪥿
 孃	娘
-孄	𫝮
-孆	𫝭
-孇	𪥫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫝮 U+2B76E
+孄	孄 𫝮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫝭 U+2B76D
+孆	孆 𫝭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪥫 U+2A96B
+孇	孇 𪥫
 孋	㛤
 孌	娈
-孎	𡠟
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𡠟 U+2181F
+孎	孎 𡠟
 孫	孙
 學	学
 孻	𡥧
-孾	𪧀
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪧀 U+2A9C0
+孾	孾 𪧀
 孿	孪
 宮	宫
 寀	采
-寠	𪧘
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪧘 U+2A9D8
+寠	寠 𪧘
 寢	寝
 實	实
 寧	宁
@@ -590,7 +784,8 @@
 屢	屡
 層	层
 屨	屦
-屩	𪨗
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪨗 U+2AA17
+屩	屩 𪨗
 屬	属
 岡	冈
 峯	峰
@@ -605,32 +800,38 @@
 崬	岽
 嵐	岚
 嵗	岁
-嵼	𡶴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𡶴 U+21DB4
+嵼	嵼 𡶴
 嵽	𫶇
 嵾	㟥
 嶁	嵝
 嶄	崭
 嶇	岖
-嶈	𡺃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𡺃 U+21E83
+嶈	嶈 𡺃
 嶔	嵚
 嶗	崂
-嶘	𡺄
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𡺄 U+21E84
+嶘	嶘 𡺄
 嶠	峤
 嶢	峣
 嶧	峄
 嶨	峃
 嶮	崄
 嶸	嵘
-嶹	𫝵
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫝵 U+2B775
+嶹	嶹 𫝵
 嶺	岭
 嶼	屿
 嶽	岳
-巊	𪩎
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪩎 U+2AA4E
+巊	巊 𪩎
 巋	岿
 巒	峦
 巔	巅
 巖	岩
-巗	𪨷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪨷 U+2AA37
+巗	巗 𪨷
 巘	𪩘
 巰	巯
 巹	卺
@@ -643,10 +844,12 @@
 幓	㡎
 幗	帼
 幘	帻
-幝	𪩷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪩷 U+2AA77
+幝	幝 𪩷
 幟	帜
 幣	币
-幩	𪩸
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪩸 U+2AA78
+幩	幩 𪩸
 幫	帮
 幬	帱
 幹	干
@@ -666,7 +869,8 @@
 廡	庑
 廢	废
 廣	广
-廧	𪪞
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪪞 U+2AA9E
+廧	廧 𪪞
 廩	廪
 廬	庐 𪪏
 廳	厅
@@ -675,7 +879,8 @@
 弳	弪
 張	张
 強	强
-彃	𪪼
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪪼 U+2AABC
+彃	彃 𪪼
 彄	𫸩
 彆	别
 彈	弹
@@ -696,7 +901,8 @@
 復	复
 徵	征 徵
 徹	彻
-徿	𪫌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪫌 U+2AACC
+徿	徿 𪫌
 恆	恒
 恥	耻
 悅	悦
@@ -713,7 +919,8 @@
 愨	悫
 愴	怆
 愷	恺
-愻	𢙏
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𢙏 U+2264F
+愻	愻 𢙏
 愾	忾
 慄	栗
 態	态
@@ -738,20 +945,25 @@
 憒	愦
 憖	慭
 憚	惮
-憢	𢙒
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𢙒 U+22652
+憢	憢 𢙒
 憤	愤
 憫	悯
 憮	怃
 憲	宪
 憶	忆
-憸	𪫺
-憹	𢙐
-懀	𢙓
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪫺 U+2AAFA
+憸	憸 𪫺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𢙐 U+22650
+憹	憹 𢙐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𢙓 U+22653
+懀	懀 𢙓
 懇	恳
 應	应
 懌	怿
 懍	懔
-懎	𢠁
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𢠁 U+22801
+懎	懎 𢠁
 懞	蒙
 懟	怼
 懣	懑
@@ -786,7 +998,8 @@
 掆	㧏
 掗	挜
 掙	挣
-掚	𪭵
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪭵 U+2AB75
+掚	掚 𪭵
 掛	挂
 採	采
 揀	拣
@@ -799,8 +1012,10 @@
 搗	捣
 搵	揾
 搶	抢
-摋	𢫬
-摐	𪭢
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𢫬 U+22AEC
+摋	摋 𢫬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪭢 U+2AB62
+摐	摐 𪭢
 摑	掴
 摜	掼
 摟	搂
@@ -810,7 +1025,8 @@
 摺	折
 摻	掺
 撈	捞
-撊	𪭾
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪭾 U+2AB7E
+撊	撊 𪭾
 撏	挦
 撐	撑
 撓	挠
@@ -818,7 +1034,8 @@
 撟	挢
 撣	掸
 撥	拨
-撧	𪮖
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪮖 U+2AB96
+撧	撧 𪮖
 撫	抚
 撲	扑
 撳	揿
@@ -833,10 +1050,13 @@
 擓	㧟
 擔	担
 據	据
-擟	𪭧
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪭧 U+2AB67
+擟	擟 𪭧
 擠	挤
+擡	抬
 擣	捣 𢭏
-擫	𢬍
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𢬍 U+22B0D
+擫	擫 𢬍
 擬	拟
 擯	摈
 擰	拧
@@ -851,7 +1071,8 @@
 擾	扰
 攄	摅
 攆	撵
-攋	𪮶
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪮶 U+2ABB6
+攋	攋 𪮶
 攏	拢
 攔	拦
 攖	撄
@@ -872,12 +1093,14 @@
 數	数
 斂	敛
 斃	毙
-斅	𢽾
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𢽾 U+22F7E
+斅	斅 𢽾
 斆	敩
 斕	斓
 斬	斩
 斷	断
-斸	𣃁
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣃁 U+230C1
+斸	斸 𣃁
 於	于 於
 旂	旗
 旣	既
@@ -896,7 +1119,8 @@
 曆	历
 曇	昙
 曉	晓
-曊	𪰶
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪰶 U+2AC36
+曊	曊 𪰶
 曏	向
 曖	暧
 曠	旷
@@ -916,7 +1140,8 @@
 桱	𣐕
 桿	杆
 梔	栀
-梖	𪱷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪱷 U+2AC77
+梖	梖 𪱷
 梘	枧
 梜	𬂩
 條	条
@@ -933,7 +1158,8 @@
 棶	梾
 椏	桠
 椲	㭏
-楇	𣒌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣒌 U+2348C
+楇	楇 𣒌
 楊	杨
 楓	枫
 楨	桢
@@ -951,7 +1177,8 @@
 槤	梿
 槧	椠
 槨	椁
-槫	𣏢
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣏢 U+233E2
+槫	槫 𣏢
 槮	椮
 槳	桨
 槶	椢
@@ -963,10 +1190,12 @@
 樓	楼
 標	标
 樞	枢
-樠	𣗊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣗊 U+235CA
+樠	樠 𣗊
 樢	㭤
 樣	样
-樤	𣔌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣔌 U+2350C
+樤	樤 𣔌
 樧	榝
 樫	㭴
 樳	桪
@@ -987,15 +1216,18 @@
 檟	槚
 檢	检
 檣	樯
-檭	𣘴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣘴 U+23634
+檭	檭 𣘴
 檮	梼
 檯	台
 檳	槟
-檵	𪲛
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪲛 U+2AC9B
+檵	檵 𪲛
 檸	柠
 檻	槛
 櫃	柜
-櫅	𪲎
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪲎 U+2AC8E
+櫅	櫅 𪲎
 櫍	𬃊
 櫓	橹
 櫚	榈
@@ -1003,7 +1235,8 @@
 櫝	椟
 櫞	橼
 櫟	栎
-櫠	𪲮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪲮 U+2ACAE
+櫠	櫠 𪲮
 櫥	橱
 櫧	槠
 櫨	栌
@@ -1016,16 +1249,21 @@
 櫻	樱
 欄	栏
 欅	榉
-欇	𪳍
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪳍 U+2ACCD
+欇	欇 𪳍
 權	权
-欍	𣐤
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣐤 U+23424
+欍	欍 𣐤
 欏	椤
-欐	𪲔
-欑	𪴙
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪲔 U+2AC94
+欐	欐 𪲔
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪴙 U+2AD19
+欑	欑 𪴙
 欒	栾
 欓	𣗋
 欖	榄
-欘	𣚚
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣚚 U+2369A
+欘	欘 𣚚
 欞	棂
 欽	钦
 歎	叹
@@ -1038,7 +1276,8 @@
 歿	殁
 殘	残
 殞	殒
-殢	𣨼
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣨼 U+23A3C
+殢	殢 𣨼
 殤	殇
 殨	㱮
 殫	殚
@@ -1052,7 +1291,8 @@
 殼	壳
 毀	毁
 毆	殴
-毊	𪵑
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪵑 U+2AD51
+毊	毊 𪵑
 毿	毵
 氂	牦
 氈	毡
@@ -1060,7 +1300,8 @@
 氣	气
 氫	氢
 氬	氩
-氭	𣱝
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣱝 U+23C5D
+氭	氭 𣱝
 氳	氲
 氾	泛
 汎	泛
@@ -1100,7 +1341,8 @@
 溈	沩
 準	准
 溝	沟
-溡	𪶄
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪶄 U+2AD84
+溡	溡 𪶄
 溫	温
 溮	浉
 溳	涢
@@ -1136,14 +1378,16 @@
 潙	沩
 潚	㴋
 潛	潜
-潣	𫞗
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫞗 U+2B797
+潣	潣 𫞗
 潤	润
 潯	浔
 潰	溃
 潷	滗
 潿	涠
 澀	涩
-澅	𣶩
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣶩 U+23DA9
+澅	澅 𣶩
 澆	浇
 澇	涝
 澐	沄
@@ -1153,7 +1397,8 @@
 澦	滪
 澩	泶
 澫	𬇕
-澬	𫞚
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫞚 U+2B79A
+澬	澬 𫞚
 澮	浍
 澱	淀
 澾	㳠
@@ -1175,9 +1420,11 @@
 濺	溅
 濼	泺
 濾	滤
-濿	𪵱
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪵱 U+2AD71
+濿	濿 𪵱
 瀂	澛
-瀃	𣽷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣽷 U+23F77
+瀃	瀃 𣽷
 瀅	滢
 瀆	渎
 瀇	㲿
@@ -1197,7 +1444,8 @@
 瀾	澜
 灃	沣
 灄	滠
-灍	𫞝
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫞝 U+2B79D
+灍	灍 𫞝
 灑	洒
 灒	𪷽
 灕	漓
@@ -1214,7 +1462,8 @@
 烏	乌
 烴	烃
 無	无
-煇	𪸩
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪸩 U+2AE29
+煇	煇 𪸩
 煉	炼
 煒	炜
 煙	烟
@@ -1223,15 +1472,21 @@
 煩	烦
 煬	炀
 煱	㶽
-熂	𪸕
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪸕 U+2AE15
+熂	熂 𪸕
 熅	煴
-熉	𤈶
-熌	𤇄
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤈶 U+24236
+熉	熉 𤈶
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤇄 U+241C4
+熌	熌 𤇄
 熒	荧
-熓	𤆡
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤆡 U+241A1
+熓	熓 𤆡
 熗	炝
-熚	𤇹
-熡	𤋏
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤇹 U+241F9
+熚	熚 𤇹
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤋏 U+242CF
+熡	熡 𤋏
 熰	𬉼
 熱	热
 熲	颎
@@ -1253,15 +1508,21 @@
 燻	熏
 燼	烬
 燾	焘
-爃	𫞡
-爄	𤇃
-爇	𦶟
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫞡 U+2B7A1
+爃	爃 𫞡
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤇃 U+241C3
+爄	爄 𤇃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦶟 U+26D9F
+爇	爇 𦶟
 爍	烁
 爐	炉
-爖	𤇭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤇭 U+241ED
+爖	爖 𤇭
 爛	烂
-爥	𪹳
-爧	𫞠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪹳 U+2AE73
+爥	爥 𪹳
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫞠 U+2B7A0
+爧	爧 𫞠
 爭	争
 爲	为
 爺	爷
@@ -1273,13 +1534,15 @@
 牽	牵
 犖	荦
 犛	牦
-犞	𪺭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪺭 U+2AEAD
+犞	犞 𪺭
 犢	犊
 犧	牺
 狀	状
 狹	狭
 狽	狈
-猌	𪺽
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪺽 U+2AEBD
+猌	猌 𪺽
 猙	狰
 猶	犹
 猻	狲
@@ -1287,10 +1550,12 @@
 獃	呆
 獄	狱
 獅	狮
-獊	𪺷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪺷 U+2AEB7
+獊	獊 𪺷
 獎	奖
 獨	独
-獩	𤞃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤞃 U+24783
+獩	獩 𤞃
 獪	狯
 獫	猃
 獮	狝
@@ -1304,8 +1569,10 @@
 獻	献
 獼	猕
 玀	猡
-玁	𤞤
-珼	𫞥
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤞤 U+247A4
+玁	玁 𤞤
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫞥 U+2B7A5
+珼	珼 𫞥
 現	现
 琱	雕
 琺	珐
@@ -1317,13 +1584,16 @@
 瑩	莹
 瑪	玛
 瑲	玱
-瑻	𪻲
-瑽	𪻐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪻲 U+2AEF2
+瑻	瑻 𪻲
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪻐 U+2AED0
+瑽	瑽 𪻐
 璉	琏
 璊	𫞩
 璕	𬍤
 璗	𬍡
-璝	𪻺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪻺 U+2AEFA
+璝	璝 𪻺
 璡	琎
 璣	玑
 璦	瑷
@@ -1332,16 +1602,20 @@
 環	环
 璵	玙
 璸	瑸
-璼	𫞨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫞨 U+2B7A8
+璼	璼 𫞨
 璽	玺
-璾	𫞦
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫞦 U+2B7A6
+璾	璾 𫞦
 璿	璇
-瓄	𪻨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪻨 U+2AEE8
+瓄	瓄 𪻨
 瓅	𬍛
 瓊	琼
 瓏	珑
 瓔	璎
-瓕	𤦀
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤦀 U+24980
+瓕	瓕 𤦀
 瓚	瓒
 瓛	𤩽
 甌	瓯
@@ -1356,12 +1630,14 @@
 異	异
 畵	画
 當	当
-畼	𪽈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪽈 U+2AF48
+畼	畼 𪽈
 疇	畴
 疊	叠
 痙	痉
 痠	酸
-痮	𪽪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪽪 U+2AF6A
+痮	痮 𪽪
 痾	疴
 瘂	痖
 瘋	疯
@@ -1371,7 +1647,8 @@
 瘡	疮
 瘧	疟
 瘮	瘆
-瘱	𪽷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪽷 U+2AF77
+瘱	瘱 𪽷
 瘲	疭
 瘺	瘘
 瘻	瘘
@@ -1379,7 +1656,8 @@
 癆	痨
 癇	痫
 癉	瘅
-癐	𤶊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤶊 U+24D8A
+癐	癐 𤶊
 癒	愈
 癘	疠
 癟	瘪
@@ -1398,7 +1676,8 @@
 發	发
 皁	皂
 皚	皑
-皟	𤾀
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤾀 U+24F80
+皟	皟 𤾀
 皰	疱
 皸	皲
 皺	皱
@@ -1409,9 +1688,11 @@
 監	监
 盤	盘
 盧	卢
-盨	𪾔
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪾔 U+2AF94
+盨	盨 𪾔
 盪	荡
-眝	𪾣
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪾣 U+2AFA3
+眝	眝 𪾣
 眞	真
 眥	眦
 眾	众
@@ -1422,13 +1703,16 @@
 瞘	眍
 瞜	䁖
 瞞	瞒
-瞤	𥆧
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥆧 U+251A7
+瞤	瞤 𥆧
 瞭	瞭 了
 瞶	瞆
 瞼	睑
 矇	蒙
-矉	𪾸
-矑	𪾦
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪾸 U+2AFB8
+矉	矉 𪾸
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪾦 U+2AFA6
+矑	矑 𪾦
 矓	眬
 矚	瞩
 矯	矫
@@ -1438,7 +1722,8 @@
 硨	砗
 硯	砚
 碕	埼
-碙	𥐻
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥐻 U+2543B
+碙	碙 𥐻
 碩	硕
 碭	砀
 碸	砜
@@ -1457,13 +1742,15 @@
 礆	硷
 礎	础
 礐	𬒈
-礒	𥐟
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥐟 U+2541F
+礒	礒 𥐟
 礙	碍
 礦	矿
 礪	砺
 礫	砾
 礬	矾
-礮	𪿫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪿫 U+2AFEB
+礮	礮 𪿫
 礱	砻
 祇	祇 只
 祕	秘
@@ -1509,9 +1796,11 @@
 竇	窦
 竈	灶
 竊	窃
-竚	𥩟
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥩟 U+25A5F
+竚	竚 𥩟
 竪	竖
-竱	𫁟
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫁟 U+2B05F
+竱	竱 𫁟
 競	竞
 筆	笔
 筍	笋
@@ -1525,7 +1814,8 @@
 築	筑
 篋	箧
 篔	筼
-篘	𥬠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥬠 U+25B20
+篘	篘 𥬠
 篠	筿
 篢	𬕂
 篤	笃
@@ -1533,12 +1823,14 @@
 篳	筚
 篸	𥮾
 簀	箦
-簂	𫂆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫂆 U+2B086
+簂	簂 𫂆
 簍	篓
 簑	蓑
 簞	箪
 簡	简
-簢	𫂃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫂃 U+2B083
+簢	簢 𫂃
 簣	篑
 簫	箫
 簹	筜
@@ -1546,7 +1838,8 @@
 簾	帘
 籃	篮
 籅	𥫣
-籋	𥬞
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥬞 U+25B1E
+籋	籋 𥬞
 籌	筹
 籔	䉤
 籙	箓
@@ -1570,7 +1863,8 @@
 糴	籴
 糶	粜
 糹	纟
-糺	𫄙
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄙 U+2B119
+糺	糺 𫄙
 糾	纠
 紀	纪
 紂	纣
@@ -1596,7 +1890,8 @@
 紜	纭
 紝	纴
 紞	𬘘
-紟	𫄛
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄛 U+2B11B
+紟	紟 𫄛
 紡	纺
 紬	䌷
 紮	扎
@@ -1610,25 +1905,30 @@
 紼	绋
 紿	绐
 絀	绌
-絁	𫄟
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄟 U+2B11F
+絁	絁 𫄟
 終	终
 絃	弦
 組	组
 絅	䌹
 絆	绊
-絍	𫟃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟃 U+2B7C3
+絍	絍 𫟃
 絎	绗
 結	结
 絕	绝
-絙	𫄠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄠 U+2B120
+絙	絙 𫄠
 絛	绦
 絝	绔
 絞	绞
 絡	络
 絢	绚
-絥	𫄢
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄢 U+2B122
+絥	絥 𫄢
 給	给
-絧	𫄡
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄡 U+2B121
+絧	絧 𫄡
 絨	绒
 絪	𬘡
 絰	绖
@@ -1638,15 +1938,18 @@
 絶	绝
 絹	绢
 絺	𫄨
-綀	𦈌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈌 U+2620C
+綀	綀 𦈌
 綁	绑
 綃	绡
 綄	𬘫
 綆	绠
-綇	𦈋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈋 U+2620B
+綇	綇 𦈋
 綈	绨
 綉	绣
-綋	𫟄
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟄 U+2B7C4
+綋	綋 𫟄
 綌	绤
 綎	𬘩
 綏	绥
@@ -1657,7 +1960,8 @@
 綜	综
 綝	𬘭
 綞	缍
-綟	𫄫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄫 U+2B12B
+綟	綟 𫄫
 綠	绿
 綡	𫟅
 綢	绸
@@ -1685,7 +1989,8 @@
 緇	缁
 緊	紧
 緋	绯
-緍	𦈏
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈏 U+2620F
+緍	緍 𦈏
 緑	绿
 緒	绪
 緓	绬
@@ -1696,24 +2001,30 @@
 線	线 缐
 緝	缉
 緞	缎
-緟	𫟆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟆 U+2B7C6
+緟	緟 𫟆
 締	缔
 緡	缗
 緣	缘
-緤	𫄬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄬 U+2B12C
+緤	緤 𫄬
 緦	缌
 編	编
 緩	缓
 緬	缅
-緮	𫄭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄭 U+2B12D
+緮	緮 𫄭
 緯	纬
-緰	𦈕
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈕 U+26215
+緰	緰 𦈕
 緱	缑
 緲	缈
 練	练
 緶	缏
-緷	𦈉
-緸	𦈑
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈉 U+26209
+緷	緷 𦈉
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈑 U+26211
+緸	緸 𦈑
 緹	缇
 緻	致
 緼	缊
@@ -1721,8 +2032,10 @@
 縉	缙
 縊	缢
 縋	缒
-縍	𫄰
-縎	𦈔
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄰 U+2B130
+縍	縍 𫄰
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈔 U+26214
+縎	縎 𦈔
 縐	绉
 縑	缣
 縕	缊
@@ -1734,11 +2047,13 @@
 縣	县
 縧	绦
 縫	缝
-縬	𦈚
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈚 U+2621A
+縬	縬 𦈚
 縭	缡
 縮	缩
 縯	𬙂
-縰	𫄳
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄳 U+2B133
+縰	縰 𫄳
 縱	纵
 縲	缧
 縳	䌸
@@ -1746,39 +2061,50 @@
 縵	缦
 縶	絷
 縷	缕
-縸	𫄲
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄲 U+2B132
+縸	縸 𫄲
 縹	缥
-縺	𦈐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈐 U+26210
+縺	縺 𦈐
 總	总
 績	绩
-繂	𫄴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄴 U+2B134
+繂	繂 𫄴
 繃	绷
 繅	缫
 繆	缪
-繈	𫄶
-繏	𦈝
-繐	𰬸
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄶 U+2B136
+繈	繈 𫄶
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈝 U+2621D
+繏	繏 𦈝
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𰬸 U+30B38
+繐	繐 𰬸
 繒	缯
-繓	𦈛
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈛 U+2621B
+繓	繓 𦈛
 織	织
 繕	缮
 繚	缭
 繞	绕
-繟	𦈎
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈎 U+2620E
+繟	繟 𦈎
 繡	绣
 繢	缋
-繨	𫄤
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄤 U+2B124
+繨	繨 𫄤
 繩	绳
 繪	绘
 繫	系
-繬	𫄱
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄱 U+2B131
+繬	繬 𫄱
 繭	茧
 繮	缰
 繯	缳
 繰	缲
 繳	缴
 繶	𫄷
-繷	𫄣
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄣 U+2B123
+繷	繷 𫄣
 繸	䍁
 繹	绎
 繻	𦈡
@@ -1798,9 +2124,11 @@
 纔	才
 纕	𬙋
 纖	纤
-纗	𫄹
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄹 U+2B139
+纗	纗 𫄹
 纘	缵
-纚	𫄥
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄥 U+2B125
+纚	纚 𫄥
 纜	缆
 缽	钵
 罃	䓨
@@ -1818,7 +2146,8 @@
 羥	羟
 羨	羡
 義	义
-羵	𫅗
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫅗 U+2B157
+羵	羵 𫅗
 羶	膻
 習	习
 翫	玩
@@ -1837,7 +2166,8 @@
 聶	聂
 職	职
 聹	聍
-聻	𫆏
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫆏 U+2B18F
+聻	聻 𫆏
 聽	听
 聾	聋
 肅	肃
@@ -1845,7 +2175,8 @@
 脈	脉
 脛	胫
 脣	唇
-脥	𣍰
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣍰 U+23370
+脥	脥 𣍰
 脩	修
 脫	脱
 脹	胀
@@ -1853,7 +2184,8 @@
 腖	胨
 腡	脶
 腦	脑
-腪	𣍯
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣍯 U+2336F
+腪	腪 𣍯
 腫	肿
 腳	脚
 腸	肠
@@ -1864,14 +2196,16 @@
 膠	胶
 膢	𦝼
 膩	腻
-膹	𪱥
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪱥 U+2AC65
+膹	膹 𪱥
 膽	胆
 膾	脍
 膿	脓
 臉	脸
 臍	脐
 臏	膑
-臗	𣎑
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣎑 U+23391
+臗	臗 𣎑
 臘	腊
 臚	胪
 臟	脏
@@ -1886,7 +2220,8 @@
 舊	旧
 舘	馆
 艙	舱
-艣	𫇛
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫇛 U+2B1DB
+艣	艣 𫇛
 艤	舣
 艦	舰
 艫	舻
@@ -1900,7 +2235,8 @@
 莖	茎
 莢	荚
 莧	苋
-菕	𰰨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𰰨 U+30C28
+菕	菕 𰰨
 華	华
 菴	庵
 菸	烟
@@ -1911,7 +2247,8 @@
 萵	莴
 葉	叶
 葒	荭
-葝	𫈎
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫈎 U+2B20E
+葝	葝 𫈎
 葤	荮
 葦	苇
 葯	药
@@ -1922,12 +2259,14 @@
 蒔	莳
 蒕	蒀
 蒞	莅
-蒭	𫇴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫇴 U+2B1F4
+蒭	蒭 𫇴
 蒼	苍
 蓀	荪
 蓆	席
 蓋	盖
-蓧	𦰏
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦰏 U+26C0F
+蓧	蓧 𦰏
 蓮	莲
 蓯	苁
 蓴	莼
@@ -1949,16 +2288,20 @@
 蕓	芸
 蕕	莸
 蕘	荛
-蕝	𫈵
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫈵 U+2B235
+蕝	蕝 𫈵
 蕢	蒉
 蕩	荡
 蕪	芜
 蕭	萧
-蕳	𫈉
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫈉 U+2B209
+蕳	蕳 𫈉
 蕷	蓣
-蕽	𫇽
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫇽 U+2B1FD
+蕽	蕽 𫇽
 薀	蕰
-薆	𫉁
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫉁 U+2B241
+薆	薆 𫉁
 薈	荟
 薊	蓟
 薌	芗
@@ -1982,7 +2325,8 @@
 藭	䓖
 藴	蕴
 藶	苈
-藷	𫉄
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫉄 U+2B244
+藷	藷 𫉄
 藹	蔼
 藺	蔺
 蘀	萚
@@ -2021,12 +2365,15 @@
 螮	䗖
 螻	蝼
 螿	螀
-蟂	𫋇
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫋇 U+2B2C7
+蟂	蟂 𫋇
 蟄	蛰
 蟈	蝈
 蟎	螨
-蟘	𫋌
-蟜	𫊸
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫋌 U+2B2CC
+蟘	蟘 𫋌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫊸 U+2B2B8
+蟜	蟜 𫊸
 蟣	虮
 蟬	蝉
 蟯	蛲
@@ -2034,7 +2381,8 @@
 蟳	𫊻
 蟶	蛏
 蟻	蚁
-蠀	𧏗
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𧏗 U+273D7
+蠀	蠀 𧏗
 蠁	蚃
 蠅	蝇
 蠆	虿
@@ -2042,15 +2390,18 @@
 蠐	蛴
 蠑	蝾
 蠔	蚝
-蠙	𧏖
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𧏖 U+273D6
+蠙	蠙 𧏖
 蠟	蜡
 蠣	蛎
-蠦	𫊮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫊮 U+2B2AE
+蠦	蠦 𫊮
 蠨	蟏
 蠱	蛊
 蠶	蚕
 蠻	蛮
-蠾	𧑏
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𧑏 U+2744F
+蠾	蠾 𧑏
 衆	众
 衊	蔑
 術	术
@@ -2077,20 +2428,25 @@
 襇	裥
 襉	裥
 襏	袯
-襓	𫋹
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫋹 U+2B2F9
+襓	襓 𫋹
 襖	袄
-襗	𫋷
-襘	𫋻
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫋷 U+2B2F7
+襗	襗 𫋷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫋻 U+2B2FB
+襘	襘 𫋻
 襝	裣
 襠	裆
 襤	褴
 襪	袜
 襬	摆 䙓
 襯	衬
-襰	𧝝
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𧝝 U+2775D
+襰	襰 𧝝
 襲	袭
 襴	襕
-襵	𫌇
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫌇 U+2B307
+襵	襵 𫌇
 覆	覆 复
 覈	核
 見	见
@@ -2099,7 +2455,8 @@
 覓	觅
 視	视
 覘	觇
-覛	𫌪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫌪 U+2B32A
+覛	覛 𫌪
 覡	觋
 覥	觍
 覦	觎
@@ -2108,9 +2465,11 @@
 覯	觏
 覲	觐
 覷	觑
-覹	𫌭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫌭 U+2B32D
+覹	覹 𫌭
 覺	觉
-覼	𫌨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫌨 U+2B328
+覼	覼 𫌨
 覽	览
 覿	觌
 觀	观
@@ -2126,7 +2485,8 @@
 討	讨
 訏	𬣙
 訐	讦
-訑	𫍙
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍙 U+2B359
+訑	訑 𫍙
 訒	讱
 訓	训
 訕	讪
@@ -2134,14 +2494,17 @@
 託	托 讬
 記	记
 訛	讹
-訜	𫍛
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍛 U+2B35B
+訜	訜 𫍛
 訝	讶
-訞	𫍚
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍚 U+2B35A
+訞	訞 𫍚
 訟	讼
 訢	䜣
 訣	诀
 訥	讷
-訨	𫟞
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟞 U+2B7DE
+訨	訨 𫟞
 訩	讻
 訪	访
 設	设
@@ -2154,12 +2517,15 @@
 詀	𧮪
 詁	诂
 詆	诋
-詊	𫟟
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟟 U+2B7DF
+詊	詊 𫟟
 詎	讵
 詐	诈
-詑	𫍡
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍡 U+2B361
+詑	詑 𫍡
 詒	诒
-詓	𫍜
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍜 U+2B35C
+詓	詓 𫍜
 詔	诏
 評	评
 詖	诐
@@ -2187,12 +2553,14 @@
 詷	𫍣
 詼	诙
 詿	诖
-誂	𫍥
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍥 U+2B365
+誂	誂 𫍥
 誄	诔
 誅	诛
 誆	诓
 誇	夸
-誋	𫍪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍪 U+2B36A
+誋	誋 𫍪
 誌	志
 認	认
 誑	诳
@@ -2209,16 +2577,21 @@
 誦	诵
 誨	诲
 說	说
-誫	𫍨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍨 U+2B368
+誫	誫 𫍨
 説	说
 誰	谁
 課	课
-誳	𫍮
-誴	𫟡
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍮 U+2B36E
+誳	誳 𫍮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟡 U+2B7E1
+誴	誴 𫟡
 誶	谇
-誷	𫍬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍬 U+2B36C
+誷	誷 𫍬
 誹	诽
-誺	𫍧
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍧 U+2B367
+誺	誺 𫍧
 誼	谊
 誾	訚
 調	调
@@ -2241,16 +2614,20 @@
 諟	𬤊
 諡	谥
 諢	诨
-諣	𫍩
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍩 U+2B369
+諣	諣 𫍩
 諤	谔
-諥	𫍳
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍳 U+2B373
+諥	諥 𫍳
 諦	谛
 諧	谐
 諫	谏 𫍝
 諭	谕
 諮	咨 谘
-諯	𫍱
-諰	𫍰
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍱 U+2B371
+諯	諯 𫍱
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍰 U+2B370
+諰	諰 𫍰
 諱	讳
 諲	𬤇
 諳	谙
@@ -2266,8 +2643,10 @@
 謂	谓
 謄	誊
 謅	诌
-謆	𫍸
-謉	𫍷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍸 U+2B378
+謆	謆 𫍸
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍷 U+2B377
+謉	謉 𫍷
 謊	谎
 謎	谜
 謏	𫍲
@@ -2285,21 +2664,29 @@
 謫	谪
 謬	谬
 謭	谫
-謯	𫍹
-謱	𫍴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍹 U+2B379
+謯	謯 𫍹
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍴 U+2B374
+謱	謱 𫍴
 謳	讴
-謸	𫍵
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍵 U+2B375
+謸	謸 𫍵
 謹	谨
 謾	谩
 譁	哗
-譂	𫟠
-譅	𰶎
-譆	𫍻
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟠 U+2B7E0
+譂	譂 𫟠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𰶎 U+30D8E
+譅	譅 𰶎
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍻 U+2B37B
+譆	譆 𫍻
 證	证
-譊	𫍢
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍢 U+2B362
+譊	譊 𫍢
 譎	谲
 譏	讥
-譑	𫍤
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍤 U+2B364
+譑	譑 𫍤
 譓	𬤝
 譖	谮
 識	识
@@ -2308,7 +2695,8 @@
 譜	谱
 譞	𫍽
 譟	噪
-譨	𫍦
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍦 U+2B366
+譨	譨 𫍦
 譫	谵
 譭	毁
 譯	译
@@ -2336,10 +2724,13 @@
 豐	丰
 豔	艳
 豬	猪
-豵	𫎆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫎆 U+2B386
+豵	豵 𫎆
 豶	豮
+貍	狸
 貓	猫
-貗	𫎌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫎌 U+2B38C
+貗	貗 𫎌
 貙	䝙
 貝	贝
 貞	贞
@@ -2382,9 +2773,11 @@
 賙	赒
 賚	赉
 賜	赐
-賝	𫎩
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫎩 U+2B3A9
+賝	賝 𫎩
 賞	赏
-賟	𧹖
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𧹖 U+27E56
+賟	賟 𧹖
 賠	赔
 賡	赓
 賢	贤
@@ -2404,23 +2797,27 @@
 購	购
 賽	赛
 賾	赜
-贃	𧹗
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𧹗 U+27E57
+贃	贃 𧹗
 贄	贽
 贅	赘
 贇	赟
 贈	赠
-贉	𫎫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫎫 U+2B3AB
+贉	贉 𫎫
 贊	赞
 贋	赝
 贍	赡
 贏	赢
 贐	赆
-贑	𫎬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫎬 U+2B3AC
+贑	贑 𫎬
 贓	赃
 贔	赑
 贖	赎
 贗	赝
-贚	𫎦
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫎦 U+2B3A6
+贚	贚 𫎦
 贛	赣
 贜	赃
 赬	赪
@@ -2433,15 +2830,18 @@
 踰	逾
 踴	踊
 蹌	跄
-蹔	𫏐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫏐 U+2B3D0
+蹔	蹔 𫏐
 蹕	跸
 蹟	迹
 蹠	跖
 蹣	蹒
 蹤	踪
-蹳	𫏆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫏆 U+2B3C6
+蹳	蹳 𫏆
 蹺	跷
-蹻	𫏋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫏋 U+2B3CB
+蹻	蹻 𫏋
 躂	跶
 躉	趸
 躊	踌
@@ -2452,15 +2852,18 @@
 躒	跞
 躓	踬
 躕	蹰
-躘	𨀁
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨀁 U+28001
+躘	躘 𨀁
 躚	跹
-躝	𨅬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨅬 U+2816C
+躝	躝 𨅬
 躡	蹑
 躥	蹿
 躦	躜
 躪	躏
 軀	躯
-軉	𨉗
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨉗 U+28257
+軉	軉 𨉗
 車	车
 軋	轧
 軌	轨
@@ -2469,25 +2872,32 @@
 軑	轪
 軒	轩
 軔	轫
-軕	𫐅
-軗	𨐅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐅 U+2B405
+軕	軕 𫐅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨐅 U+28405
+軗	軗 𨐅
 軛	轭
-軜	𫐇
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐇 U+2B407
+軜	軜 𫐇
 軝	𬨂
 軟	软
 軤	轷
-軨	𫐉
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐉 U+2B409
+軨	軨 𫐉
 軫	轸
-軬	𫐊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐊 U+2B40A
+軬	軬 𫐊
 軲	轱
-軷	𫐈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐈 U+2B408
+軷	軷 𫐈
 軸	轴
 軹	轵
 軺	轺
 軻	轲
 軼	轶
 軾	轼
-軿	𫐌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐌 U+2B40C
+軿	軿 𫐌
 較	较
 輄	𨐈
 輅	辂
@@ -2500,17 +2910,20 @@
 輓	挽
 輔	辅
 輕	轻
-輖	𫐏
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐏 U+2B40F
+輖	輖 𫐏
 輗	𫐐
 輛	辆
 輜	辎
 輝	辉
 輞	辋
 輟	辍
-輢	𫐎
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐎 U+2B40E
+輢	輢 𫐎
 輥	辊
 輦	辇
-輨	𫐑
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐑 U+2B411
+輨	輨 𫐑
 輩	辈
 輪	轮
 輬	辌
@@ -2518,7 +2931,8 @@
 輯	辑
 輳	辏
 輶	𬨎
-輷	𫐒
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐒 U+2B412
+輷	輷 𫐒
 輸	输
 輻	辐
 輼	辒
@@ -2529,19 +2943,25 @@
 轄	辖
 轅	辕
 轆	辘
-轇	𫐖
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐖 U+2B416
+轇	轇 𫐖
 轉	转
-轊	𫐕
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐕 U+2B415
+轊	轊 𫐕
 轍	辙
 轎	轿
-轐	𫐗
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐗 U+2B417
+轐	轐 𫐗
 轔	辚
-轗	𫐘
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐘 U+2B418
+轗	轗 𫐘
 轟	轰
-轠	𫐙
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐙 U+2B419
+轠	轠 𫐙
 轡	辔
 轢	轹
-轣	𫐆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐆 U+2B406
+轣	轣 𫐆
 轤	轳
 辦	办
 辭	辞
@@ -2565,7 +2985,8 @@
 遠	远
 遡	溯
 適	适
-遱	𫐷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐷 U+2B437
+遱	遱 𫐷
 遲	迟
 遷	迁
 選	选
@@ -2584,7 +3005,8 @@
 鄒	邹
 鄔	邬
 鄖	郧
-鄟	𫑘
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫑘 U+2B458
+鄟	鄟 𫑘
 鄧	邓
 鄩	𬩽
 鄭	郑
@@ -2606,7 +3028,8 @@
 醬	酱
 醱	酦
 醲	𬪩
-醶	𫑷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫑷 U+2B477
+醶	醶 𫑷
 釀	酿
 釁	衅
 釃	酾
@@ -2620,17 +3043,22 @@
 釗	钊
 釘	钉
 釙	钋
-釚	𫟲
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟲 U+2B7F2
+釚	釚 𫟲
 針	针
-釟	𫓥
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓥 U+2B4E5
+釟	釟 𫓥
 釣	钓
 釤	钐
 釦	扣
 釧	钏
-釨	𫓦
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓦 U+2B4E6
+釨	釨 𫓦
 釩	钒
-釲	𫟳
-釳	𨰿
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟳 U+2B7F3
+釲	釲 𫟳
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨰿 U+28C3F
+釳	釳 𨰿
 釴	𬬩
 釵	钗
 釷	钍
@@ -2643,11 +3071,13 @@
 鈃	钘
 鈄	钭
 鈅	钥
-鈆	𫓪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓪 U+2B4EA
+鈆	鈆 𫓪
 鈇	𫓧
 鈈	钚
 鈉	钠
-鈋	𨱂
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱂 U+28C42
+鈋	鈋 𨱂
 鈍	钝
 鈎	钩
 鈐	钤
@@ -2655,20 +3085,26 @@
 鈒	钑
 鈔	钞
 鈕	钮
-鈖	𫟴
-鈗	𫟵
-鈛	𫓨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟴 U+2B7F4
+鈖	鈖 𫟴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟵 U+2B7F5
+鈗	鈗 𫟵
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓨 U+2B4E8
+鈛	鈛 𫓨
 鈞	钧
-鈠	𨱁
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱁 U+28C41
+鈠	鈠 𨱁
 鈡	钟
 鈣	钙
 鈥	钬
 鈦	钛
 鈧	钪
 鈮	铌
-鈯	𨱄
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱄 U+28C44
+鈯	鈯 𨱄
 鈰	铈
-鈲	𨱃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱃 U+28C43
+鈲	鈲 𨱃
 鈳	钶
 鈴	铃
 鈷	钴
@@ -2679,7 +3115,8 @@
 鈾	铀
 鈿	钿
 鉀	钾
-鉁	𨱅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱅 U+28C45
+鉁	鉁 𨱅
 鉅	巨 钜
 鉆	钻
 鉈	铊
@@ -2688,14 +3125,16 @@
 鉋	铇
 鉍	铋
 鉑	铂
-鉔	𫓬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓬 U+2B4EC
+鉔	鉔 𫓬
 鉕	钷
 鉗	钳
 鉚	铆
 鉛	铅
 鉝	𫟷
 鉞	钺
-鉠	𫓭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓭 U+2B4ED
+鉠	鉠 𫓭
 鉢	钵
 鉤	钩
 鉥	𬬸
@@ -2710,18 +3149,24 @@
 鉸	铰
 鉺	铒
 鉻	铬
-鉽	𫟸
-鉾	𫓴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟸 U+2B7F8
+鉽	鉽 𫟸
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓴 U+2B4F4
+鉾	鉾 𫓴
 鉿	铪
 銀	银
-銁	𫓲
-銂	𫟻
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓲 U+2B4F2
+銁	銁 𫓲
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟻 U+2B7FB
+銂	銂 𫟻
 銃	铳
 銅	铜
 銈	𫓯
-銊	𫓰
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓰 U+2B4F0
+銊	銊 𫓰
 銍	铚
-銏	𫟶
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟶 U+2B7F6
+銏	銏 𫟶
 銑	铣
 銓	铨
 銖	铢
@@ -2746,11 +3191,13 @@
 銻	锑
 銼	锉
 鋁	铝
-鋂	𰾄
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𰾄 U+30F84
+鋂	鋂 𰾄
 鋃	锒
 鋅	锌
 鋇	钡
-鋉	𨱈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱈 U+28C48
+鋉	鋉 𨱈
 鋌	铤
 鋏	铗
 鋐	𬭎
@@ -2759,7 +3206,8 @@
 鋙	铻
 鋝	锊
 鋟	锓
-鋠	𫓵
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓵 U+2B4F5
+鋠	鋠 𫓵
 鋣	铘
 鋤	锄
 鋥	锃
@@ -2778,7 +3226,8 @@
 鋼	钢
 錀	𬬭
 錁	锞
-錂	𨱋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱋 U+28C4B
+錂	錂 𨱋
 錄	录
 錆	锖
 錇	锫
@@ -2791,15 +3240,18 @@
 錙	锱
 錚	铮
 錛	锛
-錜	𫓻
-錝	𫓽
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓻 U+2B4FB
+錜	錜 𫓻
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓽 U+2B4FD
+錝	錝 𫓽
 錞	𬭚
 錟	锬
 錠	锭
 錡	锜
 錢	钱
 錤	𫓹
-錥	𫓾
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓾 U+2B4FE
+錥	錥 𫓾
 錦	锦
 錨	锚
 錩	锠
@@ -2811,20 +3263,24 @@
 錶	表
 錸	铼
 錼	镎
-錽	𫓸
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓸 U+2B4F8
+錽	錽 𫓸
 鍀	锝
 鍁	锨
 鍃	锪
-鍄	𨱉
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱉 U+28C49
+鍄	鍄 𨱉
 鍅	钫
 鍆	钔
 鍇	锴
 鍈	锳
-鍉	𫔂
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔂 U+2B502
+鍉	鍉 𫔂
 鍊	炼 链 𫔀
 鍋	锅
 鍍	镀
-鍒	𫔄
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔄 U+2B504
+鍒	鍒 𫔄
 鍔	锷
 鍘	铡
 鍚	钖
@@ -2835,7 +3291,8 @@
 鍩	锘
 鍬	锹
 鍭	𬭤
-鍮	𨱎
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱎 U+28C4E
+鍮	鍮 𨱎
 鍰	锾
 鍵	键
 鍶	锶
@@ -2845,19 +3302,23 @@
 鎂	镁
 鎄	锿
 鎇	镅
-鎈	𫟿
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟿 U+2B7FF
+鎈	鎈 𫟿
 鎊	镑
 鎌	镰
-鎍	𫔅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔅 U+2B505
+鎍	鎍 𫔅
 鎓	𬭩
 鎔	镕
 鎖	锁
 鎘	镉
-鎙	𫔈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔈 U+2B508
+鎙	鎙 𫔈
 鎚	锤
 鎛	镈
 鎝	𨱏
-鎞	𫔇
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔇 U+2B507
+鎞	鎞 𫔇
 鎡	镃
 鎢	钨
 鎣	蓥
@@ -2868,20 +3329,24 @@
 鎬	镐
 鎭	镇
 鎮	镇
-鎯	𨱍
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱍 U+28C4D
+鎯	鎯 𨱍
 鎰	镒
 鎲	镋
 鎳	镍
 鎵	镓
 鎶	鿔
-鎷	𨰾
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨰾 U+28C3E
+鎷	鎷 𨰾
 鎸	镌
 鎿	镎
 鏃	镞
-鏆	𨱌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱌 U+28C4C
+鏆	鏆 𨱌
 鏇	旋 镟
 鏈	链
-鏉	𨱒
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱒 U+28C52
+鏉	鏉 𨱒
 鏌	镆
 鏍	镙
 鏏	𬭬
@@ -2889,7 +3354,8 @@
 鏑	镝
 鏗	铿
 鏘	锵
-鏚	𬭭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𬭭 U+2CB6D
+鏚	鏚 𬭭
 鏜	镗
 鏝	镘
 鏞	镛
@@ -2897,8 +3363,10 @@
 鏡	镜
 鏢	镖
 鏤	镂
-鏥	𫔊
-鏦	𫓩
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔊 U+2B50A
+鏥	鏥 𫔊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓩 U+2B4E9
+鏦	鏦 𫓩
 鏨	錾
 鏰	镚
 鏵	铧
@@ -2907,14 +3375,17 @@
 鏺	䥽
 鏻	𬭸
 鏽	锈
-鏾	𫔌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔌 U+2B50C
+鏾	鏾 𫔌
 鐃	铙
 鐄	𨱑
 鐇	𫔍
-鐈	𫓱
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓱 U+2B4F1
+鐈	鐈 𫓱
 鐋	铴
 鐍	𫔎
-鐎	𨱓
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱓 U+28C53
+鐎	鐎 𨱓
 鐏	𨱔
 鐐	镣
 鐒	铹
@@ -2929,7 +3400,8 @@
 鐧	锏
 鐨	镄
 鐩	𬭼
-鐪	𫓺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓺 U+2B4FA
+鐪	鐪 𫓺
 鐫	镌
 鐮	镰
 鐯	䦃
@@ -2939,12 +3411,15 @@
 鐶	镮
 鐸	铎
 鐺	铛
-鐼	𫔁
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔁 U+2B501
+鐼	鐼 𫔁
 鐽	𫟼
 鐿	镱
-鑀	𰾭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𰾭 U+30FAD
+鑀	鑀 𰾭
 鑄	铸
-鑉	𫠁
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫠁 U+2B801
+鑉	鑉 𫠁
 鑊	镬
 鑌	镔
 鑑	鉴
@@ -2960,7 +3435,8 @@
 鑰	钥
 鑱	镵
 鑲	镶
-鑴	𫔔
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔔 U+2B514
+鑴	鑴 𫔔
 鑷	镊
 鑹	镩
 鑼	锣
@@ -2978,18 +3454,23 @@
 閉	闭
 開	开 𫔭
 閌	闶
-閍	𨸂
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨸂 U+28E02
+閍	閍 𨸂
 閎	闳
 閏	闰
-閐	𨸃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨸃 U+28E03
+閐	閐 𨸃
 閑	闲
 閒	闲 𫔮
 間	间
 閔	闵
-閗	𫔯
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔯 U+2B52F
+閗	閗 𫔯
 閘	闸
-閝	𫠂
-閞	𫔰
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫠂 U+2B802
+閝	閝 𫠂
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔰 U+2B530
+閞	閞 𫔰
 閡	阂
 閣	阁
 閤	合
@@ -3001,7 +3482,8 @@
 閭	闾
 閱	阅
 閲	阅
-閵	𫔴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔴 U+2B534
+閵	閵 𫔴
 閶	阊
 閹	阉
 閻	阎
@@ -3068,9 +3550,11 @@
 電	电
 霑	沾
 霢	霡
-霣	𫕥
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫕥 U+2B565
+霣	霣 𫕥
 霧	雾
-霼	𪵣
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪵣 U+2AD63
+霼	霼 𪵣
 霽	霁
 靂	雳
 靄	霭
@@ -3081,13 +3565,15 @@
 靜	静
 靝	靔
 靦	腼 䩄
-靧	𫖃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖃 U+2B583
+靧	靧 𫖃
 靨	靥
 鞏	巩
 鞝	绱
 鞦	秋
 鞽	鞒
-鞾	𫖇
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖇 U+2B587
+鞾	鞾 𫖇
 韁	缰
 韃	鞑
 韆	千
@@ -3097,12 +3583,15 @@
 韍	韨
 韓	韩
 韙	韪
-韚	𫠅
-韛	𫖔
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫠅 U+2B805
+韚	韚 𫠅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖔 U+2B594
+韛	韛 𫖔
 韜	韬
 韝	鞲 𫖕
 韞	韫
-韠	𫖒
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖒 U+2B592
+韠	韠 𫖒
 韻	韵
 響	响
 頁	页
@@ -3141,9 +3630,12 @@
 頹	颓
 頻	频
 頽	颓
-顂	𩓋
-顃	𩖖
-顅	𫖶
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩓋 U+294CB
+顂	顂 𩓋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩖖 U+29596
+顃	顃 𩖖
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖶 U+2B5B6
+顅	顅 𫖶
 顆	颗
 題	题
 額	额
@@ -3158,7 +3650,8 @@
 顛	颠
 類	类
 顢	颟
-顣	𫖹
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖹 U+2B5B9
+顣	顣 𫖹
 顥	颢
 顧	顾
 顫	颤
@@ -3172,27 +3665,32 @@
 颭	飐
 颮	飑
 颯	飒
-颰	𩙥
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩙥 U+29665
+颰	颰 𩙥
 颱	台
 颳	刮
 颶	飓
-颷	𩙪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩙪 U+2966A
+颷	颷 𩙪
 颸	飔
 颺	飏
 颻	飖
 颼	飕
-颾	𩙫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩙫 U+2966B
+颾	颾 𩙫
 飀	飗
 飄	飘
 飆	飙
 飈	飚
-飋	𫗋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗋 U+2B5CB
+飋	飋 𫗋
 飛	飞
 飠	饣
 飢	饥
 飣	饤
 飥	饦
-飦	𫗞
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗞 U+2B5DE
+飦	飦 𫗞
 飩	饨
 飪	饪
 飫	饫
@@ -3201,8 +3699,10 @@
 飱	飧
 飲	饮
 飴	饴
-飵	𫗢
-飶	𫗣
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗢 U+2B5E2
+飵	飵 𫗢
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗣 U+2B5E3
+飶	飶 𫗣
 飼	饲
 飽	饱
 飾	饰
@@ -3219,7 +3719,8 @@
 餑	饽
 餒	馁
 餓	饿
-餔	𫗦
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗦 U+2B5E6
+餔	餔 𫗦
 餕	馂
 餖	饾
 餗	𫗧
@@ -3229,13 +3730,18 @@
 餜	馃
 餞	饯
 餡	馅
-餦	𫗠
-餧	𫗪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗠 U+2B5E0
+餦	餦 𫗠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗪 U+2B5EA
+餧	餧 𫗪
 館	馆
-餪	𫗬
-餫	𫗥
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗬 U+2B5EC
+餪	餪 𫗬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗥 U+2B5E5
+餫	餫 𫗥
 餬	糊 𫗫
-餭	𫗮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗮 U+2B5EE
+餭	餭 𫗮
 餱	糇 𫗯
 餳	饧
 餵	喂 𫗭
@@ -3260,13 +3766,16 @@
 饘	𫗴
 饜	餍
 饞	馋
-饟	𫗵
-饠	𫗩
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗵 U+2B5F5
+饟	饟 𫗵
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗩 U+2B5E9
+饠	饠 𫗩
 饢	馕
 馬	马
 馭	驭
 馮	冯
-馯	𫘛
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫘛 U+2B61B
+馯	馯 𫘛
 馱	驮
 馳	驰
 馴	驯
@@ -3275,8 +3784,10 @@
 駁	驳
 駃	𫘝
 駉	𬳶
-駊	𫘟
-駎	𩧨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫘟 U+2B61F
+駊	駊 𫘟
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧨 U+299E8
+駎	駎 𩧨
 駐	驻
 駑	驽
 駒	驹
@@ -3285,62 +3796,81 @@
 駕	驾
 駘	骀
 駙	驸
-駚	𩧫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧫 U+299EB
+駚	駚 𩧫
 駛	驶
 駝	驼
-駞	𫘞
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫘞 U+2B61E
+駞	駞 𫘞
 駟	驷
 駡	骂
 駢	骈
-駤	𫘠
-駧	𩧲
-駩	𩧴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫘠 U+2B620
+駤	駤 𫘠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧲 U+299F2
+駧	駧 𩧲
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧴 U+299F4
+駩	駩 𩧴
 駪	𬳽
-駫	𫘡
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫘡 U+2B621
+駫	駫 𫘡
 駭	骇
 駰	骃
 駱	骆
-駶	𩧺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧺 U+299FA
+駶	駶 𩧺
 駸	骎
-駻	𫘣
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫘣 U+2B623
+駻	駻 𫘣
 駼	𬳿
 駿	骏
 騁	骋
 騂	骍
-騃	𫘤
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫘤 U+2B624
+騃	騃 𫘤
 騄	𫘧
 騅	骓
-騉	𫘥
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫘥 U+2B625
+騉	騉 𫘥
 騊	𫘦
 騌	骔
 騍	骒
 騎	骑
 騏	骐
 騑	𬴂
-騔	𩨀
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩨀 U+29A00
+騔	騔 𩨀
 騖	骛
 騙	骗
-騚	𩨊
-騜	𫘩
-騝	𩨃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩨊 U+29A0A
+騚	騚 𩨊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫘩 U+2B629
+騜	騜 𫘩
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩨃 U+29A03
+騝	騝 𩨃
 騞	𬴃
-騟	𩨈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩨈 U+29A08
+騟	騟 𩨈
 騠	𫘨
 騤	骙
 騧	䯄
-騪	𩨄
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩨄 U+29A04
+騪	騪 𩨄
 騫	骞
 騭	骘
 騮	骝
 騰	腾
 騱	𫘬
-騴	𫘫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫘫 U+2B62B
+騴	騴 𫘫
 騵	𫘪
 騶	驺
 騷	骚
 騸	骟
-騻	𫘭
-騼	𫠋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫘭 U+2B62D
+騻	騻 𫘭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫠋 U+2B80B
+騼	騼 𫠋
 騾	骡
 驀	蓦
 驁	骜
@@ -3349,15 +3879,18 @@
 驄	骢 𩨂
 驅	驱
 驊	骅
-驋	𩧯
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧯 U+299EF
+驋	驋 𩧯
 驌	骕
 驍	骁
 驎	𬴊
 驏	骣
-驓	𫘯
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫘯 U+2B62F
+驓	驓 𫘯
 驕	骄
 驗	验
-驙	𫘰
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫘰 U+2B630
+驙	驙 𫘰
 驚	惊
 驛	驿
 驟	骤
@@ -3365,7 +3898,8 @@
 驤	骧
 驥	骥
 驦	骦
-驨	𫘱
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫘱 U+2B631
+驨	驨 𫘱
 驪	骊
 驫	骉
 骯	肮
@@ -3377,9 +3911,11 @@
 髮	发
 鬆	松
 鬍	胡
-鬖	𩭹
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩭹 U+29B79
+鬖	鬖 𩭹
 鬚	须
-鬠	𫘽
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫘽 U+2B63D
+鬠	鬠 𫘽
 鬢	鬓
 鬥	斗
 鬧	闹
@@ -3394,20 +3930,26 @@
 魛	鱽
 魟	𫚉
 魢	鱾
-魥	𩽹
-魦	𫚌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩽹 U+29F79
+魥	魥 𩽹
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚌 U+2B68C
+魦	魦 𫚌
 魨	鲀
 魯	鲁
 魴	鲂
-魵	𫚍
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚍 U+2B68D
+魵	魵 𫚍
 魷	鱿
 魺	鲄
-魽	𫠐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫠐 U+2B810
+魽	魽 𫠐
 鮀	𬶍
 鮁	鲅
 鮃	鲆
-鮄	𫚒
-鮅	𫚑
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚒 U+2B692
+鮄	鮄 𫚒
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚑 U+2B691
+鮅	鮅 𫚑
 鮆	𫚖
 鮈	𬶋
 鮊	鲌
@@ -3426,24 +3968,31 @@
 鮠	𬶏
 鮡	𬶐
 鮣	䲟
-鮤	𫚓
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚓 U+2B693
+鮤	鮤 𫚓
 鮦	鲖
 鮪	鲔
 鮫	鲛
 鮭	鲑
 鮮	鲜
-鮯	𫚗
-鮰	𫚔
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚗 U+2B697
+鮯	鮯 𫚗
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚔 U+2B694
+鮰	鮰 𫚔
 鮳	鲓
-鮵	𫚛
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚛 U+2B69B
+鮵	鮵 𫚛
 鮶	鲪
 鮸	𩾃
 鮺	鲝
-鮿	𫚚
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚚 U+2B69A
+鮿	鮿 𫚚
 鯀	鲧
 鯁	鲠
-鯄	𩾁
-鯆	𫚙
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩾁 U+29F81
+鯄	鯄 𩾁
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚙 U+2B699
+鯆	鯆 𫚙
 鯇	鲩
 鯉	鲤
 鯊	鲨
@@ -3454,7 +4003,8 @@
 鯗	鲞
 鯛	鲷
 鯝	鲴
-鯞	𫚡
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚡 U+2B6A1
+鯞	鯞 𫚡
 鯡	鲱
 鯢	鲵
 鯤	鲲
@@ -3462,15 +4012,19 @@
 鯨	鲸
 鯪	鲮
 鯫	鲰
-鯬	𫚞
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚞 U+2B69E
+鯬	鯬 𫚞
 鯰	鲶
-鯱	𩾇
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩾇 U+29F87
+鯱	鯱 𩾇
 鯴	鲺
-鯶	𩽼
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩽼 U+29F7C
+鯶	鯶 𩽼
 鯷	鳀
 鯻	𬶟
 鯽	鲫
-鯾	𫚣
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚣 U+2B6A3
+鯾	鯾 𫚣
 鯿	鳊
 鰁	鳈
 鰂	鲗
@@ -3479,15 +4033,18 @@
 鰈	鲽
 鰉	鳇
 鰊	𬶠
-鰋	𫚢
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚢 U+2B6A2
+鰋	鰋 𫚢
 鰌	䲡
 鰍	鳅
 鰏	鲾
 鰐	鳄
-鰑	𫚊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚊 U+2B68A
+鰑	鰑 𫚊
 鰒	鳆
 鰓	鳃
-鰕	𫚥
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚥 U+2B6A5
+鰕	鰕 𫚥
 鰛	鳁
 鰜	鳒
 鰟	鳑
@@ -3495,11 +4052,13 @@
 鰣	鲥
 鰤	𫚕
 鰥	鳏
-鰦	𫚤
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚤 U+2B6A4
+鰦	鰦 𫚤
 鰧	䲢
 鰨	鳎
 鰩	鳐
-鰫	𫚦
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚦 U+2B6A6
+鰫	鰫 𫚦
 鰭	鳍
 鰮	鳁
 鰱	鲢
@@ -3512,17 +4071,21 @@
 鰺	鲹
 鰻	鳗
 鰼	鳛
-鰽	𫚧
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚧 U+2B6A7
+鰽	鰽 𫚧
 鰾	鳔
 鱀	𬶨
 鱂	鳉
-鱄	𫚋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚋 U+2B68B
+鱄	鱄 𫚋
 鱅	鳙
-鱆	𫠒
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫠒 U+2B812
+鱆	鱆 𫠒
 鱇	𩾌
 鱈	鳕
 鱉	鳖
-鱊	𫚪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚪 U+2B6AA
+鱊	鱊 𫚪
 鱒	鳟
 鱔	鳝
 鱖	鳜
@@ -3532,13 +4095,15 @@
 鱝	鲼
 鱟	鲎
 鱠	鲙
-鱢	𫚫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚫 U+2B6AB
+鱢	鱢 𫚫
 鱣	鳣
 鱤	鳡
 鱧	鳢
 鱨	鲿
 鱭	鲚
-鱮	𫚈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚈 U+2B688
+鱮	鱮 𫚈
 鱯	鳠
 鱲	𫚭
 鱷	鳄
@@ -3552,59 +4117,79 @@
 鳳	凤
 鳴	鸣
 鳶	鸢
-鳷	𫛛
-鳼	𪉃
-鳽	𫛚
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛛 U+2B6DB
+鳷	鳷 𫛛
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉃 U+2A243
+鳼	鳼 𪉃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛚 U+2B6DA
+鳽	鳽 𫛚
 鳾	䴓
-鴀	𫛜
-鴃	𫛞
-鴅	𫛝
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛜 U+2B6DC
+鴀	鴀 𫛜
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛞 U+2B6DE
+鴃	鴃 𫛞
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛝 U+2B6DD
+鴅	鴅 𫛝
 鴆	鸩
 鴇	鸨
 鴉	鸦
-鴐	𫛤
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛤 U+2B6E4
+鴐	鴐 𫛤
 鴒	鸰
-鴔	𫛡
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛡 U+2B6E1
+鴔	鴔 𫛡
 鴕	鸵
-鴗	𫁡
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫁡 U+2B061
+鴗	鴗 𫁡
 鴛	鸳
-鴜	𪉈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉈 U+2A248
+鴜	鴜 𪉈
 鴝	鸲
 鴞	鸮
 鴟	鸱
 鴣	鸪
-鴥	𫛣
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛣 U+2B6E3
+鴥	鴥 𫛣
 鴦	鸯
 鴨	鸭
-鴮	𫛦
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛦 U+2B6E6
+鴮	鴮 𫛦
 鴯	鸸
 鴰	鸹
-鴲	𪉆
-鴳	𫛩
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉆 U+2A246
+鴲	鴲 𪉆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛩 U+2B6E9
+鴳	鴳 𫛩
 鴴	鸻
 鴷	䴕
 鴻	鸿
-鴽	𫛪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛪 U+2B6EA
+鴽	鴽 𫛪
 鴿	鸽
 鵁	䴔
 鵂	鸺
 鵃	鸼
-鵊	𫛥
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛥 U+2B6E5
+鵊	鵊 𫛥
 鵏	𬷕
 鵐	鹀
 鵑	鹃
 鵒	鹆
 鵓	鹁
-鵚	𪉍
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉍 U+2A24D
+鵚	鵚 𪉍
 鵜	鹈
 鵝	鹅
 鵟	𫛭
 鵠	鹄
 鵡	鹉
-鵧	𫛨
-鵩	𫛳
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛨 U+2B6E8
+鵧	鵧 𫛨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛳 U+2B6F3
+鵩	鵩 𫛳
 鵪	鹌
-鵫	𫛱
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛱 U+2B6F1
+鵫	鵫 𫛱
 鵬	鹏
 鵮	鹐
 鵯	鹎
@@ -3616,23 +4201,29 @@
 鶇	鸫
 鶉	鹑
 鶊	鹒
-鶌	𫛵
-鶒	𫛶
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛵 U+2B6F5
+鶌	鶌 𫛵
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛶 U+2B6F6
+鶒	鶒 𫛶
 鶓	鹋
 鶖	鹙
-鶗	𫛸
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛸 U+2B6F8
+鶗	鶗 𫛸
 鶘	鹕
 鶚	鹗
 鶠	𬸘
 鶡	鹖
 鶥	鹛
-鶦	𫛷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛷 U+2B6F7
+鶦	鶦 𫛷
 鶩	鹜
 鶪	䴗
 鶬	鸧
-鶭	𫛯
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛯 U+2B6EF
+鶭	鶭 𫛯
 鶯	莺
-鶰	𫛫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛫 U+2B6EB
+鶰	鶰 𫛫
 鶱	𬸣
 鶲	鹟
 鶴	鹤
@@ -3645,44 +4236,55 @@
 鷁	鹢
 鷂	鹞
 鷄	鸡
-鷅	𫛽
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛽 U+2B6FD
+鷅	鷅 𫛽
 鷉	䴘
 鷊	鹝
-鷐	𫜀
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜀 U+2B700
+鷐	鷐 𫜀
 鷓	鹧
-鷔	𪉑
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉑 U+2A251
+鷔	鷔 𪉑
 鷖	鹥
 鷗	鸥
 鷙	鸷
 鷚	鹨
 鷟	𬸦
-鷣	𫜃
-鷤	𫛴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜃 U+2B703
+鷣	鷣 𫜃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛴 U+2B6F4
+鷤	鷤 𫛴
 鷥	鸶
 鷦	鹪
-鷨	𪉊
-鷩	𫜁
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉊 U+2A24A
+鷨	鷨 𪉊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜁 U+2B701
+鷩	鷩 𫜁
 鷫	鹔
 鷭	𬸪
 鷯	鹩
 鷲	鹫
 鷳	鹇
 鷴	鹇
-鷷	𫜄
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜄 U+2B704
+鷷	鷷 𫜄
 鷸	鹬
 鷹	鹰
 鷺	鹭
 鷽	鸴
-鷿	𬸯
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𬸯 U+2CE2F
+鷿	鷿 𬸯
 鸂	㶉
 鸇	鹯
 鸊	䴙
-鸋	𫛢
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛢 U+2B6E2
+鸋	鸋 𫛢
 鸌	鹱
 鸏	鹲
 鸑	𬸚
 鸕	鸬
-鸗	𫛟
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛟 U+2B6DF
+鸗	鸗 𫛟
 鸘	鹴
 鸚	鹦
 鸛	鹳
@@ -3695,17 +4297,20 @@
 鹽	盐
 麗	丽
 麥	麦
-麨	𪎊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪎊 U+2A38A
+麨	麨 𪎊
 麩	麸
 麪	面 麺
 麫	面
 麬	𤿲
 麯	曲
-麲	𪎉
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪎉 U+2A389
+麲	麲 𪎉
 麳	𪎌
 麴	曲 麹
 麵	面 麺
-麷	𫜑
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜑 U+2B711
+麷	麷 𫜑
 麼	么 麽
 麽	么 麽
 黃	黄
@@ -3739,382 +4344,680 @@
 齣	出
 齦	龈
 齧	啮 𫜩
-齩	𫜪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜪 U+2B72A
+齩	齩 𫜪
 齪	龊
 齬	龉
-齭	𫜭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜭 U+2B72D
+齭	齭 𫜭
 齮	𬺈
 齯	𫠜
-齰	𫜬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜬 U+2B72C
+齰	齰 𫜬
 齲	龋
-齴	𫜮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜮 U+2B72E
+齴	齴 𫜮
 齶	腭
 齷	龌
 齼	𬺓
-齾	𫜰
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜰 U+2B730
+齾	齾 𫜰
 龍	龙
 龎	厐
 龐	庞
 龑	䶮
-龓	𫜲
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜲 U+2B732
+龓	龓 𫜲
 龔	龚
 龕	龛
 龜	龟
-龭	𩨎
-龯	𨱆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩨎 U+29A0E
+龭	龭 𩨎
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱆 U+28C46
+龯	龯 𨱆
 鿁	䜤
 鿓	鿒
 𠁞	𠀾
-𠌥	𠆿
-𠏢	𠉗
-𠐊	𫝋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠆿 U+201BF
+𠌥	𠌥 𠆿
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠉗 U+20257
+𠏢	𠏢 𠉗
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫝋 U+2B74B
+𠐊	𠐊 𫝋
 𠗣	㓆
-𠞆	𠛆
-𠠎	𠚳
-𠬙	𪠡
-𠽃	𪠺
-𠿕	𪜎
-𡂡	𪢒
-𡃄	𪡺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠛆 U+206C6
+𠞆	𠞆 𠛆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠚳 U+206B3
+𠠎	𠠎 𠚳
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪠡 U+2A821
+𠬙	𠬙 𪠡
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪠺 U+2A83A
+𠽃	𠽃 𪠺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪜎 U+2A70E
+𠿕	𠿕 𪜎
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪢒 U+2A892
+𡂡	𡂡 𪢒
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪡺 U+2A87A
+𡃄	𡃄 𪡺
 𡃕	𠴛
-𡃤	𪢐
-𡄔	𠴢
-𡄣	𠵸
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪢐 U+2A890
+𡃤	𡃤 𪢐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠴢 U+20D22
+𡄔	𡄔 𠴢
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠵸 U+20D78
+𡄣	𡄣 𠵸
 𡅏	𠲥
-𡅯	𪢖
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪢖 U+2A896
+𡅯	𡅯 𪢖
 𡑍	𫭼
 𡑭	𡋗
-𡓁	𪤄
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪤄 U+2A904
+𡓁	𡓁 𪤄
 𡓾	𡋀
 𡔖	𡍣
 𡞵	㛟
-𡟫	𫝪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫝪 U+2B76A
+𡟫	𡟫 𫝪
 𡠹	㛿
 𡢃	㛠
 𡮉	𡭜
 𡮣	𡭬
 𡳳	𡳃
-𡸗	𪨩
-𡹬	𪨹
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪨩 U+2AA29
+𡸗	𡸗 𪨩
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪨹 U+2AA39
+𡹬	𡹬 𪨹
 𡻕	岁
-𡽗	𡸃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𡸃 U+21E03
+𡽗	𡽗 𡸃
 𡾱	㟜
-𡿖	𪩛
-𢍰	𪪴
-𢠼	𢙑
-𢣐	𪬚
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪩛 U+2AA5B
+𡿖	𡿖 𪩛
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪪴 U+2AAB4
+𢍰	𢍰 𪪴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𢙑 U+22651
+𢠼	𢠼 𢙑
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪬚 U+2AB1A
+𢣐	𢣐 𪬚
 𢣚	𢘝
-𢣭	𢘞
-𢤩	𪫡
-𢤱	𢘙
-𢤿	𪬯
-𢯷	𪭝
-𢶒	𪭯
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𢘞 U+2261E
+𢣭	𢣭 𢘞
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪫡 U+2AAE1
+𢤩	𢤩 𪫡
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𢘙 U+22619
+𢤱	𢤱 𢘙
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪬯 U+2AB2F
+𢤿	𢤿 𪬯
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪭝 U+2AB5D
+𢯷	𢯷 𪭝
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪭯 U+2AB6F
+𢶒	𢶒 𪭯
 𢶫	𢫞
-𢷮	𢫊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𢫊 U+22ACA
+𢷮	𢷮 𢫊
 𢹿	𢬦
-𢺳	𪮳
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪮳 U+2ABB3
+𢺳	𢺳 𪮳
 𣈶	暅
-𣋋	𣈣
-𣍐	𫧃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣈣 U+23223
+𣋋	𣋋 𣈣
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫧃 U+2B9C3
+𣍐	𣍐 𫧃
 𣙎	㭣
-𣜬	𪳗
-𣝕	𣘷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪳗 U+2ACD7
+𣜬	𣜬 𪳗
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣘷 U+23637
+𣝕	𣝕 𣘷
 𣞻	𣘓
 𣠩	𣞎
 𣠲	𣑶
-𣯩	𣯣
-𣯴	𣭤
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣯣 U+23BE3
+𣯩	𣯩 𣯣
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣭤 U+23B64
+𣯴	𣯴 𣭤
 𣯶	毶
-𣽏	𪶮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪶮 U+2ADAE
+𣽏	𣽏 𪶮
 𣾷	㳢
-𣿉	𣶫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣶫 U+23DAB
+𣿉	𣿉 𣶫
 𤁣	𣺽
-𤄷	𪶒
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪶒 U+2AD92
+𤄷	𤄷 𪶒
 𤅶	𣷷
-𤑳	𤎻
-𤑹	𪹀
-𤒎	𤊀
-𤒻	𪹹
-𤓌	𪹠
-𤓎	𤎺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤎻 U+243BB
+𤑳	𤑳 𤎻
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪹀 U+2AE40
+𤑹	𤑹 𪹀
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤊀 U+24280
+𤒎	𤒎 𤊀
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪹹 U+2AE79
+𤒻	𤒻 𪹹
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪹠 U+2AE60
+𤓌	𤓌 𪹠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤎺 U+243BA
+𤓎	𤓎 𤎺
 𤓩	𤊰
-𤘀	𪺣
-𤛮	𤙯
-𤛱	𫞢
-𤜆	𪺪
-𤠮	𪺸
-𤢟	𤝢
-𤢻	𢢐
-𤩂	𫞧
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪺣 U+2AEA3
+𤘀	𤘀 𪺣
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤙯 U+2466F
+𤛮	𤛮 𤙯
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫞢 U+2B7A2
+𤛱	𤛱 𫞢
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪺪 U+2AEAA
+𤜆	𤜆 𪺪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪺸 U+2AEB8
+𤠮	𤠮 𪺸
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤝢 U+24762
+𤢟	𤢟 𤝢
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𢢐 U+22890
+𤢻	𤢻 𢢐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫞧 U+2B7A7
+𤩂	𤩂 𫞧
 𤪺	㻘
 𤫩	㻏
-𤬅	𪼴
-𤳷	𪽝
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪼴 U+2AF34
+𤬅	𤬅 𪼴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪽝 U+2AF5D
+𤳷	𤳷 𪽝
 𤳸	𤳄
-𤷃	𪽭
-𤸫	𤶧
-𤺔	𪽴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪽭 U+2AF6D
+𤷃	𤷃 𪽭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𤶧 U+24DA7
+𤸫	𤸫 𤶧
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪽴 U+2AF74
+𤺔	𤺔 𪽴
 𥊝	𥅿
 𥌃	𥅘
-𥏝	𪿊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪿊 U+2AFCA
+𥏝	𥏝 𪿊
 𥕥	𥐰
 𥖅	𥐯
-𥖲	𪿞
-𥗇	𪿵
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪿞 U+2AFDE
+𥖲	𥖲 𪿞
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪿵 U+2AFF5
+𥗇	𥗇 𪿵
 𥗽	𬒗
-𥜐	𫀓
-𥜰	𫀌
-𥞵	𥞦
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫀓 U+2B013
+𥜐	𥜐 𫀓
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫀌 U+2B00C
+𥜰	𥜰 𫀌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥞦 U+257A6
+𥞵	𥞵 𥞦
 𥢢	䅪
-𥢶	𫞷
-𥢷	𫀮
-𥨐	𥧂
-𥪂	𥩺
-𥯤	𫁳
-𥴨	𫂖
-𥴼	𫁺
-𥵃	𥱔
-𥵊	𥭉
-𥶽	𫁱
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫞷 U+2B7B7
+𥢶	𥢶 𫞷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫀮 U+2B02E
+𥢷	𥢷 𫀮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥧂 U+259C2
+𥨐	𥨐 𥧂
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥩺 U+25A7A
+𥪂	𥪂 𥩺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫁳 U+2B073
+𥯤	𥯤 𫁳
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫂖 U+2B096
+𥴨	𥴨 𫂖
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫁺 U+2B07A
+𥴼	𥴼 𫁺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥱔 U+25C54
+𥵃	𥵃 𥱔
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥭉 U+25B49
+𥵊	𥵊 𥭉
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫁱 U+2B071
+𥶽	𥶽 𫁱
 𥸠	𥮋
-𥻦	𫂿
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫂿 U+2B0BF
+𥻦	𥻦 𫂿
 𥼽	𥹥
-𥽖	𥺇
-𥾯	𫄝
-𥿊	𦈈
-𦀖	𫄦
-𦂅	𦈒
-𦃄	𦈗
-𦃩	𫄯
-𦅇	𫄪
-𦅈	𫄵
-𦆲	𫟇
-𦒀	𫅥
-𦔖	𫅼
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𥺇 U+25E87
+𥽖	𥽖 𥺇
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄝 U+2B11D
+𥾯	𥾯 𫄝
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈈 U+26208
+𥿊	𥿊 𦈈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄦 U+2B126
+𦀖	𦀖 𫄦
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈒 U+26212
+𦂅	𦂅 𦈒
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦈗 U+26217
+𦃄	𦃄 𦈗
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄯 U+2B12F
+𦃩	𦃩 𫄯
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄪 U+2B12A
+𦅇	𦅇 𫄪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫄵 U+2B135
+𦅈	𦅈 𫄵
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟇 U+2B7C7
+𦆲	𦆲 𫟇
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫅥 U+2B165
+𦒀	𦒀 𫅥
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫅼 U+2B17C
+𦔖	𦔖 𫅼
 𦘧	𡳒
-𦟼	𫆝
-𦠅	𫞅
-𦡝	𫆫
-𦢈	𣍨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫆝 U+2B19D
+𦟼	𦟼 𫆝
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫞅 U+2B785
+𦠅	𦠅 𫞅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫆫 U+2B1AB
+𦡝	𦡝 𫆫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣍨 U+23368
+𦢈	𦢈 𣍨
 𦣎	𦟗
-𦧺	𫇘
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫇘 U+2B1D8
+𦧺	𦧺 𫇘
 𦪙	䑽
-𦪽	𦨩
-𦱌	𫇪
-𦾟	𦶻
-𧎈	𧌥
-𧒯	𫊹
-𧔥	𧒭
-𧕟	𧉐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦨩 U+26A29
+𦪽	𦪽 𦨩
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫇪 U+2B1EA
+𦱌	𦱌 𫇪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𦶻 U+26DBB
+𦾟	𦾟 𦶻
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𧌥 U+27325
+𧎈	𧎈 𧌥
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫊹 U+2B2B9
+𧒯	𧒯 𫊹
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𧒭 U+274AD
+𧔥	𧔥 𧒭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𧉐 U+27250
+𧕟	𧕟 𧉐
 𧜗	䘞
 𧜵	䙊
 𧝞	䘛
-𧞫	𫌋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫌋 U+2B30B
+𧞫	𧞫 𫌋
 𧟀	𧝧
-𧡴	𫌫
-𧢄	𫌬
-𧦝	𫍞
-𧦧	𫍟
-𧩕	𫍭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫌫 U+2B32B
+𧡴	𧡴 𫌫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫌬 U+2B32C
+𧢄	𧢄 𫌬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍞 U+2B35E
+𧦝	𧦝 𫍞
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍟 U+2B35F
+𧦧	𧦧 𫍟
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍭 U+2B36D
+𧩕	𧩕 𫍭
 𧩙	䜥
-𧩼	𫍶
-𧫝	𫍺
-𧬤	𫍼
-𧭈	𫍾
-𧭹	𫍐
-𧳟	𧳕
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍶 U+2B376
+𧩼	𧩼 𫍶
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍺 U+2B37A
+𧫝	𧫝 𫍺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍼 U+2B37C
+𧬤	𧬤 𫍼
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍾 U+2B37E
+𧭈	𧭈 𫍾
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫍐 U+2B350
+𧭹	𧭹 𫍐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𧳕 U+27CD5
+𧳟	𧳟 𧳕
 𧵳	䞌
-𧶔	𧹓
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𧹓 U+27E53
+𧶔	𧶔 𧹓
 𧶧	䞎
-𧷎	𪠀
-𧸘	𫎨
-𧹈	𪥠
-𧽯	𫎸
-𨂐	𫏌
-𨄣	𨀱
-𨅍	𨁴
-𨆪	𫏕
-𨇁	𧿈
-𨇞	𨅫
-𨇤	𫏨
-𨇰	𫏞
-𨇽	𫏑
-𨈊	𨂺
-𨈌	𨄄
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪠀 U+2A800
+𧷎	𧷎 𪠀
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫎨 U+2B3A8
+𧸘	𧸘 𫎨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪥠 U+2A960
+𧹈	𧹈 𪥠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫎸 U+2B3B8
+𧽯	𧽯 𫎸
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫏌 U+2B3CC
+𨂐	𨂐 𫏌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨀱 U+28031
+𨄣	𨄣 𨀱
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨁴 U+28074
+𨅍	𨅍 𨁴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫏕 U+2B3D5
+𨆪	𨆪 𫏕
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𧿈 U+27FC8
+𨇁	𨇁 𧿈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨅫 U+2816B
+𨇞	𨇞 𨅫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫏨 U+2B3E8
+𨇤	𨇤 𫏨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫏞 U+2B3DE
+𨇰	𨇰 𫏞
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫏑 U+2B3D1
+𨇽	𨇽 𫏑
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨂺 U+280BA
+𨈊	𨈊 𨂺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨄄 U+28104
+𨈌	𨈌 𨄄
 𨊰	䢀
 𨊸	䢁
-𨊻	𨐆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨐆 U+28406
+𨊻	𨊻 𨐆
 𨋢	䢂
-𨌈	𫐍
-𨍰	𫐔
-𨎌	𫐋
-𨎮	𨐉
-𨏠	𨐇
-𨏥	𨐊
-𨞺	𫟫
-𨟊	𫟬
-𨢿	𨡙
-𨣈	𨡺
-𨣞	𨟳
-𨣧	𨠨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐍 U+2B40D
+𨌈	𨌈 𫐍
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐔 U+2B414
+𨍰	𨍰 𫐔
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫐋 U+2B40B
+𨎌	𨎌 𫐋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨐉 U+28409
+𨎮	𨎮 𨐉
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨐇 U+28407
+𨏠	𨏠 𨐇
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨐊 U+2840A
+𨏥	𨏥 𨐊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟫 U+2B7EB
+𨞺	𨞺 𫟫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟬 U+2B7EC
+𨟊	𨟊 𫟬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨡙 U+28859
+𨢿	𨢿 𨡙
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨡺 U+2887A
+𨣈	𨣈 𨡺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨟳 U+287F3
+𨣞	𨣞 𨟳
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨠨 U+28828
+𨣧	𨣧 𨠨
 𨤻	𨤰
-𨥛	𨱀
-𨥟	𫓫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱀 U+28C40
+𨥛	𨥛 𨱀
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓫 U+2B4EB
+𨥟	𨥟 𫓫
 𨦫	䦀
 𨧀	𬭊
 𨧜	䦁
-𨧰	𫟽
-𨧱	𨱊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟽 U+2B7FD
+𨧰	𨧰 𫟽
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱊 U+28C4A
+𨧱	𨧱 𨱊
 𨨏	𬭛
-𨨛	𫓼
-𨨢	𫓿
-𨩰	𫟾
-𨪕	𫓮
-𨫒	𨱐
-𨬖	𫔏
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓼 U+2B4FC
+𨨛	𨨛 𫓼
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓿 U+2B4FF
+𨨢	𨨢 𫓿
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫟾 U+2B7FE
+𨩰	𨩰 𫟾
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓮 U+2B4EE
+𨪕	𨪕 𫓮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱐 U+28C50
+𨫒	𨫒 𨱐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔏 U+2B50F
+𨬖	𨬖 𫔏
 𨭆	𬭶
 𨭎	𬭳
-𨭖	𫔑
-𨭸	𫔐
-𨮂	𨱕
-𨮳	𫔒
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔑 U+2B511
+𨭖	𨭖 𫔑
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔐 U+2B510
+𨭸	𨭸 𫔐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨱕 U+28C55
+𨮂	𨮂 𨱕
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔒 U+2B512
+𨮳	𨮳 𫔒
 𨯅	䥿
-𨯟	𫔓
-𨰃	𫔉
-𨰋	𫓳
-𨰥	𫔕
-𨰲	𫔃
-𨲳	𫔖
-𨳑	𨸁
-𨳕	𨸀
-𨴗	𨸅
-𨴹	𫔲
-𨵩	𨸆
-𨵸	𨸇
-𨶀	𨸉
-𨶏	𨸊
-𨶮	𨸌
-𨶲	𨸋
-𨷲	𨸎
-𨼳	𫔽
-𨽏	𨸘
-𩀨	𫕚
-𩅙	𫕨
-𩎖	𫖑
-𩎢	𩏾
-𩏂	𫖓
-𩏠	𫖖
-𩏪	𩏽
-𩏷	𫃗
-𩑔	𫖪
-𩒎	𫖭
-𩓣	𩖕
-𩓥	𫖵
-𩔑	𫖷
-𩔳	𫖴
-𩖰	𫠇
-𩗀	𩙦
-𩗓	𫗈
-𩗴	𫗉
-𩘀	𩙩
-𩘝	𩙭
-𩘹	𩙨
-𩘺	𩙬
-𩙈	𩙰
-𩚛	𩟿
-𩚥	𩠀
-𩚩	𫗡
-𩚵	𩠁
-𩛆	𩠂
-𩛌	𫗤
-𩛡	𫗨
-𩛩	𩠃
-𩜇	𩠉
-𩜦	𩠆
-𩜵	𩠊
-𩝔	𩠋
-𩝽	𫗳
-𩞄	𩠎
-𩞦	𩠏
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔓 U+2B513
+𨯟	𨯟 𫔓
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔉 U+2B509
+𨰃	𨰃 𫔉
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓳 U+2B4F3
+𨰋	𨰋 𫓳
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔕 U+2B515
+𨰥	𨰥 𫔕
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔃 U+2B503
+𨰲	𨰲 𫔃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔖 U+2B516
+𨲳	𨲳 𫔖
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨸁 U+28E01
+𨳑	𨳑 𨸁
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨸀 U+28E00
+𨳕	𨳕 𨸀
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨸅 U+28E05
+𨴗	𨴗 𨸅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔲 U+2B532
+𨴹	𨴹 𫔲
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨸆 U+28E06
+𨵩	𨵩 𨸆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨸇 U+28E07
+𨵸	𨵸 𨸇
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨸉 U+28E09
+𨶀	𨶀 𨸉
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨸊 U+28E0A
+𨶏	𨶏 𨸊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨸌 U+28E0C
+𨶮	𨶮 𨸌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨸋 U+28E0B
+𨶲	𨶲 𨸋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨸎 U+28E0E
+𨷲	𨷲 𨸎
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫔽 U+2B53D
+𨼳	𨼳 𫔽
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𨸘 U+28E18
+𨽏	𨽏 𨸘
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫕚 U+2B55A
+𩀨	𩀨 𫕚
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫕨 U+2B568
+𩅙	𩅙 𫕨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖑 U+2B591
+𩎖	𩎖 𫖑
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩏾 U+293FE
+𩎢	𩎢 𩏾
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖓 U+2B593
+𩏂	𩏂 𫖓
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖖 U+2B596
+𩏠	𩏠 𫖖
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩏽 U+293FD
+𩏪	𩏪 𩏽
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫃗 U+2B0D7
+𩏷	𩏷 𫃗
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖪 U+2B5AA
+𩑔	𩑔 𫖪
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖭 U+2B5AD
+𩒎	𩒎 𫖭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩖕 U+29595
+𩓣	𩓣 𩖕
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖵 U+2B5B5
+𩓥	𩓥 𫖵
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖷 U+2B5B7
+𩔑	𩔑 𫖷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫖴 U+2B5B4
+𩔳	𩔳 𫖴
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫠇 U+2B807
+𩖰	𩖰 𫠇
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩙦 U+29666
+𩗀	𩗀 𩙦
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗈 U+2B5C8
+𩗓	𩗓 𫗈
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗉 U+2B5C9
+𩗴	𩗴 𫗉
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩙩 U+29669
+𩘀	𩘀 𩙩
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩙭 U+2966D
+𩘝	𩘝 𩙭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩙨 U+29668
+𩘹	𩘹 𩙨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩙬 U+2966C
+𩘺	𩘺 𩙬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩙰 U+29670
+𩙈	𩙈 𩙰
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩟿 U+297FF
+𩚛	𩚛 𩟿
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩠀 U+29800
+𩚥	𩚥 𩠀
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗡 U+2B5E1
+𩚩	𩚩 𫗡
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩠁 U+29801
+𩚵	𩚵 𩠁
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩠂 U+29802
+𩛆	𩛆 𩠂
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗤 U+2B5E4
+𩛌	𩛌 𫗤
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗨 U+2B5E8
+𩛡	𩛡 𫗨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩠃 U+29803
+𩛩	𩛩 𩠃
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩠉 U+29809
+𩜇	𩜇 𩠉
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩠆 U+29806
+𩜦	𩜦 𩠆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩠊 U+2980A
+𩜵	𩜵 𩠊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩠋 U+2980B
+𩝔	𩝔 𩠋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗳 U+2B5F3
+𩝽	𩝽 𫗳
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩠎 U+2980E
+𩞄	𩞄 𩠎
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩠏 U+2980F
+𩞦	𩞦 𩠏
 𩞯	䭪
-𩟐	𩠅
-𩟗	𫗚
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩠅 U+29805
+𩟐	𩟐 𩠅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫗚 U+2B5DA
+𩟗	𩟗 𫗚
 𩠴	𩠠
-𩡣	𩡖
-𩡺	𩧦
-𩢡	𩧬
-𩢴	𩧵
-𩢸	𩧳
-𩢾	𩧮
-𩣏	𩧶
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩡖 U+29856
+𩡣	𩡣 𩡖
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧦 U+299E6
+𩡺	𩡺 𩧦
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧬 U+299EC
+𩢡	𩢡 𩧬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧵 U+299F5
+𩢴	𩢴 𩧵
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧳 U+299F3
+𩢸	𩢸 𩧳
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧮 U+299EE
+𩢾	𩢾 𩧮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧶 U+299F6
+𩣏	𩣏 𩧶
 𩣑	䯃
-𩣫	𩧸
-𩣵	𩧻
-𩣺	𩧼
-𩤊	𩧩
-𩤙	𩨆
-𩤲	𩨉
-𩤸	𩨅
-𩥄	𩨋
-𩥇	𩨍
-𩥉	𩧱
-𩥑	𩨌
-𩦠	𫠌
-𩧆	𩨐
-𩭙	𩬣
-𩯁	𫙂
-𩯳	𩯒
-𩰀	𩬤
-𩰹	𩰰
-𩳤	𩲒
-𩴵	𩴌
-𩵦	𫠏
-𩵩	𩽺
-𩵹	𩽻
-𩶁	𫚎
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧸 U+299F8
+𩣫	𩣫 𩧸
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧻 U+299FB
+𩣵	𩣵 𩧻
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧼 U+299FC
+𩣺	𩣺 𩧼
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧩 U+299E9
+𩤊	𩤊 𩧩
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩨆 U+29A06
+𩤙	𩤙 𩨆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩨉 U+29A09
+𩤲	𩤲 𩨉
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩨅 U+29A05
+𩤸	𩤸 𩨅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩨋 U+29A0B
+𩥄	𩥄 𩨋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩨍 U+29A0D
+𩥇	𩥇 𩨍
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩧱 U+299F1
+𩥉	𩥉 𩧱
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩨌 U+29A0C
+𩥑	𩥑 𩨌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫠌 U+2B80C
+𩦠	𩦠 𫠌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩨐 U+29A10
+𩧆	𩧆 𩨐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩬣 U+29B23
+𩭙	𩭙 𩬣
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫙂 U+2B642
+𩯁	𩯁 𫙂
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩯒 U+29BD2
+𩯳	𩯳 𩯒
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩬤 U+29B24
+𩰀	𩰀 𩬤
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩰰 U+29C30
+𩰹	𩰹 𩰰
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩲒 U+29C92
+𩳤	𩳤 𩲒
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩴌 U+29D0C
+𩴵	𩴵 𩴌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫠏 U+2B80F
+𩵦	𩵦 𫠏
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩽺 U+29F7A
+𩵩	𩵩 𩽺
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩽻 U+29F7B
+𩵹	𩵹 𩽻
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚎 U+2B68E
+𩶁	𩶁 𫚎
 𩶘	䲞
-𩶰	𩽿
-𩶱	𩽽
-𩷰	𩾄
-𩸃	𩾅
-𩸄	𫚝
-𩸡	𫚟
-𩸦	𩾆
-𩻗	𫚨
-𩻬	𫚩
-𩻮	𫚘
-𩼶	𫚬
-𩽇	𩾎
-𩿅	𫠖
-𩿤	𫛠
-𩿪	𪉄
-𪀖	𫛧
-𪀦	𪉅
-𪀾	𪉋
-𪁈	𪉉
-𪁖	𪉌
-𪂆	𪉎
-𪃍	𪉐
-𪃏	𪉏
-𪃒	𫛻
-𪃧	𫛹
-𪄆	𪉔
-𪄕	𪉒
-𪅂	𫜂
-𪆷	𫛾
-𪇳	𪉕
-𪈼	𱊜
-𪉸	𫜊
-𪋿	𫧮
-𪌭	𫜓
-𪍠	𫜕
-𪓰	𫜟
-𪔵	𪔭
-𪘀	𪚏
-𪘯	𪚐
-𪙏	𫜯
-𪟖	𠛾
-𪷓	𣶭
-𫒡	𫓷
-𫜦	𫜫
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩽿 U+29F7F
+𩶰	𩶰 𩽿
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩽽 U+29F7D
+𩶱	𩶱 𩽽
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩾄 U+29F84
+𩷰	𩷰 𩾄
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩾅 U+29F85
+𩸃	𩸃 𩾅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚝 U+2B69D
+𩸄	𩸄 𫚝
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚟 U+2B69F
+𩸡	𩸡 𫚟
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩾆 U+29F86
+𩸦	𩸦 𩾆
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚨 U+2B6A8
+𩻗	𩻗 𫚨
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚩 U+2B6A9
+𩻬	𩻬 𫚩
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚘 U+2B698
+𩻮	𩻮 𫚘
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫚬 U+2B6AC
+𩼶	𩼶 𫚬
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𩾎 U+29F8E
+𩽇	𩽇 𩾎
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫠖 U+2B816
+𩿅	𩿅 𫠖
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛠 U+2B6E0
+𩿤	𩿤 𫛠
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉄 U+2A244
+𩿪	𩿪 𪉄
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛧 U+2B6E7
+𪀖	𪀖 𫛧
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉅 U+2A245
+𪀦	𪀦 𪉅
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉋 U+2A24B
+𪀾	𪀾 𪉋
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉉 U+2A249
+𪁈	𪁈 𪉉
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉌 U+2A24C
+𪁖	𪁖 𪉌
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉎 U+2A24E
+𪂆	𪂆 𪉎
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉐 U+2A250
+𪃍	𪃍 𪉐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉏 U+2A24F
+𪃏	𪃏 𪉏
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛻 U+2B6FB
+𪃒	𪃒 𫛻
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛹 U+2B6F9
+𪃧	𪃧 𫛹
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉔 U+2A254
+𪄆	𪄆 𪉔
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉒 U+2A252
+𪄕	𪄕 𪉒
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜂 U+2B702
+𪅂	𪅂 𫜂
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫛾 U+2B6FE
+𪆷	𪆷 𫛾
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪉕 U+2A255
+𪇳	𪇳 𪉕
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𱊜 U+3129C
+𪈼	𪈼 𱊜
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜊 U+2B70A
+𪉸	𪉸 𫜊
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫧮 U+2B9EE
+𪋿	𪋿 𫧮
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜓 U+2B713
+𪌭	𪌭 𫜓
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜕 U+2B715
+𪍠	𪍠 𫜕
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜟 U+2B71F
+𪓰	𪓰 𫜟
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪔭 U+2A52D
+𪔵	𪔵 𪔭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪚏 U+2A68F
+𪘀	𪘀 𪚏
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𪚐 U+2A690
+𪘯	𪘯 𪚐
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜯 U+2B72F
+𪙏	𪙏 𫜯
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𠛾 U+206FE
+𪟖	𪟖 𠛾
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𣶭 U+23DAD
+𪷓	𪷓 𣶭
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫓷 U+2B4F7
+𫒡	𫒡 𫓷
+# @tofu-risk: not covered by PingFang/Source Han baseline: 𫜫 U+2B72B
+𫜦	𫜦 𫜫
+𰻞	𰻝

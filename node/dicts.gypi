@@ -4,6 +4,7 @@
     "type": "none",
     "variables": {
       "cmd": "<(module_root_dir)/node/dict.js",
+      "dict_extract_tofu_risk": "<(module_root_dir)/data/scripts/extract_tofu_risk.py",
       "dict_reverse": "<(module_root_dir)/data/scripts/reverse.py",
       "input_prefix": "<(module_root_dir)/data/dictionary/",
       "output_prefix": "<(PRODUCT_DIR)/",
@@ -44,12 +45,36 @@
       "outputs": ["<(output_prefix)TSCharacters.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
+      "action_name": "TSCharactersExt.txt",
+      "variables": {
+        "input": "<(input_prefix)TSCharacters.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)TSCharactersExt.txt"],
+      "action": ["<(python_cmd)", "<(dict_extract_tofu_risk)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "TSCharactersExt",
+      "variables": {
+        "input": "<(output_prefix)TSCharactersExt.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)TSCharactersExt.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
       "action_name": "TSPhrases",
       "variables": {
         "input": "<(input_prefix)TSPhrases.txt",
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)TSPhrases.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "TWVariantsPhrases",
+      "variables": {
+        "input": "<(input_prefix)TWVariantsPhrases.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)TWVariantsPhrases.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "TWVariants",
@@ -106,6 +131,14 @@
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)TWPhrasesRev.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "HKVariantsPhrases",
+      "variables": {
+        "input": "<(input_prefix)HKVariantsPhrases.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)HKVariantsPhrases.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "HKVariants",

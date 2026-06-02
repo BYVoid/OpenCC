@@ -2,12 +2,18 @@
 
 感謝您對 OpenCC 專案的貢獻！本文件說明如何為 OpenCC 貢獻詞典條目、撰寫測試並確保程式碼品質。
 
+## 授權
+
+OpenCC 以 [Apache License 2.0](LICENSE) 釋出。提交 Pull Request、issue/comment、郵件 patch、詞典條目、測試案例或其他形式的貢獻，即表示您確認自己有權提交這些內容，並同意您的貢獻也依 Apache License 2.0 授權釋出。
+
 ## 目錄
 
+- [授權](#授權)
 - [新增詞典條目](#新增詞典條目)
 - [排序詞典](#排序詞典)
 - [執行測試](#執行測試)
 - [撰寫測試案例](#撰寫測試案例)
+- [Jieba 插件測試](#jieba-插件測試)
 - [簡轉繁轉換的特殊注意事項](#簡轉繁轉換的特殊注意事項)
 
 ## 新增詞典條目
@@ -24,11 +30,14 @@
 
 - **臺灣正體用詞**
   - `TWVariants.txt` - 臺灣異體字
+  - `TWVariantsPhrases.txt` - 轉入臺灣字形（如 `s2tw`、`s2twp`、`t2tw`）時使用的臺灣異體字詞組例外
+  - `TWVariantsRevPhrases.txt` - 從臺灣字形轉出（如 `tw2s`、`tw2sp`、`tw2t`）時使用的臺灣異體字詞組例外
   - `TWPhrases.txt` - 臺灣慣用詞
 
 - **香港繁體用詞**
   - `HKVariants.txt` - 香港異體字
-  - `HKVariantsRevPhrases.txt` - 香港異體字反向詞組
+  - `HKVariantsPhrases.txt` - 轉入香港字形（如 `s2hk`、`t2hk`）時使用的香港異體字詞組例外
+  - `HKVariantsRevPhrases.txt` - 從香港字形轉出（如 `hk2s`、`hk2t`）時使用的香港異體字詞組例外
 
 - **日文新舊字形**
   - `JPShinjitaiCharacters.txt` - 日文新字體（單字）
@@ -104,7 +113,7 @@ STPhrases is not sorted.
 
 ## 執行測試
 
-OpenCC 使用 [Bazel](https://bazel.build/) 作為建置系統。
+OpenCC 同時維護 CMake、Bazel 與 Node.js 建置/測試流程。詞典與轉換行為修改通常至少需要跑 Bazel 測試；C++ CLI、插件或包裝相關修改也應跑對應的 CMake 或 npm 測試。
 
 ### 安裝 Bazel
 
@@ -126,24 +135,58 @@ sudo apt install bazel
 
 請參考 [Bazel 安裝文件](https://bazel.build/install) 獲取適合您系統的安裝方式。
 
-### 執行所有測試
+### Bazel 測試
 
 ```bash
-bazel test --test_output=all //src/... //data/... //test/... //python/...
+bazel test --test_output=errors //src/... //data/... //test/... //python/...
 ```
 
-### 執行特定測試
-
-僅測試詞典：
+如果修改了 jieba 插件或 golden 輸出，也請加入相關目標：
 
 ```bash
-bazel test //data/dictionary:dictionary_test
+bazel test --test_output=errors //plugins/jieba/... //test/golden:golden_convert_test
 ```
 
-僅測試轉換案例：
+常用的特定測試：
 
 ```bash
+bazel test //data/dictionary/...
 bazel test //data/config:config_dict_validation_test
+bazel test //test:command_line_converter_test
+```
+
+### CMake 測試
+
+本地 C++ 開發可使用 CMake：
+
+```bash
+cmake -S . -B build -DENABLE_GTEST=ON
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
+如需測試 optional jieba plugin：
+
+```bash
+cmake -S . -B build -DENABLE_GTEST=ON -DBUILD_OPENCC_JIEBA_PLUGIN=ON
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
+### Node.js 測試
+
+Node.js binding 與 npm CLI 修改請執行：
+
+```bash
+npm install
+npm test
+```
+
+驗證 npm prebuild 佈局時：
+
+```bash
+npm run prebuild
+PREBUILDS_ONLY=1 npm test
 ```
 
 ### 測試輸出
@@ -210,6 +253,31 @@ bazel test //data/config:config_dict_validation_test
 - `jp2t` - 日文新字體到舊字體
 - `t2jp` - 日文舊字體到新字體
 
+### Golden 測試
+
+較長文本或多配置輸出可放在 `test/golden/input/` 與 `test/golden/output/`。更新 golden 輸出時可使用：
+
+```bash
+python3 test/golden/golden_convert_test.py --update
+```
+
+提交前請檢查 golden diff，確認變更符合預期。
+
+## Jieba 插件測試
+
+`opencc-jieba` 是可選插件，配置位於 `plugins/jieba/data/config/`，測試案例位於：
+
+- `plugins/jieba/tests/data/jieba_comparison_testcases.json`
+- `test/golden/` 中的 `_jieba` 配置輸出
+
+修改 jieba 分詞、插件載入、或 `*_jieba.json` 配置時，請至少執行：
+
+```bash
+bazel test --test_output=errors //plugins/jieba/... //test/golden:golden_convert_test
+```
+
+npm 插件包位於 `plugins/jieba/node/`。若修改 npm integration，請同時安裝測試 `opencc` 與 `opencc-jieba`，確認 `s2twp_jieba` 等模式可由 JavaScript API 與 npm CLI 載入。
+
 ### 範例
 
 ```json
@@ -230,6 +298,14 @@ bazel test //data/config:config_dict_validation_test
 
 如需修改 `TWPhrases.txt`，需要同時修改 `TWPhrasesRev.txt`，反之亦然。否則測試會失敗。
 
+`TWVariantsPhrases.txt` 與 `TWVariantsRevPhrases.txt`、`HKVariantsPhrases.txt` 與
+`HKVariantsRevPhrases.txt` 則不是 `TWPhrases.txt` / `TWPhrasesRev.txt` 這種
+逐條互逆的詞彙對照表。`*VariantsPhrases.txt` 是正向地區異體字轉換的詞組級例外，
+當詞組命中時，該片段會按詞組條目轉換，不再受 `TWVariants.txt` 或 `HKVariants.txt`
+的字級映射影響；`*VariantsRevPhrases.txt` 是反向異體字轉換的詞組級例外，
+命中後同樣不再受產生的 `TWVariantsRev.txt` 或 `HKVariantsRev.txt` 的字級映射影響。
+兩者有關聯，但應依各自轉換方向的需要維護，不要求一組詞反向後必須出現在另一個檔案中。
+
 ### 涉及的配置檔案
 
 簡轉繁轉換主要涉及以下配置：
@@ -239,15 +315,15 @@ bazel test //data/config:config_dict_validation_test
 
 2. **`s2tw.json`** - 簡體轉臺灣正體
    - 使用 `STPhrases.txt`、`STCharacters.txt`
-   - 額外使用 `TWVariants.txt`
+   - 額外使用 `TWVariantsPhrases.txt`、`TWVariants.txt`
 
 3. **`s2twp.json`** - 簡體轉臺灣正體（含慣用詞）
    - 使用 `STPhrases.txt`、`STCharacters.txt`
-   - 額外使用 `TWPhrases.txt`、`TWVariants.txt`
+   - 額外使用 `TWPhrases.txt`、`TWVariantsPhrases.txt`、`TWVariants.txt`
 
 4. **`s2hk.json`** - 簡體轉香港繁體
    - 使用 `STPhrases.txt`、`STCharacters.txt`
-   - 額外使用 `HKVariants.txt`
+   - 額外使用 `HKVariantsPhrases.txt`、`HKVariants.txt`
 
 ### 測試建議
 
@@ -272,8 +348,8 @@ bazel test //data/config:config_dict_validation_test
 
 - **僅修改基本簡繁對應**：修改 `STCharacters.txt`，測試至少包含 `s2t`
 - **修改詞組轉換**：修改 `STPhrases.txt`，測試包含 `s2t`、`s2tw`、`s2twp`、`s2hk`
-- **臺灣特有用詞**：修改 `TWPhrases*.txt` 或 `TWVariants.txt`，測試包含 `s2tw`、`s2twp`
-- **香港特有用詞**：修改 `HKVariants*.txt`，測試包含 `s2hk`
+- **臺灣特有用詞**：修改 `TWPhrases*.txt` 或 `TWVariantsPhrases.txt`、`TWVariants.txt`，測試包含 `s2tw`、`s2twp`
+- **香港特有用詞**：修改 `HKVariantsPhrases.txt`、`HKVariants*.txt`，測試包含 `s2hk`
 
 ## 提交變更
 
@@ -283,7 +359,8 @@ bazel test //data/config:config_dict_validation_test
 - [ ] 詞典檔案已正確排序（執行 `sort.py` 或 `sort_all.py`）
 - [ ] 已新增對應的測試案例到 `testcases.json`
 - [ ] 修改前測試案例失敗，修改後測試通過
-- [ ] 所有測試通過（`bazel test --test_output=all //src/... //data/... //test/...`）
+- [ ] 所有相關 Bazel/CMake/npm 測試通過
+- [ ] 如修改 release packaging，已檢查相關腳本（例如 `scripts/release-windows-winget.ps1`、npm prebuild/package 腳本）
 
 符合以上條件後，即可提交 Pull Request。
 

@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { Transform, pipeline } = require('stream');
 const OpenCC = require('./opencc');
 
 const BUILT_IN_CONFIGS = [
@@ -21,6 +22,19 @@ const BUILT_IN_CONFIGS = [
   ['jp2t.json', 'New Japanese Kanji (Shinjitai) to Traditional Chinese Characters (Kyujitai) (OpenCC Standard)'],
 ];
 const BUILT_IN_CONFIG_NAMES = new Set(BUILT_IN_CONFIGS.map(([name]) => name));
+const BUILT_IN_CONFIG_STEMS = new Set(
+  BUILT_IN_CONFIGS.map(([name]) => name.replace(/\.json$/, ''))
+);
+const OPTIONAL_JIEBA_CONFIGS = new Set([
+  's2hk_jieba.json',
+  's2t_jieba.json',
+  's2tw_jieba.json',
+  's2twp_jieba.json',
+  'tw2sp_jieba.json',
+]);
+const OPTIONAL_JIEBA_CONFIG_STEMS = new Set(
+  Array.from(OPTIONAL_JIEBA_CONFIGS).map((name) => name.replace(/\.json$/, ''))
+);
 
 function printHelp() {
   console.log(`Open Chinese Convert (OpenCC) npm Command Line Tool
@@ -38,7 +52,6 @@ Options:
 Unsupported in the npm CLI:
   --inspect            Use the native OpenCC CLI for inspection output.
   --segmentation       Use the native OpenCC CLI for segmentation output.
-  plugins              Plugin-backed segmentation is not supported by this npm CLI.
 
 Built-in Configurations:
 ${BUILT_IN_CONFIGS.map(([name, description]) => `  ${name.padEnd(11)} ${description}`).join('\n')}
@@ -110,26 +123,77 @@ function parseArgs(args) {
   return options;
 }
 
-function readInput(inputFileName) {
-  if (inputFileName) {
-    return fs.readFileSync(inputFileName, 'utf8');
-  }
-  return fs.readFileSync(0, 'utf8');
-}
-
-function writeOutput(outputFileName, text) {
-  if (outputFileName) {
-    fs.writeFileSync(outputFileName, text, 'utf8');
-  } else {
-    process.stdout.write(text);
-  }
-}
-
 function resolveConfigPath(config) {
-  if (BUILT_IN_CONFIG_NAMES.has(config) || path.isAbsolute(config)) {
+  if (BUILT_IN_CONFIG_NAMES.has(config) || OPTIONAL_JIEBA_CONFIGS.has(config) || path.isAbsolute(config)) {
     return config;
   }
+
+  if (!config.endsWith('.json') && BUILT_IN_CONFIG_STEMS.has(config)) {
+    return config + '.json';
+  }
+
+  if (!config.endsWith('.json') && OPTIONAL_JIEBA_CONFIG_STEMS.has(config)) {
+    return config + '.json';
+  }
+
   return path.resolve(process.cwd(), config);
+}
+
+function createConverterStream(converter) {
+  const nativeStream = converter._createConverterStream();
+  let pendingChunk = null;
+
+  return new Transform({
+    transform(chunk, encoding, callback) {
+      try {
+        const input = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk, encoding);
+        if (pendingChunk === null) {
+          pendingChunk = Buffer.from(input);
+          callback();
+          return;
+        }
+        const output = nativeStream.convertChunk(pendingChunk);
+        pendingChunk = Buffer.from(input);
+        callback(null, output);
+      } catch (error) {
+        callback(error);
+      }
+    },
+    flush(callback) {
+      try {
+        callback(null, pendingChunk === null
+          ? nativeStream.finish()
+          : nativeStream.finish(pendingChunk));
+      } catch (error) {
+        callback(error);
+      }
+    },
+  });
+}
+
+function isSameFile(inputFileName, outputFileName) {
+  if (!inputFileName || !outputFileName) {
+    return false;
+  }
+
+  try {
+    const inputStat = fs.statSync(inputFileName);
+    const outputStat = fs.statSync(outputFileName);
+    return inputStat.dev === outputStat.dev && inputStat.ino === outputStat.ino;
+  } catch (error) {
+    return path.resolve(process.cwd(), inputFileName) ===
+      path.resolve(process.cwd(), outputFileName);
+  }
+}
+
+function convertStream(converter, options, callback) {
+  if (isSameFile(options.input, options.output)) {
+    throw new Error('Input and output refer to the same file.');
+  }
+
+  const input = options.input ? fs.createReadStream(options.input) : process.stdin;
+  const output = options.output ? fs.createWriteStream(options.output) : process.stdout;
+  pipeline(input, createConverterStream(converter), output, callback);
 }
 
 function main() {
@@ -153,9 +217,12 @@ function main() {
 
   try {
     const converter = new OpenCC(resolveConfigPath(options.config));
-    const input = readInput(options.input);
-    const output = converter.convertSync(input);
-    writeOutput(options.output, output);
+    convertStream(converter, options, (error) => {
+      if (error) {
+        const message = error && error.message ? error.message : String(error);
+        fail(path.basename(process.argv[1]) + ': ' + message);
+      }
+    });
   } catch (error) {
     const message = error && error.message ? error.message : String(error);
     fail(path.basename(process.argv[1]) + ': ' + message);

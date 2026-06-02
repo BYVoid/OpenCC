@@ -41,14 +41,31 @@ cc_binary(
     linkshared = True,
     deps = [
         "//plugins/jieba/deps/cppjieba:cppjieba",
-        "//src:common",
-        "//src:exception",
-        "//src:marisa_dict",
-        "//src:plugin_api",
-        "//src:segmentation",
-        "//src:segments",
-        "//src:utf8_util",
+        "//src:common_lib",
+        "//src:exception_lib",
+        "//src:marisa_dict_lib",
+        "//src:plugin_api_lib",
+        "//src:segmentation_lib",
+        "//src:segments_lib",
+        "//src:utf8_util_lib",
     ],
+)
+
+genrule(
+    name = "opencc_jieba_windows_zig",
+    srcs = [
+        "//deps/marisa-0.3.1:all_files",
+        "//plugins/jieba/deps/cppjieba:all_files",
+        "//src:all_files",
+        "include/JiebaSegmentation.hpp",
+        "src/JiebaSegmentation.cpp",
+        "src/JiebaSegmentationPlugin.cpp",
+    ],
+    outs = ["windows-x64/opencc-jieba.dll"],
+    cmd = "ZIG=$(ZIG_BIN) bash $(location //scripts:build_jieba_windows_zig) $@",
+    tags = ["manual"],
+    tools = ["//scripts:build_jieba_windows_zig"],
+    toolchains = ["@rules_zig//zig:toolchain_type"],
 )
 
 genrule(
@@ -66,10 +83,10 @@ cc_binary(
     name = "cppjieba_dict",
     srcs = ["tools/cppjieba_dict.cpp"],
     deps = [
-        "//src:dict",
-        "//src:dict_entry",
-        "//src:lexicon",
-        "//src:marisa_dict",
+        "//src:dict_lib",
+        "//src:dict_entry_lib",
+        "//src:lexicon_lib",
+        "//src:marisa_dict_lib",
     ],
 )
 
@@ -86,9 +103,9 @@ cc_test(
     ],
     defines = ["BAZEL"],
     deps = [
-        "//test:portable_util",
+        "//test:portable_util_lib",
         "@bazel_tools//tools/cpp/runfiles",
         "@googletest//:gtest_main",
-        "@rapidjson",
+        "//deps/rapidjson-1.1.0:rapidjson",
     ],
 )

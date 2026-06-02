@@ -21,7 +21,9 @@
 #include "Lexicon.hpp"
 #include "MarisaDict.hpp"
 #include "TextDict.hpp"
-#include "UTF8Util.hpp"
+#if defined(_WIN32) || defined(_WIN64)
+#include "WinUtil.hpp"
+#endif
 
 #ifdef ENABLE_DARTS
 #include "DartsDict.hpp"
@@ -32,13 +34,12 @@ using namespace opencc;
 DictPtr LoadDictionary(const std::string& format,
                        const std::string& inputFileName) {
   if (format == "text") {
-    FILE* fp =
-#ifdef _MSC_VER
-        _wfopen(UTF8Util::GetPlatformString(inputFileName).c_str(), L"r")
+    FILE* fp = nullptr;
+#if defined(_WIN32) || defined(_WIN64)
+    fp = _wfopen(internal::WideFromUtf8(inputFileName).c_str(), L"r");
 #else
-        fopen(UTF8Util::GetPlatformString(inputFileName).c_str(), "r")
+    fp = fopen(inputFileName.c_str(), "r");
 #endif
-        ;
     if (!fp) {
       throw FileNotFound(inputFileName);
     }

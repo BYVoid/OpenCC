@@ -1,4 +1,5 @@
 #include <napi.h>
+#include <memory>
 #include <string>
 
 #include "src/Config.hpp"
@@ -93,6 +94,8 @@ public:
     return converter_->Convert(input);
   }
 
+  ConverterPtr GetConverter() const { return converter_; }
+
   static Napi::Value Version(const Napi::CallbackInfo& info) {
     return Napi::String::New(info.Env(), VERSION);
   }
@@ -164,8 +167,87 @@ public:
   }
 };
 
+class OpenccStreamBinding : public Napi::ObjectWrap<OpenccStreamBinding> {
+  std::unique_ptr<ConverterStream> stream_;
+
+public:
+  explicit OpenccStreamBinding(const Napi::CallbackInfo& info)
+      : Napi::ObjectWrap<OpenccStreamBinding>(info), stream_() {
+    Napi::Env env = info.Env();
+    if (info.Length() < 1 || !info[0].IsObject()) {
+      Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
+      return;
+    }
+
+    OpenccBinding* owner =
+        Napi::ObjectWrap<OpenccBinding>::Unwrap(info[0].As<Napi::Object>());
+    stream_.reset(new ConverterStream(owner->GetConverter()));
+  }
+
+  Napi::Value ConvertChunk(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() < 1 || (!info[0].IsBuffer() && !info[0].IsString())) {
+      Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
+      return env.Undefined();
+    }
+
+    try {
+      std::string output;
+      if (info[0].IsBuffer()) {
+        Napi::Buffer<char> input = info[0].As<Napi::Buffer<char>>();
+        output = stream_->ConvertChunk(input.Data(), input.Length());
+      } else {
+        const std::string input = ToUtf8String(info[0]);
+        output = stream_->ConvertChunk(input.data(), input.size());
+      }
+      return Napi::String::New(env, output);
+    } catch (opencc::Exception& e) {
+      Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+      return env.Undefined();
+    }
+  }
+
+  Napi::Value Finish(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    if (info.Length() >= 1 && !info[0].IsBuffer() && !info[0].IsString()) {
+      Napi::TypeError::New(env, "Wrong arguments").ThrowAsJavaScriptException();
+      return env.Undefined();
+    }
+
+    try {
+      if (info.Length() >= 1 && info[0].IsBuffer()) {
+        Napi::Buffer<char> input = info[0].As<Napi::Buffer<char>>();
+        return Napi::String::New(
+            env, stream_->Finish(input.Data(), input.Length()));
+      }
+      if (info.Length() >= 1) {
+        const std::string input = ToUtf8String(info[0]);
+        return Napi::String::New(env,
+                                 stream_->Finish(input.data(), input.size()));
+      }
+      return Napi::String::New(env, stream_->Finish());
+    } catch (opencc::Exception& e) {
+      Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+      return env.Undefined();
+    }
+  }
+
+  static Napi::Object Init(Napi::Env env, Napi::Object exports) {
+    Napi::Function cons = DefineClass(
+        env, "OpenccStream",
+        {
+            InstanceMethod("convertChunk", &OpenccStreamBinding::ConvertChunk),
+            InstanceMethod("finish", &OpenccStreamBinding::Finish),
+        });
+    exports.Set("OpenccStream", cons);
+    return exports;
+  }
+};
+
 Napi::Object InitAll(Napi::Env env, Napi::Object exports) {
-  return OpenccBinding::Init(env, exports);
+  OpenccBinding::Init(env, exports);
+  OpenccStreamBinding::Init(env, exports);
+  return exports;
 }
 
 NODE_API_MODULE(opencc, InitAll);

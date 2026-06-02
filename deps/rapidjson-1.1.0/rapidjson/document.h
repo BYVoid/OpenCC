@@ -22,6 +22,7 @@
 #include "internal/strfunc.h"
 #include "memorystream.h"
 #include "encodedstream.h"
+#include <cstddef>
 #include <new>      // placement new
 #include <limits>
 
@@ -45,7 +46,7 @@ RAPIDJSON_DIAG_OFF(terminate) // ignore throwing RAPIDJSON_ASSERT in RAPIDJSON_N
 #endif // __GNUC__
 
 #ifndef RAPIDJSON_NOMEMBERITERATORCLASS
-#include <iterator> // std::iterator, std::random_access_iterator_tag
+#include <iterator> // std::random_access_iterator_tag
 #endif
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
@@ -98,16 +99,13 @@ struct GenericMember {
     \see GenericMember, GenericValue::MemberIterator, GenericValue::ConstMemberIterator
  */
 template <bool Const, typename Encoding, typename Allocator>
-class GenericMemberIterator
-    : public std::iterator<std::random_access_iterator_tag
-        , typename internal::MaybeAddConst<Const,GenericMember<Encoding,Allocator> >::Type> {
+class GenericMemberIterator {
 
     friend class GenericValue<Encoding,Allocator>;
     template <bool, typename, typename> friend class GenericMemberIterator;
 
     typedef GenericMember<Encoding,Allocator> PlainType;
     typedef typename internal::MaybeAddConst<Const,PlainType>::Type ValueType;
-    typedef std::iterator<std::random_access_iterator_tag,ValueType> BaseType;
 
 public:
     //! Iterator type itself
@@ -117,12 +115,22 @@ public:
     //! Non-constant iterator type
     typedef GenericMemberIterator<false,Encoding,Allocator> NonConstIterator;
 
-    //! Pointer to (const) GenericMember
-    typedef typename BaseType::pointer         Pointer;
-    //! Reference to (const) GenericMember
-    typedef typename BaseType::reference       Reference;
+    //! Category tag required by random access iterator traits.
+    typedef std::random_access_iterator_tag iterator_category;
+    //! Value type required by iterator traits.
+    typedef ValueType value_type;
     //! Signed integer type (e.g. \c ptrdiff_t)
-    typedef typename BaseType::difference_type DifferenceType;
+    typedef std::ptrdiff_t difference_type;
+    //! Pointer to (const) GenericMember
+    typedef ValueType* pointer;
+    //! Reference to (const) GenericMember
+    typedef ValueType& reference;
+    //! Backward-compatible RapidJSON pointer type alias.
+    typedef pointer Pointer;
+    //! Backward-compatible RapidJSON reference type alias.
+    typedef reference Reference;
+    //! Backward-compatible RapidJSON difference type alias.
+    typedef difference_type DifferenceType;
 
     //! Default constructor (singular value)
     /*! Creates an iterator pointing to no element.

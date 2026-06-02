@@ -1,21 +1,33 @@
 {
   "name": "opencc-jieba",
-  "version": "1.3.1-beta.0",
+  "version": "1.3.2-next3",
   "description": "Jieba segmentation plugin for OpenCC",
   "author": "Carbo Kuo and OpenCC contributors",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BYVoid/OpenCC.git",
+    "directory": "plugins/jieba/node"
+  },
   "main": "index.js",
   "peerDependencies": {
-    "opencc": ">=1.3.1"
+    "opencc": ">=1.3.2-next1"
+  },
+  "optionalDependencies": {
+    "@opencc/opencc-jieba-darwin-arm64": "1.3.2-next1",
+    "@opencc/opencc-jieba-linux-arm64": "1.3.2-next1",
+    "@opencc/opencc-jieba-linux-x64": "1.3.2-next1",
+    "@opencc/opencc-jieba-win32-x64": "1.3.2-next1"
   },
   "files": [
     "index.js",
-    "prebuilds",
     "data"
   ],
   "scripts": {
     "build": "node build.js",
-    "build:all": "npm run build && npm run build linux-x64 && npm run build linux-arm64",
-    "prepack": "npm run build:all"
+    "build:all": "npm run build",
+    "prepare:scoped-packages": "node scripts/prepare-scoped-packages.js",
+    "prepack": "node scripts/verify-main-package.js",
+    "prepublishOnly": "node scripts/verify-scoped-packages-published.js"
   }
 }

@@ -22,7 +22,7 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
-#include <Windows.h>
+#include <windows.h>
 #endif // _MSC_VER
 
 #include <cstring>
@@ -166,7 +166,7 @@ public:
   static std::string FromSubstr(const char* str, size_t length) {
     std::string newStr;
     newStr.resize(length);
-    strncpy(newStr.data(), str, length);
+    memcpy(newStr.data(), str, length);
     return newStr;
   }
 

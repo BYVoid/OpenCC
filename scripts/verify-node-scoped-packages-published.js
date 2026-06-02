@@ -1,0 +1,52 @@
+#!/usr/bin/env node
+
+const { execFileSync } = require('child_process');
+const path = require('path');
+
+const packageRoot = path.resolve(__dirname, '..');
+const packageJson = require(path.join(packageRoot, 'package.json'));
+const optionalDependencies = packageJson.optionalDependencies || {};
+
+if (process.env.OPENCC_NPM_PUBLISH_DRY_RUN === 'true') {
+  console.log(
+    'Skipping published optional dependency checks during npm publish dry-run.'
+  );
+  process.exit(0);
+}
+
+function npmViewVersion(packageName, version) {
+  const spec = `${packageName}@${version}`;
+  try {
+    return execFileSync('npm', ['view', spec, 'version'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    }).trim();
+  } catch (error) {
+    return null;
+  }
+}
+
+let hasError = false;
+
+for (const [packageName, version] of Object.entries(optionalDependencies)) {
+  if (!packageName.startsWith('@opencc/opencc-')) {
+    continue;
+  }
+  const publishedVersion = npmViewVersion(packageName, version);
+  if (publishedVersion !== version) {
+    console.error(
+      `Missing published optional dependency: ${packageName}@${version}`
+    );
+    hasError = true;
+  }
+}
+
+if (hasError) {
+  console.error('Publish the scoped binary packages before publishing opencc.');
+  process.exit(1);
+}
+
+console.log(
+  `All optional binary packages for opencc@${packageJson.version} ` +
+  'are published.'
+);

@@ -18,9 +18,6 @@
 
 #include "gtest/gtest.h"
 
-#include <unordered_map>
-#include <unordered_set>
-
 #include "src/Lexicon.hpp"
 #include "src/MarisaDict.hpp"
 #include "src/UTF8Util.hpp"
@@ -29,6 +26,11 @@
 using bazel::tools::cpp::runfiles::Runfiles;
 
 namespace opencc {
+namespace {
+
+#ifndef OPENCC_DICTIONARY_TEST_FILE
+#error "OPENCC_DICTIONARY_TEST_FILE must be defined"
+#endif
 
 static FILE* OpenFile(const std::string& path) {
 #ifdef _MSC_VER
@@ -38,8 +40,7 @@ static FILE* OpenFile(const std::string& path) {
 #endif
 }
 
-class DictionaryTest : public ::testing::Test,
-                       public ::testing::WithParamInterface<std::string> {
+class DictionaryTest : public ::testing::Test {
 protected:
   static void SetUpTestSuite() {
     runfiles_.reset(Runfiles::CreateForTest());
@@ -51,50 +52,33 @@ protected:
 
 std::unique_ptr<Runfiles> DictionaryTest::runfiles_;
 
-class DictionaryRunfilesTest : public ::testing::Test {
-protected:
-  static void SetUpTestSuite() {
-    runfiles_.reset(Runfiles::CreateForTest());
-    ASSERT_NE(nullptr, runfiles_);
-  }
-
-  static std::unique_ptr<Runfiles> runfiles_;
-};
-
-std::unique_ptr<Runfiles> DictionaryRunfilesTest::runfiles_;
-
-INSTANTIATE_TEST_SUITE_P(
-    , DictionaryTest,
-    ::testing::Values(
-        "HKVariants", "HKVariantsRev", "HKVariantsRevPhrases",
-        "JPShinjitaiCharacters", "JPShinjitaiPhrases", "JPVariants",
-        "JPVariantsRev", "STCharacters", "STPhrases", "TSCharacters",
-        "TSPhrases", "TWPhrases", "TWPhrasesRev", "TWVariants",
-        "TWVariantsRev", "TWVariantsRevPhrases"),
-    [](const testing::TestParamInfo<DictionaryTest::ParamType>& info) {
-      return info.param;
-    });
-
-TEST_P(DictionaryTest, UniqueSortedTest) {
+TEST_F(DictionaryTest, UniqueSortedTest) {
+  const std::string dictionary = OPENCC_DICTIONARY_TEST_FILE;
   const std::string dictionaryFileName =
-      runfiles_->Rlocation("_main/data/dictionary/" + GetParam() + ".txt");
+      runfiles_->Rlocation("_main/data/dictionary/" + dictionary);
   FILE* fp = OpenFile(dictionaryFileName);
   ASSERT_NE(fp, nullptr);
   LexiconPtr lexicon = Lexicon::ParseLexiconFromFile(fp);
-  EXPECT_TRUE(lexicon->IsUnique()) << GetParam() << " has duplicated keys.";
-  EXPECT_TRUE(lexicon->IsSorted()) << GetParam() << " is not sorted.";
+  EXPECT_TRUE(lexicon->IsUnique()) << dictionary << " has duplicated keys.";
+  EXPECT_TRUE(lexicon->IsSorted()) << dictionary << " is not sorted.";
 }
 
-TEST_P(DictionaryTest, BinaryTest) {
-  const std::string binaryDictionaryFileName =
-      runfiles_->Rlocation("_main/data/dictionary/" + GetParam() + ".ocd2");
+TEST_F(DictionaryTest, BinaryTest) {
+  std::string dictionary = OPENCC_DICTIONARY_TEST_FILE;
+  const std::string suffix = ".txt";
+  ASSERT_TRUE(dictionary.size() >= suffix.size());
+  ASSERT_EQ(suffix, dictionary.substr(dictionary.size() - suffix.size()));
+  dictionary.erase(dictionary.size() - suffix.size());
+
+  const std::string binaryDictionaryFileName = runfiles_->Rlocation(
+      "_main/data/dictionary/" + dictionary + ".ocd2");
   FILE* fp_bin = OpenFile(binaryDictionaryFileName);
   ASSERT_NE(fp_bin, nullptr);
   MarisaDictPtr dict = MarisaDict::NewFromFile(fp_bin);
   ASSERT_NE(dict, nullptr);
 
   const std::string textDictionaryFileName =
-      runfiles_->Rlocation("_main/data/dictionary/" + GetParam() + ".txt");
+      runfiles_->Rlocation("_main/data/dictionary/" + dictionary + ".txt");
   FILE* fp_txt = OpenFile(textDictionaryFileName);
   ASSERT_NE(fp_txt, nullptr);
   LexiconPtr txt_lexicon = Lexicon::ParseLexiconFromFile(fp_txt);
@@ -102,70 +86,5 @@ TEST_P(DictionaryTest, BinaryTest) {
   EXPECT_EQ(dict->GetLexicon()->Length(), txt_lexicon->Length());
 }
 
-TEST_F(DictionaryRunfilesTest, TWPhrasesReverseMapping) {
-  const std::string twPhrasesFile =
-      runfiles_->Rlocation("_main/data/dictionary/TWPhrases.txt");
-  const std::string twPhrasesRevFile =
-      runfiles_->Rlocation("_main/data/dictionary/TWPhrasesRev.txt");
-
-  auto loadLexicon = [](const std::string& path) -> LexiconPtr {
-    FILE* fp = OpenFile(path);
-    EXPECT_NE(fp, nullptr) << path;
-    if (fp == nullptr) {
-      return LexiconPtr();
-    }
-    return Lexicon::ParseLexiconFromFile(fp);
-  };
-
-  auto buildMap = [](const LexiconPtr& lexicon)
-      -> std::unordered_map<std::string, std::unordered_set<std::string>> {
-    std::unordered_map<std::string, std::unordered_set<std::string>> map;
-    if (!lexicon) {
-      return map;
-    }
-    for (size_t i = 0; i < lexicon->Length(); ++i) {
-      const DictEntry* entry = lexicon->At(i);
-      auto& values = map[entry->Key()];
-      for (const auto& value : entry->Values()) {
-        values.insert(value);
-      }
-    }
-    return map;
-  };
-
-  try {
-    LexiconPtr twPhrases = loadLexicon(twPhrasesFile);
-    LexiconPtr twPhrasesRev = loadLexicon(twPhrasesRevFile);
-    ASSERT_NE(twPhrases, nullptr);
-    ASSERT_NE(twPhrasesRev, nullptr);
-
-    auto twMap = buildMap(twPhrases);
-    auto twRevMap = buildMap(twPhrasesRev);
-
-    for (const auto& entry : twMap) {
-      const std::string& key = entry.first;
-      for (const auto& value : entry.second) {
-        auto it = twRevMap.find(value);
-        EXPECT_TRUE(it != twRevMap.end() && it->second.count(key) > 0)
-            << "Missing reverse mapping: " << key << " -> " << value;
-      }
-    }
-
-    for (const auto& entry : twRevMap) {
-      const std::string& key = entry.first;
-      for (const auto& value : entry.second) {
-        auto it = twMap.find(value);
-        EXPECT_TRUE(it != twMap.end() && it->second.count(key) > 0)
-            << "Missing reverse mapping: " << key << " -> " << value;
-      }
-    }
-  } catch (const Exception& ex) {
-    FAIL() << "Exception: " << ex.what();
-  } catch (const std::exception& ex) {
-    FAIL() << "std::exception: " << ex.what();
-  } catch (...) {
-    FAIL() << "Unknown exception thrown during reverse mapping check.";
-  }
-}
-
+} // namespace
 } // namespace opencc

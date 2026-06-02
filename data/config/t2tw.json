@@ -1,16 +1,28 @@
 {
-  "name": "Traditional Chinese to Traditional Chinese (Taiwan standard)",
+  "name": "Traditional Chinese (OpenCC Standard) to Traditional Chinese (Taiwan Standard)",
   "segmentation": {
     "type": "mmseg",
     "dict": {
-      "type": "ocd2",
-      "file": "TWVariants.ocd2"
+      "type": "group",
+      "dicts": [{
+        "type": "ocd2",
+        "file": "TWVariantsPhrases.ocd2"
+      }, {
+        "type": "ocd2",
+        "file": "TWVariants.ocd2"
+      }]
     }
   },
   "conversion_chain": [{
     "dict": {
-      "type": "ocd2",
-      "file": "TWVariants.ocd2"
+      "type": "group",
+      "dicts": [{
+        "type": "ocd2",
+        "file": "TWVariantsPhrases.ocd2"
+      }, {
+        "type": "ocd2",
+        "file": "TWVariants.ocd2"
+      }]
     }
   }]
 }

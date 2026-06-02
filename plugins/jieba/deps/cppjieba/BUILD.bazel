@@ -2,6 +2,11 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
+filegroup(
+    name = "all_files",
+    srcs = glob(["**/*"]),
+)
+
 exports_files([
     "dict/jieba.dict.utf8",
     "dict/user.dict.utf8",

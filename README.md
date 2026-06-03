@@ -314,7 +314,7 @@ Please update if your project is using OpenCC.
 
 Apache License 2.0
 
-## Third Party Library 第三方庫
+## Third Party Libraries 第三方庫
 
 * [darts-clone](https://github.com/s-yata/darts-clone) BSD License
 * [marisa-trie](https://github.com/s-yata/marisa-trie) BSD License
@@ -328,9 +328,11 @@ Apache License 2.0
 ## Change History 版本歷史
 
 * [NEWS](https://github.com/BYVoid/OpenCC/blob/master/NEWS.md)
+  - 另見 https://opencc.byvoid.com/news/
 
-### Links 相關鏈接
+## Links 相關連結
 
+* [Publications Using OpenCC](https://github.com/BYVoid/OpenCC/blob/master/PUBLICATIONS.md) - 近年來使用了 OpenCC 的研究論文選錄
 * [現代漢語常用繁簡轉換匹配辨析表](https://github.com/BYVoid/OpenCC/blob/master/doc/characters-easy-to-misuse.md)
 * 關於 [`opencc`](https://www.npmjs.com/package/opencc), [`opencc-js`](https://www.npmjs.com/package/opencc-js) 与 [`opencc-wasm`](https://www.npmjs.com/package/opencc-wasm) 三个 NPM packages 區別的說明
   https://github.com/nk2028/opencc-js/blob/HEAD/README-zh-TW.md#%E8%88%87-opencc-npm-package-%E7%9A%84%E5%8D%80%E5%88%A5

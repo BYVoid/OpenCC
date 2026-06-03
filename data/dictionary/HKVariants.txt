@@ -4,6 +4,8 @@
 # License: Apache-2.0 (see LICENSE)
 # Source: https://github.com/ByVoid/OpenCC
 # Used in configs: s2hk.json, t2hk.json
+# Also used to generate HKVariantsRev.txt. See data/scripts/reverse.py for
+# the reverse dictionary generation algorithm.
 
 僞	偽
 兌	兑

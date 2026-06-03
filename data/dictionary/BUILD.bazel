@@ -185,10 +185,12 @@ cc_test(
     srcs = ["DictionaryVariantRevPhrasesTest.cpp"],
     data = [
         "HKVariants.txt",
+        "HKVariantsRev.txt",
         "HKVariantsRevPhrases.txt",
         "STCharacters.txt",
         "STPhrases.txt",
         "TWVariants.txt",
+        "TWVariantsRev.txt",
         "TWVariantsRevPhrases.txt",
     ],
     deps = [

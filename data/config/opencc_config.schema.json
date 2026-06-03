@@ -125,6 +125,9 @@
         "file": {
           "type": "string",
           "minLength": 1
+        },
+        "may_output_tofu": {
+          "type": "boolean"
         }
       }
     },
@@ -147,6 +150,9 @@
           "items": {
             "$ref": "#/definitions/dict"
           }
+        },
+        "may_output_tofu": {
+          "type": "boolean"
         }
       }
     }

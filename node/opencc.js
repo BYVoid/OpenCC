@@ -127,6 +127,33 @@ function patchDictPaths(dict, baseDir) {
   }
 }
 
+function filterTofuRiskDicts(dict, includeTofuRiskDictionaries) {
+  if (!dict) return null;
+  if (dict.may_output_tofu && !includeTofuRiskDictionaries) {
+    return null;
+  }
+  if (dict.type === 'group' && Array.isArray(dict.dicts)) {
+    dict.dicts = dict.dicts
+      .map((d) => filterTofuRiskDicts(d, includeTofuRiskDictionaries))
+      .filter(Boolean);
+    if (dict.dicts.length === 0) {
+      return null;
+    }
+  }
+  return dict;
+}
+
+function filterTofuRiskConversionChain(config, includeTofuRiskDictionaries) {
+  if (!Array.isArray(config.conversion_chain)) return;
+  config.conversion_chain = config.conversion_chain
+    .map((step) => {
+      if (!step || !step.dict) return step;
+      step.dict = filterTofuRiskDicts(step.dict, includeTofuRiskDictionaries);
+      return step.dict ? step : null;
+    })
+    .filter(Boolean);
+}
+
 /**
  * Patch all relative paths in a config JSON object to absolute paths.
  *
@@ -139,7 +166,7 @@ function patchDictPaths(dict, baseDir) {
  */
 function patchConfigPaths(config, jieba, mainAssetsDir) {
   // Inject explicit plugin library path (skips dlopen search in C++)
-  if (config.segmentation) {
+  if (jieba && config.segmentation) {
     config.segmentation.__plugin_library = jieba.pluginLibrary;
     // Absolutify segmentation resource paths (dict_path, model_path, etc.)
     if (config.segmentation.resources) {
@@ -189,10 +216,15 @@ function resolveJiebaConfigPath(config, jieba) {
  * @constructor
  * @ingroup node_api
  */
-const OpenCC = module.exports = function (config) {
+const OpenCC = module.exports = function (config, options) {
   if (!config) {
     config = 's2t.json';
   }
+  if (!options) {
+    options = {};
+  }
+  const includeTofuRiskDictionaries =
+    options.includeTofuRiskDictionaries !== false;
 
   // When opencc-jieba is installed, check if the requested config is a jieba
   // config. If so, load its JSON, patch all paths to absolute, and pass the
@@ -200,6 +232,7 @@ const OpenCC = module.exports = function (config) {
   const jiebaConfigPath = resolveJiebaConfigPath(config, jiebaInfo);
   if (jiebaConfigPath) {
     const raw = JSON.parse(fs.readFileSync(jiebaConfigPath, 'utf-8'));
+    filterTofuRiskConversionChain(raw, includeTofuRiskDictionaries);
     patchConfigPaths(raw, jiebaInfo, assetsPath);
     this.handler = new binding.Opencc(
       JSON.stringify(raw),
@@ -209,6 +242,24 @@ const OpenCC = module.exports = function (config) {
   }
 
   config = getConfigPath(config);
+  if (!includeTofuRiskDictionaries) {
+    const raw = JSON.parse(fs.readFileSync(config, 'utf-8'));
+    filterTofuRiskConversionChain(raw, includeTofuRiskDictionaries);
+    const configDir = path.dirname(config);
+    if (raw.segmentation && raw.segmentation.dict) {
+      patchDictPaths(raw.segmentation.dict, configDir);
+    }
+    if (Array.isArray(raw.conversion_chain)) {
+      for (const step of raw.conversion_chain) {
+        patchDictPaths(step.dict, configDir);
+      }
+    }
+    this.handler = new binding.Opencc(
+      JSON.stringify(raw),
+      configDir + path.sep
+    );
+    return;
+  }
   this.handler = new binding.Opencc(config);
 };
 

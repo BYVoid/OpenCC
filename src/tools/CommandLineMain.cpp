@@ -231,6 +231,21 @@ FILE* GetOutputStream() {
   }
 }
 
+void PrintInteractiveStdinHint() {
+#ifdef _WIN32
+  if (_isatty(_fileno(stdin))) {
+    fprintf(stderr,
+            "Reading from standard input. Press Ctrl+Z then Enter to "
+            "finish.\n");
+  }
+#else
+  if (isatty(fileno(stdin))) {
+    fprintf(stderr,
+            "Reading from standard input. Press Ctrl+D to finish.\n");
+  }
+#endif
+}
+
 // Serializes the segmentation-only view of an inspection result as a JSON
 // object with "input" and "segments" fields. Used with --segmentation mode.
 std::string SerializeSegmentationResultJson(
@@ -356,18 +371,7 @@ void ConvertStream(FILE* fin, FILE* fout) {
 }
 
 void ConvertLineByLine() {
-#ifdef _WIN32
-  if (_isatty(_fileno(stdin))) {
-    fprintf(stderr,
-            "Reading from standard input. Press Ctrl+Z then Enter to "
-            "finish.\n");
-  }
-#else
-  if (isatty(fileno(stdin))) {
-    fprintf(stderr,
-            "Reading from standard input. Press Ctrl+D to finish.\n");
-  }
-#endif
+  PrintInteractiveStdinHint();
   std::istream& inputStream = std::cin;
   FILE* fout = GetOutputStream();
   bool isFirstLine = true;
@@ -488,6 +492,7 @@ void ConvertFile(std::string fileName) {
 }
 
 void ConvertStdin() {
+  PrintInteractiveStdinHint();
   SetBinaryMode(stdin);
   FILE* fout = GetOutputStream();
   ConvertStream(stdin, fout);

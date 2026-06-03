@@ -1,5 +1,9 @@
+interface OpenCCOptions {
+  includeTofuRiskDictionaries?: boolean;
+}
+
 declare class OpenCC {
-  constructor(config?: string);
+  constructor(config?: string, options?: OpenCCOptions);
   static readonly version: string;
   static generateDict(inputFileName: string, outputFileName: string, formatFrom: string, formatTo: string): void;
   convert(input: string, callback: (err: string | undefined, convertedText: string) => void): void;
@@ -8,7 +12,7 @@ declare class OpenCC {
 }
 
 declare namespace OpenCC {
-  export { OpenCC };
+  export { OpenCC, OpenCCOptions };
 }
 
 export = OpenCC;

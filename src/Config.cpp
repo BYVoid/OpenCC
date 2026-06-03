@@ -372,7 +372,7 @@ public:
 
   DictPtr ParseDict(const JSONValue& doc, bool includeTofuRiskDictionaries) {
     const bool mayOutputTofu =
-        GetOptionalBoolProperty(doc, "mayOutputTofu", false);
+        GetOptionalBoolProperty(doc, "may_output_tofu", false);
     if (mayOutputTofu && !includeTofuRiskDictionaries) {
       return DictPtr();
     }

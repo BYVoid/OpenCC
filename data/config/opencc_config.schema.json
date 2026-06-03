@@ -126,7 +126,7 @@
           "type": "string",
           "minLength": 1
         },
-        "mayOutputTofu": {
+        "may_output_tofu": {
           "type": "boolean"
         }
       }
@@ -151,7 +151,7 @@
             "$ref": "#/definitions/dict"
           }
         },
-        "mayOutputTofu": {
+        "may_output_tofu": {
           "type": "boolean"
         }
       }

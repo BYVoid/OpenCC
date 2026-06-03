@@ -540,8 +540,9 @@ int CommandLineMain(std::vector<std::string> args) {
         cmd, false);
     TCLAP::SwitchArg includeTofuRiskDictionariesArg(
         "", "include-tofu-risk-dictionaries",
-        "Include dictionaries marked as possibly outputting tofu. By default, "
-        "the command line tool skips these dictionaries.",
+        "Include dictionaries marked as possibly outputting tofu, i.e. "
+        "Chinese characters that may render as missing-glyph boxes. By "
+        "default, the command line tool skips these dictionaries.",
         cmd, false);
     const std::string argv0String = args.empty() ? std::string() : args[0];
     cmd.parse(args);

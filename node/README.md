@@ -80,8 +80,9 @@ Creates a converter. If `config` is omitted, OpenCC uses `s2t.json`.
 `s2t.json`, or an absolute path to a custom OpenCC configuration file.
 
 `options.includeTofuRiskDictionaries` controls whether dictionaries marked as
-possibly outputting tofu are loaded. It defaults to `true` for JavaScript API
-compatibility.
+possibly outputting tofu are loaded. Here, tofu means Chinese characters that
+cannot be displayed and may render as missing-glyph boxes. It defaults to
+`true` for JavaScript API compatibility.
 
 ### `converter.convertSync(input)`
 
@@ -140,16 +141,18 @@ Options:
 -i, --input <file>   Read original text from <file>. Defaults to stdin.
 -o, --output <file>  Write converted text to <file>. Defaults to stdout.
 --include-tofu-risk-dictionaries
-                     Include dictionaries that may output tofu.
+                     Include dictionaries that may output tofu: Chinese
+                     characters rendered as missing-glyph boxes.
 -v, --version        Print OpenCC version.
 -h, --help           Print help.
 ```
 
 The npm CLI skips dictionaries marked as possibly outputting tofu by default.
-Use `--include-tofu-risk-dictionaries` to load them. The npm CLI supports
-conversion only. Use the native OpenCC command line tool for inspection,
-segmentation output, custom resource search paths, or other advanced CLI
-features.
+Here, tofu means Chinese characters that cannot be displayed and may render as
+missing-glyph boxes. Use `--include-tofu-risk-dictionaries` to load them. The
+npm CLI supports conversion only. Use the native OpenCC command line tool for
+inspection, segmentation output, custom resource search paths, or other
+advanced CLI features.
 
 ## Built-in Configurations
 

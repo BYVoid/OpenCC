@@ -78,7 +78,8 @@ converter.convert('漢字', (err, text) => {
 OpenCC 配置檔的絕對路徑。
 
 `options.includeTofuRiskDictionaries` 控制是否載入標記為可能輸出 tofu
-的字典。為維持 JavaScript API 相容性，預設值為 `true`。
+的字典。這裡的 tofu 指無法顯示的中文字，有時會被渲染為方塊，俗稱
+豆腐塊。為維持 JavaScript API 相容性，預設值為 `true`。
 
 ### `converter.convertSync(input)`
 
@@ -137,12 +138,14 @@ echo '汉字' | opencc -c s2t.json
 -i, --input <file>   從 <file> 讀取原文。預設為 stdin。
 -o, --output <file>  將轉換結果寫入 <file>。預設為 stdout。
 --include-tofu-risk-dictionaries
-                     載入可能輸出 tofu 的字典。
+                     載入可能輸出 tofu 的字典；tofu 指無法顯示時
+                     渲染成方塊的中文字。
 -v, --version        印出 OpenCC 版本。
 -h, --help           印出說明。
 ```
 
-npm CLI 預設會略過標記為可能輸出 tofu 的字典；若要載入，請使用
+npm CLI 預設會略過標記為可能輸出 tofu 的字典。這裡的 tofu 指無法
+顯示的中文字，有時會被渲染為方塊，俗稱豆腐塊；若要載入，請使用
 `--include-tofu-risk-dictionaries`。npm CLI 僅支援文字轉換。若需要
 inspect、segmentation 輸出、自訂資源搜尋路徑，或其他進階 CLI 功能，
 請使用原生 OpenCC 命令列工具。

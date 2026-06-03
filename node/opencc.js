@@ -129,7 +129,7 @@ function patchDictPaths(dict, baseDir) {
 
 function filterTofuRiskDicts(dict, includeTofuRiskDictionaries) {
   if (!dict) return null;
-  if (dict.mayOutputTofu && !includeTofuRiskDictionaries) {
+  if (dict.may_output_tofu && !includeTofuRiskDictionaries) {
     return null;
   }
   if (dict.type === 'group' && Array.isArray(dict.dicts)) {

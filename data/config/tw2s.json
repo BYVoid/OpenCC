@@ -27,7 +27,7 @@
       }, {
         "type": "ocd2",
         "file": "TSCharactersExt.ocd2",
-        "mayOutputTofu": true
+        "may_output_tofu": true
       }, {
         "type": "ocd2",
         "file": "TSCharacters.ocd2"

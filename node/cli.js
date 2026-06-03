@@ -47,7 +47,8 @@ Options:
   -i, --input <file>   Read original text from <file>. Defaults to stdin.
   -o, --output <file>  Write converted text to <file>. Defaults to stdout.
   --include-tofu-risk-dictionaries
-                       Include dictionaries that may output tofu.
+                       Include dictionaries that may output tofu (Chinese
+                       characters rendered as missing-glyph boxes).
   -v, --version        Print OpenCC version.
   -h, --help           Print this help.
 

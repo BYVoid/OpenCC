@@ -1063,17 +1063,17 @@
       }
     },
     {
-      "id": "BYVoid_OpenCC_Issue_1246_hk_variant_reverse_phrases",
-      "input": "才智 核心 方針 肥皂 香皂 接續香煙",
+      "id": "BYVoid_OpenCC_Issue_1246_hk_variant_reverse",
+      "input": "才智 核心 方針 肥皂 香皂 接續香煙 才 核 煙",
       "expected": {
-        "hk2t": "才智 核心 方針 肥皂 香皂 接續香煙"
+        "hk2t": "才智 核心 方針 肥皂 香皂 接續香煙 才 核 煙"
       }
     },
     {
-      "id": "BYVoid_OpenCC_Issue_1246_tw_variant_reverse_phrases",
-      "input": "才智 核心 方針 肥皂 香皂 參考",
+      "id": "BYVoid_OpenCC_Issue_1246_tw_variant_reverse",
+      "input": "才智 核心 方針 肥皂 香皂 參考 才 核",
       "expected": {
-        "tw2t": "才智 核心 方針 肥皂 香皂 參考"
+        "tw2t": "才智 核心 方針 肥皂 香皂 參考 才 核"
       }
     },
     {
@@ -1092,9 +1092,9 @@
       "id": "BYVoid_OpenCC_Issue_1246_test",
       "input": "這樣才行",
       "expected": {
-        "hk2t": "這樣纔行",
+        "hk2t": "這樣才行",
         "hk2s": "这样才行",
-        "tw2t": "這樣纔行",
+        "tw2t": "這樣才行",
         "tw2s": "这样才行"
       }
     },

@@ -123,7 +123,7 @@ TEST(MixSegmentTest, TestUserDict) {
   ASSERT_EQ("[\"I\", \"B\", \"M\", \",\", \"3.14\"]", res);
 
   segment.Cut("忽如一夜春风来，千树万树梨花开", words);
-  res = limonp::Join(words.begin(), words.end(), "/");
+  res = Join(words.begin(), words.end(), "/");
   ASSERT_EQ("忽如一夜春风来/，/千树/万树/梨花/开", res);
 
   // rand input
@@ -151,7 +151,7 @@ TEST(MixSegmentTest, TestMultiUserDict) {
   string res;
 
   segment.Cut("忽如一夜春风来，千树万树梨花开", words);
-  res = limonp::Join(words.begin(), words.end(), "/");
+  res = Join(words.begin(), words.end(), "/");
   ASSERT_EQ("忽如一夜春风来/，/千树万树梨花开", res);
 }
 
@@ -327,10 +327,10 @@ TEST(MPSegmentTest, Unicode32) {
 
 // Regression test for heap corruption ("corrupted size vs. prev_size") with
 // input strings larger than 2114 bytes. The bug was caused by using
-// LocalVector<RuneStr> (only safe for primitive types) for RuneStrArray.
+// vector<RuneStr> (only safe for primitive types) for RuneStrArray.
 TEST(MixSegmentTest, LongInput) {
   // 2114 is the byte length threshold beyond which the original heap
-  // corruption was triggered when RuneStrArray used LocalVector<RuneStr>.
+  // corruption was triggered when RuneStrArray used vector<RuneStr>.
   const size_t HEAP_CORRUPTION_THRESHOLD = 2114;
 
   MixSegment segment(DICT_DIR "/jieba.dict.utf8", DICT_DIR "/hmm_model.utf8");

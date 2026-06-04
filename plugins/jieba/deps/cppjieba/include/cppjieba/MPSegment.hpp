@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <set>
 #include <cassert>
-#include "limonp/Logging.hpp"
 #include "DictTrie.hpp"
 #include "SegmentTagged.hpp"
 #include "PosTagger.hpp"
@@ -86,7 +85,7 @@ class MPSegment: public SegmentTagged {
       rit->pInfo = NULL;
       rit->weight = MIN_DOUBLE;
       assert(!rit->nexts.empty());
-      for (LocalVector<pair<size_t, const DictUnit*> >::const_iterator it = rit->nexts.begin(); it != rit->nexts.end(); it++) {
+      for (vector<pair<size_t, const DictUnit*> >::const_iterator it = rit->nexts.begin(); it != rit->nexts.end(); it++) {
         nextPos = it->first;
         p = it->second;
         val = 0.0;

@@ -3,10 +3,10 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <cassert>
 #include <string>
 #include <vector>
 #include <ostream>
-#include "limonp/LocalVector.hpp"
 
 namespace cppjieba {
 
@@ -52,7 +52,7 @@ inline std::ostream& operator << (std::ostream& os, const RuneStr& r) {
   return os << "{\"rune\": \"" << r.rune << "\", \"offset\": " << r.offset << ", \"len\": " << r.len << "}";
 }
 
-typedef limonp::LocalVector<Rune> Unicode;
+typedef std::vector<Rune> Unicode;
 typedef std::vector<RuneStr> RuneStrArray;
 
 // [left, right]

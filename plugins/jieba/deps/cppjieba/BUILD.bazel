@@ -19,12 +19,8 @@ cc_library(
     name = "cppjieba",
     hdrs = glob([
         "include/**/*.hpp",
-        "deps/limonp/include/**/*.hpp",
     ]),
-    includes = [
-        "deps/limonp/include",
-        "include",
-    ],
+    includes = ["include"],
 )
 
 filegroup(

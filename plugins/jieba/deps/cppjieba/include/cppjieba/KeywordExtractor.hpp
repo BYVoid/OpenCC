@@ -2,6 +2,7 @@
 #define CPPJIEBA_KEYWORD_EXTRACTOR_H
 
 #include <algorithm>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
 #include "MixSegment.hpp"
@@ -106,7 +107,7 @@ class KeywordExtractor {
         XLOG(ERROR) << "lineno: " << lineno << " empty. skipped.";
         continue;
       }
-      limonp::Split(line, buf, " ");
+      Split(line, buf, " ");
       if (buf.size() != 2) {
         XLOG(ERROR) << "line: " << line << ", lineno: " << lineno << " empty. skipped.";
         continue;
@@ -144,7 +145,7 @@ class KeywordExtractor {
 }; // class KeywordExtractor
 
 inline std::ostream& operator << (std::ostream& os, const KeywordExtractor::Word& word) {
-  return os << "{\"word\": \"" << word.word << "\", \"offset\": " << word.offsets << ", \"weight\": " << word.weight << "}"; 
+  return os << "{\"word\": \"" << word.word << "\", \"offset\": " << FormatVector(word.offsets) << ", \"weight\": " << word.weight << "}"; 
 }
 
 } // namespace cppjieba

@@ -1,9 +1,0 @@
-*.o
-*.ut
-libcm.a
-tags
-*.d
-build
-t.cpp
-a.out
-*.swp

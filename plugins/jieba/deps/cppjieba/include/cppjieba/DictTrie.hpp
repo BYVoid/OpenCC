@@ -13,8 +13,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include "limonp/StringUtil.hpp"
-#include "limonp/Logging.hpp"
+#include "Utils.hpp"
 #include "UnicodeFile.hpp"
 #include "Unicode.hpp"
 #include "Trie.hpp"
@@ -127,7 +126,7 @@ class DictTrie {
   void InserUserDictNode(const std::string& line) {
     std::vector<std::string> buf;
     DictUnit node_info;
-    limonp::Split(line, buf, " ");
+    Split(line, buf, " ");
     if(buf.size() == 1){
           MakeNodeInfo(node_info,
                 buf[0],
@@ -164,7 +163,7 @@ class DictTrie {
   }
 
   void LoadUserDict(const std::string& filePaths) {
-    std::vector<std::string> files = limonp::Split(filePaths, "|;");
+    std::vector<std::string> files = Split(filePaths, "|;");
     for (size_t i = 0; i < files.size(); i++) {
       std::ifstream ifs;
       OpenInputFile(files[i], ifs);
@@ -285,7 +284,7 @@ class DictTrie {
     std::string line;
     std::vector<std::string> buf;
     while (getline(ifs, line)) {
-      limonp::Split(line, buf, " ");
+      Split(line, buf, " ");
       XCHECK(buf.size() == DICT_COLUMN_NUM) << "split result illegal, line:" << line;
       DictUnit node_info;
       XCHECK(DecodeUTF8RunesInString(buf[0], node_info.word)) << "UTF-8 decode failed for dict word: " << buf[0];

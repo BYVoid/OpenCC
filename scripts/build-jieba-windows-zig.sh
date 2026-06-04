@@ -52,7 +52,6 @@ set +e
   -Isrc \
   -Iplugins/jieba/include \
   -Iplugins/jieba/deps/cppjieba/include \
-  -Iplugins/jieba/deps/cppjieba/deps/limonp/include \
   -Ideps/marisa-0.3.1/include \
   -Ideps/marisa-0.3.1/lib \
   "${sources[@]}" \

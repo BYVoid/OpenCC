@@ -237,6 +237,46 @@ Rules:
 OPENCC_DATA_DIR=/path/to/your/config/dir opencc --help
 ```
 
+#### 內聯字典（inline dictionary）
+
+配置檔中的字典可使用 `type: "inline"`，直接在 JSON 裡定義小型自訂詞彙，
+不必修改外部字典檔。例如在 `group.dicts` 最前面加入覆寫規則：
+
+```json
+{
+  "conversion_chain": [
+    {
+      "dict": {
+        "type": "group",
+        "dicts": [
+          {
+            "type": "inline",
+            "entries": {
+              "麦旋风": "冰炫風",
+              "服务器": "伺服器"
+            }
+          },
+          { "type": "ocd2", "file": "STPhrases.ocd2" },
+          { "type": "ocd2", "file": "STCharacters.ocd2" }
+        ]
+      }
+    }
+  ]
+}
+```
+
+規則與限制：
+
+- `entries` 必須是 JSON 物件。
+- `entries` 的 key/value 必須是非空字串。
+- 重複 key 不受支援（若出現重複，配置應視為無效或結果不保證）。
+- key/value 會按解析結果原樣使用，不做 trim、大小寫折疊或 Unicode normalization。
+- 內聯字典與普通字典行為一致，優先級由 `group.dicts` 的順序決定。
+- 內聯字典輸出仍會繼續經過後續 `conversion_chain` 步驟，不提供鎖定最終輸出。
+
+備註：OpenCC 1.3.2+ 解析器支援有限 JSONC 語法（`//`、`/* */` 註解與尾逗號）。
+若需跨實作相容，建議使用嚴格 JSON，不依賴 JSONC 擴充。
+
 ### Experimental Plugins 試驗性插件
 
 OpenCC 現已支援外部 C++ 分詞插件。當前第一個插件為 `opencc-jieba`，

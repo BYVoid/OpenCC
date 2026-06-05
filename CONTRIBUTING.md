@@ -15,6 +15,7 @@ OpenCC 以 [Apache License 2.0](LICENSE) 釋出。提交 Pull Request、issue/co
 - [撰寫測試案例](#撰寫測試案例)
 - [Jieba 插件測試](#jieba-插件測試)
 - [簡轉繁轉換的特殊注意事項](#簡轉繁轉換的特殊注意事項)
+- [字級規則與詞表依賴](#字級規則與詞表依賴)
 
 ## 新增詞典條目
 
@@ -71,6 +72,21 @@ OpenCC 以 [Apache License 2.0](LICENSE) 釋出。提交 Pull Request、issue/co
 1. 使用 **Tab 字元**（`\t`）分隔來源詞與目標詞
 2. 每行一個條目
 3. 檔案使用 UTF-8 編碼
+
+### 4. 檢查字級規則與詞表依賴
+
+詞組級詞表如果仍保留逐字的 `A -> B` 轉換，對應的字級詞表也必須顯式
+保留 `A` 的 `B` 候選。若一般情況下不應再把 `A` 預設轉為 `B`，請不要
+直接刪除字級關係；應改為非預設候選，例如 `A<TAB>A B`。這樣單字預設
+仍保留為 `A`，但詞表中的 `A -> B` 依賴不會變成隱式規則。
+
+修改 `STCharacters.txt`、`TSCharacters.txt`、`TWVariants.txt`、
+`HKVariants.txt` 或其對應詞組詞表時，請同步檢查詞組中逐字對齊的
+替換是否仍在字表候選中。可執行以下測試檢查這類字級依賴：
+
+```bash
+bazel test //data/dictionary:dictionary_phrase_character_dependency_test
+```
 
 ## 排序詞典
 

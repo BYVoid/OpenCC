@@ -183,6 +183,27 @@ TEST_F(ConfigTest, ExplicitProviderFindsConfigNameAndResources) {
   fs::remove_all(tempDir);
 }
 
+TEST_F(ConfigTest, RelativeParentDictionaryPathStillWorks) {
+  const fs::path tempDir = MakeTempDir("opencc-relative-parent-resource-test");
+  const fs::path configDir = tempDir / "config";
+  const fs::path dictionaryDir = tempDir / "dictionary";
+  fs::create_directories(configDir);
+  fs::create_directories(dictionaryDir);
+  WriteFile(configDir / "config.json",
+            SingleDictConfig("../dictionary/dict.txt"));
+  WriteFile(dictionaryDir / "dict.txt", utf8("鼠标\t滑鼠\n"));
+
+  try {
+    const ConverterPtr tempConverter =
+        config.NewFromFile(PathString(configDir / "config.json"));
+    EXPECT_EQ(utf8("滑鼠"), tempConverter->Convert(utf8("鼠标")));
+  } catch (...) {
+    fs::remove_all(tempDir);
+    throw;
+  }
+  fs::remove_all(tempDir);
+}
+
 TEST_F(ConfigTest, MultipleSearchPathsUseFirstMatch) {
   const fs::path tempDir = MakeTempDir("opencc-provider-order-test");
   const fs::path configDir = tempDir / "config";

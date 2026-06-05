@@ -61,21 +61,6 @@ bool IsRegularFileUtf8(const std::string& path) {
 #endif
 }
 
-bool HasParentReference(const std::string& path) {
-  size_t start = 0;
-  while (start <= path.size()) {
-    size_t end = start;
-    while (end < path.size() && !IsSeparator(path[end])) {
-      ++end;
-    }
-    if (path.substr(start, end - start) == "..") {
-      return true;
-    }
-    start = end + 1;
-  }
-  return false;
-}
-
 std::string JoinPath(const std::string& root, const std::string& resource) {
   if (root.empty()) {
     return resource;
@@ -103,10 +88,6 @@ FilesystemResourceProvider::Resolve(std::string_view resourceName) const {
     if (IsRegularFileUtf8(resourcePath)) {
       return resourcePath;
     }
-    throw FileNotFound(resourcePath);
-  }
-
-  if (HasParentReference(resourcePath)) {
     throw FileNotFound(resourcePath);
   }
 

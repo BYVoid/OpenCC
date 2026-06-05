@@ -118,6 +118,7 @@ cc_library(
     hdrs = ["ResourceProvider.hpp"],
     deps = [
         ":exception_lib",
+        ":win_util_lib",
     ],
 )
 

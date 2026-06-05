@@ -40,6 +40,7 @@ sources=(
   src/MaxMatchSegmentation.cpp
   src/PluginSegmentation.cpp
   src/PrefixMatch.cpp
+  src/ResourceProvider.cpp
   src/Segmentation.cpp
   src/SerializableDict.cpp
   src/SerializedValues.cpp

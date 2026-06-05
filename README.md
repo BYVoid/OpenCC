@@ -115,6 +115,34 @@ int main() {
 
 [Full example with Bazel](https://github.com/BYVoid/opencc-bazel-example)
 
+When OpenCC is embedded in a server binary or self-contained application, the
+JSON config can stay small while dictionary resources are loaded from explicit
+resource directories:
+
+```c++
+#include <memory>
+#include <vector>
+
+#include "SimpleConverter.hpp"
+
+int main() {
+  auto resources = std::make_shared<opencc::FilesystemResourceProvider>(
+      std::vector<std::string>{
+          "/opt/my-app/opencc",
+          "/opt/my-app/plugins/opencc-jieba",
+          "/usr/share/opencc",
+      });
+  const opencc::SimpleConverter converter("s2t.json", resources);
+  converter.Convert("汉字");
+  return 0;
+}
+```
+
+`FilesystemResourceProvider` searches directories in order. Existing
+`SimpleConverter("s2t.json")` and CLI behavior continue to use the config file
+location, current directory, explicit paths, and installed OpenCC data directory
+as before.
+
 ### C
 
 ```c

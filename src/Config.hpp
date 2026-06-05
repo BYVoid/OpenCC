@@ -19,6 +19,7 @@
 #pragma once
 
 #include "Common.hpp"
+#include "ResourceProvider.hpp"
 
 namespace opencc {
 
@@ -48,7 +49,21 @@ public:
                              const std::vector<std::string>& paths,
                              const ConfigLoadOptions& options);
 
+  ConverterPtr NewFromString(const std::string& json,
+                             std::shared_ptr<ResourceProvider> provider);
+
+  ConverterPtr NewFromString(const std::string& json,
+                             std::shared_ptr<ResourceProvider> provider,
+                             const ConfigLoadOptions& options);
+
   ConverterPtr NewFromFile(const std::string& fileName);
+
+  ConverterPtr NewFromFile(const std::string& fileName,
+                           std::shared_ptr<ResourceProvider> provider);
+
+  ConverterPtr NewFromFile(const std::string& fileName,
+                           std::shared_ptr<ResourceProvider> provider,
+                           const ConfigLoadOptions& options);
 
   ConverterPtr NewFromFile(const std::string& fileName,
                            const std::vector<std::string>& paths,

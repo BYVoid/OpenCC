@@ -264,6 +264,7 @@ class ConfigInternal {
 public:
   std::vector<std::string> paths;
   std::string configDirectory;
+  std::shared_ptr<ResourceProvider> resourceProvider;
   ConfigLoadOptions options;
 
   const JSONValue& GetProperty(const JSONValue& doc, const char* name) {
@@ -310,61 +311,58 @@ public:
   }
 
   template <typename DICT>
-  DictPtr LoadDictWithPaths(const std::string& cachePrefix,
-                            const std::string& fileName) {
-    std::vector<std::string> candidates;
-    candidates.push_back(fileName);
-    for (const std::string& dirPath : paths) {
-      candidates.push_back(dirPath + '/' + fileName);
+  DictPtr LoadDictWithResourceProvider(const std::string& cachePrefix,
+                                       const std::string& fileName) {
+    if (resourceProvider == nullptr) {
+      throw FileNotFound(fileName);
     }
 
-    for (const std::string& path : candidates) {
-      std::string cacheKey = cachePrefix;
-      cacheKey.push_back('\n');
-      if (!GetFileCacheKey(path, &cacheKey)) {
-        continue;
-      }
-      {
-        std::lock_guard<std::mutex> lock(DictCacheMutex());
-        PruneExpiredDictCache();
-        const auto cached = DictCache().find(cacheKey);
-        if (cached != DictCache().end()) {
-          DictPtr dict = cached->second.lock();
-          if (dict != nullptr) {
-            return dict;
-          }
-        }
-      }
-
-      std::shared_ptr<DICT> dict;
-      if (SerializableDict::TryLoadFromFile<DICT>(path, &dict)) {
-        std::lock_guard<std::mutex> lock(DictCacheMutex());
-        PruneExpiredDictCache();
-        std::weak_ptr<Dict>& cached = DictCache()[cacheKey];
-        DictPtr cachedDict = cached.lock();
-        if (cachedDict == nullptr) {
-          cached = dict;
+    const std::string path = resourceProvider->Resolve(fileName);
+    std::string cacheKey = cachePrefix;
+    cacheKey.push_back('\n');
+    if (!GetFileCacheKey(path, &cacheKey)) {
+      throw FileNotFound(path);
+    }
+    {
+      std::lock_guard<std::mutex> lock(DictCacheMutex());
+      PruneExpiredDictCache();
+      const auto cached = DictCache().find(cacheKey);
+      if (cached != DictCache().end()) {
+        DictPtr dict = cached->second.lock();
+        if (dict != nullptr) {
           return dict;
         }
-        return cachedDict;
       }
     }
-    throw FileNotFound(fileName);
+
+    std::shared_ptr<DICT> dict;
+    if (SerializableDict::TryLoadFromFile<DICT>(path, &dict)) {
+      std::lock_guard<std::mutex> lock(DictCacheMutex());
+      PruneExpiredDictCache();
+      std::weak_ptr<Dict>& cached = DictCache()[cacheKey];
+      DictPtr cachedDict = cached.lock();
+      if (cachedDict == nullptr) {
+        cached = dict;
+        return dict;
+      }
+      return cachedDict;
+    }
+    throw FileNotFound(path);
   }
 
   DictPtr LoadDictFromFile(const std::string& type,
                            const std::string& fileName) {
     if (type == "text") {
-      DictPtr dict = LoadDictWithPaths<TextDict>("text", fileName);
+      DictPtr dict = LoadDictWithResourceProvider<TextDict>("text", fileName);
       return MarisaDict::NewFromDict(*dict.get());
     }
 #ifdef ENABLE_DARTS
     if (type == "ocd") {
-      return LoadDictWithPaths<DartsDict>("ocd", fileName);
+      return LoadDictWithResourceProvider<DartsDict>("ocd", fileName);
     }
 #endif
     if (type == "ocd2") {
-      return LoadDictWithPaths<MarisaDict>("ocd2", fileName);
+      return LoadDictWithResourceProvider<MarisaDict>("ocd2", fileName);
     }
     throw InvalidFormat("Unknown dictionary type: " + type);
     return nullptr;
@@ -533,6 +531,23 @@ bool isRegularFile(const std::string& path) {
 #endif
 }
 
+std::shared_ptr<ResourceProvider>
+NewFilesystemResourceProvider(const std::string& configDirectory,
+                              const std::vector<std::string>& paths) {
+  std::vector<std::string> searchPaths;
+  if (!configDirectory.empty()) {
+    searchPaths.push_back(configDirectory);
+  }
+  searchPaths.push_back(".");
+  for (const std::string& path : paths) {
+    if (!path.empty()) {
+      searchPaths.push_back(path);
+    }
+  }
+  return std::shared_ptr<ResourceProvider>(
+      new FilesystemResourceProvider(searchPaths));
+}
+
 } // namespace
 
 Config::Config() : internal(new ConfigInternal()) {}
@@ -541,6 +556,46 @@ Config::~Config() { delete reinterpret_cast<ConfigInternal*>(internal); }
 
 ConverterPtr Config::NewFromFile(const std::string& fileName) {
   return NewFromFile(fileName, std::vector<std::string>{}, nullptr);
+}
+
+ConverterPtr
+Config::NewFromFile(const std::string& fileName,
+                    std::shared_ptr<ResourceProvider> provider) {
+  return NewFromFile(fileName, provider, ConfigLoadOptions());
+}
+
+ConverterPtr
+Config::NewFromFile(const std::string& fileName,
+                    std::shared_ptr<ResourceProvider> provider,
+                    const ConfigLoadOptions& options) {
+  ConfigInternal* impl = reinterpret_cast<ConfigInternal*>(internal);
+  impl->options = options;
+  impl->paths.clear();
+  impl->resourceProvider = provider;
+  std::string prefixedFileName;
+  if (provider != nullptr) {
+    try {
+      prefixedFileName = provider->Resolve(fileName);
+    } catch (const FileNotFound&) {
+      prefixedFileName = impl->FindConfigFile(fileName);
+    }
+  } else {
+    prefixedFileName = impl->FindConfigFile(fileName);
+  }
+  if (!isRegularFile(prefixedFileName)) {
+    throw FileNotFound(prefixedFileName);
+  }
+  std::string content = ReadFileUtf8(prefixedFileName);
+
+#if defined(_WIN32) || defined(_WIN64)
+  UTF8Util::ReplaceAll(prefixedFileName, "\\", "/");
+#endif // if defined(_WIN32) || defined(_WIN64)
+  size_t slashPos = prefixedFileName.rfind("/");
+  impl->configDirectory = "";
+  if (slashPos != std::string::npos) {
+    impl->configDirectory = prefixedFileName.substr(0, slashPos) + "/";
+  }
+  return NewFromString(content, provider, options);
 }
 
 ConverterPtr Config::NewFromFile(const std::string& fileName,
@@ -590,7 +645,9 @@ ConverterPtr Config::NewFromFile(const std::string& fileName,
     impl->paths.push_back(configDirectory);
   }
   impl->configDirectory = configDirectory;
-  return NewFromString(content, impl->paths, options);
+  impl->resourceProvider =
+      NewFilesystemResourceProvider(configDirectory, impl->paths);
+  return NewFromString(content, impl->resourceProvider, options);
 }
 
 ConverterPtr Config::NewFromString(const std::string& json,
@@ -614,6 +671,24 @@ ConverterPtr Config::NewFromString(const std::string& json,
 ConverterPtr Config::NewFromString(const std::string& json,
                                    const std::vector<std::string>& paths,
                                    const ConfigLoadOptions& options) {
+  ConfigInternal* impl = reinterpret_cast<ConfigInternal*>(internal);
+  impl->paths = paths;
+  impl->configDirectory = paths.empty() ? "" : paths.front();
+  impl->resourceProvider =
+      NewFilesystemResourceProvider(impl->configDirectory, paths);
+  return NewFromString(json, impl->resourceProvider, options);
+}
+
+ConverterPtr
+Config::NewFromString(const std::string& json,
+                      std::shared_ptr<ResourceProvider> provider) {
+  return NewFromString(json, provider, ConfigLoadOptions());
+}
+
+ConverterPtr
+Config::NewFromString(const std::string& json,
+                      std::shared_ptr<ResourceProvider> provider,
+                      const ConfigLoadOptions& options) {
   rapidjson::Document doc;
 
   doc.Parse<rapidjson::kParseCommentsFlag |
@@ -633,10 +708,7 @@ ConverterPtr Config::NewFromString(const std::string& json,
 
   ConfigInternal* impl = reinterpret_cast<ConfigInternal*>(internal);
   impl->options = options;
-  impl->paths = paths;
-  if (impl->configDirectory.empty()) {
-    impl->configDirectory = paths.empty() ? "" : paths.front();
-  }
+  impl->resourceProvider = provider;
 
   // Required: segmentation
   SegmentationPtr segmentation =

@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from contextlib import redirect_stdout
 
-from common import BaseDict, Dict, RichDict, find_target_items, reverse_items, sort_items
+from common import BaseTable, Table, RichTable, find_target_items, reverse_items, sort_items
 
 
 class BaseTest(unittest.TestCase):
@@ -28,11 +28,11 @@ class BaseTest(unittest.TestCase):
                 return f.read()
 
 
-class BaseDictTest(BaseTest):
-    dict_cls = BaseDict
+class BaseTableTest(BaseTest):
+    table_cls = BaseTable
 
     def test_init(self):
-        table = self.dict_cls()
+        table = self.table_cls()
         with tempfile.TemporaryDirectory() as tmpdir:
             dst = os.path.join(tmpdir, "out.txt")
             table.dump(dst)
@@ -42,12 +42,12 @@ class BaseDictTest(BaseTest):
         self.assertEqual(result, b"")
 
 
-class DictTest(BaseDictTest):
-    dict_cls = Dict
+class TableTest(BaseTableTest):
+    table_cls = Table
 
 
-class RichDictTest(BaseDictTest):
-    dict_cls = RichDict
+class RichTableTest(BaseTableTest):
+    table_cls = RichTable
 
 
 class CommonScriptTest(BaseTest):

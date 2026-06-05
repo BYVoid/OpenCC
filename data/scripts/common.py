@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-class BaseDict:
+class BaseTable:
     def __init__(self):
         self.entries = []
 
@@ -38,7 +38,7 @@ class BaseDict:
         return entry['key'] + '\t' + ' '.join(entry['values']) + '\n'
 
 
-class Dict(BaseDict):
+class Table(BaseTable):
     def sort(self):
         self.entries.sort(key=lambda e: e['key'])
 
@@ -54,7 +54,7 @@ class Dict(BaseDict):
         self.entries = [{'key': key, 'values': values} for key, values in dic.items()]
 
 
-class RichDict(Dict):
+class RichTable(Table):
     def __init__(self):
         super().__init__()
         self.blocks = {}
@@ -149,20 +149,20 @@ class RichDict(Dict):
 
 
 def sort_items(input_filename, output_filename):
-    table = RichDict.from_file(input_filename)
+    table = RichTable.from_file(input_filename)
     table.sort()
     table.dump(output_filename)
 
 
 def reverse_items(input_filename, output_filename):
-    table = Dict.from_file(input_filename)
+    table = Table.from_file(input_filename)
     table.swap()
     table.sort()
     table.dump(output_filename)
 
 
 def find_target_items(input_filename, keyword):
-    for entry in Dict().iter(input_filename):
+    for entry in Table().iter(input_filename):
         for value in entry['values']:
             if keyword in value:
-                print(Dict.get_entry_line(entry), end='')
+                print(Table.get_entry_line(entry), end='')

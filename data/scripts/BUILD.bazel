@@ -22,9 +22,9 @@ py_binary(
 )
 
 py_test(
-    name = "common_test",
+    name = "test_common",
     size = "small",
-    srcs = ["common_test.py"],
+    srcs = ["test_common.py"],
     imports = ["."],
     deps = [":common"],
 )

@@ -30,3 +30,70 @@ py_test(
     imports = ["."],
     deps = [":common"],
 )
+
+DICT_TESTS = {
+    "compatibility_ideographs": [
+        "//data/dictionary:text_dictionaries",
+    ],
+    "non_bmp": [
+        "//data/dictionary:text_dictionaries",
+    ],
+    "phrase_character_dependency": [
+        "HKVariants.txt",
+        "HKVariantsPhrases.txt",
+        "HKVariantsRev.txt",
+        "HKVariantsRevPhrases.txt",
+        "STCharacters.txt",
+        "STPhrases.txt",
+        "TSCharacters.txt",
+        "TSPhrases.txt",
+        "TWVariants.txt",
+        "TWVariantsPhrases.txt",
+        "TWVariantsRev.txt",
+        "TWVariantsRevPhrases.txt",
+    ],
+    "variant_rev_phrases": [
+        "HKVariants.txt",
+        "HKVariantsRevPhrases.txt",
+        "STCharacters.txt",
+        "STPhrases.txt",
+        "TWVariants.txt",
+        "TWVariantsRevPhrases.txt",
+    ],
+    "phrases_reverse_mapping": [
+        "HKPhrases.txt",
+        "HKPhrasesRev.txt",
+        "TWPhrases.txt",
+        "TWPhrasesRev.txt",
+    ],
+    "phrases_segmentation": [
+        "HKPhrases.txt",
+        "STPhrases.txt",
+        "TWPhrases.txt",
+    ],
+}
+
+[
+    py_test(
+        name = "dictionary_" + test_func + "_test",
+        size = "small",
+        srcs = ["test_dictionary.py"],
+        main = "test_dictionary.py",
+        args = ["-k", "test_" + test_func],
+        data = [
+            d if d.startswith("//") else "//data/dictionary:" + d
+            for d in data
+        ],
+        imports = ["."],
+        deps = [":common"],
+    )
+    for test_func, data in DICT_TESTS.items()
+]
+
+test_suite(
+    name = "dictionary_test",
+    tests = [
+        "dictionary_" + test_func + "_test"
+        for test_func in DICT_TESTS
+    ],
+)

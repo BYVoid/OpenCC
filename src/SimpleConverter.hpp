@@ -17,6 +17,7 @@
  */
 
 #include "Export.hpp"
+#include <memory>
 #include <string>
 #include <vector>
 

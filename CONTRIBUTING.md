@@ -19,6 +19,8 @@ OpenCC 以 [Apache License 2.0](LICENSE) 釋出。提交 Pull Request、issue/co
 
 ## 新增詞典條目
 
+新增地區慣用詞前，請先閱讀 [OpenCC 地區詞收錄標準](doc/regional-phrase-criteria.md)。該標準說明哪些地區詞適合收錄、需要提供哪些依據，以及應如何避免高風險誤轉換。
+
 ### 1. 選擇正確的詞典檔案
 
 詞典檔案位於 `data/dictionary/` 目錄下，根據轉換類型選擇對應的檔案：

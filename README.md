@@ -30,7 +30,7 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 * 支持中國大陸、台灣、香港異體字和地區習慣用詞轉換，如「裏」「裡」、「鼠標」「滑鼠」。
 * 詞庫和函數庫完全分離，可以自由修改、導入、擴展。
 
-詳情參閱[OpenCC 設計思想](./DESIGN_PRINCIPLES.md)。
+詳情參閱[OpenCC 設計思想](./DESIGN_PRINCIPLES.md)及[地區詞收錄標準](doc/regional-phrase-criteria.md)。
 
 ## Installation 安裝
 

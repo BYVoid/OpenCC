@@ -8,4 +8,5 @@ OpenCC documentation and project notes.
 - [Benchmark results](benchmark.md)
 - [Windows Release for WinGet](windows-winget-release.md)
 - [opencc_phrase_extract](opencc_phrase_extract.md)
+- [OpenCC 地區詞收錄標準](regional-phrase-criteria.md)
 - [現代漢語常用繁簡轉換匹配辨析表](characters-easy-to-misuse.md)

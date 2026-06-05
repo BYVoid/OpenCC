@@ -616,7 +616,8 @@ ConverterPtr Config::NewFromString(const std::string& json,
                                    const ConfigLoadOptions& options) {
   rapidjson::Document doc;
 
-  doc.ParseInsitu<0>(const_cast<char*>(json.c_str()));
+  doc.Parse<rapidjson::kParseCommentsFlag |
+            rapidjson::kParseTrailingCommasFlag>(json.c_str());
   if (doc.HasParseError()) {
     throw InvalidFormat("Error parsing JSON"); // doc.GetErrorOffset()
   }

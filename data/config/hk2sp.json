@@ -19,13 +19,24 @@
       "dict": {
         "type": "group",
         "dicts": [
-          { "type": "ocd2", "file": "TSPhrases.ocd2" },
+          {
+            "type": "ocd2",
+            "file": "TSPhrasesExt.ocd2",
+            "may_output_tofu": true
+          },
+          {
+            "type": "ocd2",
+            "file": "TSPhrasesBase.ocd2"
+          },
           {
             "type": "ocd2",
             "file": "TSCharactersExt.ocd2",
             "may_output_tofu": true
           },
-          { "type": "ocd2", "file": "TSCharacters.ocd2" }
+          {
+            "type": "ocd2",
+            "file": "TSCharactersBase.ocd2"
+          }
         ]
       }
     }

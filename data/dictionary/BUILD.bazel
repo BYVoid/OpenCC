@@ -16,20 +16,29 @@ package(default_visibility = ["//visibility:public"])
     ]
 ]
 
-genrule(
-    name = "generate_TSCharactersExt",
-    srcs = ["TSCharacters.txt"],
-    outs = ["TSCharactersExt.txt"],
-    cmd = "$(location //data/scripts:extract_tofu_risk) " +
-          "$(SRCS) $(OUTS)",
-    tools = ["//data/scripts:extract_tofu_risk"],
-)
+[
+    genrule(
+      name = "tofu_" + txt,
+      srcs = [txt + ".txt", "//data/scheme:AllowedSmpChars.txt"],
+      outs = [txt + "Base.txt", txt + "Ext.txt"],
+      cmd = "$(location //data/scripts:tofu) " +
+            "$(SRCS) $(OUTS)",
+      tools = ["//data/scripts:tofu"],
+    )
+    for txt in [
+        "TSCharacters",
+        "TSPhrases",
+    ]
+]
 
 TEXT_DICTS = glob(
     ["*.txt"],
     exclude = ["CJK_Compatibility_Ideographs.txt"],
 ) + [
+    "TSCharactersBase.txt",
     "TSCharactersExt.txt",
+    "TSPhrasesBase.txt",
+    "TSPhrasesExt.txt",
     "TWVariantsRev.txt",
     "HKVariantsRev.txt",
     "JPShinjitaiCharactersRev.txt",
@@ -41,7 +50,10 @@ NON_BMP_TEXT_DICTS = [
     if txt not in [
         "STCharacters.txt",
         "TSCharacters.txt",
+        "TSCharactersBase.txt",
         "TSCharactersExt.txt",
+        "TSPhrasesBase.txt",
+        "TSPhrasesExt.txt",
     ]
 ]
 

@@ -17,8 +17,10 @@ py_binary(
 )
 
 py_binary(
-    name = "extract_tofu_risk",
-    srcs = ["extract_tofu_risk.py"],
+    name = "tofu",
+    srcs = ["tofu.py"],
+    imports = ["."],
+    deps = [":common"],
 )
 
 py_test(

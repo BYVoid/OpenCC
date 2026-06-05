@@ -156,9 +156,6 @@
             }
           },
           "additionalProperties": false
-        },
-        "may_output_tofu": {
-          "type": "boolean"
         }
       }
     },

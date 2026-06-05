@@ -397,14 +397,18 @@ public:
   }
 
   DictPtr ParseDict(const JSONValue& doc, bool includeTofuRiskDictionaries) {
+    // Required: type
+    std::string type = GetStringProperty(doc, "type");
+
+    if (type == "inline") {
+      return LoadInlineDict(doc);
+    }
+
     const bool mayOutputTofu =
         GetOptionalBoolProperty(doc, "may_output_tofu", false);
     if (mayOutputTofu && !includeTofuRiskDictionaries) {
       return DictPtr();
     }
-
-    // Required: type
-    std::string type = GetStringProperty(doc, "type");
 
     if (type == "group") {
       std::list<DictPtr> dicts;
@@ -423,8 +427,6 @@ public:
         return DictPtr();
       }
       return DictGroupPtr(new DictGroup(dicts));
-    } else if (type == "inline") {
-      return LoadInlineDict(doc);
     } else {
       std::string fileName = GetStringProperty(doc, "file");
       DictPtr dict = LoadDictFromFile(type, fileName);

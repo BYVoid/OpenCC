@@ -409,6 +409,55 @@ TEST_F(ConfigTest, InlineDictOutputStillProcessedByLaterChainStep) {
   EXPECT_EQ("C", inlineConverter->Convert("A"));
 }
 
+TEST_F(ConfigTest, InlineSegmentationDictUsesLongestMatch) {
+  const std::string json =
+      std::string("{\n"
+                  "  \"name\": \"Inline Segmentation Test\",\n"
+                  "  \"segmentation\": {\n"
+                  "    \"type\": \"mmseg\",\n"
+                  "    \"dict\": {\n"
+                  "      \"type\": \"inline\",\n"
+                  "      \"entries\": {\n"
+                  "        \"ABC\": \"ABC\",\n"
+                  "        \"AB\": \"AB\",\n"
+                  "        \"D\": \"D\"\n"
+                  "      }\n"
+                  "    }\n"
+                  "  },\n"
+                  "  \"conversion_chain\": [{\n"
+                  "    \"dict\": {\n"
+                  "      \"type\": \"inline\",\n"
+                  "      \"entries\": {\n"
+                  "        \"ABC\": \"X\",\n"
+                  "        \"AB\": \"Y\",\n"
+                  "        \"C\": \"Z\",\n"
+                  "        \"D\": \"D\"\n"
+                  "      }\n"
+                  "    }\n"
+                  "  }]\n"
+                  "}\n");
+
+  const ConverterPtr inlineConverter = config.NewFromString(json, "");
+  EXPECT_EQ("XD", inlineConverter->Convert("ABCD"));
+}
+
+TEST_F(ConfigTest, InlineDictDoesNotUseMayOutputTofuFiltering) {
+  const std::string json = InlineSingleStepConfig(
+      "{\n"
+      "        \"A\": \"A\"\n"
+      "      }",
+      "{\n"
+      "      \"type\": \"inline\",\n"
+      "      \"may_output_tofu\": true,\n"
+      "      \"entries\": {\n"
+      "        \"A\": \"B\"\n"
+      "      }\n"
+      "    }");
+
+  const ConverterPtr inlineConverter = config.NewFromString(json, "");
+  EXPECT_EQ("B", inlineConverter->Convert("A"));
+}
+
 TEST_F(ConfigTest, InlineDictPreservesExactStringSemantics) {
   const std::string json = InlineSingleStepConfig(
       "{\n"

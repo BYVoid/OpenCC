@@ -183,6 +183,34 @@ TEST_F(ConfigTest, ExplicitProviderFindsConfigNameAndResources) {
   fs::remove_all(tempDir);
 }
 
+TEST_F(ConfigTest, ExplicitProviderConfigOverridesInstalledOrCwdConfigName) {
+  const fs::path tempDir = MakeTempDir("opencc-provider-config-override-test");
+  const fs::path cwdDir = tempDir / "cwd";
+  const fs::path resourceDir = tempDir / "resources";
+  fs::create_directories(cwdDir);
+  fs::create_directories(resourceDir);
+  WriteFile(cwdDir / "config.json", SingleDictConfig("dict_a.txt"));
+  WriteFile(resourceDir / "config.json", SingleDictConfig("dict_b.txt"));
+  WriteFile(resourceDir / "dict_a.txt", utf8("鼠标\t甲\n"));
+  WriteFile(resourceDir / "dict_b.txt", utf8("鼠标\t乙\n"));
+
+  const fs::path originalCwd = fs::current_path();
+  try {
+    fs::current_path(cwdDir);
+    std::shared_ptr<ResourceProvider> provider(
+        new FilesystemResourceProvider({PathString(resourceDir)}));
+    const ConverterPtr tempConverter =
+        config.NewFromFile("config.json", provider);
+    EXPECT_EQ(utf8("乙"), tempConverter->Convert(utf8("鼠标")));
+    fs::current_path(originalCwd);
+  } catch (...) {
+    fs::current_path(originalCwd);
+    fs::remove_all(tempDir);
+    throw;
+  }
+  fs::remove_all(tempDir);
+}
+
 TEST_F(ConfigTest, RelativeParentDictionaryPathStillWorks) {
   const fs::path tempDir = MakeTempDir("opencc-relative-parent-resource-test");
   const fs::path configDir = tempDir / "config";

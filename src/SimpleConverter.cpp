@@ -63,6 +63,17 @@ struct InternalData {
       throw std::runtime_error(ex.what());
     }
   }
+
+  static InternalData* NewInternalData(
+      const std::string& configFileName,
+      const std::shared_ptr<ResourceProvider>& provider) {
+    try {
+      Config config;
+      return new InternalData(config.NewFromFile(configFileName, provider));
+    } catch (Exception& ex) {
+      throw std::runtime_error(ex.what());
+    }
+  }
 };
 
 } // namespace
@@ -79,6 +90,10 @@ SimpleConverter::SimpleConverter(const std::string& configFileName,
                                  const char* argv0)
     : internalData(
           InternalData::NewInternalData(configFileName, paths, argv0)) {}
+
+SimpleConverter::SimpleConverter(const std::string& configFileName,
+                                 std::shared_ptr<ResourceProvider> provider)
+    : internalData(InternalData::NewInternalData(configFileName, provider)) {}
 
 SimpleConverter::~SimpleConverter() { delete (InternalData*)internalData; }
 

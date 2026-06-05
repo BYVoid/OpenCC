@@ -8,6 +8,7 @@ cc_library(
     hdrs = [
         "//src:ConversionInspection.hpp",
         "//src:Export.hpp",
+        "//src:ResourceProvider.hpp",
         "//src:SimpleConverter.hpp",
         "//src:opencc.h",
     ],

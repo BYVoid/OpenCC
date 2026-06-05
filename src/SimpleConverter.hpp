@@ -24,6 +24,7 @@
 #define __OPENCC_SIMPLECONVERTER_HPP_
 
 #include "ConversionInspection.hpp"
+#include "ResourceProvider.hpp"
 
 /**
  * @defgroup opencc_simple_api OpenCC C++ Simple API
@@ -63,6 +64,15 @@ public:
    */
   SimpleConverter(const std::string& configFileName,
                   const std::vector<std::string>& paths, const char* argv0);
+
+  /**
+   * Constructor of SimpleConverter
+   * @param configFileName File name of configuration.
+   * @param provider Provider used to locate dictionary/resource files
+   * referenced by the configuration.
+   */
+  SimpleConverter(const std::string& configFileName,
+                  std::shared_ptr<ResourceProvider> provider);
 
   ~SimpleConverter();
 

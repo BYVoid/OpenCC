@@ -74,6 +74,24 @@ resolving them at runtime. Relative resource paths are expected to resolve
 within the existing OpenCC data layout rather than a plugin-specific ad hoc
 directory tree.
 
+For dictionary files referenced by OpenCC configs, embedded applications can
+compose a single resource provider from the main application, plugin, and
+system OpenCC data directories:
+
+```c++
+auto resources = std::make_shared<opencc::FilesystemResourceProvider>(
+    std::vector<std::string>{
+        main_app_resource_dir,
+        plugin_resource_dir,
+        system_opencc_data_dir,
+    });
+opencc::SimpleConverter converter("s2twp_jieba.json", resources);
+```
+
+Plugins only need to tell the host which resource directory they ship. The
+OpenCC core resolves dictionary resource names through the provider and does
+not need plugin-specific lookup logic.
+
 ## Segmentation ABI
 
 The current segmentation plugin ABI entry point is:

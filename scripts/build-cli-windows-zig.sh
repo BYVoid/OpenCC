@@ -79,6 +79,7 @@ sources=(
   src/PluginSegmentation.cpp
   src/PhraseExtract.cpp
   src/PrefixMatch.cpp
+  src/ResourceProvider.cpp
   src/Segmentation.cpp
   src/SerializableDict.cpp
   src/SerializedValues.cpp

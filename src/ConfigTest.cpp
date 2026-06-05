@@ -18,18 +18,63 @@
 
 #include <fstream>
 #include <filesystem>
+#include <memory>
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
+#else
+#include <unistd.h>
 #endif
 
 #include "Config.hpp"
 #include "ConfigTestBase.hpp"
 #include "Converter.hpp"
 #include "Exception.hpp"
+#include "ResourceProvider.hpp"
 #include "TestUtilsUTF8.hpp"
 
 namespace opencc {
+namespace {
+
+namespace fs = std::filesystem;
+
+std::string PathString(const fs::path& path) { return path.u8string(); }
+
+fs::path MakeTempDir(const std::string& name) {
+#if defined(_WIN32) || defined(_WIN64)
+  const auto suffix = std::to_string(GetCurrentProcessId());
+#else
+  const auto suffix = std::to_string(getpid());
+#endif
+  fs::path dir = fs::temp_directory_path() / (name + "-" + suffix);
+  fs::remove_all(dir);
+  fs::create_directories(dir);
+  return dir;
+}
+
+void WriteFile(const fs::path& path, const std::string& content) {
+  std::ofstream ofs(path, std::ios::binary);
+  ofs << content;
+}
+
+std::string SingleDictConfig(const std::string& dictFile) {
+  return std::string("{\n"
+                     "  \"name\": \"Resource Provider Test\",\n"
+                     "  \"segmentation\": {\n"
+                     "    \"type\": \"mmseg\",\n"
+                     "    \"dict\": {\"type\": \"text\", \"file\": \"") +
+         dictFile +
+         "\"}\n"
+         "  },\n"
+         "  \"conversion_chain\": [{\n"
+         "    \"dict\": {\"type\": \"text\", \"file\": \"" +
+         dictFile +
+         "\"}\n"
+         "  }]\n"
+         "}\n";
+}
+
+} // namespace
 
 class ConfigTest : public ConfigTestBase {
 protected:
@@ -74,6 +119,120 @@ TEST_F(ConfigTest, NewFromStringWitoutTrailingSlash) {
                       (std::istreambuf_iterator<char>()));
 
   const ConverterPtr _ = config.NewFromString(content, CONFIG_TEST_DIR_PATH);
+}
+
+TEST_F(ConfigTest, DefaultConfigPathFindsAdjacentResources) {
+  const fs::path tempDir = MakeTempDir("opencc-adjacent-resource-test");
+  fs::copy_file(fs::u8path(CONFIG_TEST_DIR_PATH) / "config_test.json",
+                tempDir / "config_test.json");
+  fs::copy_file(fs::u8path(CONFIG_TEST_DIR_PATH) / "config_test_phrases.txt",
+                tempDir / "config_test_phrases.txt");
+  fs::copy_file(fs::u8path(CONFIG_TEST_DIR_PATH) / "config_test_characters.txt",
+                tempDir / "config_test_characters.txt");
+
+  try {
+    const ConverterPtr tempConverter =
+        config.NewFromFile(PathString(tempDir / "config_test.json"));
+    EXPECT_EQ(expected, tempConverter->Convert(input));
+  } catch (...) {
+    fs::remove_all(tempDir);
+    throw;
+  }
+  fs::remove_all(tempDir);
+}
+
+TEST_F(ConfigTest, ExplicitProviderFindsResources) {
+  const fs::path tempDir = MakeTempDir("opencc-explicit-provider-test");
+  const fs::path configDir = tempDir / "config";
+  const fs::path resourceDir = tempDir / "resources";
+  fs::create_directories(configDir);
+  fs::create_directories(resourceDir);
+  WriteFile(configDir / "config.json", SingleDictConfig("dict.txt"));
+  WriteFile(resourceDir / "dict.txt", utf8("鼠标\t滑鼠\n"));
+
+  try {
+    std::shared_ptr<ResourceProvider> provider(
+        new FilesystemResourceProvider({PathString(resourceDir)}));
+    const ConverterPtr tempConverter =
+        config.NewFromFile(PathString(configDir / "config.json"), provider);
+    EXPECT_EQ(utf8("滑鼠"), tempConverter->Convert(utf8("鼠标")));
+  } catch (...) {
+    fs::remove_all(tempDir);
+    throw;
+  }
+  fs::remove_all(tempDir);
+}
+
+TEST_F(ConfigTest, MultipleSearchPathsUseFirstMatch) {
+  const fs::path tempDir = MakeTempDir("opencc-provider-order-test");
+  const fs::path configDir = tempDir / "config";
+  const fs::path firstDir = tempDir / "first";
+  const fs::path secondDir = tempDir / "second";
+  fs::create_directories(configDir);
+  fs::create_directories(firstDir);
+  fs::create_directories(secondDir);
+  WriteFile(configDir / "config.json", SingleDictConfig("dict.txt"));
+  WriteFile(firstDir / "dict.txt", utf8("鼠标\t第一\n"));
+  WriteFile(secondDir / "dict.txt", utf8("鼠标\t第二\n"));
+
+  try {
+    std::shared_ptr<ResourceProvider> provider(
+        new FilesystemResourceProvider(
+            {PathString(firstDir), PathString(secondDir)}));
+    const ConverterPtr tempConverter =
+        config.NewFromFile(PathString(configDir / "config.json"), provider);
+    EXPECT_EQ(utf8("第一"), tempConverter->Convert(utf8("鼠标")));
+  } catch (...) {
+    fs::remove_all(tempDir);
+    throw;
+  }
+  fs::remove_all(tempDir);
+}
+
+TEST_F(ConfigTest, MissingResourceListsSearchedPaths) {
+  const fs::path tempDir = MakeTempDir("opencc-provider-missing-test");
+  const fs::path firstDir = tempDir / "first";
+  const fs::path secondDir = tempDir / "second";
+  fs::create_directories(firstDir);
+  fs::create_directories(secondDir);
+
+  try {
+    FilesystemResourceProvider provider(
+        {PathString(firstDir), PathString(secondDir)});
+    provider.Resolve("missing.ocd2");
+    FAIL() << "Expected FileNotFound";
+  } catch (const FileNotFound& e) {
+    const std::string message = e.what();
+    EXPECT_NE(std::string::npos, message.find("missing.ocd2"));
+    EXPECT_NE(std::string::npos, message.find(PathString(firstDir)));
+    EXPECT_NE(std::string::npos, message.find(PathString(secondDir)));
+  }
+  fs::remove_all(tempDir);
+}
+
+TEST_F(ConfigTest, PluginLikeResourcePathSupplementsMainPath) {
+  const fs::path tempDir = MakeTempDir("opencc-plugin-resource-test");
+  const fs::path configDir = tempDir / "config";
+  const fs::path mainDir = tempDir / "main";
+  const fs::path pluginDir = tempDir / "plugin";
+  fs::create_directories(configDir);
+  fs::create_directories(mainDir);
+  fs::create_directories(pluginDir);
+  WriteFile(configDir / "config.json", SingleDictConfig("plugin_dict.txt"));
+  WriteFile(pluginDir / "plugin_dict.txt", utf8("服务器\t伺服器\n"));
+
+  try {
+    std::shared_ptr<ResourceProvider> provider(
+        new FilesystemResourceProvider(
+            {PathString(mainDir), PathString(pluginDir)}));
+    const ConverterPtr tempConverter =
+        config.NewFromFile(PathString(configDir / "config.json"), provider);
+    EXPECT_EQ(utf8("伺服器"), tempConverter->Convert(utf8("服务器")));
+  } catch (...) {
+    fs::remove_all(tempDir);
+    throw;
+  }
+  fs::remove_all(tempDir);
 }
 
 #if defined(_MSC_VER)

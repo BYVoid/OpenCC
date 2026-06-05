@@ -30,7 +30,6 @@ namespace opencc {
  */
 class OPENCC_EXPORT Dict {
 public:
-  virtual ~Dict() = default;
   /**
    * Matches a word exactly and returns the DictEntry or Optional::Null().
    */
@@ -98,5 +97,7 @@ public:
   virtual const std::list<DictPtr>* GetDictGroupItems() const {
     return nullptr;
   }
+
+  virtual ~Dict() = default;
 };
 } // namespace opencc

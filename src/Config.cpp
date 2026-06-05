@@ -572,7 +572,15 @@ Config::NewFromFile(const std::string& fileName,
   impl->options = options;
   impl->paths.clear();
   impl->resourceProvider = provider;
-  std::string prefixedFileName = impl->FindConfigFile(fileName);
+  std::string prefixedFileName;
+  try {
+    prefixedFileName = impl->FindConfigFile(fileName);
+  } catch (const FileNotFound&) {
+    if (provider == nullptr) {
+      throw;
+    }
+    prefixedFileName = provider->Resolve(fileName);
+  }
   if (!isRegularFile(prefixedFileName)) {
     throw FileNotFound(prefixedFileName);
   }

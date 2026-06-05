@@ -163,6 +163,26 @@ TEST_F(ConfigTest, ExplicitProviderFindsResources) {
   fs::remove_all(tempDir);
 }
 
+TEST_F(ConfigTest, ExplicitProviderFindsConfigNameAndResources) {
+  const fs::path tempDir = MakeTempDir("opencc-provider-config-test");
+  const fs::path resourceDir = tempDir / "resources";
+  fs::create_directories(resourceDir);
+  WriteFile(resourceDir / "provider_config.json", SingleDictConfig("dict.txt"));
+  WriteFile(resourceDir / "dict.txt", utf8("鼠标\t滑鼠\n"));
+
+  try {
+    std::shared_ptr<ResourceProvider> provider(
+        new FilesystemResourceProvider({PathString(resourceDir)}));
+    const ConverterPtr tempConverter =
+        config.NewFromFile("provider_config.json", provider);
+    EXPECT_EQ(utf8("滑鼠"), tempConverter->Convert(utf8("鼠标")));
+  } catch (...) {
+    fs::remove_all(tempDir);
+    throw;
+  }
+  fs::remove_all(tempDir);
+}
+
 TEST_F(ConfigTest, MultipleSearchPathsUseFirstMatch) {
   const fs::path tempDir = MakeTempDir("opencc-provider-order-test");
   const fs::path configDir = tempDir / "config";

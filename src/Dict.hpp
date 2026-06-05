@@ -30,6 +30,7 @@ namespace opencc {
  */
 class OPENCC_EXPORT Dict {
 public:
+  virtual ~Dict() = default;
   /**
    * Matches a word exactly and returns the DictEntry or Optional::Null().
    */

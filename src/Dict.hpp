@@ -97,5 +97,7 @@ public:
   virtual const std::list<DictPtr>* GetDictGroupItems() const {
     return nullptr;
   }
+
+  virtual ~Dict() = default;
 };
 } // namespace opencc

@@ -260,22 +260,43 @@ class TestDictionaries(unittest.TestCase):
             "TWPhrases",
         )
 
+        reports = []
         for dict_name in dict_names:
-            with self.subTest(name=dict_name):
-                dict_name_rev = f"{dict_name}Rev"
+            dict_name_rev = f"{dict_name}Rev"
 
-                table = Table.from_file(os.path.join(dict_dir, f"{dict_name}.txt"))
-                table_rev = Table.from_file(os.path.join(dict_dir, f"{dict_name_rev}.txt"))
+            table = Table.from_file(os.path.join(dict_dir, f"{dict_name}.txt"))
+            table_rev = Table.from_file(os.path.join(dict_dir, f"{dict_name_rev}.txt"))
 
-                for key, values in table.items():
-                    for value in values:
-                        if key not in table_rev.get(value, []):
-                            self.fail(f"Missing reverse mapping in {dict_name_rev}: {key} -> {value}")
+            missing = []
+            for key, values in table.items():
+                for value in values:
+                    if key not in table_rev.get(value, []):
+                        missing.append(f"{value} -> {key}")
+            if missing:
+                reports.append(
+                    f"{dict_name_rev}: expect following mappings:\n" + "\n".join(missing)
+                )
 
-                for key, values in table_rev.items():
-                    for value in values:
-                        if key not in table.get(value, []):
-                            self.fail(f"Missing reverse mapping in {dict_name}: {key} -> {value}")
+            missing = []
+            for key, values in table_rev.items():
+                for value in values:
+                    if key not in table.get(value, []):
+                        missing.append(f"{value} -> {key}")
+            if missing:
+                reports.append(
+                    f"{dict_name}: expect following mappings:\n" + "\n".join(missing)
+                )
+
+        if reports:
+            self.fail(
+                "Phrase reverse mapping validation failed.\n\n"
+                "To ensure consistency, forward dictionaries and their reversed counterpart "
+                "should maintain bijective mappings. For example, if TWPhrases contains "
+                "'宏 -> 巨集', then TWPhrasesRev should contain '巨集 -> 宏'. "
+                "If the reverse conversion is not generally desired, create an identity mapping "
+                "(e.g., TWPhrases: '宏 -> 宏 巨集' and TWPhrasesRev: '巨集 -> 宏', '宏 -> 宏').\n\n" +
+                "\n\n".join(reports)
+            )
 
     def test_phrases_segmentation(self):
         """

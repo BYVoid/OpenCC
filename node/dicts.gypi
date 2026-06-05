@@ -4,9 +4,10 @@
     "type": "none",
     "variables": {
       "cmd": "<(module_root_dir)/node/dict.js",
-      "dict_extract_tofu_risk": "<(module_root_dir)/data/scripts/extract_tofu_risk.py",
+      "dict_tofu": "<(module_root_dir)/data/scripts/tofu.py",
       "dict_reverse": "<(module_root_dir)/data/scripts/reverse.py",
       "input_prefix": "<(module_root_dir)/data/dictionary/",
+      "scheme_prefix": "<(module_root_dir)/data/scheme/",
       "output_prefix": "<(PRODUCT_DIR)/",
       "python_cmd": "python3"
     },
@@ -45,13 +46,22 @@
       "outputs": ["<(output_prefix)TSCharacters.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
-      "action_name": "TSCharactersExt.txt",
+      "action_name": "TSCharactersBase.txt and TSCharactersExt.txt",
       "variables": {
         "input": "<(input_prefix)TSCharacters.txt",
+        "scheme": "<(scheme_prefix)AllowedSmpChars.txt",
+      },
+      "inputs": ["<(input)", "<(scheme)"],
+      "outputs": ["<(output_prefix)TSCharactersBase.txt", "<(output_prefix)TSCharactersExt.txt"],
+      "action": ["<(python_cmd)", "<(dict_tofu)", "<@(_inputs)", "<@(_outputs)"]
+    }, {
+      "action_name": "TSCharactersBase",
+      "variables": {
+        "input": "<(output_prefix)TSCharactersBase.txt",
       },
       "inputs": ["<(input)"],
-      "outputs": ["<(output_prefix)TSCharactersExt.txt"],
-      "action": ["<(python_cmd)", "<(dict_extract_tofu_risk)", "<(input)", "<@(_outputs)"]
+      "outputs": ["<(output_prefix)TSCharactersBase.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "TSCharactersExt",
       "variables": {
@@ -67,6 +77,31 @@
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)TSPhrases.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "TSPhrasesBase.txt and TSPhrasesExt.txt",
+      "variables": {
+        "input": "<(input_prefix)TSPhrases.txt",
+        "scheme": "<(scheme_prefix)AllowedSmpChars.txt",
+      },
+      "inputs": ["<(input)", "<(scheme)"],
+      "outputs": ["<(output_prefix)TSPhrasesBase.txt", "<(output_prefix)TSPhrasesExt.txt"],
+      "action": ["<(python_cmd)", "<(dict_tofu)", "<@(_inputs)", "<@(_outputs)"]
+    }, {
+      "action_name": "TSPhrasesBase",
+      "variables": {
+        "input": "<(output_prefix)TSPhrasesBase.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)TSPhrasesBase.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "TSPhrasesExt",
+      "variables": {
+        "input": "<(output_prefix)TSPhrasesExt.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)TSPhrasesExt.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "TWVariantsPhrases",

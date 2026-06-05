@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from collections import UserDict, UserList
+from collections import UserDict, UserList, UserString
 
 
 class BaseTable(UserDict):
@@ -189,6 +189,28 @@ class RichTable(Table):
         if '\t' in line:
             return 'entry'
         raise ValueError('Invalid dictionary line: ' + line)
+
+
+class SmpTable(BaseTable):
+    def iter(self, file):
+        for i, line in enumerate(self._iter(file)):
+            if line.startswith('#') or not line.strip():
+                continue
+            char, rep = (line.rstrip('\n').split('\t') + [None] * 2)[:2]
+            entry = UserDict(
+                char=char,
+                rep = rep or None
+            )
+            entry.line = i + 1
+            yield entry
+
+    @staticmethod
+    def get_entry_key(entry):
+        return entry['char']
+
+    @staticmethod
+    def get_entry_line(entry):
+        return entry['char'] + '\t' + entry.get('rep', '') + '\n'
 
 
 def sort_items(input_filename, output_filename):

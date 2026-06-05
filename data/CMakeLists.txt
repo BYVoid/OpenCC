@@ -2,9 +2,10 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
 set(OPENCC_DICT_BIN opencc_dict)
 set(DICT_REVERSE_BIN "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/reverse.py")
-set(DICT_EXTRACT_TOFU_RISK_BIN "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/extract_tofu_risk.py")
+set(DICT_TOFU_BIN "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/tofu.py")
 set(DICT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dictionary)
 set(DICT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(SCHEME_DIR ${CMAKE_CURRENT_SOURCE_DIR}/scheme)
 
 set(
   DICTS_RAW
@@ -27,12 +28,21 @@ set(
 )
 
 set(
-  DICTS_GENERATED
-  TSCharactersExt
+  DICTS_GENERATED_REV
   TWVariantsRev
   HKVariantsRev
   JPShinjitaiCharactersRev
 )
+
+set(
+  DICTS_GENERATED_TOFU
+  TSCharactersBase
+  TSCharactersExt
+  TSPhrasesBase
+  TSPhrasesExt
+)
+
+set(DICTS_GENERATED ${DICTS_GENERATED_REV} ${DICTS_GENERATED_TOFU})
 
 set(DICTS ${DICTS_RAW} ${DICTS_GENERATED})
 
@@ -56,12 +66,8 @@ foreach(DICT ${DICTS_GENERATED})
 endforeach(DICT)
 
 set(
-  DICT_TSCharactersExt_GENERATING_INPUT
-  ${DICT_DIR}/TSCharacters.txt
-)
-set(
-  DICT_TSCharactersExt_GENERATING_COMMAND
-  ${DICT_EXTRACT_TOFU_RISK_BIN} ${DICT_TSCharactersExt_GENERATING_INPUT} TSCharactersExt.txt
+  SCHEME_ALLOWED_SMP
+  ${SCHEME_DIR}/AllowedSmpChars.txt
 )
 
 set(
@@ -91,7 +97,7 @@ set(
   ${DICT_REVERSE_BIN} ${DICT_JPShinjitaiCharactersRev_GENERATING_INPUT} JPShinjitaiCharactersRev.txt
 )
 
-foreach(DICT ${DICTS_GENERATED})
+foreach(DICT ${DICTS_GENERATED_REV})
   add_custom_command(
     OUTPUT
       ${DICT}.txt
@@ -108,6 +114,40 @@ foreach(DICT ${DICTS_GENERATED})
         "${DICT_GENERATED_DIR}/${DICT}.txt"
   )
 endforeach(DICT)
+
+add_custom_command(
+  OUTPUT
+    "${DICT_GENERATED_DIR}/TSCharactersBase.txt"
+    "${DICT_GENERATED_DIR}/TSCharactersExt.txt"
+  COMMENT
+    "Generating TSCharactersBase.txt and TSCharactersExt.txt"
+  COMMAND
+    ${DICT_TOFU_BIN}
+    "${DICT_DIR}/TSCharacters.txt"
+    "${SCHEME_ALLOWED_SMP}"
+    "${DICT_GENERATED_DIR}/TSCharactersBase.txt"
+    "${DICT_GENERATED_DIR}/TSCharactersExt.txt"
+  DEPENDS
+    "${DICT_DIR}/TSCharacters.txt"
+    "${SCHEME_ALLOWED_SMP}"
+)
+
+add_custom_command(
+  OUTPUT
+    "${DICT_GENERATED_DIR}/TSPhrasesBase.txt"
+    "${DICT_GENERATED_DIR}/TSPhrasesExt.txt"
+  COMMENT
+    "Generating TSPhrasesBase.txt and TSPhrasesExt.txt"
+  COMMAND
+    ${DICT_TOFU_BIN}
+    "${DICT_DIR}/TSPhrases.txt"
+    "${SCHEME_ALLOWED_SMP}"
+    "${DICT_GENERATED_DIR}/TSPhrasesBase.txt"
+    "${DICT_GENERATED_DIR}/TSPhrasesExt.txt"
+  DEPENDS
+    "${DICT_DIR}/TSPhrases.txt"
+    "${SCHEME_ALLOWED_SMP}"
+)
 
 add_custom_target(
   copy_libopencc_to_dir_of_opencc_dict

@@ -22,6 +22,26 @@ ALLOWED_SMP_CHARACTERS = (
 
 
 class TestDictionaries(unittest.TestCase):
+    def test_sorted(self):
+        """Validate that dictionaries are sorted."""
+        excluded_dicts = (
+            "CJK_Compatibility_Ideographs",
+            "TSCharactersBase.txt",
+            "TSCharactersExt.txt",
+            "TSPhrasesBase.txt",
+            "TSPhrasesExt.txt",
+        )
+
+        for file in glob.iglob(os.path.join(glob.escape(dict_dir), "*.txt")):
+            basename = os.path.basename(file)
+            if basename in excluded_dicts:
+                continue
+
+            with self.subTest(name=basename):
+                table = Table.from_file(file)
+                if sorted(table) != list(table):
+                    self.fail("dictionary file not sorted")
+
     def test_compatibility_ideographs(self):
         """
         Validate that regular dictionaries do not contain Unicode CJK

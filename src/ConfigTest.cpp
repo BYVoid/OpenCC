@@ -441,23 +441,6 @@ TEST_F(ConfigTest, InlineSegmentationDictUsesLongestMatch) {
   EXPECT_EQ("XD", inlineConverter->Convert("ABCD"));
 }
 
-TEST_F(ConfigTest, InlineDictDoesNotUseMayOutputTofuFiltering) {
-  const std::string json = InlineSingleStepConfig(
-      "{\n"
-      "        \"A\": \"A\"\n"
-      "      }",
-      "{\n"
-      "      \"type\": \"inline\",\n"
-      "      \"may_output_tofu\": true,\n"
-      "      \"entries\": {\n"
-      "        \"A\": \"B\"\n"
-      "      }\n"
-      "    }");
-
-  const ConverterPtr inlineConverter = config.NewFromString(json, "");
-  EXPECT_EQ("B", inlineConverter->Convert("A"));
-}
-
 TEST_F(ConfigTest, InlineDictPreservesExactStringSemantics) {
   const std::string json = InlineSingleStepConfig(
       "{\n"
@@ -592,6 +575,29 @@ TEST_F(ConfigTest, InlineDictValidationErrors) {
       "  }]\n"
       "}\n",
       "Inline dictionary value must be a non-empty string: A");
+
+  ExpectInvalidFormat(
+      "{\n"
+      "  \"segmentation\": {\n"
+      "    \"type\": \"mmseg\",\n"
+      "    \"dict\": {\n"
+      "      \"type\": \"inline\",\n"
+      "      \"entries\": {\n"
+      "        \"A\": \"A\"\n"
+      "      }\n"
+      "    }\n"
+      "  },\n"
+      "  \"conversion_chain\": [{\n"
+      "    \"dict\": {\n"
+      "      \"type\": \"inline\",\n"
+      "      \"may_output_tofu\": true,\n"
+      "      \"entries\": {\n"
+      "        \"A\": \"B\"\n"
+      "      }\n"
+      "    }\n"
+      "  }]\n"
+      "}\n",
+      "Inline dictionary does not support may_output_tofu");
 }
 
 TEST_F(ConfigTest, InlineDictSupportsJsoncCommentsAndTrailingComma) {

@@ -370,6 +370,10 @@ public:
   }
 
   DictPtr LoadInlineDict(const JSONValue& doc) {
+    if (doc.HasMember("may_output_tofu")) {
+      throw InvalidFormat("Inline dictionary does not support may_output_tofu");
+    }
+
     const JSONValue& entries = GetObjectProperty(doc, "entries");
     LexiconPtr lexicon(new Lexicon);
     for (auto it = entries.MemberBegin(); it != entries.MemberEnd(); ++it) {

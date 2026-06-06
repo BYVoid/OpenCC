@@ -4,25 +4,21 @@
     "type": "mmseg",
     "dict": {
       "type": "group",
-      "dicts": [{
-        "type": "ocd2",
-        "file": "TWVariantsPhrases.ocd2"
-      }, {
-        "type": "ocd2",
-        "file": "TWVariants.ocd2"
-      }]
+      "dicts": [
+        { "type": "ocd2", "file": "TWVariantsPhrases.ocd2" },
+        { "type": "ocd2", "file": "TWVariants.ocd2" }
+      ]
     }
   },
-  "conversion_chain": [{
-    "dict": {
-      "type": "group",
-      "dicts": [{
-        "type": "ocd2",
-        "file": "TWVariantsPhrases.ocd2"
-      }, {
-        "type": "ocd2",
-        "file": "TWVariants.ocd2"
-      }]
+  "conversion_chain": [
+    {
+      "dict": {
+        "type": "group",
+        "dicts": [
+          { "type": "ocd2", "file": "TWVariantsPhrases.ocd2" },
+          { "type": "ocd2", "file": "TWVariants.ocd2" }
+        ]
+      }
     }
-  }]
+  ]
 }

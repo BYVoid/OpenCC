@@ -19,6 +19,7 @@
 #include <fstream>
 #include <filesystem>
 #include <memory>
+#include <vector>
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
@@ -93,6 +94,31 @@ std::string InlineSingleStepConfig(const std::string& segmentationEntries,
          "\n"
          "  }]\n"
          "}\n";
+}
+
+std::string FindOcd2DictionaryDir(const std::string& configTestDirPath) {
+  std::vector<fs::path> candidates;
+  if (!PACKAGE_DATA_DIRECTORY.empty()) {
+    candidates.push_back(fs::u8path(PACKAGE_DATA_DIRECTORY));
+  }
+
+  const fs::path configDir = fs::u8path(configTestDirPath);
+  candidates.push_back(configDir.parent_path().parent_path() / "data" /
+                       "dictionary");
+  candidates.push_back(fs::current_path() / "data" / "dictionary");
+  candidates.push_back(fs::current_path().parent_path() / "data" / "dictionary");
+
+  for (const fs::path& candidate : candidates) {
+    if (candidate.empty()) {
+      continue;
+    }
+    const fs::path phrases = candidate / "STPhrases.ocd2";
+    const fs::path characters = candidate / "STCharacters.ocd2";
+    if (fs::is_regular_file(phrases) && fs::is_regular_file(characters)) {
+      return PathString(candidate) + "/";
+    }
+  }
+  return "";
 }
 
 } // namespace
@@ -626,6 +652,53 @@ TEST_F(ConfigTest, InlineDictSupportsJsoncCommentsAndTrailingComma) {
 
   const ConverterPtr inlineConverter = config.NewFromString(json, "");
   EXPECT_EQ(utf8("冰炫風"), inlineConverter->Convert(utf8("麦旋风")));
+}
+
+TEST_F(ConfigTest, InlineSegmentationAndConversionWorksWithOcd2GroupDicts) {
+  const std::string ocd2Dir = FindOcd2DictionaryDir(CONFIG_TEST_DIR_PATH);
+  if (ocd2Dir.empty()) {
+    GTEST_SKIP() << "STPhrases.ocd2/STCharacters.ocd2 not found";
+  }
+
+  const std::string json =
+      std::string("{\n"
+                  "  \"name\": \"Inline Segmentation+Conversion ocd2 Test\",\n"
+                  "  \"segmentation\": {\n"
+                  "    \"type\": \"mmseg\",\n"
+                  "    \"dict\": {\n"
+                  "      \"type\": \"group\",\n"
+                  "      \"dicts\": [\n"
+                  "        {\n"
+                  "          \"type\": \"inline\",\n"
+                  "          \"entries\": {\n"
+                  "            \"台湾\": \"台灣\"\n"
+                  "          }\n"
+                  "        },\n"
+                  "        {\"type\": \"ocd2\", \"file\": \"STPhrases.ocd2\"}\n"
+                  "      ]\n"
+                  "    }\n"
+                  "  },\n"
+                  "  \"conversion_chain\": [\n"
+                  "    {\n"
+                  "      \"dict\": {\n"
+                  "        \"type\": \"group\",\n"
+                  "        \"dicts\": [\n"
+                  "          {\n"
+                  "            \"type\": \"inline\",\n"
+                  "            \"entries\": {\n"
+                  "              \"台灣\": \"台灣\"\n"
+                  "            }\n"
+                  "          },\n"
+                  "          {\"type\": \"ocd2\", \"file\": \"STPhrases.ocd2\"},\n"
+                  "          {\"type\": \"ocd2\", \"file\": \"STCharacters.ocd2\"}\n"
+                  "        ]\n"
+                  "      }\n"
+                  "    }\n"
+                  "  ]\n"
+                  "}\n");
+
+  const ConverterPtr inlineConverter = config.NewFromString(json, {ocd2Dir});
+  EXPECT_EQ(utf8("台灣"), inlineConverter->Convert(utf8("台湾")));
 }
 
 #if defined(_MSC_VER)

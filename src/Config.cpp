@@ -396,8 +396,7 @@ public:
                           duplicateKey);
     }
 
-    DictPtr dict(new TextDict(lexicon));
-    return MarisaDict::NewFromDict(*dict.get());
+    return DictPtr(new TextDict(lexicon));
   }
 
   DictPtr ParseDict(const JSONValue& doc, bool includeTofuRiskDictionaries) {

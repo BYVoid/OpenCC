@@ -275,7 +275,7 @@ OPENCC_DATA_DIR=/path/to/your/config/dir opencc --help
 
 - `entries` 必須是 JSON 物件。
 - `entries` 的 key/value 必須是非空字串。
-- 重複 key 不受支援；如包含，處理結果不保證。
+- 重複 key 不受支援；如包含，載入會直接失敗（拋出錯誤）。
 - key/value 會按解析結果原樣使用，不做 trim、大小寫折疊或 Unicode normalization。
 - 內聯字典與普通字典行為一致，優先級由 `group.dicts` 的順序決定。
 - 內聯字典輸出仍會繼續經過後續 `conversion_chain` 步驟，不提供鎖定最終輸出。

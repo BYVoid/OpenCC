@@ -103,6 +103,9 @@
           "$ref": "#/definitions/file_dict"
         },
         {
+          "$ref": "#/definitions/inline_dict"
+        },
+        {
           "$ref": "#/definitions/group_dict"
         }
       ]
@@ -128,6 +131,31 @@
         },
         "may_output_tofu": {
           "type": "boolean"
+        }
+      }
+    },
+    "inline_dict": {
+      "type": "object",
+      "required": [
+        "type",
+        "entries"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "inline"
+          ]
+        },
+        "entries": {
+          "type": "object",
+          "patternProperties": {
+            ".+": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
         }
       }
     },

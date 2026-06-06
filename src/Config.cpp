@@ -33,6 +33,7 @@
 #include "Converter.hpp"
 #include "DictGroup.hpp"
 #include "Exception.hpp"
+#include "Lexicon.hpp"
 #include "MarisaDict.hpp"
 #include "MaxMatchSegmentation.hpp"
 #include "PluginSegmentation.hpp"
@@ -368,15 +369,49 @@ public:
     return nullptr;
   }
 
+  DictPtr LoadInlineDict(const JSONValue& doc) {
+    if (doc.HasMember("may_output_tofu")) {
+      throw InvalidFormat("Inline dictionary does not support may_output_tofu");
+    }
+
+    const JSONValue& entries = GetObjectProperty(doc, "entries");
+    LexiconPtr lexicon(new Lexicon);
+    for (auto it = entries.MemberBegin(); it != entries.MemberEnd(); ++it) {
+      if (it->name.GetStringLength() == 0) {
+        throw InvalidFormat("Inline dictionary key must be a non-empty string");
+      }
+      if (!it->value.IsString() || it->value.GetStringLength() == 0) {
+        throw InvalidFormat(
+            "Inline dictionary value must be a non-empty string: " +
+            std::string(it->name.GetString()));
+      }
+      lexicon->Add(
+          DictEntryFactory::New(it->name.GetString(), it->value.GetString()));
+    }
+
+    lexicon->Sort();
+    std::string duplicateKey;
+    if (!lexicon->IsUnique(&duplicateKey)) {
+      throw InvalidFormat("Inline dictionary contains duplicate key: " +
+                          duplicateKey);
+    }
+
+    return DictPtr(new TextDict(lexicon));
+  }
+
   DictPtr ParseDict(const JSONValue& doc, bool includeTofuRiskDictionaries) {
+    // Required: type
+    std::string type = GetStringProperty(doc, "type");
+
+    if (type == "inline") {
+      return LoadInlineDict(doc);
+    }
+
     const bool mayOutputTofu =
         GetOptionalBoolProperty(doc, "may_output_tofu", false);
     if (mayOutputTofu && !includeTofuRiskDictionaries) {
       return DictPtr();
     }
-
-    // Required: type
-    std::string type = GetStringProperty(doc, "type");
 
     if (type == "group") {
       std::list<DictPtr> dicts;

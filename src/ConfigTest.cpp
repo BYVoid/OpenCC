@@ -19,6 +19,7 @@
 #include <fstream>
 #include <filesystem>
 #include <memory>
+#include <vector>
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
@@ -72,6 +73,52 @@ std::string SingleDictConfig(const std::string& dictFile) {
          "\"}\n"
          "  }]\n"
          "}\n";
+}
+
+std::string InlineSingleStepConfig(const std::string& segmentationEntries,
+                                   const std::string& conversionDict) {
+  return std::string("{\n"
+                     "  \"name\": \"Inline Dict Test\",\n"
+                     "  \"segmentation\": {\n"
+                     "    \"type\": \"mmseg\",\n"
+                     "    \"dict\": {\n"
+                     "      \"type\": \"inline\",\n"
+                     "      \"entries\": ") +
+         segmentationEntries +
+         "\n"
+         "    }\n"
+         "  },\n"
+         "  \"conversion_chain\": [{\n"
+         "    \"dict\": " +
+         conversionDict +
+         "\n"
+         "  }]\n"
+         "}\n";
+}
+
+std::string FindOcd2DictionaryDir(const std::string& configTestDirPath) {
+  std::vector<fs::path> candidates;
+  if (!PACKAGE_DATA_DIRECTORY.empty()) {
+    candidates.push_back(fs::u8path(PACKAGE_DATA_DIRECTORY));
+  }
+
+  const fs::path configDir = fs::u8path(configTestDirPath);
+  candidates.push_back(configDir.parent_path().parent_path() / "data" /
+                       "dictionary");
+  candidates.push_back(fs::current_path() / "data" / "dictionary");
+  candidates.push_back(fs::current_path().parent_path() / "data" / "dictionary");
+
+  for (const fs::path& candidate : candidates) {
+    if (candidate.empty()) {
+      continue;
+    }
+    const fs::path phrases = candidate / "STPhrases.ocd2";
+    const fs::path characters = candidate / "STCharacters.ocd2";
+    if (fs::is_regular_file(phrases) && fs::is_regular_file(characters)) {
+      return PathString(candidate) + "/";
+    }
+  }
+  return "";
 }
 
 } // namespace
@@ -302,6 +349,357 @@ TEST_F(ConfigTest, PluginLikeResourcePathSupplementsMainPath) {
     throw;
   }
   fs::remove_all(tempDir);
+}
+
+TEST_F(ConfigTest, InlineDictBasicConversion) {
+  const std::string json = InlineSingleStepConfig(
+      "{\n"
+      "        \"麦旋风\": \"麦旋风\"\n"
+      "      }",
+      "{\n"
+      "      \"type\": \"inline\",\n"
+      "      \"entries\": {\n"
+      "        \"麦旋风\": \"冰炫風\"\n"
+      "      }\n"
+      "    }");
+
+  const ConverterPtr inlineConverter = config.NewFromString(json, "");
+  EXPECT_EQ(utf8("我想吃冰炫風"),
+            inlineConverter->Convert(utf8("我想吃麦旋风")));
+}
+
+TEST_F(ConfigTest, InlineDictInGroupTakesPriorityOverFollowingFileDict) {
+  const std::string json =
+      std::string("{\n"
+                  "  \"name\": \"Inline Group Priority Test\",\n"
+                  "  \"segmentation\": {\n"
+                  "    \"type\": \"mmseg\",\n"
+                  "    \"dict\": {\"type\": \"text\", \"file\": \"config_test_phrases.txt\"}\n"
+                  "  },\n"
+                  "  \"conversion_chain\": [{\n"
+                  "    \"dict\": {\n"
+                  "      \"type\": \"group\",\n"
+                  "      \"dicts\": [\n"
+                  "        {\n"
+                  "          \"type\": \"inline\",\n"
+                  "          \"entries\": {\n"
+                  "            \"燕燕于飞\": \"自訂覆寫\"\n"
+                  "          }\n"
+                  "        },\n"
+                  "        {\"type\": \"text\", \"file\": \"config_test_phrases.txt\"}\n"
+                  "      ]\n"
+                  "    }\n"
+                  "  }]\n"
+                  "}\n");
+
+  const ConverterPtr inlineConverter =
+      config.NewFromString(json, {CONFIG_TEST_DIR_PATH + "/"});
+  EXPECT_EQ(utf8("自訂覆寫"), inlineConverter->Convert(utf8("燕燕于飞")));
+}
+
+TEST_F(ConfigTest, InlineDictOutputStillProcessedByLaterChainStep) {
+  const std::string json =
+      std::string("{\n"
+                  "  \"name\": \"Inline Chain Test\",\n"
+                  "  \"segmentation\": {\n"
+                  "    \"type\": \"mmseg\",\n"
+                  "    \"dict\": {\n"
+                  "      \"type\": \"inline\",\n"
+                  "      \"entries\": {\n"
+                  "        \"A\": \"A\",\n"
+                  "        \"B\": \"B\"\n"
+                  "      }\n"
+                  "    }\n"
+                  "  },\n"
+                  "  \"conversion_chain\": [\n"
+                  "    {\n"
+                  "      \"dict\": {\n"
+                  "        \"type\": \"inline\",\n"
+                  "        \"entries\": {\n"
+                  "          \"A\": \"B\"\n"
+                  "        }\n"
+                  "      }\n"
+                  "    },\n"
+                  "    {\n"
+                  "      \"dict\": {\n"
+                  "        \"type\": \"inline\",\n"
+                  "        \"entries\": {\n"
+                  "          \"B\": \"C\"\n"
+                  "        }\n"
+                  "      }\n"
+                  "    }\n"
+                  "  ]\n"
+                  "}\n");
+
+  const ConverterPtr inlineConverter = config.NewFromString(json, "");
+  EXPECT_EQ("C", inlineConverter->Convert("A"));
+}
+
+TEST_F(ConfigTest, InlineSegmentationDictUsesLongestMatch) {
+  const std::string json =
+      std::string("{\n"
+                  "  \"name\": \"Inline Segmentation Test\",\n"
+                  "  \"segmentation\": {\n"
+                  "    \"type\": \"mmseg\",\n"
+                  "    \"dict\": {\n"
+                  "      \"type\": \"inline\",\n"
+                  "      \"entries\": {\n"
+                  "        \"ABC\": \"ABC\",\n"
+                  "        \"AB\": \"AB\",\n"
+                  "        \"D\": \"D\"\n"
+                  "      }\n"
+                  "    }\n"
+                  "  },\n"
+                  "  \"conversion_chain\": [{\n"
+                  "    \"dict\": {\n"
+                  "      \"type\": \"inline\",\n"
+                  "      \"entries\": {\n"
+                  "        \"ABC\": \"X\",\n"
+                  "        \"AB\": \"Y\",\n"
+                  "        \"C\": \"Z\",\n"
+                  "        \"D\": \"D\"\n"
+                  "      }\n"
+                  "    }\n"
+                  "  }]\n"
+                  "}\n");
+
+  const ConverterPtr inlineConverter = config.NewFromString(json, "");
+  EXPECT_EQ("XD", inlineConverter->Convert("ABCD"));
+}
+
+TEST_F(ConfigTest, InlineDictPreservesExactStringSemantics) {
+  const std::string json = InlineSingleStepConfig(
+      "{\n"
+      "        \"A\": \"A\",\n"
+      "        \" A \": \" A \"\n"
+      "      }",
+      "{\n"
+      "      \"type\": \"inline\",\n"
+      "      \"entries\": {\n"
+      "        \" A \": \"B\"\n"
+      "      }\n"
+      "    }");
+
+  const ConverterPtr inlineConverter = config.NewFromString(json, "");
+  EXPECT_EQ("A", inlineConverter->Convert("A"));
+  EXPECT_EQ("B", inlineConverter->Convert(" A "));
+}
+
+TEST_F(ConfigTest, InlineDictValidationErrors) {
+  const auto ExpectInvalidFormat = [this](const std::string& json,
+                                          const std::string& expectedMessage) {
+    try {
+      const ConverterPtr _ = config.NewFromString(json, "");
+      FAIL() << "Expected InvalidFormat";
+    } catch (const InvalidFormat& e) {
+      EXPECT_NE(std::string::npos,
+                std::string(e.what()).find(expectedMessage));
+    }
+  };
+
+  ExpectInvalidFormat(
+      "{\n"
+      "  \"segmentation\": {\n"
+      "    \"type\": \"mmseg\",\n"
+      "    \"dict\": {\n"
+      "      \"type\": \"inline\",\n"
+      "      \"entries\": {\n"
+      "        \"A\": \"A\"\n"
+      "      }\n"
+      "    }\n"
+      "  },\n"
+      "  \"conversion_chain\": [{\n"
+      "    \"dict\": {\n"
+      "      \"type\": \"inline\"\n"
+      "    }\n"
+      "  }]\n"
+      "}\n",
+      "Required property not found: entries");
+
+  ExpectInvalidFormat(
+      "{\n"
+      "  \"segmentation\": {\n"
+      "    \"type\": \"mmseg\",\n"
+      "    \"dict\": {\n"
+      "      \"type\": \"inline\",\n"
+      "      \"entries\": {\n"
+      "        \"A\": \"A\"\n"
+      "      }\n"
+      "    }\n"
+      "  },\n"
+      "  \"conversion_chain\": [{\n"
+      "    \"dict\": {\n"
+      "      \"type\": \"inline\",\n"
+      "      \"entries\": []\n"
+      "    }\n"
+      "  }]\n"
+      "}\n",
+      "Property must be an object: entries");
+
+  ExpectInvalidFormat(
+      "{\n"
+      "  \"segmentation\": {\n"
+      "    \"type\": \"mmseg\",\n"
+      "    \"dict\": {\n"
+      "      \"type\": \"inline\",\n"
+      "      \"entries\": {\n"
+      "        \"A\": \"A\"\n"
+      "      }\n"
+      "    }\n"
+      "  },\n"
+      "  \"conversion_chain\": [{\n"
+      "    \"dict\": {\n"
+      "      \"type\": \"inline\",\n"
+      "      \"entries\": {\n"
+      "        \"\": \"B\"\n"
+      "      }\n"
+      "    }\n"
+      "  }]\n"
+      "}\n",
+      "Inline dictionary key must be a non-empty string");
+
+  ExpectInvalidFormat(
+      "{\n"
+      "  \"segmentation\": {\n"
+      "    \"type\": \"mmseg\",\n"
+      "    \"dict\": {\n"
+      "      \"type\": \"inline\",\n"
+      "      \"entries\": {\n"
+      "        \"A\": \"A\"\n"
+      "      }\n"
+      "    }\n"
+      "  },\n"
+      "  \"conversion_chain\": [{\n"
+      "    \"dict\": {\n"
+      "      \"type\": \"inline\",\n"
+      "      \"entries\": {\n"
+      "        \"A\": \"\"\n"
+      "      }\n"
+      "    }\n"
+      "  }]\n"
+      "}\n",
+      "Inline dictionary value must be a non-empty string: A");
+
+  ExpectInvalidFormat(
+      "{\n"
+      "  \"segmentation\": {\n"
+      "    \"type\": \"mmseg\",\n"
+      "    \"dict\": {\n"
+      "      \"type\": \"inline\",\n"
+      "      \"entries\": {\n"
+      "        \"A\": \"A\"\n"
+      "      }\n"
+      "    }\n"
+      "  },\n"
+      "  \"conversion_chain\": [{\n"
+      "    \"dict\": {\n"
+      "      \"type\": \"inline\",\n"
+      "      \"entries\": {\n"
+      "        \"A\": 1\n"
+      "      }\n"
+      "    }\n"
+      "  }]\n"
+      "}\n",
+      "Inline dictionary value must be a non-empty string: A");
+
+  ExpectInvalidFormat(
+      "{\n"
+      "  \"segmentation\": {\n"
+      "    \"type\": \"mmseg\",\n"
+      "    \"dict\": {\n"
+      "      \"type\": \"inline\",\n"
+      "      \"entries\": {\n"
+      "        \"A\": \"A\"\n"
+      "      }\n"
+      "    }\n"
+      "  },\n"
+      "  \"conversion_chain\": [{\n"
+      "    \"dict\": {\n"
+      "      \"type\": \"inline\",\n"
+      "      \"may_output_tofu\": true,\n"
+      "      \"entries\": {\n"
+      "        \"A\": \"B\"\n"
+      "      }\n"
+      "    }\n"
+      "  }]\n"
+      "}\n",
+      "Inline dictionary does not support may_output_tofu");
+}
+
+TEST_F(ConfigTest, InlineDictSupportsJsoncCommentsAndTrailingComma) {
+  const std::string json =
+      std::string("{\n"
+                  "  \"name\": \"Inline JSONC Test\",\n"
+                  "  \"segmentation\": {\n"
+                  "    \"type\": \"mmseg\",\n"
+                  "    \"dict\": {\n"
+                  "      \"type\": \"inline\",\n"
+                  "      \"entries\": {\n"
+                  "        \"麦旋风\": \"麦旋风\"\n"
+                  "      }\n"
+                  "    }\n"
+                  "  },\n"
+                  "  \"conversion_chain\": [{\n"
+                  "    \"dict\": {\n"
+                  "      \"type\": \"inline\",\n"
+                  "      \"entries\": {\n"
+                  "        // Custom entry.\n"
+                  "        \"麦旋风\": \"冰炫風\",\n"
+                  "      }\n"
+                  "    }\n"
+                  "  }]\n"
+                  "}\n");
+
+  const ConverterPtr inlineConverter = config.NewFromString(json, "");
+  EXPECT_EQ(utf8("冰炫風"), inlineConverter->Convert(utf8("麦旋风")));
+}
+
+TEST_F(ConfigTest, InlineSegmentationAndConversionWorksWithOcd2GroupDicts) {
+  const std::string ocd2Dir = FindOcd2DictionaryDir(CONFIG_TEST_DIR_PATH);
+  if (ocd2Dir.empty()) {
+    GTEST_SKIP() << "STPhrases.ocd2/STCharacters.ocd2 not found";
+  }
+
+  const std::string json =
+      std::string("{\n"
+                  "  \"name\": \"Inline Segmentation+Conversion ocd2 Test\",\n"
+                  "  \"segmentation\": {\n"
+                  "    \"type\": \"mmseg\",\n"
+                  "    \"dict\": {\n"
+                  "      \"type\": \"group\",\n"
+                  "      \"dicts\": [\n"
+                  "        {\n"
+                  "          \"type\": \"inline\",\n"
+                  "          \"entries\": {\n"
+                  "            \"台湾\": \"台灣\"\n"
+                  "          }\n"
+                  "        },\n"
+                  "        {\"type\": \"ocd2\", \"file\": \"STPhrases.ocd2\"}\n"
+                  "      ]\n"
+                  "    }\n"
+                  "  },\n"
+                  "  \"conversion_chain\": [\n"
+                  "    {\n"
+                  "      \"dict\": {\n"
+                  "        \"type\": \"group\",\n"
+                  "        \"dicts\": [\n"
+                  "          {\n"
+                  "            \"type\": \"inline\",\n"
+                  "            \"entries\": {\n"
+                  "              \"台灣\": \"台灣\"\n"
+                  "            }\n"
+                  "          },\n"
+                  "          {\"type\": \"ocd2\", \"file\": \"STPhrases.ocd2\"},\n"
+                  "          {\"type\": \"ocd2\", \"file\": \"STCharacters.ocd2\"}\n"
+                  "        ]\n"
+                  "      }\n"
+                  "    }\n"
+                  "  ]\n"
+                  "}\n");
+
+  const ConverterPtr inlineConverter = config.NewFromString(json, {ocd2Dir});
+  EXPECT_EQ(utf8("臺灣"), inlineConverter->Convert(utf8("台湾")));
+  EXPECT_EQ(utf8("台灣"), inlineConverter->Convert(utf8("台灣")));
 }
 
 #if defined(_MSC_VER)

@@ -100,20 +100,30 @@ class TestDictionaries(unittest.TestCase):
             "STCharacters",
         )
 
+        reports = []
         for file in glob.iglob(os.path.join(glob.escape(dict_dir), "*.txt")):
             basename, _ = os.path.splitext(os.path.basename(file))
             if basename in excluded_dicts:
                 continue
 
-            with self.subTest(name=basename):
-                for entry in Table().iter(file):
-                    for value in entry:
-                        for char in value:
-                            if ord(char) > 0xFFFF and char not in self.smp_table:
-                                self.fail(
-                                    f"{basename}:{entry.line} contains non-BMP character {char!r}. "
-                                    f"Add it to 'scheme/AllowedSmpChars.txt' only if it is intentional."
-                                )
+            for entry in Table().iter(file):
+                reported_chars = set()
+                for value in entry:
+                    for char in value:
+                        if char in reported_chars:
+                            continue
+
+                        cp = ord(char)
+                        if cp > 0xFFFF and char not in self.smp_table:
+                            reported_chars.add(char)
+                            reports.append(f"{basename}:{entry.line}: {char!r} (U+{cp:04X})")
+
+        if reports:
+            self.fail(
+                "Unallowed SMP characters detected in dictionary values.\n\n"
+                "If these characters are intended, please register them in "
+                "'scheme/AllowedSmpChars.txt'.\n\n" + "\n".join(reports)
+            )
 
     def test_phrase_character_dependency(self):
         """

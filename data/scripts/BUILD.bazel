@@ -32,6 +32,9 @@ py_test(
 )
 
 DICT_TESTS = {
+    "sorted": [
+        "//data/dictionary:text_dictionaries",
+    ],
     "compatibility_ideographs": [
         "//data/dictionary:text_dictionaries",
         "//data/scheme:scheme_files",

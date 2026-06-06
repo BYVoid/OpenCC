@@ -698,7 +698,8 @@ TEST_F(ConfigTest, InlineSegmentationAndConversionWorksWithOcd2GroupDicts) {
                   "}\n");
 
   const ConverterPtr inlineConverter = config.NewFromString(json, {ocd2Dir});
-  EXPECT_EQ(utf8("台灣"), inlineConverter->Convert(utf8("台湾")));
+  EXPECT_EQ(utf8("臺灣"), inlineConverter->Convert(utf8("台湾")));
+  EXPECT_EQ(utf8("台灣"), inlineConverter->Convert(utf8("台灣")));
 }
 
 #if defined(_MSC_VER)

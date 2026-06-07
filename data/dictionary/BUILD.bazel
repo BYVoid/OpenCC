@@ -25,7 +25,10 @@ genrule(
     tools = ["//data/scripts:extract_tofu_risk"],
 )
 
-TEXT_DICTS = glob(["*.txt"]) + [
+TEXT_DICTS = glob(
+    ["*.txt"],
+    exclude = ["CJK_Compatibility_Ideographs.txt"],
+) + [
     "TSCharactersExt.txt",
     "TWVariantsRev.txt",
     "HKVariantsRev.txt",

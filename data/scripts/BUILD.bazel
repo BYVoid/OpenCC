@@ -37,6 +37,7 @@ DICT_TESTS = {
     ],
     "non_bmp": [
         "//data/dictionary:text_dictionaries",
+        "//data/scheme:scheme_files",
     ],
     "phrase_character_dependency": [
         "HKVariants.txt",

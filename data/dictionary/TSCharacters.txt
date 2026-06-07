@@ -2251,7 +2251,6 @@
 萵	莴
 葉	叶
 葒	荭
-著	著 着
 # @tofu-risk: not covered by PingFang/Source Han baseline: 𫈎 U+2B20E
 葝	葝 𫈎
 葤	荮

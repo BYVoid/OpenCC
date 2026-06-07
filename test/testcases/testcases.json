@@ -380,6 +380,20 @@
       }
     },
     {
+      "id": "BYVoid_OpenCC_PR_1291_s2twp",
+      "input": "现代无线通信技术可以通过无线信道进行高速传输，不受电缆束缚",
+      "expected": {
+        "s2twp": "現代無線通訊技術可以通過無線通道進行高速傳輸，不受電纜束縛"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_PR_1291_tw2sp",
+      "input": "現代無線通訊技術可以透過無線通道進行高速傳輸，不受電纜束縛",
+      "expected": {
+        "tw2sp": "现代无线通信技术可以透过无线通道进行高速传输，不受电缆束缚"
+      }
+    },
+    {
       "id": "ByVoid_OpenCC_Issue950_AlgorithmConversion",
       "input": "算法",
       "expected": {

@@ -3,185 +3,97 @@
   "id": "https://opencc.byvoid.com/schema/opencc_config.schema.json",
   "title": "OpenCC configuration",
   "type": "object",
-  "required": [
-    "segmentation",
-    "conversion_chain"
-  ],
+  "required": ["segmentation", "conversion_chain"],
   "additionalProperties": false,
   "properties": {
-    "name": {
-      "type": "string"
-    },
-    "segmentation": {
-      "$ref": "#/definitions/segmentation"
-    },
+    "name": { "type": "string" },
+    "segmentation": { "$ref": "#/definitions/segmentation" },
     "conversion_chain": {
       "type": "array",
       "minItems": 1,
-      "items": {
-        "$ref": "#/definitions/conversion"
-      }
+      "items": { "$ref": "#/definitions/conversion" }
     }
   },
   "definitions": {
     "segmentation": {
       "anyOf": [
-        {
-          "$ref": "#/definitions/mmseg_segmentation"
-        },
-        {
-          "$ref": "#/definitions/plugin_segmentation"
-        }
+        { "$ref": "#/definitions/mmseg_segmentation" },
+        { "$ref": "#/definitions/plugin_segmentation" }
       ]
     },
     "mmseg_segmentation": {
       "type": "object",
-      "required": [
-        "type",
-        "dict"
-      ],
+      "required": ["type", "dict"],
       "additionalProperties": false,
       "properties": {
-        "type": {
-          "enum": [
-            "mmseg"
-          ]
-        },
-        "dict": {
-          "$ref": "#/definitions/dict"
-        }
+        "type": { "enum": ["mmseg"] },
+        "dict": { "$ref": "#/definitions/dict" }
       }
     },
     "plugin_segmentation": {
       "type": "object",
-      "required": [
-        "type"
-      ],
+      "required": ["type"],
       "not": {
-        "properties": {
-          "type": {
-            "enum": [
-              "mmseg"
-            ]
-          }
-        },
-        "required": [
-          "type"
-        ]
+        "properties": { "type": { "enum": ["mmseg"] } },
+        "required": ["type"]
       },
       "properties": {
-        "type": {
-          "type": "string",
-          "minLength": 1
-        },
+        "type": { "type": "string", "minLength": 1 },
         "resources": {
           "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
+          "additionalProperties": { "type": "string" }
         }
       },
-      "additionalProperties": {
-        "type": "string"
-      }
+      "additionalProperties": { "type": "string" }
     },
     "conversion": {
       "type": "object",
-      "required": [
-        "dict"
-      ],
+      "required": ["dict"],
       "additionalProperties": false,
-      "properties": {
-        "dict": {
-          "$ref": "#/definitions/dict"
-        }
-      }
+      "properties": { "dict": { "$ref": "#/definitions/dict" } }
     },
     "dict": {
       "anyOf": [
-        {
-          "$ref": "#/definitions/file_dict"
-        },
-        {
-          "$ref": "#/definitions/inline_dict"
-        },
-        {
-          "$ref": "#/definitions/group_dict"
-        }
+        { "$ref": "#/definitions/file_dict" },
+        { "$ref": "#/definitions/inline_dict" },
+        { "$ref": "#/definitions/group_dict" }
       ]
     },
     "file_dict": {
       "type": "object",
-      "required": [
-        "type",
-        "file"
-      ],
+      "required": ["type", "file"],
       "additionalProperties": false,
       "properties": {
-        "type": {
-          "enum": [
-            "text",
-            "ocd",
-            "ocd2"
-          ]
-        },
-        "file": {
-          "type": "string",
-          "minLength": 1
-        },
-        "may_output_tofu": {
-          "type": "boolean"
-        }
+        "type": { "enum": ["text", "ocd", "ocd2"] },
+        "file": { "type": "string", "minLength": 1 },
+        "may_output_tofu": { "type": "boolean" }
       }
     },
     "inline_dict": {
       "type": "object",
-      "required": [
-        "type",
-        "entries"
-      ],
+      "required": ["type", "entries"],
       "additionalProperties": false,
       "properties": {
-        "type": {
-          "enum": [
-            "inline"
-          ]
-        },
+        "type": { "enum": ["inline"] },
         "entries": {
           "type": "object",
-          "patternProperties": {
-            ".+": {
-              "type": "string",
-              "minLength": 1
-            }
-          },
+          "patternProperties": { ".+": { "type": "string", "minLength": 1 } },
           "additionalProperties": false
         }
       }
     },
     "group_dict": {
       "type": "object",
-      "required": [
-        "type",
-        "dicts"
-      ],
+      "required": ["type", "dicts"],
       "additionalProperties": false,
       "properties": {
-        "type": {
-          "enum": [
-            "group"
-          ]
-        },
+        "type": { "enum": ["group"] },
         "dicts": {
           "type": "array",
           "minItems": 1,
-          "items": {
-            "$ref": "#/definitions/dict"
-          }
+          "items": { "$ref": "#/definitions/dict" }
         },
-        "may_output_tofu": {
-          "type": "boolean"
-        }
+        "may_output_tofu": { "type": "boolean" }
       }
     }
   }

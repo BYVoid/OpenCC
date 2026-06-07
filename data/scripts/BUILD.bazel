@@ -43,6 +43,10 @@ DICT_TESTS = {
         "//data/dictionary:text_dictionaries",
         "//data/scheme:scheme_files",
     ],
+    "phrases_tofu_fallbacks": [
+        "//data/dictionary:text_dictionaries",
+        "//data/scheme:scheme_files",
+    ],
     "phrase_character_dependency": [
         "HKVariants.txt",
         "HKVariantsPhrases.txt",

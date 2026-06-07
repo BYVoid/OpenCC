@@ -141,55 +141,55 @@ class TestDictionaries(unittest.TestCase):
             ("TWVariantsRevPhrases", "TWVariantsRev"),
         )
 
+        reports = []
         for phrase_name, char_name in dict_pairs:
-            with self.subTest(phrase=phrase_name, character=char_name):
-                phrase_file = os.path.join(dict_dir, f"{phrase_name}.txt")
-                char_file = os.path.join(dict_dir, f"{char_name}.txt")
+            phrase_file = os.path.join(dict_dir, f"{phrase_name}.txt")
+            char_file = os.path.join(dict_dir, f"{char_name}.txt")
 
-                # Special handling: load swapped dict from "<file>" if "<file>Rev" not generated
-                if not os.path.isfile(char_file) and char_name.endswith("Rev"):
-                    char_file = os.path.join(dict_dir, f"{char_name[:-3]}.txt")
-                    table = Table.from_file(char_file)
-                    table.swap()
-                    entries = table.values()
-                else:
-                    entries = Table().iter(char_file)
+            # Special handling: load swapped dict from "<file>" if "<file>Rev" not generated
+            if not os.path.isfile(char_file) and char_name.endswith("Rev"):
+                char_file = os.path.join(dict_dir, f"{char_name[:-3]}.txt")
+                table = Table.from_file(char_file)
+                table.swap()
+                entries = table.values()
+            else:
+                entries = Table().iter(char_file)
 
-                char_cands = {}
-                for entry in entries:
-                    key = entry.key
-                    values = entry
-                    if not (len(key) == 1 and values):
+            char_cands = {}
+            for entry in entries:
+                key = entry.key
+                values = entry
+                if not (len(key) == 1 and values):
+                    continue
+                char_cands[key] = set(values)
+
+            for entry in Table().iter(phrase_file):
+                key = entry.key
+                for value in entry:
+                    if len(key) != len(value):
                         continue
-                    char_cands[key] = set(values)
 
-                failures = []
-                for entry in Table().iter(phrase_file):
-                    key = entry.key
-                    for value in entry:
-                        if len(key) != len(value):
+                    for k_char, v_char in zip(key, value):
+                        if k_char == v_char:
                             continue
 
-                        for k_char, v_char in zip(key, value):
-                            if k_char == v_char:
-                                continue
+                        if v_char in char_cands.get(k_char, set()):
+                            continue
 
-                            if v_char in char_cands.get(k_char, set()):
-                                continue
+                        reports.append(
+                            f"{phrase_name}:{entry.line}: "
+                            f"{k_char!r} -> {v_char!r} (in {key!r} -> {value!r}) "
+                            f"not declared in {char_name}."
+                        )
 
-                            failures.append(
-                                f"{phrase_name}:{entry.line} maps {key!r} -> {value!r}, "
-                                f"including character substitution {k_char!r} -> {v_char!r}, "
-                                f"but {char_name} does not list that target as a candidate."
-                            )
-
-                if failures:
-                    self.fail(
-                        "Phrase-level character substitutions must also be declared in the "
-                        "corresponding character dictionary. If a direct character conversion "
-                        "is not generally desirable, keep it as a non-default candidate such "
-                        "as A<TAB>A B instead of deleting it outright:\n" + "\n".join(failures)
-                    )
+        if reports:
+            self.fail(
+                "Phrase-character dependency validation failed.\n\n"
+                "Phrase-level character substitutions should also be declared in the "
+                "corresponding character dictionary. If a direct character conversion "
+                "is not generally desirable (e.g., 周 -> 週), make it a non-default "
+                "candidate (e.g., 周 -> 周 週).\n" + "\n".join(reports)
+            )
 
     def test_variant_rev_phrases(self):
         """Validate reverse variant phrase dictionary coverage."""

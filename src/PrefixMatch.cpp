@@ -49,7 +49,7 @@ uint32_t Utf8CharKey(const char* str, size_t charLen) {
 
 class PrefixMatch::Tables {
 public:
-  std::vector<std::unique_ptr<Table>> tables;
+  std::unique_ptr<Table> table;
 };
 
 namespace {
@@ -115,17 +115,18 @@ void PruneExpiredPrefixMatchCache(
 
 class PrefixMatch::Table {
 public:
-  explicit Table(const DictPtr& dict) {
+  Table() {}
+
+  void AddDict(const DictPtr& dict, size_t dictOrder) {
     const LexiconPtr lexicon = dict->GetLexicon();
     for (const std::unique_ptr<DictEntry>& item : *lexicon) {
-      AddEntry(item->Key(), item->GetDefault());
+      AddEntry(item->Key(), item->GetDefault(), dictOrder);
     }
   }
 
   PrefixMatch::Match MatchPrefix(const char* word, size_t len) const {
     const Node* node = &root;
-    const Node* matchedNode = nullptr;
-    size_t matchedLength = 0;
+    const Candidate* matchedCandidate = nullptr;
     for (const char* pstr = word; pstr < word + len;) {
       const size_t remainingLength = word + len - pstr;
       const size_t charLength = Utf8CharLength(pstr, remainingLength);
@@ -138,27 +139,37 @@ public:
       }
       pstr += charLength;
       node = child->second.get();
-      if (node->keyLength > 0) {
-        matchedLength = node->keyLength;
-        matchedNode = node;
+      if (node->candidate.hasValue &&
+          (matchedCandidate == nullptr ||
+           node->candidate.dictOrder < matchedCandidate->dictOrder ||
+           (node->candidate.dictOrder == matchedCandidate->dictOrder &&
+            node->candidate.keyLength > matchedCandidate->keyLength))) {
+        matchedCandidate = &node->candidate;
       }
     }
-    if (matchedNode != nullptr) {
-      return Match{true, matchedLength, &matchedNode->key,
-                   &matchedNode->value};
+    if (matchedCandidate != nullptr) {
+      return Match{true, matchedCandidate->keyLength, &matchedCandidate->key,
+                   &matchedCandidate->value};
     }
     return Match{false, 0, nullptr, nullptr};
   }
 
 private:
-  struct Node {
+  struct Candidate {
+    bool hasValue = false;
+    size_t dictOrder = 0;
     size_t keyLength = 0;
     std::string key;
     std::string value;
+  };
+
+  struct Node {
+    Candidate candidate;
     std::unordered_map<uint32_t, std::unique_ptr<Node>> children;
   };
 
-  void AddEntry(const std::string& key, const std::string& value) {
+  void AddEntry(const std::string& key, const std::string& value,
+                size_t dictOrder) {
     Node* node = &root;
     for (const char* pstr = key.c_str(); *pstr != '\0';) {
       const size_t remainingLength = key.c_str() + key.length() - pstr;
@@ -174,9 +185,13 @@ private:
       node = child.get();
       pstr += charLength;
     }
-    node->keyLength = key.length();
-    node->key = key;
-    node->value = value;
+    if (!node->candidate.hasValue || dictOrder < node->candidate.dictOrder) {
+      node->candidate.hasValue = true;
+      node->candidate.dictOrder = dictOrder;
+      node->candidate.keyLength = key.length();
+      node->candidate.key = key;
+      node->candidate.value = value;
+    }
   }
 
   Node root;
@@ -208,7 +223,9 @@ PrefixMatch::PrefixMatch(const DictPtr& dict) {
   }
 
   std::shared_ptr<Tables> built(new Tables);
-  AddDict(dict, built.get());
+  built->table.reset(new Table);
+  size_t dictOrder = 0;
+  AddDict(dict, built.get(), &dictOrder);
 
   std::lock_guard<std::mutex> lock(cacheMutex);
   PruneExpiredPrefixMatchCache(&cache);
@@ -238,24 +255,20 @@ PrefixMatch::~PrefixMatch() {}
 
 PrefixMatch::Match PrefixMatch::MatchPrefix(const char* word,
                                             size_t len) const {
-  for (const std::unique_ptr<Table>& table : tables->tables) {
-    const Match match = table->MatchPrefix(word, len);
-    if (match.matched) {
-      return match;
-    }
-  }
-  return Match{false, 0, nullptr, nullptr};
+  return tables->table->MatchPrefix(word, len);
 }
 
-void PrefixMatch::AddDict(const DictPtr& dict, Tables* output) {
+void PrefixMatch::AddDict(const DictPtr& dict, Tables* output,
+                          size_t* dictOrder) {
   const std::list<DictPtr>* dictGroupItems = dict->GetDictGroupItems();
   if (dictGroupItems != nullptr) {
     for (const DictPtr& child : *dictGroupItems) {
-      AddDict(child, output);
+      AddDict(child, output, dictOrder);
     }
     return;
   }
-  output->tables.emplace_back(new Table(dict));
+  output->table->AddDict(dict, *dictOrder);
+  ++(*dictOrder);
 }
 
 void PrefixMatch::AppendCacheKey(const DictPtr& dict, std::string* output) {

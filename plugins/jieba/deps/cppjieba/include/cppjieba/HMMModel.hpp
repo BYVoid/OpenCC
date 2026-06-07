@@ -1,14 +1,15 @@
 #ifndef CPPJIEBA_HMMMODEL_H
 #define CPPJIEBA_HMMMODEL_H
 
+#include <cstring>
+#include <unordered_map>
+#include "Utils.hpp"
 #include "UnicodeFile.hpp"
-#include "limonp/StringUtil.hpp"
 #include "Trie.hpp"
 
 namespace cppjieba {
 
-using namespace limonp;
-typedef unordered_map<Rune, double> EmitProbMap;
+typedef std::unordered_map<Rune, double> EmitProbMap;
 
 struct HMMModel {
   /*

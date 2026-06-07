@@ -50,7 +50,7 @@ for (const packageName of expectedOptionalPackages) {
 
 if (process.exitCode) {
   console.error(
-    'opencc package is not ready. Run npm run prebuild:all before publishing.'
+    'opencc package is not ready. Run npm run prebuild before publishing.'
   );
 } else {
   console.log(`opencc@${packageJson.version} package files are ready.`);

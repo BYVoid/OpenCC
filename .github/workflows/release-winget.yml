@@ -9,15 +9,29 @@ on:
       version:
         description: "Release version or tag, for example 1.2.0, 1.2.1-rc1, 1.2.1-alpha1, or ver.1.2.0"
         required: false
+      sign_windows_binaries:
+        description: "Sign Windows binaries with SignPath before packaging"
+        required: true
+        type: boolean
+        default: false
+      signpath_signing_policy_slug:
+        description: "SignPath signing policy slug to use when signing is enabled"
+        required: true
+        type: string
+        default: test-signing
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  SIGNPATH_PROJECT_SLUG: OpenCC
+
 jobs:
   build-release:
     runs-on: windows-2022
     permissions:
+      actions: read
       contents: write
     steps:
       - uses: actions/checkout@v4
@@ -40,7 +54,9 @@ jobs:
           if (-not $value -and $env:GIT_REF_TYPE -eq "tag") {
             $value = $env:GIT_REF_NAME
           }
-          if ($value.StartsWith("ver.")) {
+          if (-not $value) {
+            $clean = ""
+          } elseif ($value.StartsWith("ver.")) {
             $clean = $value.Substring(4)
           } elseif ($value.StartsWith("v")) {
             $clean = $value.Substring(1)
@@ -48,6 +64,96 @@ jobs:
             $clean = $value
           }
           "value=$clean" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Build portable release staging
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
+          GITHUB_REPO: ${{ github.repository }}
+        run: |
+          ./scripts/release-windows-winget.ps1 `
+            -Version "$env:RELEASE_VERSION" `
+            -OutputDir release `
+            -GitHubRepository "$env:GITHUB_REPO" `
+            -PackageIdentifier "BYVoid.OpenCC" `
+            -Publisher "BYVoid" `
+            -PrepareOnly
+
+      - name: Create unsigned SignPath input
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_windows_binaries }}
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path release/signpath | Out-Null
+          Compress-Archive `
+            -Path "release/staging/*" `
+            -DestinationPath "release/signpath/opencc-winget-portable-win32-x64.zip" `
+            -CompressionLevel Optimal
+
+      - name: Upload unsigned SignPath input
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_windows_binaries }}
+        id: upload-unsigned-signpath-input
+        uses: actions/upload-artifact@v7
+        with:
+          name: unsigned-opencc-winget-portable-win32-x64
+          path: release/signpath/opencc-winget-portable-win32-x64.zip
+          archive: false
+          if-no-files-found: error
+
+      - name: Submit SignPath signing request
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_windows_binaries }}
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ env.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ inputs.signpath_signing_policy_slug || 'test-signing' }}
+          artifact-configuration-slug: opencc-winget-portable-win32-x64
+          github-artifact-id: ${{ steps.upload-unsigned-signpath-input.outputs.artifact-id }}
+          wait-for-completion: true
+          skip-decompress: true
+          output-artifact-directory: release/signpath-signed
+
+      - name: Restore signed portable staging
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_windows_binaries }}
+        shell: pwsh
+        run: |
+          $signedRoot = "release/signpath-signed"
+          $stagingRoot = "release/staging"
+          $signedZip = Get-ChildItem -Path $signedRoot -Filter "*.zip" -Recurse | Select-Object -First 1
+          $signedContentRoot = Get-ChildItem -Path $signedRoot -Directory -Recurse |
+            Where-Object { Test-Path (Join-Path $_.FullName "bin") } |
+            Select-Object -First 1
+
+          Remove-Item -Recurse -Force $stagingRoot -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force -Path $stagingRoot | Out-Null
+
+          if ($signedZip) {
+            Expand-Archive -Path $signedZip.FullName -DestinationPath $stagingRoot -Force
+          } elseif (Test-Path (Join-Path $signedRoot "bin")) {
+            Copy-Item -Path (Join-Path $signedRoot "*") -Destination $stagingRoot -Recurse -Force
+          } elseif ($signedContentRoot) {
+            Copy-Item -Path (Join-Path $signedContentRoot.FullName "*") -Destination $stagingRoot -Recurse -Force
+          } else {
+            throw "Unable to locate signed portable archive or extracted staging files under $signedRoot."
+          }
+
+      - name: Verify signed portable files
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_windows_binaries }}
+        shell: pwsh
+        run: |
+          $files = @(
+            "release/staging/bin/opencc.exe",
+            "release/staging/bin/opencc_dict.exe",
+            "release/staging/bin/opencc_phrase_extract.exe"
+          ) + (Get-ChildItem "release/staging/bin/plugins" -Filter "*.dll" | ForEach-Object { $_.FullName })
+
+          foreach ($file in $files) {
+            $signature = Get-AuthenticodeSignature -FilePath $file
+            if ($signature.SignerCertificate -eq $null) {
+              throw "Missing Authenticode signature: $file"
+            }
+            Write-Host "$file signed by $($signature.SignerCertificate.Subject); status: $($signature.Status)"
+          }
 
       - name: Build portable release and WinGet manifests
         shell: pwsh
@@ -60,7 +166,8 @@ jobs:
             -OutputDir release `
             -GitHubRepository "$env:GITHUB_REPO" `
             -PackageIdentifier "BYVoid.OpenCC" `
-            -Publisher "BYVoid"
+            -Publisher "BYVoid" `
+            -PackageOnly
 
       - name: Upload release artifacts
         uses: actions/upload-artifact@v4

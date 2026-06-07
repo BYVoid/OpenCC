@@ -1,14 +1,7 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 3.10)
 PROJECT(CPPJIEBA)
 
-find_package(limonp)
-if(limonp_FOUND)
-    get_target_property(LIMONP_INCLUDE_DIR limonp::limonp INTERFACE_INCLUDE_DIRECTORIES)
-else()
-    set(LIMONP_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/deps/limonp/include")
-endif()
-INCLUDE_DIRECTORIES("${LIMONP_INCLUDE_DIR}"
-  ${PROJECT_SOURCE_DIR}/include)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/include)
 
 if(NOT DEFINED CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD 11)
@@ -31,7 +24,6 @@ if(NOT TARGET cppjieba)
   add_library(cppjieba INTERFACE)
   target_include_directories(cppjieba INTERFACE
     ${PROJECT_SOURCE_DIR}/include
-    ${PROJECT_SOURCE_DIR}/deps/limonp/include
   )
 endif()
 

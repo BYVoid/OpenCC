@@ -286,6 +286,9 @@ OPENCC_DATA_DIR=/path/to/your/config/dir opencc --help
 備註：OpenCC 1.3.2+ 解析器支援有限 JSONC 語法（`//`、`/* */` 註解與尾逗號）。
 若需跨實作相容，建議使用嚴格 JSON，不依賴 JSONC 擴充。
 
+更多完整示例可見 `examples/config/`。該目錄僅供學習與自訂參考，不屬於官方內建
+配置列表。
+
 ### Experimental Plugins 試驗性插件
 
 OpenCC 現已支援外部 C++ 分詞插件。當前第一個插件為 `opencc-jieba`，

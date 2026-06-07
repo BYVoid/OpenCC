@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from collections import UserDict, UserList, UserString
+from collections import UserDict, UserList
 
 
 class BaseTable(UserDict):
@@ -197,10 +197,10 @@ class SmpTable(BaseTable):
             if line.startswith('#') or not line.strip():
                 continue
             char, rep = (line.rstrip('\n').split('\t') + [None] * 2)[:2]
-            entry = UserDict(
-                char=char,
-                rep = rep or None
-            )
+            entry = UserDict({
+                'char': char,
+                'rep': rep or None,
+            })
             entry.line = i + 1
             yield entry
 

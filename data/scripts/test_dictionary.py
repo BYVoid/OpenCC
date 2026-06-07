@@ -12,16 +12,13 @@ root_dir = os.path.normpath(os.path.join(__file__, "..", ".."))
 dict_dir = os.path.join(root_dir, "dictionary")
 scheme_dir = os.path.join(root_dir, "scheme")
 
-ALLOWED_SMP_CHARACTERS = (
-    ("STPhrases", "𫖮"),  # U+2B5AE
-    ("STPhrases", "𫗧"),  # U+2B5E7
-    ("STPhrases", "𫛭"),  # U+2B6ED
-    ("STPhrases", "𬴃"),  # U+2CD03
-    ("TSPhrases", "𫫇"),  # U+2BAC7
-)
-
 
 class TestDictionaries(unittest.TestCase):
+    @cached_property
+    def smp_table(cls):
+        scheme_file = os.path.join(scheme_dir, "AllowedSmpChars.txt")
+        return SmpTable.from_file(scheme_file)
+
     def test_sorted(self):
         """Validate that dictionaries are sorted."""
         excluded_dicts = (
@@ -109,16 +106,14 @@ class TestDictionaries(unittest.TestCase):
                 continue
 
             with self.subTest(name=basename):
-                for i, line in enumerate(Table()._iter(file)):
-                    for char in line:
-                        if (
-                            ord(char) > 0xFFFF and
-                            not any(basename == f and char == c for f, c in ALLOWED_SMP_CHARACTERS)
-                        ):
-                            self.fail(
-                                f"{basename}:{i + 1} contains non-BMP character {char!r}. "
-                                f"Add it to `ALLOWED_SMP_CHARACTERS` only if it is intentional."
-                            )
+                for entry in Table().iter(file):
+                    for value in entry:
+                        for char in value:
+                            if ord(char) > 0xFFFF and char not in self.smp_table:
+                                self.fail(
+                                    f"{basename}:{entry.line} contains non-BMP character {char!r}. "
+                                    f"Add it to 'scheme/AllowedSmpChars.txt' only if it is intentional."
+                                )
 
     def test_phrase_character_dependency(self):
         """

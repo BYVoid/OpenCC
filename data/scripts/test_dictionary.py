@@ -133,6 +133,52 @@ class TestDictionaries(unittest.TestCase):
                 "'scheme/AllowedSmpChars.txt'.\n\n" + "\n".join(reports)
             )
 
+    def test_phrases_tofu_fallbacks(self):
+        """
+        Validate that every tofu-risky dictionary key have the corresponding
+        replacement tofu-free key declared.
+        """
+        excluded_dicts = (
+            "TSCharacters",
+            "TSCharactersBase",
+            "TSCharactersExt",
+            "TSPhrasesBase",
+            "TSPhrasesExt",
+            "STCharacters",
+        )
+
+        reports = []
+        for file in glob.iglob(os.path.join(glob.escape(dict_dir), "*.txt")):
+            basename, _ = os.path.splitext(os.path.basename(file))
+            if basename in excluded_dicts:
+                continue
+
+            keys = {}
+            expected_keys = {}
+            for entry in Table().iter(file):
+                key = entry.key
+                if len(key) == 1:
+                    continue
+                keys[key] = True
+                expected_key = "".join((self.smp_table.get(c, {}).get("rep") or c) for c in key)
+                if expected_key == key:
+                    continue
+                expected_keys[expected_key] = (expected_key, key, entry.line)
+
+            for expected_key, orig_key, orig_line in expected_keys.values():
+                if expected_key not in keys:
+                    reports.append(f"{basename}:{orig_line}: {orig_key!r} (expect {expected_key!r})")
+
+        if reports:
+            self.fail(
+                "Tofu-risky phrase replacement keys validation failed.\n\n"
+                "To prevent word segmentation failures on platforms with incomplete "
+                "font support, any phrase key containing a tofu-risky character "
+                "(e.g., '𣗊溪') should have the corresponding tofu-free key declared "
+                "(e.g., '樠溪'), based on the mappings in 'schemes/AllowedSmpChars.txt'.\n\n" +
+                "\n".join(reports)
+            )
+
     def test_phrase_character_dependency(self):
         """
         Validate that phrase-level character substitutions remain declared in the

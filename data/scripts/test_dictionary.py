@@ -166,7 +166,14 @@ class TestDictionaries(unittest.TestCase):
             for entry in Table().iter(phrase_file):
                 key = entry.key
                 for value in entry:
+                    # @TODO: calculate length based on unicode composite units to
+                    # allow a substitution like '<U+82A6>' => '<U+82A6><U+E0134>'
+                    # or '𧍯' => '⿰虫风'.
                     if len(key) != len(value):
+                        reports.append(
+                            f"{phrase_name}:{entry.line}: "
+                            f"{key!r} -> {value!r} has unmatching length."
+                        )
                         continue
 
                     for k_char, v_char in zip(key, value):

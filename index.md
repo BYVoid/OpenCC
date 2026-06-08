@@ -156,6 +156,7 @@ npm install -g opencc opencc-jieba</code></pre>
   </div>
   <div class="link-list">
     <a href="/1.3.1/">Latest API docs / 最新 API 文檔 <span>1.3.1</span></a>
+    <a href="/characters-easy-to-misuse/">Character disambiguation / 易混淆字辨析 <span>Table</span></a>
     <a href="/docs/">Historical docs / 歷史文檔 <span>All versions</span></a>
     <a href="https://github.com/BYVoid/OpenCC">Source code / 原始碼 <span>GitHub</span></a>
     <a href="https://t.me/open_chinese_convert">Discussion / 討論 <span>Telegram</span></a>

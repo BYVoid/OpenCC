@@ -7,6 +7,10 @@ nav_order: 2
 description: Historical docs for OpenCC.
 ---
 
+## 參考資料
+
+* [現代漢語常用繁簡轉換匹配辨析表](/characters-easy-to-misuse/)
+
 ## 最新版本
 
 * [1.3.1](/1.3.1/)

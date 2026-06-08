@@ -100,12 +100,10 @@ class TestDictionaries(unittest.TestCase):
         Validate non-BMP characters in phrase and variant dictionaries.
         """
         excluded_dicts = (
-            "TSCharacters",
             "TSCharactersBase",
             "TSCharactersExt",
             "TSPhrasesBase",
             "TSPhrasesExt",
-            "STCharacters",
         )
 
         reports = []

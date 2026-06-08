@@ -33,15 +33,21 @@ class TestDictionaries(unittest.TestCase):
             "TSPhrasesExt.txt",
         )
 
+        reports = []
         for file in glob.iglob(os.path.join(glob.escape(dict_dir), "*.txt")):
             basename = os.path.basename(file)
             if basename in excluded_dicts:
                 continue
 
-            with self.subTest(name=basename):
-                table = Table.from_file(file)
-                if sorted(table) != list(table):
-                    self.fail("dictionary file not sorted")
+            table = Table.from_file(file)
+            if sorted(table) != list(table):
+                reports.append(basename)
+
+        if reports:
+            self.fail(
+                "Dictionary files not sorted:\n" +
+                "\n".join(reports)
+            )
 
     def test_compatibility_ideographs(self):
         """

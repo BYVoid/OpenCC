@@ -325,7 +325,7 @@ class TestDictionaries(unittest.TestCase):
 
             for entry in Table().iter(dict_file):
                 key = entry.key
-                if any(key in value for value in seg_values):
+                if key in seg_values:
                     continue
 
                 for seg_entry in seg_values.values():

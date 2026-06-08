@@ -27,7 +27,8 @@
       "input": "㑮",
       "expected_segmentation": "㑮",
       "expected": {
-        "tw2sp_jieba": "㑮"
+        "tw2sp_jieba": "㑮",
+        "hk2sp_jieba": "㑮"
       }
     },
     {

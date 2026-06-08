@@ -1,0 +1,17 @@
+# Open Chinese Convert (OpenCC) Dictionary
+# File: HKPhrasesRev.txt
+# Format: key	value(s) (values separated by spaces)
+# License: Apache-2.0 (see LICENSE)
+# Source: https://github.com/ByVoid/OpenCC
+# Used in configs: hk2sp.json (via HKPhrasesRev.ocd2)
+
+伺服器	服務器
+作業系統	操作系統
+寬頻	寬帶
+搜尋	搜索
+概率	概率 幾率
+機會率	概率
+機率	幾率
+私隱權	隱私權
+程式語言	編程語言
+資料夾	文件夾

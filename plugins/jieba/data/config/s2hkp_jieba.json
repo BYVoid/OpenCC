@@ -1,0 +1,31 @@
+{
+  "name": "Simplified Chinese to Traditional Chinese (Hong Kong variant, with phrases, Jieba Segmentation - Experimental)",
+  "segmentation": {
+    "type": "jieba",
+    "resources": {
+      "dict_path": "jieba_dict/jieba_merged.ocd2",
+      "model_path": "jieba_dict/hmm_model.utf8"
+    }
+  },
+  "conversion_chain": [
+    {
+      "dict": {
+        "type": "group",
+        "dicts": [
+          { "type": "ocd2", "file": "STPhrases.ocd2" },
+          { "type": "ocd2", "file": "STCharacters.ocd2" }
+        ]
+      }
+    },
+    {
+      "dict": {
+        "type": "group",
+        "dicts": [
+          { "type": "ocd2", "file": "HKPhrases.ocd2" },
+          { "type": "ocd2", "file": "HKVariantsPhrases.ocd2" },
+          { "type": "ocd2", "file": "HKVariants.ocd2" }
+        ]
+      }
+    }
+  ]
+}

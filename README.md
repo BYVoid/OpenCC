@@ -223,7 +223,9 @@ Rules:
 * `s2tw.json` **Simplified Chinese** to **Traditional Chinese (Taiwan Standard)** / **簡體** 到 **台灣正體**
 * `tw2s.json` **Traditional Chinese (Taiwan Standard)** to **Simplified Chinese** / **台灣正體** 到 **簡體**
 * `s2hk.json` **Simplified Chinese** to **Traditional Chinese (Hong Kong variant)** / **簡體** 到 **香港繁體**
+* `s2hkp.json` **Simplified Chinese** to **Traditional Chinese (Hong Kong variant, with Hong Kong Phrases)** / **簡體** 到 **香港繁體（香港常用詞彙）**
 * `hk2s.json` **Traditional Chinese (Hong Kong variant)** to **Simplified Chinese** / **香港繁體** 到 **簡體**
+* `hk2sp.json` **Traditional Chinese (Hong Kong variant)** to **Simplified Chinese (Mainland China Phrases)** / **香港繁體** 到 **簡體（含中國大陸常用詞彙）**
 * `s2twp.json` **Simplified Chinese** to **Traditional Chinese (Taiwan Standard, with Taiwan Phrases)** / **簡體** 到 **台灣正體（含台灣常用詞彙）**
 * `tw2sp.json` **Traditional Chinese (Taiwan Standard)** to **Simplified Chinese (Mainland China Phrases)** / **台灣正體** 到 **簡體（含中國大陸常用詞彙）**
 * `t2tw.json` **Traditional Chinese (OpenCC Standard)** to **Traditional Chinese (Taiwan Standard)** / **OpenCC 標準繁體** 到 **台灣正體**

@@ -25,7 +25,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SIGNPATH_PROJECT_SLUG: opencc
+  SIGNPATH_PROJECT_SLUG: OpenCC
 
 jobs:
   build-release:

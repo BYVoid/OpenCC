@@ -7,16 +7,15 @@
       "model_path": "jieba_dict/hmm_model.utf8"
     }
   },
-  "conversion_chain": [{
-    "dict": {
-      "type": "group",
-      "dicts": [{
-        "type": "ocd2",
-        "file": "STPhrases.ocd2"
-      }, {
-        "type": "ocd2",
-        "file": "STCharacters.ocd2"
-      }]
+  "conversion_chain": [
+    {
+      "dict": {
+        "type": "group",
+        "dicts": [
+          { "type": "ocd2", "file": "STPhrases.ocd2" },
+          { "type": "ocd2", "file": "STCharacters.ocd2" }
+        ]
+      }
     }
-  }]
+  ]
 }

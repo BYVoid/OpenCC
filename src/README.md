@@ -24,11 +24,16 @@ The data files that drive this pipeline live outside this directory:
   - Finds and parses JSON configuration files.
   - Builds segmenters, dictionaries, dictionary groups, conversions, and
     converters.
-  - Maintains dictionary search paths from explicit `--path` values,
-    `argv[0]`, installed package data paths, and Windows portable-layout
-    locations.
+  - Resolves dictionary/resource files through `ResourceProvider`.
+  - Keeps config loading separate from dictionary resource lookup.
   - Uses UTF-16-capable file checks on Windows for internal config and
     resource paths.
+- `ResourceProvider.hpp`, `ResourceProvider.cpp`
+  - Provides `ResourceProvider` and `FilesystemResourceProvider`.
+  - `FilesystemResourceProvider` searches configured resource directories in
+    order and returns a resolved path for lower-level dictionary loaders.
+  - Embedded hosts can combine application, plugin, and system OpenCC data
+    directories without changing config JSON.
 
 ### Segmentation
 
@@ -103,7 +108,8 @@ behavior because phrase priority and multi-stage conversion order matter.
 
 - `SimpleConverter.hpp`, `SimpleConverter.cpp`
   - High-level C++ wrapper around `Config` and `Converter`.
-  - Accepts a config name/path and optional search paths.
+  - Accepts a config name/path, optional search paths, or an explicit
+    `ResourceProvider`.
   - Throws C++ exceptions on failures.
 
 ### C API

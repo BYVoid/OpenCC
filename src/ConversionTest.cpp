@@ -63,6 +63,27 @@ TEST_F(ConversionTest, PreserveDictGroupPriority) {
   EXPECT_EQ("Xbc", groupConversion.Convert("abc"));
 }
 
+TEST_F(ConversionTest, PreserveNestedDictGroupPriority) {
+  LexiconPtr firstLexicon(new Lexicon);
+  firstLexicon->Add(DictEntryFactory::New("a", "X"));
+  firstLexicon->Sort();
+  LexiconPtr secondLexicon(new Lexicon);
+  secondLexicon->Add(DictEntryFactory::New("ab", "Y"));
+  secondLexicon->Sort();
+  LexiconPtr thirdLexicon(new Lexicon);
+  thirdLexicon->Add(DictEntryFactory::New("abc", "Z"));
+  thirdLexicon->Sort();
+
+  DictPtr firstDict(new TextDict(firstLexicon));
+  DictPtr secondDict(new TextDict(secondLexicon));
+  DictPtr thirdDict(new TextDict(thirdLexicon));
+  DictPtr nestedGroup(new DictGroup(std::list<DictPtr>{firstDict, secondDict}));
+  DictPtr dictGroup(new DictGroup(std::list<DictPtr>{nestedGroup, thirdDict}));
+  Conversion groupConversion(dictGroup);
+
+  EXPECT_EQ("Xbc", groupConversion.Convert("abc"));
+}
+
 TEST_F(ConversionTest, TruncatedUtf8Sequence) {
   // This test specifically triggers the information disclosure vulnerability
   // in the old code. The bug occurs when a string ends with an incomplete

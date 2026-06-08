@@ -1,5 +1,5 @@
 {
-  "name": "Simplified Chinese to Traditional Chinese (Taiwan Standard)",
+  "name": "Example: Simplified Chinese to Taiwan Traditional with quote mark override",
   "segmentation": {
     "type": "mmseg",
     "dict": { "type": "ocd2", "file": "STPhrases.ocd2" }
@@ -18,9 +18,21 @@
       "dict": {
         "type": "group",
         "dicts": [
+          { "type": "ocd2", "file": "TWPhrases.ocd2" },
           { "type": "ocd2", "file": "TWVariantsPhrases.ocd2" },
           { "type": "ocd2", "file": "TWVariants.ocd2" }
         ]
+      }
+    },
+    {
+      "dict": {
+        "type": "inline",
+        "entries": {
+          "“": "「",
+          "”": "」",
+          "‘": "『",
+          "’": "』"
+        }
       }
     }
   ]

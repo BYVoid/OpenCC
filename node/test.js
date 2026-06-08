@@ -20,6 +20,7 @@ function createLocalInstalledShape() {
   const requiredFiles = [
     path.join(jiebaPackageDir, 'index.js'),
     path.join(jiebaPackageDir, 'data', 's2twp_jieba.json'),
+    path.join(jiebaPackageDir, 'data', 'tw2sp_jieba.json'),
     path.join(jiebaPackageDir, 'data', 'jieba_dict', 'jieba_merged.ocd2'),
     path.join(jiebaPackageDir, 'prebuilds', `${os.platform()}-${os.arch()}`, libName),
   ];
@@ -63,6 +64,13 @@ describe('Sync API', function () {
         testSync(tc, cfg, expected, done);
       });
     });
+  });
+});
+
+describe('API compatibility', function () {
+  it('includes tofu-risk dictionaries by default', function () {
+    const opencc = new OpenCC('t2s.json');
+    assert.equal(opencc.convertSync('㑮'), '𫝈');
   });
 });
 
@@ -127,6 +135,29 @@ describe('npm CLI', function () {
     });
     assert.equal(result.status, 0, result.stderr);
     assert.equal(result.stdout, '漢字');
+  });
+
+  it('skips tofu-risk dictionaries by default', function () {
+    const result = childProcess.spawnSync(process.execPath, [cli, '-c', 't2s.json'], {
+      input: '㑮',
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, '㑮');
+  });
+
+  it('includes tofu-risk dictionaries when requested', function () {
+    const result = childProcess.spawnSync(process.execPath, [
+      cli,
+      '-c',
+      't2s.json',
+      '--include-tofu-risk-dictionaries',
+    ], {
+      input: '㑮',
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, '𫝈');
   });
 
   it('converts input file to output file', function () {
@@ -422,6 +453,43 @@ describe('Optional opencc-jieba package integration', function () {
     });
     assert.equal(result.status, 0, result.stderr);
     assert.equal(result.stdout, '雲端計算');
+  });
+
+  it('skips tofu-risk dictionaries in jieba configs by default in the npm CLI', function () {
+    const installRoot = createLocalInstalledShape();
+    if (!installRoot) this.skip();
+
+    const result = childProcess.spawnSync(process.execPath, [
+      path.join(installRoot, 'node_modules', 'opencc', 'node', 'cli.js'),
+      '-c',
+      'tw2sp_jieba',
+    ], {
+      cwd: installRoot,
+      env: { ...process.env },
+      input: '㑮',
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, '㑮');
+  });
+
+  it('includes tofu-risk dictionaries in jieba configs when requested in the npm CLI', function () {
+    const installRoot = createLocalInstalledShape();
+    if (!installRoot) this.skip();
+
+    const result = childProcess.spawnSync(process.execPath, [
+      path.join(installRoot, 'node_modules', 'opencc', 'node', 'cli.js'),
+      '-c',
+      'tw2sp_jieba',
+      '--include-tofu-risk-dictionaries',
+    ], {
+      cwd: installRoot,
+      env: { ...process.env },
+      input: '㑮',
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, '𫝈');
   });
 });
 

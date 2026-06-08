@@ -1,9 +1,12 @@
 #ifndef CPPJIEBA_TRIE_HPP
 #define CPPJIEBA_TRIE_HPP
 
-#include <vector>
+#include <cassert>
 #include <queue>
-#include "limonp/StdExtension.hpp"
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 #include "Unicode.hpp"
 
 namespace cppjieba {
@@ -28,7 +31,7 @@ struct DictUnit {
 struct Dag {
   RuneStr runestr;
   // [offset, nexts.first]
-  limonp::LocalVector<pair<size_t, const DictUnit*> > nexts;
+  vector<pair<size_t, const DictUnit*> > nexts;
   const DictUnit * pInfo;
   double weight;
   size_t nextPos; // TODO

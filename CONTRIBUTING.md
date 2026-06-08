@@ -15,6 +15,7 @@ OpenCC 以 [Apache License 2.0](LICENSE) 釋出。提交 Pull Request、issue/co
 - [撰寫測試案例](#撰寫測試案例)
 - [Jieba 插件測試](#jieba-插件測試)
 - [簡轉繁轉換的特殊注意事項](#簡轉繁轉換的特殊注意事項)
+- [字級規則與詞表依賴](#字級規則與詞表依賴)
 
 ## 新增詞典條目
 
@@ -71,6 +72,21 @@ OpenCC 以 [Apache License 2.0](LICENSE) 釋出。提交 Pull Request、issue/co
 1. 使用 **Tab 字元**（`\t`）分隔來源詞與目標詞
 2. 每行一個條目
 3. 檔案使用 UTF-8 編碼
+
+### 4. 檢查字級規則與詞表依賴
+
+詞組級詞表如果仍保留逐字的 `A -> B` 轉換，對應的字級詞表也必須顯式
+保留 `A` 的 `B` 候選。若一般情況下不應再把 `A` 預設轉為 `B`，請不要
+直接刪除字級關係；應改為非預設候選，例如 `A<TAB>A B`。這樣單字預設
+仍保留為 `A`，但詞表中的 `A -> B` 依賴不會變成隱式規則。
+
+修改 `STCharacters.txt`、`TSCharacters.txt`、`TWVariants.txt`、
+`HKVariants.txt` 或其對應詞組詞表時，請同步檢查詞組中逐字對齊的
+替換是否仍在字表候選中。可執行以下測試檢查這類字級依賴：
+
+```bash
+bazel test //data/dictionary:dictionary_phrase_character_dependency_test
+```
 
 ## 排序詞典
 
@@ -235,6 +251,53 @@ PREBUILDS_ONLY=1 npm test
 - `expected`：各種轉換配置的預期輸出
   - 僅需包含您要測試的轉換配置
   - 可以同時測試多種配置
+
+### 使用腳本生成測試案例
+
+專案提供 `scripts/add_testcase.py`，可根據目前建置出的 OpenCC 與詞典，自動為
+`test/testcases/testcases.json` 生成一筆測試案例。此工具適合在已完成詞典修改後，
+快速補齊多個常用配置的 `expected` 輸出；提交前仍需人工檢查輸出是否符合預期。
+
+基本用法：
+
+```bash
+python3 scripts/add_testcase.py \
+  --kind Issue \
+  --number 1234 \
+  --brief-description taiwan_regional_phrase \
+  --input "这个软件里有一套软体动物的数据库"
+```
+
+腳本預設會先執行 Bazel build，然後使用 `bazel-bin/src/tools/command_line` 與
+建置出的詞典生成結果。測試案例 ID 會組成類似
+`BYVoid_OpenCC_Issue_1234_taiwan_regional_phrase` 的格式。
+
+常用參數：
+
+- `--kind`：來源類型，使用 `Issue` 或 `PR`
+- `--number`：issue 或 PR 編號
+- `--brief-description`：英文簡短描述，會作為測試案例 ID 的後綴
+- `--input`：測試輸入文字
+- `--dry-run`：只輸出將生成的 JSON，不寫入檔案
+- `--replace`：若同 ID 測試案例已存在，覆蓋原案例
+- `--no-build`：跳過 Bazel build，直接使用既有 build artifacts
+- `--opencc`、`--config-dir`、`--dict-dir`、`--testcases`：指定自訂執行檔、配置目錄、
+  詞典目錄或測試案例檔案
+
+例如先預覽生成內容：
+
+```bash
+python3 scripts/add_testcase.py \
+  --kind PR \
+  --number 5678 \
+  --brief-description hk_variant_phrase \
+  --input "测试文字" \
+  --dry-run
+```
+
+此腳本目前生成以下配置的結果：`s2t`、`s2tw`、`s2twp`、`s2hk`、`t2s`、
+`t2tw`、`t2hk`、`tw2s`、`tw2sp`、`tw2t`、`hk2s`、`hk2t`。若需要測試
+`jp2t`、`t2jp`，請手動在 `expected` 中加入對應結果。
 
 ### 可用的轉換配置
 

@@ -106,6 +106,8 @@
     "src/PluginSegmentation.hpp",
     "src/PrefixMatch.cpp",
     "src/PrefixMatch.hpp",
+    "src/ResourceProvider.cpp",
+    "src/ResourceProvider.hpp",
     "src/Segmentation.cpp",
     "src/Segmentation.hpp",
     "src/Segments.hpp",

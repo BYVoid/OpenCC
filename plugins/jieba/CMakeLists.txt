@@ -74,7 +74,6 @@ if (NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   include_directories("${PROJECT_SOURCE_DIR}/src")
 endif()
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/include")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/deps/limonp/include")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 if (NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   include_directories("${PROJECT_SOURCE_DIR}/deps/rapidjson-1.1.0")
@@ -218,7 +217,6 @@ set_target_properties(opencc_jieba PROPERTIES
 target_include_directories(opencc_jieba PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/deps/limonp/include
 )
 
 if (BUILD_OPENCC_JIEBA_PLUGIN AND OPENCC_ENABLE_INSTALL)

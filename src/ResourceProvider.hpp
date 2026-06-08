@@ -18,35 +18,29 @@
 
 #pragma once
 
-#include "Common.hpp"
+#include <string>
+#include <string_view>
+#include <vector>
+
+#include "Export.hpp"
 
 namespace opencc {
 
-class PrefixMatch {
+class OPENCC_EXPORT ResourceProvider {
 public:
-  class Tables;
+  virtual ~ResourceProvider() = default;
 
-  struct Match {
-    bool matched;
-    size_t keyLength;
-    const std::string* key;
-    const std::string* value;
-  };
+  virtual std::string Resolve(std::string_view resourceName) const = 0;
+};
 
-  explicit PrefixMatch(const DictPtr& dict);
-  ~PrefixMatch();
+class OPENCC_EXPORT FilesystemResourceProvider : public ResourceProvider {
+public:
+  explicit FilesystemResourceProvider(std::vector<std::string> searchPaths);
 
-  Match MatchPrefix(const char* word, size_t len) const;
+  std::string Resolve(std::string_view resourceName) const override;
 
 private:
-  class Table;
-
-  void AddDict(const DictPtr& dict, Tables* output, size_t* dictOrder);
-  static void AppendCacheKey(const DictPtr& dict, std::string* output);
-  static void CollectLeafDicts(const DictPtr& dict,
-                               std::vector<std::weak_ptr<const Dict>>* output);
-
-  std::shared_ptr<const Tables> tables;
+  std::vector<std::string> searchPaths;
 };
 
 } // namespace opencc

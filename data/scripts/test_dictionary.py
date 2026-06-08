@@ -319,44 +319,41 @@ class TestDictionaries(unittest.TestCase):
                         "line": entry.line,
                     }
 
+        reports = []
         for dict_name in dict_names:
-            with self.subTest(name=dict_name):
-                phrases_file = os.path.join(dict_dir, f"{dict_name}.txt")
+            phrases_file = os.path.join(dict_dir, f"{dict_name}.txt")
+            for entry in Table().iter(phrases_file):
+                key = entry.key
+                if any(key in value for value in st_values):
+                    continue
 
-                missing = []
-                for entry in Table().iter(phrases_file):
-                    key = entry.key
-                    if any(key in value for value in st_values):
+                for st_entry in st_values.values():
+                    value = st_entry["value"]
+                    if len(value) >= len(key) or len(value) < 2:
                         continue
 
-                    for st_entry in st_values.values():
-                        value = st_entry["value"]
-                        if len(value) >= len(key) or len(value) < 2:
-                            continue
+                    pos = key.find(value)
+                    if pos == -1:
+                        continue
 
-                        pos = key.find(value)
-                        if pos == -1:
-                            continue
-
-                        if pos == 0:
-                            category = "prefix"
-                        elif pos + len(value) == len(key):
-                            category = "suffix"
-                        else:
-                            category = "middle"
-
-                        missing.append(
-                            f"{dict_name!r} key {key!r} is not covered by any STPhrases value.\n"
-                            f"  Conflicting STPhrases record: STPhrases.txt:{st_entry['line']} {st_entry['key']!r} -> {value!r}\n"
-                            f"  The existing value appears as a {category} fragment of the {dict_name!r} key."
-                        )
-                        break
-
-                if missing:
-                    self.fail(
-                        f"Potential missing STPhrases entries for {dict_name!r} segmentation:\n" +
-                        "\n".join(missing)
+                    reports.append(
+                        f"{dict_name}:{entry.line}: {key!r} "
+                        f"(may conflict with STPhrases.txt:{st_entry['line']}: "
+                        f"{st_entry['key']!r} -> {value!r})"
                     )
+                    break
+
+        if reports:
+            self.fail(
+                "Phrase segmentation coverage validation failed.\n\n"
+                "Every phrase key declared in a regional dictionary should be "
+                "covered by the conversion values in STPhrases. "
+                "If a regional key (e.g., 表達式 -> 運算式) contains an existing "
+                "STPhrases value as a partial fragment (e.g., 表达 -> 表達), "
+                "the full regional key (i.e., 表達式) should typically be added "
+                "to STPhrases as well.\n\n"
+                "Potentially missing STPhrases entries for segmentation:\n" + "\n".join(reports)
+            )
 
 
 if __name__ == "__main__":

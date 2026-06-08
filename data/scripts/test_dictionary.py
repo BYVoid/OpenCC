@@ -303,60 +303,57 @@ class TestDictionaries(unittest.TestCase):
         Validate that regional phrase keys are not interrupted by s2t phrase
         values during a phrase-related conversion like s2twp.
         """
-        dict_names = (
-            "HKPhrases",
-            "TWPhrases",
+        dict_pairs = (
+            ("HKPhrases", "STPhrases"),
+            ("TWPhrases", "STPhrases"),
         )
-        st_phrases_file = os.path.join(dict_dir, "STPhrases.txt")
 
-        st_values = {}
-        for entry in Table().iter(st_phrases_file):
-            for value in entry:
-                if value not in st_values:
-                    st_values[value] = {
-                        "key": entry.key,
-                        "value": value,
-                        "line": entry.line,
-                    }
+        reports = []
+        for dict_name, seg_dict_name in dict_pairs:
+            dict_file = os.path.join(dict_dir, f"{dict_name}.txt")
+            seg_dict_file = os.path.join(dict_dir, f"{seg_dict_name}.txt")
 
-        for dict_name in dict_names:
-            with self.subTest(name=dict_name):
-                phrases_file = os.path.join(dict_dir, f"{dict_name}.txt")
+            seg_values = {}
+            for entry in Table().iter(seg_dict_file):
+                for value in entry:
+                    if value not in seg_values:
+                        seg_values[value] = {
+                            "key": entry.key,
+                            "value": value,
+                            "line": entry.line,
+                        }
 
-                missing = []
-                for entry in Table().iter(phrases_file):
-                    key = entry.key
-                    if any(key in value for value in st_values):
+            for entry in Table().iter(dict_file):
+                key = entry.key
+                if any(key in value for value in seg_values):
+                    continue
+
+                for seg_entry in seg_values.values():
+                    value = seg_entry["value"]
+                    if len(value) >= len(key) or len(value) < 2:
                         continue
 
-                    for st_entry in st_values.values():
-                        value = st_entry["value"]
-                        if len(value) >= len(key) or len(value) < 2:
-                            continue
+                    if value not in key:
+                        continue
 
-                        pos = key.find(value)
-                        if pos == -1:
-                            continue
-
-                        if pos == 0:
-                            category = "prefix"
-                        elif pos + len(value) == len(key):
-                            category = "suffix"
-                        else:
-                            category = "middle"
-
-                        missing.append(
-                            f"{dict_name!r} key {key!r} is not covered by any STPhrases value.\n"
-                            f"  Conflicting STPhrases record: STPhrases.txt:{st_entry['line']} {st_entry['key']!r} -> {value!r}\n"
-                            f"  The existing value appears as a {category} fragment of the {dict_name!r} key."
-                        )
-                        break
-
-                if missing:
-                    self.fail(
-                        f"Potential missing STPhrases entries for {dict_name!r} segmentation:\n" +
-                        "\n".join(missing)
+                    reports.append(
+                        f"{dict_name}:{entry.line}: {key!r} "
+                        f"(may conflict with {seg_dict_name}:{seg_entry['line']}: "
+                        f"{seg_entry['key']!r} -> {value!r})"
                     )
+                    break
+
+        if reports:
+            self.fail(
+                "Phrase segmentation coverage validation failed.\n\n"
+                "Every phrase key declared in a dictionary should be "
+                "covered by the conversion values in the segmentation "
+                "dictionary. If a key (e.g., 表達式 -> 運算式) conflicts "
+                "with a value in the segmentation dictionary (e.g., 表达 -> 表達), "
+                "the full key (i.e., 表達式) should typically be added "
+                "to the segmentation dictionary as well.\n\n"
+                "Potentially missing segmentation entries:\n" + "\n".join(reports)
+            )
 
 
 if __name__ == "__main__":

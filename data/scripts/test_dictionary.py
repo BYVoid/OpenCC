@@ -55,36 +55,39 @@ class TestDictionaries(unittest.TestCase):
             "TSPhrasesExt",
         )
 
+        reports = []
         for file in glob.iglob(os.path.join(glob.escape(dict_dir), "*.txt")):
             basename, _ = os.path.splitext(os.path.basename(file))
             if basename in excluded_dicts:
                 continue
 
-            with self.subTest(name=basename):
-                for entry in Table().iter(file):
-                    for value in entry:
-                        for char in value:
-                            cp = ord(char)
-                            comp_entry = self.cjk_comp_table.get(cp)
-                            if not comp_entry:
-                                continue
+            for entry in Table().iter(file):
+                reported_chars = set()
+                for value in entry:
+                    for char in value:
+                        if char in reported_chars:
+                            continue
 
-                            line = entry.line
+                        cp = ord(char)
+                        comp_entry = self.cjk_comp_table.get(cp)
+                        if not comp_entry:
+                            continue
 
-                            message = (
-                                f"{basename}:{line} contains CJK Compatibility Ideograph U+{cp:04X}. "
-                            )
+                        reported_chars.add(char)
+                        line = entry.line
+                        rep_cp = comp_entry["std"]
+                        if rep_cp:
+                            reports.append(f"{basename}:{line}: U+{cp:04X} {char!r} (replace with U+{rep_cp:04X} {chr(rep_cp)!r})")
+                        else:
+                            reports.append(f"{basename}:{line}: U+{cp:04X} {char!r}")
 
-                            rep_cp = comp_entry["std"]
-                            if rep_cp:
-                                message += f"Replace it with {chr(rep_cp)} U+{rep_cp:04X}."
-                            else:
-                                message += (
-                                    "No UnicodeData decomposition mapping is available; "
-                                    "replace it manually with the standard CJK unified ideograph form."
-                                )
-
-                            self.fail(message)
+        if reports:
+            self.fail(
+                "CJK compatibility ideographs validation failed.\n\n"
+                "Regular dictionaries should not output Unicode CJK Compatibility Ideographs. "
+                "Every compatibility ideograph should be replaced with its corresponding standard "
+                "CJK unified ideograph form.\n\n" + "\n".join(reports)
+            )
 
     def test_non_bmp(self):
         """

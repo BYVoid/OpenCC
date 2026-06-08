@@ -192,6 +192,28 @@ class RichTable(Table):
         raise ValueError('Invalid dictionary line: ' + line)
 
 
+class CjkCompTable(BaseTable):
+    def iter(self, file):
+        for i, line in enumerate(self._iter(file)):
+            if line.startswith('#') or not line.strip():
+                continue
+            comp_code, std_code = (line.rstrip('\n').split('\t') + [None] * 2)[:2]
+            entry = UserDict({
+                'comp': int(comp_code, 16),
+                'std': int(std_code, 16) if std_code else None,
+            })
+            entry.line = i + 1
+            yield entry
+
+    @staticmethod
+    def get_entry_key(entry):
+        return entry['comp']
+
+    @staticmethod
+    def get_entry_line(entry):
+        return f'U+{entry["comp"]:04X}' + '\t' + f'U+{entry["std"]:04X}' + '\n'
+
+
 class SmpTable(BaseTable):
     def iter(self, file):
         for i, line in enumerate(self._iter(file)):

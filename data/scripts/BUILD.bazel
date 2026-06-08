@@ -34,6 +34,7 @@ py_test(
 DICT_TESTS = {
     "compatibility_ideographs": [
         "//data/dictionary:text_dictionaries",
+        "//data/scheme:scheme_files",
     ],
     "non_bmp": [
         "//data/dictionary:text_dictionaries",

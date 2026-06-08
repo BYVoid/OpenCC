@@ -31,10 +31,7 @@ package(default_visibility = ["//visibility:public"])
     ]
 ]
 
-TEXT_DICTS = glob(
-    ["*.txt"],
-    exclude = ["CJK_Compatibility_Ideographs.txt"],
-) + [
+TEXT_DICTS = glob(["*.txt"]) + [
     "TSCharactersBase.txt",
     "TSCharactersExt.txt",
     "TSPhrasesBase.txt",

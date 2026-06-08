@@ -330,7 +330,7 @@ class TestDictionaries(unittest.TestCase):
             phrases_file = os.path.join(dict_dir, f"{dict_name}.txt")
             for entry in Table().iter(phrases_file):
                 key = entry.key
-                if any(key in value for value in st_values):
+                if key in st_values:
                     continue
 
                 for st_entry in st_values.values():

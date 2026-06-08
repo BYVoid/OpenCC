@@ -2,12 +2,75 @@
 layout: default
 title: News
 heading: 版本歷史
-nav_title: News
+nav_title: News 新聞
 nav_order: 2
 description: Release history and change log for OpenCC.
 ---
 
 # Change History of OpenCC
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var main = document.querySelector("main");
+    if (!main) return;
+
+    var headings = Array.prototype.slice.call(main.querySelectorAll("h2"))
+      .filter(function (heading) {
+        return /^Version\s+/.test(heading.textContent.trim());
+      });
+    if (!headings.length) return;
+
+    var accordion = document.createElement("section");
+    accordion.className = "release-accordion";
+    accordion.setAttribute("aria-label", "OpenCC release history");
+    headings[0].parentNode.insertBefore(accordion, headings[0]);
+
+    headings.forEach(function (heading, index) {
+      var details = document.createElement("details");
+      details.className = "release-drawer";
+      if (index === 0) details.open = true;
+
+      var title = heading.textContent.trim();
+      var dateElement = heading.nextElementSibling && heading.nextElementSibling.tagName === "P"
+        ? heading.nextElementSibling
+        : null;
+
+      var summary = document.createElement("summary");
+      var titleSpan = document.createElement("span");
+      titleSpan.className = "release-title";
+      titleSpan.textContent = title;
+      summary.appendChild(titleSpan);
+
+      if (dateElement) {
+        var dateSpan = document.createElement("span");
+        dateSpan.className = "release-date";
+        dateSpan.textContent = dateElement.textContent.trim();
+        summary.appendChild(dateSpan);
+      }
+
+      var body = document.createElement("div");
+      body.className = "release-body";
+
+      var nextHeading = headings[index + 1] || null;
+      var node = heading.nextSibling;
+      heading.remove();
+
+      while (node && node !== nextHeading) {
+        var next = node.nextSibling;
+        if (node !== dateElement) {
+          body.appendChild(node);
+        } else {
+          node.remove();
+        }
+        node = next;
+      }
+
+      details.appendChild(summary);
+      details.appendChild(body);
+      accordion.appendChild(details);
+    });
+  });
+</script>
 
 ## Version 1.3.1
 

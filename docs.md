@@ -2,7 +2,7 @@
 layout: default
 title: Docs
 heading: 文檔
-nav_title: Docs
+nav_title: Docs 文檔
 nav_order: 2
 description: Historical docs for OpenCC.
 ---

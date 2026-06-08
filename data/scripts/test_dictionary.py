@@ -6,7 +6,7 @@ import os
 import unittest
 from functools import cached_property
 
-from common import Table, SmpTable
+from common import Table, CjkCompTable, SmpTable
 
 root_dir = os.path.normpath(os.path.join(__file__, "..", ".."))
 dict_dir = os.path.join(root_dir, "dictionary")
@@ -15,6 +15,11 @@ scheme_dir = os.path.join(root_dir, "scheme")
 
 class TestDictionaries(unittest.TestCase):
     @cached_property
+    def cjk_comp_table(cls):
+        scheme_file = os.path.join(scheme_dir, "CJKCompatibilityIdeographs.txt")
+        return CjkCompTable.from_file(scheme_file)
+
+    @cached_property
     def smp_table(cls):
         scheme_file = os.path.join(scheme_dir, "AllowedSmpChars.txt")
         return SmpTable.from_file(scheme_file)
@@ -22,7 +27,6 @@ class TestDictionaries(unittest.TestCase):
     def test_sorted(self):
         """Validate that dictionaries are sorted."""
         excluded_dicts = (
-            "CJK_Compatibility_Ideographs",
             "TSCharactersBase.txt",
             "TSCharactersExt.txt",
             "TSPhrasesBase.txt",
@@ -45,19 +49,11 @@ class TestDictionaries(unittest.TestCase):
         Compatibility Ideographs.
         """
         excluded_dicts = (
-            "CJK_Compatibility_Ideographs",
             "TSCharactersBase",
             "TSCharactersExt",
             "TSPhrasesBase",
             "TSPhrasesExt",
         )
-        comp_file = os.path.join(dict_dir, "CJK_Compatibility_Ideographs.txt")
-
-        comp_map = {}
-        for entry in Table().iter(comp_file):
-            if entry:
-                comp_map[entry.key] = entry[0]
-        self.assertEqual(len(comp_map), 1002)
 
         for file in glob.iglob(os.path.join(glob.escape(dict_dir), "*.txt")):
             basename, _ = os.path.splitext(os.path.basename(file))
@@ -65,33 +61,36 @@ class TestDictionaries(unittest.TestCase):
                 continue
 
             with self.subTest(name=basename):
-                for i, line in enumerate(Table()._iter(file)):
-                    for char in line:
-                        cp = ord(char)
-                        if not ((0xF900 <= cp <= 0xFAFF) or (0x2F800 <= cp <= 0x2FA1F)):
-                            continue
+                for entry in Table().iter(file):
+                    for value in entry:
+                        for char in value:
+                            cp = ord(char)
+                            comp_entry = self.cjk_comp_table.get(cp)
+                            if not comp_entry:
+                                continue
 
-                        message = (
-                            f"{basename}:{i + 1} contains CJK Compatibility Ideograph U+{cp:04X}. "
-                        )
+                            line = entry.line
 
-                        if char in comp_map:
-                            rep_char = comp_map[char]
-                            message += f"Replace it with {rep_char} U+{ord(rep_char):04X}."
-                        else:
-                            message += (
-                                "No UnicodeData decomposition mapping is available; "
-                                "replace it manually with the standard CJK unified ideograph form."
+                            message = (
+                                f"{basename}:{line} contains CJK Compatibility Ideograph U+{cp:04X}. "
                             )
 
-                        self.fail(message)
+                            rep_cp = comp_entry["std"]
+                            if rep_cp:
+                                message += f"Replace it with {chr(rep_cp)} U+{rep_cp:04X}."
+                            else:
+                                message += (
+                                    "No UnicodeData decomposition mapping is available; "
+                                    "replace it manually with the standard CJK unified ideograph form."
+                                )
+
+                            self.fail(message)
 
     def test_non_bmp(self):
         """
         Validate non-BMP characters in phrase and variant dictionaries.
         """
         excluded_dicts = (
-            "CJK_Compatibility_Ideographs",
             "TSCharacters",
             "TSCharactersBase",
             "TSCharactersExt",

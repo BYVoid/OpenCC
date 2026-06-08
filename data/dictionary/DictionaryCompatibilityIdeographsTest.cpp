@@ -13,7 +13,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
-#include <unordered_set>
+#include <unordered_map>
 #include <vector>
 
 #include "src/UTF8Util.hpp"
@@ -74,12 +74,17 @@ std::string FormatCodePoint(uint32_t codePoint) {
   return buffer;
 }
 
-std::unordered_set<std::string> LoadCompatibilityIdeographs(
+bool IsCjkCompatibilityIdeograph(uint32_t codePoint) {
+  return (codePoint >= 0xF900 && codePoint <= 0xFAFF) ||
+         (codePoint >= 0x2F800 && codePoint <= 0x2FA1F);
+}
+
+std::unordered_map<std::string, std::string> LoadCompatibilityMappings(
     const std::string& path) {
   std::ifstream stream(UTF8Util::GetPlatformString(path));
   EXPECT_TRUE(stream.is_open()) << path;
 
-  std::unordered_set<std::string> compatibilityIdeographs;
+  std::unordered_map<std::string, std::string> compatibilityMappings;
   std::string line;
   size_t lineNumber = 0;
   while (std::getline(stream, line)) {
@@ -93,14 +98,15 @@ std::unordered_set<std::string> LoadCompatibilityIdeographs(
                     << " is missing a tab separator.";
       continue;
     }
-    compatibilityIdeographs.insert(line.substr(0, tab));
+    compatibilityMappings.emplace(line.substr(0, tab), line.substr(tab + 1));
   }
-  return compatibilityIdeographs;
+  return compatibilityMappings;
 }
 
 void ExpectNoCompatibilityIdeographs(
     const std::string& dictionaryName, const std::string& path,
-    const std::unordered_set<std::string>& compatibilityIdeographs) {
+    const std::unordered_map<std::string, std::string>&
+        compatibilityMappings) {
   std::ifstream stream(UTF8Util::GetPlatformString(path));
   ASSERT_TRUE(stream.is_open()) << path;
 
@@ -114,13 +120,26 @@ void ExpectNoCompatibilityIdeographs(
 
     for (const char* cursor = line.c_str(); *cursor != '\0';) {
       const size_t length = UTF8Util::NextCharLength(cursor);
-      const std::string character = UTF8Util::FromSubstr(cursor, length);
-      if (compatibilityIdeographs.count(character) != 0) {
-        const uint32_t codePoint = DecodeUtf8CodePoint(cursor, length);
-        ADD_FAILURE() << dictionaryName << ":" << lineNumber
-                      << " contains CJK Compatibility Ideograph "
-                      << FormatCodePoint(codePoint) << ". Use the standard "
-                      << "CJK unified ideograph form instead.";
+      const uint32_t codePoint = DecodeUtf8CodePoint(cursor, length);
+      if (IsCjkCompatibilityIdeograph(codePoint)) {
+        const std::string character = UTF8Util::FromSubstr(cursor, length);
+        std::ostringstream message;
+        message << dictionaryName << ":" << lineNumber
+                << " contains CJK Compatibility Ideograph "
+                << FormatCodePoint(codePoint) << ". ";
+        const auto mapping = compatibilityMappings.find(character);
+        if (mapping == compatibilityMappings.end()) {
+          message << "No UnicodeData decomposition mapping is available; "
+                     "replace it manually with the standard CJK unified "
+                     "ideograph form.";
+        } else {
+          message << "Replace it with " << mapping->second << " "
+                  << FormatCodePoint(DecodeUtf8CodePoint(
+                         mapping->second.c_str(),
+                         UTF8Util::NextCharLength(mapping->second.c_str())))
+                  << ".";
+        }
+        ADD_FAILURE() << message.str();
       }
       cursor += length;
     }
@@ -135,16 +154,16 @@ TEST(DictionaryCompatibilityIdeographsTest,
   const std::string dictionaryDir = "_main/data/dictionary/";
   const std::string compatibilityPath = runfiles->Rlocation(
       dictionaryDir + "CJK_Compatibility_Ideographs.txt");
-  const std::unordered_set<std::string> compatibilityIdeographs =
-      LoadCompatibilityIdeographs(compatibilityPath);
-  ASSERT_EQ(1002, compatibilityIdeographs.size());
+  const std::unordered_map<std::string, std::string> compatibilityMappings =
+      LoadCompatibilityMappings(compatibilityPath);
+  ASSERT_EQ(1002, compatibilityMappings.size());
 
   for (const std::string& dictionaryName :
        SplitCommaSeparated(OPENCC_COMPATIBILITY_AUDIT_FILES)) {
     const std::string dictionaryPath =
         runfiles->Rlocation(dictionaryDir + dictionaryName);
     ExpectNoCompatibilityIdeographs(dictionaryName, dictionaryPath,
-                                    compatibilityIdeographs);
+                                    compatibilityMappings);
   }
 }
 

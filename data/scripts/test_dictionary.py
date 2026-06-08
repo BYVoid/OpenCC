@@ -207,38 +207,48 @@ class TestDictionaries(unittest.TestCase):
         st_characters_file = os.path.join(dict_dir, "STCharacters.txt")
         st_phrases_file = os.path.join(dict_dir, "STPhrases.txt")
 
+        reports = []
         for dict_name in dict_names:
-            with self.subTest(name=dict_name):
-                phrases_file_name = f"{dict_name}RevPhrases"
+            phrases_file_name = f"{dict_name}RevPhrases"
 
-                variants_file = os.path.join(dict_dir, f"{dict_name}.txt")
-                phrases_file = os.path.join(dict_dir, f"{phrases_file_name}.txt")
+            variants_file = os.path.join(dict_dir, f"{dict_name}.txt")
+            phrases_file = os.path.join(dict_dir, f"{phrases_file_name}.txt")
 
-                variant_sets = [e for e in Table().iter(st_characters_file) if len(e) > 1]
+            variant_sets = [e for e in Table().iter(st_characters_file) if len(e) > 1]
 
-                exception_chars = set()
-                for entry in Table().iter(variants_file):
-                    key = entry.key
-                    for v in entry:
-                        if key != v and any(key in v_set and v in v_set for v_set in variant_sets):
-                            exception_chars.add(v)
+            exception_chars = set()
+            for entry in Table().iter(variants_file):
+                key = entry.key
+                for v in entry:
+                    if key != v and any(key in v_set and v in v_set for v_set in variant_sets):
+                        exception_chars.add(v)
 
-                expected_phrases = set()
-                for values in Table().iter(st_phrases_file):
-                    if values and len(values[0]) >= 2 and any(c in exception_chars for c in values[0]):
-                        expected_phrases.add(values[0])
+            expected_phrases = set()
+            for values in Table().iter(st_phrases_file):
+                if values and len(values[0]) >= 2 and any(c in exception_chars for c in values[0]):
+                    expected_phrases.add(values[0])
 
-                identity_keys = {
-                    entry.key for entry in Table().iter(phrases_file)
-                    if entry.key in entry
-                }
+            identity_keys = {
+                entry.key for entry in Table().iter(phrases_file)
+                if entry.key in entry
+            }
 
-                missing_phrases = [p for p in expected_phrases if p not in identity_keys]
-                if missing_phrases:
-                    self.fail(
-                        f"{phrases_file_name} missing reverse phrase identity exceptions:\n" +
-                        "\n".join(missing_phrases)
-                    )
+            missing_phrases = [p for p in expected_phrases if p not in identity_keys]
+            if missing_phrases:
+                reports.append(
+                    f"{phrases_file_name}:\n" + "\n".join(missing_phrases)
+                )
+
+        if reports:
+            self.fail(
+                "Reverse phrase identity exceptions validation failed.\n\n"
+                "When a variant file declares an asymmetric mapping (e.g., 纔 -> 才) "
+                "for characters in the same ST variant set (e.g., 才 -> 才 纔), "
+                "every corresponding output phrase in STPhrases (e.g., 专才 -> 專才) "
+                "should be explicitly declared as an identity mapping (i.e., 專才 -> 專才) "
+                "in the VariantRevPhrases file to prevent a bad reverse conversion "
+                "(i.e., 專才 -> 專纔).\n\n" + "\n\n".join(reports)
+            )
 
     def test_phrases_reverse_mapping(self):
         """

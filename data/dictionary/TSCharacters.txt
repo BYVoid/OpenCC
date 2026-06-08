@@ -524,6 +524,7 @@
 呂	吕
 咼	呙
 員	员
+哩	哩 里
 # @tofu-risk: not covered by PingFang/Source Han baseline: 𠯟 U+20BDF
 哯	哯 𠯟
 唄	呗

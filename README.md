@@ -223,9 +223,7 @@ Rules:
 * `s2tw.json` **Simplified Chinese** to **Traditional Chinese (Taiwan Standard)** / **簡體** 到 **台灣正體**
 * `tw2s.json` **Traditional Chinese (Taiwan Standard)** to **Simplified Chinese** / **台灣正體** 到 **簡體**
 * `s2hk.json` **Simplified Chinese** to **Traditional Chinese (Hong Kong variant)** / **簡體** 到 **香港繁體**
-* `s2hkp.json` **Simplified Chinese** to **Traditional Chinese (Hong Kong variant, with Hong Kong Phrases)** / **簡體** 到 **香港繁體（香港常用詞彙）**
 * `hk2s.json` **Traditional Chinese (Hong Kong variant)** to **Simplified Chinese** / **香港繁體** 到 **簡體**
-* `hk2sp.json` **Traditional Chinese (Hong Kong variant)** to **Simplified Chinese (Mainland China Phrases)** / **香港繁體** 到 **簡體（含中國大陸常用詞彙）**
 * `s2twp.json` **Simplified Chinese** to **Traditional Chinese (Taiwan Standard, with Taiwan Phrases)** / **簡體** 到 **台灣正體（含台灣常用詞彙）**
 * `tw2sp.json` **Traditional Chinese (Taiwan Standard)** to **Simplified Chinese (Mainland China Phrases)** / **台灣正體** 到 **簡體（含中國大陸常用詞彙）**
 * `t2tw.json` **Traditional Chinese (OpenCC Standard)** to **Traditional Chinese (Taiwan Standard)** / **OpenCC 標準繁體** 到 **台灣正體**
@@ -234,6 +232,11 @@ Rules:
 * `hk2t.json` **Traditional Chinese (Hong Kong variant)** to **Traditional Chinese (OpenCC Standard)** / **香港繁體** 到 **OpenCC 標準繁體**
 * `t2jp.json` **Traditional Chinese Characters (Kyūjitai)** to **New Japanese Kanji (Shinjitai)** / **OpenCC 標準繁體（日文舊字體）** 到 **日文新字體**
 * `jp2t.json` **New Japanese Kanji (Shinjitai)** to **Traditional Chinese Characters (Kyūjitai)** / **日文新字體** 到 **OpenCC 標準繁體（日文舊字體）**
+
+下列配置文件仍在開發中，歡迎貢獻新詞組：
+
+* `s2hkp.json` **Simplified Chinese** to **Traditional Chinese (Hong Kong variant, with Hong Kong Phrases)** / **簡體** 到 **香港繁體（香港常用詞彙）**
+* `hk2sp.json` **Traditional Chinese (Hong Kong variant)** to **Simplified Chinese (Mainland China Phrases)** / **香港繁體** 到 **簡體（含中國大陸常用詞彙）**
 
 #### 指定配置文件
 

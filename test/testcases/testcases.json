@@ -1293,6 +1293,34 @@
       "expected": {
         "s2t": "拉揸麪"
       }
+    },
+    {
+      "id": "case_157",
+      "input": "杂烩面",
+      "expected": {
+        "s2t": "雜燴麪"
+      }
+    },
+    {
+      "id": "case_158",
+      "input": "拉杂面",
+      "expected": {
+        "s2t": "拉雜麪"
+      }
+    },
+    {
+      "id": "case_159",
+      "input": "嗱喳面",
+      "expected": {
+        "s2t": "嗱喳麪"
+      }
+    },
+    {
+      "id": "case_160",
+      "input": "强棒面",
+      "expected": {
+        "s2t": "強棒麪"
+      }
     }
   ]
 }

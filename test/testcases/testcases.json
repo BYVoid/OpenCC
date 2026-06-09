@@ -1209,6 +1209,69 @@
       "expected": {
         "s2t": "肥腸麪"
       }
+    },
+    {
+      "id": "case_145",
+      "input": "炒码面",
+      "expected": {
+        "s2t": "炒碼麪"
+      }
+    },
+    {
+      "id": "case_146",
+      "input": "牛腩面",
+      "expected": {
+        "s2t": "牛腩麪"
+      }
+    },
+    {
+      "id": "case_147",
+      "input": "牛筋面",
+      "expected": {
+        "s2t": "牛筋麪"
+      }
+    },
+    {
+      "id": "case_148",
+      "input": "三鲜面",
+      "expected": {
+        "s2t": "三鮮麪"
+      }
+    },
+    {
+      "id": "case_149",
+      "input": "番茄面",
+      "expected": {
+        "s2t": "番茄麪"
+      }
+    },
+    {
+      "id": "case_150",
+      "input": "羊肉面",
+      "expected": {
+        "s2t": "羊肉麪"
+      }
+    },
+    {
+      "id": "case_151",
+      "input": "猪肉面",
+      "expected": {
+        "s2t": "豬肉麪"
+      }
+    },
+    {
+      "id": "case_152",
+      "input": "卤肉面",
+      "expected": {
+        "s2t": "滷肉麪"
+      }
+    },
+    {
+      "id": "case_153",
+      "input": "鲁肉面",
+      "expected": {
+        "s2t": "魯肉麪"
+      }
     }
   ]
 }

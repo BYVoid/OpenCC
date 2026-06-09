@@ -1342,6 +1342,209 @@
       "expected": {
         "s2t": "油醬麪"
       }
+    },
+    {
+      "id": "case_164",
+      "input": "干炒牛河",
+      "expected": {
+        "s2t": "乾炒牛河"
+      }
+    },
+    {
+      "id": "case_165",
+      "input": "干拌饭",
+      "expected": {
+        "s2t": "乾拌飯"
+      }
+    },
+    {
+      "id": "case_166",
+      "input": "干拌面",
+      "expected": {
+        "s2t": "乾拌麪"
+      }
+    },
+    {
+      "id": "case_167",
+      "input": "干捞面",
+      "expected": {
+        "s2t": "乾撈麪"
+      }
+    },
+    {
+      "id": "case_168",
+      "input": "焖面",
+      "expected": {
+        "s2t": "燜麪"
+      }
+    },
+    {
+      "id": "case_169",
+      "input": "焗面",
+      "expected": {
+        "s2t": "焗麪"
+      }
+    },
+    {
+      "id": "case_170",
+      "input": "焗猪扒面",
+      "expected": {
+        "s2t": "焗豬扒麪"
+      }
+    },
+    {
+      "id": "case_171",
+      "input": "猫耳面",
+      "expected": {
+        "s2t": "貓耳麪"
+      }
+    },
+    {
+      "id": "case_172",
+      "input": "削筋面",
+      "expected": {
+        "s2t": "削筋麪"
+      }
+    },
+    {
+      "id": "case_173",
+      "input": "浆水面",
+      "expected": {
+        "s2t": "漿水麪"
+      }
+    },
+    {
+      "id": "case_174",
+      "input": "拨鱼面",
+      "expected": {
+        "s2t": "撥魚麪"
+      }
+    },
+    {
+      "id": "case_175",
+      "input": "刀拨面",
+      "expected": {
+        "s2t": "刀撥麪"
+      }
+    },
+    {
+      "id": "case_176",
+      "input": "银丝面",
+      "expected": {
+        "s2t": "銀絲麪"
+      }
+    },
+    {
+      "id": "case_177",
+      "input": "菠菜面",
+      "expected": {
+        "s2t": "菠菜麪"
+      }
+    },
+    {
+      "id": "case_178",
+      "input": "黄鱼面",
+      "expected": {
+        "s2t": "黃魚麪"
+      }
+    },
+    {
+      "id": "case_179",
+      "input": "大肠面",
+      "expected": {
+        "s2t": "大腸麪"
+      }
+    },
+    {
+      "id": "case_180",
+      "input": "焖肉面",
+      "expected": {
+        "s2t": "燜肉麪"
+      }
+    },
+    {
+      "id": "case_181",
+      "input": "大排面",
+      "expected": {
+        "s2t": "大排麪"
+      }
+    },
+    {
+      "id": "case_182",
+      "input": "腰花面",
+      "expected": {
+        "s2t": "腰花麪"
+      }
+    },
+    {
+      "id": "case_183",
+      "input": "咖喱面",
+      "expected": {
+        "s2t": "咖喱麪"
+      }
+    },
+    {
+      "id": "case_184",
+      "input": "麻辣面",
+      "expected": {
+        "s2t": "麻辣麪"
+      }
+    },
+    {
+      "id": "case_185",
+      "input": "酸辣面",
+      "expected": {
+        "s2t": "酸辣麪"
+      }
+    },
+    {
+      "id": "case_186",
+      "input": "火鸡面",
+      "expected": {
+        "s2t": "火雞麪"
+      }
+    },
+    {
+      "id": "case_187",
+      "input": "锅烧面",
+      "expected": {
+        "s2t": "鍋燒麪"
+      }
+    },
+    {
+      "id": "case_188",
+      "input": "切仔面",
+      "expected": {
+        "s2t": "切仔麪"
+      }
+    },
+    {
+      "id": "case_189",
+      "input": "卤味面",
+      "expected": {
+        "s2t": "滷味麪"
+      }
+    },
+    {
+      "id": "case_190",
+      "input": "炒鳝面",
+      "expected": {
+        "s2t": "炒鱔麪"
+      }
+    },
+    {
+      "id": "case_191",
+      "input": "沾面",
+      "expected": {
+        "s2t": "沾麪"
+      }
+    },
+    {
+      "id": "case_192",
+      "input": "手工面",
+      "expected": {
+        "s2t": "手工麪"
+      }
     }
   ]
 }

@@ -1130,6 +1130,13 @@
       }
     },
     {
+      "id": "BYVoid_OpenCC_PR_1295",
+      "input": "耳机里漏出很多声音",
+      "expected": {
+        "s2t": "耳機裏漏出很多聲音"
+      }
+    },
+    {
       "id": "BYVoid_OpenCC_Issue_1288_acyl_group",
       "input": "异烟碱酰酸",
       "expected": {

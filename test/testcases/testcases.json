@@ -1163,6 +1163,15 @@
       }
     },
     {
+      "id": "chongqing_small_area_exception",
+      "input": "重庆小面积商铺",
+      "expected": {
+        "s2t": "重慶小面積商鋪",
+        "s2tw": "重慶小面積商鋪",
+        "s2twp": "重慶小面積商鋪"
+      }
+    },
+    {
       "id": "BYVoid_OpenCC_Issue_506",
       "input": "几率 機率 機會率 概率",
       "expected": {

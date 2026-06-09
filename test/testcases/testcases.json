@@ -1321,6 +1321,27 @@
       "expected": {
         "s2t": "強棒麪"
       }
+    },
+    {
+      "id": "case_161",
+      "input": "酱面",
+      "expected": {
+        "s2t": "醬麪"
+      }
+    },
+    {
+      "id": "case_162",
+      "input": "葱油面",
+      "expected": {
+        "s2t": "蔥油麪"
+      }
+    },
+    {
+      "id": "case_163",
+      "input": "油酱面",
+      "expected": {
+        "s2t": "油醬麪"
+      }
     }
   ]
 }

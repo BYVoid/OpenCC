@@ -22,9 +22,15 @@ def test_init_delete_converter():
 
 def test_conversion():
     import opencc
+    import re
 
     with open(_testcases_path, 'r', encoding='utf-8') as f:
-        parsed = json.load(f)
+        content = f.read()
+    
+    # Strip comments and trailing commas
+    pattern = re.compile(r'"(?:[^"\\]|\\.)*"|(/\*[\s\S]*?\*/|//.*)|(,\s*(?=[\]}]))')
+    clean_content = pattern.sub(lambda m: "" if (m.group(1) or m.group(2)) else m.group(0), content)
+    parsed = json.loads(clean_content)
 
     for case in parsed.get('cases', []):
         input_text = case.get('input')

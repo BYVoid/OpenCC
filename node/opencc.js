@@ -231,7 +231,7 @@ const OpenCC = module.exports = function (config, options) {
   // patched JSON string directly to the C++ layer via NewFromString.
   const jiebaConfigPath = resolveJiebaConfigPath(config, jiebaInfo);
   if (jiebaConfigPath) {
-    const raw = JSON.parse(fs.readFileSync(jiebaConfigPath, 'utf-8'));
+    const raw = parseJSON(fs.readFileSync(jiebaConfigPath, 'utf-8'));
     filterTofuRiskConversionChain(raw, includeTofuRiskDictionaries);
     patchConfigPaths(raw, jiebaInfo, assetsPath);
     this.handler = new binding.Opencc(
@@ -243,7 +243,7 @@ const OpenCC = module.exports = function (config, options) {
 
   config = getConfigPath(config);
   if (!includeTofuRiskDictionaries) {
-    const raw = JSON.parse(fs.readFileSync(config, 'utf-8'));
+    const raw = parseJSON(fs.readFileSync(config, 'utf-8'));
     filterTofuRiskConversionChain(raw, includeTofuRiskDictionaries);
     const configDir = path.dirname(config);
     if (raw.segmentation && raw.segmentation.dict) {
@@ -263,8 +263,14 @@ const OpenCC = module.exports = function (config, options) {
   this.handler = new binding.Opencc(config);
 };
 
+function parseJSON(str) {
+  const cleanStr = str.replace(/"(?:[^"\\]|\\.)*"|(\/\/.*|\/\*[\s\S]*?\*\/)|(,\s*(?=[\]}]))/g, (m, g1, g2) => (g1 || g2) ? "" : m);
+  return JSON.parse(cleanStr);
+}
+
 // This is to support both CommonJS and ES module.
 OpenCC.OpenCC = OpenCC;
+OpenCC._parseJSON = parseJSON;
 
 /**
  * The version of OpenCC library.

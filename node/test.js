@@ -9,7 +9,9 @@ const util = require('util');
 const OpenCC = require('./opencc');
 const { prepareArtifacts } = require('../scripts/prepare-node-prebuild-artifacts');
 
-const cases = JSON.parse(fs.readFileSync('test/testcases/testcases.json', 'utf-8')).cases || [];
+const parseJSON = OpenCC._parseJSON;
+
+const cases = parseJSON(fs.readFileSync('test/testcases/testcases.json', 'utf-8')).cases || [];
 
 function createLocalInstalledShape() {
   const rootDir = path.resolve(__dirname, '..');
@@ -71,6 +73,43 @@ describe('API compatibility', function () {
   it('includes tofu-risk dictionaries by default', function () {
     const opencc = new OpenCC('t2s.json');
     assert.equal(opencc.convertSync('㑮'), '𫝈');
+  });
+
+  it('supports JSONC (JSON with comments and trailing commas) configuration files', function () {
+    const tempConfigPath = path.join(os.tmpdir(), 'test_comment_config.json');
+    fs.writeFileSync(tempConfigPath, `
+      // This is a single line comment
+      {
+        "name": "Test Config", /* This is a multi-line
+        comment */
+        "segmentation": {
+          "type": "mmseg",
+          "dict": {
+            "type": "inline",
+            "entries": {},
+          },
+        },
+        "conversion_chain": [{
+          "dict": {
+            "type": "inline",
+            "entries": {
+              "A": "B",
+            },
+          },
+        }],
+      }
+    `);
+    try {
+      const opencc = new OpenCC(tempConfigPath, { includeTofuRiskDictionaries: false });
+      assert.equal(opencc.convertSync('A'), 'B');
+
+      const openccWithTofu = new OpenCC(tempConfigPath, { includeTofuRiskDictionaries: true });
+      assert.equal(openccWithTofu.convertSync('A'), 'B');
+    } finally {
+      if (fs.existsSync(tempConfigPath)) {
+        fs.unlinkSync(tempConfigPath);
+      }
+    }
   });
 });
 

@@ -362,7 +362,8 @@ protected:
     buffer << ifs.rdbuf();
     rapidjson::Document doc;
     std::string content = buffer.str();
-    doc.Parse(content.c_str());
+    doc.Parse<rapidjson::kParseCommentsFlag |
+              rapidjson::kParseTrailingCommasFlag>(content.c_str());
     if (doc.HasParseError() || !doc.IsObject() || !doc.HasMember("cases")) {
       throw std::runtime_error("Invalid testcase format");
     }

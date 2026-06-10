@@ -27,9 +27,9 @@ def test_conversion():
     with open(_testcases_path, 'r', encoding='utf-8') as f:
         content = f.read()
     
-    # Strip comments (single-line // and multi-line /* */)
-    pattern = re.compile(r'"(?:[^"\\]|\\.)*"|(/\*[\s\S]*?\*/|//.*)')
-    clean_content = pattern.sub(lambda m: "" if m.group(1) else m.group(0), content)
+    # Strip comments and trailing commas
+    pattern = re.compile(r'"(?:[^"\\]|\\.)*"|(/\*[\s\S]*?\*/|//.*)|(,\s*(?=[\]}]))')
+    clean_content = pattern.sub(lambda m: "" if (m.group(1) or m.group(2)) else m.group(0), content)
     parsed = json.loads(clean_content)
 
     for case in parsed.get('cases', []):

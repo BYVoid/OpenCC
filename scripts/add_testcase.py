@@ -118,9 +118,9 @@ def load_testcases(path: Path) -> dict:
     import re
     with path.open(encoding="utf-8") as stream:
         content = stream.read()
-    # Strip comments (single-line // and multi-line /* */)
-    pattern = re.compile(r'"(?:[^"\\]|\\.)*"|(/\*[\s\S]*?\*/|//.*)')
-    clean_content = pattern.sub(lambda m: "" if m.group(1) else m.group(0), content)
+    # Strip comments and trailing commas
+    pattern = re.compile(r'"(?:[^"\\]|\\.)*"|(/\*[\s\S]*?\*/|//.*)|(,\s*(?=[\]}]))')
+    clean_content = pattern.sub(lambda m: "" if (m.group(1) or m.group(2)) else m.group(0), content)
     return json.loads(clean_content)
 
 

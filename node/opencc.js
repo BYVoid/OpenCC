@@ -264,12 +264,15 @@ const OpenCC = module.exports = function (config, options) {
 };
 
 function parseJSON(str) {
-  const cleanStr = str.replace(/"(?:[^"\\]|\\.)*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (m, g) => g ? "" : m);
+  const cleanStr = str.replace(/"(?:[^"\\]|\\.)*"|(\/\/.*|\/\*[\s\S]*?\*\/)|(,\s*(?=[\]}]))/g, (m, g1, g2) => (g1 || g2) ? "" : m);
   return JSON.parse(cleanStr);
 }
 
 // This is to support both CommonJS and ES module.
 OpenCC.OpenCC = OpenCC;
+OpenCC._parseJSON = parseJSON;
+
+module.exports = OpenCC;
 
 /**
  * The version of OpenCC library.

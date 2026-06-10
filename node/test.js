@@ -9,10 +9,7 @@ const util = require('util');
 const OpenCC = require('./opencc');
 const { prepareArtifacts } = require('../scripts/prepare-node-prebuild-artifacts');
 
-function parseJSON(str) {
-  const cleanStr = str.replace(/"(?:[^"\\]|\\.)*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (m, g) => g ? "" : m);
-  return JSON.parse(cleanStr);
-}
+const parseJSON = OpenCC._parseJSON;
 
 const cases = parseJSON(fs.readFileSync('test/testcases/testcases.json', 'utf-8')).cases || [];
 
@@ -78,7 +75,7 @@ describe('API compatibility', function () {
     assert.equal(opencc.convertSync('㑮'), '𫝈');
   });
 
-  it('supports JSONC (JSON with comments) configuration files', function () {
+  it('supports JSONC (JSON with comments and trailing commas) configuration files', function () {
     const tempConfigPath = path.join(os.tmpdir(), 'test_comment_config.json');
     fs.writeFileSync(tempConfigPath, `
       // This is a single line comment
@@ -89,17 +86,17 @@ describe('API compatibility', function () {
           "type": "mmseg",
           "dict": {
             "type": "inline",
-            "entries": {}
-          }
+            "entries": {},
+          },
         },
         "conversion_chain": [{
           "dict": {
             "type": "inline",
             "entries": {
-              "A": "B"
-            }
-          }
-        }]
+              "A": "B",
+            },
+          },
+        }],
       }
     `);
     try {

@@ -230,13 +230,16 @@ Rules:
 * `tw2t.json` **Traditional Chinese (Taiwan Standard)** to **Traditional Chinese (OpenCC Standard)** / **台灣正體** 到 **OpenCC 標準繁體**
 * `t2hk.json` **Traditional Chinese (OpenCC Standard)** to **Traditional Chinese (Hong Kong variant)** / **OpenCC 標準繁體** 到 **香港繁體**
 * `hk2t.json` **Traditional Chinese (Hong Kong variant)** to **Traditional Chinese (OpenCC Standard)** / **香港繁體** 到 **OpenCC 標準繁體**
-* `t2jp.json` **Traditional Chinese Characters (Kyūjitai)** to **New Japanese Kanji (Shinjitai)** / **OpenCC 標準繁體（日文舊字體）** 到 **日文新字體**
-* `jp2t.json` **New Japanese Kanji (Shinjitai)** to **Traditional Chinese Characters (Kyūjitai)** / **日文新字體** 到 **OpenCC 標準繁體（日文舊字體）**
 
 下列配置文件仍在開發中，歡迎貢獻新詞組：
 
 * `s2hkp.json` **Simplified Chinese** to **Traditional Chinese (Hong Kong variant, with Hong Kong Phrases)** / **簡體** 到 **香港繁體（香港常用詞彙）**
 * `hk2sp.json` **Traditional Chinese (Hong Kong variant)** to **Simplified Chinese (Mainland China Phrases)** / **香港繁體** 到 **簡體（含中國大陸常用詞彙）**
+
+下列配置文件僅供探索性研究，不建議用於生產環境：
+
+* `t2jp.json` **Old Japanese Kanji (Kyūjitai)** to **New Japanese Kanji (Shinjitai)** / **日文舊字體** 到 **日文新字體**
+* `jp2t.json` **New Japanese Kanji (Shinjitai)** to **Old Japanese Kanji (Kyūjitai)** / **日文新字體** 到 **日文舊字體**，並將少量日文詞組轉換爲對應中文
 
 #### 指定配置文件
 

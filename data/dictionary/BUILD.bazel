@@ -12,7 +12,7 @@ package(default_visibility = ["//visibility:public"])
     for txt in [
         "TWVariants",
         "HKVariants",
-        "JPVariants",
+        "JPShinjitaiCharacters",
     ]
 ]
 
@@ -32,7 +32,7 @@ TEXT_DICTS = glob(
     "TSCharactersExt.txt",
     "TWVariantsRev.txt",
     "HKVariantsRev.txt",
-    "JPVariantsRev.txt",
+    "JPShinjitaiCharactersRev.txt",
 ]
 
 NON_BMP_TEXT_DICTS = [

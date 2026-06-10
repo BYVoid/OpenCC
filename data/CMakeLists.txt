@@ -22,7 +22,6 @@ set(
   HKVariantsRevPhrases
   HKPhrases
   HKPhrasesRev
-  JPVariants
   JPShinjitaiCharacters
   JPShinjitaiPhrases
 )
@@ -32,7 +31,7 @@ set(
   TSCharactersExt
   TWVariantsRev
   HKVariantsRev
-  JPVariantsRev
+  JPShinjitaiCharactersRev
 )
 
 set(DICTS ${DICTS_RAW} ${DICTS_GENERATED})
@@ -84,12 +83,12 @@ set(
 )
 
 set(
-  DICT_JPVariantsRev_GENERATING_INPUT
-  ${DICT_DIR}/JPVariants.txt
+  DICT_JPShinjitaiCharactersRev_GENERATING_INPUT
+  ${DICT_DIR}/JPShinjitaiCharacters.txt
 )
 set(
-  DICT_JPVariantsRev_GENERATING_COMMAND
-  ${DICT_REVERSE_BIN} ${DICT_JPVariantsRev_GENERATING_INPUT} JPVariantsRev.txt
+  DICT_JPShinjitaiCharactersRev_GENERATING_COMMAND
+  ${DICT_REVERSE_BIN} ${DICT_JPShinjitaiCharactersRev_GENERATING_INPUT} JPShinjitaiCharactersRev.txt
 )
 
 foreach(DICT ${DICTS_GENERATED})

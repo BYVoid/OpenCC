@@ -42,10 +42,9 @@ OpenCC 以 [Apache License 2.0](LICENSE) 釋出。提交 Pull Request、issue/co
   - `HKVariantsPhrases.txt` - 轉入香港字形（如 `s2hk`、`t2hk`）時使用的香港異體字詞組例外
   - `HKVariantsRevPhrases.txt` - 從香港字形轉出（如 `hk2s`、`hk2t`）時使用的香港異體字詞組例外
 
-- **日文新舊字形**
-  - `JPShinjitaiCharacters.txt` - 日文新字體（單字）
-  - `JPShinjitaiPhrases.txt` - 日文新字體（詞組）
-  - `JPVariants.txt` - 日文異體字
+- **日文新舊字形**（僅供探索性研究，不建議用於生產環境）
+  - `JPShinjitaiCharacters.txt` - 日文新舊字體對照（單字）
+  - `JPShinjitaiPhrases.txt` - 日文新字體到舊字體（詞組，亦包含少量和製漢語詞匯轉換）
 
 ### 2. 詞典格式規範
 
@@ -315,6 +314,12 @@ python3 scripts/add_testcase.py \
 - `t2s` - OpenCC 標準繁體到簡體
 - `t2tw` - OpenCC 標準繁體到臺灣正體
 - `t2hk` - OpenCC 標準繁體到香港繁體
+
+下列模式目前缺少大量詞組，歡迎貢獻新詞組：
+- `s2hkp` - 簡體到香港繁體（含地域用詞轉換）
+- `hk2sp` - 香港繁體到簡體（含地域用詞轉換）
+
+下列模式僅供探索性研究，不建議用於生產環境：
 - `jp2t` - 日文新字體到舊字體
 - `t2jp` - 日文舊字體到新字體
 

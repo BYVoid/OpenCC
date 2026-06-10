@@ -272,8 +272,6 @@ function parseJSON(str) {
 OpenCC.OpenCC = OpenCC;
 OpenCC._parseJSON = parseJSON;
 
-module.exports = OpenCC;
-
 /**
  * The version of OpenCC library.
  *

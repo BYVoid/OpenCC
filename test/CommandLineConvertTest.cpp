@@ -292,7 +292,8 @@ CasesByConfig LoadCases(const std::string& jsonPath) {
   }
 
   rapidjson::Document doc;
-  doc.Parse(content.c_str());
+  doc.Parse<rapidjson::kParseCommentsFlag |
+            rapidjson::kParseTrailingCommasFlag>(content.c_str());
   if (doc.HasParseError() || !doc.IsObject() || !doc.HasMember("cases") ||
       !doc["cases"].IsArray()) {
     throw std::runtime_error("Invalid testcases.json format");

@@ -88,7 +88,8 @@ protected:
 TEST_F(ConfigDictValidationTest, ConvertExpectedOutputs) {
   const std::string json = ReadFile(testcasesPath_);
   rapidjson::Document doc;
-  doc.Parse(json.c_str());
+  doc.Parse<rapidjson::kParseCommentsFlag |
+            rapidjson::kParseTrailingCommasFlag>(json.c_str());
   ASSERT_FALSE(doc.HasParseError());
   ASSERT_TRUE(doc.IsObject());
   ASSERT_TRUE(doc.HasMember("cases"));

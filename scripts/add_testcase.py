@@ -115,8 +115,13 @@ def convert(opencc: Path, config: Path, dict_dir: Path, text: str) -> str:
 
 
 def load_testcases(path: Path) -> dict:
+    import re
     with path.open(encoding="utf-8") as stream:
-        return json.load(stream)
+        content = stream.read()
+    # Strip comments (single-line // and multi-line /* */)
+    pattern = re.compile(r'"(?:[^"\\]|\\.)*"|(/\*[\s\S]*?\*/|//.*)')
+    clean_content = pattern.sub(lambda m: "" if m.group(1) else m.group(0), content)
+    return json.loads(clean_content)
 
 
 def write_testcases(path: Path, data: dict) -> None:

@@ -9,7 +9,12 @@ const util = require('util');
 const OpenCC = require('./opencc');
 const { prepareArtifacts } = require('../scripts/prepare-node-prebuild-artifacts');
 
-const cases = JSON.parse(fs.readFileSync('test/testcases/testcases.json', 'utf-8')).cases || [];
+function parseJSON(str) {
+  const cleanStr = str.replace(/"(?:[^"\\]|\\.)*"|(\/\/.*|\/\*[\s\S]*?\*\/)/g, (m, g) => g ? "" : m);
+  return JSON.parse(cleanStr);
+}
+
+const cases = parseJSON(fs.readFileSync('test/testcases/testcases.json', 'utf-8')).cases || [];
 
 function createLocalInstalledShape() {
   const rootDir = path.resolve(__dirname, '..');

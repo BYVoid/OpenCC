@@ -1,16 +1,16 @@
 #ifndef CPPJIEBA_SEGMENTBASE_H
 #define CPPJIEBA_SEGMENTBASE_H
 
-#include "limonp/Logging.hpp"
-#include "PreFilter.hpp"
 #include <cassert>
+#include <unordered_set>
+#include "PreFilter.hpp"
+#include "Utils.hpp"
 
 
 namespace cppjieba {
 
 const char* const SPECIAL_SEPARATORS = " \t\n\xEF\xBC\x8C\xE3\x80\x82";
 
-using namespace limonp;
 
 class SegmentBase {
  public:
@@ -38,7 +38,7 @@ class SegmentBase {
     return true;
   }
  protected:
-  unordered_set<Rune> symbols_;
+  std::unordered_set<Rune> symbols_;
 }; // class SegmentBase
 
 } // cppjieba

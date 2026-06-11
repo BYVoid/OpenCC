@@ -9,7 +9,9 @@ const util = require('util');
 const OpenCC = require('./opencc');
 const { prepareArtifacts } = require('../scripts/prepare-node-prebuild-artifacts');
 
-const cases = JSON.parse(fs.readFileSync('test/testcases/testcases.json', 'utf-8')).cases || [];
+const parseJSON = OpenCC._parseJSON;
+
+const cases = parseJSON(fs.readFileSync('test/testcases/testcases.json', 'utf-8')).cases || [];
 
 function createLocalInstalledShape() {
   const rootDir = path.resolve(__dirname, '..');
@@ -20,6 +22,7 @@ function createLocalInstalledShape() {
   const requiredFiles = [
     path.join(jiebaPackageDir, 'index.js'),
     path.join(jiebaPackageDir, 'data', 's2twp_jieba.json'),
+    path.join(jiebaPackageDir, 'data', 'tw2sp_jieba.json'),
     path.join(jiebaPackageDir, 'data', 'jieba_dict', 'jieba_merged.ocd2'),
     path.join(jiebaPackageDir, 'prebuilds', `${os.platform()}-${os.arch()}`, libName),
   ];
@@ -63,6 +66,50 @@ describe('Sync API', function () {
         testSync(tc, cfg, expected, done);
       });
     });
+  });
+});
+
+describe('API compatibility', function () {
+  it('includes tofu-risk dictionaries by default', function () {
+    const opencc = new OpenCC('t2s.json');
+    assert.equal(opencc.convertSync('㑮'), '𫝈');
+  });
+
+  it('supports JSONC (JSON with comments and trailing commas) configuration files', function () {
+    const tempConfigPath = path.join(os.tmpdir(), 'test_comment_config.json');
+    fs.writeFileSync(tempConfigPath, `
+      // This is a single line comment
+      {
+        "name": "Test Config", /* This is a multi-line
+        comment */
+        "segmentation": {
+          "type": "mmseg",
+          "dict": {
+            "type": "inline",
+            "entries": {},
+          },
+        },
+        "conversion_chain": [{
+          "dict": {
+            "type": "inline",
+            "entries": {
+              "A": "B",
+            },
+          },
+        }],
+      }
+    `);
+    try {
+      const opencc = new OpenCC(tempConfigPath, { includeTofuRiskDictionaries: false });
+      assert.equal(opencc.convertSync('A'), 'B');
+
+      const openccWithTofu = new OpenCC(tempConfigPath, { includeTofuRiskDictionaries: true });
+      assert.equal(openccWithTofu.convertSync('A'), 'B');
+    } finally {
+      if (fs.existsSync(tempConfigPath)) {
+        fs.unlinkSync(tempConfigPath);
+      }
+    }
   });
 });
 
@@ -127,6 +174,29 @@ describe('npm CLI', function () {
     });
     assert.equal(result.status, 0, result.stderr);
     assert.equal(result.stdout, '漢字');
+  });
+
+  it('skips tofu-risk dictionaries by default', function () {
+    const result = childProcess.spawnSync(process.execPath, [cli, '-c', 't2s.json'], {
+      input: '㑮',
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, '㑮');
+  });
+
+  it('includes tofu-risk dictionaries when requested', function () {
+    const result = childProcess.spawnSync(process.execPath, [
+      cli,
+      '-c',
+      't2s.json',
+      '--include-tofu-risk-dictionaries',
+    ], {
+      input: '㑮',
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, '𫝈');
   });
 
   it('converts input file to output file', function () {
@@ -422,6 +492,43 @@ describe('Optional opencc-jieba package integration', function () {
     });
     assert.equal(result.status, 0, result.stderr);
     assert.equal(result.stdout, '雲端計算');
+  });
+
+  it('skips tofu-risk dictionaries in jieba configs by default in the npm CLI', function () {
+    const installRoot = createLocalInstalledShape();
+    if (!installRoot) this.skip();
+
+    const result = childProcess.spawnSync(process.execPath, [
+      path.join(installRoot, 'node_modules', 'opencc', 'node', 'cli.js'),
+      '-c',
+      'tw2sp_jieba',
+    ], {
+      cwd: installRoot,
+      env: { ...process.env },
+      input: '㑮',
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, '㑮');
+  });
+
+  it('includes tofu-risk dictionaries in jieba configs when requested in the npm CLI', function () {
+    const installRoot = createLocalInstalledShape();
+    if (!installRoot) this.skip();
+
+    const result = childProcess.spawnSync(process.execPath, [
+      path.join(installRoot, 'node_modules', 'opencc', 'node', 'cli.js'),
+      '-c',
+      'tw2sp_jieba',
+      '--include-tofu-risk-dictionaries',
+    ], {
+      cwd: installRoot,
+      env: { ...process.env },
+      input: '㑮',
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, '𫝈');
   });
 });
 

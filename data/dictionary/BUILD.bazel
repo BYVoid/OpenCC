@@ -12,7 +12,7 @@ package(default_visibility = ["//visibility:public"])
     for txt in [
         "TWVariants",
         "HKVariants",
-        "JPVariants",
+        "JPShinjitaiCharacters",
     ]
 ]
 
@@ -25,11 +25,14 @@ genrule(
     tools = ["//data/scripts:extract_tofu_risk"],
 )
 
-TEXT_DICTS = glob(["*.txt"]) + [
+TEXT_DICTS = glob(
+    ["*.txt"],
+    exclude = ["CJK_Compatibility_Ideographs.txt"],
+) + [
     "TSCharactersExt.txt",
     "TWVariantsRev.txt",
     "HKVariantsRev.txt",
-    "JPVariantsRev.txt",
+    "JPShinjitaiCharactersRev.txt",
 ]
 
 NON_BMP_TEXT_DICTS = [
@@ -91,10 +94,12 @@ filegroup(
 ]
 
 cc_test(
-    name = "dictionary_TWPhrases_reverse_mapping_test",
+    name = "dictionary_phrases_reverse_mapping_test",
     size = "small",
     srcs = ["DictionaryReverseMappingTest.cpp"],
     data = [
+        "HKPhrases.txt",
+        "HKPhrasesRev.txt",
         "TWPhrases.txt",
         "TWPhrasesRev.txt",
     ],
@@ -107,15 +112,41 @@ cc_test(
 )
 
 cc_test(
-    name = "dictionary_TWPhrases_segmentation_test",
+    name = "dictionary_phrases_segmentation_test",
     size = "small",
-    srcs = ["DictionaryTaiwanPhraseSegmentationTest.cpp"],
+    srcs = ["DictionaryPhraseSegmentationTest.cpp"],
     data = [
+        "HKPhrases.txt",
         "STPhrases.txt",
         "TWPhrases.txt",
     ],
     deps = [
         "//src:lexicon_lib",
+        "//src:utf8_util_lib",
+        "@bazel_tools//tools/cpp/runfiles",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "dictionary_phrase_character_dependency_test",
+    size = "small",
+    srcs = ["DictionaryPhraseCharacterDependencyTest.cpp"],
+    data = [
+        "HKVariantsPhrases.txt",
+        "HKVariantsRev.txt",
+        "HKVariantsRevPhrases.txt",
+        "HKVariants.txt",
+        "STCharacters.txt",
+        "STPhrases.txt",
+        "TSCharacters.txt",
+        "TSPhrases.txt",
+        "TWVariantsRev.txt",
+        "TWVariantsRevPhrases.txt",
+        "TWVariants.txt",
+        "TWVariantsPhrases.txt",
+    ],
+    deps = [
         "//src:utf8_util_lib",
         "@bazel_tools//tools/cpp/runfiles",
         "@googletest//:gtest_main",
@@ -129,11 +160,28 @@ cc_test(
     data = [
         "HKVariants.txt",
         "HKVariantsRevPhrases.txt",
+        "STCharacters.txt",
         "STPhrases.txt",
         "TWVariants.txt",
         "TWVariantsRevPhrases.txt",
-        "//data/scheme:st_multi",
     ],
+    deps = [
+        "//src:utf8_util_lib",
+        "@bazel_tools//tools/cpp/runfiles",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "dictionary_compatibility_ideographs_test",
+    size = "small",
+    srcs = ["DictionaryCompatibilityIdeographsTest.cpp"],
+    local_defines = [
+        "OPENCC_COMPATIBILITY_AUDIT_FILES=\\\"" + ",".join(TEXT_DICTS) + "\\\"",
+    ],
+    data = [
+        "CJK_Compatibility_Ideographs.txt",
+    ] + TEXT_DICTS,
     deps = [
         "//src:utf8_util_lib",
         "@bazel_tools//tools/cpp/runfiles",
@@ -147,8 +195,10 @@ test_suite(
         ":dictionary_" + txt[:-4] + "_test"
         for txt in TEXT_DICTS
     ] + [
-        ":dictionary_TWPhrases_reverse_mapping_test",
-        ":dictionary_TWPhrases_segmentation_test",
+        ":dictionary_phrases_reverse_mapping_test",
+        ":dictionary_phrases_segmentation_test",
+        ":dictionary_compatibility_ideographs_test",
+        ":dictionary_phrase_character_dependency_test",
         ":dictionary_variant_rev_phrases_test",
     ],
 )

@@ -1,11 +1,11 @@
 #include <iostream>
 #include <ctime>
 #include <fstream>
+#include <iterator>
 #include "cppjieba/MPSegment.hpp"
 #include "cppjieba/HMMSegment.hpp"
 #include "cppjieba/MixSegment.hpp"
 #include "cppjieba/KeywordExtractor.hpp"
-#include "limonp/Colors.hpp"
 #include "test_paths.h"
 
 using namespace cppjieba;
@@ -16,7 +16,7 @@ void Cut(size_t times = 50) {
   string doc;
   ifstream ifs(TEST_DATA_DIR "/weicheng.utf8");
   assert(ifs);
-  doc << ifs;
+  doc.assign(istreambuf_iterator<char>(ifs), istreambuf_iterator<char>());
   long beginTime = clock();
   for (size_t i = 0; i < times; i ++) {
     printf("process [%3.0lf %%]\r", 100.0*(i+1)/times);
@@ -26,7 +26,7 @@ void Cut(size_t times = 50) {
   }
   printf("\n");
   long endTime = clock();
-  ColorPrintln(GREEN, "Cut: [%.3lf seconds]time consumed.", double(endTime - beginTime)/CLOCKS_PER_SEC);
+  printf("\033[0;32mCut: [%.3lf seconds]time consumed.\033[0m\n", double(endTime - beginTime)/CLOCKS_PER_SEC);
 }
 
 void Extract(size_t times = 400) {
@@ -38,7 +38,7 @@ void Extract(size_t times = 400) {
   string doc;
   ifstream ifs(TEST_DATA_DIR "/review.100");
   assert(ifs);
-  doc << ifs;
+  doc.assign(istreambuf_iterator<char>(ifs), istreambuf_iterator<char>());
   long beginTime = clock();
   for (size_t i = 0; i < times; i ++) {
     printf("process [%3.0lf %%]\r", 100.0*(i+1)/times);
@@ -48,7 +48,7 @@ void Extract(size_t times = 400) {
   }
   printf("\n");
   long endTime = clock();
-  ColorPrintln(GREEN, "Extract: [%.3lf seconds]time consumed.", double(endTime - beginTime)/CLOCKS_PER_SEC);
+  printf("\033[0;32mExtract: [%.3lf seconds]time consumed.\033[0m\n", double(endTime - beginTime)/CLOCKS_PER_SEC);
 }
 
 int main(int argc, char ** argv) {

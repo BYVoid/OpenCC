@@ -292,7 +292,8 @@ CasesByConfig LoadCases(const std::string& jsonPath) {
   }
 
   rapidjson::Document doc;
-  doc.Parse(content.c_str());
+  doc.Parse<rapidjson::kParseCommentsFlag |
+            rapidjson::kParseTrailingCommasFlag>(content.c_str());
   if (doc.HasParseError() || !doc.IsObject() || !doc.HasMember("cases") ||
       !doc["cases"].IsArray()) {
     throw std::runtime_error("Invalid testcases.json format");
@@ -341,7 +342,11 @@ TEST_F(CommandLineConvertTest, ConvertFromJson) {
       }
     }
 
-    ASSERT_EQ(0, system(TestCommand(config, inputFile, outputFile).c_str()));
+    ASSERT_EQ(0,
+              system(TestCommandWithFlags(
+                         config, inputFile, outputFile,
+                         "--include-tofu-risk-dictionaries")
+                         .c_str()));
 
     // Read outputs and compare line by line.
     std::ifstream ifs(outputFile, std::ios::binary);
@@ -359,6 +364,37 @@ TEST_F(CommandLineConvertTest, ConvertFromJson) {
     }
     EXPECT_EQ(idx, entry.second.size()) << "config=" << config;
   }
+}
+
+TEST_F(CommandLineConvertTest, SkipsTofuRiskDictionariesByDefault) {
+  const std::string inputFile = InputFile("tofu_risk_default");
+  const std::string outputFile = OutputFile("tofu_risk_default");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "㑮";
+  }
+
+  ASSERT_EQ(0, system(TestCommand("t2s", inputFile, outputFile).c_str()));
+  EXPECT_EQ("㑮", GetFileContents(outputFile));
+}
+
+TEST_F(CommandLineConvertTest, IncludeTofuRiskDictionariesFlagRestoresLegacy) {
+  const std::string inputFile = InputFile("tofu_risk_include");
+  const std::string outputFile = OutputFile("tofu_risk_include");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "㑮";
+  }
+
+  ASSERT_EQ(0, system(TestCommandWithFlags(
+                   "t2s", inputFile, outputFile,
+                   "--include-tofu-risk-dictionaries")
+                   .c_str()));
+  EXPECT_EQ("𫝈", GetFileContents(outputFile));
 }
 
 TEST_F(CommandLineConvertTest, StdinPreservesLineEndingsAndUnknownCharacters) {

@@ -2,11 +2,12 @@
 #define CPPJIEBA_TEXTRANK_EXTRACTOR_H
 
 #include <cmath>
+#include <map>
+#include <set>
 #include "Jieba.hpp"
 #include "UnicodeFile.hpp"
 
 namespace cppjieba {
-  using namespace limonp;
   using namespace std;
 
   class TextRankExtractor {
@@ -183,7 +184,7 @@ namespace cppjieba {
   }; // class TextRankExtractor
   
   inline ostream& operator << (ostream& os, const TextRankExtractor::Word& word) {
-    return os << "{\"word\": \"" << word.word << "\", \"offset\": " << word.offsets << ", \"weight\": " << word.weight << "}"; 
+    return os << "{\"word\": \"" << word.word << "\", \"offset\": " << FormatVector(word.offsets) << ", \"weight\": " << word.weight << "}"; 
   }
 } // namespace cppjieba
 

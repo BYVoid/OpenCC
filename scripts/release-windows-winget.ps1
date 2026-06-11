@@ -6,6 +6,8 @@ param(
     [string]$GitHubRepository = "BYVoid/OpenCC",
     [string]$PackageIdentifier = "BYVoid.OpenCC",
     [string]$Publisher = "BYVoid",
+    [switch]$PrepareOnly,
+    [switch]$PackageOnly,
     [switch]$SkipTests
 )
 
@@ -191,10 +193,81 @@ ManifestVersion: 1.9.0
     Write-Utf8File -Path (Join-Path $ManifestRoot "BYVoid.OpenCC.locale.en-US.yaml") -Content $localeManifest
 }
 
+function New-PortableStaging {
+    param(
+        [Parameter(Mandatory = $true)][string]$BuildDir,
+        [Parameter(Mandatory = $true)][string]$InstallRoot,
+        [Parameter(Mandatory = $true)][string]$StagingRoot,
+        [Parameter(Mandatory = $true)][bool]$SkipTests
+    )
+
+    Remove-Item -Recurse -Force $BuildDir -ErrorAction SilentlyContinue
+    Remove-Item -Recurse -Force $InstallRoot -ErrorAction SilentlyContinue
+    Remove-Item -Recurse -Force $StagingRoot -ErrorAction SilentlyContinue
+    New-Item -ItemType Directory -Force -Path $BuildDir | Out-Null
+    New-Item -ItemType Directory -Force -Path $InstallRoot | Out-Null
+    New-Item -ItemType Directory -Force -Path $StagingRoot | Out-Null
+
+    Invoke-Native cmake @(
+        "-S", ".",
+        "-B", $BuildDir,
+        "-A", "x64",
+        "-DBUILD_SHARED_LIBS:BOOL=OFF",
+        "-DBUILD_OPENCC_JIEBA_PLUGIN:BOOL=ON",
+        "-DCMAKE_INSTALL_PREFIX:PATH=$InstallRoot",
+        "-DENABLE_GTEST:BOOL=OFF",
+        "-DENABLE_BENCHMARK:BOOL=OFF"
+    )
+
+    Invoke-Native cmake @("--build", $BuildDir, "--config", "Release", "--target", "install")
+
+    if (-not $SkipTests) {
+        Invoke-Native ctest @("--test-dir", $BuildDir, "--build-config", "Release", "--output-on-failure")
+    }
+
+    New-Item -ItemType Directory -Force -Path (Join-Path $StagingRoot "bin") | Out-Null
+    New-Item -ItemType Directory -Force -Path (Join-Path $StagingRoot "bin\plugins") | Out-Null
+    New-Item -ItemType Directory -Force -Path (Join-Path $StagingRoot "share\opencc") | Out-Null
+
+    Copy-Item -Path (Join-Path $InstallRoot "bin\opencc.exe") -Destination (Join-Path $StagingRoot "bin\opencc.exe")
+    Copy-Item -Path (Join-Path $InstallRoot "bin\opencc_dict.exe") -Destination (Join-Path $StagingRoot "bin\opencc_dict.exe")
+    Copy-Item -Path (Join-Path $InstallRoot "bin\opencc_phrase_extract.exe") -Destination (Join-Path $StagingRoot "bin\opencc_phrase_extract.exe")
+    Copy-Item -Path (Join-Path $InstallRoot "bin\plugins\*.dll") -Destination (Join-Path $StagingRoot "bin\plugins")
+    Copy-Item -Path (Join-Path $InstallRoot "share\opencc\*") -Destination (Join-Path $StagingRoot "share\opencc") -Recurse
+    Copy-Item -Path LICENSE -Destination (Join-Path $StagingRoot "LICENSE.txt")
+    Copy-Item -Path README.md -Destination (Join-Path $StagingRoot "README.md")
+}
+
+function New-PortableArchive {
+    param(
+        [Parameter(Mandatory = $true)][string]$StagingRoot,
+        [Parameter(Mandatory = $true)][string]$AssetPath,
+        [Parameter(Mandatory = $true)][string]$ChecksumPath,
+        [Parameter(Mandatory = $true)][string]$AssetName
+    )
+
+    if (-not (Test-Path $StagingRoot)) {
+        throw "Missing portable staging directory: $StagingRoot"
+    }
+
+    Remove-Item -Force $AssetPath -ErrorAction SilentlyContinue
+    Remove-Item -Force $ChecksumPath -ErrorAction SilentlyContinue
+
+    Compress-Archive -Path (Join-Path $StagingRoot '*') -DestinationPath $AssetPath -CompressionLevel Optimal
+
+    $hash = (Get-FileHash -Path $AssetPath -Algorithm SHA256).Hash.ToUpperInvariant()
+    Write-Utf8File -Path $ChecksumPath -Content "$hash *$AssetName`n"
+    return $hash
+}
+
 $repoRoot = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot ".."))
 Push-Location $repoRoot
 
 try {
+    if ($PrepareOnly -and $PackageOnly) {
+        throw "Use at most one of -PrepareOnly and -PackageOnly."
+    }
+
     $publicBaseUrl = "https://opencc.byvoid.com/opencc-winget-release"
 
     if (-not $Version) {
@@ -224,45 +297,33 @@ try {
     $wingetRoot = Join-Path $resolvedOutputDir "winget-manifests\$wingetPathIdentifier\$Version"
     $releaseUrl = "$releaseUrlBase/$assetName"
 
-    Remove-Item -Recurse -Force $resolvedBuildDir -ErrorAction SilentlyContinue
-    Remove-Item -Recurse -Force $resolvedOutputDir -ErrorAction SilentlyContinue
-    New-Item -ItemType Directory -Force -Path $resolvedBuildDir | Out-Null
-    New-Item -ItemType Directory -Force -Path $installRoot | Out-Null
-    New-Item -ItemType Directory -Force -Path $stagingRoot | Out-Null
+    if (-not $PackageOnly) {
+        if (Test-Path $resolvedOutputDir) {
+            Get-ChildItem -Path $resolvedOutputDir -Force |
+                Where-Object { $_.FullName -ne $stagingRoot } |
+                Remove-Item -Recurse -Force
+        } else {
+            New-Item -ItemType Directory -Force -Path $resolvedOutputDir | Out-Null
+        }
 
-    Invoke-Native cmake @(
-        "-S", ".",
-        "-B", $resolvedBuildDir,
-        "-A", "x64",
-        "-DBUILD_SHARED_LIBS:BOOL=OFF",
-        "-DBUILD_OPENCC_JIEBA_PLUGIN:BOOL=ON",
-        "-DCMAKE_INSTALL_PREFIX:PATH=$installRoot",
-        "-DENABLE_GTEST:BOOL=OFF",
-        "-DENABLE_BENCHMARK:BOOL=OFF"
-    )
+        New-PortableStaging `
+            -BuildDir $resolvedBuildDir `
+            -InstallRoot $installRoot `
+            -StagingRoot $stagingRoot `
+            -SkipTests ([bool]$SkipTests)
 
-    Invoke-Native cmake @("--build", $resolvedBuildDir, "--config", "Release", "--target", "install")
-
-    if (-not $SkipTests) {
-        Invoke-Native ctest @("--test-dir", $resolvedBuildDir, "--build-config", "Release", "--output-on-failure")
+        Write-Host "Portable staging: $stagingRoot"
     }
 
-    New-Item -ItemType Directory -Force -Path (Join-Path $stagingRoot "bin") | Out-Null
-    New-Item -ItemType Directory -Force -Path (Join-Path $stagingRoot "bin\plugins") | Out-Null
-    New-Item -ItemType Directory -Force -Path (Join-Path $stagingRoot "share\opencc") | Out-Null
+    if ($PrepareOnly) {
+        return
+    }
 
-    Copy-Item -Path (Join-Path $installRoot "bin\opencc.exe") -Destination (Join-Path $stagingRoot "bin\opencc.exe")
-    Copy-Item -Path (Join-Path $installRoot "bin\opencc_dict.exe") -Destination (Join-Path $stagingRoot "bin\opencc_dict.exe")
-    Copy-Item -Path (Join-Path $installRoot "bin\opencc_phrase_extract.exe") -Destination (Join-Path $stagingRoot "bin\opencc_phrase_extract.exe")
-    Copy-Item -Path (Join-Path $installRoot "bin\plugins\*.dll") -Destination (Join-Path $stagingRoot "bin\plugins")
-    Copy-Item -Path (Join-Path $installRoot "share\opencc\*") -Destination (Join-Path $stagingRoot "share\opencc") -Recurse
-    Copy-Item -Path LICENSE -Destination (Join-Path $stagingRoot "LICENSE.txt")
-    Copy-Item -Path README.md -Destination (Join-Path $stagingRoot "README.md")
-
-    Compress-Archive -Path (Join-Path $stagingRoot '*') -DestinationPath $assetPath -CompressionLevel Optimal
-
-    $hash = (Get-FileHash -Path $assetPath -Algorithm SHA256).Hash.ToUpperInvariant()
-    Write-Utf8File -Path $checksumPath -Content "$hash *$assetName`n"
+    $hash = New-PortableArchive `
+        -StagingRoot $stagingRoot `
+        -AssetPath $assetPath `
+        -ChecksumPath $checksumPath `
+        -AssetName $assetName
 
     New-WinGetManifests `
         -PackageVersion $Version `

@@ -81,9 +81,9 @@ public:
         << std::endl
         << "   t2hk.json   Traditional Chinese (OpenCC Standard) to Traditional Chinese (Hong Kong variant)"
         << std::endl
-        << "   t2jp.json   Traditional Chinese Characters (Kyūjitai) to New Japanese Kanji (Shinjitai)"
+        << "   t2jp.json   Old Japanese Kanji (Kyūjitai) to New Japanese Kanji (Shinjitai)"
         << std::endl
-        << "   jp2t.json   New Japanese Kanji (Shinjitai) to Traditional Chinese Characters (Kyūjitai)"
+        << "   jp2t.json   New Japanese Kanji (Shinjitai) to Old Japanese Kanji (Kyūjitai)"
         << std::endl
         << std::endl;
   }
@@ -231,6 +231,21 @@ FILE* GetOutputStream() {
   }
 }
 
+void PrintInteractiveStdinHint() {
+#ifdef _WIN32
+  if (_isatty(_fileno(stdin))) {
+    fprintf(stderr,
+            "Reading from standard input. Press Ctrl+Z then Enter to "
+            "finish.\n");
+  }
+#else
+  if (isatty(fileno(stdin))) {
+    fprintf(stderr,
+            "Reading from standard input. Press Ctrl+D to finish.\n");
+  }
+#endif
+}
+
 // Serializes the segmentation-only view of an inspection result as a JSON
 // object with "input" and "segments" fields. Used with --segmentation mode.
 std::string SerializeSegmentationResultJson(
@@ -356,18 +371,7 @@ void ConvertStream(FILE* fin, FILE* fout) {
 }
 
 void ConvertLineByLine() {
-#ifdef _WIN32
-  if (_isatty(_fileno(stdin))) {
-    fprintf(stderr,
-            "Reading from standard input. Press Ctrl+Z then Enter to "
-            "finish.\n");
-  }
-#else
-  if (isatty(fileno(stdin))) {
-    fprintf(stderr,
-            "Reading from standard input. Press Ctrl+D to finish.\n");
-  }
-#endif
+  PrintInteractiveStdinHint();
   std::istream& inputStream = std::cin;
   FILE* fout = GetOutputStream();
   bool isFirstLine = true;
@@ -488,6 +492,7 @@ void ConvertFile(std::string fileName) {
 }
 
 void ConvertStdin() {
+  PrintInteractiveStdinHint();
   SetBinaryMode(stdin);
   FILE* fout = GetOutputStream();
   ConvertStream(stdin, fout);
@@ -538,6 +543,12 @@ int CommandLineMain(std::vector<std::string> args) {
         "Output full inspection result (segmentation + per-stage conversion + "
         "final output) as JSON.",
         cmd, false);
+    TCLAP::SwitchArg includeTofuRiskDictionariesArg(
+        "", "include-tofu-risk-dictionaries",
+        "Include dictionaries marked as possibly outputting tofu, i.e. "
+        "Chinese characters that may render as missing-glyph boxes. By "
+        "default, the command line tool skips these dictionaries.",
+        cmd, false);
     const std::string argv0String = args.empty() ? std::string() : args[0];
     cmd.parse(args);
 
@@ -572,7 +583,12 @@ int CommandLineMain(std::vector<std::string> args) {
     }
     const auto loadStart = std::chrono::steady_clock::now();
     const char* argv0 = argv0String.empty() ? nullptr : argv0String.c_str();
-    converter = config.NewFromFile(configFileName, pathArg.getValue(), argv0);
+    ConfigLoadOptions configOptions;
+    configOptions.includeTofuRiskDictionaries =
+        includeTofuRiskDictionariesArg.getValue();
+    converter =
+        config.NewFromFile(configFileName, pathArg.getValue(), argv0,
+                           configOptions);
     measurement.loadMs +=
         DurationToMilliseconds(std::chrono::steady_clock::now() - loadStart);
     bool lineByLine = inputFileName.IsNull();

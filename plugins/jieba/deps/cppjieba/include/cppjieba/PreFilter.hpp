@@ -1,8 +1,9 @@
 #ifndef CPPJIEBA_PRE_FILTER_H
 #define CPPJIEBA_PRE_FILTER_H
 
+#include <unordered_set>
 #include "Trie.hpp"
-#include "limonp/Logging.hpp"
+#include "Utils.hpp"
 
 namespace cppjieba {
 
@@ -14,7 +15,7 @@ class PreFilter {
     RuneStrArray::const_iterator end;
   }; // struct Range
 
-  PreFilter(const unordered_set<Rune>& symbols, 
+  PreFilter(const std::unordered_set<Rune>& symbols, 
         const string& sentence)
     : symbols_(symbols) {
     if (!DecodeUTF8RunesInString(sentence, sentence_)) {
@@ -46,7 +47,7 @@ class PreFilter {
  private:
   RuneStrArray::const_iterator cursor_;
   RuneStrArray sentence_;
-  const unordered_set<Rune>& symbols_;
+  const std::unordered_set<Rune>& symbols_;
 }; // class PreFilter
 
 } // namespace cppjieba

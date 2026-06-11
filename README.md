@@ -7,6 +7,9 @@
 [![Python CI](https://github.com/BYVoid/OpenCC/actions/workflows/python.yml/badge.svg)](https://github.com/BYVoid/OpenCC/actions/workflows/python.yml)
 [![AppVeyor](https://img.shields.io/appveyor/ci/Carbo/OpenCC.svg)](https://ci.appveyor.com/project/Carbo/OpenCC)
 
+[![npm package badge](https://img.shields.io/npm/v/opencc)](https://www.npmjs.com/package/opencc)
+[![PyPI version](https://img.shields.io/pypi/v/opencc.svg)](https://pypi.org/project/opencc/)
+[![Debian package](https://img.shields.io/debian/v/opencc/unstable)](https://packages.debian.org/search?keywords=opencc)
 [![latest packaged version(s)](https://repology.org/badge/latest-versions/opencc.svg)](https://repology.org/project/opencc/versions)
 
 ## Introduction 介紹
@@ -27,7 +30,7 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 * 支持中國大陸、台灣、香港異體字和地區習慣用詞轉換，如「裏」「裡」、「鼠標」「滑鼠」。
 * 詞庫和函數庫完全分離，可以自由修改、導入、擴展。
 
-詳情參閱[OpenCC 設計思想](./DESIGN_PRINCIPLES.md)。
+詳情參閱[OpenCC 設計思想](./DESIGN_PRINCIPLES.md)及[地區詞收錄標準](doc/regional-phrase-criteria.md)。
 
 ## Installation 安裝
 
@@ -115,6 +118,34 @@ int main() {
 
 [Full example with Bazel](https://github.com/BYVoid/opencc-bazel-example)
 
+When OpenCC is embedded in a server binary or self-contained application, the
+JSON config can stay small while dictionary resources are loaded from explicit
+resource directories:
+
+```c++
+#include <memory>
+#include <vector>
+
+#include "SimpleConverter.hpp"
+
+int main() {
+  auto resources = std::make_shared<opencc::FilesystemResourceProvider>(
+      std::vector<std::string>{
+          "/opt/my-app/opencc",
+          "/opt/my-app/plugins/opencc-jieba",
+          "/usr/share/opencc",
+      });
+  const opencc::SimpleConverter converter("s2t.json", resources);
+  converter.Convert("汉字");
+  return 0;
+}
+```
+
+`FilesystemResourceProvider` searches directories in order. Existing
+`SimpleConverter("s2t.json")` and CLI behavior continue to use the config file
+location, current directory, explicit paths, and installed OpenCC data directory
+as before.
+
 ### C
 
 ```c
@@ -199,8 +230,16 @@ Rules:
 * `tw2t.json` **Traditional Chinese (Taiwan Standard)** to **Traditional Chinese (OpenCC Standard)** / **台灣正體** 到 **OpenCC 標準繁體**
 * `t2hk.json` **Traditional Chinese (OpenCC Standard)** to **Traditional Chinese (Hong Kong variant)** / **OpenCC 標準繁體** 到 **香港繁體**
 * `hk2t.json` **Traditional Chinese (Hong Kong variant)** to **Traditional Chinese (OpenCC Standard)** / **香港繁體** 到 **OpenCC 標準繁體**
-* `t2jp.json` **Traditional Chinese Characters (Kyūjitai)** to **New Japanese Kanji (Shinjitai)** / **OpenCC 標準繁體（日文舊字體）** 到 **日文新字體**
-* `jp2t.json` **New Japanese Kanji (Shinjitai)** to **Traditional Chinese Characters (Kyūjitai)** / **日文新字體** 到 **OpenCC 標準繁體（日文舊字體）**
+
+下列配置文件仍在開發中，歡迎貢獻新詞組：
+
+* `s2hkp.json` **Simplified Chinese** to **Traditional Chinese (Hong Kong variant, with Hong Kong Phrases)** / **簡體** 到 **香港繁體（香港常用詞彙）**
+* `hk2sp.json` **Traditional Chinese (Hong Kong variant)** to **Simplified Chinese (Mainland China Phrases)** / **香港繁體** 到 **簡體（含中國大陸常用詞彙）**
+
+下列配置文件僅供探索性研究，不建議用於生產環境：
+
+* `t2jp.json` **Old Japanese Kanji (Kyūjitai)** to **New Japanese Kanji (Shinjitai)** / **日文舊字體** 到 **日文新字體**
+* `jp2t.json` **New Japanese Kanji (Shinjitai)** to **Old Japanese Kanji (Kyūjitai)** / **日文新字體** 到 **日文舊字體**，並將少量日文詞組轉換爲對應中文
 
 #### 指定配置文件
 
@@ -208,6 +247,55 @@ Rules:
 ```sh
 OPENCC_DATA_DIR=/path/to/your/config/dir opencc --help
 ```
+
+#### 內聯字典（inline dictionary）
+
+配置檔中的字典可使用 `type: "inline"`，直接在 JSON 裡定義小型自訂詞彙，
+不必修改外部字典檔。例如在 `group.dicts` 最前面加入覆寫規則：
+
+```json
+{
+  "conversion_chain": [
+    {
+      "dict": {
+        "type": "group",
+        "dicts": [
+          {
+            "type": "inline",
+            "entries": {
+              "麦旋风": "冰炫風",
+              "服务器": "伺服器"
+            }
+          },
+          {
+            "type": "ocd2",
+            "file": "STPhrases.ocd2"
+          },
+          {
+            "type": "ocd2",
+            "file": "STCharacters.ocd2"
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+規則與限制：
+
+- `entries` 必須是 JSON 物件。
+- `entries` 的 key/value 必須是非空字串。
+- 重複 key 不受支援；如包含，載入會直接失敗（拋出錯誤）。
+- key/value 會按解析結果原樣使用，不做 trim、大小寫折疊或 Unicode normalization。
+- 內聯字典與普通字典行為一致，優先級由 `group.dicts` 的順序決定。
+- 內聯字典輸出仍會繼續經過後續 `conversion_chain` 步驟，不提供鎖定最終輸出。
+
+備註：OpenCC 1.3.2+ 解析器支援有限 JSONC 語法（`//`、`/* */` 註解與尾逗號）。
+若需跨實作相容，建議使用嚴格 JSON，不依賴 JSONC 擴充。
+
+更多完整示例可見 `examples/config/`。該目錄僅供學習與自訂參考，不屬於官方內建
+配置列表。
 
 ### Experimental Plugins 試驗性插件
 
@@ -314,7 +402,7 @@ Please update if your project is using OpenCC.
 
 Apache License 2.0
 
-## Third Party Library 第三方庫
+## Third Party Libraries 第三方庫
 
 * [darts-clone](https://github.com/s-yata/darts-clone) BSD License
 * [marisa-trie](https://github.com/s-yata/marisa-trie) BSD License
@@ -328,11 +416,12 @@ Apache License 2.0
 ## Change History 版本歷史
 
 * [NEWS](https://github.com/BYVoid/OpenCC/blob/master/NEWS.md)
+  - 另見 https://opencc.byvoid.com/news/
 
-### Links 相關鏈接
+## Links 相關連結
 
-* Introduction 詳細介紹 https://github.com/BYVoid/OpenCC/wiki/%E7%B7%A3%E7%94%B1
-* 現代漢語常用簡繁一對多字義辨析表 https://ytenx.org/byohlyuk/KienxPyan
+* [Publications Using OpenCC](https://github.com/BYVoid/OpenCC/blob/master/PUBLICATIONS.md) - 近年來使用了 OpenCC 的研究論文選錄
+* [現代漢語常用繁簡轉換匹配辨析表](https://github.com/BYVoid/OpenCC/blob/master/doc/characters-easy-to-misuse.md)
 * 關於 [`opencc`](https://www.npmjs.com/package/opencc), [`opencc-js`](https://www.npmjs.com/package/opencc-js) 与 [`opencc-wasm`](https://www.npmjs.com/package/opencc-wasm) 三个 NPM packages 區別的說明
   https://github.com/nk2028/opencc-js/blob/HEAD/README-zh-TW.md#%E8%88%87-opencc-npm-package-%E7%9A%84%E5%8D%80%E5%88%A5
 

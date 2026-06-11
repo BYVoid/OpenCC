@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <set>
 #include <cassert>
-#include "limonp/Logging.hpp"
 #include "DictTrie.hpp"
 #include "SegmentBase.hpp"
 #include "Unicode.hpp"
@@ -49,7 +48,7 @@ class FullSegment: public SegmentBase {
         RuneStrArray::const_iterator end, 
         vector<WordRange>& res) const {
     // result of searching in trie tree
-    LocalVector<pair<size_t, const DictUnit*> > tRes;
+    vector<pair<size_t, const DictUnit*> > tRes;
 
     // max index of res's words
     size_t maxIdx = 0;

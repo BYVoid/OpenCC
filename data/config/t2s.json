@@ -2,24 +2,22 @@
   "name": "Traditional Chinese (OpenCC Standard) to Simplified Chinese",
   "segmentation": {
     "type": "mmseg",
-    "dict": {
-      "type": "ocd2",
-      "file": "TSPhrases.ocd2"
-    }
+    "dict": { "type": "ocd2", "file": "TSPhrases.ocd2" }
   },
-  "conversion_chain": [{
-    "dict": {
-      "type": "group",
-      "dicts": [{
-        "type": "ocd2",
-        "file": "TSPhrases.ocd2"
-      }, {
-        "type": "ocd2",
-        "file": "TSCharactersExt.ocd2"
-      }, {
-        "type": "ocd2",
-        "file": "TSCharacters.ocd2"
-      }]
+  "conversion_chain": [
+    {
+      "dict": {
+        "type": "group",
+        "dicts": [
+          { "type": "ocd2", "file": "TSPhrases.ocd2" },
+          {
+            "type": "ocd2",
+            "file": "TSCharactersExt.ocd2",
+            "may_output_tofu": true
+          },
+          { "type": "ocd2", "file": "TSCharacters.ocd2" }
+        ]
+      }
     }
-  }]
+  ]
 }

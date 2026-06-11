@@ -38,7 +38,7 @@ bool IsDictionaryEntry(const std::string& line) {
   return !line.empty() && line[0] != '#';
 }
 
-std::vector<std::unordered_set<std::string>> LoadNonEquivalentVariantSets(
+std::vector<std::unordered_set<std::string>> LoadMultiVariantSets(
     const std::string& path) {
   std::ifstream stream(path);
   EXPECT_TRUE(stream.is_open()) << path;
@@ -67,7 +67,7 @@ std::vector<std::unordered_set<std::string>> LoadNonEquivalentVariantSets(
   return variantSets;
 }
 
-bool IsInSameNonEquivalentSet(
+bool IsInSameMultiVariantSet(
     const std::vector<std::unordered_set<std::string>>& variantSets,
     const std::string& first, const std::string& second) {
   for (const auto& variantSet : variantSets) {
@@ -79,9 +79,9 @@ bool IsInSameNonEquivalentSet(
 }
 
 std::unordered_set<std::string> LoadReverseExceptionCharacters(
-    const std::string& variantsPath, const std::string& schemePath) {
+    const std::string& variantsPath, const std::string& stCharactersPath) {
   const std::vector<std::unordered_set<std::string>> variantSets =
-      LoadNonEquivalentVariantSets(schemePath);
+      LoadMultiVariantSets(stCharactersPath);
   EXPECT_FALSE(variantSets.empty());
 
   std::ifstream stream(variantsPath);
@@ -105,7 +105,7 @@ std::unordered_set<std::string> LoadReverseExceptionCharacters(
       if (key == value) {
         continue;
       }
-      if (IsInSameNonEquivalentSet(variantSets, key, value)) {
+      if (IsInSameMultiVariantSet(variantSets, key, value)) {
         exceptionChars.insert(value);
       }
     }
@@ -193,13 +193,13 @@ void ExpectRevPhrasesComplete(const std::string& variantsName) {
       runfiles->Rlocation("_main/data/dictionary/" + variantsName + ".txt");
   const std::string phrasesPath = runfiles->Rlocation(
       "_main/data/dictionary/" + revPhrasesName);
-  const std::string schemePath =
-      runfiles->Rlocation("_main/data/scheme/st_multi.txt");
+  const std::string stCharactersPath =
+      runfiles->Rlocation("_main/data/dictionary/STCharacters.txt");
   const std::string stPhrasesPath =
       runfiles->Rlocation("_main/data/dictionary/STPhrases.txt");
 
   const std::unordered_set<std::string> exceptionChars =
-      LoadReverseExceptionCharacters(variantsPath, schemePath);
+      LoadReverseExceptionCharacters(variantsPath, stCharactersPath);
   ASSERT_FALSE(exceptionChars.empty()) << variantsName;
 
   const std::unordered_set<std::string> expected =

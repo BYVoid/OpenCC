@@ -5,6 +5,8 @@
 
 namespace cppjieba {
 
+class DictTrie;
+
 class SegmentTagged : public SegmentBase{
  public:
   SegmentTagged() {

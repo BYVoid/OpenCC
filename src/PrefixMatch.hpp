@@ -41,7 +41,7 @@ public:
 private:
   class Table;
 
-  void AddDict(const DictPtr& dict, Tables* output);
+  void AddDict(const DictPtr& dict, Tables* output, size_t* dictOrder);
   static void AppendCacheKey(const DictPtr& dict, std::string* output);
   static void CollectLeafDicts(const DictPtr& dict,
                                std::vector<std::weak_ptr<const Dict>>* output);

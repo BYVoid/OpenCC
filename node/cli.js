@@ -18,8 +18,8 @@ const BUILT_IN_CONFIGS = [
   ['t2tw.json', 'Traditional Chinese (OpenCC Standard) to Taiwan Standard'],
   ['hk2t.json', 'Traditional Chinese (Hong Kong variant) to Traditional Chinese (OpenCC Standard)'],
   ['t2hk.json', 'Traditional Chinese (OpenCC Standard) to Hong Kong variant'],
-  ['t2jp.json', 'Traditional Chinese Characters (Kyujitai) to New Japanese Kanji (Shinjitai)'],
-  ['jp2t.json', 'New Japanese Kanji (Shinjitai) to Traditional Chinese Characters (Kyujitai) (OpenCC Standard)'],
+  ['t2jp.json', 'Old Japanese Kanji (Kyujitai) to New Japanese Kanji (Shinjitai)'],
+  ['jp2t.json', 'New Japanese Kanji (Shinjitai) to Old Japanese Kanji (Kyujitai)'],
 ];
 const BUILT_IN_CONFIG_NAMES = new Set(BUILT_IN_CONFIGS.map(([name]) => name));
 const BUILT_IN_CONFIG_STEMS = new Set(
@@ -46,6 +46,9 @@ Options:
   -c, --config <file>  Configuration file. Defaults to s2t.json.
   -i, --input <file>   Read original text from <file>. Defaults to stdin.
   -o, --output <file>  Write converted text to <file>. Defaults to stdout.
+  --include-tofu-risk-dictionaries
+                       Include dictionaries that may output tofu (Chinese
+                       characters rendered as missing-glyph boxes).
   -v, --version        Print OpenCC version.
   -h, --help           Print this help.
 
@@ -84,6 +87,7 @@ function parseArgs(args) {
     config: 's2t.json',
     input: null,
     output: null,
+    includeTofuRiskDictionaries: false,
     help: false,
     version: false,
   };
@@ -109,6 +113,8 @@ function parseArgs(args) {
       i += 1;
     } else if (arg.startsWith('--output=')) {
       options.output = readInlineOptionValue(arg, '--output');
+    } else if (arg === '--include-tofu-risk-dictionaries') {
+      options.includeTofuRiskDictionaries = true;
     } else if (arg === '--inspect' || arg === '--segmentation') {
       throw new Error(`${arg} is not supported by the npm CLI. Use the native OpenCC CLI instead.`);
     } else if (arg === '--path' || arg.startsWith('--path=')) {
@@ -216,7 +222,9 @@ function main() {
   }
 
   try {
-    const converter = new OpenCC(resolveConfigPath(options.config));
+    const converter = new OpenCC(resolveConfigPath(options.config), {
+      includeTofuRiskDictionaries: options.includeTofuRiskDictionaries,
+    });
     convertStream(converter, options, (error) => {
       if (error) {
         const message = error && error.message ? error.message : String(error);

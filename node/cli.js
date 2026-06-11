@@ -18,8 +18,8 @@ const BUILT_IN_CONFIGS = [
   ['t2tw.json', 'Traditional Chinese (OpenCC Standard) to Taiwan Standard'],
   ['hk2t.json', 'Traditional Chinese (Hong Kong variant) to Traditional Chinese (OpenCC Standard)'],
   ['t2hk.json', 'Traditional Chinese (OpenCC Standard) to Hong Kong variant'],
-  ['t2jp.json', 'Traditional Chinese Characters (Kyujitai) to New Japanese Kanji (Shinjitai)'],
-  ['jp2t.json', 'New Japanese Kanji (Shinjitai) to Traditional Chinese Characters (Kyujitai) (OpenCC Standard)'],
+  ['t2jp.json', 'Old Japanese Kanji (Kyujitai) to New Japanese Kanji (Shinjitai)'],
+  ['jp2t.json', 'New Japanese Kanji (Shinjitai) to Old Japanese Kanji (Kyujitai)'],
 ];
 const BUILT_IN_CONFIG_NAMES = new Set(BUILT_IN_CONFIGS.map(([name]) => name));
 const BUILT_IN_CONFIG_STEMS = new Set(

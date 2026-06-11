@@ -12,6 +12,7 @@
 #   work as intended, it may contain identity mappings.
 # - This dictionary may also contain entries that are not lexical words.
 # - In principle, the first column should contain only Simplified-input keys.
+
 SQL注入	SQL注入
 SQL注入攻击	SQL注入攻擊
 㓦划	㓦劃

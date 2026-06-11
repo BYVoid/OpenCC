@@ -4,6 +4,7 @@
 # License: Apache-2.0 (see LICENSE)
 # Source: https://github.com/ByVoid/OpenCC
 # Used in configs: s2twp.json (via TWPhrases.ocd2)
+
 B超	超音波
 PN結	PN接面
 SQL注入	SQL隱碼攻擊

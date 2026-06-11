@@ -81,9 +81,9 @@ public:
         << std::endl
         << "   t2hk.json   Traditional Chinese (OpenCC Standard) to Traditional Chinese (Hong Kong variant)"
         << std::endl
-        << "   t2jp.json   Traditional Chinese Characters (Kyūjitai) to New Japanese Kanji (Shinjitai)"
+        << "   t2jp.json   Old Japanese Kanji (Kyūjitai) to New Japanese Kanji (Shinjitai)"
         << std::endl
-        << "   jp2t.json   New Japanese Kanji (Shinjitai) to Traditional Chinese Characters (Kyūjitai)"
+        << "   jp2t.json   New Japanese Kanji (Shinjitai) to Old Japanese Kanji (Kyūjitai)"
         << std::endl
         << std::endl;
   }

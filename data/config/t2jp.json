@@ -1,10 +1,10 @@
 {
-  "name": "Traditional Chinese Characters (Kyūjitai) to New Japanese Kanji (Shinjitai)",
+  "name": "Old Japanese Kanji (Kyūjitai) to New Japanese Kanji (Shinjitai)",
   "segmentation": {
     "type": "mmseg",
-    "dict": { "type": "ocd2", "file": "JPVariants.ocd2" }
+    "dict": { "type": "ocd2", "file": "JPShinjitaiCharactersRev.ocd2" }
   },
   "conversion_chain": [
-    { "dict": { "type": "ocd2", "file": "JPVariants.ocd2" } }
+    { "dict": { "type": "ocd2", "file": "JPShinjitaiCharactersRev.ocd2" } }
   ]
 }

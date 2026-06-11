@@ -4,6 +4,7 @@
 # License: Apache-2.0 (see LICENSE)
 # Source: https://github.com/ByVoid/OpenCC
 # Used in configs: tw2sp.json (via TWPhrasesRev.ocd2)
+
 A型肝炎	甲型肝炎
 A肝	甲肝
 BMW集團	寶馬集團

@@ -218,11 +218,14 @@ class TestDictionaries(unittest.TestCase):
                         continue
 
                     for k_char, v_char in zip(key, value):
-                        if k_char == v_char:
-                            continue
-
-                        if v_char in char_cands.get(k_char, set()):
-                            continue
+                        try:
+                            cands = char_cands[k_char]
+                        except KeyError:
+                            if k_char == v_char:
+                                continue
+                        else:
+                            if v_char in cands:
+                                continue
 
                         reports.append(
                             f"{phrase_name}:{entry.line}: "

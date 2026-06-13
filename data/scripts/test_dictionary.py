@@ -348,9 +348,32 @@ class TestDictionaries(unittest.TestCase):
         Validate that regional phrase keys are not interrupted by s2t phrase
         values during a phrase-related conversion like s2twp.
         """
+        def iter_conflicts(key, entry):
+            for phrase in (entry["key"], entry["value"]):
+                if len(phrase) < len(key) and phrase in key:
+                    yield phrase
+
+                for ln in range(len(key) - 1, 0, -1):
+                    subphrase = phrase[:ln]
+                    if key[-ln:] == subphrase:
+                        yield subphrase
+
+                # for ln in range(len(key) - 1, 0, -1):
+                    # subphrase = phrase[-ln:]
+                    # if key[:ln] == subphrase:
+                        # yield subphrase
+
         dict_pairs = (
             ("HKPhrases", "STPhrases"),
             ("TWPhrases", "STPhrases"),
+            ("TWPhrasesRev", "TSPhrases"),
+            ("TWVariantsRevPhrases", "TSPhrases"),
+            ("HKPhrasesRev", "TSPhrases"),
+            ("HKVariantsRevPhrases", "TSPhrases"),
+            # ("TSPhrases", "TWPhrasesRev"),
+            # ("TSPhrases", "TWVariantsRevPhrases"),
+            # ("TSPhrases", "HKPhrasesRev"),
+            # ("TSPhrases", "HKVariantsRevPhrases"),
         )
 
         reports = []
@@ -374,19 +397,13 @@ class TestDictionaries(unittest.TestCase):
                     continue
 
                 for seg_entry in seg_values.values():
-                    value = seg_entry["value"]
-                    if len(value) >= len(key) or len(value) < 2:
-                        continue
-
-                    if value not in key:
-                        continue
-
-                    reports.append(
-                        f"{dict_name}:{entry.line}: {key!r} "
-                        f"(may conflict with {seg_dict_name}:{seg_entry['line']}: "
-                        f"{seg_entry['key']!r} -> {value!r})"
-                    )
-                    break
+                    if next(iter_conflicts(key, seg_entry), None):
+                        reports.append(
+                            f"{dict_name}:{entry.line}: {key!r} "
+                            f"(may conflict with {seg_dict_name}:{seg_entry['line']}: "
+                            f"{seg_entry['key']!r} -> {seg_entry['value']!r})"
+                        )
+                        break
 
         if reports:
             self.fail(
@@ -394,7 +411,7 @@ class TestDictionaries(unittest.TestCase):
                 "Every phrase key declared in a dictionary should be "
                 "covered by the conversion values in the segmentation "
                 "dictionary. If a key (e.g., 表達式 -> 運算式) conflicts "
-                "with a value in the segmentation dictionary (e.g., 表达 -> 表達), "
+                "with an entry in the segmentation dictionary (e.g., 表达 -> 表達), "
                 "the full key (i.e., 表達式) should typically be added "
                 "to the segmentation dictionary as well.\n\n"
                 "Potentially missing segmentation entries:\n" + "\n".join(reports)

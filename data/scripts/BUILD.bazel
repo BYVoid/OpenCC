@@ -81,8 +81,13 @@ DICT_TESTS = {
     ],
     "phrases_segmentation": [
         "HKPhrases.txt",
+        "HKPhrasesRev.txt",
+        "HKVariantsRevPhrases.txt",
         "STPhrases.txt",
+        "TSPhrases.txt",
         "TWPhrases.txt",
+        "TWPhrasesRev.txt",
+        "TWVariantsRevPhrases.txt",
     ],
 }
 

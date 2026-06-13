@@ -18,9 +18,11 @@ set(
   TWVariantsPhrases
   TWVariants
   TWVariantsRevPhrases
+  TWVariantsRev
   HKVariantsPhrases
   HKVariants
   HKVariantsRevPhrases
+  HKVariantsRev
   HKPhrases
   HKPhrasesRev
   JPShinjitaiCharacters
@@ -29,8 +31,6 @@ set(
 
 set(
   DICTS_GENERATED_REV
-  TWVariantsRev
-  HKVariantsRev
   JPShinjitaiCharactersRev
 )
 
@@ -68,24 +68,6 @@ endforeach(DICT)
 set(
   SCHEME_ALLOWED_SMP
   ${SCHEME_DIR}/AllowedSmpChars.txt
-)
-
-set(
-  DICT_TWVariantsRev_GENERATING_INPUT
-  ${DICT_DIR}/TWVariants.txt
-)
-set(
-  DICT_TWVariantsRev_GENERATING_COMMAND
-  ${DICT_REVERSE_BIN} ${DICT_TWVariantsRev_GENERATING_INPUT} TWVariantsRev.txt
-)
-
-set(
-  DICT_HKVariantsRev_GENERATING_INPUT
-  ${DICT_DIR}/HKVariants.txt
-)
-set(
-  DICT_HKVariantsRev_GENERATING_COMMAND
-  ${DICT_REVERSE_BIN} ${DICT_HKVariantsRev_GENERATING_INPUT} HKVariantsRev.txt
 )
 
 set(

@@ -62,18 +62,22 @@ DICT_TESTS = {
         "TWVariantsRevPhrases.txt",
     ],
     "variant_rev_phrases": [
-        "HKVariants.txt",
+        "HKVariantsRev.txt",
         "HKVariantsRevPhrases.txt",
         "STCharacters.txt",
         "STPhrases.txt",
-        "TWVariants.txt",
+        "TWVariantsRev.txt",
         "TWVariantsRevPhrases.txt",
     ],
-    "phrases_reverse_mapping": [
+    "reverse_mapping": [
         "HKPhrases.txt",
         "HKPhrasesRev.txt",
+        "HKVariants.txt",
+        "HKVariantsRev.txt",
         "TWPhrases.txt",
         "TWPhrasesRev.txt",
+        "TWVariants.txt",
+        "TWVariantsRev.txt",
     ],
     "phrases_segmentation": [
         "HKPhrases.txt",

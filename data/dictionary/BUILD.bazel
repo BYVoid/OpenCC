@@ -10,8 +10,6 @@ package(default_visibility = ["//visibility:public"])
         tools = ["//data/scripts:reverse"],
     )
     for txt in [
-        "TWVariants",
-        "HKVariants",
         "JPShinjitaiCharacters",
     ]
 ]
@@ -36,8 +34,6 @@ TEXT_DICTS = glob(["*.txt"]) + [
     "TSCharactersExt.txt",
     "TSPhrasesBase.txt",
     "TSPhrasesExt.txt",
-    "TWVariantsRev.txt",
-    "HKVariantsRev.txt",
     "JPShinjitaiCharactersRev.txt",
 ]
 

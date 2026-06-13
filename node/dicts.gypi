@@ -144,14 +144,6 @@
       "outputs": ["<(output_prefix)JPShinjitaiCharactersRev.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
-      "action_name": "TWVariantsRev.txt",
-      "variables": {
-        "input": "<(input_prefix)TWVariants.txt",
-      },
-      "inputs": ["<(input)"],
-      "outputs": ["<(output_prefix)TWVariantsRev.txt"],
-      "action": ["<(python_cmd)", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
-    }, {
       "action_name": "TWPhrases",
       "variables": {
         "input": "<(input_prefix)TWPhrases.txt",
@@ -162,7 +154,7 @@
     }, {
       "action_name": "TWVariantsRev",
       "variables": {
-        "input": "<(output_prefix)TWVariantsRev.txt",
+        "input": "<(input_prefix)TWVariantsRev.txt",
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)TWVariantsRev.ocd2"],
@@ -208,17 +200,9 @@
       "outputs": ["<(output_prefix)HKPhrases.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
-      "action_name": "HKVariantsRev.txt",
-      "variables": {
-        "input": "<(input_prefix)HKVariants.txt",
-      },
-      "inputs": ["<(input)"],
-      "outputs": ["<(output_prefix)HKVariantsRev.txt"],
-      "action": ["<(python_cmd)", "<(dict_reverse)", "<(input)", "<@(_outputs)"]
-    }, {
       "action_name": "HKVariantsRev",
       "variables": {
-        "input": "<(output_prefix)HKVariantsRev.txt",
+        "input": "<(input_prefix)HKVariantsRev.txt",
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)HKVariantsRev.ocd2"],

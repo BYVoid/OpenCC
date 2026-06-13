@@ -196,17 +196,8 @@ class TestDictionaries(unittest.TestCase):
             phrase_file = os.path.join(dict_dir, f"{phrase_name}.txt")
             char_file = os.path.join(dict_dir, f"{char_name}.txt")
 
-            # Special handling: load swapped dict from "<file>" if "<file>Rev" not generated
-            if not os.path.isfile(char_file) and char_name.endswith("Rev"):
-                char_file = os.path.join(dict_dir, f"{char_name[:-3]}.txt")
-                table = Table.from_file(char_file)
-                table.swap()
-                entries = table.values()
-            else:
-                entries = Table().iter(char_file)
-
             char_cands = {}
-            for entry in entries:
+            for entry in Table().iter(char_file):
                 key = entry.key
                 values = entry
                 if not (len(key) == 1 and values):
@@ -251,15 +242,15 @@ class TestDictionaries(unittest.TestCase):
     def test_variant_rev_phrases(self):
         """Validate reverse variant phrase dictionary coverage."""
         dict_names = (
-            "HKVariants",
-            "TWVariants",
+            "HKVariantsRev",
+            "TWVariantsRev",
         )
         st_characters_file = os.path.join(dict_dir, "STCharacters.txt")
         st_phrases_file = os.path.join(dict_dir, "STPhrases.txt")
 
         reports = []
         for dict_name in dict_names:
-            phrases_file_name = f"{dict_name}RevPhrases"
+            phrases_file_name = f"{dict_name}Phrases"
 
             variants_file = os.path.join(dict_dir, f"{dict_name}.txt")
             phrases_file = os.path.join(dict_dir, f"{phrases_file_name}.txt")
@@ -269,9 +260,9 @@ class TestDictionaries(unittest.TestCase):
             exception_chars = set()
             for entry in Table().iter(variants_file):
                 key = entry.key
-                for v in entry:
-                    if key != v and any(key in v_set and v in v_set for v_set in variant_sets):
-                        exception_chars.add(v)
+                v = entry[0]
+                if key != v and any(key in v_set and v in v_set for v_set in variant_sets):
+                    exception_chars.add(key)
 
             expected_phrases = set()
             for values in Table().iter(st_phrases_file):
@@ -292,7 +283,7 @@ class TestDictionaries(unittest.TestCase):
         if reports:
             self.fail(
                 "Reverse phrase identity exceptions validation failed.\n\n"
-                "When a variant file declares an asymmetric mapping (e.g., 纔 -> 才) "
+                "When a VariantRev file declares an asymmetric mapping (e.g., 才 -> 纔) "
                 "for characters in the same ST variant set (e.g., 才 -> 才 纔), "
                 "every corresponding output phrase in STPhrases (e.g., 专才 -> 專才) "
                 "should be explicitly declared as an identity mapping (i.e., 專才 -> 專才) "
@@ -300,14 +291,15 @@ class TestDictionaries(unittest.TestCase):
                 "(i.e., 專才 -> 專纔).\n\n" + "\n\n".join(reports)
             )
 
-    def test_phrases_reverse_mapping(self):
+    def test_reverse_mapping(self):
         """
-        Validate that regional phrase and reversed phrase dictionaries match
-        each other.
+        Validate that regional dictionaries match their reversed counterparts.
         """
         dict_names = (
             "HKPhrases",
+            "HKVariants",
             "TWPhrases",
+            "TWVariants",
         )
 
         reports = []

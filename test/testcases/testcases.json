@@ -1297,6 +1297,16 @@
       "expected": {
         "s2t": "手工面具 手工面膜"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_790_qian_ta_po",
+      "input": "乾闥婆",
+      "expected": {
+        "t2s": "乾闼婆",
+        "hk2s": "乾闼婆",
+        "tw2s": "乾闼婆",
+        "tw2sp": "乾闼婆"
+      }
     }
   ]
 }

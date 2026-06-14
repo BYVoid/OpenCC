@@ -380,6 +380,10 @@ std::shared_ptr<const ResourceProvider::Resource>
 ResourceProvider::GetResource(std::string_view resourceName) const {
   const std::string path = Resolve(resourceName);
   std::shared_ptr<std::string> content(new std::string);
+#if defined(_WIN32) || defined(_WIN64)
+  const std::vector<unsigned char> data = ReadBinaryFile(path);
+  content->assign(reinterpret_cast<const char*>(data.data()), data.size());
+#else
   std::ifstream input(path, std::ios::binary);
   if (!input) {
     throw FileNotFound(path);
@@ -389,6 +393,7 @@ ResourceProvider::GetResource(std::string_view resourceName) const {
   if (input.bad()) {
     throw FileNotFound(path);
   }
+#endif
 
   std::string cacheKey;
   if (!GetFileFreshnessCacheKey(path, &cacheKey)) {

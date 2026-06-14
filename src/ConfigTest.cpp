@@ -42,6 +42,15 @@ namespace fs = std::filesystem;
 
 std::string PathString(const fs::path& path) { return path.u8string(); }
 
+std::string NormalizePathString(std::string path) {
+  for (char& ch : path) {
+    if (ch == '\\') {
+      ch = '/';
+    }
+  }
+  return path;
+}
+
 fs::path MakeTempDir(const std::string& name) {
 #if defined(_WIN32) || defined(_WIN64)
   const auto suffix = std::to_string(GetCurrentProcessId());
@@ -480,9 +489,10 @@ TEST_F(ConfigTest, FilesystemResourceCacheKeyIncludesFreshness) {
     FilesystemResourceProvider provider({PathString(resourceDir)});
     const std::shared_ptr<const ResourceProvider::Resource> resource =
         provider.GetResource("dict.txt");
-    EXPECT_EQ(PathString(dictPath), resource->Name());
+    EXPECT_EQ(NormalizePathString(PathString(dictPath)),
+              NormalizePathString(resource->Name()));
     const std::string oldKey =
-        PathString(dictPath) + "\n" + std::to_string(resource->Size());
+        resource->Name() + "\n" + std::to_string(resource->Size());
     EXPECT_NE(oldKey, resource->CacheKey());
   } catch (...) {
     fs::remove_all(tempDir);

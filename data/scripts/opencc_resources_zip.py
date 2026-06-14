@@ -60,7 +60,9 @@ def write_entry(archive, name, content, date_time):
 
 def main():
     args = parse_args()
-    os.makedirs(os.path.dirname(args.output), exist_ok=True)
+    output_dir = os.path.dirname(args.output)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
     date_time = time.localtime()[:6]
     with zipfile.ZipFile(args.output, "w") as archive:
         for path in sorted(args.configs, key=os.path.basename):

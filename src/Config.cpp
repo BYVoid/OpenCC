@@ -351,14 +351,14 @@ public:
     throw FileNotFound(path);
   }
 
-  DictPtr LoadTextDictWithResourceProvider(const std::string& fileName) {
+  DictPtr LoadTextMarisaDictWithResourceProvider(const std::string& fileName) {
     if (resourceProvider == nullptr) {
       throw FileNotFound(fileName);
     }
 
     const std::shared_ptr<const ResourceProvider::Resource> resource =
         resourceProvider->GetResource(fileName);
-    std::string cacheKey = "text\n" + resource->CacheKey();
+    std::string cacheKey = "text-marisa\n" + resource->CacheKey();
     {
       std::lock_guard<std::mutex> lock(DictCacheMutex());
       PruneExpiredDictCache();
@@ -371,8 +371,9 @@ public:
       }
     }
 
-    TextDictPtr dict = TextDict::NewFromBuffer(resource->Data(),
-                                               resource->Size());
+    TextDictPtr textDict = TextDict::NewFromBuffer(resource->Data(),
+                                                   resource->Size());
+    DictPtr dict = MarisaDict::NewFromDict(*textDict.get());
     {
       std::lock_guard<std::mutex> lock(DictCacheMutex());
       PruneExpiredDictCache();
@@ -389,8 +390,7 @@ public:
   DictPtr LoadDictFromFile(const std::string& type,
                            const std::string& fileName) {
     if (type == "text") {
-      DictPtr dict = LoadTextDictWithResourceProvider(fileName);
-      return MarisaDict::NewFromDict(*dict.get());
+      return LoadTextMarisaDictWithResourceProvider(fileName);
     }
 #ifdef ENABLE_DARTS
     if (type == "ocd") {
@@ -651,6 +651,8 @@ Config::NewFromFile(const std::string& fileName,
       return NewFromString(std::string(resource->Data(), resource->Size()),
                            provider, options);
     } catch (const FileNotFound&) {
+      // Some callers pass a provider for dictionaries only; keep normal config
+      // file lookup as a fallback when the provider cannot supply the config.
       prefixedFileName = impl->FindConfigFile(fileName);
     }
   } else {

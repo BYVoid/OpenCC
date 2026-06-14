@@ -201,6 +201,9 @@ public:
 #endif
   }
 
+  MappedZipArchive(const MappedZipArchive&) = delete;
+  MappedZipArchive& operator=(const MappedZipArchive&) = delete;
+
   ~MappedZipArchive() {
 #if !defined(_WIN32) && !defined(_WIN64)
     if (data != nullptr) {
@@ -224,19 +227,25 @@ private:
 #endif
 };
 
-struct ZipResourceProviderInternal {
-  explicit ZipResourceProviderInternal(const std::string& zipFileName_)
-      : archive(std::make_shared<MappedZipArchive>(zipFileName_)) {}
+} // namespace
+
+struct ZipResourceProvider::Internal {
+  explicit Internal(const std::string& zipFileName_)
+      : archive(std::make_shared<MappedZipArchive>(zipFileName_)) {
+    Index();
+  }
+
+  void Index();
 
   std::shared_ptr<MappedZipArchive> archive;
   std::unordered_map<std::string, ZipEntry> entries;
 };
 
-void IndexZipArchive(ZipResourceProviderInternal* impl) {
-  const unsigned char* data = impl->archive->data;
-  const size_t size = impl->archive->size;
+void ZipResourceProvider::Internal::Index() {
+  const unsigned char* data = archive->data;
+  const size_t size = archive->size;
   if (size < 22) {
-    throw InvalidFormat("Invalid zip archive: " + impl->archive->fileName);
+    throw InvalidFormat("Invalid zip archive: " + archive->fileName);
   }
 
   const size_t maxCommentSize = 65535;
@@ -254,7 +263,7 @@ void IndexZipArchive(ZipResourceProviderInternal* impl) {
     }
   }
   if (eocdOffset == std::string::npos) {
-    throw InvalidFormat("Invalid zip archive: " + impl->archive->fileName);
+    throw InvalidFormat("Invalid zip archive: " + archive->fileName);
   }
 
   const uint16_t entryCount = ReadLe16(&data[eocdOffset + 10]);
@@ -262,13 +271,13 @@ void IndexZipArchive(ZipResourceProviderInternal* impl) {
   const uint32_t centralDirectoryOffset = ReadLe32(&data[eocdOffset + 16]);
   if (centralDirectoryOffset > size ||
       centralDirectorySize > size - centralDirectoryOffset) {
-    throw InvalidFormat("Invalid zip central directory: " + impl->archive->fileName);
+    throw InvalidFormat("Invalid zip central directory: " + archive->fileName);
   }
 
   size_t pos = centralDirectoryOffset;
   for (uint16_t i = 0; i < entryCount; i++) {
     if (pos + 46 > size || ReadLe32(&data[pos]) != 0x02014b50) {
-      throw InvalidFormat("Invalid zip central directory: " + impl->archive->fileName);
+      throw InvalidFormat("Invalid zip central directory: " + archive->fileName);
     }
     const uint16_t method = ReadLe16(&data[pos + 10]);
     const uint32_t compressedSize = ReadLe32(&data[pos + 20]);
@@ -279,7 +288,7 @@ void IndexZipArchive(ZipResourceProviderInternal* impl) {
     const uint32_t localHeaderOffset = ReadLe32(&data[pos + 42]);
     const size_t next = pos + 46 + fileNameLength + extraLength + commentLength;
     if (next > size) {
-      throw InvalidFormat("Invalid zip central directory: " + impl->archive->fileName);
+      throw InvalidFormat("Invalid zip central directory: " + archive->fileName);
     }
     const std::string name(
         reinterpret_cast<const char*>(&data[pos + 46]), fileNameLength);
@@ -288,24 +297,22 @@ void IndexZipArchive(ZipResourceProviderInternal* impl) {
         IsSafeZipResourceName(normalized)) {
       if (localHeaderOffset + 30 > size ||
           ReadLe32(&data[localHeaderOffset]) != 0x04034b50) {
-        throw InvalidFormat("Invalid zip local header: " + impl->archive->fileName);
+        throw InvalidFormat("Invalid zip local header: " + archive->fileName);
       }
       const uint16_t localNameLength = ReadLe16(&data[localHeaderOffset + 26]);
       const uint16_t localExtraLength = ReadLe16(&data[localHeaderOffset + 28]);
       const size_t dataOffset =
           localHeaderOffset + 30 + localNameLength + localExtraLength;
       if (dataOffset > size || compressedSize > size - dataOffset) {
-        throw InvalidFormat("Invalid zip entry data: " + impl->archive->fileName);
+        throw InvalidFormat("Invalid zip entry data: " + archive->fileName);
       }
-      impl->entries[normalized] = ZipEntry{
+      entries[normalized] = ZipEntry{
           method, compressedSize, uncompressedSize,
           static_cast<uint32_t>(dataOffset)};
     }
     pos = next;
   }
 }
-
-} // namespace
 
 ResourceProvider::Resource::Resource(std::string name_, const char* data_,
                                      size_t size_,
@@ -371,13 +378,9 @@ FilesystemResourceProvider::Resolve(std::string_view resourceName) const {
 }
 
 ZipResourceProvider::ZipResourceProvider(std::string zipFileName)
-    : internal(new ZipResourceProviderInternal(zipFileName)) {
-  IndexZipArchive(reinterpret_cast<ZipResourceProviderInternal*>(internal));
-}
+    : internal(new Internal(zipFileName)) {}
 
-ZipResourceProvider::~ZipResourceProvider() {
-  delete reinterpret_cast<ZipResourceProviderInternal*>(internal);
-}
+ZipResourceProvider::~ZipResourceProvider() = default;
 
 std::string ZipResourceProvider::Resolve(std::string_view resourceName) const {
   throw FileNotFound(std::string(resourceName));
@@ -390,17 +393,14 @@ ZipResourceProvider::GetResource(std::string_view resourceName) const {
     throw FileNotFound(std::string(resourceName));
   }
 
-  const ZipResourceProviderInternal* impl =
-      reinterpret_cast<const ZipResourceProviderInternal*>(internal);
-
-  auto entry = impl->entries.find(normalized);
-  if (entry == impl->entries.end()) {
+  auto entry = internal->entries.find(normalized);
+  if (entry == internal->entries.end()) {
     const std::string baseName = BaseName(normalized);
     if (baseName != normalized) {
-      entry = impl->entries.find(baseName);
+      entry = internal->entries.find(baseName);
     }
   }
-  if (entry == impl->entries.end()) {
+  if (entry == internal->entries.end()) {
     throw FileNotFound(normalized);
   }
   if (entry->second.method != 0) {
@@ -411,14 +411,14 @@ ZipResourceProvider::GetResource(std::string_view resourceName) const {
   }
 
   const char* data = reinterpret_cast<const char*>(
-      impl->archive->data + entry->second.dataOffset);
-  std::string cacheKey = impl->archive->fileName;
+      internal->archive->data + entry->second.dataOffset);
+  std::string cacheKey = internal->archive->fileName;
   cacheKey.push_back('\n');
   cacheKey.append(entry->first);
   cacheKey.push_back('\n');
   cacheKey.append(std::to_string(entry->second.uncompressedSize));
   return std::make_shared<ResourceProvider::Resource>(
-      entry->first, data, entry->second.uncompressedSize, impl->archive,
+      entry->first, data, entry->second.uncompressedSize, internal->archive,
       cacheKey);
 }
 

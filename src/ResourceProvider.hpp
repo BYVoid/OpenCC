@@ -70,13 +70,17 @@ public:
   explicit ZipResourceProvider(std::string zipFileName);
   ~ZipResourceProvider();
 
+  ZipResourceProvider(const ZipResourceProvider&) = delete;
+  ZipResourceProvider& operator=(const ZipResourceProvider&) = delete;
+
   std::string Resolve(std::string_view resourceName) const override;
 
   std::shared_ptr<const Resource>
   GetResource(std::string_view resourceName) const override;
 
 private:
-  void* internal;
+  struct Internal;
+  std::unique_ptr<Internal> internal;
 };
 
 } // namespace opencc

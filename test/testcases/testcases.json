@@ -531,6 +531,13 @@
       }
     },
     {
+      "id": "medical_phrases_tw_aids_love_taste_tw2sp",
+      "input": "愛滋病患也能嚐到戀愛滋味",
+      "expected": {
+        "tw2sp": "艾滋病人也能尝到恋爱滋味"
+      }
+    },
+    {
       "id": "medical_phrases_tw_hepatitis_s2twp",
       "input": "乙肝和丙肝患者要定期追蹤",
       "expected": {

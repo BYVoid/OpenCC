@@ -331,6 +331,48 @@ TEST_F(ConfigTest, ZipProviderFindsConfigNameAndResources) {
   fs::remove_all(tempDir);
 }
 
+TEST_F(ConfigTest, ZipProviderDoesNotOverrideAbsoluteConfigPath) {
+  const fs::path tempDir = MakeTempDir("opencc-zip-absolute-config-test");
+  const fs::path zipPath = tempDir / "resources.zip";
+  const fs::path configPath = tempDir / "config.json";
+  WriteStoredZip(zipPath, {
+                              {"config.json",
+                               InlineSingleStepConfig(
+                                   "{\n"
+                                   "        \"鼠标\": \"鼠标\"\n"
+                                   "      }",
+                                   "{\n"
+                                   "      \"type\": \"inline\",\n"
+                                   "      \"entries\": {\n"
+                                   "        \"鼠标\": \"乙\"\n"
+                                   "      }\n"
+                                   "    }")},
+                          });
+  WriteFile(configPath,
+            InlineSingleStepConfig(
+                "{\n"
+                "        \"鼠标\": \"鼠标\"\n"
+                "      }",
+                "{\n"
+                "      \"type\": \"inline\",\n"
+                "      \"entries\": {\n"
+                "        \"鼠标\": \"甲\"\n"
+                "      }\n"
+                "    }"));
+
+  try {
+    std::shared_ptr<ResourceProvider> provider(
+        new ZipResourceProvider(PathString(zipPath)));
+    const ConverterPtr tempConverter =
+        config.NewFromFile(PathString(configPath), provider);
+    EXPECT_EQ(utf8("甲"), tempConverter->Convert(utf8("鼠标")));
+  } catch (...) {
+    fs::remove_all(tempDir);
+    throw;
+  }
+  fs::remove_all(tempDir);
+}
+
 TEST_F(ConfigTest, ExplicitProviderConfigOverridesInstalledOrCwdConfigName) {
   const fs::path tempDir = MakeTempDir("opencc-provider-config-override-test");
   const fs::path cwdDir = tempDir / "cwd";
@@ -423,6 +465,28 @@ TEST_F(ConfigTest, MissingResourceListsSearchedPaths) {
     EXPECT_NE(std::string::npos, message.find("missing.ocd2"));
     EXPECT_NE(std::string::npos, message.find(PathString(firstDir)));
     EXPECT_NE(std::string::npos, message.find(PathString(secondDir)));
+  }
+  fs::remove_all(tempDir);
+}
+
+TEST_F(ConfigTest, FilesystemResourceCacheKeyIncludesFreshness) {
+  const fs::path tempDir = MakeTempDir("opencc-resource-cache-key-test");
+  const fs::path resourceDir = tempDir / "resources";
+  fs::create_directories(resourceDir);
+  const fs::path dictPath = resourceDir / "dict.txt";
+  WriteFile(dictPath, utf8("鼠标\t滑鼠\n"));
+
+  try {
+    FilesystemResourceProvider provider({PathString(resourceDir)});
+    const std::shared_ptr<const ResourceProvider::Resource> resource =
+        provider.GetResource("dict.txt");
+    EXPECT_EQ(PathString(dictPath), resource->Name());
+    const std::string oldKey =
+        PathString(dictPath) + "\n" + std::to_string(resource->Size());
+    EXPECT_NE(oldKey, resource->CacheKey());
+  } catch (...) {
+    fs::remove_all(tempDir);
+    throw;
   }
   fs::remove_all(tempDir);
 }

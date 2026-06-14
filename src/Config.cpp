@@ -647,7 +647,7 @@ Config::NewFromFile(const std::string& fileName,
     try {
       const std::shared_ptr<const ResourceProvider::Resource> resource =
           provider->GetResource(fileName);
-      impl->configDirectory = "";
+      impl->configDirectory = GetParentDirectory(resource->Name());
       return NewFromString(std::string(resource->Data(), resource->Size()),
                            provider, options);
     } catch (const FileNotFound&) {

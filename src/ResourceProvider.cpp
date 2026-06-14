@@ -130,6 +130,56 @@ std::string BaseName(const std::string& path) {
   return path.substr(pos + 1);
 }
 
+bool GetFileFreshnessCacheKey(const std::string& path, std::string* cacheKey) {
+#if defined(_WIN32) || defined(_WIN64)
+  WIN32_FILE_ATTRIBUTE_DATA fileInfo;
+  const std::wstring widePath = internal::WideFromUtf8(path);
+  if (widePath.empty() ||
+      !GetFileAttributesExW(widePath.c_str(), GetFileExInfoStandard,
+                            &fileInfo)) {
+    return false;
+  }
+#else
+  struct stat statBuf;
+  if (stat(path.c_str(), &statBuf) != 0) {
+    return false;
+  }
+#endif
+  *cacheKey = path;
+  cacheKey->push_back('\n');
+#if defined(_WIN32) || defined(_WIN64)
+  cacheKey->append(
+      std::to_string(static_cast<unsigned long long>(
+          fileInfo.ftLastWriteTime.dwHighDateTime)));
+  cacheKey->push_back('.');
+  cacheKey->append(
+      std::to_string(static_cast<unsigned long long>(
+          fileInfo.ftLastWriteTime.dwLowDateTime)));
+  cacheKey->push_back('\n');
+  cacheKey->append(
+      std::to_string(static_cast<unsigned long long>(fileInfo.nFileSizeHigh)));
+  cacheKey->push_back('.');
+  cacheKey->append(
+      std::to_string(static_cast<unsigned long long>(fileInfo.nFileSizeLow)));
+#else
+  cacheKey->append(std::to_string(static_cast<long long>(statBuf.st_mtime)));
+  cacheKey->push_back('.');
+#if defined(__APPLE__) && defined(__MACH__)
+  cacheKey->append(
+      std::to_string(static_cast<long long>(statBuf.st_mtimespec.tv_nsec)));
+#elif defined(st_mtime_nsec)
+  cacheKey->append(
+      std::to_string(static_cast<long long>(statBuf.st_mtime_nsec)));
+#else
+  cacheKey->append(
+      std::to_string(static_cast<long long>(statBuf.st_mtim.tv_nsec)));
+#endif
+  cacheKey->push_back('\n');
+  cacheKey->append(std::to_string(static_cast<long long>(statBuf.st_size)));
+#endif
+  return true;
+}
+
 #if defined(_WIN32) || defined(_WIN64)
 std::vector<unsigned char> ReadBinaryFile(const std::string& path) {
   FILE* file = _wfopen(internal::WideFromUtf8(path).c_str(), L"rb");
@@ -170,6 +220,9 @@ struct ZipEntry {
 class MappedZipArchive {
 public:
   explicit MappedZipArchive(const std::string& path) : fileName(path) {
+    if (!GetFileFreshnessCacheKey(path, &cacheKey)) {
+      throw FileNotFound(path);
+    }
 #if defined(_WIN32) || defined(_WIN64)
     buffer = ReadBinaryFile(path);
     data = buffer.empty() ? nullptr : buffer.data();
@@ -217,6 +270,7 @@ public:
   }
 
   const std::string fileName;
+  std::string cacheKey;
   const unsigned char* data = nullptr;
   size_t size = 0;
 
@@ -294,8 +348,8 @@ void ZipResourceProvider::Internal::Index() {
     const std::string name(
         reinterpret_cast<const char*>(&data[pos + 46]), fileNameLength);
     const std::string normalized = NormalizeResourceName(name);
-    if (!normalized.empty() && normalized.back() != '/' &&
-        IsSafeZipResourceName(normalized)) {
+    if (!IsAbsolutePath(name) && !normalized.empty() &&
+        normalized.back() != '/' && IsSafeZipResourceName(normalized)) {
       if (localHeaderOffset + 30 > size ||
           ReadLe32(&data[localHeaderOffset]) != 0x04034b50) {
         throw InvalidFormat("Invalid zip local header: " + archive->fileName);
@@ -336,9 +390,10 @@ ResourceProvider::GetResource(std::string_view resourceName) const {
     throw FileNotFound(path);
   }
 
-  std::string cacheKey = path;
-  cacheKey.push_back('\n');
-  cacheKey.append(std::to_string(content->size()));
+  std::string cacheKey;
+  if (!GetFileFreshnessCacheKey(path, &cacheKey)) {
+    throw FileNotFound(path);
+  }
   return std::make_shared<Resource>(path, content->data(), content->size(),
                                     content, cacheKey);
 }
@@ -389,6 +444,10 @@ std::string ZipResourceProvider::Resolve(std::string_view resourceName) const {
 
 std::shared_ptr<const ResourceProvider::Resource>
 ZipResourceProvider::GetResource(std::string_view resourceName) const {
+  if (IsAbsolutePath(std::string(resourceName))) {
+    throw FileNotFound(std::string(resourceName));
+  }
+
   const std::string normalized = NormalizeResourceName(resourceName);
   if (!IsSafeZipResourceName(normalized)) {
     throw FileNotFound(std::string(resourceName));
@@ -413,7 +472,7 @@ ZipResourceProvider::GetResource(std::string_view resourceName) const {
 
   const char* data = reinterpret_cast<const char*>(
       internal->archive->data + entry->second.dataOffset);
-  std::string cacheKey = internal->archive->fileName;
+  std::string cacheKey = internal->archive->cacheKey;
   cacheKey.push_back('\n');
   cacheKey.append(entry->first);
   cacheKey.push_back('\n');

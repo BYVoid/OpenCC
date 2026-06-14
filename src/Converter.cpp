@@ -96,6 +96,22 @@ std::string ConverterStream::ConvertChunk(const char* input, size_t length) {
     charsKept++;
   }
 
+  const char* idsKeepStart = completeEnd;
+  const char* idsCandidate = completeEnd;
+  size_t idsCharsScanned = 0;
+  const size_t kMaxIDSCodePoints = 64;
+  while (idsCandidate > bufferBegin && idsCharsScanned < kMaxIDSCodePoints) {
+    idsCandidate -= UTF8Util::PrevCharLength(idsCandidate);
+    idsCharsScanned++;
+    if (UTF8Util::IsIncompleteIdeographicDescriptionSequencePrefix(
+            idsCandidate, completeEnd - idsCandidate)) {
+      idsKeepStart = idsCandidate;
+    }
+  }
+  if (idsKeepStart < keepStart) {
+    keepStart = idsKeepStart;
+  }
+
   if (keepStart == bufferBegin) {
     return std::string();
   }

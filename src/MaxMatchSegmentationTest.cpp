@@ -54,6 +54,13 @@ TEST_F(MaxMatchSegmentationTest, SingleCharacter) {
   EXPECT_EQ(utf8("一"), std::string(segments->At(0)));
 }
 
+TEST_F(MaxMatchSegmentationTest, PreserveIdeographicDescriptionSequence) {
+  const auto& segments = segmenter->Segment(utf8("⿰钅干干"));
+  EXPECT_EQ(2, segments->Length());
+  EXPECT_EQ(utf8("⿰钅干"), std::string(segments->At(0)));
+  EXPECT_EQ(utf8("干"), std::string(segments->At(1)));
+}
+
 TEST_F(MaxMatchSegmentationTest, TruncatedUtf8Sequence) {
   // This test specifically triggers the buffer overflow bug in the old code.
   // The bug occurs when a string ends with an incomplete UTF-8 sequence.

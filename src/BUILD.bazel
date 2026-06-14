@@ -191,7 +191,9 @@ cc_test(
     srcs = ["ConversionChainTest.cpp"],
     deps = [
         ":conversion_chain_lib",
+        ":converter_lib",
         ":dict_group_test_base_lib",
+        ":max_match_segmentation_lib",
         "@googletest//:gtest_main",
     ],
 )

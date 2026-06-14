@@ -84,6 +84,50 @@ TEST_F(ConversionTest, PreserveNestedDictGroupPriority) {
   EXPECT_EQ("Xbc", groupConversion.Convert("abc"));
 }
 
+TEST_F(ConversionTest, PreserveIdeographicDescriptionSequenceComponents) {
+  LexiconPtr lexicon(new Lexicon);
+  lexicon->Add(DictEntryFactory::New(utf8("钅"), utf8("釒")));
+  lexicon->Add(DictEntryFactory::New(utf8("只"), utf8("隻")));
+  lexicon->Sort();
+
+  DictPtr componentDict(new TextDict(lexicon));
+  Conversion componentConversion(componentDict);
+
+  EXPECT_EQ(utf8("⿰钅只隻"), componentConversion.Convert(utf8("⿰钅只只")));
+}
+
+TEST_F(ConversionTest, PreserveComplexIdeographicDescriptionSequenceComponents) {
+  LexiconPtr lexicon(new Lexicon);
+  lexicon->Add(DictEntryFactory::New(utf8("長"), utf8("长")));
+  lexicon->Add(DictEntryFactory::New(utf8("馬"), utf8("马")));
+  lexicon->Add(DictEntryFactory::New(utf8("心"), utf8("芯")));
+  lexicon->Sort();
+
+  DictPtr componentDict(new TextDict(lexicon));
+  Conversion componentConversion(componentDict);
+
+  EXPECT_EQ(
+      utf8("⿺⻍⿳穴⿲月⿱⿲幺言幺⿲長馬長刂心长"),
+      componentConversion.Convert(
+          utf8("⿺⻍⿳穴⿲月⿱⿲幺言幺⿲長馬長刂心長")));
+}
+
+TEST_F(ConversionTest, DoesNotPreserveIsolatedIdeographicDescriptionCharacters) {
+  LexiconPtr lexicon(new Lexicon);
+  lexicon->Add(DictEntryFactory::New(utf8("表"), utf8("錶")));
+  lexicon->Add(DictEntryFactory::New(utf8("证"), utf8("證")));
+  lexicon->Sort();
+
+  DictPtr dict(new TextDict(lexicon));
+  Conversion idcDescriptionConversion(dict);
+
+  EXPECT_EQ(
+      utf8("錶意文字描述字元包括這些字元：⿰⿱⿲⿳⿴⿵⿶⿷⿸⿹⿺⿻⿼⿽⿾⿿"),
+      idcDescriptionConversion.Convert(
+          utf8("表意文字描述字元包括這些字元：⿰⿱⿲⿳⿴⿵⿶⿷⿸⿹⿺⿻⿼⿽⿾⿿")));
+  EXPECT_EQ(utf8("⿾证證"), idcDescriptionConversion.Convert(utf8("⿾证证")));
+}
+
 TEST_F(ConversionTest, TruncatedUtf8Sequence) {
   // This test specifically triggers the information disclosure vulnerability
   // in the old code. The bug occurs when a string ends with an incomplete

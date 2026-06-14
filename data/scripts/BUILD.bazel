@@ -17,14 +17,101 @@ py_binary(
 )
 
 py_binary(
-    name = "extract_tofu_risk",
-    srcs = ["extract_tofu_risk.py"],
+    name = "tofu",
+    srcs = ["tofu.py"],
+    imports = ["."],
+    deps = [":common"],
 )
 
 py_test(
-    name = "common_test",
+    name = "test_common",
     size = "small",
-    srcs = ["common_test.py"],
+    srcs = ["test_common.py"],
     imports = ["."],
     deps = [":common"],
+)
+
+DICT_TESTS = {
+    "sorted": [
+        "//data/dictionary:text_dictionaries",
+    ],
+    "compatibility_ideographs": [
+        "//data/dictionary:text_dictionaries",
+        "//data/scheme:scheme_files",
+    ],
+    "non_bmp": [
+        "//data/dictionary:text_dictionaries",
+        "//data/scheme:scheme_files",
+    ],
+    "phrases_tofu_fallbacks": [
+        "//data/dictionary:text_dictionaries",
+        "//data/scheme:scheme_files",
+    ],
+    "phrase_character_dependency": [
+        "HKVariants.txt",
+        "HKVariantsPhrases.txt",
+        "HKVariantsRev.txt",
+        "HKVariantsRevPhrases.txt",
+        "STCharacters.txt",
+        "STPhrases.txt",
+        "TSCharacters.txt",
+        "TSPhrases.txt",
+        "TWVariants.txt",
+        "TWVariantsPhrases.txt",
+        "TWVariantsRev.txt",
+        "TWVariantsRevPhrases.txt",
+    ],
+    "variant_rev_phrases": [
+        "HKVariantsRev.txt",
+        "HKVariantsRevPhrases.txt",
+        "STCharacters.txt",
+        "STPhrases.txt",
+        "TWVariantsRev.txt",
+        "TWVariantsRevPhrases.txt",
+    ],
+    "reverse_mapping": [
+        "HKPhrases.txt",
+        "HKPhrasesRev.txt",
+        "HKVariants.txt",
+        "HKVariantsRev.txt",
+        "TWPhrases.txt",
+        "TWPhrasesRev.txt",
+        "TWVariants.txt",
+        "TWVariantsRev.txt",
+    ],
+    "phrases_segmentation": [
+        "HKPhrases.txt",
+        "HKPhrasesRev.txt",
+        "HKVariantsRevPhrases.txt",
+        "STPhrases.txt",
+        "TSPhrases.txt",
+        "TWPhrases.txt",
+        "TWPhrasesRev.txt",
+        "TWVariantsRevPhrases.txt",
+    ],
+}
+
+[
+    py_test(
+        name = "dictionary_" + test_func + "_test",
+        size = "small",
+        srcs = ["test_dictionary.py"],
+        main = "test_dictionary.py",
+        args = ["-k", "test_" + test_func],
+        data = [
+            d if d.startswith("//") else "//data/dictionary:" + d
+            for d in data
+        ],
+        imports = ["."],
+        deps = [":common"],
+    )
+    for test_func, data in DICT_TESTS.items()
+]
+
+test_suite(
+    name = "dictionary_test",
+    tests = [
+        "dictionary_" + test_func + "_test"
+        for test_func in DICT_TESTS
+    ],
 )

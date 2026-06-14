@@ -226,6 +226,15 @@ const OpenCC = module.exports = function (config, options) {
   const includeTofuRiskDictionaries =
     options.includeTofuRiskDictionaries !== false;
 
+  if (options.resourceZip) {
+    this.handler = new binding.Opencc(
+      config,
+      options.resourceZip,
+      includeTofuRiskDictionaries
+    );
+    return;
+  }
+
   // When opencc-jieba is installed, check if the requested config is a jieba
   // config. If so, load its JSON, patch all paths to absolute, and pass the
   // patched JSON string directly to the C++ layer via NewFromString.

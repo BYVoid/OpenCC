@@ -51,6 +51,8 @@ public:
 
   static TextDictPtr NewFromFile(FILE* fp);
 
+  static TextDictPtr NewFromBuffer(const char* data, size_t size);
+
   static TextDictPtr NewFromSortedFile(FILE* fp);
 
 private:

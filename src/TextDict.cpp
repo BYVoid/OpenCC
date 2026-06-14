@@ -57,6 +57,17 @@ TextDictPtr TextDict::NewFromFile(FILE* fp) {
   return TextDictPtr(new TextDict(lexicon));
 }
 
+TextDictPtr TextDict::NewFromBuffer(const char* data, size_t size) {
+  const LexiconPtr& lexicon = Lexicon::ParseLexiconFromBuffer(data, size);
+  lexicon->Sort();
+  std::string dupkey;
+  if (!lexicon->IsUnique(&dupkey)) {
+    throw InvalidFormat(
+        "The text dictionary contains duplicated keys: " + dupkey + ".");
+  }
+  return TextDictPtr(new TextDict(lexicon));
+}
+
 TextDictPtr TextDict::NewFromDict(const Dict& dict) {
   return TextDictPtr(new TextDict(dict.GetLexicon()));
 }

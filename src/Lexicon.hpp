@@ -63,6 +63,7 @@ public:
   }
 
   static LexiconPtr ParseLexiconFromFile(FILE* fp);
+  static LexiconPtr ParseLexiconFromBuffer(const char* data, size_t size);
 
 private:
   std::vector<std::unique_ptr<DictEntry>> entries;

@@ -87,6 +87,7 @@ function parseArgs(args) {
     config: 's2t.json',
     input: null,
     output: null,
+    resourceZip: null,
     includeTofuRiskDictionaries: false,
     help: false,
     version: false,
@@ -103,6 +104,11 @@ function parseArgs(args) {
       i += 1;
     } else if (arg.startsWith('--config=')) {
       options.config = readInlineOptionValue(arg, '--config');
+    } else if (arg === '--resource-zip') {
+      options.resourceZip = readOptionValue(args, i, arg);
+      i += 1;
+    } else if (arg.startsWith('--resource-zip=')) {
+      options.resourceZip = readInlineOptionValue(arg, '--resource-zip');
     } else if (arg === '-i' || arg === '--input') {
       options.input = readOptionValue(args, i, arg);
       i += 1;
@@ -224,6 +230,7 @@ function main() {
   try {
     const converter = new OpenCC(resolveConfigPath(options.config), {
       includeTofuRiskDictionaries: options.includeTofuRiskDictionaries,
+      resourceZip: options.resourceZip,
     });
     convertStream(converter, options, (error) => {
       if (error) {

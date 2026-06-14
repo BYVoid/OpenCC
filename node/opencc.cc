@@ -6,6 +6,7 @@
 #include "src/Converter.hpp"
 #include "src/DictConverter.hpp"
 #include "src/Exception.hpp"
+#include "src/ResourceProvider.hpp"
 
 using namespace opencc;
 
@@ -56,6 +57,25 @@ public:
   explicit OpenccBinding(const Napi::CallbackInfo& info)
       : Napi::ObjectWrap<OpenccBinding>(info), config_(), converter_() {
     Napi::Env env = info.Env();
+
+    if (info.Length() >= 3 && info[0].IsString() && info[1].IsString() &&
+        info[2].IsBoolean()) {
+      // Three-argument mode:
+      // NewFromFile(configFileName, ZipResourceProvider(resourceZipFileName)).
+      const std::string configFile = ToUtf8String(info[0]);
+      const std::string resourceZipFile = ToUtf8String(info[1]);
+      ConfigLoadOptions options;
+      options.includeTofuRiskDictionaries =
+          info[2].As<Napi::Boolean>().Value();
+      try {
+        std::shared_ptr<ResourceProvider> provider(
+            new ZipResourceProvider(resourceZipFile));
+        converter_ = config_.NewFromFile(configFile, provider, options);
+      } catch (opencc::Exception& e) {
+        Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
+      }
+      return;
+    }
 
     if (info.Length() >= 2 && info[0].IsString() && info[1].IsString()) {
       // Two-argument mode: NewFromString(jsonString, configDirectory)

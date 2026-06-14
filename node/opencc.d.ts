@@ -1,5 +1,6 @@
 interface OpenCCOptions {
   includeTofuRiskDictionaries?: boolean;
+  resourceZip?: string;
 }
 
 declare class OpenCC {

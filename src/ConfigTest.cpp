@@ -19,6 +19,7 @@
 #include <fstream>
 #include <filesystem>
 #include <memory>
+#include <utility>
 #include <vector>
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -56,6 +57,85 @@ fs::path MakeTempDir(const std::string& name) {
 void WriteFile(const fs::path& path, const std::string& content) {
   std::ofstream ofs(path, std::ios::binary);
   ofs << content;
+}
+
+void WriteLe16(std::ofstream& output, uint16_t value) {
+  output.put(static_cast<char>(value & 0xff));
+  output.put(static_cast<char>((value >> 8) & 0xff));
+}
+
+void WriteLe32(std::ofstream& output, uint32_t value) {
+  output.put(static_cast<char>(value & 0xff));
+  output.put(static_cast<char>((value >> 8) & 0xff));
+  output.put(static_cast<char>((value >> 16) & 0xff));
+  output.put(static_cast<char>((value >> 24) & 0xff));
+}
+
+struct ZipTestEntry {
+  std::string name;
+  std::string content;
+  uint32_t localHeaderOffset;
+};
+
+void WriteStoredZip(const fs::path& path,
+                    std::vector<std::pair<std::string, std::string>> entries) {
+  std::ofstream output(path, std::ios::binary);
+  std::vector<ZipTestEntry> writtenEntries;
+  for (const auto& entry : entries) {
+    const std::string& name = entry.first;
+    const std::string& content = entry.second;
+    const uint32_t localHeaderOffset =
+        static_cast<uint32_t>(output.tellp());
+    WriteLe32(output, 0x04034b50);
+    WriteLe16(output, 20);
+    WriteLe16(output, 0);
+    WriteLe16(output, 0);
+    WriteLe16(output, 0);
+    WriteLe16(output, 0);
+    WriteLe32(output, 0);
+    WriteLe32(output, static_cast<uint32_t>(content.size()));
+    WriteLe32(output, static_cast<uint32_t>(content.size()));
+    WriteLe16(output, static_cast<uint16_t>(name.size()));
+    WriteLe16(output, 0);
+    output.write(name.data(), static_cast<std::streamsize>(name.size()));
+    output.write(content.data(), static_cast<std::streamsize>(content.size()));
+    writtenEntries.push_back(ZipTestEntry{name, content, localHeaderOffset});
+  }
+
+  const uint32_t centralDirectoryOffset =
+      static_cast<uint32_t>(output.tellp());
+  for (const ZipTestEntry& entry : writtenEntries) {
+    WriteLe32(output, 0x02014b50);
+    WriteLe16(output, 20);
+    WriteLe16(output, 20);
+    WriteLe16(output, 0);
+    WriteLe16(output, 0);
+    WriteLe16(output, 0);
+    WriteLe16(output, 0);
+    WriteLe32(output, 0);
+    WriteLe32(output, static_cast<uint32_t>(entry.content.size()));
+    WriteLe32(output, static_cast<uint32_t>(entry.content.size()));
+    WriteLe16(output, static_cast<uint16_t>(entry.name.size()));
+    WriteLe16(output, 0);
+    WriteLe16(output, 0);
+    WriteLe16(output, 0);
+    WriteLe16(output, 0);
+    WriteLe32(output, 0);
+    WriteLe32(output, entry.localHeaderOffset);
+    output.write(entry.name.data(),
+                 static_cast<std::streamsize>(entry.name.size()));
+  }
+  const uint32_t centralDirectorySize =
+      static_cast<uint32_t>(output.tellp()) - centralDirectoryOffset;
+
+  WriteLe32(output, 0x06054b50);
+  WriteLe16(output, 0);
+  WriteLe16(output, 0);
+  WriteLe16(output, static_cast<uint16_t>(writtenEntries.size()));
+  WriteLe16(output, static_cast<uint16_t>(writtenEntries.size()));
+  WriteLe32(output, centralDirectorySize);
+  WriteLe32(output, centralDirectoryOffset);
+  WriteLe16(output, 0);
 }
 
 std::string SingleDictConfig(const std::string& dictFile) {
@@ -222,6 +302,27 @@ TEST_F(ConfigTest, ExplicitProviderFindsConfigNameAndResources) {
         new FilesystemResourceProvider({PathString(resourceDir)}));
     const ConverterPtr tempConverter =
         config.NewFromFile("provider_config.json", provider);
+    EXPECT_EQ(utf8("滑鼠"), tempConverter->Convert(utf8("鼠标")));
+  } catch (...) {
+    fs::remove_all(tempDir);
+    throw;
+  }
+  fs::remove_all(tempDir);
+}
+
+TEST_F(ConfigTest, ZipProviderFindsConfigNameAndResources) {
+  const fs::path tempDir = MakeTempDir("opencc-zip-provider-test");
+  const fs::path zipPath = tempDir / "resources.zip";
+  WriteStoredZip(zipPath, {
+                              {"config.json", SingleDictConfig("dict.txt")},
+                              {"dict.txt", utf8("鼠标\t滑鼠\n")},
+                          });
+
+  try {
+    std::shared_ptr<ResourceProvider> provider(
+        new ZipResourceProvider(PathString(zipPath)));
+    const ConverterPtr tempConverter =
+        config.NewFromFile("config.json", provider);
     EXPECT_EQ(utf8("滑鼠"), tempConverter->Convert(utf8("鼠标")));
   } catch (...) {
     fs::remove_all(tempDir);

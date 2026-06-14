@@ -144,6 +144,12 @@ protected:
 #endif
   }
 
+#ifdef BAZEL
+  std::string ResourceZipFile() const {
+    return runfiles_->Rlocation("_main/data/opencc-resources.zip");
+  }
+#endif
+
   std::string ConfigurationDirectory() const {
 #ifdef BAZEL
     return "";
@@ -205,6 +211,22 @@ protected:
     return system(cmd.c_str());
 #endif
   }
+
+#ifdef BAZEL
+  std::string TestResourceZipCommand(const std::string& config,
+                                     const std::string& inputFile,
+                                     const std::string& outputFile) const {
+    std::string cmd = QuotePath(OpenccCommand()) + " -i " +
+                      QuotePath(inputFile) + " -o " + QuotePath(outputFile) +
+                      " -c " + QuotePath(config + ".json") +
+                      " --resource-zip " + QuotePath(ResourceZipFile());
+#ifdef _WIN32
+    return "\"" + cmd + "\"";
+#else
+    return cmd;
+#endif
+  }
+#endif
 
   std::string TestCommandWithFlags(const std::string& config,
                                    const std::string& inputFile,
@@ -396,6 +418,23 @@ TEST_F(CommandLineConvertTest, IncludeTofuRiskDictionariesFlagRestoresLegacy) {
                    .c_str()));
   EXPECT_EQ("𫝈", GetFileContents(outputFile));
 }
+
+#ifdef BAZEL
+TEST_F(CommandLineConvertTest, ResourceZipConvertsWithoutResourcePaths) {
+  const std::string inputFile = InputFile("resource_zip");
+  const std::string outputFile = OutputFile("resource_zip");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "打印机和鼠标";
+  }
+
+  ASSERT_EQ(0,
+            RunCommand(TestResourceZipCommand("s2twp", inputFile, outputFile)));
+  EXPECT_EQ("印表機和滑鼠", GetFileContents(outputFile));
+}
+#endif
 
 TEST_F(CommandLineConvertTest, StdinPreservesLineEndingsAndUnknownCharacters) {
   const std::string config = "s2t";

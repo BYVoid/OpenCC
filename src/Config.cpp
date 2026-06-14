@@ -351,10 +351,45 @@ public:
     throw FileNotFound(path);
   }
 
+  DictPtr LoadTextDictWithResourceProvider(const std::string& fileName) {
+    if (resourceProvider == nullptr) {
+      throw FileNotFound(fileName);
+    }
+
+    const std::shared_ptr<const ResourceProvider::Resource> resource =
+        resourceProvider->GetResource(fileName);
+    std::string cacheKey = "text\n" + resource->CacheKey();
+    {
+      std::lock_guard<std::mutex> lock(DictCacheMutex());
+      PruneExpiredDictCache();
+      const auto cached = DictCache().find(cacheKey);
+      if (cached != DictCache().end()) {
+        DictPtr dict = cached->second.lock();
+        if (dict != nullptr) {
+          return dict;
+        }
+      }
+    }
+
+    TextDictPtr dict = TextDict::NewFromBuffer(resource->Data(),
+                                               resource->Size());
+    {
+      std::lock_guard<std::mutex> lock(DictCacheMutex());
+      PruneExpiredDictCache();
+      std::weak_ptr<Dict>& cached = DictCache()[cacheKey];
+      DictPtr cachedDict = cached.lock();
+      if (cachedDict == nullptr) {
+        cached = dict;
+        return dict;
+      }
+      return cachedDict;
+    }
+  }
+
   DictPtr LoadDictFromFile(const std::string& type,
                            const std::string& fileName) {
     if (type == "text") {
-      DictPtr dict = LoadDictWithResourceProvider<TextDict>("text", fileName);
+      DictPtr dict = LoadTextDictWithResourceProvider(fileName);
       return MarisaDict::NewFromDict(*dict.get());
     }
 #ifdef ENABLE_DARTS
@@ -610,7 +645,11 @@ Config::NewFromFile(const std::string& fileName,
   std::string prefixedFileName;
   if (provider != nullptr) {
     try {
-      prefixedFileName = provider->Resolve(fileName);
+      const std::shared_ptr<const ResourceProvider::Resource> resource =
+          provider->GetResource(fileName);
+      impl->configDirectory = "";
+      return NewFromString(std::string(resource->Data(), resource->Size()),
+                           provider, options);
     } catch (const FileNotFound&) {
       prefixedFileName = impl->FindConfigFile(fileName);
     }
@@ -630,7 +669,12 @@ Config::NewFromFile(const std::string& fileName,
   if (slashPos != std::string::npos) {
     impl->configDirectory = prefixedFileName.substr(0, slashPos) + "/";
   }
-  return NewFromString(content, provider, options);
+  std::shared_ptr<ResourceProvider> effectiveProvider = provider;
+  if (effectiveProvider == nullptr) {
+    effectiveProvider =
+        NewFilesystemResourceProvider(impl->configDirectory, impl->paths);
+  }
+  return NewFromString(content, effectiveProvider, options);
 }
 
 ConverterPtr Config::NewFromFile(const std::string& fileName,

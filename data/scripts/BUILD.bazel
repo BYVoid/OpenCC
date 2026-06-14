@@ -21,6 +21,11 @@ py_binary(
     srcs = ["extract_tofu_risk.py"],
 )
 
+py_binary(
+    name = "opencc_resources_zip",
+    srcs = ["opencc_resources_zip.py"],
+)
+
 py_test(
     name = "common_test",
     size = "small",

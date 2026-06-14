@@ -43,7 +43,12 @@ SegmentsPtr MaxMatchSegmentation::Segment(const std::string& text) const {
         prefixMatch->MatchPrefix(pstr, remainingLength);
     size_t matchedLength;
     if (!matched.matched) {
-      matchedLength = UTF8Util::NextCharLength(pstr);
+      matchedLength =
+          UTF8Util::NextIdeographicDescriptionSequenceLength(pstr,
+                                                             remainingLength);
+      if (matchedLength == 0) {
+        matchedLength = UTF8Util::NextCharLength(pstr);
+      }
       // Ensure we don't advance beyond the string boundary
       if (matchedLength > remainingLength) {
         matchedLength = remainingLength;

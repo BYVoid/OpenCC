@@ -25,6 +25,7 @@
 #include <windows.h>
 #endif // _MSC_VER
 
+#include <cstdint>
 #include <cstring>
 
 #include "Common.hpp"
@@ -109,6 +110,81 @@ public:
    */
   static const char* PrevChar(const char* str) {
     return str - PrevCharLength(str);
+  }
+
+  static size_t IdeographicDescriptionOperatorArity(uint32_t codePoint) {
+    switch (codePoint) {
+    case 0x2FF2:
+    case 0x2FF3:
+      return 3;
+    case 0x2FFE:
+    case 0x2FFF:
+      return 1;
+    case 0x2FF0:
+    case 0x2FF1:
+    case 0x2FF4:
+    case 0x2FF5:
+    case 0x2FF6:
+    case 0x2FF7:
+    case 0x2FF8:
+    case 0x2FF9:
+    case 0x2FFA:
+    case 0x2FFB:
+    case 0x2FFC:
+    case 0x2FFD:
+      return 2;
+    default:
+      return 0;
+    }
+  }
+
+  static size_t NextIdeographicDescriptionSequenceLength(const char* str,
+                                                         size_t len) {
+    const size_t kMaxIDSDepth = 16;
+    const size_t kMaxIDSCodePoints = 64;
+    if (len == 0) {
+      return 0;
+    }
+    const size_t charLen = NextCharLengthNoException(str);
+    if (charLen == 0 || charLen > len) {
+      return 0;
+    }
+    const uint32_t codePoint = CodePointNoException(str, charLen);
+    if (IdeographicDescriptionOperatorArity(codePoint) == 0) {
+      return 0;
+    }
+
+    size_t consumed = 0;
+    size_t codePoints = 0;
+    if (ConsumeIdeographicDescriptionSequence(
+            str, len, kMaxIDSDepth, kMaxIDSCodePoints, &consumed,
+            &codePoints) == IDSParseStatus::Complete) {
+      return consumed;
+    }
+    return 0;
+  }
+
+  static bool IsIncompleteIdeographicDescriptionSequencePrefix(const char* str,
+                                                               size_t len) {
+    const size_t kMaxIDSDepth = 16;
+    const size_t kMaxIDSCodePoints = 64;
+    if (len == 0) {
+      return false;
+    }
+    const size_t charLen = NextCharLengthNoException(str);
+    if (charLen == 0 || charLen > len) {
+      return false;
+    }
+    const uint32_t codePoint = CodePointNoException(str, charLen);
+    if (IdeographicDescriptionOperatorArity(codePoint) == 0) {
+      return false;
+    }
+
+    size_t consumed = 0;
+    size_t codePoints = 0;
+    return ConsumeIdeographicDescriptionSequence(
+               str, len, kMaxIDSDepth, kMaxIDSCodePoints, &consumed,
+               &codePoints) == IDSParseStatus::Incomplete;
   }
 
   /**
@@ -295,5 +371,69 @@ public:
     return ret;
   }
 #endif // _MSC_VER
+
+private:
+  enum class IDSParseStatus {
+    Complete,
+    Incomplete,
+    Invalid,
+  };
+
+  static uint32_t CodePointNoException(const char* str, size_t charLen) {
+    const unsigned char first = static_cast<unsigned char>(str[0]);
+    if (charLen == 1) {
+      return first;
+    }
+
+    uint32_t codePoint = first & ((1U << (7 - charLen)) - 1);
+    for (size_t i = 1; i < charLen; i++) {
+      codePoint = (codePoint << 6) |
+                  (static_cast<unsigned char>(str[i]) & 0x3FU);
+    }
+    return codePoint;
+  }
+
+  static IDSParseStatus ConsumeIdeographicDescriptionSequence(
+      const char* str, size_t len, size_t depthLeft, size_t maxCodePoints,
+      size_t* consumed, size_t* codePoints) {
+    if (len == 0) {
+      return IDSParseStatus::Incomplete;
+    }
+    if (depthLeft == 0 || *codePoints >= maxCodePoints) {
+      return IDSParseStatus::Invalid;
+    }
+    const size_t charLen = NextCharLengthNoException(str);
+    if (charLen == 0) {
+      return IDSParseStatus::Invalid;
+    }
+    if (charLen > len) {
+      return IDSParseStatus::Incomplete;
+    }
+    ++(*codePoints);
+
+    const uint32_t codePoint = CodePointNoException(str, charLen);
+    const size_t arity = IdeographicDescriptionOperatorArity(codePoint);
+    if (arity == 0) {
+      *consumed = charLen;
+      return IDSParseStatus::Complete;
+    }
+
+    size_t offset = charLen;
+    for (size_t i = 0; i < arity; i++) {
+      if (offset >= len) {
+        return IDSParseStatus::Incomplete;
+      }
+      size_t operandLength = 0;
+      const IDSParseStatus operandStatus = ConsumeIdeographicDescriptionSequence(
+          str + offset, len - offset, depthLeft - 1, maxCodePoints,
+          &operandLength, codePoints);
+      if (operandStatus != IDSParseStatus::Complete) {
+        return operandStatus;
+      }
+      offset += operandLength;
+    }
+    *consumed = offset;
+    return IDSParseStatus::Complete;
+  }
 };
 } // namespace opencc

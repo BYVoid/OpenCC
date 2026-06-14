@@ -17,7 +17,9 @@
  */
 
 #include "ConversionChain.hpp"
+#include "Converter.hpp"
 #include "DictGroupTestBase.hpp"
+#include "MaxMatchSegmentation.hpp"
 
 namespace opencc {
 
@@ -55,6 +57,63 @@ TEST_F(ConversionChainTest, Convert) {
   const SegmentsPtr& converted =
       conversionChain->Convert(SegmentsPtr(new Segments{utf8("里面")}));
   SegmentsAssertEquals(SegmentsPtr(new Segments{utf8("裡面")}), converted);
+}
+
+TEST_F(ConversionChainTest, StreamKeepsIncompleteIdeographicDescriptionSequence) {
+  LexiconPtr lexicon(new Lexicon);
+  lexicon->Add(DictEntryFactory::New(utf8("钅"), utf8("釒")));
+  lexicon->Add(DictEntryFactory::New(utf8("只"), utf8("隻")));
+  lexicon->Sort();
+
+  DictPtr componentDict(new TextDict(lexicon));
+  SegmentationPtr segmentation(new MaxMatchSegmentation(componentDict));
+  ConversionPtr componentConversion(new Conversion(componentDict));
+  ConversionChainPtr chain(
+      new ConversionChain(std::list<ConversionPtr>{componentConversion}));
+  ConverterPtr converter(new Converter("test", segmentation, chain));
+  ConverterStream stream(converter, 1);
+
+  const std::string firstChunk = utf8("prefix⿰钅");
+  const std::string secondChunk = utf8("只只");
+  std::string output;
+  output += stream.ConvertChunk(firstChunk.c_str(), firstChunk.length());
+  output += stream.Finish(secondChunk.c_str(), secondChunk.length());
+
+  EXPECT_EQ(utf8("prefix⿰钅只隻"), output);
+}
+
+TEST_F(ConversionChainTest,
+       StreamKeepsIncompleteIdeographicDescriptionSequenceBeforeKeepLimit) {
+  LexiconPtr lexicon(new Lexicon);
+  lexicon->Add(DictEntryFactory::New(utf8("只"), utf8("隻")));
+  lexicon->Sort();
+
+  DictPtr componentDict(new TextDict(lexicon));
+  SegmentationPtr segmentation(new MaxMatchSegmentation(componentDict));
+  ConversionPtr componentConversion(new Conversion(componentDict));
+  ConversionChainPtr chain(
+      new ConversionChain(std::list<ConversionPtr>{componentConversion}));
+  ConverterPtr converter(new Converter("test", segmentation, chain));
+  ConverterStream stream(converter, 16);
+
+  std::string nestedPrefix = utf8("prefix");
+  std::string expected = utf8("prefix");
+  for (size_t i = 0; i < 10; i++) {
+    nestedPrefix += utf8("⿰");
+    expected += utf8("⿰");
+  }
+  for (size_t i = 0; i < 10; i++) {
+    nestedPrefix += utf8("木");
+    expected += utf8("木");
+  }
+  expected += utf8("只隻");
+
+  const std::string secondChunk = utf8("只只");
+  std::string output;
+  output += stream.ConvertChunk(nestedPrefix.c_str(), nestedPrefix.length());
+  output += stream.Finish(secondChunk.c_str(), secondChunk.length());
+
+  EXPECT_EQ(expected, output);
 }
 
 } // namespace opencc

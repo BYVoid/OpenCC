@@ -86,6 +86,68 @@ TEST_F(UTF8UtilTest, TruncateUTF8) {
   EXPECT_EQ(text, UTF8Util::TruncateUTF8(text, length + 1));
 }
 
+TEST(UTF8UtilIDSTest, IdeographicDescriptionSequenceLength) {
+  const std::string sequence = "⿰钅只只";
+  EXPECT_EQ(strlen("⿰钅只"),
+            UTF8Util::NextIdeographicDescriptionSequenceLength(
+                sequence.c_str(), sequence.length()));
+}
+
+TEST(UTF8UtilIDSTest, NestedIdeographicDescriptionSequenceLength) {
+  const std::string sequence = "⿱艹⿰钅只干";
+  EXPECT_EQ(strlen("⿱艹⿰钅只"),
+            UTF8Util::NextIdeographicDescriptionSequenceLength(
+                sequence.c_str(), sequence.length()));
+}
+
+TEST(UTF8UtilIDSTest, ComplexIdeographicDescriptionSequenceLength) {
+  const std::string sequence = "⿺⻍⿳穴⿲月⿱⿲幺言幺⿲長馬長刂心長";
+  EXPECT_EQ(strlen("⿺⻍⿳穴⿲月⿱⿲幺言幺⿲長馬長刂心"),
+            UTF8Util::NextIdeographicDescriptionSequenceLength(
+                sequence.c_str(), sequence.length()));
+}
+
+TEST(UTF8UtilIDSTest, OperatorOnlyIdeographicDescriptionSequenceReturnsZero) {
+  const std::string sequence = "⿰⿱⿲⿳⿴⿵⿶⿷⿸⿹⿺⿻⿼⿽⿾⿿";
+  EXPECT_EQ(0, UTF8Util::NextIdeographicDescriptionSequenceLength(
+                   sequence.c_str(), sequence.length()));
+}
+
+TEST(UTF8UtilIDSTest, IsolatedIdeographicDescriptionCharactersAreNotSequences) {
+  const std::vector<std::string> operators = {
+      "⿰", "⿱", "⿲", "⿳", "⿴", "⿵", "⿶", "⿷",
+      "⿸", "⿹", "⿺", "⿻", "⿼", "⿽", "⿾", "⿿"};
+  for (const std::string& op : operators) {
+    EXPECT_EQ(0, UTF8Util::NextIdeographicDescriptionSequenceLength(
+                     op.c_str(), op.length()))
+        << op;
+  }
+}
+
+TEST(UTF8UtilIDSTest, IncompleteIdeographicDescriptionSequenceReturnsZero) {
+  const std::string sequence = "⿰钅";
+  EXPECT_EQ(0, UTF8Util::NextIdeographicDescriptionSequenceLength(
+                   sequence.c_str(), sequence.length()));
+}
+
+TEST(UTF8UtilIDSTest, OverlyDeepIdeographicDescriptionSequenceReturnsZero) {
+  const std::string sequence = "⿰⿰⿰⿰⿰⿰⿰⿰⿰⿰⿰⿰⿰⿰⿰⿰⿰木木木木木木木木木木木木木木木木木木";
+  EXPECT_EQ(0, UTF8Util::NextIdeographicDescriptionSequenceLength(
+                   sequence.c_str(), sequence.length()));
+}
+
+TEST(UTF8UtilIDSTest, OverlyLongIdeographicDescriptionSequenceReturnsZero) {
+  std::string sequence;
+  for (size_t i = 0; i < 64; i++) {
+    sequence += "⿰";
+  }
+  for (size_t i = 0; i < 65; i++) {
+    sequence += "木";
+  }
+  EXPECT_EQ(0, UTF8Util::NextIdeographicDescriptionSequenceLength(
+                   sequence.c_str(), sequence.length()));
+}
+
 TEST_F(UTF8UtilTest, GetByteMap) {
   std::vector<size_t> byteMap;
   UTF8Util::GetByteMap(text, 6, &byteMap);

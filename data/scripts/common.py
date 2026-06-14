@@ -7,9 +7,10 @@ class BaseDict:
 
     def iter(self, file):
         for i, line in enumerate(self._iter(file)):
-            if line.startswith('#') or not line.strip():
+            line = line.rstrip('\n')
+            if line.startswith('#') or not line:
                 continue
-            key, value = line.rstrip('\n').split('\t', 1)
+            key, value = line.split('\t', 1)
             yield {
                 'key': key,
                 'values': value.split(' '),
@@ -131,7 +132,7 @@ class RichDict(Dict):
 
     @staticmethod
     def get_line_type(line):
-        if not line.strip():
+        if not line:
             return 'empty'
         if line.startswith('#'):
             return 'comment'

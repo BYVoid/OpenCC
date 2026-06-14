@@ -3,7 +3,14 @@
 # Format: key	value(s) (values separated by spaces)
 # License: Apache-2.0 (see LICENSE)
 # Source: https://github.com/ByVoid/OpenCC
-# Used in configs: jp2t.json
+# Used in configs: jp2t.json; the reversed version is used in t2jp.json.
+# In principle, this dictionary only includes correspondences from the
+# Shinjitai in 「常用漢字表」, variant characters in 「人名用漢字表」, and
+# the 22 Shinjitai in 「表外漢字字體表」. Individual exceptions must include
+# an explanation.
+# Historical compatibility entries that are not covered by the three tables are
+# kept with a self-mapping as the first candidate.
+# Reference: https://zh.wikipedia.org/wiki/%E6%96%B0%E5%AD%97%E4%BD%93#%E6%96%B0%E8%88%8A%E5%AD%97%E9%AB%94%E5%B0%8D%E7%85%A7%E8%A1%A8
 
 万	萬
 与	與
@@ -26,15 +33,18 @@
 価	價
 倹	儉
 偽	僞
-兎	兔
+# Preserved for compatibility
+兎	兎 兔
 児	兒
 党	黨
-内	內
+# Preserved for compatibility
+内	内 內
 円	圓
 写	寫
 凜	凛
 処	處
-刹	剎
+# Preserved for compatibility
+刹	刹 剎
 剣	劍
 剤	劑
 剰	剩
@@ -44,26 +54,42 @@
 勅	敕
 勧	勸
 勲	勳
-匀	勻
+# Preserved for compatibility
+匀	匀 勻
 区	區
 医	醫
 単	單
 即	卽
-却	卻
-厠	廁
+# Preserved for compatibility
+却	却 卻
+# Preserved for compatibility
+厠	厠 廁
 厳	嚴
 参	參
 双	雙
 収	收
-叙	敘 敍
+# 「叙」U+53D9 日文新字體，常用漢字，可用於人名。
+# 「敍」U+654D 舊字（康熙字典體），人名用漢字，可用於人名。
+# 「敘」U+6558 另一舊字形，既非常用漢字也非人名用漢字，不可用於人名
+# （歷史上因官報印刷錯誤而被混用，後被明確排除）。
+# Ref: https://dictionary.sanseido-publ.co.jp/column/%e7%ac%ac11%e5%9b%9e%e3%80%8c%e5%8f%99%e3%80%8d%e3%81%a8%e3%80%8c%e6%95%8d%e3%80%8d%e3%81%a8%e3%80%8c%e6%95%98%e3%80%8d
+叙	敍 敘
 台	臺
 号	號
-呉	吳
-呪	咒
-唇	脣
+# 「呉」U+5449 是日文新字體，屬於常用漢字，可用於日本人姓名。
+# 「吳」U+5433 是繁體中文字形，在日文中既非常用漢字也非人名用漢字，
+# 不可用於日本人戶籍姓名。此處列出「吳」僅為繁體中文字形映射相容，
+# 外籍華人在留卡依法務省正字告示可保留「吳」字形。
+# Ref: https://dictionary.sanseido-publ.co.jp/column/kure
+呉	呉 吳
+# Preserved for compatibility
+呪	呪 咒
+# Preserved for compatibility
+唇	唇 脣
 唖	啞
 営	營
-嘘	噓
+# Preserved for compatibility
+嘘	嘘 噓
 嘱	囑
 噛	嚙
 団	團
@@ -84,7 +110,8 @@
 売	賣
 変	變
 奥	奧
-奨	獎
+# Preserved for compatibility
+奨	奬 獎
 嬢	孃
 学	學
 宝	寶
@@ -101,7 +128,8 @@
 属	屬
 岳	嶽
 峡	峽
-峰	峯
+# Preserved for compatibility
+峰	峰 峯
 巌	巖
 巣	巢
 巻	卷
@@ -109,7 +137,8 @@
 帰	歸
 庁	廳
 広	廣
-床	牀
+# Preserved for compatibility
+床	床 牀
 廃	廢
 弁	辨 辯 瓣
 弐	貳
@@ -117,17 +146,20 @@
 弯	彎
 弾	彈
 当	當
-彦	彥
+# Preserved for compatibility
+彦	彦 彥
 径	徑
 従	從
-御	禦
+# Preserved for compatibility
+御	御 禦
 徳	德
 徴	徵
 応	應
 恋	戀
 恒	恆
 恵	惠
-悦	悅
+# Preserved for compatibility
+悦	悦 悅
 悩	惱
 悪	惡
 惨	慘
@@ -135,9 +167,11 @@
 懐	懷
 戦	戰
 戯	戲
-戸	戶
+# Preserved for compatibility
+戸	戸 戶
 戻	戾
-才	纔
+# Preserved for compatibility
+才	才 纔
 払	拂
 抜	拔
 択	擇
@@ -145,12 +179,14 @@
 拝	拜
 拠	據
 拡	擴
-挙	舉 擧
+# Preserved for compatibility
+挙	擧 舉
 挟	挾
 挿	插
 捜	搜
 掲	揭
-掴	摑
+# Preserved for compatibility
+掴	掴 摑
 掻	搔
 揺	搖
 摂	攝
@@ -163,23 +199,27 @@
 旧	舊
 昼	晝
 晃	晄
-晋	晉
+# Preserved for compatibility
+晋	晋 晉
 晩	晚
 暁	曉
 暦	曆
-曁	暨
+# Preserved for compatibility
+曁	曁 暨
 曽	曾
 条	條
 来	來
 枢	樞
-査	查
+# Preserved for compatibility
+査	査 查
 栄	榮
 桜	櫻
 桝	枡
 桟	棧
 桧	檜
 検	檢
-楡	榆
+# Preserved for compatibility
+楡	楡 榆
 楼	樓
 楽	樂
 概	槪
@@ -199,26 +239,33 @@
 殻	殼
 毎	每
 気	氣
-氷	冰
-汚	污
-没	沒
+# Preserved for compatibility
+氷	氷 冰
+# Preserved for compatibility
+汚	汚 污
+# Preserved for compatibility
+没	没 沒
 沢	澤
 沪	濾
 浄	淨
 浅	淺
 浜	濱
 涙	淚
-涛	濤
+# Preserved for compatibility
+涛	涛 濤
 渇	渴
 済	濟
 渉	涉
+# Preserved for compatibility
 渋	澁 澀
 渓	溪
 温	溫
 湾	灣
+# Preserved for compatibility
 湿	濕 溼
 満	滿
-溌	潑
+# Preserved for compatibility
+溌	溌 潑
 滝	瀧
 滞	滯
 潜	潛
@@ -227,32 +274,39 @@
 炉	爐
 点	點
 為	爲
-焔	焰
+# Preserved for compatibility
+焔	焔 焰
 焼	燒
-煙	菸
+# Preserved for compatibility
+煙	煙 菸
 犠	犧
 状	狀
 独	獨
 狭	狹
 猟	獵
-猫	貓
+# Preserved for compatibility
+猫	猫 貓
 献	獻
 獣	獸
 瓶	甁
-産	產
+# Preserved for compatibility
+産	産 產
 画	畫
 畳	疊
 痩	瘦
 痴	癡
-痺	痹
+# Preserved for compatibility
+痺	痺 痹
 発	發
-皐	皋
+# Preserved for compatibility
+皐	皐 皋
 盗	盜
 県	縣
 真	眞
 研	硏
 砕	碎
-砺	礪
+# Preserved for compatibility
+砺	砺 礪
 礼	禮
 祢	禰
 祷	禱
@@ -260,23 +314,29 @@
 禅	禪
 秘	祕
 称	稱
-税	稅
-稜	棱
+# Preserved for compatibility
+税	税 稅
+# Preserved for compatibility
+稜	稜 棱
 稲	稻
 穂	穗
 穏	穩
 穣	穰
 窃	竊
-竃	竈
+# Preserved for compatibility
+竃	竃 竈
 竜	龍
 粋	粹
 粛	肅
-粧	妝
-粽	糉
+# Preserved for compatibility
+粧	粧 妝
+# Preserved for compatibility
+粽	粽 糉
 糸	絲
 経	經
 絵	繪
-絶	絕
+# Preserved for compatibility
+絶	絶 絕
 継	繼
 続	續
 総	總
@@ -286,29 +346,37 @@
 縄	繩
 縦	縱
 繊	纖
-繋	繫
+# Preserved for compatibility
+繋	繋 繫
 繍	繡
 缶	罐
-群	羣
+# Preserved for compatibility
+群	群 羣
 翻	飜
-聡	聰
+# Preserved for compatibility
+聡	聡 聰
 聴	聽
 胆	膽
 脚	腳
 脱	脫
 脳	腦
 臓	臟
-舎	舍
-舗	鋪
+# Preserved for compatibility
+舎	舎 舍
+# Preserved for compatibility
+舗	舗 鋪
 艶	艷
 芦	蘆
 芸	藝
 茎	莖
-茘	荔
+# Preserved for compatibility
+茘	茘 荔
 荘	莊
-莱	萊
+# Preserved for compatibility
+莱	莱 萊
 萌	萠
-葱	蔥
+# Preserved for compatibility
+葱	葱 蔥
 蒋	蔣
 蔵	藏
 薫	薰
@@ -336,21 +404,26 @@
 譲	讓
 豊	豐
 賛	贊
-贋	贗
+# Preserved for compatibility
+贋	贋 贗
 践	踐
 転	轉
 軽	輕
-輌	輛
+# Preserved for compatibility
+輌	輌 輛
 辞	辭
 辺	邊
 逓	遞
-連	聯
+# Preserved for compatibility
+連	連 聯
 遅	遲
 遥	遙
 郎	郞
+# Preserved for compatibility
 郷	鄕 鄉
 酔	醉
-醗	醱
+# Preserved for compatibility
+醗	醗 醱
 醤	醬
 醸	釀
 釈	釋
@@ -363,6 +436,7 @@
 鎮	鎭
 関	關
 閲	閱
+# Preserved for compatibility
 闘	鬭 鬥
 陥	陷
 険	險
@@ -383,13 +457,16 @@
 髄	髓
 髪	髮
 鴎	鷗
+# Preserved for compatibility
 鶏	鷄 雞
 鹸	鹼
 麦	麥
 麹	麴
+# Preserved for compatibility
 麺	麵 麪
 黄	黃
 黒	黑
 黙	默
-鼈	鱉
+# Preserved for compatibility
+鼈	鼈 鱉
 齢	齡

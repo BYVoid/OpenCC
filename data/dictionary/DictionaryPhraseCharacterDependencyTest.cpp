@@ -2,7 +2,8 @@
  * Open Chinese Convert
  *
  * Validate that phrase-level character substitutions remain declared in the
- * corresponding character dictionary.
+ * corresponding character dictionary when phrase entries participate in the
+ * same character conversion domain.
  */
 
 #include "gtest/gtest.h"
@@ -162,12 +163,12 @@ TEST(DictionaryPhraseCharacterDependencyTest,
   std::unique_ptr<Runfiles> runfiles(Runfiles::CreateForTest());
   ASSERT_NE(nullptr, runfiles);
 
+  // Regional variant phrase dictionaries may contain phrase-only exceptions
+  // that should not become general character-level variant candidates.
   const std::vector<DictionaryPair> dictionaryPairs = {
       {"STPhrases.txt", "STCharacters.txt"},
       {"TSPhrases.txt", "TSCharacters.txt"},
-      {"HKVariantsPhrases.txt", "HKVariants.txt"},
       {"HKVariantsRevPhrases.txt", "HKVariantsRev.txt"},
-      {"TWVariantsPhrases.txt", "TWVariants.txt"},
       {"TWVariantsRevPhrases.txt", "TWVariantsRev.txt"},
   };
   for (const DictionaryPair& dictionaryPair : dictionaryPairs) {

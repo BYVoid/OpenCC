@@ -118,6 +118,8 @@
 奥	奧
 # Preserved for compatibility
 奨	奬 獎
+# Preserved for compatibility
+姫	姫 姬
 嬢	孃
 学	學
 宝	寶

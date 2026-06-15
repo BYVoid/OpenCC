@@ -31,6 +31,10 @@
 余	餘
 併	倂
 価	價
+# Preserved for compatibility
+値	値 值
+# Preserved for compatibility
+倶	倶 俱
 倹	儉
 偽	僞
 # Preserved for compatibility
@@ -100,6 +104,8 @@
 圧	壓
 堕	墮
 塁	壘
+# Preserved for compatibility
+塡	塡 填
 塩	鹽
 増	增
 壊	壞

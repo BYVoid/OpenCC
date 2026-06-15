@@ -97,4 +97,38 @@ LexiconPtr Lexicon::ParseLexiconFromFile(FILE* fp) {
   return lexicon;
 }
 
+LexiconPtr Lexicon::ParseLexiconFromBuffer(const char* data, size_t size) {
+  LexiconPtr lexicon(new Lexicon);
+  size_t offset = 0;
+  if (size >= 3 && static_cast<unsigned char>(data[0]) == 0xef &&
+      static_cast<unsigned char>(data[1]) == 0xbb &&
+      static_cast<unsigned char>(data[2]) == 0xbf) {
+    offset = 3;
+  }
+
+  size_t lineNum = 1;
+  while (offset < size) {
+    size_t lineEnd = offset;
+    while (lineEnd < size && data[lineEnd] != '\n') {
+      lineEnd++;
+    }
+
+    std::string line(data + offset, lineEnd - offset);
+    if (!line.empty() && line.back() == '\r') {
+      line.pop_back();
+    }
+    if (!line.empty() && line.front() != '#') {
+      line.push_back('\n');
+      DictEntry* entry = ParseKeyValues(line.c_str(), lineNum);
+      if (entry != nullptr) {
+        lexicon->Add(entry);
+      }
+    }
+
+    offset = lineEnd < size ? lineEnd + 1 : lineEnd;
+    lineNum++;
+  }
+  return lexicon;
+}
+
 } // namespace opencc

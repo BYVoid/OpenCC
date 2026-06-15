@@ -1,0 +1,17 @@
+package(default_visibility = ["//visibility:public"])
+
+genrule(
+    name = "opencc_resources_zip",
+    srcs = [
+        "//data/config:config",
+        "//data/dictionary:text_dictionaries",
+    ],
+    outs = ["opencc-resources.zip"],
+    cmd = (
+        "$(location //data/scripts:opencc_resources_zip) "
+        + "--output $@ "
+        + "--configs $(locations //data/config:config) "
+        + "--dicts $(locations //data/dictionary:text_dictionaries)"
+    ),
+    tools = ["//data/scripts:opencc_resources_zip"],
+)

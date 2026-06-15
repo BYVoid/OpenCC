@@ -36,6 +36,7 @@ cc_test(
     ],
     data = [
         "//data/config",
+        "//data:opencc_resources_zip",
         "//data/dictionary:binary_dictionaries",
         "//data/dictionary:text_dictionaries",
         "//src/tools:command_line",

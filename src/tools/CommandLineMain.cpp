@@ -37,6 +37,7 @@
 #include "src/ConversionInspection.hpp"
 #include "src/Converter.hpp"
 #include "src/Exception.hpp"
+#include "src/ResourceProvider.hpp"
 #include "src/Segments.hpp"
 #include "src/tools/CommandLineMain.hpp"
 #include "src/tools/PlatformIO.hpp"
@@ -550,7 +551,40 @@ int CommandLineMain(std::vector<std::string> args) {
         "default, the command line tool skips these dictionaries.",
         cmd, false);
     const std::string argv0String = args.empty() ? std::string() : args[0];
-    cmd.parse(args);
+    Optional<std::string> resourceZipFileName =
+        Optional<std::string>::Null();
+    std::vector<std::string> visibleArgs;
+    if (!args.empty()) {
+      visibleArgs.push_back(args[0]);
+    }
+    for (size_t i = 1; i < args.size(); i++) {
+      const std::string& arg = args[i];
+      std::string value;
+      if (arg == "--resource-zip") {
+        if (i + 1 >= args.size() || args[i + 1].empty() ||
+            args[i + 1][0] == '-') {
+          std::cerr << "error: Missing value for " << arg << std::endl;
+          return 1;
+        }
+        value = args[++i];
+      } else if (arg.rfind("--resource-zip=", 0) == 0) {
+        value = arg.substr(std::string("--resource-zip=").size());
+      } else {
+        visibleArgs.push_back(arg);
+        continue;
+      }
+      if (value.empty()) {
+        std::cerr << "error: Missing value for " << arg << std::endl;
+        return 1;
+      }
+      if (!resourceZipFileName.IsNull()) {
+        std::cerr << "error: resource zip specified more than once."
+                  << std::endl;
+        return 1;
+      }
+      resourceZipFileName = Optional<std::string>(value);
+    }
+    cmd.parse(visibleArgs);
 
     // Validate mutual exclusion and dependencies
     if (segmentationArg.getValue() && inspectArg.getValue()) {
@@ -586,9 +620,15 @@ int CommandLineMain(std::vector<std::string> args) {
     ConfigLoadOptions configOptions;
     configOptions.includeTofuRiskDictionaries =
         includeTofuRiskDictionariesArg.getValue();
-    converter =
-        config.NewFromFile(configFileName, pathArg.getValue(), argv0,
-                           configOptions);
+    if (!resourceZipFileName.IsNull()) {
+      std::shared_ptr<ResourceProvider> provider(
+          new ZipResourceProvider(resourceZipFileName.Get()));
+      converter = config.NewFromFile(configFileName, provider, configOptions);
+    } else {
+      converter =
+          config.NewFromFile(configFileName, pathArg.getValue(), argv0,
+                             configOptions);
+    }
     measurement.loadMs +=
         DurationToMilliseconds(std::chrono::steady_clock::now() - loadStart);
     bool lineByLine = inputFileName.IsNull();

@@ -1637,7 +1637,9 @@
 甕	瓮
 產	产
 産	产
-甦	苏 甦
+# 《通用規範漢字表》規定「甦」可用於姓氏、人名。普通詞語如「甦醒」
+# 仍簡化為「苏」，其例外列於 TSPhrases.txt。
+甦	甦 苏
 甯	甯 宁
 畝	亩
 畢	毕
@@ -1754,7 +1756,8 @@
 磽	硗
 磾	䃅
 礄	硚
-礆	硷
+# 參見 STCharacters.txt 中「硷」的注釋。
+礆	礆 硷
 礎	础
 礐	𬒈
 # @tofu-risk: not covered by PingFang/Source Han baseline: 𥐟 U+2541F

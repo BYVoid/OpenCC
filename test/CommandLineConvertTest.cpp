@@ -452,6 +452,59 @@ TEST_F(CommandLineConvertTest, StdinPreservesLineEndingsAndUnknownCharacters) {
 }
 
 #ifndef _WIN32
+TEST_F(CommandLineConvertTest, WarnsWhenInputContainsVariationSelector) {
+  const std::string inputFile = InputFile("ivs_warning");
+  const std::string outputFile = OutputFile("ivs_warning");
+  const std::string stderrFile = OutputFile("ivs_warning.stderr");
+  const std::string variationSelector = "\xF3\xA0\x84\x80";
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "汉禰" << variationSelector;
+  }
+
+  const std::string command =
+      TestCommand("s2t", inputFile, outputFile) + " 2> " +
+      QuotePath(stderrFile);
+  ASSERT_EQ(0, system(command.c_str()));
+  EXPECT_EQ("漢禰" + variationSelector, GetFileContents(outputFile));
+  EXPECT_NE(std::string::npos,
+            GetFileContents(stderrFile).find(
+                "warning: input contains Unicode variation selectors"));
+}
+
+TEST_F(CommandLineConvertTest,
+       WarnsWhenSupplementaryVariationSelectorCrossesChunkBoundary) {
+  const std::string inputFile = InputFile("ivs_warning_chunk_boundary");
+  const std::string outputFile = OutputFile("ivs_warning_chunk_boundary");
+  const std::string stderrFile =
+      OutputFile("ivs_warning_chunk_boundary.stderr");
+
+  std::string input(1048576 - 1, 'a');
+  input.push_back(static_cast<char>(0xF3));
+  input.push_back(static_cast<char>(0xA0));
+  input.push_back(static_cast<char>(0x84));
+  input.push_back(static_cast<char>(0x80));
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << input;
+  }
+
+  const std::string command =
+      TestCommand("s2t", inputFile, outputFile) + " 2> " +
+      QuotePath(stderrFile);
+  ASSERT_EQ(0, system(command.c_str()));
+  EXPECT_EQ(input, GetFileContents(outputFile));
+  EXPECT_NE(std::string::npos,
+            GetFileContents(stderrFile).find(
+                "warning: input contains Unicode variation selectors"));
+}
+#endif
+
+#ifndef _WIN32
 TEST_F(CommandLineConvertTest, PipeShortReadContinuesUntilEof) {
   const std::string outputFile = OutputFile("pipe_short_read");
 

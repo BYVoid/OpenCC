@@ -187,6 +187,32 @@ public:
                &codePoints) == IDSParseStatus::Incomplete;
   }
 
+  static bool IsVariationSelector(uint32_t codePoint) {
+    return (codePoint >= 0xFE00 && codePoint <= 0xFE0F) ||
+           (codePoint >= 0xE0100 && codePoint <= 0xE01EF);
+  }
+
+  static bool ContainsVariationSelector(const char* str, size_t len) {
+    const char* pStr = str;
+    const char* strEnd = str + len;
+    while (pStr < strEnd) {
+      const size_t remainingLength = strEnd - pStr;
+      const size_t charLen = NextCharLengthNoException(pStr);
+      if (charLen == 0) {
+        ++pStr;
+        continue;
+      }
+      if (charLen > remainingLength) {
+        return false;
+      }
+      if (IsVariationSelector(CodePointNoException(pStr, charLen))) {
+        return true;
+      }
+      pStr += charLen;
+    }
+    return false;
+  }
+
   /**
    * Returns the UTF8 length of a null-terminated string.
    * Throws InvalidUTF8 for invalid or truncated byte sequences.

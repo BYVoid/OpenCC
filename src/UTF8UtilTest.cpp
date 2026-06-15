@@ -148,6 +148,21 @@ TEST(UTF8UtilIDSTest, OverlyLongIdeographicDescriptionSequenceReturnsZero) {
                    sequence.c_str(), sequence.length()));
 }
 
+TEST(UTF8UtilVariationSelectorTest, ContainsVariationSelector) {
+  const std::string bmpVariationSelector = std::string("禰") + "\xEF\xB8\x80";
+  const std::string supplementaryVariationSelector =
+      std::string("禰") + "\xF3\xA0\x84\x80";
+  EXPECT_TRUE(UTF8Util::ContainsVariationSelector(
+      bmpVariationSelector.c_str(), bmpVariationSelector.length()));
+  EXPECT_TRUE(UTF8Util::ContainsVariationSelector(
+      supplementaryVariationSelector.c_str(),
+      supplementaryVariationSelector.length()));
+  const std::string textWithoutVariationSelector = "東菄鶇䍶𠍀倲𩜍𢘐";
+  EXPECT_FALSE(UTF8Util::ContainsVariationSelector(
+      textWithoutVariationSelector.c_str(),
+      textWithoutVariationSelector.length()));
+}
+
 TEST_F(UTF8UtilTest, GetByteMap) {
   std::vector<size_t> byteMap;
   UTF8Util::GetByteMap(text, 6, &byteMap);

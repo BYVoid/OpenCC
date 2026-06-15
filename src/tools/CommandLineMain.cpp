@@ -39,6 +39,7 @@
 #include "src/Exception.hpp"
 #include "src/ResourceProvider.hpp"
 #include "src/Segments.hpp"
+#include "src/UTF8Util.hpp"
 #include "src/tools/CommandLineMain.hpp"
 #include "src/tools/PlatformIO.hpp"
 
@@ -99,6 +100,8 @@ bool inPlace = false;
 OutputMode outputMode = OutputMode::Convert;
 Config config;
 ConverterPtr converter;
+bool variationSelectorWarningShown = false;
+std::string variationSelectorScanTail;
 
 struct MeasurementResult {
   double loadMs = 0.0;
@@ -247,6 +250,47 @@ void PrintInteractiveStdinHint() {
 #endif
 }
 
+void PrintVariationSelectorWarningOnce() {
+  if (variationSelectorWarningShown) {
+    return;
+  }
+  variationSelectorWarningShown = true;
+  fprintf(stderr,
+          "warning: input contains Unicode variation selectors (possible IVS); "
+          "conversion results may be inaccurate.\n");
+}
+
+void WarnIfTextContainsVariationSelector(const char* input, size_t length) {
+  if (variationSelectorWarningShown) {
+    return;
+  }
+  if (UTF8Util::ContainsVariationSelector(input, length)) {
+    PrintVariationSelectorWarningOnce();
+  }
+}
+
+void WarnIfStreamChunkContainsVariationSelector(const char* input,
+                                                size_t length) {
+  if (variationSelectorWarningShown) {
+    return;
+  }
+
+  std::string scan = variationSelectorScanTail;
+  scan.append(input, length);
+  if (UTF8Util::ContainsVariationSelector(scan.data(), scan.size())) {
+    PrintVariationSelectorWarningOnce();
+    variationSelectorScanTail.clear();
+    return;
+  }
+
+  const size_t maxVariationSelectorUtf8Bytes = 4;
+  const size_t keepBytes = scan.size() < maxVariationSelectorUtf8Bytes
+                               ? scan.size()
+                               : maxVariationSelectorUtf8Bytes;
+  variationSelectorScanTail.assign(scan.data() + scan.size() - keepBytes,
+                                   keepBytes);
+}
+
 // Serializes the segmentation-only view of an inspection result as a JSON
 // object with "input" and "segments" fields. Used with --segmentation mode.
 std::string SerializeSegmentationResultJson(
@@ -303,6 +347,7 @@ std::string SerializeInspectionResultJson(
 }
 
 std::string ConvertLineByMode(const std::string& line) {
+  WarnIfTextContainsVariationSelector(line.c_str(), line.size());
   const auto convertStart = std::chrono::steady_clock::now();
   std::string output;
   if (outputMode == OutputMode::Segmentation) {
@@ -336,6 +381,7 @@ void ConvertStream(FILE* fin, FILE* fout) {
       break;
     }
     measurement.inputBytes += length;
+    WarnIfStreamChunkContainsVariationSelector(buffer.data(), length);
 
     const auto convertStart = std::chrono::steady_clock::now();
     const bool isFinalChunk = length < buffer.size() && feof(fin);

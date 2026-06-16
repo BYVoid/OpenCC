@@ -194,6 +194,14 @@
         "s2twp": "擁有一百年曆史",
         "s2twp_jieba": "擁有一百年歷史"
       }
+    },
+    {
+      "id": "jieba_s2t_BYVoid_OpenCC_Issue175",
+      "description": "Jieba should keep 刚一出 as a motion phrase while preserving 一出 as a classifier",
+      "input": "刚一出火车站，就直奔剧场看了一出单口喜剧，演员演的有一点出戏，一出剧院[sic]，就发现一出租车停在门口招揽生意",
+      "expected": {
+        "s2t_jieba": "剛一出火車站，就直奔劇場看了一齣單口喜劇，演員演的有一點出戲，一齣劇院[sic]，就發現一出租車停在門口招攬生意"
+      }
     }
   ]
 }

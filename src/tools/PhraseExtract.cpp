@@ -55,7 +55,7 @@ void Extract(const std::vector<std::string>& inputFiles,
 int main(int argc, const char* argv[]) {
   try {
     TCLAP::CmdLine cmd("Open Chinese Convert (OpenCC) Phrase Extractor", ' ',
-                       VERSION);
+                       OPENCC_VERSION);
     CmdLineOutput cmdLineOutput;
     cmd.setOutput(&cmdLineOutput);
     TCLAP::UnlabeledMultiArg<std::string> fileNames(

@@ -25,7 +25,7 @@ using namespace opencc;
 int main(int argc, const char* argv[]) {
   try {
     TCLAP::CmdLine cmd("Open Chinese Convert (OpenCC) Dictionary Tool", ' ',
-                       VERSION);
+                       OPENCC_VERSION);
     CmdLineOutput cmdLineOutput;
     cmd.setOutput(&cmdLineOutput);
 

@@ -117,7 +117,7 @@ public:
   ConverterPtr GetConverter() const { return converter_; }
 
   static Napi::Value Version(const Napi::CallbackInfo& info) {
-    return Napi::String::New(info.Env(), VERSION);
+    return Napi::String::New(info.Env(), OPENCC_VERSION);
   }
 
   Napi::Value Convert(const Napi::CallbackInfo& info) {

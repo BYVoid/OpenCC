@@ -553,7 +553,7 @@ int CommandLineMain(std::vector<std::string> args) {
   try {
     const auto totalStart = std::chrono::steady_clock::now();
     TCLAP::CmdLine cmd("Open Chinese Convert (OpenCC) Command Line Tool", ' ',
-                       VERSION);
+                       OPENCC_VERSION);
     OpenCCOutput cmdLineOutput;
     cmd.setOutput(&cmdLineOutput);
 

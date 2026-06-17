@@ -84,6 +84,6 @@ const std::string PACKAGE_SEGMENTATION_PLUGIN_DIRECTORY =
     OPENCC_SEGMENTATION_PLUGIN_DIR "/";
 #endif
 
-#ifndef VERSION
-#define VERSION "1.0.*"
-#endif // ifndef VERSION
+#ifndef OPENCC_VERSION
+#define OPENCC_VERSION "1.3.*"
+#endif // ifndef OPENCC_VERSION

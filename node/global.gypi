@@ -4,7 +4,7 @@
   },
   "target_defaults": {
     "defines": [
-      "VERSION=\"<(opencc_version)\""
+      "OPENCC_VERSION=\"<(opencc_version)\""
     ],
     "conditions": [
       [

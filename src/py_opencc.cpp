@@ -27,8 +27,8 @@ PYBIND11_MODULE(opencc_clib, m) {
       .def("convert", py::overload_cast<const char*, size_t>(
                           &opencc::SimpleConverter::Convert, py::const_));
 
-#ifdef VERSION
-  m.attr("__version__") = VERSION;
+#ifdef OPENCC_VERSION
+  m.attr("__version__") = OPENCC_VERSION;
 #else
   m.attr("__version__") = "dev";
 #endif

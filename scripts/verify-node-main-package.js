@@ -18,6 +18,7 @@ const requiredFiles = [
   'prebuilds/assets/s2twp.json',
   'prebuilds/assets/STCharacters.ocd2',
   'prebuilds/assets/STPhrases.ocd2',
+  'prebuilds/assets/STPhrases_GeneratedFromRegionalPhrases.ocd2',
   'prebuilds/assets/TWVariantsPhrases.ocd2',
 ];
 

@@ -29,6 +29,7 @@ TEXT_DICTS = glob(
     ["*.txt"],
     exclude = ["CJK_Compatibility_Ideographs.txt"],
 ) + [
+    "STPhrases_GeneratedFromRegionalPhrases.txt",
     "TSCharactersExt.txt",
     "TWVariantsRev.txt",
     "HKVariantsRev.txt",
@@ -59,6 +60,30 @@ NON_BMP_TEXT_DICTS = [
     )
     for txt in TEXT_DICTS
 ]
+
+genrule(
+    name = "generate_STPhrases_GeneratedFromRegionalPhrases",
+    srcs = [
+        "HKPhrases.txt",
+        "TWPhrases.txt",
+        "TSCharacters.ocd2",
+        "TSCharactersExt.ocd2",
+        "TSPhrases.ocd2",
+        "//data/config:t2s.json",
+    ],
+    outs = ["STPhrases_GeneratedFromRegionalPhrases.txt"],
+    cmd = "$(location //data/scripts:generate_st_phrases_from_regional_phrases) " +
+          "--input $(location HKPhrases.txt) " +
+          "--input $(location TWPhrases.txt) " +
+          "--output $@ " +
+          "--opencc $(location //src/tools:command_line) " +
+          "--config $(location //data/config:t2s.json) " +
+          "--dict-dir $$(dirname $(location TSPhrases.ocd2))",
+    tools = [
+        "//data/scripts:generate_st_phrases_from_regional_phrases",
+        "//src/tools:command_line",
+    ],
+)
 
 filegroup(
     name = "text_dictionaries",
@@ -118,6 +143,7 @@ cc_test(
     data = [
         "HKPhrases.txt",
         "STPhrases.txt",
+        "STPhrases_GeneratedFromRegionalPhrases.txt",
         "TWPhrases.txt",
     ],
     deps = [

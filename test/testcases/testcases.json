@@ -372,6 +372,20 @@
       }
     },
     {
+      "id": "BYVoid_OpenCC_Issue_475_s2twp",
+      "input": "仙童半导体厂 人工智能借用",
+      "expected": {
+        "s2twp": "快捷半導體廠 人工智慧借用"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_475_tw2sp",
+      "input": "畫素 畫素藉由 圖示 圖示覆蓋[sic]",
+      "expected": {
+        "tw2sp": "像素 画素借由 图标 图示复盖[sic]"
+      }
+    },
+    {
       "id": "ByVoid_OpenCC_Issue714",
       "input": "寫一個解算器程式來解決方程式",
       "expected": {

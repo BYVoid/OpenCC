@@ -5,6 +5,7 @@
     "variables": {
       "cmd": "<(module_root_dir)/node/dict.js",
       "dict_extract_tofu_risk": "<(module_root_dir)/data/scripts/extract_tofu_risk.py",
+      "dict_generate_st_phrases": "<(module_root_dir)/data/scripts/generate_st_phrases_from_regional_phrases.py",
       "dict_reverse": "<(module_root_dir)/data/scripts/reverse.py",
       "input_prefix": "<(module_root_dir)/data/dictionary/",
       "output_prefix": "<(PRODUCT_DIR)/",
@@ -67,6 +68,43 @@
       },
       "inputs": ["<(input)"],
       "outputs": ["<(output_prefix)TSPhrases.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
+      "action_name": "STPhrases_GeneratedFromRegionalPhrases.txt",
+      "inputs": [
+        "<(dict_generate_st_phrases)",
+        "<(input_prefix)HKPhrases.txt",
+        "<(input_prefix)TWPhrases.txt",
+        "<(module_root_dir)/data/config/t2s.json",
+        "<(output_prefix)TSCharacters.ocd2",
+        "<(output_prefix)TSCharactersExt.ocd2",
+        "<(output_prefix)TSPhrases.ocd2",
+        "<(output_prefix)opencc.node"
+      ],
+      "outputs": ["<(output_prefix)STPhrases_GeneratedFromRegionalPhrases.txt"],
+      "action": [
+        "<(python_cmd)",
+        "<(dict_generate_st_phrases)",
+        "--input",
+        "<(input_prefix)HKPhrases.txt",
+        "--input",
+        "<(input_prefix)TWPhrases.txt",
+        "--output",
+        "<@(_outputs)",
+        "--node-binding",
+        "<(output_prefix)opencc.node",
+        "--config",
+        "<(module_root_dir)/data/config/t2s.json",
+        "--dict-dir",
+        "<(output_prefix)"
+      ]
+    }, {
+      "action_name": "STPhrases_GeneratedFromRegionalPhrases",
+      "variables": {
+        "input": "<(output_prefix)STPhrases_GeneratedFromRegionalPhrases.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)STPhrases_GeneratedFromRegionalPhrases.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
       "action_name": "TWVariantsPhrases",

@@ -23,6 +23,10 @@ def parse_args():
     return parser.parse_args()
 
 
+def clean_path_arg(path):
+    return path.replace('"', "")
+
+
 def convert_keys(opencc, config, dict_dir, keys):
     result = subprocess.run(
         [
@@ -34,7 +38,7 @@ def convert_keys(opencc, config, dict_dir, keys):
             "--include-tofu-risk-dictionaries",
         ],
         input="\n".join(keys) + "\n",
-        text=True,
+        encoding="utf-8",
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         check=False,
@@ -60,7 +64,7 @@ const fs = require('fs');
 const path = require('path');
 const binding = require(process.argv[1]);
 const config = fs.readFileSync(process.argv[2], 'utf8');
-let dictDir = process.argv[3];
+let dictDir = process.argv[3].replace(/"/g, '');
 if (!dictDir.endsWith(path.sep)) {
   dictDir += path.sep;
 }
@@ -78,7 +82,7 @@ process.stdin.on('end', () => {
     result = subprocess.run(
         ["node", "-e", script, node_binding, config, dict_dir],
         input="\n".join(keys) + "\n",
-        text=True,
+        encoding="utf-8",
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         check=False,
@@ -100,6 +104,12 @@ process.stdin.on('end', () => {
 
 def main():
     args = parse_args()
+    if args.opencc:
+        args.opencc = clean_path_arg(args.opencc)
+    if args.node_binding:
+        args.node_binding = clean_path_arg(args.node_binding)
+    args.config = clean_path_arg(args.config)
+    args.dict_dir = clean_path_arg(args.dict_dir)
     input_names = [input_path.rsplit("/", 1)[-1] for input_path in args.input]
     output_name = args.output.rsplit("/", 1)[-1]
 

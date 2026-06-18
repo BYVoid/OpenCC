@@ -96,7 +96,7 @@
         "--config",
         "<(module_root_dir)/data/config/t2s.json",
         "--dict-dir",
-        "<(output_prefix)"
+        "<(PRODUCT_DIR)"
       ]
     }, {
       "action_name": "STPhrases_GeneratedFromRegionalPhrases",

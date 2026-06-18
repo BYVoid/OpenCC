@@ -26,7 +26,7 @@ public:
     std::cout << std::endl
               << cmd.getMessage() << std::endl
               << "Author: Carbo Kuo <byvoid@byvoid.com>" << std::endl
-              << "Bug Report: http://github.com/BYVoid/OpenCC/issues"
+              << "Bug Report: https://github.com/BYVoid/OpenCC/issues"
               << std::endl
               << std::endl
               << "Usage: " << std::endl

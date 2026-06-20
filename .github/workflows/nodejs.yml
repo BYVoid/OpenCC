@@ -24,9 +24,9 @@ jobs:
         # LTS coverage on macOS 14 (ARM64)
         include:
           - os: macos-14
-            node-version: 22
+            node-version: 24
           - os: windows-2022
-            node-version: 22
+            node-version: 24
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,14 +46,14 @@ jobs:
       - run: npm ci
       - run: npm test
       - name: Build Node.js prebuild
-        if: ${{ matrix.node-version == 22 }}
+        if: ${{ matrix.node-version == 24 }}
         run: npm run prebuild
       - name: Verify Node.js prebuild layout
-        if: ${{ matrix.node-version == 22 }}
+        if: ${{ matrix.node-version == 24 }}
         run: |
           node -e "const fs=require('fs'); const path=require('path'); const dirs=fs.readdirSync('prebuilds',{withFileTypes:true}).filter((entry)=>entry.isDirectory()).map((entry)=>entry.name); if(!dirs.includes('assets')) throw new Error('missing prebuilds/assets'); const platformDirs=dirs.filter((name)=>name!=='assets'); if(platformDirs.length!==1) throw new Error('expected one platform prebuild directory, found '+platformDirs.join(',')); const addon=path.join('prebuilds', platformDirs[0], 'opencc.node'); if(!fs.existsSync(addon)) throw new Error('missing '+addon); console.log('Verified '+addon+' with shared assets');"
       - name: Test Node.js prebuild
-        if: ${{ matrix.node-version == 22 }}
+        if: ${{ matrix.node-version == 24 }}
         env:
           PREBUILDS_ONLY: 1
         run: npm test

@@ -20,7 +20,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -73,7 +73,7 @@ jobs:
           (cd build/doc/doc && zip -r "../../../dist/opencc-${VERSION}-doc.zip" html)
 
       - name: Upload documentation artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: opencc-doc-${{ steps.version.outputs.value }}
           path: dist/opencc-${{ steps.version.outputs.value }}-doc.zip

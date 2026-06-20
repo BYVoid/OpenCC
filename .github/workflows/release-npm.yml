@@ -45,12 +45,12 @@ jobs:
             library: opencc-jieba.dll
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org/
@@ -125,7 +125,7 @@ jobs:
 
       - name: Upload package artifact
         if: steps.publish_check.outputs.published != 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: npm-opencc-jieba-binary-${{ matrix.target }}
           path: plugins/jieba/node/dist/npm-artifacts/*.tgz
@@ -179,7 +179,7 @@ jobs:
 
       - name: Upload npm debug logs
         if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.upload_npm_debug_logs }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: npm-debug-logs-opencc-jieba-binary-${{ matrix.target }}
           path: npm-debug-logs/*.log
@@ -194,12 +194,12 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org/
@@ -261,7 +261,7 @@ jobs:
 
       - name: Upload package artifact
         if: steps.publish_check.outputs.published != 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: npm-opencc-jieba
           path: plugins/jieba/node/dist/npm-artifacts/*.tgz
@@ -317,7 +317,7 @@ jobs:
 
       - name: Upload npm debug logs
         if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.upload_npm_debug_logs }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: npm-debug-logs-opencc-jieba
           path: npm-debug-logs/*.log
@@ -344,12 +344,12 @@ jobs:
             runner: windows-2025
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org/
@@ -418,7 +418,7 @@ jobs:
 
       - name: Upload package artifact
         if: steps.publish_check.outputs.published != 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: npm-opencc-binary-${{ matrix.target }}
           path: dist/npm-artifacts/*.tgz
@@ -472,7 +472,7 @@ jobs:
 
       - name: Upload npm debug logs
         if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.upload_npm_debug_logs }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: npm-debug-logs-opencc-binary-${{ matrix.target }}
           path: npm-debug-logs/*.log
@@ -487,12 +487,12 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org/
@@ -555,7 +555,7 @@ jobs:
 
       - name: Upload package artifact
         if: steps.publish_check.outputs.published != 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: npm-opencc
           path: dist/npm-artifacts/*.tgz
@@ -609,7 +609,7 @@ jobs:
 
       - name: Upload npm debug logs
         if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.upload_npm_debug_logs }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: npm-debug-logs-opencc
           path: npm-debug-logs/*.log

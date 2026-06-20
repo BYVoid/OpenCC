@@ -43,7 +43,7 @@ TEST(DictTrieTest, Test1) {
   ASSERT_NEAR(-8.870, du->weight, 0.001);
 
   word = "清华大学";
-  vector<pair<size_t, const DictUnit*> > res;
+  LocalVector<pair<size_t, const DictUnit*> > res;
   const char * words[] = {"清", "清华", "清华大学"};
   for (size_t i = 0; i < sizeof(words)/sizeof(words[0]); i++) {
     ASSERT_TRUE(DecodeUTF8RunesInString(words[i], uni));
@@ -55,8 +55,8 @@ TEST(DictTrieTest, Test1) {
   trie.Find(uni.begin(), uni.end(), dags);
   ASSERT_EQ(dags.size(), uni.size());
   ASSERT_NE(dags.size(), 0u);
-  s1 = FormatVector(res);
-  s2 = FormatVector(dags[0].nexts);
+  s1 << res;
+  s2 << dags[0].nexts;
   ASSERT_EQ(s1, s2);
 }
 

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <set>
 #include <cassert>
+#include "Utils.hpp"
 #include "DictTrie.hpp"
 #include "SegmentBase.hpp"
 #include "FullSegment.hpp"

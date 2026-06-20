@@ -36,6 +36,7 @@ ADD_EXECUTABLE(test.run
     pre_filter_test.cpp
     unicode_test.cpp
     textrank_test.cpp
+    unicode_path_test.cpp
 )
 
 TARGET_LINK_LIBRARIES(test.run gtest)

@@ -1,0 +1,132 @@
+name: Resource Diff
+
+on:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      before_ref:
+        description: "Base ref/SHA to compare from. Defaults to the PR base or master."
+        required: false
+        type: string
+      after_ref:
+        description: "Head ref/SHA to compare. Defaults to the PR head or current ref."
+        required: false
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  diff:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+
+    env:
+      BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
+
+    steps:
+      - name: Resolve refs
+        id: refs
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_BEFORE_REF: ${{ inputs.before_ref }}
+          INPUT_AFTER_REF: ${{ inputs.after_ref }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          GITHUB_SHA_VALUE: ${{ github.sha }}
+        run: |
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            before_ref="${INPUT_BEFORE_REF:-$PR_BASE_SHA}"
+            after_ref="${INPUT_AFTER_REF:-$PR_HEAD_SHA}"
+          else
+            before_ref="${INPUT_BEFORE_REF:-master}"
+            after_ref="${INPUT_AFTER_REF:-$GITHUB_SHA_VALUE}"
+          fi
+          echo "before_ref=$before_ref" >> "$GITHUB_OUTPUT"
+          echo "after_ref=$after_ref" >> "$GITHUB_OUTPUT"
+          echo "Before: $before_ref"
+          echo "After: $after_ref"
+
+      - name: Checkout before
+        uses: actions/checkout@v4
+        with:
+          path: before
+          repository: ${{ github.event.pull_request.base.repo.full_name || github.repository }}
+          ref: ${{ steps.refs.outputs.before_ref }}
+          fetch-depth: 0
+
+      - name: Checkout after
+        uses: actions/checkout@v4
+        with:
+          path: after
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ steps.refs.outputs.after_ref }}
+          fetch-depth: 0
+
+      - uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Configure BuildBuddy
+        shell: bash
+        run: |
+          for checkout in before after; do
+            if [ -n "${BUILDBUDDY_API_KEY}" ]; then
+              {
+                echo "build --config=buildbuddy"
+                echo "build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
+                echo "build --bes_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
+              } >> "$checkout/.bazelrc.user"
+              echo "BuildBuddy enabled for $checkout."
+            else
+              echo "BUILDBUDDY_API_KEY not set; skipping BuildBuddy config for $checkout."
+            fi
+          done
+
+      - name: Build before resource zip
+        shell: bash
+        working-directory: before
+        env:
+          MSYS_NO_PATHCONV: 1
+        run: |
+          args=()
+          if [ -x ./scripts/bazel-workspace-status.sh ]; then
+            args+=(--workspace_status_command=./scripts/bazel-workspace-status.sh)
+          fi
+          bazel build "${args[@]}" //data:opencc_resources_zip
+
+      - name: Build after resource zip
+        shell: bash
+        working-directory: after
+        env:
+          MSYS_NO_PATHCONV: 1
+        run: |
+          args=()
+          if [ -x ./scripts/bazel-workspace-status.sh ]; then
+            args+=(--workspace_status_command=./scripts/bazel-workspace-status.sh)
+          fi
+          bazel build "${args[@]}" //data:opencc_resources_zip
+
+      - name: Generate diff report
+        shell: bash
+        run: |
+          mkdir -p dist
+          python3 after/data/scripts/opencc_resources_zip_diff.py \
+            before/bazel-bin/data/opencc-resources.zip \
+            after/bazel-bin/data/opencc-resources.zip \
+            --markdown dist/opencc-resource-diff.md
+          cat dist/opencc-resource-diff.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload diff report
+        uses: actions/upload-artifact@v7
+        with:
+          path: dist/opencc-resource-diff.md
+          archive: false
+          if-no-files-found: error

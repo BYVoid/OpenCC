@@ -27,6 +27,11 @@ py_binary(
 )
 
 py_binary(
+    name = "opencc_resources_zip_diff",
+    srcs = ["opencc_resources_zip_diff.py"],
+)
+
+py_binary(
     name = "generate_st_phrases_from_regional_phrases",
     srcs = ["generate_st_phrases_from_regional_phrases.py"],
     imports = ["."],

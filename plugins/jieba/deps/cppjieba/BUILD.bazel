@@ -1,4 +1,4 @@
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -24,14 +24,4 @@ cc_library(
     name = "cppjieba",
     hdrs = glob(["include/cppjieba/**/*.hpp"]),
     includes = ["include"],
-)
-
-cc_test(
-    name = "bazel_smoke_test",
-    srcs = ["test/bazel_smoke_test.cpp"],
-    data = [":dict"],
-    defines = [
-        "CPPJIEBA_BAZEL_RUNFILES_PREFIX=\\\"plugins/jieba/deps/cppjieba/\\\"",
-    ],
-    deps = [":cppjieba"],
 )

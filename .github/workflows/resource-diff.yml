@@ -52,7 +52,7 @@ jobs:
           echo "After: $after_ref"
 
       - name: Checkout before
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: before
           repository: ${{ github.event.pull_request.base.repo.full_name || github.repository }}
@@ -60,17 +60,19 @@ jobs:
           fetch-depth: 0
 
       - name: Checkout after
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           path: after
           repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
           ref: ${{ steps.refs.outputs.after_ref }}
           fetch-depth: 0
 
-      - uses: bazelbuild/setup-bazelisk@v3
+      - uses: bazel-contrib/setup-bazel@0.19.0
+        with:
+          bazelisk-cache: true
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 

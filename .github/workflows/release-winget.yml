@@ -34,7 +34,7 @@ jobs:
       actions: read
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -170,7 +170,7 @@ jobs:
             -PackageOnly
 
       - name: Upload release artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: opencc-winget-release-${{ steps.version.outputs.value }}
           path: |

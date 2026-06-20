@@ -19,7 +19,7 @@ namespace cppjieba {
 
 #ifdef _WIN32
 inline bool Utf8ToWidePath(const std::string& path, std::wstring& widePath) {
-  if (path.size() > static_cast<size_t>(std::numeric_limits<int>::max())) {
+  if (path.size() > static_cast<size_t>((std::numeric_limits<int>::max)())) {
     return false;
   }
   if (path.empty()) {

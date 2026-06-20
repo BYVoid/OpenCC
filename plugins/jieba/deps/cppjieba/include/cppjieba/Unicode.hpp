@@ -1,12 +1,13 @@
 #ifndef CPPJIEBA_UNICODE_H
 #define CPPJIEBA_UNICODE_H
 
+#include <cassert>
 #include <stdint.h>
 #include <stdlib.h>
-#include <cassert>
 #include <string>
 #include <vector>
 #include <ostream>
+#include "Utils.hpp"
 
 namespace cppjieba {
 
@@ -52,7 +53,7 @@ inline std::ostream& operator << (std::ostream& os, const RuneStr& r) {
   return os << "{\"rune\": \"" << r.rune << "\", \"offset\": " << r.offset << ", \"len\": " << r.len << "}";
 }
 
-typedef std::vector<Rune> Unicode;
+typedef LocalVector<Rune> Unicode;
 typedef std::vector<RuneStr> RuneStrArray;
 
 // [left, right]

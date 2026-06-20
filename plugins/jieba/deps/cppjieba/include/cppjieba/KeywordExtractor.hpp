@@ -94,7 +94,7 @@ class KeywordExtractor {
  private:
   void LoadIdfDict(const std::string& idfPath) {
     std::ifstream ifs;
-    OpenInputFile(idfPath, ifs);
+    OpenInputFile(ifs, idfPath);
     XCHECK(ifs.is_open()) << "open " << idfPath << " failed";
     std::string line ;
     std::vector<std::string> buf;
@@ -124,7 +124,7 @@ class KeywordExtractor {
   }
   void LoadStopWordDict(const std::string& filePath) {
     std::ifstream ifs;
-    OpenInputFile(filePath, ifs);
+    OpenInputFile(ifs, filePath);
     XCHECK(ifs.is_open()) << "open " << filePath << " failed";
     std::string line ;
     while (getline(ifs, line)) {
@@ -145,7 +145,7 @@ class KeywordExtractor {
 }; // class KeywordExtractor
 
 inline std::ostream& operator << (std::ostream& os, const KeywordExtractor::Word& word) {
-  return os << "{\"word\": \"" << word.word << "\", \"offset\": " << FormatVector(word.offsets) << ", \"weight\": " << word.weight << "}"; 
+  return os << "{\"word\": \"" << word.word << "\", \"offset\": " << word.offsets << ", \"weight\": " << word.weight << "}"; 
 }
 
 } // namespace cppjieba

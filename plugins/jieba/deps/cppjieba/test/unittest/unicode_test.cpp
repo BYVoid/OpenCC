@@ -11,7 +11,7 @@ TEST(UnicodeTest, Test1) {
   ASSERT_TRUE(DecodeUTF8RunesInString(s, runes));
   string actual;
   string expected = "[{\"rune\": \"20320\", \"offset\": 0, \"len\": 3}, {\"rune\": \"22909\", \"offset\": 3, \"len\": 3}, {\"rune\": \"19990\", \"offset\": 6, \"len\": 3}, {\"rune\": \"30028\", \"offset\": 9, \"len\": 3}]";
-  actual = FormatVector(runes);
+  actual << runes;
   ASSERT_EQ(expected, actual);
 }
 
@@ -21,7 +21,7 @@ TEST(UnicodeTest, Illegal) {
   ASSERT_FALSE(DecodeUTF8RunesInString(s, runes));
   string actual;
   string expected = "[]";
-  actual = FormatVector(runes);
+  actual << runes;
   ASSERT_EQ(expected, actual);
 }
 

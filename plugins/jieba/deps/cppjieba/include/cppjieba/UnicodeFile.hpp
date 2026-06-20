@@ -1,42 +1,68 @@
 #ifndef CPPJIEBA_UNICODE_FILE_HPP
 #define CPPJIEBA_UNICODE_FILE_HPP
 
-#include <filesystem>
 #include <fstream>
+#include <limits>
 #include <string>
 
-#if defined(_WIN32) || defined(_WIN64)
+#ifdef _WIN32
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
 #include <windows.h>
 #endif
 
 namespace cppjieba {
 
-#if defined(_WIN32) || defined(_WIN64)
-inline std::wstring WidePathFromUtf8(const std::string& path) {
+#ifdef _WIN32
+inline bool Utf8ToWidePath(const std::string& path, std::wstring& widePath) {
+  if (path.size() > static_cast<size_t>(std::numeric_limits<int>::max())) {
+    return false;
+  }
   if (path.empty()) {
-    return L"";
+    widePath.clear();
+    return true;
   }
-  const int size =
-      MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, nullptr, 0);
-  if (size <= 1) {
-    return L"";
+
+  const int pathSize = static_cast<int>(path.size());
+  const int wideSize = MultiByteToWideChar(
+      CP_UTF8,
+      MB_ERR_INVALID_CHARS,
+      path.data(),
+      pathSize,
+      NULL,
+      0);
+  if (wideSize <= 0) {
+    return false;
   }
-  std::wstring wide(static_cast<size_t>(size), L'\0');
-  MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, &wide[0], size);
-  wide.resize(static_cast<size_t>(size - 1));
-  return wide;
+
+  widePath.resize(static_cast<size_t>(wideSize));
+  return MultiByteToWideChar(
+             CP_UTF8,
+             MB_ERR_INVALID_CHARS,
+             path.data(),
+             pathSize,
+             &widePath[0],
+             wideSize) == wideSize;
 }
 #endif
 
-inline void OpenInputFile(const std::string& path, std::ifstream& ifs,
-                          std::ios_base::openmode mode = std::ios::in) {
-#if defined(_WIN32) || defined(_WIN64)
-  ifs.open(std::filesystem::path(WidePathFromUtf8(path)), mode);
-#else
-  ifs.open(path.c_str(), mode);
+inline void OpenInputFile(std::ifstream& ifs, const std::string& path) {
+#ifdef _WIN32
+  std::wstring widePath;
+  if (Utf8ToWidePath(path, widePath)) {
+    ifs.open(widePath.c_str());
+    return;
+  }
+  ifs.setstate(std::ios::failbit);
+  return;
 #endif
+  ifs.open(path.c_str());
 }
 
 } // namespace cppjieba
 
-#endif // CPPJIEBA_UNICODE_FILE_HPP
+#endif

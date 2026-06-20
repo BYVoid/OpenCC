@@ -35,6 +35,10 @@ TEST(JiebaTest, Test0) {
   jieba.CutForSearch("他来到了网易杭研大厦", words);
   result << words;
   ASSERT_EQ("[\"他\", \"来到\", \"了\", \"网易\", \"杭研\", \"大厦\"]", result);
+
+  jieba.Cut("让我去了解一下", words);
+  result << words;
+  ASSERT_EQ("[\"让\", \"我\", \"去\", \"了解\", \"一下\"]", result);
 }
 
 TEST(JiebaTest, Test1) {
@@ -72,6 +76,10 @@ TEST(JiebaTest, Test1) {
   jieba.CutForSearch("他来到了网易杭研大厦", words);
   result << words;
   ASSERT_EQ("[\"他\", \"来到\", \"了\", \"网易\", \"杭研\", \"大厦\"]", result);
+
+  jieba.Cut("让我去了解一下", words);
+  result << words;
+  ASSERT_EQ("[\"让\", \"我\", \"去\", \"了解\", \"一下\"]", result);
 }
 
 TEST(JiebaTest, WordTest) {

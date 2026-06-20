@@ -8,9 +8,16 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <deque>
+#include <fstream>
 #include <iostream>
+#include <iterator>
+#include <map>
+#include <set>
 #include <sstream>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -26,13 +33,31 @@
 
 namespace cppjieba {
 
-enum LogLevel {
+using std::deque;
+using std::ifstream;
+using std::make_pair;
+using std::map;
+using std::min;
+using std::ofstream;
+using std::ostream;
+using std::pair;
+using std::set;
+using std::string;
+using std::stringstream;
+using std::unordered_map;
+using std::unordered_set;
+using std::vector;
+
+enum {
   LL_DEBUG = 0,
   LL_INFO = 1,
   LL_WARNING = 2,
   LL_ERROR = 3,
   LL_FATAL = 4,
 };
+
+static const char* const LOG_LEVEL_ARRAY[] = {"DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+static const char* const LOG_TIME_FORMAT = "%Y-%m-%d %H:%M:%S";
 
 class Logger {
  public:
@@ -43,26 +68,30 @@ class Logger {
       return;
     }
 #endif
-    static const char* const kLogLevelNames[] = {"DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
-    assert(level_ < sizeof(kLogLevelNames) / sizeof(*kLogLevelNames));
+    assert(level_ <= sizeof(LOG_LEVEL_ARRAY) / sizeof(*LOG_LEVEL_ARRAY));
 
     char buf[32];
-    time_t time_now;
-    time(&time_now);
-    struct tm tm_now;
+    time_t timeNow;
+    time(&timeNow);
 
+    struct tm tmNow;
 #if defined(_WIN32) || defined(_WIN64)
-    errno_t e = localtime_s(&tm_now, &time_now);
+    errno_t e = localtime_s(&tmNow, &timeNow);
     assert(e == 0);
     (void)e;
 #else
-    struct tm* tm_tmp = localtime_r(&time_now, &tm_now);
+    struct tm* tm_tmp = localtime_r(&timeNow, &tmNow);
     assert(tm_tmp != NULL);
     (void)tm_tmp;
 #endif
 
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tm_now);
-    stream_ << buf << " " << filename << ":" << lineno << " " << kLogLevelNames[level_] << " ";
+    strftime(buf, sizeof(buf), LOG_TIME_FORMAT, &tmNow);
+
+    stream_ << buf
+            << " " << filename
+            << ":" << lineno
+            << " " << LOG_LEVEL_ARRAY[level_]
+            << " ";
   }
 
   ~Logger() {
@@ -86,140 +115,221 @@ class Logger {
   size_t level_;
 };
 
-template <class Iterator>
-std::string Join(Iterator begin, Iterator end, const std::string& connector) {
-  if (begin == end) {
-    return std::string();
+template <class T>
+class LocalVector {
+ public:
+  typedef const T* const_iterator;
+  typedef T value_type;
+  typedef size_t size_type;
+
+  LocalVector() {}
+  LocalVector(const_iterator begin, const_iterator end) : data_(begin, end) {}
+  LocalVector(size_t size, const T& value) : data_(size, value) {}
+
+  T& operator[](size_t i) {
+    return data_[i];
   }
-  std::ostringstream os;
-  os << *begin;
+  const T& operator[](size_t i) const {
+    return data_[i];
+  }
+
+  void push_back(const T& value) {
+    data_.push_back(value);
+  }
+  void reserve(size_t size) {
+    data_.reserve(size);
+  }
+  bool empty() const {
+    return data_.empty();
+  }
+  size_t size() const {
+    return data_.size();
+  }
+  size_t capacity() const {
+    return data_.capacity();
+  }
+  const_iterator begin() const {
+    return data_.data();
+  }
+  const_iterator end() const {
+    return data_.data() + data_.size();
+  }
+  void clear() {
+    data_.clear();
+  }
+
+  bool operator==(const LocalVector<T>& rhs) const {
+    return data_ == rhs.data_;
+  }
+  bool operator!=(const LocalVector<T>& rhs) const {
+    return !(*this == rhs);
+  }
+
+ private:
+  vector<T> data_;
+};
+
+inline string StringFormat(const char* fmt, ...) {
+  int size = 256;
+  string str;
+  va_list ap;
+  while (true) {
+    str.resize(size);
+    va_start(ap, fmt);
+    int n = vsnprintf(&str[0], size, fmt, ap);
+    va_end(ap);
+    if (n > -1 && n < size) {
+      str.resize(n);
+      return str;
+    }
+    if (n > -1) {
+      size = n + 1;
+    } else {
+      size *= 2;
+    }
+  }
+}
+
+template <class T>
+void Join(T begin, T end, string& res, const string& connector) {
+  if (begin == end) {
+    return;
+  }
+  stringstream ss;
+  ss << *begin;
   ++begin;
   while (begin != end) {
-    os << connector << *begin;
+    ss << connector << *begin;
     ++begin;
   }
-  return os.str();
+  res = ss.str();
 }
 
-template <class Iterator>
-void Join(Iterator begin, Iterator end, std::string& result, const std::string& connector) {
-  result = Join(begin, end, connector);
+template <class T>
+string Join(T begin, T end, const string& connector) {
+  string res;
+  Join(begin, end, res, connector);
+  return res;
 }
 
-inline std::string StringFormat(const char* format, ...) {
-  va_list args;
-  va_start(args, format);
-  va_list args_copy;
-  va_copy(args_copy, args);
-  int length = std::vsnprintf(NULL, 0, format, args_copy);
-  va_end(args_copy);
-  if (length < 0) {
-    va_end(args);
-    return std::string();
-  }
-
-  std::vector<char> buffer(static_cast<size_t>(length) + 1);
-  std::vsnprintf(buffer.data(), buffer.size(), format, args);
-  va_end(args);
-  return std::string(buffer.data(), static_cast<size_t>(length));
-}
-
-inline void Split(const std::string& src,
-                  std::vector<std::string>& result,
-                  const std::string& delimiters,
-                  size_t maxsplit = std::string::npos) {
-  result.clear();
-  size_t start = 0;
-  while (start < src.size()) {
-    size_t end = src.find_first_of(delimiters, start);
-    if (end == std::string::npos || result.size() >= maxsplit) {
-      result.push_back(src.substr(start));
-      return;
-    }
-    result.push_back(src.substr(start, end - start));
-    start = end + 1;
-  }
-}
-
-inline std::vector<std::string> Split(const std::string& src,
-                                      const std::string& delimiters,
-                                      size_t maxsplit = std::string::npos) {
-  std::vector<std::string> result;
-  Split(src, result, delimiters, maxsplit);
-  return result;
-}
-
-inline std::string& LTrim(std::string& s) {
+inline string& LTrim(string& s) {
   s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
     return !std::isspace(ch);
   }));
   return s;
 }
 
-inline std::string& RTrim(std::string& s) {
+inline string& RTrim(string& s) {
   s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
     return !std::isspace(ch);
   }).base(), s.end());
   return s;
 }
 
-inline std::string& Trim(std::string& s) {
+inline string& Trim(string& s) {
   return LTrim(RTrim(s));
 }
 
-inline bool StartsWith(const std::string& str, const std::string& prefix) {
-  return prefix.size() <= str.size() && str.compare(0, prefix.size(), prefix) == 0;
+inline bool StartsWith(const string& str, const string& prefix) {
+  if (prefix.length() > str.length()) {
+    return false;
+  }
+  return str.compare(0, prefix.length(), prefix) == 0;
 }
 
-template <class KeyType, class ContainerType>
-bool IsIn(const ContainerType& container, const KeyType& key) {
-  return container.find(key) != container.end();
+inline void Split(const string& src, vector<string>& res, const string& pattern, size_t maxsplit = string::npos) {
+  res.clear();
+  size_t start = 0;
+  size_t end = 0;
+  while (start < src.size()) {
+    end = src.find_first_of(pattern, start);
+    if (end == string::npos || res.size() >= maxsplit) {
+      res.push_back(src.substr(start));
+      return;
+    }
+    res.push_back(src.substr(start, end - start));
+    start = end + 1;
+  }
+}
+
+inline vector<string> Split(const string& src, const string& pattern, size_t maxsplit = string::npos) {
+  vector<string> res;
+  Split(src, res, pattern, maxsplit);
+  return res;
+}
+
+template <class KeyType, class ContainType>
+bool IsIn(const ContainType& contain, const KeyType& key) {
+  return contain.end() != contain.find(key);
 }
 
 template <class T1, class T2>
-std::ostream& operator<<(std::ostream& os, const std::pair<T1, T2>& value) {
-  return os << value.first << ":" << value.second;
+ostream& operator<<(ostream& os, const pair<T1, T2>& pr) {
+  os << pr.first << ":" << pr.second;
+  return os;
 }
 
-template <class T>
-std::string FormatVector(const std::vector<T>& values) {
-  if (values.empty()) {
-    return "[]";
+template <typename T>
+ostream& operator<<(ostream& os, const vector<T>& v) {
+  if (v.empty()) {
+    return os << "[]";
   }
-  std::ostringstream os;
-  os << "[" << values[0];
-  for (size_t i = 1; i < values.size(); ++i) {
-    os << ", " << values[i];
+  os << "[" << v[0];
+  for (size_t i = 1; i < v.size(); i++) {
+    os << ", " << v[i];
   }
   os << "]";
-  return os.str();
+  return os;
 }
 
-inline std::string FormatVector(const std::vector<std::string>& values) {
-  if (values.empty()) {
-    return "[]";
+template <>
+inline ostream& operator<<(ostream& os, const vector<string>& v) {
+  if (v.empty()) {
+    return os << "[]";
   }
-  std::ostringstream os;
-  os << "[\"" << values[0];
-  for (size_t i = 1; i < values.size(); ++i) {
-    os << "\", \"" << values[i];
+  os << "[\"" << v[0];
+  for (size_t i = 1; i < v.size(); i++) {
+    os << "\", \"" << v[i];
   }
   os << "\"]";
-  return os.str();
+  return os;
+}
+
+template <typename T>
+ostream& operator<<(ostream& os, const deque<T>& dq) {
+  if (dq.empty()) {
+    return os << "[]";
+  }
+  os << "[\"" << dq[0];
+  for (size_t i = 1; i < dq.size(); i++) {
+    os << "\", \"" << dq[i];
+  }
+  os << "\"]";
+  return os;
 }
 
 template <class T>
-std::string& operator<<(std::string& result, const T& value) {
-  std::ostringstream os;
-  os << value;
-  result = os.str();
-  return result;
+ostream& operator<<(ostream& os, const LocalVector<T>& vec) {
+  if (vec.empty()) {
+    return os << "[]";
+  }
+  os << "[\"" << vec[0];
+  for (size_t i = 1; i < vec.size(); i++) {
+    os << "\", \"" << vec[i];
+  }
+  os << "\"]";
+  return os;
 }
 
 template <class T>
-std::string& operator<<(std::string& result, const std::vector<T>& values) {
-  result = FormatVector(values);
-  return result;
+string& operator<<(string& str, const T& obj) {
+  stringstream ss;
+  ss << obj;
+  return str = ss.str();
+}
+
+inline string& operator<<(string& s, ifstream& ifs) {
+  return s.assign(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
 }
 
 } // namespace cppjieba

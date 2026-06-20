@@ -1,7 +1,6 @@
 #include <iostream>
 #include <ctime>
 #include <fstream>
-#include <iterator>
 #include "cppjieba/MPSegment.hpp"
 #include "cppjieba/HMMSegment.hpp"
 #include "cppjieba/MixSegment.hpp"
@@ -14,9 +13,9 @@ void Cut(size_t times = 50) {
   MixSegment seg(DICT_DIR "/jieba.dict.utf8", DICT_DIR "/hmm_model.utf8");
   vector<string> res;
   string doc;
-  ifstream ifs(TEST_DATA_DIR "/weicheng.utf8");
+  ifstream ifs(TEST_DATA_DIR "/synthetic_doc.utf8");
   assert(ifs);
-  doc.assign(istreambuf_iterator<char>(ifs), istreambuf_iterator<char>());
+  doc << ifs;
   long beginTime = clock();
   for (size_t i = 0; i < times; i ++) {
     printf("process [%3.0lf %%]\r", 100.0*(i+1)/times);
@@ -26,7 +25,7 @@ void Cut(size_t times = 50) {
   }
   printf("\n");
   long endTime = clock();
-  printf("\033[0;32mCut: [%.3lf seconds]time consumed.\033[0m\n", double(endTime - beginTime)/CLOCKS_PER_SEC);
+  printf("Cut: [%.3lf seconds]time consumed.\n", double(endTime - beginTime)/CLOCKS_PER_SEC);
 }
 
 void Extract(size_t times = 400) {
@@ -38,7 +37,7 @@ void Extract(size_t times = 400) {
   string doc;
   ifstream ifs(TEST_DATA_DIR "/review.100");
   assert(ifs);
-  doc.assign(istreambuf_iterator<char>(ifs), istreambuf_iterator<char>());
+  doc << ifs;
   long beginTime = clock();
   for (size_t i = 0; i < times; i ++) {
     printf("process [%3.0lf %%]\r", 100.0*(i+1)/times);
@@ -48,7 +47,7 @@ void Extract(size_t times = 400) {
   }
   printf("\n");
   long endTime = clock();
-  printf("\033[0;32mExtract: [%.3lf seconds]time consumed.\033[0m\n", double(endTime - beginTime)/CLOCKS_PER_SEC);
+  printf("Extract: [%.3lf seconds]time consumed.\n", double(endTime - beginTime)/CLOCKS_PER_SEC);
 }
 
 int main(int argc, char ** argv) {

@@ -3,7 +3,6 @@
 
 #include <cmath>
 #include <map>
-#include <set>
 #include "Jieba.hpp"
 #include "UnicodeFile.hpp"
 
@@ -166,7 +165,7 @@ namespace cppjieba {
   private:
     void LoadStopWordDict(const string& filePath) {
       ifstream ifs;
-      OpenInputFile(filePath, ifs);
+      OpenInputFile(ifs, filePath);
       XCHECK(ifs.is_open()) << "open " << filePath << " failed";
       string line ;
       while (getline(ifs, line)) {
@@ -184,7 +183,7 @@ namespace cppjieba {
   }; // class TextRankExtractor
   
   inline ostream& operator << (ostream& os, const TextRankExtractor::Word& word) {
-    return os << "{\"word\": \"" << word.word << "\", \"offset\": " << FormatVector(word.offsets) << ", \"weight\": " << word.weight << "}"; 
+    return os << "{\"word\": \"" << word.word << "\", \"offset\": " << word.offsets << ", \"weight\": " << word.weight << "}"; 
   }
 } // namespace cppjieba
 

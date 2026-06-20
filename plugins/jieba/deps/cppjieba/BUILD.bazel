@@ -1,10 +1,15 @@
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
     name = "all_files",
     srcs = glob(["**/*"]),
+)
+
+filegroup(
+    name = "dict",
+    srcs = glob(["dict/**"]),
 )
 
 exports_files([
@@ -17,13 +22,16 @@ exports_files([
 
 cc_library(
     name = "cppjieba",
-    hdrs = glob([
-        "include/**/*.hpp",
-    ]),
+    hdrs = glob(["include/cppjieba/**/*.hpp"]),
     includes = ["include"],
 )
 
-filegroup(
-    name = "dict",
-    srcs = glob(["dict/*"]),
+cc_test(
+    name = "bazel_smoke_test",
+    srcs = ["test/bazel_smoke_test.cpp"],
+    data = [":dict"],
+    defines = [
+        "CPPJIEBA_BAZEL_RUNFILES_PREFIX=\\\"plugins/jieba/deps/cppjieba/\\\"",
+    ],
+    deps = [":cppjieba"],
 )

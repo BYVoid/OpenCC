@@ -33,8 +33,6 @@ CppJieba是"结巴(Jieba)"中文分词的C++版本
 ```sh
 git clone https://github.com/yanyiwu/cppjieba.git
 cd cppjieba
-git submodule init
-git submodule update
 mkdir build
 cd build
 cmake ..
@@ -42,6 +40,24 @@ make
 
 make test
 ```
+
+### Benchmark
+
+项目提供了一个用于本地性能对比的 benchmark 目标：
+
+```sh
+make benchmark
+```
+
+它会构建并运行 `test/benchmark.cpp`，输出以下指标：
+
+- `DictTrieLoad`: 词典加载耗时，以及可用时的进程 RSS 内存占用
+- `HMMModelLoad`: HMM 模型加载耗时，以及可用时的进程 RSS 内存占用
+- `MPCut`: `MPSegment` 对基准文本的分词吞吐
+- `MixCut`: `MixSegment` 对基准文本的分词吞吐
+- `DictFind`: 词典查找吞吐
+
+这个 benchmark 主要用于本地修改前后的性能回归和对比，不作为默认测试的一部分。
 
 ## 使用示例
 
@@ -162,6 +178,32 @@ Query方法先使用Mix方法切词，对于切出来的较长的词再使用Ful
 
 自定义词典示例请看`dict/user.dict.utf8`。
 
+用户词典支持以下三种格式，每行一条，列之间用空格分隔:
+
+```text
+词语
+词语 词性
+词语 词频 词性
+```
+
+- `1` 列: 只提供词语，词频使用默认值，词性为空。
+- `2` 列: 当前解释为 `词语 词性`，词频仍使用默认值。
+- `3` 列: 解释为 `词语 词频 词性`。
+- 多个用户词典文件可以用 `|` 或 `;` 连接后一起传入。
+- 不支持行内注释或额外的列。
+
+主词典 `dict/jieba.dict.utf8` 的格式固定为三列:
+
+```text
+词语 词频 词性
+```
+
+其中:
+
+- `词频` 在加载时会被转换成对数权重，供概率分词使用。
+- 用户词典如果未显式提供词频，会使用主词典统计出来的默认权重；默认策略是中位数权重。
+- `词性` 在代码中只是原样保存的字符串，没有内置枚举校验；主词典当前实际使用了 `55` 种 tag，例如 `n`、`v`、`nr`、`ns`、`nz`、`x`、`eng` 等。
+
 没有使用自定义用户词典时的结果:
 
 ```
@@ -229,6 +271,7 @@ CppJieba 已经被广泛应用于各种编程语言的分词实现中：
 - [pg_jieba](https://github.com/jaiminpan/pg_jieba) - PostgreSQL 分词插件
 - [gitbook-plugin-search-pro](https://plugins.gitbook.com/plugin/search-pro) - Gitbook 中文搜索插件
 - [ngx_http_cppjieba_module](https://github.com/yanyiwu/ngx_http_cppjieba_module) - Nginx 分词插件
+- [OpenCC](https://github.com/byvoid/OpenCC) - OpenCC 中的 jieba 分词插件
 
 ## 贡献指南
 
@@ -241,5 +284,3 @@ CppJieba 已经被广泛应用于各种编程语言的分词实现中：
 
 
 如果您觉得 CppJieba 对您有帮助，欢迎 star ⭐️ 支持项目！
-
-

@@ -65,6 +65,14 @@ TEST(MixSegmentTest, Test1) {
     actual = Join(words.begin(), words.end(), "/");
     ASSERT_EQ(actual, expected);
   }
+
+  {
+    sentence = "马克思主义和习总书记新时代中国特色社会主义";
+    expected = "马克思主义/和/习总书记/新/时代/中国/特色/社会主义";
+    segment.Cut(sentence, words);
+    actual = Join(words.begin(), words.end(), "/");
+    ASSERT_EQ(actual, expected);
+  }
 }
 
 TEST(MixSegmentTest, NoUserDict) {
@@ -327,10 +335,10 @@ TEST(MPSegmentTest, Unicode32) {
 
 // Regression test for heap corruption ("corrupted size vs. prev_size") with
 // input strings larger than 2114 bytes. The bug was caused by using
-// vector<RuneStr> (only safe for primitive types) for RuneStrArray.
+// LocalVector<RuneStr> (only safe for primitive types) for RuneStrArray.
 TEST(MixSegmentTest, LongInput) {
   // 2114 is the byte length threshold beyond which the original heap
-  // corruption was triggered when RuneStrArray used vector<RuneStr>.
+  // corruption was triggered when RuneStrArray used LocalVector<RuneStr>.
   const size_t HEAP_CORRUPTION_THRESHOLD = 2114;
 
   MixSegment segment(DICT_DIR "/jieba.dict.utf8", DICT_DIR "/hmm_model.utf8");

@@ -1,12 +1,9 @@
 #ifndef CPPJIEBA_TRIE_HPP
 #define CPPJIEBA_TRIE_HPP
 
-#include <cassert>
-#include <queue>
-#include <string>
-#include <unordered_map>
-#include <utility>
 #include <vector>
+#include <queue>
+#include "Utils.hpp"
 #include "Unicode.hpp"
 
 namespace cppjieba {
@@ -31,7 +28,7 @@ struct DictUnit {
 struct Dag {
   RuneStr runestr;
   // [offset, nexts.first]
-  vector<pair<size_t, const DictUnit*> > nexts;
+  LocalVector<pair<size_t, const DictUnit*> > nexts;
   const DictUnit * pInfo;
   double weight;
   size_t nextPos; // TODO

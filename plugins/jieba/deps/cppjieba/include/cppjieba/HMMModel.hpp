@@ -1,15 +1,13 @@
 #ifndef CPPJIEBA_HMMMODEL_H
 #define CPPJIEBA_HMMMODEL_H
 
-#include <cstring>
-#include <unordered_map>
-#include "Utils.hpp"
 #include "UnicodeFile.hpp"
+#include "Utils.hpp"
 #include "Trie.hpp"
 
 namespace cppjieba {
 
-typedef std::unordered_map<Rune, double> EmitProbMap;
+typedef unordered_map<Rune, double> EmitProbMap;
 
 struct HMMModel {
   /*
@@ -35,7 +33,7 @@ struct HMMModel {
   }
   void LoadModel(const string& filePath) {
     ifstream ifile;
-    OpenInputFile(filePath, ifile);
+    OpenInputFile(ifile, filePath);
     XCHECK(ifile.is_open()) << "open " << filePath << " failed";
     string line;
     vector<string> tmp;

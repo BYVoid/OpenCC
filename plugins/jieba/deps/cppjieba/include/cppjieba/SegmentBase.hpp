@@ -1,16 +1,14 @@
 #ifndef CPPJIEBA_SEGMENTBASE_H
 #define CPPJIEBA_SEGMENTBASE_H
 
-#include <cassert>
-#include <unordered_set>
-#include "PreFilter.hpp"
 #include "Utils.hpp"
+#include "PreFilter.hpp"
+#include <cassert>
 
 
 namespace cppjieba {
 
 const char* const SPECIAL_SEPARATORS = " \t\n\xEF\xBC\x8C\xE3\x80\x82";
-
 
 class SegmentBase {
  public:
@@ -38,7 +36,7 @@ class SegmentBase {
     return true;
   }
  protected:
-  std::unordered_set<Rune> symbols_;
+  unordered_set<Rune> symbols_;
 }; // class SegmentBase
 
 } // cppjieba

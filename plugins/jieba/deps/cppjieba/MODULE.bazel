@@ -1,0 +1,6 @@
+module(
+    name = "cppjieba",
+    version = "5.6.7",
+)
+
+bazel_dep(name = "rules_cc", version = "0.2.17")

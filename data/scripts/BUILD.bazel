@@ -26,6 +26,13 @@ py_binary(
     srcs = ["opencc_resources_zip.py"],
 )
 
+py_binary(
+    name = "generate_st_phrases_from_regional_phrases",
+    srcs = ["generate_st_phrases_from_regional_phrases.py"],
+    imports = ["."],
+    deps = [":common"],
+)
+
 py_test(
     name = "common_test",
     size = "small",

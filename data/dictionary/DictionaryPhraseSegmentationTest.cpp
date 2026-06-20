@@ -45,6 +45,7 @@ bool HasAtLeastTwoCharacters(const std::string& text) {
 }
 
 struct STPhraseValue {
+  std::string source;
   size_t lineNumber;
   std::string key;
   std::string value;
@@ -64,7 +65,8 @@ std::vector<std::string> SplitValues(const std::string& values) {
   return split;
 }
 
-std::vector<STPhraseValue> LoadSTPhraseValues(const std::string& path) {
+std::vector<STPhraseValue> LoadSTPhraseValues(const std::string& path,
+                                              const std::string& source) {
   std::ifstream stream(path);
   if (!stream.is_open()) {
     ADD_FAILURE() << path;
@@ -90,7 +92,7 @@ std::vector<STPhraseValue> LoadSTPhraseValues(const std::string& path) {
     const std::string valueText = line.substr(tab + 1);
     for (const std::string& value : SplitValues(valueText)) {
       if (seenValues.insert(value).second) {
-        values.push_back(STPhraseValue{lineNumber, key, value});
+        values.push_back(STPhraseValue{source, lineNumber, key, value});
       }
     }
   }
@@ -109,6 +111,7 @@ bool IsCoveredBySTPhraseValue(const std::string& key,
 
 struct FragmentRisk {
   std::string category;
+  std::string source;
   size_t lineNumber;
   std::string key;
   std::string value;
@@ -135,6 +138,7 @@ bool FindSTPhraseValueFragment(const std::string& key,
     } else {
       risk->category = "middle";
     }
+    risk->source = stValue.source;
     risk->lineNumber = stValue.lineNumber;
     risk->key = stValue.key;
     risk->value = value;
@@ -149,6 +153,8 @@ void ExpectProperSegmentationCoverage(const std::string& phrasesName) {
 
   const std::string stPhrasesFile =
       runfiles->Rlocation("_main/data/dictionary/STPhrases.txt");
+  const std::string generatedSTPhrasesFile = runfiles->Rlocation(
+      "_main/data/dictionary/STPhrases_GeneratedFromRegionalPhrases.txt");
   const std::string phrasesFile =
       runfiles->Rlocation("_main/data/dictionary/" + phrasesName + ".txt");
 
@@ -156,7 +162,12 @@ void ExpectProperSegmentationCoverage(const std::string& phrasesName) {
     LexiconPtr phrases = LoadLexicon(phrasesFile);
     ASSERT_NE(phrases, nullptr);
 
-    std::vector<STPhraseValue> stValues = LoadSTPhraseValues(stPhrasesFile);
+    std::vector<STPhraseValue> stValues =
+        LoadSTPhraseValues(stPhrasesFile, "STPhrases.txt");
+    std::vector<STPhraseValue> generatedSTValues = LoadSTPhraseValues(
+        generatedSTPhrasesFile, "STPhrases_GeneratedFromRegionalPhrases.txt");
+    stValues.insert(stValues.end(), generatedSTValues.begin(),
+                    generatedSTValues.end());
     ASSERT_FALSE(stValues.empty());
 
     std::ostringstream missing;
@@ -174,8 +185,8 @@ void ExpectProperSegmentationCoverage(const std::string& phrasesName) {
 
       ++missingCount;
       missing << phrasesName << " key \"" << key
-              << "\" is not covered by any STPhrases value.\n"
-              << "  Conflicting STPhrases record: STPhrases.txt:"
+              << "\" is not covered by any ST phrase value.\n"
+              << "  Conflicting ST phrase record: " << risk.source << ":"
               << risk.lineNumber << " \"" << risk.key
               << "\" -> \"" << risk.value << "\"\n"
               << "  The existing value appears as a " << risk.category
@@ -183,7 +194,7 @@ void ExpectProperSegmentationCoverage(const std::string& phrasesName) {
     }
 
     EXPECT_EQ(0U, missingCount)
-        << "Potential missing STPhrases entries for " << phrasesName << ":\n"
+        << "Potential missing ST phrase entries for " << phrasesName << ":\n"
         << missing.str();
   } catch (const Exception& ex) {
     FAIL() << "Exception: " << ex.what();
@@ -195,14 +206,64 @@ void ExpectProperSegmentationCoverage(const std::string& phrasesName) {
   }
 }
 
+void ExpectGeneratedSTPhrasesFromRegionalPhrasesAreValid() {
+  std::unique_ptr<Runfiles> runfiles(Runfiles::CreateForTest());
+  ASSERT_NE(nullptr, runfiles);
+
+  const std::string hkPhrasesFile =
+      runfiles->Rlocation("_main/data/dictionary/HKPhrases.txt");
+  const std::string twPhrasesFile =
+      runfiles->Rlocation("_main/data/dictionary/TWPhrases.txt");
+  const std::string generatedName = "STPhrases_GeneratedFromRegionalPhrases";
+  const std::string generatedSTPhrasesFile = runfiles->Rlocation(
+      "_main/data/dictionary/" + generatedName + ".txt");
+
+  try {
+    LexiconPtr hkPhrases = LoadLexicon(hkPhrasesFile);
+    ASSERT_NE(hkPhrases, nullptr);
+    LexiconPtr twPhrases = LoadLexicon(twPhrasesFile);
+    ASSERT_NE(twPhrases, nullptr);
+    LexiconPtr generatedSTPhrases = LoadLexicon(generatedSTPhrasesFile);
+    ASSERT_NE(generatedSTPhrases, nullptr);
+
+    std::unordered_set<std::string> phraseKeys;
+    for (size_t i = 0; i < hkPhrases->Length(); ++i) {
+      phraseKeys.insert(hkPhrases->At(i)->Key());
+    }
+    for (size_t i = 0; i < twPhrases->Length(); ++i) {
+      phraseKeys.insert(twPhrases->At(i)->Key());
+    }
+
+    for (size_t i = 0; i < generatedSTPhrases->Length(); ++i) {
+      const std::string key = generatedSTPhrases->At(i)->Key();
+      EXPECT_GE(UTF8Util::Length(key.c_str()), 3U)
+          << "Short generated ST phrase key may split longer words: " << key;
+
+      const std::vector<std::string> values = generatedSTPhrases->At(i)->Values();
+      for (const std::string& value : values) {
+        EXPECT_NE(phraseKeys.count(value), 0U)
+            << generatedName << " value is not a regional phrase key: "
+            << value;
+      }
+    }
+  } catch (const Exception& ex) {
+    FAIL() << "Exception: " << ex.what();
+  } catch (const std::exception& ex) {
+    FAIL() << "std::exception: " << ex.what();
+  } catch (...) {
+    FAIL() << "Unknown exception thrown during " << generatedName
+           << " coverage check.";
+  }
+}
+
 TEST(DictionaryPhraseSegmentationTest,
      HKPhrasesKeysAreCoveredBySTPhraseValues) {
   ExpectProperSegmentationCoverage("HKPhrases");
 }
 
 TEST(DictionaryPhraseSegmentationTest,
-     TWPhrasesKeysAreCoveredBySTPhraseValues) {
-  ExpectProperSegmentationCoverage("TWPhrases");
+     GeneratedSTPhrasesFromRegionalPhrasesAreValid) {
+  ExpectGeneratedSTPhrasesFromRegionalPhrasesAreValid();
 }
 
 } // namespace

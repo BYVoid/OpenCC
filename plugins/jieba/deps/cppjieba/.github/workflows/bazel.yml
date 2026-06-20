@@ -1,0 +1,16 @@
+name: Bazel
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v6
+
+      - name: Test
+        run: npx --yes @bazel/bazelisk test //:bazel_smoke_test

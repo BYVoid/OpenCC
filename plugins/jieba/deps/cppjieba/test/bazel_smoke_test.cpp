@@ -14,7 +14,12 @@ std::string RunfilePath(const std::string& relative_path) {
     return relative_path;
   }
 
+#ifdef CPPJIEBA_BAZEL_RUNFILES_PREFIX
+  return std::string(test_srcdir) + "/" + test_workspace + "/" +
+         CPPJIEBA_BAZEL_RUNFILES_PREFIX + relative_path;
+#else
   return std::string(test_srcdir) + "/" + test_workspace + "/" + relative_path;
+#endif
 }
 
 }  // namespace

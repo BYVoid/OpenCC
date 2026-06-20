@@ -144,7 +144,7 @@ protected:
 #endif
   }
 
-#ifdef BAZEL
+#if defined(BAZEL) && defined(OPENCC_ENABLE_RESOURCE_ZIP_TEST)
   std::string ResourceZipFile() const {
     return runfiles_->Rlocation("_main/data/opencc-resources.zip");
   }
@@ -212,7 +212,7 @@ protected:
 #endif
   }
 
-#ifdef BAZEL
+#if defined(BAZEL) && defined(OPENCC_ENABLE_RESOURCE_ZIP_TEST)
   std::string TestResourceZipCommand(const std::string& config,
                                      const std::string& inputFile,
                                      const std::string& outputFile) const {
@@ -419,7 +419,7 @@ TEST_F(CommandLineConvertTest, IncludeTofuRiskDictionariesFlagRestoresLegacy) {
   EXPECT_EQ("𫝈", GetFileContents(outputFile));
 }
 
-#ifdef BAZEL
+#if defined(BAZEL) && defined(OPENCC_ENABLE_RESOURCE_ZIP_TEST)
 TEST_F(CommandLineConvertTest, ResourceZipConvertsWithoutResourcePaths) {
   const std::string inputFile = InputFile("resource_zip");
   const std::string outputFile = OutputFile("resource_zip");

@@ -11,6 +11,65 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  resource-package:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+
+    env:
+      BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compute version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(bash scripts/compute-version.sh)
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Computed version: $VERSION"
+      - uses: bazelbuild/setup-bazelisk@v3
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Configure BuildBuddy
+        shell: bash
+        run: |
+          if [ -n "${BUILDBUDDY_API_KEY}" ]; then
+            {
+              echo "build --config=buildbuddy"
+              echo "build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
+              echo "build --bes_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
+            } >> .bazelrc.user
+            echo "BuildBuddy enabled."
+          else
+            echo "BUILDBUDDY_API_KEY not set; skipping BuildBuddy config (fork PR or missing secret)."
+          fi
+      - name: Build resource package
+        shell: bash
+        env:
+          MSYS_NO_PATHCONV: 1
+        run: |
+          bazel build \
+            --workspace_status_command=./scripts/bazel-workspace-status.sh \
+            //data:opencc_resources_zip
+      - name: Stage resource package
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp bazel-bin/data/opencc-resources.zip "dist/opencc-${VERSION}-resources.zip"
+          unzip -l "dist/opencc-${VERSION}-resources.zip"
+      - name: Upload resource package
+        uses: actions/upload-artifact@v4
+        with:
+          name: opencc-${{ env.VERSION }}-resources
+          path: dist/opencc-${{ env.VERSION }}-resources.zip
+          if-no-files-found: error
+
   build-and-test:
     permissions:
       contents: read

@@ -30,6 +30,8 @@ from unittest import mock
 CONFIGS = [
     "s2hk",
     "s2hk_jieba",
+    "s2hkp",
+    "s2hkp_jieba",
     "s2t",
     "s2t_jieba",
     "s2tw",

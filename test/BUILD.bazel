@@ -36,13 +36,18 @@ cc_test(
     ],
     data = [
         "//data/config",
-        "//data:opencc_resources_zip",
         "//data/dictionary:binary_dictionaries",
         "//data/dictionary:text_dictionaries",
         "//src/tools:command_line",
         "//test/testcases",
-    ],
-    defines = ["BAZEL"],
+    ] + select({
+        "@platforms//os:windows": [],
+        "//conditions:default": ["//data:opencc_resources_zip"],
+    }),
+    defines = ["BAZEL"] + select({
+        "@platforms//os:windows": [],
+        "//conditions:default": ["OPENCC_ENABLE_RESOURCE_ZIP_TEST"],
+    }),
     deps = [
         "//src:common_lib",
         "@bazel_tools//tools/cpp/runfiles",

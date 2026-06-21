@@ -51,50 +51,113 @@ jobs:
           echo "Before: $before_ref"
           echo "After: $after_ref"
 
-      - name: Checkout before
+      - name: Check resource diff safety
+        id: safety
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          enabled=1
+          if [ "$EVENT_NAME" = "pull_request" ] && [ "$PR_HEAD_REPO" != "$REPOSITORY" ]; then
+            enabled=0
+          fi
+          echo "enabled=$enabled" >> "$GITHUB_OUTPUT"
+
+          if [ "$enabled" = "0" ]; then
+            {
+              echo "## Resource Diff Skipped"
+              echo
+              echo "Resource diff is skipped for fork pull requests because building"
+              echo "the resource zip executes repository Bazel/Python code from the PR."
+              echo
+              echo "- Repository: \`${REPOSITORY}\`"
+              echo "- PR head repository: \`${PR_HEAD_REPO}\`"
+              echo "- Before ref: \`${{ steps.refs.outputs.before_ref }}\`"
+              echo "- After ref: \`${{ steps.refs.outputs.after_ref }}\`"
+              echo
+              echo "A maintainer can run this workflow manually with reviewed refs if needed."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Checkout repository
+        if: steps.safety.outputs.enabled == '1'
         uses: actions/checkout@v5
         with:
-          path: before
-          repository: ${{ github.event.pull_request.base.repo.full_name || github.repository }}
-          ref: ${{ steps.refs.outputs.before_ref }}
           fetch-depth: 0
 
-      - name: Checkout after
-        uses: actions/checkout@v5
-        with:
-          path: after
-          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
-          ref: ${{ steps.refs.outputs.after_ref }}
-          fetch-depth: 0
+      - name: Create comparison worktrees
+        if: steps.safety.outputs.enabled == '1'
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_HEAD_REPO_URL: ${{ github.event.pull_request.head.repo.clone_url }}
+        run: |
+          before_ref="${{ steps.refs.outputs.before_ref }}"
+          after_ref="${{ steps.refs.outputs.after_ref }}"
+
+          git fetch --no-tags origin "${before_ref}:refs/resource-diff/before"
+          if [ "$EVENT_NAME" = "pull_request" ] && [ -n "$PR_HEAD_REPO_URL" ]; then
+            git fetch --no-tags "$PR_HEAD_REPO_URL" "${after_ref}:refs/resource-diff/after"
+          else
+            git fetch --no-tags origin "${after_ref}:refs/resource-diff/after"
+          fi
+
+          git worktree add "$RUNNER_TEMP/opencc-before" refs/resource-diff/before
+          git worktree add "$RUNNER_TEMP/opencc-after" refs/resource-diff/after
+
+      - name: Verify checked out refs
+        if: steps.safety.outputs.enabled == '1'
+        shell: bash
+        run: |
+          before_head="$(git -C "$RUNNER_TEMP/opencc-before" rev-parse HEAD)"
+          after_head="$(git -C "$RUNNER_TEMP/opencc-after" rev-parse HEAD)"
+          {
+            echo "## Checked Out Refs"
+            echo
+            echo "- Expected before: \`${{ steps.refs.outputs.before_ref }}\`"
+            echo "- Actual before: \`${before_head}\`"
+            echo "- Expected after: \`${{ steps.refs.outputs.after_ref }}\`"
+            echo "- Actual after: \`${after_head}\`"
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          test "$before_head" = "${{ steps.refs.outputs.before_ref }}"
+          test "$after_head" = "${{ steps.refs.outputs.after_ref }}"
 
       - uses: bazel-contrib/setup-bazel@0.19.0
+        if: steps.safety.outputs.enabled == '1'
         with:
           bazelisk-cache: true
 
       - name: Set up Python
+        if: steps.safety.outputs.enabled == '1'
         uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
       - name: Configure BuildBuddy
+        if: steps.safety.outputs.enabled == '1'
         shell: bash
         run: |
-          for checkout in before after; do
-            if [ -n "${BUILDBUDDY_API_KEY}" ]; then
+          if [ -n "${BUILDBUDDY_API_KEY}" ]; then
+            for checkout in "$RUNNER_TEMP/opencc-before" "$RUNNER_TEMP/opencc-after"; do
               {
                 echo "build --config=buildbuddy"
                 echo "build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
                 echo "build --bes_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
               } >> "$checkout/.bazelrc.user"
               echo "BuildBuddy enabled for $checkout."
-            else
-              echo "BUILDBUDDY_API_KEY not set; skipping BuildBuddy config for $checkout."
-            fi
-          done
+            done
+          else
+            echo "BUILDBUDDY_API_KEY not set; skipping BuildBuddy config."
+          fi
 
       - name: Build before resource zip
+        if: steps.safety.outputs.enabled == '1'
         shell: bash
-        working-directory: before
+        working-directory: ${{ runner.temp }}/opencc-before
         env:
           MSYS_NO_PATHCONV: 1
         run: |
@@ -102,11 +165,15 @@ jobs:
           if [ -x ./scripts/bazel-workspace-status.sh ]; then
             args+=(--workspace_status_command=./scripts/bazel-workspace-status.sh)
           fi
+          args+=(--noremote_accept_cached --remote_upload_local_results=false)
           bazel build "${args[@]}" //data:opencc_resources_zip
+          mkdir -p "$GITHUB_WORKSPACE/dist"
+          cp -f bazel-bin/data/opencc-resources.zip "$GITHUB_WORKSPACE/dist/opencc-resources-before.zip"
 
       - name: Build after resource zip
+        if: steps.safety.outputs.enabled == '1'
         shell: bash
-        working-directory: after
+        working-directory: ${{ runner.temp }}/opencc-after
         env:
           MSYS_NO_PATHCONV: 1
         run: |
@@ -114,19 +181,53 @@ jobs:
           if [ -x ./scripts/bazel-workspace-status.sh ]; then
             args+=(--workspace_status_command=./scripts/bazel-workspace-status.sh)
           fi
+          args+=(--noremote_accept_cached --remote_upload_local_results=false)
           bazel build "${args[@]}" //data:opencc_resources_zip
+          mkdir -p "$GITHUB_WORKSPACE/dist"
+          cp -f bazel-bin/data/opencc-resources.zip "$GITHUB_WORKSPACE/dist/opencc-resources-after.zip"
+
+      - name: Capture resource zip metadata
+        if: steps.safety.outputs.enabled == '1'
+        shell: bash
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import hashlib
+          import json
+          import zipfile
+
+          print("## Resource Zip Metadata")
+          print()
+          for label, path in [
+              ("Before", "dist/opencc-resources-before.zip"),
+              ("After", "dist/opencc-resources-after.zip"),
+          ]:
+              data = open(path, "rb").read()
+              with zipfile.ZipFile(path) as archive:
+                  manifest_data = archive.read("opencc-resource-manifest.json")
+              manifest = json.loads(manifest_data)
+              print(f"- {label} zip SHA256: `{hashlib.sha256(data).hexdigest()}`")
+              print(
+                  f"- {label} manifest SHA256: "
+                  f"`{hashlib.sha256(manifest_data).hexdigest()}`"
+              )
+              print(f"- {label} manifest commit: `{manifest.get('commit_id')}`")
+              print(f"- {label} manifest built: `{manifest.get('build_time_utc')}`")
+          print()
+          PY
 
       - name: Generate diff report
+        if: steps.safety.outputs.enabled == '1'
         shell: bash
         run: |
           mkdir -p dist
-          python3 after/data/scripts/opencc_resources_zip_diff.py \
-            before/bazel-bin/data/opencc-resources.zip \
-            after/bazel-bin/data/opencc-resources.zip \
+          python3 "$RUNNER_TEMP/opencc-after/data/scripts/opencc_resources_zip_diff.py" \
+            dist/opencc-resources-before.zip \
+            dist/opencc-resources-after.zip \
             --markdown dist/opencc-resource-diff.md
           cat dist/opencc-resource-diff.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload diff report
+        if: steps.safety.outputs.enabled == '1'
         uses: actions/upload-artifact@v7
         with:
           path: dist/opencc-resource-diff.md

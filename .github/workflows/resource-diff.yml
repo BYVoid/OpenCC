@@ -5,6 +5,10 @@ on:
     branches: [master]
   workflow_dispatch:
     inputs:
+      pull_request:
+        description: "Pull request number to compare. Enables manual maintainer-approved diff for fork PRs."
+        required: false
+        type: string
       before_ref:
         description: "Base ref/SHA to compare from. Defaults to the PR base or master."
         required: false
@@ -22,10 +26,8 @@ jobs:
   diff:
     permissions:
       contents: read
+      pull-requests: read
     runs-on: ubuntu-latest
-
-    env:
-      BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
 
     steps:
       - name: Resolve refs
@@ -33,37 +35,74 @@ jobs:
         shell: bash
         env:
           EVENT_NAME: ${{ github.event_name }}
+          INPUT_PULL_REQUEST: ${{ inputs.pull_request }}
           INPUT_BEFORE_REF: ${{ inputs.before_ref }}
           INPUT_AFTER_REF: ${{ inputs.after_ref }}
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          PR_HEAD_REPO_URL: ${{ github.event.pull_request.head.repo.clone_url }}
           GITHUB_SHA_VALUE: ${{ github.sha }}
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
         run: |
-          if [ "$EVENT_NAME" = "pull_request" ]; then
+          pr_number=""
+          pr_head_repo=""
+          pr_head_repo_url=""
+          manual_pr=0
+
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] && [ -n "$INPUT_PULL_REQUEST" ]; then
+            pr_number="$INPUT_PULL_REQUEST"
+            before_ref="${INPUT_BEFORE_REF:-$(gh api "repos/${REPOSITORY}/pulls/${pr_number}" --jq '.base.sha')}"
+            after_ref="${INPUT_AFTER_REF:-$(gh api "repos/${REPOSITORY}/pulls/${pr_number}" --jq '.head.sha')}"
+            pr_head_repo="$(gh api "repos/${REPOSITORY}/pulls/${pr_number}" --jq '.head.repo.full_name')"
+            pr_head_repo_url="$(gh api "repos/${REPOSITORY}/pulls/${pr_number}" --jq '.head.repo.clone_url')"
+            manual_pr=1
+          elif [ "$EVENT_NAME" = "pull_request" ]; then
             before_ref="${INPUT_BEFORE_REF:-$PR_BASE_SHA}"
             after_ref="${INPUT_AFTER_REF:-$PR_HEAD_SHA}"
+            pr_head_repo="$PR_HEAD_REPO"
+            pr_head_repo_url="$PR_HEAD_REPO_URL"
           else
             before_ref="${INPUT_BEFORE_REF:-master}"
             after_ref="${INPUT_AFTER_REF:-$GITHUB_SHA_VALUE}"
+            pr_head_repo="$REPOSITORY"
           fi
+
           echo "before_ref=$before_ref" >> "$GITHUB_OUTPUT"
           echo "after_ref=$after_ref" >> "$GITHUB_OUTPUT"
+          echo "pr_number=$pr_number" >> "$GITHUB_OUTPUT"
+          echo "pr_head_repo=$pr_head_repo" >> "$GITHUB_OUTPUT"
+          echo "pr_head_repo_url=$pr_head_repo_url" >> "$GITHUB_OUTPUT"
+          echo "manual_pr=$manual_pr" >> "$GITHUB_OUTPUT"
           echo "Before: $before_ref"
           echo "After: $after_ref"
+          if [ -n "$pr_number" ]; then
+            echo "Pull request: #$pr_number"
+          fi
+          if [ -n "$pr_head_repo" ]; then
+            echo "PR head repository: $pr_head_repo"
+          fi
 
       - name: Check resource diff safety
         id: safety
         shell: bash
         env:
           EVENT_NAME: ${{ github.event_name }}
-          PR_HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          PR_HEAD_REPO: ${{ steps.refs.outputs.pr_head_repo }}
+          MANUAL_PR: ${{ steps.refs.outputs.manual_pr }}
           REPOSITORY: ${{ github.repository }}
         run: |
           enabled=1
+          use_buildbuddy=1
           if [ "$EVENT_NAME" = "pull_request" ] && [ "$PR_HEAD_REPO" != "$REPOSITORY" ]; then
             enabled=0
           fi
+          if [ "$PR_HEAD_REPO" != "$REPOSITORY" ]; then
+            use_buildbuddy=0
+          fi
           echo "enabled=$enabled" >> "$GITHUB_OUTPUT"
+          echo "use_buildbuddy=$use_buildbuddy" >> "$GITHUB_OUTPUT"
 
           if [ "$enabled" = "0" ]; then
             {
@@ -77,7 +116,18 @@ jobs:
               echo "- Before ref: \`${{ steps.refs.outputs.before_ref }}\`"
               echo "- After ref: \`${{ steps.refs.outputs.after_ref }}\`"
               echo
-              echo "A maintainer can run this workflow manually with reviewed refs if needed."
+              echo "A maintainer can run this workflow manually with the PR number after review."
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [ "$enabled" = "1" ] && [ "$MANUAL_PR" = "1" ]; then
+            {
+              echo "## Resource Diff Manually Approved"
+              echo
+              echo "This workflow was manually triggered for PR #${{ steps.refs.outputs.pr_number }}."
+              echo "- PR head repository: \`${PR_HEAD_REPO}\`"
+              echo "- BuildBuddy enabled: \`${use_buildbuddy}\`"
+              echo
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
@@ -92,13 +142,13 @@ jobs:
         shell: bash
         env:
           EVENT_NAME: ${{ github.event_name }}
-          PR_HEAD_REPO_URL: ${{ github.event.pull_request.head.repo.clone_url }}
+          PR_HEAD_REPO_URL: ${{ steps.refs.outputs.pr_head_repo_url }}
         run: |
           before_ref="${{ steps.refs.outputs.before_ref }}"
           after_ref="${{ steps.refs.outputs.after_ref }}"
 
           git fetch --no-tags origin "${before_ref}:refs/resource-diff/before"
-          if [ "$EVENT_NAME" = "pull_request" ] && [ -n "$PR_HEAD_REPO_URL" ]; then
+          if [ -n "$PR_HEAD_REPO_URL" ]; then
             git fetch --no-tags "$PR_HEAD_REPO_URL" "${after_ref}:refs/resource-diff/after"
           else
             git fetch --no-tags origin "${after_ref}:refs/resource-diff/after"
@@ -138,18 +188,18 @@ jobs:
           python-version: "3.12"
 
       - name: Configure BuildBuddy
-        if: steps.safety.outputs.enabled == '1'
+        if: steps.safety.outputs.enabled == '1' && steps.safety.outputs.use_buildbuddy == '1'
         shell: bash
+        env:
+          BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
         run: |
           if [ -n "${BUILDBUDDY_API_KEY}" ]; then
-            for checkout in "$RUNNER_TEMP/opencc-before" "$RUNNER_TEMP/opencc-after"; do
-              {
-                echo "build --config=buildbuddy"
-                echo "build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
-                echo "build --bes_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
-              } >> "$checkout/.bazelrc.user"
-              echo "BuildBuddy enabled for $checkout."
-            done
+            {
+              echo "build --config=buildbuddy"
+              echo "build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
+              echo "build --bes_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
+            } >> "$RUNNER_TEMP/opencc-before/.bazelrc.user"
+            echo "BuildBuddy enabled for before worktree."
           else
             echo "BUILDBUDDY_API_KEY not set; skipping BuildBuddy config."
           fi
@@ -165,7 +215,6 @@ jobs:
           if [ -x ./scripts/bazel-workspace-status.sh ]; then
             args+=(--workspace_status_command=./scripts/bazel-workspace-status.sh)
           fi
-          args+=(--noremote_accept_cached --remote_upload_local_results=false)
           bazel build "${args[@]}" //data:opencc_resources_zip
           mkdir -p "$GITHUB_WORKSPACE/dist"
           cp -f bazel-bin/data/opencc-resources.zip "$GITHUB_WORKSPACE/dist/opencc-resources-before.zip"
@@ -181,7 +230,6 @@ jobs:
           if [ -x ./scripts/bazel-workspace-status.sh ]; then
             args+=(--workspace_status_command=./scripts/bazel-workspace-status.sh)
           fi
-          args+=(--noremote_accept_cached --remote_upload_local_results=false)
           bazel build "${args[@]}" //data:opencc_resources_zip
           mkdir -p "$GITHUB_WORKSPACE/dist"
           cp -f bazel-bin/data/opencc-resources.zip "$GITHUB_WORKSPACE/dist/opencc-resources-after.zip"
@@ -220,7 +268,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist
-          python3 "$RUNNER_TEMP/opencc-after/data/scripts/opencc_resources_zip_diff.py" \
+          python3 "$RUNNER_TEMP/opencc-before/data/scripts/opencc_resources_zip_diff.py" \
             dist/opencc-resources-before.zip \
             dist/opencc-resources-after.zip \
             --markdown dist/opencc-resource-diff.md

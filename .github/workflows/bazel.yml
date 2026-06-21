@@ -16,9 +16,6 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
 
-    env:
-      BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
-
     steps:
       - uses: actions/checkout@v5
         with:
@@ -39,7 +36,10 @@ jobs:
         with:
           python-version: "3.12"
       - name: Configure BuildBuddy
+        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
         shell: bash
+        env:
+          BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
         run: |
           if [ -n "${BUILDBUDDY_API_KEY}" ]; then
             {
@@ -49,7 +49,7 @@ jobs:
             } >> .bazelrc.user
             echo "BuildBuddy enabled."
           else
-            echo "BUILDBUDDY_API_KEY not set; skipping BuildBuddy config (fork PR or missing secret)."
+            echo "BUILDBUDDY_API_KEY not set; skipping BuildBuddy config."
           fi
       - name: Build resource package
         shell: bash
@@ -80,9 +80,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-2022]
 
-    env:
-      BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
-
     steps:
       - uses: actions/checkout@v5
         with:
@@ -103,7 +100,10 @@ jobs:
         with:
           python-version: "3.12"
       - name: Configure BuildBuddy
+        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
         shell: bash
+        env:
+          BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
         run: |
           if [ -n "${BUILDBUDDY_API_KEY}" ]; then
             {
@@ -113,7 +113,7 @@ jobs:
             } >> .bazelrc.user
             echo "BuildBuddy enabled."
           else
-            echo "BUILDBUDDY_API_KEY not set; skipping BuildBuddy config (fork PR or missing secret)."
+            echo "BUILDBUDDY_API_KEY not set; skipping BuildBuddy config."
           fi
       - name: Build
         if: runner.os == 'Linux' || runner.os == 'macOS'

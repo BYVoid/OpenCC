@@ -9,6 +9,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
@@ -78,11 +79,40 @@ bool IsInSameMultiVariantSet(
   return false;
 }
 
+std::unordered_map<std::string, std::string> LoadPreferredValues(
+    const std::string& path) {
+  std::ifstream stream(path);
+  EXPECT_TRUE(stream.is_open()) << path;
+
+  std::unordered_map<std::string, std::string> preferredValues;
+  std::string line;
+  while (std::getline(stream, line)) {
+    if (!IsDictionaryEntry(line)) {
+      continue;
+    }
+
+    const size_t tab = line.find('\t');
+    if (tab == std::string::npos) {
+      ADD_FAILURE() << line;
+      continue;
+    }
+    const std::string key = line.substr(0, tab);
+    const std::vector<std::string> values = SplitValues(line.substr(tab + 1));
+    if (!values.empty()) {
+      preferredValues[key] = values.front();
+    }
+  }
+  return preferredValues;
+}
+
 std::unordered_set<std::string> LoadReverseExceptionCharacters(
-    const std::string& variantsPath, const std::string& stCharactersPath) {
+    const std::string& variantsPath, const std::string& variantsRevPath,
+    const std::string& stCharactersPath) {
   const std::vector<std::unordered_set<std::string>> variantSets =
       LoadMultiVariantSets(stCharactersPath);
   EXPECT_FALSE(variantSets.empty());
+  const std::unordered_map<std::string, std::string> reversePreferredValues =
+      LoadPreferredValues(variantsRevPath);
 
   std::ifstream stream(variantsPath);
   EXPECT_TRUE(stream.is_open()) << variantsPath;
@@ -103,6 +133,11 @@ std::unordered_set<std::string> LoadReverseExceptionCharacters(
     const std::string values = line.substr(tab + 1);
     for (const std::string& value : SplitValues(values)) {
       if (key == value) {
+        continue;
+      }
+      const auto reversePreferredValue = reversePreferredValues.find(value);
+      if (reversePreferredValue != reversePreferredValues.end() &&
+          reversePreferredValue->second == value) {
         continue;
       }
       if (IsInSameMultiVariantSet(variantSets, key, value)) {
@@ -191,6 +226,8 @@ void ExpectRevPhrasesComplete(const std::string& variantsName) {
   const std::string revPhrasesName = variantsName + "RevPhrases.txt";
   const std::string variantsPath =
       runfiles->Rlocation("_main/data/dictionary/" + variantsName + ".txt");
+  const std::string variantsRevPath =
+      runfiles->Rlocation("_main/data/dictionary/" + variantsName + "Rev.txt");
   const std::string phrasesPath = runfiles->Rlocation(
       "_main/data/dictionary/" + revPhrasesName);
   const std::string stCharactersPath =
@@ -199,7 +236,8 @@ void ExpectRevPhrasesComplete(const std::string& variantsName) {
       runfiles->Rlocation("_main/data/dictionary/STPhrases.txt");
 
   const std::unordered_set<std::string> exceptionChars =
-      LoadReverseExceptionCharacters(variantsPath, stCharactersPath);
+      LoadReverseExceptionCharacters(variantsPath, variantsRevPath,
+                                     stCharactersPath);
   ASSERT_FALSE(exceptionChars.empty()) << variantsName;
 
   const std::unordered_set<std::string> expected =

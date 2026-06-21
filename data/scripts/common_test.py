@@ -86,6 +86,27 @@ class CommonScriptTest(unittest.TestCase):
             "x\tA B\ny\tA\n",
         )
 
+    def test_reverse_items_applies_reverse_preference(self):
+        out = self.run_file_op(
+            reverse_items,
+            "# @reverse-prefer: x B\nA\tx\nB\tx\n",
+        )
+        self.assertEqual(out.decode("utf-8"), "x\tB A\n")
+
+    def test_reverse_items_uses_key_as_default_reverse_preference(self):
+        out = self.run_file_op(
+            reverse_items,
+            "# @reverse-prefer: x\nx\tx\nA\tx\n",
+        )
+        self.assertEqual(out.decode("utf-8"), "x\tx A\n")
+
+    def test_reverse_items_rejects_unmatched_reverse_preference(self):
+        with self.assertRaises(ValueError):
+            self.run_file_op(
+                reverse_items,
+                "# @reverse-prefer: x C\nA\tx\nB\tx\n",
+            )
+
     def test_find_target_items_matches_values_only(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             src = os.path.join(tmpdir, "in.txt")

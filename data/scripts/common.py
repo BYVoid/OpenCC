@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+REVERSE_PREFERENCE_PREFIX = '# @reverse-prefer:'
+
 class BaseDict:
     def _iter(self, file):
         with open(file, 'r', encoding='utf-8') as fh:
@@ -36,6 +38,28 @@ class BaseDict:
 
 
 class Dict(BaseDict):
+    def load(self, file):
+        self.reverse_preferences = {}
+        super().load(file)
+
+    def iter(self, file):
+        for item in super().iter(file):
+            yield item
+
+    def _iter(self, file):
+        for line_number, line in enumerate(super()._iter(file), start=1):
+            line_text = line.rstrip('\r\n')
+            if line_text.startswith(REVERSE_PREFERENCE_PREFIX):
+                if not hasattr(self, 'reverse_preferences'):
+                    self.reverse_preferences = {}
+                fields = line_text[len(REVERSE_PREFERENCE_PREFIX):].split()
+                if len(fields) not in (1, 2):
+                    raise ValueError(
+                        f'Invalid reverse preference at line {line_number}: {line_text}'
+                    )
+                self.reverse_preferences[fields[0]] = fields[-1]
+            yield line
+
     def sort(self):
         self.entries.sort(key=lambda e: e['key'])
 
@@ -48,6 +72,13 @@ class Dict(BaseDict):
                     dic[value].append(key)
                 else:
                     dic[value] = [key]
+        for key, preferred_value in getattr(self, 'reverse_preferences', {}).items():
+            if key not in dic or preferred_value not in dic[key]:
+                raise ValueError(
+                    f'Reverse preference {key} -> {preferred_value} has no matching mapping'
+                )
+            values = dic[key]
+            values.insert(0, values.pop(values.index(preferred_value)))
         self.entries = [{'key': key, 'values': values} for key, values in dic.items()]
 
 

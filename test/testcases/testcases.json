@@ -1541,6 +1541,20 @@
       "expected": {
         "s2t": "剛一出戲院 一出劇院 一出電影院 一出機場 一出來 風聲一出 一出道 一出城 一出聲 太陽一出"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_936_s2twp",
+      "input": "市场营销",
+      "expected": {
+        "s2twp": "市場行銷"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_936_tw2sp",
+      "input": "市場行銷",
+      "expected": {
+        "tw2sp": "市场营销"
+      }
     }
   ]
 }

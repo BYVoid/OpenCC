@@ -18,8 +18,15 @@
 
 #pragma once
 
+#include <atomic>
+#include <mutex>
+
 #include "Common.hpp"
 #include "SerializableDict.hpp"
+
+namespace marisa {
+class Trie;
+}
 
 namespace opencc {
 /**
@@ -51,13 +58,22 @@ public:
 
   static MarisaDictPtr NewFromFile(FILE* fp);
 
+  static MarisaDictPtr NewFromBuffer(const char* data, size_t size);
+
 private:
   MarisaDict();
 
-  size_t maxLength;
-  LexiconPtr lexicon;
+  void LoadFromMappedBuffer();
+  void ReconstructLexicon() const;
+
+  mutable size_t maxLength;
+  mutable LexiconPtr lexicon;
+  mutable std::mutex lexiconMutex;
+  mutable std::atomic<bool> lexiconReconstructed;
+  LexiconPtr valuesLexicon;
 
   class MarisaInternal;
   std::unique_ptr<MarisaInternal> internal;
+
 };
 } // namespace opencc

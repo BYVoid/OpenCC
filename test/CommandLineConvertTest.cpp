@@ -148,6 +148,10 @@ protected:
   std::string ResourceZipFile() const {
     return runfiles_->Rlocation("_main/data/opencc-resources.zip");
   }
+
+  std::string ResourceOcd2ZipFile() const {
+    return runfiles_->Rlocation("_main/data/opencc-resources-ocd2.zip");
+  }
 #endif
 
   std::string ConfigurationDirectory() const {
@@ -432,6 +436,28 @@ TEST_F(CommandLineConvertTest, ResourceZipConvertsWithoutResourcePaths) {
 
   ASSERT_EQ(0,
             RunCommand(TestResourceZipCommand("s2twp", inputFile, outputFile)));
+  EXPECT_EQ("印表機和滑鼠", GetFileContents(outputFile));
+}
+
+TEST_F(CommandLineConvertTest, ResourceOcd2ZipConvertsWithoutResourcePaths) {
+  const std::string inputFile = InputFile("resource_ocd2_zip");
+  const std::string outputFile = OutputFile("resource_ocd2_zip");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "打印机和鼠标";
+  }
+
+  std::string cmd = QuotePath(OpenccCommand()) + " -i " +
+                    QuotePath(inputFile) + " -o " + QuotePath(outputFile) +
+                    " -c s2twp.json" +
+                    " --resource-zip " + QuotePath(ResourceOcd2ZipFile());
+#ifdef _WIN32
+  cmd = "\"" + cmd + "\"";
+#endif
+
+  ASSERT_EQ(0, RunCommand(cmd));
   EXPECT_EQ("印表機和滑鼠", GetFileContents(outputFile));
 }
 #endif

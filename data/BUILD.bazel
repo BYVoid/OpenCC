@@ -1,4 +1,8 @@
-load("//data/scripts:opencc_resources_zip.bzl", "opencc_resources_zip")
+load(
+    "//data/scripts:opencc_resources_zip.bzl",
+    "opencc_resources_ocd2_zip",
+    "opencc_resources_zip",
+)
 
 package(default_visibility = ["//visibility:public"])
 
@@ -7,4 +11,10 @@ opencc_resources_zip(
     configs = ["//data/config:config"],
     dicts = ["//data/dictionary:text_dictionaries"],
     out = "opencc-resources.zip",
+)
+
+opencc_resources_ocd2_zip(
+    name = "opencc_resources_ocd2_zip",
+    src = ":opencc_resources_zip",
+    out = "opencc-resources-ocd2.zip",
 )

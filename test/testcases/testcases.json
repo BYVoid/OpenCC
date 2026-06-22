@@ -737,6 +737,16 @@
       }
     },
     {
+      "id": "BYVoid_OpenCC_Issue_580",
+      "input": "去干扰",
+      "expected": {
+        "s2t": "去干擾",
+        "s2tw": "去干擾",
+        "s2twp": "去干擾",
+        "s2hk": "去干擾"
+      }
+    },
+    {
       "id": "console_stays_unchanged",
       "input": "控制台",
       "expected": {

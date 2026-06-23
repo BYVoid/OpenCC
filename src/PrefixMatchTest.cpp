@@ -113,4 +113,35 @@ TEST_F(PrefixMatchTest, FastPathSelectsLongestMatch) {
   EXPECT_EQ(m.key->length(), m.keyLength);
 }
 
+TEST_F(PrefixMatchTest, MatchPrefixViewFastPathReturnsViews) {
+  // Single-dict fast-path: key view should point into caller's input buffer,
+  // value view should point into the dict's stable storage (no copy).
+  PrefixMatch pm(marisaDict);
+
+  const std::string query = utf8("清華大學校園");
+  PrefixMatchView v = pm.MatchPrefixView(query.c_str(), query.length());
+
+  EXPECT_TRUE(v.matched);
+  EXPECT_EQ(utf8("清華大學"), std::string(v.key));
+  EXPECT_EQ(utf8("TsinghuaUniversity"), std::string(v.value));
+  EXPECT_EQ(v.key.size(), v.keyLength);
+  // key view must alias the caller's buffer exactly.
+  EXPECT_EQ(query.data(), v.key.data());
+}
+
+TEST_F(PrefixMatchTest, MatchPrefixViewTablePathReturnsViews) {
+  // Table-path (multi-dict): value view points into stable PrefixMatch storage.
+  std::list<DictPtr> dictsMulti = {marisaDict, textDict};
+  DictPtr dictGroupMulti(new DictGroup(dictsMulti));
+  PrefixMatch pm(dictGroupMulti);
+
+  const std::string query = utf8("清華大學校園");
+  PrefixMatchView v = pm.MatchPrefixView(query.c_str(), query.length());
+
+  EXPECT_TRUE(v.matched);
+  EXPECT_EQ(utf8("清華大學"), std::string(v.key));
+  EXPECT_EQ(utf8("TsinghuaUniversity"), std::string(v.value));
+  EXPECT_EQ(v.key.size(), v.keyLength);
+}
+
 } // namespace opencc

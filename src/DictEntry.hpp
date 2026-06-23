@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include "Common.hpp"
 #include "Segments.hpp"
 #include "UTF8Util.hpp"
@@ -31,21 +33,25 @@ class OPENCC_EXPORT DictEntry {
 public:
   virtual ~DictEntry() {}
 
-  virtual std::string Key() const = 0;
+  virtual std::string_view KeyView() const = 0;
+
+  virtual std::string_view GetDefaultView() const = 0;
+
+  virtual std::string Key() const { return std::string(KeyView()); }
 
   virtual std::vector<std::string> Values() const = 0;
 
-  virtual std::string GetDefault() const = 0;
+  virtual std::string GetDefault() const { return std::string(GetDefaultView()); }
 
   virtual size_t NumValues() const = 0;
 
   virtual std::string ToString() const = 0;
 
-  size_t KeyLength() const { return Key().length(); }
+  size_t KeyLength() const { return KeyView().length(); }
 
-  bool operator<(const DictEntry& that) const { return Key() < that.Key(); }
+  bool operator<(const DictEntry& that) const { return KeyView() < that.KeyView(); }
 
-  bool operator==(const DictEntry& that) const { return Key() == that.Key(); }
+  bool operator==(const DictEntry& that) const { return KeyView() == that.KeyView(); }
 
   static bool UPtrLessThan(const std::unique_ptr<DictEntry>& a,
                            const std::unique_ptr<DictEntry>& b) {
@@ -59,17 +65,18 @@ public:
 
   virtual ~NoValueDictEntry() {}
 
-  virtual std::string Key() const { return key; }
+  std::string Key() const override { return key; }
+  std::string_view KeyView() const override { return key; }
+  std::string GetDefault() const override { return key; }
+  std::string_view GetDefaultView() const override { return key; }
 
-  virtual std::vector<std::string> Values() const {
+  std::vector<std::string> Values() const override {
     return std::vector<std::string>();
   }
 
-  virtual std::string GetDefault() const { return key; }
+  size_t NumValues() const override { return 0; }
 
-  virtual size_t NumValues() const { return 0; }
-
-  virtual std::string ToString() const { return key; }
+  std::string ToString() const override { return key; }
 
 private:
   std::string key;
@@ -79,16 +86,18 @@ class OPENCC_EXPORT SingleValueDictEntry : public DictEntry {
 public:
   virtual std::string Value() const = 0;
 
-  virtual std::vector<std::string> Values() const {
+  virtual std::string_view ValueView() const = 0;
+
+  std::string_view GetDefaultView() const override { return ValueView(); }
+
+  std::vector<std::string> Values() const override {
     return std::vector<std::string>{Value()};
   }
 
-  virtual std::string GetDefault() const { return Value(); }
+  size_t NumValues() const override { return 1; }
 
-  virtual size_t NumValues() const { return 1; }
-
-  virtual std::string ToString() const {
-    return std::string(Key()) + "\t" + Value();
+  std::string ToString() const override {
+    return std::string(KeyView()) + "\t" + Value();
   }
 };
 
@@ -99,9 +108,12 @@ public:
 
   virtual ~StrSingleValueDictEntry() {}
 
-  virtual std::string Key() const { return key; }
+  std::string Key() const override { return key; }
+  std::string_view KeyView() const override { return key; }
 
-  virtual std::string Value() const { return value; }
+  std::string Value() const override { return value; }
+  std::string GetDefault() const override { return value; }
+  std::string_view ValueView() const override { return value; }
 
 private:
   std::string key;
@@ -110,14 +122,6 @@ private:
 
 class OPENCC_EXPORT MultiValueDictEntry : public DictEntry {
 public:
-  virtual std::string GetDefault() const {
-    if (NumValues() > 0) {
-      return Values().at(0);
-    } else {
-      return Key();
-    }
-  }
-
   virtual std::string ToString() const;
 };
 
@@ -129,11 +133,19 @@ public:
 
   virtual ~StrMultiValueDictEntry() {}
 
-  virtual std::string Key() const { return key; }
+  std::string Key() const override { return key; }
+  std::string_view KeyView() const override { return key; }
 
-  size_t NumValues() const { return values.size(); }
+  std::string GetDefault() const override {
+    return values.empty() ? key : values[0];
+  }
+  std::string_view GetDefaultView() const override {
+    return values.empty() ? std::string_view(key) : std::string_view(values[0]);
+  }
 
-  std::vector<std::string> Values() const { return values; }
+  size_t NumValues() const override { return values.size(); }
+
+  std::vector<std::string> Values() const override { return values; }
 
 private:
   std::string key;

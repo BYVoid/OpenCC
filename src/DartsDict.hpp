@@ -42,9 +42,8 @@ public:
 
   virtual bool SupportsFastPrefixMatch() const override { return true; }
 
-  virtual bool MatchPrefixValue(const char* word, size_t len,
-                                std::string* key, std::string* value,
-                                size_t* keyLength) const override;
+  virtual PrefixMatchView MatchPrefixValue(const char* word,
+                                           size_t len) const override;
 
   virtual void SerializeToFile(FILE* fp) const override;
 

@@ -21,6 +21,7 @@
 
 #include "BinaryDict.hpp"
 #include "DartsDict.hpp"
+#include "Dict.hpp"
 #include "Lexicon.hpp"
 #include "darts.h"
 
@@ -99,18 +100,18 @@ Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word,
 
 LexiconPtr DartsDict::GetLexicon() const { return lexicon; }
 
-bool DartsDict::MatchPrefixValue(const char* word, size_t len,
-                                 std::string* key, std::string* value,
-                                 size_t* keyLength) const {
+PrefixMatchView DartsDict::MatchPrefixValue(const char* word,
+                                            size_t len) const {
   Optional<const DictEntry*> matched = MatchPrefix(word, len);
   if (matched.IsNull()) {
-    return false;
+    return PrefixMatchView{};
   }
   const DictEntry* entry = matched.Get();
-  *key = entry->Key();
-  *value = entry->GetDefault();
-  *keyLength = entry->KeyLength();
-  return true;
+  const size_t keyLen = entry->KeyLength();
+  // value view points directly into the DictEntry's owned string storage,
+  // valid for the lifetime of this dictionary.
+  return PrefixMatchView{true, keyLen, std::string_view(word, keyLen),
+                         entry->GetDefaultView()};
 }
 
 DartsDictPtr DartsDict::NewFromFile(FILE* fp) {

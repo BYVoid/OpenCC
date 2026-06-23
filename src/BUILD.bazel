@@ -403,8 +403,6 @@ cc_library(
         ":dict_lib",
         ":lexicon_lib",
         ":utf8_util_lib",
-        ":marisa_dict_lib",
-        ":darts_dict_lib",
     ],
 )
 

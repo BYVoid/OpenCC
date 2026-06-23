@@ -60,6 +60,23 @@ This document compiles the Open Chinese Convert (OpenCC) project information to 
 - **Incomplete dictionaries/configuration**: Missing segmentation dictionaries, regional differences and other `.ocd2` files will result in missing words in output.
 - **Path and loading process differences**: If OpenCC's path search and configuration parsing details are not followed, the actual loaded resources will differ from official ones, naturally leading to different results.
 
+## Communication Language
+
+Respond in Traditional Chinese (繁體中文) preferred; Simplified Chinese acceptable. When quoting dictionary keys, code identifiers, file names, or any string literal that appears in the codebase in Simplified Chinese, preserve the original Simplified form verbatim — do not transliterate it.
+
+## Commit Message Style
+
+- **First line**: action verb + concise description, no conventional-commit prefix (`feat:`, `fix:`, `perf:`, etc.). Example: `Implement single-dictionary lookup fast-path for PrefixMatch`
+- **Body**: one or two sentences summarising motivation and scope, separated from the title by a blank line.
+- **Multi-area changes**: add a `Detailed Changes:` section with bold headers and sub-bullets:
+  ```
+  Detailed Changes:
+  - **Section Name**:
+    - Sub-point one.
+    - Sub-point two.
+  ```
+- **No** `Co-Authored-By` trailer lines.
+
 ## Further Reading
 
 ### Contribution Guide

@@ -25,7 +25,7 @@ std::string MultiValueDictEntry::ToString() const {
   size_t i = 0;
   size_t length = Values().size();
   std::ostringstream buffer;
-  buffer << Key() << '\t';
+  buffer << KeyView() << '\t';
   for (const std::string& value : Values()) {
     buffer << value;
     if (i < length - 1) {

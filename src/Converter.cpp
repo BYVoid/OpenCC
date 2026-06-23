@@ -27,9 +27,13 @@
 using namespace opencc;
 
 std::string Converter::Convert(const std::string& text) const {
-  const SegmentsPtr& segments = segmentation->Segment(text);
   std::string converted;
   converted.reserve(text.length() + text.length() / 5);
+  if (segmentation == nullptr) {
+    conversionChain->AppendConvertedSegment(text.c_str(), &converted);
+    return converted;
+  }
+  const SegmentsPtr& segments = segmentation->Segment(text);
   for (const char* segment : *segments) {
     conversionChain->AppendConvertedSegment(segment, &converted);
   }
@@ -46,7 +50,13 @@ ConversionInspectionResult Converter::Inspect(const std::string& text) const {
   ConversionInspectionResult result;
   result.input = text;
 
-  const SegmentsPtr& initialSegments = segmentation->Segment(text);
+  SegmentsPtr initialSegments;
+  if (segmentation == nullptr) {
+    initialSegments.reset(new Segments);
+    initialSegments->AddSegment(text);
+  } else {
+    initialSegments = segmentation->Segment(text);
+  }
   result.segments = initialSegments->ToVector();
 
   const std::vector<SegmentsPtr> trace =

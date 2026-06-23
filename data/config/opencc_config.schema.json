@@ -3,7 +3,7 @@
   "id": "https://opencc.byvoid.com/schema/opencc_config.schema.json",
   "title": "OpenCC configuration",
   "type": "object",
-  "required": ["segmentation", "conversion_chain"],
+  "required": ["name", "conversion_chain"],
   "additionalProperties": false,
   "properties": {
     "name": { "type": "string" },

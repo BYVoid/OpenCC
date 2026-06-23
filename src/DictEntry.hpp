@@ -65,8 +65,9 @@ public:
 
   virtual ~NoValueDictEntry() {}
 
+  std::string Key() const override { return key; }
   std::string_view KeyView() const override { return key; }
-
+  std::string GetDefault() const override { return key; }
   std::string_view GetDefaultView() const override { return key; }
 
   std::vector<std::string> Values() const override {
@@ -107,10 +108,11 @@ public:
 
   virtual ~StrSingleValueDictEntry() {}
 
+  std::string Key() const override { return key; }
   std::string_view KeyView() const override { return key; }
 
   std::string Value() const override { return value; }
-
+  std::string GetDefault() const override { return value; }
   std::string_view ValueView() const override { return value; }
 
 private:
@@ -131,8 +133,12 @@ public:
 
   virtual ~StrMultiValueDictEntry() {}
 
+  std::string Key() const override { return key; }
   std::string_view KeyView() const override { return key; }
 
+  std::string GetDefault() const override {
+    return values.empty() ? key : values[0];
+  }
   std::string_view GetDefaultView() const override {
     return values.empty() ? std::string_view(key) : std::string_view(values[0]);
   }

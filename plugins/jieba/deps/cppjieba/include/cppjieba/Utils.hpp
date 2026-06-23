@@ -33,6 +33,9 @@
 
 namespace cppjieba {
 
+const double MIN_DOUBLE = -3.14e+100;
+const double MAX_DOUBLE = 3.14e+100;
+
 using std::deque;
 using std::ifstream;
 using std::make_pair;

@@ -98,6 +98,27 @@ public:
     return nullptr;
   }
 
+  /**
+   * Returns true if this dict can handle prefix queries directly without
+   * PrefixMatch building a lookup table. Subclasses that override
+   * MatchPrefixValue() must also override this to return true.
+   */
+  virtual bool SupportsFastPrefixMatch() const { return false; }
+
+  /**
+   * Fast-path prefix match. Only called when SupportsFastPrefixMatch() is
+   * true. Writes the longest matching key/value and its byte length into the
+   * output parameters and returns true; returns false on no match.
+   *
+   * The caller owns the output storage; implementations must not cache the
+   * pointers across calls.
+   */
+  virtual bool MatchPrefixValue(const char* word, size_t len,
+                                std::string* key, std::string* value,
+                                size_t* keyLength) const {
+    return false;
+  }
+
   virtual ~Dict() = default;
 };
 } // namespace opencc

@@ -85,6 +85,7 @@ set(UNITTESTS
   MarisaDictTest
   MaxMatchSegmentationTest
   PhraseExtractTest
+  PrefixMatchTest
   SerializedValuesTest
   SimpleConverterTest
   TextDictTest

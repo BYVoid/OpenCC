@@ -35,21 +35,28 @@ namespace opencc {
  */
 class OPENCC_EXPORT MarisaDict : public Dict, public SerializableDict {
 public:
-  virtual ~MarisaDict();
+  virtual ~MarisaDict() override;
 
-  virtual size_t KeyMaxLength() const;
+  virtual size_t KeyMaxLength() const override;
 
-  virtual Optional<const DictEntry*> Match(const char* word, size_t len) const;
+  virtual Optional<const DictEntry*> Match(const char* word,
+                                           size_t len) const override;
 
   virtual Optional<const DictEntry*> MatchPrefix(const char* word,
-                                                 size_t len) const;
+                                                 size_t len) const override;
 
-  virtual std::vector<const DictEntry*> MatchAllPrefixes(const char* word,
-                                                         size_t len) const;
+  virtual std::vector<const DictEntry*> MatchAllPrefixes(
+      const char* word, size_t len) const override;
 
-  virtual LexiconPtr GetLexicon() const;
+  virtual LexiconPtr GetLexicon() const override;
 
-  virtual void SerializeToFile(FILE* fp) const;
+  virtual bool SupportsFastPrefixMatch() const override { return true; }
+
+  virtual bool MatchPrefixValue(const char* word, size_t len,
+                                std::string* key, std::string* value,
+                                size_t* keyLength) const override;
+
+  virtual void SerializeToFile(FILE* fp) const override;
 
   /**
    * Constructs a MarisaDict from another dictionary.
@@ -59,6 +66,10 @@ public:
   static MarisaDictPtr NewFromFile(FILE* fp);
 
   static MarisaDictPtr NewFromBuffer(const char* data, size_t size);
+
+  bool IsLexiconReconstructed() const {
+    return lexiconReconstructed.load(std::memory_order_acquire);
+  }
 
 private:
   MarisaDict();
@@ -74,6 +85,5 @@ private:
 
   class MarisaInternal;
   std::unique_ptr<MarisaInternal> internal;
-
 };
 } // namespace opencc

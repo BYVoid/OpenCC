@@ -403,6 +403,22 @@ cc_library(
         ":dict_lib",
         ":lexicon_lib",
         ":utf8_util_lib",
+        ":marisa_dict_lib",
+        ":darts_dict_lib",
+    ],
+)
+
+cc_test(
+    name = "prefix_match_test",
+    size = "small",
+    srcs = ["PrefixMatchTest.cpp"],
+    deps = [
+        ":prefix_match_lib",
+        ":dict_group_lib",
+        ":marisa_dict_lib",
+        ":test_utils_utf8_lib",
+        ":text_dict_test_base_lib",
+        "@googletest//:gtest_main",
     ],
 )
 

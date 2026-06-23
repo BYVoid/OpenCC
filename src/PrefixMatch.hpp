@@ -22,7 +22,7 @@
 
 namespace opencc {
 
-class PrefixMatch {
+class OPENCC_EXPORT PrefixMatch {
 public:
   class Tables;
 
@@ -47,6 +47,7 @@ private:
                                std::vector<std::weak_ptr<const Dict>>* output);
 
   std::shared_ptr<const Tables> tables;
+  DictPtr singleDict;
 };
 
 } // namespace opencc

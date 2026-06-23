@@ -258,3 +258,46 @@ void MarisaDict::SerializeToFile(FILE* fp) const {
       new SerializedValues(GetLexicon()));
   serialized_values->SerializeToFile(fp);
 }
+bool MarisaDict::MatchPrefixValue(const char* word,
+                                  size_t len,
+                                  std::string* key,
+                                  std::string* value,
+                                  size_t* keyLength) const {
+  const marisa::Trie* trie = internal->marisa.get();
+  if (trie == nullptr) {
+    return false;
+  }
+  static thread_local marisa::Agent agent;
+  agent.set_query(word, len);
+  bool matched = false;
+  size_t matchedId = 0;
+  size_t matchedLength = 0;
+  while (trie->common_prefix_search(agent)) {
+    const size_t currentLength = agent.key().length();
+    if (!matched || currentLength > matchedLength) {
+      matched = true;
+      matchedId = agent.key().id();
+      matchedLength = currentLength;
+    }
+  }
+  if (!matched) {
+    return false;
+  }
+  if (valuesLexicon != nullptr) {
+    if (matchedId < valuesLexicon->Length()) {
+      *value = valuesLexicon->At(matchedId)->GetDefault();
+    } else {
+      return false;
+    }
+  } else {
+    LexiconPtr lex = GetLexicon();
+    if (lex != nullptr && matchedId < lex->Length()) {
+      *value = lex->At(matchedId)->GetDefault();
+    } else {
+      return false;
+    }
+  }
+  key->assign(word, matchedLength);
+  *keyLength = matchedLength;
+  return true;
+}

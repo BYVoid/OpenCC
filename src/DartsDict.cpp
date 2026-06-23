@@ -99,6 +99,20 @@ Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word,
 
 LexiconPtr DartsDict::GetLexicon() const { return lexicon; }
 
+bool DartsDict::MatchPrefixValue(const char* word, size_t len,
+                                 std::string* key, std::string* value,
+                                 size_t* keyLength) const {
+  Optional<const DictEntry*> matched = MatchPrefix(word, len);
+  if (matched.IsNull()) {
+    return false;
+  }
+  const DictEntry* entry = matched.Get();
+  *key = entry->Key();
+  *value = entry->GetDefault();
+  *keyLength = entry->KeyLength();
+  return true;
+}
+
 DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
   DartsDictPtr dict(new DartsDict());
 

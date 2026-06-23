@@ -198,6 +198,22 @@ private:
 };
 
 PrefixMatch::PrefixMatch(const DictPtr& dict) {
+  // Try to unwrap single dict group
+  DictPtr actualDict = dict;
+  while (actualDict) {
+    const std::list<DictPtr>* items = actualDict->GetDictGroupItems();
+    if (items != nullptr && items->size() == 1) {
+      actualDict = items->front();
+    } else {
+      break;
+    }
+  }
+
+  if (actualDict && actualDict->SupportsFastPrefixMatch()) {
+    singleDict = actualDict;
+    return;
+  }
+
   static std::mutex cacheMutex;
   static std::unordered_map<std::string, std::vector<CacheEntry>> cache;
 
@@ -255,6 +271,21 @@ PrefixMatch::~PrefixMatch() {}
 
 PrefixMatch::Match PrefixMatch::MatchPrefix(const char* word,
                                             size_t len) const {
+  if (singleDict != nullptr) {
+    struct MatchCache {
+      std::string key;
+      std::string value;
+      size_t keyLength;
+    };
+    // The returned key/value pointers are valid until the next MatchPrefix()
+    // call on the same thread.
+    static thread_local MatchCache matchCache;
+    if (singleDict->MatchPrefixValue(word, len, &matchCache.key, &matchCache.value, &matchCache.keyLength)) {
+      return Match{true, matchCache.keyLength, &matchCache.key, &matchCache.value};
+    }
+    return Match{false, 0, nullptr, nullptr};
+  }
+
   return tables->table->MatchPrefix(word, len);
 }
 

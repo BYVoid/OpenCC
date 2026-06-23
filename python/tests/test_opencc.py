@@ -23,6 +23,7 @@ def test_init_delete_converter():
 def test_conversion():
     import opencc
     import re
+    from collections import defaultdict
 
     with open(_testcases_path, 'r', encoding='utf-8') as f:
         content = f.read()
@@ -32,13 +33,20 @@ def test_conversion():
     clean_content = pattern.sub(lambda m: "" if (m.group(1) or m.group(2)) else m.group(0), content)
     parsed = json.loads(clean_content)
 
+    # Group test cases by configuration
+    config_cases = defaultdict(list)
     for case in parsed.get('cases', []):
         input_text = case.get('input')
         expected = case.get('expected', {})
         if not input_text or not isinstance(expected, dict):
             continue
         for cfg, ans in expected.items():
-            converter = opencc.OpenCC(f'{cfg}.json')
+            config_cases[cfg].append((input_text, ans))
+
+    # Run conversions config-by-config, reusing the converter instance
+    for cfg, cases in config_cases.items():
+        converter = opencc.OpenCC(f'{cfg}.json')
+        for input_text, ans in cases:
             assert converter.convert(input_text) == ans, \
                 'Failed to convert {} for {} -> {}'.format(cfg, input_text, ans)
 

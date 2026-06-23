@@ -42,7 +42,10 @@ cc_test(
         "//test/testcases",
     ] + select({
         "@platforms//os:windows": [],
-        "//conditions:default": ["//data:opencc_resources_zip"],
+        "//conditions:default": [
+            "//data:opencc_resources_zip",
+            "//data:opencc_resources_ocd2_zip",
+        ],
     }),
     defines = ["BAZEL"] + select({
         "@platforms//os:windows": [],

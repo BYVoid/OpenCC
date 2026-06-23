@@ -387,6 +387,40 @@ public:
     }
   }
 
+  DictPtr LoadOcd2DictWithResourceProvider(const std::string& fileName) {
+    if (resourceProvider == nullptr) {
+      throw FileNotFound(fileName);
+    }
+
+    const std::shared_ptr<const ResourceProvider::Resource> resource =
+        resourceProvider->GetResource(fileName);
+    std::string cacheKey = "ocd2-marisa\n" + resource->CacheKey();
+    {
+      std::lock_guard<std::mutex> lock(DictCacheMutex());
+      PruneExpiredDictCache();
+      const auto cached = DictCache().find(cacheKey);
+      if (cached != DictCache().end()) {
+        DictPtr dict = cached->second.lock();
+        if (dict != nullptr) {
+          return dict;
+        }
+      }
+    }
+
+    DictPtr dict = MarisaDict::NewFromBuffer(resource->Data(), resource->Size());
+    {
+      std::lock_guard<std::mutex> lock(DictCacheMutex());
+      PruneExpiredDictCache();
+      std::weak_ptr<Dict>& cached = DictCache()[cacheKey];
+      DictPtr cachedDict = cached.lock();
+      if (cachedDict == nullptr) {
+        cached = dict;
+        return dict;
+      }
+      return cachedDict;
+    }
+  }
+
   DictPtr LoadDictFromFile(const std::string& type,
                            const std::string& fileName) {
     if (type == "text") {
@@ -398,6 +432,13 @@ public:
     }
 #endif
     if (type == "ocd2") {
+      if (resourceProvider != nullptr) {
+        try {
+          return LoadOcd2DictWithResourceProvider(fileName);
+        } catch (const FileNotFound&) {
+          // Fallback to loading from resolved file path
+        }
+      }
       return LoadDictWithResourceProvider<MarisaDict>("ocd2", fileName);
     }
     throw InvalidFormat("Unknown dictionary type: " + type);

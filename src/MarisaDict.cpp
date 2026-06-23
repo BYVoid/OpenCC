@@ -41,14 +41,19 @@ public:
   MarisaInternal() : marisa(new marisa::Trie()) {}
 };
 
-MarisaDict::MarisaDict() : internal(new MarisaInternal()) {}
+MarisaDict::MarisaDict()
+    : maxLength(128), lexiconReconstructed(false), internal(new MarisaInternal()) {}
 
 MarisaDict::~MarisaDict() {}
 
-size_t MarisaDict::KeyMaxLength() const { return maxLength; }
+size_t MarisaDict::KeyMaxLength() const {
+  ReconstructLexicon();
+  return maxLength;
+}
 
 Optional<const DictEntry*> MarisaDict::Match(const char* word,
                                              size_t len) const {
+  ReconstructLexicon();
   if (len > maxLength) {
     return Optional<const DictEntry*>::Null();
   }
@@ -64,6 +69,7 @@ Optional<const DictEntry*> MarisaDict::Match(const char* word,
 
 Optional<const DictEntry*> MarisaDict::MatchPrefix(const char* word,
                                                    size_t len) const {
+  ReconstructLexicon();
   const marisa::Trie& trie = *internal->marisa;
   marisa::Agent agent;
   agent.set_query(word, (std::min)(maxLength, len));
@@ -80,6 +86,7 @@ Optional<const DictEntry*> MarisaDict::MatchPrefix(const char* word,
 
 std::vector<const DictEntry*> MarisaDict::MatchAllPrefixes(const char* word,
                                                            size_t len) const {
+  ReconstructLexicon();
   const marisa::Trie& trie = *internal->marisa;
   marisa::Agent agent;
   agent.set_query(word, (std::min)(maxLength, len));
@@ -91,7 +98,49 @@ std::vector<const DictEntry*> MarisaDict::MatchAllPrefixes(const char* word,
   return matches;
 }
 
-LexiconPtr MarisaDict::GetLexicon() const { return lexicon; }
+LexiconPtr MarisaDict::GetLexicon() const {
+  ReconstructLexicon();
+  return lexicon;
+}
+
+void MarisaDict::ReconstructLexicon() const {
+  if (lexiconReconstructed.load(std::memory_order_acquire)) {
+    return;
+  }
+  std::lock_guard<std::mutex> lock(lexiconMutex);
+  if (lexiconReconstructed.load(std::memory_order_relaxed)) {
+    return;
+  }
+  if (!valuesLexicon) {
+    lexiconReconstructed.store(true, std::memory_order_release);
+    return;
+  }
+  marisa::Agent agent;
+  agent.set_query("");
+  std::vector<std::unique_ptr<DictEntry>> entries;
+  entries.resize(valuesLexicon->Length());
+  size_t maxLen = 0;
+  try {
+    while (internal->marisa->predictive_search(agent)) {
+      const std::string key(agent.key().ptr(), agent.key().length());
+      size_t id = agent.key().id();
+      if (id >= entries.size()) {
+        throw InvalidFormat(
+            "Invalid OpenCC Marisa dictionary (key id out of bounds)");
+      }
+      maxLen = (std::max)(key.length(), maxLen);
+      std::unique_ptr<DictEntry> entry(
+          DictEntryFactory::New(key, valuesLexicon->At(id)->Values()));
+      entries[id] = std::move(entry);
+    }
+  } catch (const std::exception& e) {
+    throw InvalidFormat(std::string("Invalid OpenCC Marisa dictionary: ") +
+                        e.what());
+  }
+  lexicon.reset(new Lexicon(std::move(entries)));
+  maxLength = maxLen;
+  lexiconReconstructed.store(true, std::memory_order_release);
+}
 
 MarisaDictPtr MarisaDict::NewFromFile(FILE* fp) {
   // Verify file header
@@ -110,23 +159,45 @@ MarisaDictPtr MarisaDict::NewFromFile(FILE* fp) {
       (fileEnd > trieOffset) ? static_cast<size_t>(fileEnd - trieOffset) : 0;
 
   MarisaDictPtr dict(new MarisaDict());
-  dict->internal->mappedBuffer.resize(remainingSize);
-  bytesRead = fread(const_cast<char*>(dict->internal->mappedBuffer.data()),
-                    sizeof(char), remainingSize, fp);
-  if (bytesRead != remainingSize) {
-    throw InvalidFormat("Invalid OpenCC Marisa dictionary.");
+  if (remainingSize > 0) {
+    dict->internal->mappedBuffer.resize(remainingSize);
+    bytesRead = fread(&dict->internal->mappedBuffer[0],
+                      sizeof(char), remainingSize, fp);
+    if (bytesRead != remainingSize) {
+      throw InvalidFormat("Invalid OpenCC Marisa dictionary.");
+    }
   }
 
+  dict->LoadFromMappedBuffer();
+  return dict;
+}
+
+MarisaDictPtr MarisaDict::NewFromBuffer(const char* data, size_t size) {
+  // Verify file header
+  size_t headerLen = strlen(OCD2_HEADER);
+  if (size < headerLen || memcmp(data, OCD2_HEADER, headerLen) != 0) {
+    throw InvalidFormat("Invalid OpenCC dictionary header");
+  }
+
+  size_t remainingSize = size - headerLen;
+  MarisaDictPtr dict(new MarisaDict());
+  dict->internal->mappedBuffer.assign(data + headerLen, remainingSize);
+
+  dict->LoadFromMappedBuffer();
+  return dict;
+}
+
+void MarisaDict::LoadFromMappedBuffer() {
   try {
-    dict->internal->marisa->map(dict->internal->mappedBuffer.data(),
-                                dict->internal->mappedBuffer.size());
+    internal->marisa->map(internal->mappedBuffer.data(),
+                          internal->mappedBuffer.size());
   } catch (const std::exception& e) {
     throw InvalidFormat(std::string("Invalid OpenCC Marisa dictionary: ") +
                         e.what());
   }
 
-  const size_t trieSize = dict->internal->marisa->io_size();
-  if (trieSize > dict->internal->mappedBuffer.size()) {
+  const size_t trieSize = internal->marisa->io_size();
+  if (trieSize > internal->mappedBuffer.size()) {
     throw InvalidFormat(
         "Invalid OpenCC Marisa dictionary (trie exceeds file size)");
   }
@@ -134,45 +205,19 @@ MarisaDictPtr MarisaDict::NewFromFile(FILE* fp) {
   size_t valuesBytesRead = 0;
   std::shared_ptr<SerializedValues> serialized_values =
       SerializedValues::NewFromBuffer(
-          dict->internal->mappedBuffer.data() + trieSize,
-          dict->internal->mappedBuffer.size() - trieSize, &valuesBytesRead);
-  LexiconPtr values_lexicon = serialized_values->GetLexicon();
+          internal->mappedBuffer.data() + trieSize,
+          internal->mappedBuffer.size() - trieSize, &valuesBytesRead);
+  valuesLexicon = serialized_values->GetLexicon();
   // Validate key count consistency
-  size_t numKeys = dict->internal->marisa->num_keys();
-  if (numKeys != values_lexicon->Length()) {
+  size_t numKeys = internal->marisa->num_keys();
+  if (numKeys != valuesLexicon->Length()) {
     throw InvalidFormat(
         "Invalid OpenCC Marisa dictionary (key count mismatch)");
   }
-  // Extract lexicon from built Marisa Trie, in order to get the order of keys.
-  marisa::Agent agent;
-  agent.set_query("");
-  std::vector<std::unique_ptr<DictEntry>> entries;
-  entries.resize(values_lexicon->Length());
-  size_t maxLength = 0;
-  try {
-    while (dict->internal->marisa->predictive_search(agent)) {
-      const std::string key(agent.key().ptr(), agent.key().length());
-      size_t id = agent.key().id();
-      if (id >= entries.size()) {
-        throw InvalidFormat(
-            "Invalid OpenCC Marisa dictionary (key id out of bounds)");
-      }
-      maxLength = (std::max)(key.length(), maxLength);
-      std::unique_ptr<DictEntry> entry(
-          DictEntryFactory::New(key, values_lexicon->At(id)->Values()));
-      entries[id] = std::move(entry);
-    }
-  } catch (const InvalidFormat&) {
-    throw;
-  } catch (const std::exception& e) {
-    throw InvalidFormat(std::string("Invalid OpenCC Marisa dictionary: ") +
-                        e.what());
-  }
-  // Read values
-  dict->lexicon.reset(new Lexicon(std::move(entries)));
-  dict->maxLength = maxLength;
-  return dict;
+  maxLength = 128;
+  lexiconReconstructed.store(false, std::memory_order_release);
 }
+
 
 MarisaDictPtr MarisaDict::NewFromDict(const Dict& thatDict) {
   // Extract lexicon into marisa::Keyset and a map.
@@ -202,6 +247,7 @@ MarisaDictPtr MarisaDict::NewFromDict(const Dict& thatDict) {
   // Set lexicon with entries ordered by Marisa Trie key id.
   dict->lexicon.reset(new Lexicon(std::move(entries)));
   dict->maxLength = maxLength;
+  dict->lexiconReconstructed.store(true, std::memory_order_release);
   return dict;
 }
 
@@ -209,6 +255,6 @@ void MarisaDict::SerializeToFile(FILE* fp) const {
   fwrite(OCD2_HEADER, sizeof(char), strlen(OCD2_HEADER), fp);
   marisa::fwrite(fp, *internal->marisa);
   std::unique_ptr<SerializedValues> serialized_values(
-      new SerializedValues(lexicon));
+      new SerializedValues(GetLexicon()));
   serialized_values->SerializeToFile(fp);
 }

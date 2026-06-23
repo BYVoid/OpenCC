@@ -832,9 +832,12 @@ Config::NewFromString(const std::string& json,
   impl->options = options;
   impl->resourceProvider = provider;
 
-  // Required: segmentation
-  SegmentationPtr segmentation =
-      impl->ParseSegmentation(impl->GetObjectProperty(doc, "segmentation"));
+  // Optional: segmentation
+  SegmentationPtr segmentation;
+  if (doc.HasMember("segmentation")) {
+    segmentation =
+        impl->ParseSegmentation(impl->GetObjectProperty(doc, "segmentation"));
+  }
 
   // Required: conversion_chain
   ConversionChainPtr chain = impl->ParseConversionChain(

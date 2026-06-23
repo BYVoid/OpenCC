@@ -67,6 +67,7 @@ public:
 
   static MarisaDictPtr NewFromBuffer(const char* data, size_t size);
 
+  // Exposed for testing only.
   bool IsLexiconReconstructed() const {
     return lexiconReconstructed.load(std::memory_order_acquire);
   }

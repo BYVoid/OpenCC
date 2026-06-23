@@ -19,11 +19,25 @@
 #pragma once
 
 #include <list>
+#include <string_view>
 
 #include "Common.hpp"
 #include "DictEntry.hpp"
 
 namespace opencc {
+
+/**
+ * Result of a PrefixMatch fast-path lookup.
+ * key and value are non-owning views; see PrefixMatch::MatchPrefixView()
+ * for lifetime details.
+ */
+struct OPENCC_EXPORT PrefixMatchView {
+  bool matched = false;
+  size_t keyLength = 0;
+  std::string_view key;
+  std::string_view value;
+};
+
 /**
  * Abstract class of dictionary
  * @ingroup opencc_cpp_api
@@ -107,16 +121,12 @@ public:
 
   /**
    * Fast-path prefix match. Only called when SupportsFastPrefixMatch() is
-   * true. Writes the longest matching key/value and its byte length into the
-   * output parameters and returns true; returns false on no match.
-   *
-   * The caller owns the output storage; implementations must not cache the
-   * pointers across calls.
+   * true. Returns a PrefixMatchView with matched=false on no match.
+   * See PrefixMatch::MatchPrefixView() for key/value lifetime details.
    */
-  virtual bool MatchPrefixValue(const char* word, size_t len,
-                                std::string* key, std::string* value,
-                                size_t* keyLength) const {
-    return false;
+  virtual PrefixMatchView MatchPrefixValue(const char* word,
+                                           size_t len) const {
+    return PrefixMatchView{};
   }
 
   virtual ~Dict() = default;

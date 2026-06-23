@@ -258,14 +258,11 @@ void MarisaDict::SerializeToFile(FILE* fp) const {
       new SerializedValues(GetLexicon()));
   serialized_values->SerializeToFile(fp);
 }
-bool MarisaDict::MatchPrefixValue(const char* word,
-                                  size_t len,
-                                  std::string* key,
-                                  std::string* value,
-                                  size_t* keyLength) const {
+PrefixMatchView MarisaDict::MatchPrefixValue(const char* word,
+                                             size_t len) const {
   const marisa::Trie* trie = internal->marisa.get();
   if (trie == nullptr) {
-    return false;
+    return PrefixMatchView{};
   }
   static thread_local marisa::Agent agent;
   agent.set_query(word, len);
@@ -281,23 +278,23 @@ bool MarisaDict::MatchPrefixValue(const char* word,
     }
   }
   if (!matched) {
-    return false;
+    return PrefixMatchView{};
   }
+  // value view points directly into the DictEntry's owned string storage,
+  // valid for the lifetime of this dictionary.
   if (valuesLexicon != nullptr) {
     if (matchedId < valuesLexicon->Length()) {
-      *value = valuesLexicon->At(matchedId)->GetDefault();
-    } else {
-      return false;
+      return PrefixMatchView{true, matchedLength,
+                             std::string_view(word, matchedLength),
+                             valuesLexicon->At(matchedId)->GetDefaultView()};
     }
-  } else {
-    LexiconPtr lex = GetLexicon();
-    if (lex != nullptr && matchedId < lex->Length()) {
-      *value = lex->At(matchedId)->GetDefault();
-    } else {
-      return false;
-    }
+    return PrefixMatchView{};
   }
-  key->assign(word, matchedLength);
-  *keyLength = matchedLength;
-  return true;
+  LexiconPtr lex = GetLexicon();
+  if (lex != nullptr && matchedId < lex->Length()) {
+    return PrefixMatchView{true, matchedLength,
+                           std::string_view(word, matchedLength),
+                           lex->At(matchedId)->GetDefaultView()};
+  }
+  return PrefixMatchView{};
 }

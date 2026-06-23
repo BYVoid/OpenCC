@@ -114,6 +114,20 @@ void PruneExpiredPrefixMatchCache(
 } // namespace
 
 class PrefixMatch::Table {
+private:
+  struct Candidate {
+    bool hasValue = false;
+    size_t dictOrder = 0;
+    size_t keyLength = 0;
+    std::string key;
+    std::string value;
+  };
+
+  struct Node {
+    Candidate candidate;
+    std::unordered_map<uint32_t, std::unique_ptr<Node>> children;
+  };
+
 public:
   Table() {}
 
@@ -125,6 +139,25 @@ public:
   }
 
   PrefixMatch::Match MatchPrefix(const char* word, size_t len) const {
+    const Candidate* c = MatchPrefixCandidate(word, len);
+    if (c != nullptr) {
+      return Match{true, c->keyLength, &c->key, &c->value};
+    }
+    return Match{false, 0, nullptr, nullptr};
+  }
+
+  PrefixMatchView MatchPrefixView(const char* word, size_t len) const {
+    const Candidate* c = MatchPrefixCandidate(word, len);
+    if (c != nullptr) {
+      return PrefixMatchView{true, c->keyLength,
+                             std::string_view(c->key),
+                             std::string_view(c->value)};
+    }
+    return PrefixMatchView{};
+  }
+
+private:
+  const Candidate* MatchPrefixCandidate(const char* word, size_t len) const {
     const Node* node = &root;
     const Candidate* matchedCandidate = nullptr;
     for (const char* pstr = word; pstr < word + len;) {
@@ -147,26 +180,8 @@ public:
         matchedCandidate = &node->candidate;
       }
     }
-    if (matchedCandidate != nullptr) {
-      return Match{true, matchedCandidate->keyLength, &matchedCandidate->key,
-                   &matchedCandidate->value};
-    }
-    return Match{false, 0, nullptr, nullptr};
+    return matchedCandidate;
   }
-
-private:
-  struct Candidate {
-    bool hasValue = false;
-    size_t dictOrder = 0;
-    size_t keyLength = 0;
-    std::string key;
-    std::string value;
-  };
-
-  struct Node {
-    Candidate candidate;
-    std::unordered_map<uint32_t, std::unique_ptr<Node>> children;
-  };
 
   void AddEntry(const std::string& key, const std::string& value,
                 size_t dictOrder) {
@@ -275,18 +290,28 @@ PrefixMatch::Match PrefixMatch::MatchPrefix(const char* word,
     struct MatchCache {
       std::string key;
       std::string value;
-      size_t keyLength;
     };
-    // The returned key/value pointers are valid until the next MatchPrefix()
-    // call on the same thread.
+    // key/value pointers are valid until the next MatchPrefix() call on this
+    // thread.
     static thread_local MatchCache matchCache;
-    if (singleDict->MatchPrefixValue(word, len, &matchCache.key, &matchCache.value, &matchCache.keyLength)) {
-      return Match{true, matchCache.keyLength, &matchCache.key, &matchCache.value};
+    const PrefixMatchView pv = singleDict->MatchPrefixValue(word, len);
+    if (pv.matched) {
+      matchCache.key = std::string(pv.key);
+      matchCache.value = std::string(pv.value);
+      return Match{true, pv.keyLength, &matchCache.key, &matchCache.value};
     }
     return Match{false, 0, nullptr, nullptr};
   }
 
   return tables->table->MatchPrefix(word, len);
+}
+
+PrefixMatchView PrefixMatch::MatchPrefixView(const char* word,
+                                              size_t len) const {
+  if (singleDict != nullptr) {
+    return singleDict->MatchPrefixValue(word, len);
+  }
+  return tables->table->MatchPrefixView(word, len);
 }
 
 void PrefixMatch::AddDict(const DictPtr& dict, Tables* output,

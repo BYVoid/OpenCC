@@ -19,6 +19,7 @@
 #pragma once
 
 #include "Common.hpp"
+#include "Dict.hpp"
 
 namespace opencc {
 
@@ -37,6 +38,14 @@ public:
   ~PrefixMatch();
 
   Match MatchPrefix(const char* word, size_t len) const;
+
+  /**
+   * Like MatchPrefix but returns non-owning string_view fields.
+   * key is valid for the lifetime of the caller's input buffer.
+   * value is valid for the lifetime of the underlying dictionary (fast-path)
+   * or the lifetime of this PrefixMatch (table-path).
+   */
+  PrefixMatchView MatchPrefixView(const char* word, size_t len) const;
 
 private:
   class Table;

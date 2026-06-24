@@ -1555,6 +1555,13 @@
       "expected": {
         "tw2sp": "市场营销"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1335",
+      "input": "幷州",
+      "expected": {
+        "t2s": "并州"
+      }
     }
   ]
 }

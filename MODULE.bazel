@@ -13,7 +13,7 @@ bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "pybind11_bazel", version = "3.0.1")
 bazel_dep(name = "rapidjson", version = "1.1.0.bcr.20250205")
 bazel_dep(name = "rules_cc", version = "0.2.18")
-bazel_dep(name = "rules_python", version = "1.9.0")
+bazel_dep(name = "rules_python", version = "2.0.3")
 bazel_dep(name = "rules_zig", version = "0.14.0")
 bazel_dep(name = "tclap", version = "1.2.5.bcr.1")
 bazel_dep(name = "toolchains_buildbuddy", version = "0.0.4", dev_dependency = True)
@@ -29,7 +29,7 @@ single_version_override(
     module_name = "rules_python",
     patches = ["//patches:rules-python-write-unstamped-build-data.patch"],
     patch_strip = 1,
-    version = "1.9.0",
+    version = "2.0.3",
 )
 
 # Node.js native addon build dependencies:

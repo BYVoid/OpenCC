@@ -134,7 +134,22 @@ jobs:
         shell: bash
         env:
           MSYS_NO_PATHCONV: 1
-        run: bazel test --show_timestamps --test_output=all //src/... //data/... //test/... //python/... //plugins/...
+        run: |
+          set +e
+          bazel test --show_timestamps --test_output=all //src/... //data/... //test/... //python/... //plugins/...
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            echo "Bazel test failed with exit code ${status}."
+            testlogs_dir="$(bazel info bazel-testlogs 2>/dev/null)"
+            echo "Bazel testlogs dir: ${testlogs_dir}"
+            echo "Failing test logs:"
+            find "${testlogs_dir}" -name test.log -print
+            if [ -f "${testlogs_dir}/python/tests/test_opencc/test.log" ]; then
+              echo "===== //python/tests:test_opencc test.log ====="
+              sed -n '1,240p' "${testlogs_dir}/python/tests/test_opencc/test.log"
+            fi
+          fi
+          exit "$status"
       - name: upload artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v7

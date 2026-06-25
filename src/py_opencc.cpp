@@ -16,14 +16,33 @@
  * limitations under the License.
  */
 
+#include "Config.hpp"
+#include "ResourceProvider.hpp"
 #include "opencc.h"
+#include <memory>
 #include <pybind11/pybind11.h>
 
 namespace py = pybind11;
 
 PYBIND11_MODULE(opencc_clib, m) {
   py::class_<opencc::SimpleConverter>(m, "_OpenCC")
-      .def(py::init<const std::string&>())
+      .def(py::init([](const std::string& configFileName,
+                       bool includeTofuRiskDictionaries,
+                       py::object resourceZip) {
+             opencc::ConfigLoadOptions options;
+             options.includeTofuRiskDictionaries = includeTofuRiskDictionaries;
+             if (!resourceZip.is_none()) {
+               std::shared_ptr<opencc::ResourceProvider> provider(
+                   new opencc::ZipResourceProvider(
+                       resourceZip.cast<std::string>()));
+               return new opencc::SimpleConverter(configFileName, provider,
+                                                  options);
+             }
+             return new opencc::SimpleConverter(configFileName, options);
+           }),
+           py::arg("config"),
+           py::arg("include_tofu_risk_dictionaries") = true,
+           py::arg("resource_zip") = py::none())
       .def("convert", py::overload_cast<const char*, size_t>(
                           &opencc::SimpleConverter::Convert, py::const_));
 

@@ -25,6 +25,13 @@ single_version_override(
     version = "0.3.1.bcr.1",
 )
 
+single_version_override(
+    module_name = "rules_python",
+    patches = ["//patches:rules-python-write-unstamped-build-data.patch"],
+    patch_strip = 1,
+    version = "1.9.0",
+)
+
 # Node.js native addon build dependencies:
 #   - node-addon-api headers
 #   - Node.js headers

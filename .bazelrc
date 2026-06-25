@@ -2,6 +2,7 @@
 common --enable_platform_specific_config
 
 # Enable C++17 for MSVC on Windows
+startup:windows --windows_enable_symlinks
 build:windows --cxxopt=/std:c++17
 build:windows --host_cxxopt=/std:c++17
 

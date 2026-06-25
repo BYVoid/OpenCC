@@ -31,6 +31,7 @@ jobs:
       - uses: bazel-contrib/setup-bazel@0.19.0
         with:
           bazelisk-cache: true
+          repository-cache: true
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -78,12 +79,19 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-2022]
+        os: [ubuntu-latest, macos-latest, windows-2025-vs2026]
 
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
+      - name: Best-effort Defender exclusions
+        if: runner.os == 'Windows'
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          Add-MpPreference -ExclusionPath "$env:GITHUB_WORKSPACE" `
+            -ExclusionProcess "bazel.exe","bazelisk.exe","python.exe","cl.exe","link.exe"
       - name: Compute version
         id: version
         shell: bash
@@ -95,6 +103,7 @@ jobs:
       - uses: bazel-contrib/setup-bazel@0.19.0
         with:
           bazelisk-cache: true
+          repository-cache: true
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -125,7 +134,22 @@ jobs:
         shell: bash
         env:
           MSYS_NO_PATHCONV: 1
-        run: bazel test --test_output=all //src/... //data/... //test/... //python/... //plugins/...
+        run: |
+          set +e
+          bazel test --show_timestamps --test_output=all //src/... //data/... //test/... //python/... //plugins/...
+          status=$?
+          if [ "$status" -ne 0 ]; then
+            echo "Bazel test failed with exit code ${status}."
+            testlogs_dir="$(bazel info bazel-testlogs 2>/dev/null)"
+            echo "Bazel testlogs dir: ${testlogs_dir}"
+            echo "Failing test logs:"
+            find "${testlogs_dir}" -name test.log -print
+            if [ -f "${testlogs_dir}/python/tests/test_opencc/test.log" ]; then
+              echo "===== //python/tests:test_opencc test.log ====="
+              sed -n '1,240p' "${testlogs_dir}/python/tests/test_opencc/test.log"
+            fi
+          fi
+          exit "$status"
       - name: upload artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v7

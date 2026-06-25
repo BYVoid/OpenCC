@@ -1,1 +1,4 @@
-exports_files(["marisa-flat-vector-zero-init.patch"])
+exports_files([
+    "marisa-flat-vector-zero-init.patch",
+    "rules-python-write-unstamped-build-data.patch",
+])

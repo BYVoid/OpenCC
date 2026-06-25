@@ -1,0 +1,22 @@
+diff --git a/python/private/py_executable.bzl b/python/private/py_executable.bzl
+index 2813d010..3c5a5d7a 100644
+--- a/python/private/py_executable.bzl
++++ b/python/private/py_executable.bzl
+@@ -1362,6 +1362,17 @@ def _write_build_data(ctx):
+         name = ctx.label.name + ".build_data.txt",
+         root = ctx.bin_dir,
+     )
++    if not is_stamping_enabled(ctx):
++        ctx.actions.write(
++            output = build_data,
++            content = "\n".join([
++                "TARGET {}".format(str(ctx.label)),
++                "CONFIG_MODE {}".format("EXEC" if _is_tool_config(ctx) else "TARGET"),
++                "STAMPED FALSE",
++                "",
++            ]),
++        )
++        return build_data
+ 
+     action_args = ctx.actions.args()
+     writer_file = ctx.files._build_data_writer[0]

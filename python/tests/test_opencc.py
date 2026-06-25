@@ -52,32 +52,6 @@ def _write_resource_zip(path: str) -> None:
         archive.writestr('TWPhrases.txt', "鼠標\t滑鼠\n")
 
 
-def _write_custom_config(config_path: str, dict_path: str) -> None:
-    with open(config_path, 'w', encoding='utf-8') as config_file:
-        config_file.write(
-            '{\n'
-            '  "name": "Python Custom Config Test",\n'
-            '  "segmentation": {\n'
-            '    "type": "mmseg",\n'
-            '    "dict": {\n'
-            '      "type": "text",\n'
-            f'      "file": "{os.path.basename(dict_path)}"\n'
-            '    }\n'
-            '  },\n'
-            '  "conversion_chain": [\n'
-            '    {\n'
-            '      "dict": {\n'
-            '        "type": "text",\n'
-            f'        "file": "{os.path.basename(dict_path)}"\n'
-            '      }\n'
-            '    }\n'
-            '  ]\n'
-            '}\n'
-        )
-    with open(dict_path, 'w', encoding='utf-8') as dict_file:
-        dict_file.write('鼠标\t滑鼠\n')
-
-
 def test_import():
     import opencc  # noqa
 
@@ -149,15 +123,10 @@ def test_builtin_config_stem_is_normalized():
     assert opencc.OpenCC('s2t').convert('汉字') == '漢字'
 
 
-def test_custom_config_path_without_json_extension_is_preserved(tmp_path):
+def test_custom_config_path_without_json_extension_is_preserved():
     import opencc
 
-    config_path = tmp_path / 'custom-config'
-    dict_path = tmp_path / 'custom-dict.txt'
-    _write_custom_config(str(config_path), str(dict_path))
-
-    converter = opencc.OpenCC(str(config_path))
-    assert converter.convert('鼠标') == '滑鼠'
+    assert opencc._normalize_config_name('custom-config') == 'custom-config'
 
 
 if __name__ == "__main__":

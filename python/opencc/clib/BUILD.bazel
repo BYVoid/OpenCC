@@ -1,0 +1,6 @@
+package(default_visibility = ["//python/opencc:__pkg__"])
+
+alias(
+    name = "opencc_clib_pyd",
+    actual = "//src/pyd:opencc_clib_pyd_copy",
+)

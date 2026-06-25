@@ -219,6 +219,11 @@ setuptools.setup(
         'bdist_wheel': BDistWheelCommand,
     },
     setup_requires=setup_requires,
+    entry_points={
+        'console_scripts': [
+            'opencc=opencc.cli:main',
+        ],
+    },
 
     classifiers=[
         'Development Status :: 5 - Production/Stable',

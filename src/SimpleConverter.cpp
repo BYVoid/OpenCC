@@ -37,7 +37,8 @@ struct InternalData {
 
   static InternalData* NewInternalData(const std::string& configFileName,
                                        const std::vector<std::string>& paths,
-                                       const char* argv0) {
+                                       const char* argv0,
+                                       const ConfigLoadOptions& options) {
     try {
       Config config;
 #ifdef BAZEL
@@ -55,10 +56,12 @@ struct InternalData {
         paths_with_runfiles.push_back(
             bazel_runfiles->Rlocation("_main/data/dictionary"));
         return new InternalData(
-            config.NewFromFile(configFileName, paths_with_runfiles, argv0));
+            config.NewFromFile(configFileName, paths_with_runfiles, argv0,
+                               options));
       }
 #endif
-      return new InternalData(config.NewFromFile(configFileName, paths, argv0));
+      return new InternalData(
+          config.NewFromFile(configFileName, paths, argv0, options));
     } catch (Exception& ex) {
       throw std::runtime_error(ex.what());
     }
@@ -66,10 +69,12 @@ struct InternalData {
 
   static InternalData* NewInternalData(
       const std::string& configFileName,
-      const std::shared_ptr<ResourceProvider>& provider) {
+      const std::shared_ptr<ResourceProvider>& provider,
+      const ConfigLoadOptions& options) {
     try {
       Config config;
-      return new InternalData(config.NewFromFile(configFileName, provider));
+      return new InternalData(
+          config.NewFromFile(configFileName, provider, options));
     } catch (Exception& ex) {
       throw std::runtime_error(ex.what());
     }
@@ -79,21 +84,43 @@ struct InternalData {
 } // namespace
 
 SimpleConverter::SimpleConverter(const std::string& configFileName)
-    : SimpleConverter(configFileName, std::vector<std::string>()) {}
+    : SimpleConverter(configFileName, ConfigLoadOptions()) {}
+
+SimpleConverter::SimpleConverter(const std::string& configFileName,
+                                 const ConfigLoadOptions& options)
+    : SimpleConverter(configFileName, std::vector<std::string>(), options) {}
 
 SimpleConverter::SimpleConverter(const std::string& configFileName,
                                  const std::vector<std::string>& paths)
-    : SimpleConverter(configFileName, paths, nullptr) {}
+    : SimpleConverter(configFileName, paths, ConfigLoadOptions()) {}
+
+SimpleConverter::SimpleConverter(const std::string& configFileName,
+                                 const std::vector<std::string>& paths,
+                                 const ConfigLoadOptions& options)
+    : SimpleConverter(configFileName, paths, nullptr, options) {}
 
 SimpleConverter::SimpleConverter(const std::string& configFileName,
                                  const std::vector<std::string>& paths,
                                  const char* argv0)
+    : SimpleConverter(configFileName, paths, argv0, ConfigLoadOptions()) {}
+
+SimpleConverter::SimpleConverter(const std::string& configFileName,
+                                 const std::vector<std::string>& paths,
+                                 const char* argv0,
+                                 const ConfigLoadOptions& options)
     : internalData(
-          InternalData::NewInternalData(configFileName, paths, argv0)) {}
+          InternalData::NewInternalData(configFileName, paths, argv0,
+                                        options)) {}
 
 SimpleConverter::SimpleConverter(const std::string& configFileName,
                                  std::shared_ptr<ResourceProvider> provider)
-    : internalData(InternalData::NewInternalData(configFileName, provider)) {}
+    : SimpleConverter(configFileName, provider, ConfigLoadOptions()) {}
+
+SimpleConverter::SimpleConverter(const std::string& configFileName,
+                                 std::shared_ptr<ResourceProvider> provider,
+                                 const ConfigLoadOptions& options)
+    : internalData(
+          InternalData::NewInternalData(configFileName, provider, options)) {}
 
 SimpleConverter::~SimpleConverter() { delete (InternalData*)internalData; }
 

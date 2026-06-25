@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 try:
     import opencc_clib
@@ -19,6 +20,7 @@ elif os.path.isdir(_opencc_configdir):
     CONFIGS = [f for f in os.listdir(_opencc_configdir) if f.endswith('.json')]
 else:
     CONFIGS = []
+_CONFIG_STEMS = {config[:-5] for config in CONFIGS}
 
 
 def _append_path_to_env(name: str, path: str) -> None:
@@ -32,16 +34,26 @@ def _append_path_to_env(name: str, path: str) -> None:
     os.environ[name] = value
 
 
+def _normalize_config_name(config: str) -> str:
+    if config.endswith('.json'):
+        return config
+    if config in _CONFIG_STEMS:
+        return config + '.json'
+    return config
+
+
 class OpenCC(opencc_clib._OpenCC):
 
-    def __init__(self, config: str = 't2s') -> None:
-        if not config.endswith('.json'):
-            config += '.json'
-        if not os.path.isfile(config):
+    def __init__(self,
+                 config: str = 't2s',
+                 include_tofu_risk_dictionaries: bool = True,
+                 resource_zip: Optional[str] = None) -> None:
+        config = _normalize_config_name(config)
+        if resource_zip is None and not os.path.isfile(config):
             config_under_share_dir = os.path.join(_opencc_share_dir, config)
             if os.path.isfile(config_under_share_dir):
                 config = config_under_share_dir
-        super().__init__(config)
+        super().__init__(config, include_tofu_risk_dictionaries, resource_zip)
         self.config = config
 
     def convert(self, text: str):

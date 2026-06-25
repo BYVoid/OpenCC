@@ -48,6 +48,7 @@ Discussion (Telegram): https://t.me/open_chinese_convert
     * 使用 `npm install -g opencc` 命令可安裝 OpenCC Node.js CLI
     * 使用 `npm install -g opencc opencc-jieba` 命令可同時安裝 OpenCC Node.js CLI 及 Jieba 分詞插件
 * [Python](https://pypi.org/project/OpenCC/)
+    * 使用 `pip install opencc` 命令可安裝 Python API 及 Python CLI
 * [More (Repology)](https://repology.org/project/opencc/versions)
 
 ### Prebuilt binaries 預編譯二進位檔
@@ -103,6 +104,17 @@ import opencc
 converter = opencc.OpenCC('s2t.json')
 converter.convert('汉字')  # 漢字
 ```
+
+The Python package also installs a basic CLI:
+
+```sh
+pip install opencc
+opencc -c s2t.json -i input.txt -o output.txt
+```
+
+The Python CLI supports basic text conversion, `--include-tofu-risk-dictionaries`,
+and `--resource-zip`. Diagnostic modes such as `--inspect` and `--segmentation`
+still require the native OpenCC CLI.
 
 ### C++
 
@@ -165,6 +177,11 @@ int main() {
 [Full Document 完整文檔](https://opencc.byvoid.com/docs/)
 
 ### Command Line
+
+Unless otherwise noted, this section describes the native OpenCC CLI built from
+the C++ toolchain. The Python and npm CLIs support basic file/stdin conversion
+only, plus `--include-tofu-risk-dictionaries`; the Python CLI also supports
+`--resource-zip`.
 
 * `opencc --help`
 * `opencc_dict --help`

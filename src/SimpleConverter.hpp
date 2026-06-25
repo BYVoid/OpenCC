@@ -35,6 +35,8 @@
 
 namespace opencc {
 
+struct ConfigLoadOptions;
+
 /**
  * A high level converter
  * This interface does not require C++11 to compile.
@@ -51,10 +53,28 @@ public:
   /**
    * Constructor of SimpleConverter
    * @param configFileName File name of configuration.
+   * @param options Configuration loading options.
+   */
+  SimpleConverter(const std::string& configFileName,
+                  const ConfigLoadOptions& options);
+
+  /**
+   * Constructor of SimpleConverter
+   * @param configFileName File name of configuration.
    * @param paths Additional paths to locate configuration and dictionary files.
    */
   SimpleConverter(const std::string& configFileName,
                   const std::vector<std::string>& paths);
+
+  /**
+   * Constructor of SimpleConverter
+   * @param configFileName File name of configuration.
+   * @param paths Additional paths to locate configuration and dictionary files.
+   * @param options Configuration loading options.
+   */
+  SimpleConverter(const std::string& configFileName,
+                  const std::vector<std::string>& paths,
+                  const ConfigLoadOptions& options);
 
   /**
    * Constructor of SimpleConverter
@@ -69,11 +89,34 @@ public:
   /**
    * Constructor of SimpleConverter
    * @param configFileName File name of configuration.
+   * @param paths Additional paths to locate configuration and dictionary files.
+   * @param argv0 Path of the executable (argv[0]), in addition to additional
+   * paths.
+   * @param options Configuration loading options.
+   */
+  SimpleConverter(const std::string& configFileName,
+                  const std::vector<std::string>& paths, const char* argv0,
+                  const ConfigLoadOptions& options);
+
+  /**
+   * Constructor of SimpleConverter
+   * @param configFileName File name of configuration.
    * @param provider Provider used to locate dictionary/resource files
    * referenced by the configuration.
    */
   SimpleConverter(const std::string& configFileName,
                   std::shared_ptr<ResourceProvider> provider);
+
+  /**
+   * Constructor of SimpleConverter
+   * @param configFileName File name of configuration.
+   * @param provider Provider used to locate dictionary/resource files
+   * referenced by the configuration.
+   * @param options Configuration loading options.
+   */
+  SimpleConverter(const std::string& configFileName,
+                  std::shared_ptr<ResourceProvider> provider,
+                  const ConfigLoadOptions& options);
 
   ~SimpleConverter();
 

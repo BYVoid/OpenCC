@@ -16,3 +16,16 @@ py_test(
         requirement("exceptiongroup"),
     ],
 )
+
+py_test(
+    name = "test_cli",
+    size = "small",
+    srcs = ["test_cli.py"],
+    imports = [".."],
+    deps = [
+        "//python/opencc",
+        requirement("pytest"),
+        requirement("pygments"),
+        requirement("exceptiongroup"),
+    ],
+)

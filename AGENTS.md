@@ -33,6 +33,14 @@ This document compiles the Open Chinese Convert (OpenCC) project information to 
 - Tools `opencc_dict`, `opencc_phrase_extract` (`src/tools/`) help developers convert dictionary formats and extract phrases.
 - Node.js tests live in `node/test.js`; npm prebuild packaging uses `npm run prebuild` and related scripts in `scripts/`.
 
+### CLI Consistency Follow-up
+- There is ongoing work to align user-facing behavior across the native CLI, npm CLI, and Python CLI. Treat CLI behavior differences as intentional only when they are documented in `README.md` and covered by tests.
+- Known area to unify: `-c/--config` values that omit `.json`. Current target behavior is the npm CLI rule:
+  - Built-in config stems such as `s2t` and `t2s` should resolve to `s2t.json` / `t2s.json`.
+  - Custom config paths should be preserved as given; do not auto-append `.json` for arbitrary filenames.
+- Before changing config resolution rules in one CLI, check the corresponding implementations in `src/tools/CommandLineMain.cpp`, `node/cli.js`, and `python/opencc/__init__.py`, then update tests for all affected surfaces.
+- When possible, add both direct tests and subprocess/integration-style tests so packaging entry points and standalone CLI invocation are covered, not just in-process helper calls.
+
 ## Ecosystem Bindings
 - Python module is located in `python/`, providing the `OpenCC` class through the C API.
 - Node.js extension is in the `node/` directory, using N-API/Node-API to call the core library. The optional `opencc-jieba` npm package lives in `plugins/jieba/node/` and supplies plugin configs, dictionaries, and platform-specific plugin binaries.

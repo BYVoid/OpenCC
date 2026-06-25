@@ -14,15 +14,17 @@ bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "pybind11_bazel", version = "3.0.1")
 bazel_dep(name = "rapidjson", version = "1.1.0.bcr.20250205")
 bazel_dep(name = "rules_cc", version = "0.2.18")
+bazel_dep(name = "rules_nodejs", version = "6.7.4")
 bazel_dep(name = "rules_python", version = "2.0.3")
 bazel_dep(name = "rules_zig", version = "0.14.0")
 bazel_dep(name = "tclap", version = "1.2.5.bcr.1")
 bazel_dep(name = "toolchains_buildbuddy", version = "0.0.4", dev_dependency = True)
 
-# node-addon-api is header-only; we supply the Node headers ourselves via
-# @node_headers, so the patch drops its rules_nodejs dependency (avoiding a
-# registered Node toolchain) and adds exports_files so the Windows-Zig genrule
-# can reference the raw headers.
+# node-addon-api (BCR) is header-only. The patch keeps it that way by dropping
+# its dependency on the rules_nodejs Node toolchain and adds exports_files so the
+# Windows-Zig genrule can reference the raw napi.h headers. The Node C headers
+# (node_api.h) are supplied separately: by the rules_nodejs Node toolchain for
+# the native addon, and by @node_headers for the Windows-Zig cross-compile.
 single_version_override(
     module_name = "node_addon_api",
     patches = ["//patches:node-addon-api-drop-rules-nodejs-dep.patch"],
@@ -45,10 +47,17 @@ single_version_override(
 )
 
 # Node.js native addon build dependencies (node-addon-api comes from BCR above):
-#   - Node.js headers
+#   - Node.js headers (Windows-Zig cross-compile only; the native addon now uses
+#     the rules_nodejs Node toolchain headers)
 #   - Windows x64 node.lib import library for Zig/MinGW addon linking
 node_deps = use_extension("//node:deps.bzl", "node_deps")
 use_repo(node_deps, "node_headers", "node_win_x64_lib")
+
+# Node toolchain providing the Node C headers (node_api.h) for the native addon
+# via @rules_nodejs//nodejs/headers:current_node_cc_headers.
+node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
+node.toolchain(include_headers = True)
+use_repo(node, "nodejs_toolchains")
 
 buildbuddy = use_extension("@toolchains_buildbuddy//:extensions.bzl", "buildbuddy", dev_dependency = True)
 

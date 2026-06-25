@@ -321,7 +321,7 @@
     "@@rules_nodejs+//nodejs:extensions.bzl%node": {
       "general": {
         "bzlTransitiveDigest": "oZFClfRhTTwsYzpxVPkOpOt/r0+OzEfEV37au0jFZ0s=",
-        "usagesDigest": "L4Q2UlIbt5gshp/w+TdVxrd8QkzhsO7PFZW2nL7EICM=",
+        "usagesDigest": "HBUErPri+msdCqQXbh3ysOrlL+FqTVvBYNA3Z2ekaO4=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -335,7 +335,7 @@
                 "https://nodejs.org/dist/v{version}/{filename}"
               ],
               "node_version": "22.22.2",
-              "include_headers": false,
+              "include_headers": true,
               "platform": "linux_amd64"
             }
           },
@@ -348,7 +348,7 @@
                 "https://nodejs.org/dist/v{version}/{filename}"
               ],
               "node_version": "22.22.2",
-              "include_headers": false,
+              "include_headers": true,
               "platform": "linux_arm64"
             }
           },
@@ -361,7 +361,7 @@
                 "https://nodejs.org/dist/v{version}/{filename}"
               ],
               "node_version": "22.22.2",
-              "include_headers": false,
+              "include_headers": true,
               "platform": "linux_s390x"
             }
           },
@@ -374,7 +374,7 @@
                 "https://nodejs.org/dist/v{version}/{filename}"
               ],
               "node_version": "22.22.2",
-              "include_headers": false,
+              "include_headers": true,
               "platform": "linux_ppc64le"
             }
           },
@@ -387,7 +387,7 @@
                 "https://nodejs.org/dist/v{version}/{filename}"
               ],
               "node_version": "22.22.2",
-              "include_headers": false,
+              "include_headers": true,
               "platform": "darwin_amd64"
             }
           },
@@ -400,7 +400,7 @@
                 "https://nodejs.org/dist/v{version}/{filename}"
               ],
               "node_version": "22.22.2",
-              "include_headers": false,
+              "include_headers": true,
               "platform": "darwin_arm64"
             }
           },
@@ -413,7 +413,7 @@
                 "https://nodejs.org/dist/v{version}/{filename}"
               ],
               "node_version": "22.22.2",
-              "include_headers": false,
+              "include_headers": true,
               "platform": "windows_amd64"
             }
           },
@@ -426,7 +426,7 @@
                 "https://nodejs.org/dist/v{version}/{filename}"
               ],
               "node_version": "22.22.2",
-              "include_headers": false,
+              "include_headers": true,
               "platform": "windows_arm64"
             }
           },

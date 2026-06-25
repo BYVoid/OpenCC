@@ -31,7 +31,7 @@ cc_binary(
     linkshared = True,
     deps = [
         "@node_addon_api//:node_addon_api",
-        "@node_headers//:node_headers",
+        "@rules_nodejs//nodejs/headers:current_node_cc_headers",
         "//src:opencc_lib",
         # Explicit sub-library deps for headers not in //src:opencc_lib's hdrs:
         "//src:config_lib",       # Config.hpp

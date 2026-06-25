@@ -1,14 +1,9 @@
+import importlib.util
 import os
 from typing import Optional
 
-try:
-    import opencc_clib
-except ImportError:
-    from opencc.clib import opencc_clib
-
 __all__ = ['CONFIGS', 'OpenCC', '__version__']
 
-__version__ = opencc_clib.__version__
 _this_dir = os.path.dirname(os.path.abspath(__file__))
 _opencc_share_dir = os.path.join(_this_dir, 'clib', 'share', 'opencc')
 _opencc_rootdir = os.path.abspath(os.path.join(_this_dir, '..', '..'))
@@ -30,8 +25,51 @@ def _append_path_to_env(name: str, path: str) -> None:
     if value == '':
         value = path
     else:
-        value += f':{path}'
+        value += f'{os.pathsep}{path}'
     os.environ[name] = value
+
+
+def _load_opencc_clib_from_runfiles():
+    candidate_dirs = [
+        os.path.join(_opencc_rootdir, 'src', 'pyd'),
+        os.path.join(_opencc_rootdir, 'src'),
+    ]
+    candidate_names = [
+        'opencc_clib.pyd',
+        'opencc_clib.so',
+    ]
+    for directory in candidate_dirs:
+        if not os.path.isdir(directory):
+            continue
+        for entry in os.listdir(directory):
+            if entry == 'opencc_clib.pyd' or entry.startswith('opencc_clib.') or entry.startswith('opencc_clib.cpython-'):
+                candidate_names.append(entry)
+    candidate_paths = []
+    for directory in candidate_dirs:
+        for name in candidate_names:
+            candidate_paths.append(os.path.join(directory, name))
+    for candidate in candidate_paths:
+        if not os.path.isfile(candidate):
+            continue
+        spec = importlib.util.spec_from_file_location('opencc_clib', candidate)
+        if spec is None or spec.loader is None:
+            continue
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+    raise ImportError('opencc_clib not found in Bazel runfiles')
+
+
+try:
+    import opencc_clib
+except ImportError:
+    try:
+        from opencc.clib import opencc_clib
+    except ImportError:
+        opencc_clib = _load_opencc_clib_from_runfiles()
+
+
+__version__ = opencc_clib.__version__
 
 
 def _normalize_config_name(config: str) -> str:

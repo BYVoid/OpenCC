@@ -23,8 +23,7 @@ bazel_dep(name = "toolchains_buildbuddy", version = "0.0.4", dev_dependency = Tr
 # node-addon-api (BCR) is header-only. The patch keeps it that way by dropping
 # its dependency on the rules_nodejs Node toolchain and adds exports_files so the
 # Windows-Zig genrule can reference the raw napi.h headers. The Node C headers
-# (node_api.h) are supplied separately: by the rules_nodejs Node toolchain for
-# the native addon, and by @node_headers for the Windows-Zig cross-compile.
+# (node_api.h) come from the rules_nodejs Node toolchain for every target.
 single_version_override(
     module_name = "node_addon_api",
     patches = ["//patches:node-addon-api-drop-rules-nodejs-dep.patch"],
@@ -46,15 +45,16 @@ single_version_override(
     version = "2.0.3",
 )
 
-# Node.js native addon build dependencies (node-addon-api comes from BCR above):
-#   - Node.js headers (Windows-Zig cross-compile only; the native addon now uses
-#     the rules_nodejs Node toolchain headers)
-#   - Windows x64 node.lib import library for Zig/MinGW addon linking
+# Windows x64 node.lib import library for Zig/MinGW addon linking. node-addon-api
+# comes from BCR (above) and the Node C headers come from the rules_nodejs Node
+# toolchain (below); this import library is available from neither.
 node_deps = use_extension("//node:deps.bzl", "node_deps")
-use_repo(node_deps, "node_headers", "node_win_x64_lib")
+use_repo(node_deps, "node_win_x64_lib")
 
-# Node toolchain providing the Node C headers (node_api.h) for the native addon
-# via @rules_nodejs//nodejs/headers:current_node_cc_headers.
+# Node toolchain providing the Node C headers (node_api.h). The native addon
+# depends on @rules_nodejs//nodejs/headers:current_node_cc_headers directly; the
+# Windows-Zig genrule unwraps the same headers into raw files (see
+# //node:cc_headers_files.bzl).
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 node.toolchain(include_headers = True)
 use_repo(node, "nodejs_toolchains")

@@ -49,14 +49,14 @@ jobs:
       - name: Build and install
         run: python -m pip install .
       - name: Test with pytest
-        run: pytest python/ --junitxml=pytest.xml
+        run: python python/tests/run_pytest_with_artifacts.py python --artifact-dir python-test-artifacts/unit-test --artifact-prefix pytest
       - name: upload artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v7
         with:
           name: opencc-${{ env.VERSION }}-python-${{ matrix.python-version }}
           path: |
-            pytest.xml
+            python-test-artifacts/unit-test/**
 
   test-pypi:
     permissions:
@@ -94,7 +94,7 @@ jobs:
           CIBW_ARCHS_WINDOWS: "AMD64"
           CIBW_MANYLINUX_X86_64_IMAGE: "manylinux2014"
           CIBW_TEST_REQUIRES: "pytest"
-          CIBW_TEST_COMMAND: "pytest {project}/python/tests"
+          CIBW_TEST_COMMAND: "python {project}/python/tests/run_pytest_with_artifacts.py {project}/python/tests --artifact-dir {project}/python-test-artifacts/cibuildwheel --artifact-prefix pytest"
 
       - name: upload artifacts
         if: ${{ always() }}
@@ -103,3 +103,4 @@ jobs:
           name: opencc-${{ env.VERSION }}-pypi-${{ matrix.os }}-${{ matrix.python-build }}
           path: |
             wheelhouse/*.whl
+            python-test-artifacts/cibuildwheel/**

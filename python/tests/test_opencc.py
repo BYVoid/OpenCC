@@ -130,4 +130,4 @@ def test_custom_config_path_without_json_extension_is_preserved():
 
 
 if __name__ == "__main__":
-    sys.exit(pytest.main(sys.argv[1:]))
+    sys.exit(pytest.main([os.path.abspath(__file__), *sys.argv[1:]]))

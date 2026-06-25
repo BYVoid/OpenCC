@@ -6,5 +6,8 @@ genrule(
     srcs = ["//src:opencc_clib"],
     outs = ["opencc_clib.pyd"],
     cmd = "cp $< $@",
-    visibility = ["//src:__pkg__"],
+    visibility = [
+        "//python/opencc/clib:__pkg__",
+        "//src:__pkg__",
+    ],
 )

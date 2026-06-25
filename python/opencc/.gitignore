@@ -1,3 +1,4 @@
 version.py
-clib/
+clib/*
 !clib/__init__.py
+!clib/BUILD.bazel

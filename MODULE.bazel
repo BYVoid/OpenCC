@@ -9,6 +9,7 @@ module(
 bazel_dep(name = "darts-clone", version = "0.32")
 bazel_dep(name = "googletest", version = "1.17.0.bcr.2", dev_dependency = True)
 bazel_dep(name = "marisa-trie", version = "0.3.1.bcr.1")
+bazel_dep(name = "node_addon_api", version = "8.8.0")
 bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "pybind11_bazel", version = "3.0.1")
 bazel_dep(name = "rapidjson", version = "1.1.0.bcr.20250205")
@@ -17,6 +18,16 @@ bazel_dep(name = "rules_python", version = "2.0.3")
 bazel_dep(name = "rules_zig", version = "0.14.0")
 bazel_dep(name = "tclap", version = "1.2.5.bcr.1")
 bazel_dep(name = "toolchains_buildbuddy", version = "0.0.4", dev_dependency = True)
+
+# node-addon-api is header-only; we supply the Node headers ourselves via
+# @node_headers, so drop its rules_nodejs dependency to avoid requiring a
+# registered Node toolchain.
+single_version_override(
+    module_name = "node_addon_api",
+    patches = ["//patches:node-addon-api-drop-rules-nodejs-dep.patch"],
+    patch_strip = 1,
+    version = "8.8.0",
+)
 
 single_version_override(
     module_name = "marisa-trie",
@@ -32,12 +43,11 @@ single_version_override(
     version = "2.0.3",
 )
 
-# Node.js native addon build dependencies:
-#   - node-addon-api headers
+# Node.js native addon build dependencies (node-addon-api comes from BCR above):
 #   - Node.js headers
 #   - Windows x64 node.lib import library for Zig/MinGW addon linking
 node_deps = use_extension("//node:deps.bzl", "node_deps")
-use_repo(node_deps, "node_addon_api", "node_headers", "node_win_x64_lib")
+use_repo(node_deps, "node_headers", "node_win_x64_lib")
 
 buildbuddy = use_extension("@toolchains_buildbuddy//:extensions.bzl", "buildbuddy", dev_dependency = True)
 

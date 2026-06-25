@@ -18,6 +18,9 @@
 
 #pragma once
 
+#include <string>
+#include <string_view>
+
 #include "Common.hpp"
 
 namespace opencc {
@@ -29,5 +32,8 @@ class OPENCC_EXPORT Segmentation {
 public:
   virtual ~Segmentation() {}
   virtual SegmentsPtr Segment(const std::string& text) const = 0;
+
+  SegmentsPtr Segment(const char* text) const;
+  SegmentsPtr Segment(std::string_view text) const;
 };
 } // namespace opencc

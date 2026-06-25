@@ -15,3 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include "Segmentation.hpp"
+
+using namespace opencc;
+
+SegmentsPtr Segmentation::Segment(const char* text) const {
+  return Segment(std::string(text));
+}
+
+SegmentsPtr Segmentation::Segment(std::string_view text) const {
+  return Segment(std::string(text));
+}

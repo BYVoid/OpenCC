@@ -20,6 +20,7 @@
 
 #include <cstddef>
 #include <string>
+#include <string_view>
 
 #include "Common.hpp"
 #include "ConversionInspection.hpp"
@@ -37,7 +38,11 @@ public:
       : name(_name), segmentation(_segmentation),
         conversionChain(_conversionChain) {}
 
+  std::string Convert(const char* text) const;
+
   std::string Convert(const std::string& text) const;
+
+  std::string Convert(std::string_view text) const;
 
   size_t Convert(const char* input, char* output) const;
 

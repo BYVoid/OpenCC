@@ -29,11 +29,15 @@ class PrefixMatch;
  */
 class OPENCC_EXPORT MaxMatchSegmentation : public Segmentation {
 public:
+  using Segmentation::Segment;
+
   MaxMatchSegmentation(const DictPtr _dict);
 
   virtual ~MaxMatchSegmentation() {}
 
   virtual SegmentsPtr Segment(const std::string& text) const;
+
+  SegmentsPtr Segment(std::string_view text) const;
 
   const DictPtr GetDict() const { return dict; }
 

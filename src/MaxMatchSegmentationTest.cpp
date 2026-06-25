@@ -48,6 +48,17 @@ TEST_F(MaxMatchSegmentationTest, EmptyString) {
   EXPECT_EQ(0, segments->Length());
 }
 
+TEST_F(MaxMatchSegmentationTest, StringViewSlice) {
+  const std::string text = utf8("x太后的头发干燥y");
+  const std::string_view slice(text.data() + 1, text.size() - 2);
+  const auto& segments = segmenter->Segment(slice);
+  EXPECT_EQ(4, segments->Length());
+  EXPECT_EQ(utf8("太后"), std::string(segments->At(0)));
+  EXPECT_EQ(utf8("的"), std::string(segments->At(1)));
+  EXPECT_EQ(utf8("头发"), std::string(segments->At(2)));
+  EXPECT_EQ(utf8("干燥"), std::string(segments->At(3)));
+}
+
 TEST_F(MaxMatchSegmentationTest, SingleCharacter) {
   const auto& segments = segmenter->Segment(utf8("一"));
   EXPECT_EQ(1, segments->Length());

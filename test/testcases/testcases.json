@@ -727,6 +727,16 @@
       }
     },
     {
+      "id": "BYVoid_OpenCC_Issue_585",
+      "input": "妆发",
+      "expected": {
+        "s2t": "妝髮",
+        "s2tw": "妝髮",
+        "s2twp": "妝髮",
+        "s2hk": "妝髮"
+      }
+    },
+    {
       "id": "BYVoid_OpenCC_Issue_582",
       "input": "倒霉",
       "expected": {

@@ -58,7 +58,11 @@ genrule(
         "//deps/marisa-0.3.1:all_files",
         "//deps/rapidjson-1.1.0:all_files",
         "//src:all_files",
-        "@node_addon_api//:all_files",
+        # node-addon-api headers, exposed via exports_files in the BCR module
+        # (see //patches:node-addon-api-drop-rules-nodejs-dep.patch).
+        "@node_addon_api//:napi-inl.deprecated.h",
+        "@node_addon_api//:napi-inl.h",
+        "@node_addon_api//:napi.h",
         "@node_headers//:all_files",
     ],
     outs = ["windows-x64/opencc.node"],
@@ -67,13 +71,14 @@ genrule(
         "bash $(location //scripts:build_node_windows_zig) " +
         "$@ " +
         "$(location @node_headers//:node_api_header) " +
-        "$(location @node_addon_api//:napi_header) " +
+        "$(location @node_addon_api//:napi.h) " +
         "$(location @node_win_x64_lib//file)"
     ),
     tools = [
         "//scripts:build_node_windows_zig",
-        "@node_addon_api//:all_files",
-        "@node_addon_api//:napi_header",
+        "@node_addon_api//:napi-inl.deprecated.h",
+        "@node_addon_api//:napi-inl.h",
+        "@node_addon_api//:napi.h",
         "@node_headers//:all_files",
         "@node_headers//:node_api_header",
         "@node_win_x64_lib//file",

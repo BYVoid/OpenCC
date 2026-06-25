@@ -147,7 +147,7 @@
     "prebuildify": "^6.0.1"
   },
   "dependencies": {
-    "node-addon-api": "^8.7.0",
+    "node-addon-api": "^8.8.0",
     "node-gyp": "^12.3.0",
     "node-gyp-build": "^4.8.4"
   },

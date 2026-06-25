@@ -1,7 +1,8 @@
 """Module extension to fetch Node.js native addon build dependencies.
 
-Fetches:
-  - node-addon-api 8.7.0  → @node_addon_api
+node-addon-api itself comes from the Bazel Central Registry (see the
+`bazel_dep(name = "node_addon_api", ...)` in MODULE.bazel). This extension only
+fetches the pieces that are not available there:
   - Node.js 20.20.2 headers → @node_headers  (provides node_api.h etc.)
   - Node.js 20.20.2 win-x64 node.lib → @node_win_x64_lib
 """
@@ -9,15 +10,6 @@ Fetches:
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
 def _node_deps_impl(ctx):
-    # node-addon-api 8.7.0
-    http_archive(
-        name = "node_addon_api",
-        url = "https://registry.npmjs.org/node-addon-api/-/node-addon-api-8.7.0.tgz",
-        sha256 = "06cdc368599c65b996003ac5d71fe594a78d3d94fc51600b2085d5a325a3d930",
-        strip_prefix = "package",
-        build_file = Label("//node:node_addon_api.BUILD"),
-    )
-
     # Node.js 20.20.2 headers (node_api.h, v8.h, etc.)
     http_archive(
         name = "node_headers",

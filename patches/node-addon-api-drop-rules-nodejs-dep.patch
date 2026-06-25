@@ -1,0 +1,33 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 1111111..2222222 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -1,18 +1,19 @@
+ load("@rules_cc//cc:defs.bzl", "cc_library")
+
+ # node-addon-api is header-only (napi.h + napi-inl.h). It sits on top of the
+-# Node C headers, which are supplied cross-platform by the consumer's active
+-# Node toolchain through rules_nodejs' current_node_cc_headers target.
+-#
+-# NOTE: the consuming (root) module must enable header output on its Node
+-# toolchain, otherwise current_node_cc_headers resolves to nothing:
+-#
+-#   node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
+-#   node.toolchain(include_headers = True)
++# Node C headers. Upstream pulls those from rules_nodejs'
++# current_node_cc_headers target, which requires a registered Node toolchain.
++# OpenCC instead supplies the Node headers itself through the @node_headers repo
++# (see //node:deps.bzl) and depends on it directly from the consuming targets,
++# so the rules_nodejs dependency is dropped here.
+ cc_library(
+     name = "node_addon_api",
+     hdrs = glob(["*.h"]),
+     includes = ["."],
+     visibility = ["//visibility:public"],
+-    deps = ["@rules_nodejs//nodejs/headers:current_node_cc_headers"],
+ )
++
++# Expose the raw header files so targets that build outside the C++ toolchain
++# (e.g. OpenCC's Windows-Zig genrule) can reference them directly via
++# $(location).
++exports_files(glob(["*.h"]))

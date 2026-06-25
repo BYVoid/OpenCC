@@ -129,7 +129,7 @@ jobs:
         shell: bash
         env:
           MSYS_NO_PATHCONV: 1
-        run: bazel build //:opencc //src/tools/... //plugins/...
+        run: bazel build //:opencc //src/tools/... //plugins/... //node/...
       - name: Test
         shell: bash
         env:

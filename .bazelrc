@@ -1,8 +1,12 @@
+# Enable Windows runfiles symlinks. Bazel does not support startup:windows, so
+# this must be a plain startup option; non-Windows Bazel ignores it with a
+# warning-free no-op.
+startup --windows_enable_symlinks
+
 # Automatically apply platform-specific config sections (e.g. build:windows)
 common --enable_platform_specific_config
 
 # Enable C++17 for MSVC on Windows
-startup:windows --windows_enable_symlinks
 build:windows --cxxopt=/std:c++17
 build:windows --host_cxxopt=/std:c++17
 

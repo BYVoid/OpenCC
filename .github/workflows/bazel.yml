@@ -109,7 +109,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Configure BuildBuddy
-        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+        if: (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && runner.os != 'Windows'
         shell: bash
         env:
           BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}

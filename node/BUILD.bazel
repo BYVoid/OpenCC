@@ -1,24 +1,8 @@
 """Bazel build rules for the OpenCC Node.js native addon (opencc.node)."""
 
 load("@rules_cc//cc:defs.bzl", "cc_binary")
-load(":napi_headers.bzl", "cc_library_headers")
 
 package(default_visibility = ["//visibility:public"])
-
-# node-addon-api comes from the BCR `@node_addon_api` module as a header-only
-# cc_library. The Windows-Zig genrule below builds outside the C++ toolchain, so
-# it needs the header files themselves: `napi_all_headers` for the sandbox and
-# `napi_header` to anchor the `-I` include dir.
-cc_library_headers(
-    name = "napi_all_headers",
-    lib = "@node_addon_api//:node_addon_api",
-)
-
-cc_library_headers(
-    name = "napi_header",
-    lib = "@node_addon_api//:node_addon_api",
-    only = "napi.h",
-)
 
 # The shared library that becomes opencc.node.
 # cc_binary with linkshared=True on Linux produces "libopencc_clib.so";
@@ -74,7 +58,11 @@ genrule(
         "//deps/marisa-0.3.1:all_files",
         "//deps/rapidjson-1.1.0:all_files",
         "//src:all_files",
-        ":napi_all_headers",
+        # node-addon-api headers, exposed via exports_files in the BCR module
+        # (see //patches:node-addon-api-drop-rules-nodejs-dep.patch).
+        "@node_addon_api//:napi-inl.deprecated.h",
+        "@node_addon_api//:napi-inl.h",
+        "@node_addon_api//:napi.h",
         "@node_headers//:all_files",
     ],
     outs = ["windows-x64/opencc.node"],
@@ -83,13 +71,14 @@ genrule(
         "bash $(location //scripts:build_node_windows_zig) " +
         "$@ " +
         "$(location @node_headers//:node_api_header) " +
-        "$(location :napi_header) " +
+        "$(location @node_addon_api//:napi.h) " +
         "$(location @node_win_x64_lib//file)"
     ),
     tools = [
         "//scripts:build_node_windows_zig",
-        ":napi_all_headers",
-        ":napi_header",
+        "@node_addon_api//:napi-inl.deprecated.h",
+        "@node_addon_api//:napi-inl.h",
+        "@node_addon_api//:napi.h",
         "@node_headers//:all_files",
         "@node_headers//:node_api_header",
         "@node_win_x64_lib//file",

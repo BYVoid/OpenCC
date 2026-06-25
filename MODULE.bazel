@@ -20,8 +20,9 @@ bazel_dep(name = "tclap", version = "1.2.5.bcr.1")
 bazel_dep(name = "toolchains_buildbuddy", version = "0.0.4", dev_dependency = True)
 
 # node-addon-api is header-only; we supply the Node headers ourselves via
-# @node_headers, so drop its rules_nodejs dependency to avoid requiring a
-# registered Node toolchain.
+# @node_headers, so the patch drops its rules_nodejs dependency (avoiding a
+# registered Node toolchain) and adds exports_files so the Windows-Zig genrule
+# can reference the raw headers.
 single_version_override(
     module_name = "node_addon_api",
     patches = ["//patches:node-addon-api-drop-rules-nodejs-dep.patch"],

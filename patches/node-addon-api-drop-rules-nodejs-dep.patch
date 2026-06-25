@@ -2,7 +2,7 @@ diff --git a/BUILD.bazel b/BUILD.bazel
 index 1111111..2222222 100644
 --- a/BUILD.bazel
 +++ b/BUILD.bazel
-@@ -1,18 +1,14 @@
+@@ -1,18 +1,19 @@
  load("@rules_cc//cc:defs.bzl", "cc_library")
 
  # node-addon-api is header-only (napi.h + napi-inl.h). It sits on top of the
@@ -26,3 +26,8 @@ index 1111111..2222222 100644
      visibility = ["//visibility:public"],
 -    deps = ["@rules_nodejs//nodejs/headers:current_node_cc_headers"],
  )
++
++# Expose the raw header files so targets that build outside the C++ toolchain
++# (e.g. OpenCC's Windows-Zig genrule) can reference them directly via
++# $(location).
++exports_files(glob(["*.h"]))

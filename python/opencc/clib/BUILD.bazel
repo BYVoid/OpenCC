@@ -1,6 +1,8 @@
 package(default_visibility = ["//python/opencc:__pkg__"])
 
-alias(
+genrule(
     name = "opencc_clib_pyd",
-    actual = "//src/pyd:opencc_clib_pyd_copy",
+    srcs = ["//src/pyd:opencc_clib_pyd_copy"],
+    outs = ["opencc_clib.pyd"],
+    cmd = "cp $< $@",
 )

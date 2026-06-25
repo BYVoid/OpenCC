@@ -19,13 +19,16 @@ environment:
     # Build plain C++
     - nodejs_version: none
 
+    # Build Python package from source and smoke-test the installed wheel.
+    - nodejs_version: python
+
 platform:
   - x64
 
 for:
 - matrix:
-    except:
-      - nodejs_version: none
+    only:
+      - nodejs_version: stable
   install:
     - ps: Install-Product node $env:nodejs_version $env:platform
     - npm -g i npm@latest
@@ -130,3 +133,45 @@ for:
     name: OpenCCWinGetManifests
   - path: opencc-smoke-output.zip
     name: OpenCCSmokeOutput
+
+- matrix:
+    only:
+      - nodejs_version: python
+  install:
+    - py -3 --version
+    - py -3 -m pip install --upgrade pip setuptools wheel
+  build_script:
+    - py -3 -m pip wheel --no-deps --wheel-dir python-smoke-dist .
+    - for %%F in (python-smoke-dist\*.whl) do set OPENCC_PY_WHL=%%~fF
+    - py -3 -m venv python-smoke-venv
+    - python-smoke-venv\Scripts\python.exe -m pip install "%OPENCC_PY_WHL%"
+  test_script:
+    - chcp 65001
+    - python-smoke-venv\Scripts\opencc.exe --version
+    - python-smoke-venv\Scripts\opencc.exe --help >nul
+    - mkdir python-smoke\測試
+    - echo 打印机和鼠标 > python-smoke\測試\簡體輸入.txt
+    - echo 開放中文轉換 > python-smoke\測試\繁體輸入.txt
+    - echo [opencc python smoke] s2twp input
+    - type python-smoke\測試\簡體輸入.txt
+    - python-smoke-venv\Scripts\opencc.exe -i python-smoke\測試\簡體輸入.txt -o python-smoke\測試\輸出.s2twp.txt -c s2twp
+    - echo [opencc python smoke] s2twp file output
+    - type python-smoke\測試\輸出.s2twp.txt
+    - type python-smoke\測試\簡體輸入.txt | python-smoke-venv\Scripts\opencc.exe -c s2twp > python-smoke\測試\管線.s2twp.txt
+    - echo [opencc python smoke] s2twp pipe output
+    - type python-smoke\測試\管線.s2twp.txt
+    - echo [opencc python smoke] t2s input
+    - type python-smoke\測試\繁體輸入.txt
+    - python-smoke-venv\Scripts\opencc.exe -i python-smoke\測試\繁體輸入.txt -o python-smoke\測試\輸出.t2s.txt -c t2s
+    - echo [opencc python smoke] t2s file output
+    - type python-smoke\測試\輸出.t2s.txt
+    - type python-smoke\測試\繁體輸入.txt | python-smoke-venv\Scripts\opencc.exe -c t2s > python-smoke\測試\管線.t2s.txt
+    - echo [opencc python smoke] t2s pipe output
+    - type python-smoke\測試\管線.t2s.txt
+    - python-smoke-venv\Scripts\python.exe python\tests\pypi_smoke.py
+    - 7z a opencc-python-smoke-output.zip python-smoke\測試\*.txt
+  artifacts:
+  - path: python-smoke-dist\*.whl
+    name: OpenCCPythonWheel
+  - path: opencc-python-smoke-output.zip
+    name: OpenCCPythonSmokeOutput

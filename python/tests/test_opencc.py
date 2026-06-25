@@ -127,6 +127,10 @@ def test_custom_config_path_without_json_extension_is_preserved():
     import opencc
 
     assert opencc._normalize_config_name('custom-config') == 'custom-config'
+    assert opencc._normalize_config_name('custom-config.jsonc') == 'custom-config.jsonc'
+    assert opencc._normalize_config_name('./s2t') == './s2t'
+    assert opencc._normalize_config_name('configs/s2t') == 'configs/s2t'
+    assert opencc._normalize_config_name(r'configs\s2t') == r'configs\s2t'
 
 
 if __name__ == "__main__":

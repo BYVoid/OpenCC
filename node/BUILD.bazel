@@ -1,8 +1,25 @@
 """Bazel build rules for the OpenCC Node.js native addon (opencc.node)."""
 
 load("@rules_cc//cc:defs.bzl", "cc_binary")
+load(":cc_headers_files.bzl", "cc_header_pick", "cc_headers_files")
 
 package(default_visibility = ["//visibility:public"])
+
+# Raw Node header files for the Windows-Zig cross-compile ONLY (see the genrule
+# below). The main native-addon path (//node:opencc_node) depends on the Node
+# headers as a normal cc_library and does NOT use these targets. rules_nodejs
+# only exposes the toolchain headers as a cc_library (CcInfo), so we unwrap them
+# into raw files that `zig c++` can consume via $(location) / -I.
+cc_headers_files(
+    name = "windows_zig_node_header_files",
+    lib = "@rules_nodejs//nodejs/headers:current_node_cc_headers",
+)
+
+cc_header_pick(
+    name = "windows_zig_node_api_h",
+    basename = "node_api.h",
+    lib = "@rules_nodejs//nodejs/headers:current_node_cc_headers",
+)
 
 # The shared library that becomes opencc.node.
 # cc_binary with linkshared=True on Linux produces "libopencc_clib.so";
@@ -31,7 +48,7 @@ cc_binary(
     linkshared = True,
     deps = [
         "@node_addon_api//:node_addon_api",
-        "@node_headers//:node_headers",
+        "@rules_nodejs//nodejs/headers:current_node_cc_headers",
         "//src:opencc_lib",
         # Explicit sub-library deps for headers not in //src:opencc_lib's hdrs:
         "//src:config_lib",       # Config.hpp
@@ -63,14 +80,16 @@ genrule(
         "@node_addon_api//:napi-inl.deprecated.h",
         "@node_addon_api//:napi-inl.h",
         "@node_addon_api//:napi.h",
-        "@node_headers//:all_files",
+        # Node C headers for cross-compiling only; the host Node toolchain's
+        # headers (node_api.h is platform-agnostic) feed the zig build.
+        ":windows_zig_node_header_files",
     ],
     outs = ["windows-x64/opencc.node"],
     cmd = (
         "ZIG=$(ZIG_BIN) " +
         "bash $(location //scripts:build_node_windows_zig) " +
         "$@ " +
-        "$(location @node_headers//:node_api_header) " +
+        "$(location :windows_zig_node_api_h) " +
         "$(location @node_addon_api//:napi.h) " +
         "$(location @node_win_x64_lib//file)"
     ),
@@ -79,8 +98,8 @@ genrule(
         "@node_addon_api//:napi-inl.deprecated.h",
         "@node_addon_api//:napi-inl.h",
         "@node_addon_api//:napi.h",
-        "@node_headers//:all_files",
-        "@node_headers//:node_api_header",
+        ":windows_zig_node_api_h",
+        ":windows_zig_node_header_files",
         "@node_win_x64_lib//file",
     ],
     toolchains = ["@rules_zig//zig:toolchain_type"],

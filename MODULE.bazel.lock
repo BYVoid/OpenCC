@@ -222,21 +222,12 @@
   "moduleExtensions": {
     "//node:deps.bzl%node_deps": {
       "general": {
-        "bzlTransitiveDigest": "dfY3ERRtUNTZhSXRbmN7tClBUKbOO1RXwfLJyFryahQ=",
+        "bzlTransitiveDigest": "Qg1rI4cAriK0PgShvDU6Af7nG0/h8s6Vp5+AavIeBaA=",
         "usagesDigest": "esPTUhVzyf9OPxVsSL5LztvF1asl51CUrDAW/3Os3pI=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
         "generatedRepoSpecs": {
-          "node_headers": {
-            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
-            "attributes": {
-              "url": "https://nodejs.org/dist/v20.20.2/node-v20.20.2-headers.tar.gz",
-              "sha256": "6de0e836efa9f32512e61db3dfd08b3d97a015b7e828d1a5efdf281a56a692d9",
-              "strip_prefix": "node-v20.20.2",
-              "build_file": "@@//node:node_headers.BUILD"
-            }
-          },
           "node_win_x64_lib": {
             "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
             "attributes": {
@@ -321,7 +312,7 @@
     "@@rules_nodejs+//nodejs:extensions.bzl%node": {
       "general": {
         "bzlTransitiveDigest": "oZFClfRhTTwsYzpxVPkOpOt/r0+OzEfEV37au0jFZ0s=",
-        "usagesDigest": "L4Q2UlIbt5gshp/w+TdVxrd8QkzhsO7PFZW2nL7EICM=",
+        "usagesDigest": "HBUErPri+msdCqQXbh3ysOrlL+FqTVvBYNA3Z2ekaO4=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -335,7 +326,7 @@
                 "https://nodejs.org/dist/v{version}/{filename}"
               ],
               "node_version": "22.22.2",
-              "include_headers": false,
+              "include_headers": true,
               "platform": "linux_amd64"
             }
           },
@@ -348,7 +339,7 @@
                 "https://nodejs.org/dist/v{version}/{filename}"
               ],
               "node_version": "22.22.2",
-              "include_headers": false,
+              "include_headers": true,
               "platform": "linux_arm64"
             }
           },
@@ -361,7 +352,7 @@
                 "https://nodejs.org/dist/v{version}/{filename}"
               ],
               "node_version": "22.22.2",
-              "include_headers": false,
+              "include_headers": true,
               "platform": "linux_s390x"
             }
           },
@@ -374,7 +365,7 @@
                 "https://nodejs.org/dist/v{version}/{filename}"
               ],
               "node_version": "22.22.2",
-              "include_headers": false,
+              "include_headers": true,
               "platform": "linux_ppc64le"
             }
           },
@@ -387,7 +378,7 @@
                 "https://nodejs.org/dist/v{version}/{filename}"
               ],
               "node_version": "22.22.2",
-              "include_headers": false,
+              "include_headers": true,
               "platform": "darwin_amd64"
             }
           },
@@ -400,7 +391,7 @@
                 "https://nodejs.org/dist/v{version}/{filename}"
               ],
               "node_version": "22.22.2",
-              "include_headers": false,
+              "include_headers": true,
               "platform": "darwin_arm64"
             }
           },
@@ -413,7 +404,7 @@
                 "https://nodejs.org/dist/v{version}/{filename}"
               ],
               "node_version": "22.22.2",
-              "include_headers": false,
+              "include_headers": true,
               "platform": "windows_amd64"
             }
           },
@@ -426,7 +417,7 @@
                 "https://nodejs.org/dist/v{version}/{filename}"
               ],
               "node_version": "22.22.2",
-              "include_headers": false,
+              "include_headers": true,
               "platform": "windows_arm64"
             }
           },

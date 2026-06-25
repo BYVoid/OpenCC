@@ -47,7 +47,10 @@ cc_binary(
     }),
     linkshared = True,
     deps = [
-        "@node_addon_api//:node_addon_api",
+        # node-addon-api's own wrapper headers (napi.h); the Node C headers come
+        # from the rules_nodejs toolchain dep below, so we use the headers-only
+        # target rather than the full :node_addon_api (which bundles its own).
+        "@node_addon_api//:node_addon_api_headers_only",
         "@rules_nodejs//nodejs/headers:current_node_cc_headers",
         "//src:opencc_lib",
         # Explicit sub-library deps for headers not in //src:opencc_lib's hdrs:
@@ -75,8 +78,8 @@ genrule(
         "//deps/marisa-0.3.1:all_files",
         "//deps/rapidjson-1.1.0:all_files",
         "//src:all_files",
-        # node-addon-api headers, exposed via exports_files in the BCR module
-        # (see //patches:node-addon-api-drop-rules-nodejs-dep.patch).
+        # node-addon-api headers, exposed as raw files via exports_files in the
+        # BCR node_addon_api module's BUILD overlay.
         "@node_addon_api//:napi-inl.deprecated.h",
         "@node_addon_api//:napi-inl.h",
         "@node_addon_api//:napi.h",

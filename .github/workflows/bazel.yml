@@ -138,16 +138,17 @@ jobs:
           set +e
           bazel test --show_timestamps --test_output=all //src/... //data/... //test/... //python/... //plugins/...
           status=$?
+          bash scripts/collect_bazel_testlogs.sh bazel-testlogs-artifact
           if [ "$status" -ne 0 ]; then
             echo "Bazel test failed with exit code ${status}."
             testlogs_dir="$(bazel info bazel-testlogs 2>/dev/null)"
             echo "Bazel testlogs dir: ${testlogs_dir}"
             echo "Failing test logs:"
             find "${testlogs_dir}" -name test.log -print
-            if [ -f "${testlogs_dir}/python/tests/test_opencc/test.log" ]; then
-              echo "===== //python/tests:test_opencc test.log ====="
-              sed -n '1,240p' "${testlogs_dir}/python/tests/test_opencc/test.log"
-            fi
+            while IFS= read -r log; do
+              echo "===== ${log#"${testlogs_dir}/"} ====="
+              sed -n '1,240p' "${log}"
+            done < <(find "${testlogs_dir}" -name test.log -print | sort)
           fi
           exit "$status"
       - name: upload artifacts
@@ -156,5 +157,4 @@ jobs:
         with:
           name: opencc-${{ env.VERSION }}-bazel-${{ matrix.os }}
           path: |
-            bazel-testlogs/**/*.log
-            bazel-testlogs/**
+            bazel-testlogs-artifact/**

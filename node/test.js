@@ -1,7 +1,6 @@
 const assert = require('assert');
 const childProcess = require('child_process');
 const fs = require('fs');
-const nodeGypBuild = require('node-gyp-build');
 const os = require('os');
 const path = require('path');
 const { after, describe, it } = require('node:test');
@@ -141,17 +140,9 @@ describe('Async Promise API', function () {
 describe('npm CLI', function () {
   const cli = path.join(__dirname, 'cli.js');
 
+  // The opencc module already resolves the addon and its adjacent assets dir.
   function getAssetsPath() {
-    const bindingPath = nodeGypBuild.path(path.join(__dirname, '..'));
-    const bindingDir = path.dirname(bindingPath);
-    const prebuildsDir = path.dirname(bindingDir);
-    if (path.basename(prebuildsDir) === 'prebuilds') {
-      const sharedAssetsPath = path.join(prebuildsDir, 'assets');
-      if (fs.existsSync(sharedAssetsPath)) {
-        return sharedAssetsPath;
-      }
-    }
-    return bindingDir;
+    return OpenCC._assetsPath;
   }
 
   it('converts stdin to stdout', function () {

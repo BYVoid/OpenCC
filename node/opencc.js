@@ -28,7 +28,6 @@
 
 const path = require('path');
 const fs = require('fs');
-const nodeGypBuild = require('node-gyp-build');
 const packageRoot = path.join(__dirname, '..');
 
 function requireOptionalPackage(packageName) {
@@ -43,17 +42,37 @@ function requireOptionalPackage(packageName) {
 }
 
 function resolveBindingPath() {
-  try {
-    return nodeGypBuild.path(packageRoot);
-  } catch (error) {
-    const scopedBinaryPackage = requireOptionalPackage(
-      `@opencc/opencc-${process.platform}-${process.arch}`
-    );
-    if (scopedBinaryPackage && scopedBinaryPackage.binaryPath) {
-      return scopedBinaryPackage.binaryPath;
+  // The addon ships either as a local build (build/Release, also used by the
+  // node-gyp source build and the Bazel sandbox), as a prebuildify prebuild
+  // under prebuilds/<platform>-<arch>/, or via an @opencc/opencc-<platform>-<arch>
+  // scoped package. OpenCC ships a single N-API build per platform (no
+  // musl/abi variants), so a direct filesystem lookup replaces node-gyp-build.
+  const candidates = [path.join(packageRoot, 'build', 'Release', 'opencc.node')];
+  const prebuildDir = path.join(
+    packageRoot, 'prebuilds', `${process.platform}-${process.arch}`
+  );
+  if (fs.existsSync(prebuildDir)) {
+    for (const entry of fs.readdirSync(prebuildDir)) {
+      if (entry.endsWith('.node')) {
+        candidates.push(path.join(prebuildDir, entry));
+      }
     }
-    throw error;
   }
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  const scopedBinaryPackage = requireOptionalPackage(
+    `@opencc/opencc-${process.platform}-${process.arch}`
+  );
+  if (scopedBinaryPackage && scopedBinaryPackage.binaryPath) {
+    return scopedBinaryPackage.binaryPath;
+  }
+  throw new Error(
+    'Could not locate the opencc native addon (looked in build/Release, ' +
+    'prebuilds/, and @opencc/opencc-* scoped packages)'
+  );
 }
 
 const bindingPath = resolveBindingPath();
@@ -280,6 +299,12 @@ function parseJSON(str) {
 // This is to support both CommonJS and ES module.
 OpenCC.OpenCC = OpenCC;
 OpenCC._parseJSON = parseJSON;
+
+// Resolved native addon path and its adjacent assets (config/dictionary)
+// directory, exported so tooling/tests can locate them without re-deriving the
+// lookup (and without depending on node-gyp-build).
+OpenCC._bindingPath = bindingPath;
+OpenCC._assetsPath = assetsPath;
 
 /**
  * The version of OpenCC library.

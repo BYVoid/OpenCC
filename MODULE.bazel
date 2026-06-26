@@ -63,18 +63,6 @@ node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 node.toolchain(include_headers = True)
 use_repo(node, "nodejs_toolchains")
 
-# npm dependency for the Node.js js_test: node-gyp-build (used by node/opencc.js
-# to locate the addon). The test framework is Node's built-in node:test.
-npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
-npm.npm_translate_lock(
-    name = "npm",
-    # The js_test uses the Bazel-built addon, so no native rebuilds are needed.
-    lifecycle_hooks = {"*": []},
-    pnpm_lock = "//:pnpm-lock.yaml",
-    verify_node_modules_ignored = "//:.bazelignore",
-)
-use_repo(npm, "npm")
-
 buildbuddy = use_extension("@toolchains_buildbuddy//:extensions.bzl", "buildbuddy", dev_dependency = True)
 
 zig = use_extension("@rules_zig//zig:extensions.bzl", "zig")

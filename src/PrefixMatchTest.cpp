@@ -144,4 +144,28 @@ TEST_F(PrefixMatchTest, MatchPrefixViewTablePathReturnsViews) {
   EXPECT_EQ(v.key.size(), v.keyLength);
 }
 
+TEST_F(PrefixMatchTest, ShortCircuitGroupPrefersEarlierShorterMatch) {
+  LexiconPtr firstLexicon(new Lexicon);
+  firstLexicon->Add(DictEntryFactory::New(utf8("意"), "first"));
+  firstLexicon->Sort();
+  DictPtr firstDict(new TextDict(firstLexicon));
+
+  LexiconPtr secondLexicon(new Lexicon);
+  secondLexicon->Add(DictEntryFactory::New(utf8("意大利面"), "second"));
+  secondLexicon->Sort();
+  DictPtr secondDict(new TextDict(secondLexicon));
+
+  DictPtr dictGroup(new DictGroup(
+      std::list<DictPtr>{firstDict, secondDict},
+      DictGroupMatchPolicy::ShortCircuit));
+  PrefixMatch pm(dictGroup);
+
+  const std::string query = utf8("意大利面");
+  PrefixMatch::Match m = pm.MatchPrefix(query.c_str(), query.length());
+
+  EXPECT_TRUE(m.matched);
+  EXPECT_EQ(utf8("意"), *m.key);
+  EXPECT_EQ("first", *m.value);
+}
+
 } // namespace opencc

@@ -18,6 +18,7 @@
 
 #include "PrefixMatch.hpp"
 #include "Dict.hpp"
+#include "DictGroup.hpp"
 #include "Lexicon.hpp"
 #include "UTF8Util.hpp"
 
@@ -111,6 +112,14 @@ void PruneExpiredPrefixMatchCache(
   }
 }
 
+void Unreachable() {
+#if defined(_MSC_VER)
+  __assume(false);
+#elif defined(__GNUC__) || defined(__clang__)
+  __builtin_unreachable();
+#endif
+}
+
 } // namespace
 
 class PrefixMatch::Table {
@@ -129,7 +138,8 @@ private:
   };
 
 public:
-  Table() {}
+  explicit Table(DictGroupMatchPolicy _matchPolicy)
+      : matchPolicy(_matchPolicy) {}
 
   void AddDict(const DictPtr& dict, size_t dictOrder) {
     const LexiconPtr lexicon = dict->GetLexicon();
@@ -172,15 +182,29 @@ private:
       }
       pstr += charLength;
       node = child->second.get();
-      if (node->candidate.hasValue &&
-          (matchedCandidate == nullptr ||
-           node->candidate.dictOrder < matchedCandidate->dictOrder ||
-           (node->candidate.dictOrder == matchedCandidate->dictOrder &&
-            node->candidate.keyLength > matchedCandidate->keyLength))) {
+      if (IsBetterMatch(node->candidate, matchedCandidate)) {
         matchedCandidate = &node->candidate;
       }
     }
     return matchedCandidate;
+  }
+
+  bool IsBetterMatch(const Candidate& candidate,
+                     const Candidate* matchedCandidate) const {
+    if (!candidate.hasValue) {
+      return false;
+    }
+    if (matchedCandidate == nullptr) {
+      return true;
+    }
+    switch (matchPolicy) {
+    case DictGroupMatchPolicy::ShortCircuit:
+      return candidate.dictOrder < matchedCandidate->dictOrder ||
+             (candidate.dictOrder == matchedCandidate->dictOrder &&
+              candidate.keyLength > matchedCandidate->keyLength);
+    }
+    Unreachable();
+    return false;
   }
 
   void AddEntry(const std::string& key, const std::string& value,
@@ -210,6 +234,7 @@ private:
   }
 
   Node root;
+  const DictGroupMatchPolicy matchPolicy;
 };
 
 PrefixMatch::PrefixMatch(const DictPtr& dict) {
@@ -254,7 +279,7 @@ PrefixMatch::PrefixMatch(const DictPtr& dict) {
   }
 
   std::shared_ptr<Tables> built(new Tables);
-  built->table.reset(new Table);
+  built->table.reset(new Table(dict->GetMatchPolicy()));
   size_t dictOrder = 0;
   AddDict(dict, built.get(), &dictOrder);
 
@@ -331,6 +356,12 @@ void PrefixMatch::AppendCacheKey(const DictPtr& dict, std::string* output) {
   const std::list<DictPtr>* dictGroupItems = dict->GetDictGroupItems();
   if (dictGroupItems != nullptr) {
     output->push_back('[');
+    const DictGroupMatchPolicy matchPolicy = dict->GetMatchPolicy();
+    switch (matchPolicy) {
+    case DictGroupMatchPolicy::ShortCircuit:
+      output->append("short_circuit:");
+      break;
+    }
     for (const DictPtr& child : *dictGroupItems) {
       AppendCacheKey(child, output);
     }

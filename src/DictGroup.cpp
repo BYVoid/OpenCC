@@ -38,7 +38,12 @@ size_t GetKeyMaxLength(const std::list<DictPtr>& dicts) {
 } // namespace
 
 DictGroup::DictGroup(const std::list<DictPtr>& _dicts)
-    : keyMaxLength(GetKeyMaxLength(_dicts)), dicts(_dicts) {}
+    : DictGroup(_dicts, DictGroupMatchPolicy::ShortCircuit) {}
+
+DictGroup::DictGroup(const std::list<DictPtr>& _dicts,
+                     DictGroupMatchPolicy _matchPolicy)
+    : keyMaxLength(GetKeyMaxLength(_dicts)), dicts(_dicts),
+      matchPolicy(_matchPolicy) {}
 
 DictGroup::~DictGroup() {}
 

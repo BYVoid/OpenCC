@@ -422,6 +422,7 @@ cc_library(
     hdrs = ["PrefixMatch.hpp"],
     deps = [
         ":common_lib",
+        ":dict_group_lib",
         ":dict_lib",
         ":lexicon_lib",
         ":utf8_util_lib",

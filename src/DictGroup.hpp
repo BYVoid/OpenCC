@@ -24,11 +24,13 @@
 #include "Dict.hpp"
 
 namespace opencc {
+
 /**
  * Group of dictionaries.
  *
- * DictGroup preserves dictionary order. Exact lookup returns the first match
- * from the first child dictionary that contains the key.
+ * DictGroup preserves dictionary order. With the current ShortCircuit match
+ * policy, exact lookup returns the first match from the first child dictionary
+ * that contains the key.
  *
  * OpenCC's built-in conversion and mmseg segmentation paths do not call
  * DictGroup::MatchPrefix() or DictGroup::MatchAllPrefixes() directly. They
@@ -41,7 +43,9 @@ namespace opencc {
  */
 class OPENCC_EXPORT DictGroup : public Dict {
 public:
-  DictGroup(const std::list<DictPtr>& dicts);
+  explicit DictGroup(const std::list<DictPtr>& dicts);
+
+  DictGroup(const std::list<DictPtr>& dicts, DictGroupMatchPolicy matchPolicy);
 
   static DictGroupPtr NewFromDict(const Dict& dict);
 
@@ -104,8 +108,14 @@ public:
    */
   const std::list<DictPtr> GetDicts() const { return dicts; }
 
+  /**
+   * Returns how this group resolves matches across child dictionaries.
+   */
+  virtual DictGroupMatchPolicy GetMatchPolicy() const { return matchPolicy; }
+
 private:
   const size_t keyMaxLength;
   const std::list<DictPtr> dicts;
+  const DictGroupMatchPolicy matchPolicy;
 };
 } // namespace opencc

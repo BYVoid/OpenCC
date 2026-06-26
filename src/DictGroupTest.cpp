@@ -32,6 +32,20 @@ TEST_F(DictGroupTest, KeyMaxLength) {
   EXPECT_EQ(3, dictGroup->GetDicts().back()->KeyMaxLength());
 }
 
+TEST_F(DictGroupTest, MatchPolicyDefaultsToShortCircuit) {
+  const DictGroupPtr& dictGroup = CreateDictGroupForConversion();
+  EXPECT_EQ(DictGroupMatchPolicy::ShortCircuit, dictGroup->GetMatchPolicy());
+}
+
+TEST_F(DictGroupTest, ExplicitMatchPolicy) {
+  const DictPtr phrasesDict = CreateDictForPhrases();
+  const DictPtr charactersDict = CreateDictForCharacters();
+  const DictGroupPtr dictGroup(new DictGroup(
+      std::list<DictPtr>{phrasesDict, charactersDict},
+      DictGroupMatchPolicy::ShortCircuit));
+  EXPECT_EQ(DictGroupMatchPolicy::ShortCircuit, dictGroup->GetMatchPolicy());
+}
+
 TEST_F(DictGroupTest, SimpleGroupTest) {
   const DictGroupPtr& dictGroup = CreateDictGroupForConversion();
   {

@@ -14,6 +14,7 @@ bazel_dep(name = "platforms", version = "1.0.0")
 bazel_dep(name = "pybind11_bazel", version = "3.0.1")
 bazel_dep(name = "rapidjson", version = "1.1.0.bcr.20250205")
 bazel_dep(name = "rules_cc", version = "0.2.18")
+bazel_dep(name = "rules_node_addon", version = "1.0.0")
 bazel_dep(name = "rules_nodejs", version = "6.7.4")
 bazel_dep(name = "rules_python", version = "2.0.3")
 bazel_dep(name = "rules_zig", version = "0.14.0")
@@ -34,16 +35,33 @@ single_version_override(
     version = "2.0.3",
 )
 
+# rules_node_addon is not in the Bazel Central Registry; fetch the release tarball.
+# The patch drops defs.bzl's imports of rules_cc's Starlark CcInfo/cc_common
+# private modules, which require a newer Bazel builtin (cc_internal.create_header_info)
+# than our pinned Bazel provides; CcInfo and cc_common are available as natives.
+archive_override(
+    module_name = "rules_node_addon",
+    integrity = "sha256-x/UdRvRpwzxCtzDWHQXnKd5s9EwVERFjL3mF34Ho600=",
+    patch_strip = 1,
+    patches = ["//patches:rules-node-addon-native-cc-globals.patch"],
+    strip_prefix = "rules_node_addon-1.0.0",
+    urls = ["https://github.com/BYVoid/rules_node_addon/archive/refs/tags/v1.0.0.tar.gz"],
+)
+
 # Windows x64 node.lib import library for Zig/MinGW addon linking. node-addon-api
 # comes from BCR (above) and the Node C headers come from the rules_nodejs Node
 # toolchain (below); this import library is available from neither.
 node_deps = use_extension("//node:deps.bzl", "node_deps")
 use_repo(node_deps, "node_win_x64_lib")
 
-# Node toolchain providing the Node C headers (node_api.h). The native addon
-# depends on @rules_nodejs//nodejs/headers:current_node_cc_headers directly; the
-# Windows-Zig genrule unwraps the same headers into raw files (see
-# //node:cc_headers_files.bzl).
+# Windows Node headers and import libraries for rules_node_addon's native Windows
+# addon build (rules_nodejs' Node toolchain does not ship C headers on Windows).
+node_addon_windows = use_extension("@rules_node_addon//node_addon:windows.bzl", "node_addon_windows")
+use_repo(node_addon_windows, "windows_node_api")
+
+# Node toolchain providing the Node C headers (node_api.h). rules_node_addon's
+# node_addon rule consumes these for the native addon; the Windows-Zig genrule
+# unwraps the same headers into raw files (see //node:cc_headers_files.bzl).
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 node.toolchain(include_headers = True)
 use_repo(node, "nodejs_toolchains")

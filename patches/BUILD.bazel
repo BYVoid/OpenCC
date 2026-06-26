@@ -1,4 +1,5 @@
 exports_files([
     "marisa-flat-vector-zero-init.patch",
+    "rules-node-addon-native-cc-globals.patch",
     "rules-python-write-unstamped-build-data.patch",
 ])

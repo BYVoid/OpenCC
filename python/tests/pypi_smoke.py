@@ -30,8 +30,11 @@ def main():
     # Traditional → Simplified
     _check(opencc.OpenCC('t2s').convert('開放中文轉換'), '开放中文转换')
 
-    # Taiwan → Simplified (reverse direction)
-    _check(opencc.OpenCC('tw2s').convert('滑鼠'), '鼠标')
+    # Taiwan → Simplified: character-variant conversion only (no vocabulary replacement)
+    _check(opencc.OpenCC('tw2s').convert('台灣'), '台湾')
+
+    # Taiwan → Simplified: with Mainland vocabulary replacement (tw2sp)
+    _check(opencc.OpenCC('tw2sp').convert('滑鼠'), '鼠标')
 
     # Config stem without .json suffix resolves correctly
     _check(opencc.OpenCC('s2t').convert('汉字'), '漢字')

@@ -6,7 +6,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 def get_opencc_version() -> str:
     try:
@@ -73,25 +73,30 @@ def load_dict(name: str, dict_dir: Path) -> Dict[str, List[str]]:
             
     raise FileNotFoundError(f"Dictionary file not found for: {name} in {dict_dir}")
 
-def resolve_and_merge_dict(dict_def: Dict[str, Any], dict_dir: Path) -> Dict[str, str]:
+def inline_entries_for_file_dict(dict_def: Dict[str, Any], dict_dir: Path) -> Dict[str, str]:
+    file_name = dict_def["file"]
+    base_name = Path(file_name).stem
+    raw_dict = load_dict(base_name, dict_dir)
+    return {k: v[0] for k, v in raw_dict.items()}
+
+def compile_dict(dict_def: Dict[str, Any], dict_dir: Path) -> Dict[str, Any]:
     if dict_def["type"] == "group":
-        merged_entries: Dict[str, str] = {}
-        for sub_def in dict_def["dicts"]:
-            sub_entries = resolve_and_merge_dict(sub_def, dict_dir)
-            for key, val in sub_entries.items():
-                if key not in merged_entries:
-                    merged_entries[key] = val
-        return merged_entries
+        return {
+            "type": "group",
+            "dicts": [
+                compile_dict(sub_def, dict_dir) for sub_def in dict_def["dicts"]
+            ],
+        }
+
+    if dict_def["type"] == "inline":
+        entries = dict_def["entries"]
     else:
-        # It's a file dictionary (type: text, ocd, ocd2, or inline)
-        if dict_def["type"] == "inline":
-            return dict_def["entries"]
-        else:
-            # File dict
-            file_name = dict_def["file"]
-            base_name = Path(file_name).stem
-            raw_dict = load_dict(base_name, dict_dir)
-            return {k: v[0] for k, v in raw_dict.items()}
+        entries = inline_entries_for_file_dict(dict_def, dict_dir)
+
+    return {
+        "type": "inline",
+        "entries": sort_dict_keys(entries),
+    }
 
 def sort_dict_keys(d: Dict[str, str]) -> Dict[str, str]:
     return {k: d[k] for k in sorted(d.keys())}
@@ -105,22 +110,14 @@ def compile_config(config_path: Path, dict_dir: Path) -> Dict[str, Any]:
     # Process segmentation dict if present
     if "segmentation" in config_data and "dict" in config_data["segmentation"]:
         dict_def = config_data["segmentation"]["dict"]
-        merged_entries = resolve_and_merge_dict(dict_def, dict_dir)
-        config_data["segmentation"]["dict"] = {
-            "type": "inline",
-            "entries": sort_dict_keys(merged_entries)
-        }
+        config_data["segmentation"]["dict"] = compile_dict(dict_def, dict_dir)
         
     # Process conversion chain dicts
     if "conversion_chain" in config_data:
         for stage in config_data["conversion_chain"]:
             if "dict" in stage:
                 dict_def = stage["dict"]
-                merged_entries = resolve_and_merge_dict(dict_def, dict_dir)
-                stage["dict"] = {
-                    "type": "inline",
-                    "entries": sort_dict_keys(merged_entries)
-                }
+                stage["dict"] = compile_dict(dict_def, dict_dir)
                 
     return config_data
 
@@ -169,4 +166,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

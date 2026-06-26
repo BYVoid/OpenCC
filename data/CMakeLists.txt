@@ -32,6 +32,7 @@ set(
   DICTS_GENERATED
   TSCharactersExt
   STPhrases_GeneratedFromRegionalPhrases
+  STPhrases_WithGeneratedFromRegionalPhrases
   TWVariantsRev
   HKVariantsRev
   JPShinjitaiCharactersRev
@@ -82,6 +83,28 @@ set(
     --input ${DICT_DIR}/HKPhrases.txt
     --input ${DICT_DIR}/TWPhrases.txt
     --output STPhrases_GeneratedFromRegionalPhrases.txt
+    --opencc $<TARGET_FILE:${OPENCC_BIN}>
+    --config ${CMAKE_CURRENT_SOURCE_DIR}/config/t2s.json
+    --dict-dir ${DICT_GENERATED_DIR}
+)
+
+set(
+  DICT_STPhrases_WithGeneratedFromRegionalPhrases_GENERATING_INPUT
+  ${DICT_DIR}/HKPhrases.txt
+  ${DICT_DIR}/TWPhrases.txt
+  ${DICT_DIR}/STPhrases.txt
+  ${DICT_GENERATED_DIR}/TSCharacters.ocd2
+  ${DICT_GENERATED_DIR}/TSCharactersExt.ocd2
+  ${DICT_GENERATED_DIR}/TSPhrases.ocd2
+  ${CMAKE_CURRENT_SOURCE_DIR}/config/t2s.json
+)
+set(
+  DICT_STPhrases_WithGeneratedFromRegionalPhrases_GENERATING_COMMAND
+  ${DICT_GENERATE_ST_PHRASES_BIN}
+    --input ${DICT_DIR}/HKPhrases.txt
+    --input ${DICT_DIR}/TWPhrases.txt
+    --append-to ${DICT_DIR}/STPhrases.txt
+    --output STPhrases_WithGeneratedFromRegionalPhrases.txt
     --opencc $<TARGET_FILE:${OPENCC_BIN}>
     --config ${CMAKE_CURRENT_SOURCE_DIR}/config/t2s.json
     --dict-dir ${DICT_GENERATED_DIR}

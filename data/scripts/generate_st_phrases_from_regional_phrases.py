@@ -14,6 +14,7 @@ def parse_args():
         description="Generate ST phrase entries from regional phrase keys."
     )
     parser.add_argument("--input", action="append", required=True)
+    parser.add_argument("--append-to")
     parser.add_argument("--output", required=True)
     backend = parser.add_mutually_exclusive_group(required=True)
     backend.add_argument("--opencc")
@@ -146,6 +147,12 @@ def main():
         {"key": key, "values": [values[0]]}
         for key, values in collisions.items()
     ]
+    if args.append_to:
+        base_entries = list(Dict().iter(args.append_to))
+        seen_keys = {entry["key"] for entry in base_entries}
+        generated = base_entries + [
+            entry for entry in generated if entry["key"] not in seen_keys
+        ]
     generated.sort(key=lambda entry: entry["key"])
 
     with open(args.output, "w", encoding="utf-8", newline="\n") as stream:
@@ -157,7 +164,12 @@ def main():
             "# Source: generated from " + ", ".join(input_names) +
             " keys via t2s.json\n"
         )
-        stream.write("# Used in configs: s2t.json, s2hk.json, s2hkp.json, s2tw.json, s2twp.json\n")
+        if args.append_to:
+            append_to_name = args.append_to.rsplit("/", 1)[-1]
+            stream.write(f"# Also includes entries from {append_to_name}\n")
+            stream.write("# Used in configs: s2t.json, s2hk.json, s2tw.json\n")
+        else:
+            stream.write("# Used in configs: s2hkp.json, s2twp.json\n")
         stream.write("#\n")
         stream.write("# This generated ST phrase dictionary preserves Simplified-input spans\n")
         stream.write("# before applying regional phrase vocabulary.\n")

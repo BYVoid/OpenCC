@@ -1,5 +1,6 @@
 load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@rules_python//python:py_binary.bzl", "py_binary")
+load("@rules_python//python:py_test.bzl", "py_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -12,6 +13,17 @@ js_library(
 py_binary(
     name = "convert_resource_zip",
     srcs = ["convert_resource_zip.py"],
+)
+
+py_test(
+    name = "compile_to_inline_config_test",
+    size = "small",
+    srcs = [
+        "compile_to_inline_config.py",
+        "compile_to_inline_config_test.py",
+    ],
+    imports = ["."],
+    main = "compile_to_inline_config_test.py",
 )
 
 sh_binary(

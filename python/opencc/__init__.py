@@ -1,4 +1,5 @@
 import importlib.util
+import ntpath
 import os
 from typing import Optional
 
@@ -73,7 +74,10 @@ __version__ = opencc_clib.__version__
 
 
 def _normalize_config_name(config: str) -> str:
-    if config.endswith('.json'):
+    basename = ntpath.basename(os.path.basename(config))
+    if basename != config:
+        return config
+    if '.' in basename:
         return config
     if config in _CONFIG_STEMS:
         return config + '.json'

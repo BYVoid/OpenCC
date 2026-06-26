@@ -63,7 +63,8 @@ node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 node.toolchain(include_headers = True)
 use_repo(node, "nodejs_toolchains")
 
-# npm dependencies for the Node.js js_test (mocha, node-gyp-build).
+# npm dependency for the Node.js js_test: node-gyp-build (used by node/opencc.js
+# to locate the addon). The test framework is Node's built-in node:test.
 npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
 npm.npm_translate_lock(
     name = "npm",

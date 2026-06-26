@@ -1,15 +1,15 @@
 """Bazel build rules for the OpenCC Node.js native addon (opencc.node)."""
 
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_node_addon//node_addon:defs.bzl", "node_addon")
 load(":cc_headers_files.bzl", "cc_header_pick", "cc_headers_files")
 
 package(default_visibility = ["//visibility:public"])
 
 # Raw Node header files for the Windows-Zig cross-compile ONLY (see the genrule
-# below). The main native-addon path (//node:opencc_node) depends on the Node
-# headers as a normal cc_library and does NOT use these targets. rules_nodejs
-# only exposes the toolchain headers as a cc_library (CcInfo), so we unwrap them
-# into raw files that `zig c++` can consume via $(location) / -I.
+# below). The main native-addon path (//node:opencc) gets its Node headers
+# through node_addon and does NOT use these targets. rules_nodejs only exposes
+# the toolchain headers as a cc_library (CcInfo), so we unwrap them into raw
+# files that `zig c++` can consume via $(location) / -I.
 cc_headers_files(
     name = "windows_zig_node_header_files",
     lib = "@rules_nodejs//nodejs/headers:current_node_cc_headers",
@@ -21,14 +21,15 @@ cc_header_pick(
     lib = "@rules_nodejs//nodejs/headers:current_node_cc_headers",
 )
 
-# The shared library that becomes opencc.node.
-# cc_binary with linkshared=True on Linux produces "libopencc_clib.so";
-# on macOS it produces "libopencc_clib.dylib". We rename via genrule below.
+# The native Node addon (opencc.node). node_addon wraps a linkshared cc_binary
+# and renames the output to "opencc.node", and supplies node-addon-api plus the
+# Node C headers itself (the rules_nodejs toolchain on Unix; the windows_node_api
+# import library on Windows).
 #
 # node-gyp and Bazel both compile the same binding source. node-gyp lists the
 # OpenCC and marisa sources directly, while Bazel links against //src:opencc_lib.
-cc_binary(
-    name = "opencc_clib",
+node_addon(
+    name = "opencc",
     srcs = ["opencc.cc"],
     copts = select({
         "@platforms//os:windows": ["/std:c++20"],
@@ -40,18 +41,13 @@ cc_binary(
         "Opencc_BUILT_AS_STATIC",
     ],
     includes = [".", "src"],
+    # node_addon already appends `-undefined dynamic_lookup` on macOS.
     linkopts = select({
-        "@platforms//os:macos": ["-undefined", "dynamic_lookup", "-Wl,-S", "-Wl,-no_uuid"],
+        "@platforms//os:macos": ["-Wl,-S", "-Wl,-no_uuid"],
         "@platforms//os:linux": ["-Wl,-s", "-Wl,--build-id=sha1"],
         "//conditions:default": ["-Wl,-s"],
     }),
-    linkshared = True,
     deps = [
-        # node-addon-api's own wrapper headers (napi.h); the Node C headers come
-        # from the rules_nodejs toolchain dep below, so we use the headers-only
-        # target rather than the full :node_addon_api (which bundles its own).
-        "@node_addon_api//:node_addon_api_headers_only",
-        "@rules_nodejs//nodejs/headers:current_node_cc_headers",
         "//src:opencc_lib",
         # Explicit sub-library deps for headers not in //src:opencc_lib's hdrs:
         "//src:config_lib",       # Config.hpp
@@ -59,16 +55,6 @@ cc_binary(
         "//src:dict_converter_lib",  # DictConverter.hpp
         "//src:exception_lib",    # Exception.hpp
     ],
-)
-
-# ----------------------------------------------------------------
-# Rename the platform-specific shared library to "opencc.node"
-# ----------------------------------------------------------------
-genrule(
-    name = "opencc_node",
-    srcs = [":opencc_clib"],
-    outs = ["opencc.node"],
-    cmd = "cp $(location :opencc_clib) $@",
 )
 
 genrule(

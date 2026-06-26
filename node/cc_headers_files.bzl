@@ -3,10 +3,8 @@
 SCOPE: This is used ONLY by the Windows-Zig cross-compile genrule
 (//node:opencc_node_windows_zig), which shells out to `zig c++` and therefore
 needs raw Node header *files* it can pass via $(location) / -I. It is NOT part
-of the main native-addon build path: the regular cc_binary (//node:opencc_node)
-consumes the Node headers as a normal cc_library dependency
-(@rules_nodejs//nodejs/headers:current_node_cc_headers) and never goes through
-these rules.
+of the main native-addon build path: //node:opencc is built by rules_node_addon,
+which supplies the Node headers itself, and never goes through these rules.
 
 rules_nodejs only exposes the active Node toolchain's headers as a cc_library
 (CcInfo), not as a filegroup of raw files, so these rules unwrap the

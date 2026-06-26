@@ -720,6 +720,20 @@
       }
     },
     {
+      "id": "macro_names_s2twp",
+      "input": "黄宏和李彦宏",
+      "expected": {
+        "s2twp": "黃宏和李彥宏"
+      }
+    },
+    {
+      "id": "macro_names_tw2sp",
+      "input": "黃宏和李彥宏",
+      "expected": {
+        "tw2sp": "黄宏和李彦宏"
+      }
+    },
+    {
       "id": "macro_terms_tw2sp",
       "input": "巨集定義、巨集展開、巨集呼叫、巨集替換、巨集命令、巨集語言、巨集處理、巨集函式、巨集指令和巨集程式設計",
       "expected": {

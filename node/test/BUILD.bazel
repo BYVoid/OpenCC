@@ -42,4 +42,12 @@ js_test(
         "//:node_modules/node-gyp-build",
     ],
     entry_point = "mocha_entry.js",
+    # Linux/macOS only. The addon builds on Windows (rules_node_addon MSVC path),
+    # but the js_test fails there: with the runfiles tree enabled, Node resolves
+    # mocha but not its transitive deps (e.g. escape-string-regexp) because the
+    # node_modules closure isn't fully materialized in the Windows runfiles.
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
 )

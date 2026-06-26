@@ -1,0 +1,51 @@
+load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
+
+package(default_visibility = ["//visibility:public"])
+
+# Self-contained runtime sandbox mirroring an npm-install layout. node/opencc.js
+# computes its package root from its own location and (via node-gyp-build) looks
+# for the addon under <packageRoot>/build/Release, so the addon, its JS API, the
+# config/dictionary assets, and the testcases are assembled into one tree here.
+copy_to_directory(
+    name = "node_test_release",
+    srcs = [
+        "//data/config:config",
+        "//data/dictionary:binary_dictionaries",
+        "//node:js_srcs",
+        "//node:opencc",
+        "//scripts:prepare_node_prebuild_artifacts",
+        "//test/testcases:testcases_js",
+    ],
+    out = "sandbox",
+    replace_prefixes = {
+        "node/opencc.node": "build/Release/opencc.node",
+        "data/config": "build/Release",
+        "data/dictionary": "build/Release",
+    },
+)
+
+js_library(
+    name = "mocha_entry",
+    srcs = ["mocha_entry.js"],
+)
+
+# Run node/test.js (mocha) against the Bazel-built addon. npm deps (mocha,
+# node-gyp-build) are linked at the repo root (//:node_modules).
+js_test(
+    name = "node_test",
+    size = "medium",
+    data = [
+        ":mocha_entry",
+        ":node_test_release",
+        "//:node_modules/mocha",
+        "//:node_modules/node-gyp-build",
+    ],
+    entry_point = "mocha_entry.js",
+    # The native addon's Windows build (rules_node_addon MSVC path) and this
+    # js_test are not yet validated on Windows; run on Linux/macOS for now.
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+)

@@ -81,12 +81,11 @@ def inline_entries_for_file_dict(dict_def: Dict[str, Any], dict_dir: Path) -> Di
 
 def compile_dict(dict_def: Dict[str, Any], dict_dir: Path) -> Dict[str, Any]:
     if dict_def["type"] == "group":
-        return {
-            "type": "group",
-            "dicts": [
-                compile_dict(sub_def, dict_dir) for sub_def in dict_def["dicts"]
-            ],
-        }
+        result: Dict[str, Any] = {"type": "group"}
+        if "match_policy" in dict_def:
+            result["match_policy"] = dict_def["match_policy"]
+        result["dicts"] = [compile_dict(sub_def, dict_dir) for sub_def in dict_def["dicts"]]
+        return result
 
     if dict_def["type"] == "inline":
         entries = dict_def["entries"]

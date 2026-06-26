@@ -8,6 +8,7 @@
     {
       "dict": {
         "type": "group",
+        "match_policy": "short_circuit",
         "dicts": [
           { "type": "ocd2", "file": "HKPhrasesRev.ocd2" },
           { "type": "ocd2", "file": "HKVariantsRevPhrases.ocd2" },
@@ -18,6 +19,7 @@
     {
       "dict": {
         "type": "group",
+        "match_policy": "short_circuit",
         "dicts": [
           { "type": "ocd2", "file": "TSPhrases.ocd2" },
           {

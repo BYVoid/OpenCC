@@ -11,6 +11,7 @@
     {
       "dict": {
         "type": "group",
+        "match_policy": "short_circuit",
         "dicts": [
           { "type": "ocd2", "file": "TWPhrasesRev.ocd2" },
           { "type": "ocd2", "file": "TWVariantsRevPhrases.ocd2" },
@@ -21,6 +22,7 @@
     {
       "dict": {
         "type": "group",
+        "match_policy": "short_circuit",
         "dicts": [
           { "type": "ocd2", "file": "TSPhrases.ocd2" },
           {

@@ -57,13 +57,6 @@ node_addon(
     ],
 )
 
-# Back-compat target name: scripts/build-node-prebuild-bazel.sh builds
-# //node:opencc_node and copies bazel-bin/node/opencc.node.
-alias(
-    name = "opencc_node",
-    actual = ":opencc",
-)
-
 genrule(
     name = "opencc_node_windows_zig",
     srcs = [

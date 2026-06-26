@@ -9,14 +9,14 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 echo "Building Linux x64 (node-linux-x64)..."
-bazel build --config=node-linux-x64 -c opt --remote_download_toplevel //node:opencc_node
+bazel build --config=node-linux-x64 -c opt --remote_download_toplevel //node:opencc
 mkdir -p prebuilds/linux-x64
 cp -fL bazel-bin/node/opencc.node prebuilds/linux-x64/
 echo "Copied to prebuilds/linux-x64/opencc.node"
 
 echo ""
 echo "Building Linux arm64 (node-linux-arm64)..."
-bazel build --config=node-linux-arm64 -c opt --remote_download_toplevel //node:opencc_node
+bazel build --config=node-linux-arm64 -c opt --remote_download_toplevel //node:opencc
 mkdir -p prebuilds/linux-arm64
 cp -fL bazel-bin/node/opencc.node prebuilds/linux-arm64/
 echo "Copied to prebuilds/linux-arm64/opencc.node"

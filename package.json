@@ -26,7 +26,6 @@
   "scripts": {
     "test": "node --test --test-reporter=spec node/test.js && node node/esm-test.mjs",
     "prebuild": "prebuildify --napi --strip --postinstall \"node scripts/prepare-node-prebuild-artifacts.js\"",
-    "prebuild:all": "npm run prebuild",
     "prepare:scoped-packages": "node scripts/prepare-node-scoped-packages.js",
     "prepack": "node scripts/verify-node-main-package.js",
     "prepublishOnly": "node scripts/verify-node-scoped-packages-published.js",

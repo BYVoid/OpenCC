@@ -4,9 +4,11 @@ load("@aspect_rules_js//js:defs.bzl", "js_library", "js_test")
 package(default_visibility = ["//visibility:public"])
 
 # Self-contained runtime sandbox mirroring an npm-install layout. node/opencc.js
-# computes its package root from its own location and (via node-gyp-build) looks
-# for the addon under <packageRoot>/build/Release, so the addon, its JS API, the
-# config/dictionary assets, and the testcases are assembled into one tree here.
+# computes its package root from its own location and looks for the addon under
+# <packageRoot>/build/Release, so the addon, its JS API, the config/dictionary
+# assets, and the testcases are assembled into one tree here. The addon is
+# located by a plain filesystem lookup (no node-gyp-build), so the test needs no
+# npm packages at all.
 copy_to_directory(
     name = "node_test_release",
     srcs = [
@@ -26,28 +28,25 @@ copy_to_directory(
 )
 
 js_library(
-    name = "mocha_entry",
-    srcs = ["mocha_entry.js"],
+    name = "test_entry",
+    srcs = ["test_entry.js"],
 )
 
-# Run node/test.js (mocha) against the Bazel-built addon. npm deps (mocha,
-# node-gyp-build) are linked at the repo root (//:node_modules).
+# Run node/test.js with Node's built-in test runner against the Bazel-built
+# addon. node:test ships with the Node runtime and opencc.js locates the addon
+# without node-gyp-build, so the test has no npm dependencies (no pnpm-lock).
 js_test(
     name = "node_test",
     size = "medium",
     data = [
-        ":mocha_entry",
         ":node_test_release",
-        "//:node_modules/mocha",
-        "//:node_modules/node-gyp-build",
+        ":test_entry",
     ],
-    entry_point = "mocha_entry.js",
-    # Linux/macOS only. The addon builds on Windows (rules_node_addon MSVC path),
-    # but the js_test fails there: with the runfiles tree enabled, Node resolves
-    # mocha but not its transitive deps (e.g. escape-string-regexp) because the
-    # node_modules closure isn't fully materialized in the Windows runfiles.
-    target_compatible_with = select({
-        "@platforms//os:windows": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
+    entry_point = "test_entry.js",
+    # Force the concise spec reporter; otherwise node:test defaults to the
+    # verbose TAP reporter when stdout is not a TTY (e.g. under Bazel/CI).
+    node_options = [
+        "--test-reporter=spec",
+        "--test-reporter-destination=stdout",
+    ],
 )

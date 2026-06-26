@@ -24,9 +24,8 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "test": "mocha -R spec node/test.js && node node/esm-test.mjs",
+    "test": "node --test --test-reporter=spec node/test.js && node node/esm-test.mjs",
     "prebuild": "prebuildify --napi --strip --postinstall \"node scripts/prepare-node-prebuild-artifacts.js\"",
-    "prebuild:all": "npm run prebuild",
     "prepare:scoped-packages": "node scripts/prepare-node-scoped-packages.js",
     "prepack": "node scripts/verify-node-main-package.js",
     "prepublishOnly": "node scripts/verify-node-scoped-packages-published.js",
@@ -143,7 +142,6 @@
     "Traditional Chinese"
   ],
   "devDependencies": {
-    "mocha": "^11.7.5",
     "prebuildify": "^6.0.1"
   },
   "dependencies": {
@@ -161,8 +159,5 @@
     "brace-expansion": "^2.0.3",
     "diff": "^8.0.3",
     "serialize-javascript": "^7.0.5"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": []
   }
 }

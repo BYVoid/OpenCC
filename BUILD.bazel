@@ -1,12 +1,7 @@
-load("@npm//:defs.bzl", "npm_link_all_packages")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_python//python:py_library.bzl", "py_library")
 
 package(default_visibility = ["//visibility:public"])
-
-# npm packages for the Node.js js_test (//node/test:node_test) are linked here at
-# the repo root, matching the pnpm-lock importer.
-npm_link_all_packages(name = "node_modules")
 
 cc_library(
     name = "opencc_lib",

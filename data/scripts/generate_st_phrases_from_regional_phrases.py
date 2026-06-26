@@ -103,10 +103,6 @@ process.stdin.on('end', () => {
     return converted
 
 
-def has_non_bmp(text):
-    return any(ord(char) > 0xFFFF for char in text)
-
-
 def main():
     args = parse_args()
     if args.opencc:
@@ -155,9 +151,7 @@ def main():
         base_entries = list(Dict().iter(args.append_to))
         seen_keys = {entry["key"] for entry in base_entries}
         generated = base_entries + [
-            entry
-            for entry in generated
-            if entry["key"] not in seen_keys and not has_non_bmp(entry["key"])
+            entry for entry in generated if entry["key"] not in seen_keys
         ]
     generated.sort(key=lambda entry: entry["key"])
 

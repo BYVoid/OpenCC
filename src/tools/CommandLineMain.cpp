@@ -22,6 +22,7 @@
 #include <cstring>
 #include <iostream>
 #include <string>
+#include <string_view>
 
 #ifdef _WIN32
 #include <fcntl.h>
@@ -354,7 +355,7 @@ std::string ConvertLineByMode(const std::string& line) {
     // True segmentation-only path: call the segmenter directly without
     // running any conversion stage.
     const SegmentsPtr& segments =
-        converter->GetSegmentation()->Segment(line);
+        converter->GetSegmentation()->Segment(std::string_view(line));
     ConversionInspectionResult result;
     result.input = line;
     result.segments = segments->ToVector();
@@ -363,7 +364,7 @@ std::string ConvertLineByMode(const std::string& line) {
     const ConversionInspectionResult& result = converter->Inspect(line);
     output = SerializeInspectionResultJson(result);
   } else {
-    output = converter->Convert(line);
+    output = converter->Convert(std::string_view(line));
   }
   measurement.convertMs += DurationToMilliseconds(
       std::chrono::steady_clock::now() - convertStart);

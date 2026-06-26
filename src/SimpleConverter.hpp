@@ -19,6 +19,7 @@
 #include "Export.hpp"
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #ifndef __OPENCC_SIMPLECONVERTER_HPP_
@@ -125,6 +126,14 @@ public:
    * @param input Text to be converted.
    */
   std::string Convert(const std::string& input) const;
+
+  /**
+   * Converts a text without requiring a null-terminated buffer.
+   * New code should prefer this overload when a string_view is already
+   * available.
+   * @param input Text to be converted.
+   */
+  std::string Convert(std::string_view input) const;
 
   /**
    * Converts a text

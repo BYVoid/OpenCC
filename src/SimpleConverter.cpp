@@ -125,6 +125,10 @@ SimpleConverter::SimpleConverter(const std::string& configFileName,
 SimpleConverter::~SimpleConverter() { delete (InternalData*)internalData; }
 
 std::string SimpleConverter::Convert(const std::string& input) const {
+  return Convert(std::string_view(input));
+}
+
+std::string SimpleConverter::Convert(std::string_view input) const {
   try {
     const InternalData* data = (InternalData*)internalData;
     return data->converter->Convert(input);
@@ -134,7 +138,7 @@ std::string SimpleConverter::Convert(const std::string& input) const {
 }
 
 std::string SimpleConverter::Convert(const char* input) const {
-  return Convert(std::string(input));
+  return Convert(std::string_view(input));
 }
 
 std::string SimpleConverter::Convert(const char* input, size_t length) const {

@@ -17,6 +17,7 @@
  */
 
 #include <thread>
+#include <string_view>
 
 #include "ConfigTestBase.hpp"
 #include "SimpleConverter.hpp"
@@ -31,8 +32,8 @@ protected:
 
   void TestConverter(const std::string& config) const {
     const SimpleConverter converter(config);
-    const std::string& converted =
-        converter.Convert(utf8("燕燕于飞差池其羽之子于归远送于野"));
+    const std::string converted = converter.Convert(
+        std::string_view(utf8("燕燕于飞差池其羽之子于归远送于野")));
     EXPECT_EQ(utf8("燕燕于飛差池其羽之子于歸遠送於野"), converted);
   }
 };

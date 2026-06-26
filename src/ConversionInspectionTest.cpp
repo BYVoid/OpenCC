@@ -22,6 +22,8 @@
 #include "SimpleConverter.hpp"
 #include "TestUtilsUTF8.hpp"
 
+#include <string_view>
+
 namespace opencc {
 
 // ---- Segments::ToVector tests ----
@@ -81,7 +83,7 @@ TEST_F(ConversionInspectionTest, OutputMatchesConvert) {
   const SimpleConverter converter(CONFIG_TEST_JSON_PATH);
   const std::string text = utf8("燕燕于飞差池其羽之子于归远送于野");
   const ConversionInspectionResult result = converter.Inspect(text);
-  const std::string converted = converter.Convert(text);
+  const std::string converted = converter.Convert(std::string_view(text));
   EXPECT_EQ(converted, result.output);
 }
 

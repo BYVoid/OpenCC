@@ -23,12 +23,16 @@
 
 using namespace opencc;
 
-MaxMatchSegmentation::MaxMatchSegmentation(const DictPtr _dict)
-    : dict(_dict), prefixMatch(new PrefixMatch(_dict)) {}
+namespace {
 
-SegmentsPtr MaxMatchSegmentation::Segment(const std::string& text) const {
+SegmentsPtr SegmentText(const std::shared_ptr<PrefixMatch>& prefixMatch,
+                        std::string_view text) {
   SegmentsPtr segments(new Segments);
-  const char* segStart = text.c_str();
+  if (text.empty()) {
+    return segments;
+  }
+
+  const char* segStart = text.data();
   size_t segLength = 0;
   auto clearBuffer = [&segments, &segStart, &segLength]() {
     if (segLength > 0) {
@@ -36,8 +40,8 @@ SegmentsPtr MaxMatchSegmentation::Segment(const std::string& text) const {
       segLength = 0;
     }
   };
-  const char* textEnd = text.c_str() + text.length();
-  for (const char* pstr = text.c_str(); *pstr != '\0';) {
+  const char* textEnd = text.data() + text.length();
+  for (const char* pstr = text.data(); pstr < textEnd;) {
     size_t remainingLength = textEnd - pstr;
     const PrefixMatch::Match matched =
         prefixMatch->MatchPrefix(pstr, remainingLength);
@@ -64,4 +68,17 @@ SegmentsPtr MaxMatchSegmentation::Segment(const std::string& text) const {
   }
   clearBuffer();
   return segments;
+}
+
+} // namespace
+
+MaxMatchSegmentation::MaxMatchSegmentation(const DictPtr _dict)
+    : dict(_dict), prefixMatch(new PrefixMatch(_dict)) {}
+
+SegmentsPtr MaxMatchSegmentation::Segment(const std::string& text) const {
+  return SegmentText(prefixMatch, text);
+}
+
+SegmentsPtr MaxMatchSegmentation::Segment(std::string_view text) const {
+  return SegmentText(prefixMatch, text);
 }

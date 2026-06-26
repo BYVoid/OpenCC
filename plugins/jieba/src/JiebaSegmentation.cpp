@@ -325,3 +325,13 @@ SegmentsPtr JiebaSegmentation::Segment(const std::string& text) const {
   }
   return segments;
 }
+
+SegmentsPtr JiebaSegmentation::Segment(std::string_view text) const {
+  SegmentsPtr segments(new Segments);
+  std::vector<std::string> words;
+  jieba_->Cut(std::string(text), words, true);
+  for (const auto& word : words) {
+    segments->AddSegment(word);
+  }
+  return segments;
+}

@@ -29,6 +29,8 @@ namespace opencc {
 
 class JiebaSegmentation : public Segmentation {
 public:
+  using Segmentation::Segment;
+
   JiebaSegmentation(const std::string& dictPath,
                     const std::string& modelPath,
                     const std::string& userDictPath = "",
@@ -38,6 +40,8 @@ public:
   ~JiebaSegmentation() override;
 
   SegmentsPtr Segment(const std::string& text) const override;
+
+  SegmentsPtr Segment(std::string_view text) const;
 
 private:
   std::unique_ptr<cppjieba::Jieba> jieba_;

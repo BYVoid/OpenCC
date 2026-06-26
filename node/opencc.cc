@@ -1,6 +1,7 @@
 #include <napi.h>
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include "src/Config.hpp"
 #include "src/Converter.hpp"
@@ -110,7 +111,7 @@ public:
 
   ~OpenccBinding() override {}
 
-  std::string Convert(const std::string& input) {
+  std::string Convert(std::string_view input) {
     return converter_->Convert(input);
   }
 
@@ -144,7 +145,7 @@ public:
     const std::string input = ToUtf8String(info[0]);
     std::string output;
     try {
-      output = Convert(input);
+      output = Convert(std::string_view(input));
     } catch (opencc::Exception& e) {
       Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
       return env.Undefined();

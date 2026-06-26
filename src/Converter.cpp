@@ -26,11 +26,21 @@
 
 using namespace opencc;
 
+std::string Converter::Convert(const char* text) const {
+  return Convert(std::string_view(text));
+}
+
 std::string Converter::Convert(const std::string& text) const {
+  return Convert(std::string_view(text));
+}
+
+std::string Converter::Convert(std::string_view text) const {
   std::string converted;
   converted.reserve(text.length() + text.length() / 5);
   if (segmentation == nullptr) {
-    conversionChain->AppendConvertedSegment(text.c_str(), &converted);
+    // AppendConvertedSegment requires null-termination; copy once for this path
+    const std::string owned(text);
+    conversionChain->AppendConvertedSegment(owned.c_str(), &converted);
     return converted;
   }
   const SegmentsPtr& segments = segmentation->Segment(text);
@@ -41,7 +51,7 @@ std::string Converter::Convert(const std::string& text) const {
 }
 
 size_t Converter::Convert(const char* input, char* output) const {
-  const std::string& converted = Convert(input);
+  const std::string converted = Convert(std::string_view(input));
   strcpy(output, converted.c_str());
   return converted.length();
 }
@@ -126,15 +136,16 @@ std::string ConverterStream::ConvertChunk(const char* input, size_t length) {
     return std::string();
   }
 
-  const std::string output = converter->Convert(
-      std::string(bufferBegin, static_cast<size_t>(keepStart - bufferBegin)));
+  const std::string output = converter->Convert(std::string_view(
+      bufferBegin, static_cast<size_t>(keepStart - bufferBegin)));
   pending.erase(0, static_cast<size_t>(keepStart - bufferBegin));
   return output;
 }
 
 std::string ConverterStream::Finish() {
-  const std::string output = pending.empty() ? std::string()
-                                             : converter->Convert(pending);
+  const std::string output =
+      pending.empty() ? std::string()
+                      : converter->Convert(std::string_view(pending));
   pending.clear();
   return output;
 }

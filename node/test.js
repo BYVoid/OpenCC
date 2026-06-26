@@ -4,7 +4,7 @@ const fs = require('fs');
 const nodeGypBuild = require('node-gyp-build');
 const os = require('os');
 const path = require('path');
-const util = require('util');
+const { after, describe, it } = require('node:test');
 
 const OpenCC = require('./opencc');
 const { prepareArtifacts } = require('../scripts/prepare-node-prebuild-artifacts');
@@ -37,19 +37,24 @@ function createLocalInstalledShape() {
   return root;
 }
 
-const testSync = function (tc, cfg, expected, done) {
+const testSync = function (tc, cfg, expected) {
   const opencc = new OpenCC(cfg + '.json');
   const converted = opencc.convertSync(tc.input);
   assert.equal(converted, expected);
-  done();
 };
 
-const testAsync = function (tc, cfg, expected, done) {
-  const opencc = new OpenCC(cfg + '.json');
-  opencc.convert(tc.input, function (err, converted) {
-    if (err) return done(err);
-    assert.equal(converted, expected);
-    done();
+const testAsync = function (tc, cfg, expected) {
+  return new Promise(function (resolve, reject) {
+    const opencc = new OpenCC(cfg + '.json');
+    opencc.convert(tc.input, function (err, converted) {
+      if (err) return reject(err);
+      try {
+        assert.equal(converted, expected);
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    });
   });
 };
 
@@ -62,8 +67,8 @@ async function testAsyncPromise(tc, cfg, expected) {
 describe('Sync API', function () {
   cases.forEach(function (tc, idx) {
     Object.entries(tc.expected || {}).forEach(function ([cfg, expected]) {
-      it('[' + cfg + '] case #' + (idx + 1), function (done) {
-        testSync(tc, cfg, expected, done);
+      it('[' + cfg + '] case #' + (idx + 1), function () {
+        testSync(tc, cfg, expected);
       });
     });
   });
@@ -116,8 +121,8 @@ describe('API compatibility', function () {
 describe('Async API', function () {
   cases.forEach(function (tc, idx) {
     Object.entries(tc.expected || {}).forEach(function ([cfg, expected]) {
-      it('[' + cfg + '] case #' + (idx + 1), function (done) {
-        testAsync(tc, cfg, expected, done);
+      it('[' + cfg + '] case #' + (idx + 1), function () {
+        return testAsync(tc, cfg, expected);
       });
     });
   });
@@ -126,8 +131,8 @@ describe('Async API', function () {
 describe('Async Promise API', function () {
   cases.forEach(function (tc, idx) {
     Object.entries(tc.expected || {}).forEach(function ([cfg, expected]) {
-      it('[' + cfg + '] case #' + (idx + 1), function (done) {
-        testAsyncPromise(tc, cfg, expected).then(() => done(), done);
+      it('[' + cfg + '] case #' + (idx + 1), function () {
+        return testAsyncPromise(tc, cfg, expected);
       });
     });
   });
@@ -459,9 +464,12 @@ describe('npm CLI', function () {
 });
 
 describe('Optional opencc-jieba package integration', function () {
-  it('loads jieba configs by mode name in the JavaScript API', function () {
+  it('loads jieba configs by mode name in the JavaScript API', function (t) {
     const installRoot = createLocalInstalledShape();
-    if (!installRoot) this.skip();
+    if (!installRoot) {
+      t.skip();
+      return;
+    }
 
     const script = [
       "const OpenCC = require('opencc');",
@@ -477,9 +485,12 @@ describe('Optional opencc-jieba package integration', function () {
     assert.equal(result.stdout, '雲端計算');
   });
 
-  it('loads jieba configs by mode name in the npm CLI', function () {
+  it('loads jieba configs by mode name in the npm CLI', function (t) {
     const installRoot = createLocalInstalledShape();
-    if (!installRoot) this.skip();
+    if (!installRoot) {
+      t.skip();
+      return;
+    }
 
     const result = childProcess.spawnSync(process.execPath, [
       path.join(installRoot, 'node_modules', 'opencc', 'node', 'cli.js'),
@@ -495,9 +506,12 @@ describe('Optional opencc-jieba package integration', function () {
     assert.equal(result.stdout, '雲端計算');
   });
 
-  it('skips tofu-risk dictionaries in jieba configs by default in the npm CLI', function () {
+  it('skips tofu-risk dictionaries in jieba configs by default in the npm CLI', function (t) {
     const installRoot = createLocalInstalledShape();
-    if (!installRoot) this.skip();
+    if (!installRoot) {
+      t.skip();
+      return;
+    }
 
     const result = childProcess.spawnSync(process.execPath, [
       path.join(installRoot, 'node_modules', 'opencc', 'node', 'cli.js'),
@@ -513,9 +527,12 @@ describe('Optional opencc-jieba package integration', function () {
     assert.equal(result.stdout, '㑮');
   });
 
-  it('includes tofu-risk dictionaries in jieba configs when requested in the npm CLI', function () {
+  it('includes tofu-risk dictionaries in jieba configs when requested in the npm CLI', function (t) {
     const installRoot = createLocalInstalledShape();
-    if (!installRoot) this.skip();
+    if (!installRoot) {
+      t.skip();
+      return;
+    }
 
     const result = childProcess.spawnSync(process.execPath, [
       path.join(installRoot, 'node_modules', 'opencc', 'node', 'cli.js'),

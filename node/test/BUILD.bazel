@@ -42,10 +42,4 @@ js_test(
         "//:node_modules/node-gyp-build",
     ],
     entry_point = "mocha_entry.js",
-    # The native addon's Windows build (rules_node_addon MSVC path) and this
-    # js_test are not yet validated on Windows; run on Linux/macOS for now.
-    target_compatible_with = select({
-        "@platforms//os:windows": ["@platforms//:incompatible"],
-        "//conditions:default": [],
-    }),
 )

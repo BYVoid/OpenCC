@@ -6,6 +6,11 @@ startup --windows_enable_symlinks
 # Automatically apply platform-specific config sections (e.g. build:windows)
 common --enable_platform_specific_config
 
+# Materialize a real runfiles tree on Windows so the js_test can resolve its
+# node_modules (require('mocha')); otherwise Bazel uses a runfiles manifest and
+# node_modules is not a real directory.
+build:windows --enable_runfiles
+
 # Enable C++17 for MSVC on Windows
 build:windows --cxxopt=/std:c++17
 build:windows --host_cxxopt=/std:c++17

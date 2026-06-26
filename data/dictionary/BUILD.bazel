@@ -30,6 +30,7 @@ TEXT_DICTS = glob(
     exclude = ["CJK_Compatibility_Ideographs.txt"],
 ) + [
     "STPhrases_GeneratedFromRegionalPhrases.txt",
+    "STPhrases_WithGeneratedFromRegionalPhrases.txt",
     "TSCharactersExt.txt",
     "TWVariantsRev.txt",
     "HKVariantsRev.txt",
@@ -75,6 +76,32 @@ genrule(
     cmd = "$(location //data/scripts:generate_st_phrases_from_regional_phrases) " +
           "--input $(location HKPhrases.txt) " +
           "--input $(location TWPhrases.txt) " +
+          "--output $@ " +
+          "--opencc $(location //src/tools:command_line) " +
+          "--config $(location //data/config:t2s.json) " +
+          "--dict-dir $$(dirname $(location TSPhrases.ocd2))",
+    tools = [
+        "//data/scripts:generate_st_phrases_from_regional_phrases",
+        "//src/tools:command_line",
+    ],
+)
+
+genrule(
+    name = "generate_STPhrases_WithGeneratedFromRegionalPhrases",
+    srcs = [
+        "HKPhrases.txt",
+        "TWPhrases.txt",
+        "STPhrases.txt",
+        "TSCharacters.ocd2",
+        "TSCharactersExt.ocd2",
+        "TSPhrases.ocd2",
+        "//data/config:t2s.json",
+    ],
+    outs = ["STPhrases_WithGeneratedFromRegionalPhrases.txt"],
+    cmd = "$(location //data/scripts:generate_st_phrases_from_regional_phrases) " +
+          "--input $(location HKPhrases.txt) " +
+          "--input $(location TWPhrases.txt) " +
+          "--append-to $(location STPhrases.txt) " +
           "--output $@ " +
           "--opencc $(location //src/tools:command_line) " +
           "--config $(location //data/config:t2s.json) " +

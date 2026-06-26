@@ -67,6 +67,9 @@ std::string FormatCodePoint(uint32_t codePoint) {
 
 bool IsAllowedNonBmpCharacter(const std::string& dictionary,
                               const std::string& character) {
+  if (dictionary == "STPhrases_WithGeneratedFromRegionalPhrases") {
+    return IsAllowedNonBmpCharacter("STPhrases", character);
+  }
   for (const auto& exception : kAllowedNonBmpCharacters) {
     if (dictionary == exception.dictionary && character == exception.character) {
       return true;

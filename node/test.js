@@ -282,8 +282,7 @@ describe('npm CLI', function () {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'opencc-node-cli-config-'));
     const assetsPath = getAssetsPath();
     fs.copyFileSync(path.join(assetsPath, 's2t.json'), path.join(dir, 'custom-s2t.json'));
-    fs.copyFileSync(path.join(assetsPath, 'STPhrases_GeneratedFromRegionalPhrases.ocd2'), path.join(dir, 'STPhrases_GeneratedFromRegionalPhrases.ocd2'));
-    fs.copyFileSync(path.join(assetsPath, 'STPhrases.ocd2'), path.join(dir, 'STPhrases.ocd2'));
+    fs.copyFileSync(path.join(assetsPath, 'STPhrases_WithGeneratedFromRegionalPhrases.ocd2'), path.join(dir, 'STPhrases_WithGeneratedFromRegionalPhrases.ocd2'));
     fs.copyFileSync(path.join(assetsPath, 'STCharacters.ocd2'), path.join(dir, 'STCharacters.ocd2'));
 
     const result = childProcess.spawnSync(process.execPath, [cli, '-c', './custom-s2t.json'], {

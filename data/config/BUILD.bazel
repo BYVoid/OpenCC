@@ -15,6 +15,11 @@ filegroup(
     srcs = ["opencc_config.schema.json"],
 )
 
+filegroup(
+    name = "config_schema_validation_test_src",
+    srcs = ["ConfigSchemaValidationTest.cpp"],
+)
+
 [
     cc_test(
         name = "config_dict_validation_" + config[:-5],
@@ -54,7 +59,7 @@ test_suite(
         srcs = ["ConfigSchemaValidationTest.cpp"],
         local_defines = [
             "BAZEL",
-            "OPENCC_CONFIG_SCHEMA_TEST_FILE=\\\"" + config + "\\\"",
+            "OPENCC_CONFIG_SCHEMA_TEST_FILE=\\\"data/config/" + config + "\\\"",
         ],
         data = [
             config,

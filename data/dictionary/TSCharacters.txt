@@ -861,8 +861,8 @@
 幩	幩 𪩸
 幫	帮
 幬	帱
-# 參見 BYVoid/OpenCC/issues/1335 暫不處理「幷」字轉換
-幷	幷 并
+# BYVoid/OpenCC/issues/1335
+幷	并
 幹	干
 幾	几
 庫	库

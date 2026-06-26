@@ -43,4 +43,10 @@ js_test(
         ":test_entry",
     ],
     entry_point = "test_entry.js",
+    # Force the concise spec reporter; otherwise node:test defaults to the
+    # verbose TAP reporter when stdout is not a TTY (e.g. under Bazel/CI).
+    node_options = [
+        "--test-reporter=spec",
+        "--test-reporter-destination=stdout",
+    ],
 )

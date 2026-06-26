@@ -18,6 +18,16 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
+filegroup(
+    name = "config_test_nested_group",
+    srcs = [
+        "config_test_nested_group.json",
+        "config_test_characters.txt",
+        "config_test_phrases.txt",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 # Schema validation for the with-policy variant; the original config_test.json
 # is kept for backward-compatibility and is exercised by //src:config_test.
 cc_test(
@@ -30,6 +40,25 @@ cc_test(
     ],
     data = [
         ":config_test_with_policy",
+        "//data/config:config_schema",
+    ],
+    deps = [
+        "@bazel_tools//tools/cpp/runfiles",
+        "@googletest//:gtest_main",
+        "//deps/rapidjson-1.1.0:rapidjson",
+    ],
+)
+
+cc_test(
+    name = "config_schema_validation_config_test_nested_group",
+    size = "small",
+    srcs = ["//data/config:config_schema_validation_test_src"],
+    local_defines = [
+        "BAZEL",
+        "OPENCC_CONFIG_SCHEMA_TEST_FILE=\\\"test/config_test/config_test_nested_group.json\\\"",
+    ],
+    data = [
+        ":config_test_nested_group",
         "//data/config:config_schema",
     ],
     deps = [

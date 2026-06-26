@@ -25,7 +25,18 @@
 
 namespace opencc {
 /**
- * Group of dictionaries
+ * Group of dictionaries.
+ *
+ * DictGroup preserves dictionary order. Exact lookup returns the first match
+ * from the first child dictionary that contains the key.
+ *
+ * OpenCC's built-in conversion and mmseg segmentation paths do not call
+ * DictGroup::MatchPrefix() or DictGroup::MatchAllPrefixes() directly. They
+ * construct a PrefixMatch from the group, and PrefixMatch expands
+ * GetDictGroupItems() to build its own prefix lookup table. The prefix
+ * methods below are still part of the Dict API for direct DictGroup callers
+ * and tests.
+ *
  * @ingroup opencc_cpp_api
  */
 class OPENCC_EXPORT DictGroup : public Dict {
@@ -36,22 +47,61 @@ public:
 
   virtual ~DictGroup();
 
+  /**
+   * Returns the maximum KeyMaxLength() among all child dictionaries.
+   */
   virtual size_t KeyMaxLength() const;
 
+  /**
+   * Matches the key exactly against child dictionaries in group order.
+   * Returns the first child dictionary's exact match, if any.
+   */
   virtual Optional<const DictEntry*> Match(const char* word, size_t len) const;
 
+  /**
+   * Matches the longest prefix within the first child dictionary that has any
+   * prefix match. A shorter match from an earlier child dictionary therefore
+   * wins over a longer match from a later child dictionary.
+   *
+   * This method is not used by OpenCC's normal conversion or mmseg
+   * segmentation paths; PrefixMatch expands the group via GetDictGroupItems()
+   * instead.
+   */
   virtual Optional<const DictEntry*> MatchPrefix(const char* word,
                                                  size_t len) const;
 
+  /**
+   * Returns prefix matches from all child dictionaries, sorted by key length
+   * descending. When multiple child dictionaries have matches of the same key
+   * length, the first child dictionary wins.
+   *
+   * This method is not used by OpenCC's normal conversion or mmseg
+   * segmentation paths; PrefixMatch expands the group via GetDictGroupItems()
+   * instead.
+   */
   virtual std::vector<const DictEntry*> MatchAllPrefixes(const char* word,
                                                          size_t len) const;
 
+  /**
+   * Returns a merged lexicon from all child dictionaries.
+   *
+   * Duplicate keys are not deduplicated here. PrefixMatch handles group
+   * priority while building its lookup table.
+   */
   virtual LexiconPtr GetLexicon() const;
 
+  /**
+   * Exposes child dictionaries to callers that need group-aware behavior.
+   * PrefixMatch uses this to flatten nested groups and preserve dictionary
+   * order.
+   */
   virtual const std::list<DictPtr>* GetDictGroupItems() const {
     return &dicts;
   }
 
+  /**
+   * Returns the child dictionaries by value.
+   */
   const std::list<DictPtr> GetDicts() const { return dicts; }
 
 private:

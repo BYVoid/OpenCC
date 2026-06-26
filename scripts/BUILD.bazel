@@ -1,6 +1,13 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@rules_python//python:py_binary.bzl", "py_binary")
 
 package(default_visibility = ["//visibility:public"])
+
+# Consumed by the Node.js js_test (//:node_test) for the prebuild-assets case.
+js_library(
+    name = "prepare_node_prebuild_artifacts",
+    srcs = ["prepare-node-prebuild-artifacts.js"],
+)
 
 py_binary(
     name = "convert_resource_zip",

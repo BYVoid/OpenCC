@@ -1,9 +1,20 @@
 """Bazel build rules for the OpenCC Node.js native addon (opencc.node)."""
 
+load("@aspect_rules_js//js:defs.bzl", "js_library")
 load("@rules_node_addon//node_addon:defs.bzl", "node_addon")
 load(":cc_headers_files.bzl", "cc_header_pick", "cc_headers_files")
 
 package(default_visibility = ["//visibility:public"])
+
+# JavaScript API sources exercised by the Node.js js_test (//:node_test).
+js_library(
+    name = "js_srcs",
+    srcs = [
+        "cli.js",
+        "opencc.js",
+        "test.js",
+    ],
+)
 
 # Raw Node header files for the Windows-Zig cross-compile ONLY (see the genrule
 # below). The main native-addon path (//node:opencc) gets its Node headers
@@ -43,7 +54,9 @@ node_addon(
     includes = [".", "src"],
     # node_addon already appends `-undefined dynamic_lookup` on macOS.
     linkopts = select({
-        "@platforms//os:macos": ["-Wl,-S", "-Wl,-no_uuid"],
+        # LC_UUID must be kept: modern macOS dyld rejects dlopen of a bundle
+        # without it (ERR_DLOPEN_FAILED "missing LC_UUID load command").
+        "@platforms//os:macos": ["-Wl,-S"],
         "@platforms//os:linux": ["-Wl,-s", "-Wl,--build-id=sha1"],
         "//conditions:default": ["-Wl,-s"],
     }),

@@ -6,6 +6,8 @@ module(
     compatibility_level = 1,
 )
 
+bazel_dep(name = "aspect_bazel_lib", version = "2.22.5")
+bazel_dep(name = "aspect_rules_js", version = "3.2.2")
 bazel_dep(name = "darts-clone", version = "0.32")
 bazel_dep(name = "googletest", version = "1.17.0.bcr.2", dev_dependency = True)
 bazel_dep(name = "marisa-trie", version = "0.3.1.bcr.1")
@@ -60,6 +62,17 @@ use_repo(node_addon_windows, "windows_node_api")
 node = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node")
 node.toolchain(include_headers = True)
 use_repo(node, "nodejs_toolchains")
+
+# npm dependencies for the Node.js js_test (mocha, node-gyp-build).
+npm = use_extension("@aspect_rules_js//npm:extensions.bzl", "npm")
+npm.npm_translate_lock(
+    name = "npm",
+    # The js_test uses the Bazel-built addon, so no native rebuilds are needed.
+    lifecycle_hooks = {"*": []},
+    pnpm_lock = "//:pnpm-lock.yaml",
+    verify_node_modules_ignored = "//:.bazelignore",
+)
+use_repo(npm, "npm")
 
 buildbuddy = use_extension("@toolchains_buildbuddy//:extensions.bzl", "buildbuddy", dev_dependency = True)
 

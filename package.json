@@ -161,5 +161,8 @@
     "brace-expansion": "^2.0.3",
     "diff": "^8.0.3",
     "serialize-javascript": "^7.0.5"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": []
   }
 }

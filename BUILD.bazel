@@ -1,7 +1,55 @@
+load("@aspect_bazel_lib//lib:copy_to_directory.bzl", "copy_to_directory")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@npm//:mocha/package_json.bzl", mocha_bin = "bin")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_python//python:py_library.bzl", "py_library")
 
 package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages(name = "node_modules")
+
+# Assemble the node-gyp-build layout that node/opencc.js expects at runtime:
+# build/Release/opencc.node next to the config (*.json) and dictionary (*.ocd2)
+# assets, all flattened into one directory (the addon's getAssetsPath() falls
+# back to the directory containing the .node file).
+copy_to_directory(
+    name = "node_test_release",
+    srcs = [
+        "//data/config:config",
+        "//data/dictionary:binary_dictionaries",
+        "//node:opencc",
+    ],
+    out = "build/Release",
+    root_paths = [
+        "data/config",
+        "data/dictionary",
+        "node",
+    ],
+)
+
+# Run node/test.js (mocha) against the Bazel-built addon.
+mocha_bin.mocha_test(
+    name = "node_test",
+    args = [
+        "node/test.js",
+        "--reporter",
+        "spec",
+    ],
+    size = "medium",
+    # The native addon's Windows build (rules_node_addon MSVC path) and this
+    # js_test are not yet validated on Windows; run on Linux/macOS for now.
+    target_compatible_with = select({
+        "@platforms//os:windows": ["@platforms//:incompatible"],
+        "//conditions:default": [],
+    }),
+    data = [
+        ":node_modules/node-gyp-build",
+        ":node_test_release",
+        "//node:js_srcs",
+        "//scripts:prepare_node_prebuild_artifacts",
+        "//test/testcases:testcases_js",
+    ],
+)
 
 cc_library(
     name = "opencc_lib",

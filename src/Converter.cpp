@@ -136,15 +136,16 @@ std::string ConverterStream::ConvertChunk(const char* input, size_t length) {
     return std::string();
   }
 
-  const std::string output = converter->Convert(
-      std::string(bufferBegin, static_cast<size_t>(keepStart - bufferBegin)));
+  const std::string output = converter->Convert(std::string_view(
+      bufferBegin, static_cast<size_t>(keepStart - bufferBegin)));
   pending.erase(0, static_cast<size_t>(keepStart - bufferBegin));
   return output;
 }
 
 std::string ConverterStream::Finish() {
-  const std::string output = pending.empty() ? std::string()
-                                             : converter->Convert(pending);
+  const std::string output =
+      pending.empty() ? std::string()
+                      : converter->Convert(std::string_view(pending));
   pending.clear();
   return output;
 }

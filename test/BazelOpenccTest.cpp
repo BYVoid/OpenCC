@@ -19,6 +19,8 @@
 #include "opencc.h"
 #include "gtest/gtest.h"
 
+#include <string_view>
+
 #ifdef BAZEL
 #include "tools/cpp/runfiles/runfiles.h"
 using bazel::tools::cpp::runfiles::Runfiles;
@@ -73,14 +75,14 @@ std::string BazelOpenccTest::dictDir_;
 TEST_F(BazelOpenccTest, SimpleConverter_s2t) {
   SimpleConverter converter(OPENCC_DEFAULT_CONFIG_SIMP_TO_TRAD,
                             {configDir_, dictDir_});
-  EXPECT_EQ(converter.Convert("简化字测试"), "簡化字測試");
+  EXPECT_EQ(converter.Convert(std::string_view("简化字测试")), "簡化字測試");
 }
 
 TEST_F(BazelOpenccTest, SimpleConverter_t2s) {
   SimpleConverter converter(OPENCC_DEFAULT_CONFIG_TRAD_TO_SIMP,
                             {configDir_, dictDir_});
-  EXPECT_EQ(converter.Convert("簡化字測試"), "简化字测试");
-  EXPECT_EQ(converter.Convert("㑮"), "𫝈");
+  EXPECT_EQ(converter.Convert(std::string_view("簡化字測試")), "简化字测试");
+  EXPECT_EQ(converter.Convert(std::string_view("㑮")), "𫝈");
 }
 
 TEST_F(BazelOpenccTest, CInterface_s2t) {

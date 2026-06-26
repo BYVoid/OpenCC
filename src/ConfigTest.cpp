@@ -19,6 +19,7 @@
 #include <fstream>
 #include <filesystem>
 #include <memory>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -229,7 +230,7 @@ protected:
 };
 
 TEST_F(ConfigTest, Convert) {
-  const std::string& converted = converter->Convert(input);
+  const std::string converted = converter->Convert(std::string_view(input));
   EXPECT_EQ(expected, converted);
 }
 
@@ -269,7 +270,7 @@ TEST_F(ConfigTest, DefaultConfigPathFindsAdjacentResources) {
   try {
     const ConverterPtr tempConverter =
         config.NewFromFile(PathString(tempDir / "config_test.json"));
-    EXPECT_EQ(expected, tempConverter->Convert(input));
+    EXPECT_EQ(expected, tempConverter->Convert(std::string_view(input)));
   } catch (...) {
     fs::remove_all(tempDir);
     throw;
@@ -291,7 +292,8 @@ TEST_F(ConfigTest, ExplicitProviderFindsResources) {
         new FilesystemResourceProvider({PathString(resourceDir)}));
     const ConverterPtr tempConverter =
         config.NewFromFile(PathString(configDir / "config.json"), provider);
-    EXPECT_EQ(utf8("滑鼠"), tempConverter->Convert(utf8("鼠标")));
+    EXPECT_EQ(utf8("滑鼠"),
+              tempConverter->Convert(std::string_view(utf8("鼠标"))));
   } catch (...) {
     fs::remove_all(tempDir);
     throw;
@@ -311,7 +313,8 @@ TEST_F(ConfigTest, ExplicitProviderFindsConfigNameAndResources) {
         new FilesystemResourceProvider({PathString(resourceDir)}));
     const ConverterPtr tempConverter =
         config.NewFromFile("provider_config.json", provider);
-    EXPECT_EQ(utf8("滑鼠"), tempConverter->Convert(utf8("鼠标")));
+    EXPECT_EQ(utf8("滑鼠"),
+              tempConverter->Convert(std::string_view(utf8("鼠标"))));
   } catch (...) {
     fs::remove_all(tempDir);
     throw;
@@ -332,7 +335,8 @@ TEST_F(ConfigTest, ZipProviderFindsConfigNameAndResources) {
         new ZipResourceProvider(PathString(zipPath)));
     const ConverterPtr tempConverter =
         config.NewFromFile("config.json", provider);
-    EXPECT_EQ(utf8("滑鼠"), tempConverter->Convert(utf8("鼠标")));
+    EXPECT_EQ(utf8("滑鼠"),
+              tempConverter->Convert(std::string_view(utf8("鼠标"))));
   } catch (...) {
     fs::remove_all(tempDir);
     throw;
@@ -374,7 +378,8 @@ TEST_F(ConfigTest, ZipProviderDoesNotOverrideAbsoluteConfigPath) {
         new ZipResourceProvider(PathString(zipPath)));
     const ConverterPtr tempConverter =
         config.NewFromFile(PathString(configPath), provider);
-    EXPECT_EQ(utf8("甲"), tempConverter->Convert(utf8("鼠标")));
+    EXPECT_EQ(utf8("甲"),
+              tempConverter->Convert(std::string_view(utf8("鼠标"))));
   } catch (...) {
     fs::remove_all(tempDir);
     throw;
@@ -400,7 +405,8 @@ TEST_F(ConfigTest, ExplicitProviderConfigOverridesInstalledOrCwdConfigName) {
         new FilesystemResourceProvider({PathString(resourceDir)}));
     const ConverterPtr tempConverter =
         config.NewFromFile("config.json", provider);
-    EXPECT_EQ(utf8("乙"), tempConverter->Convert(utf8("鼠标")));
+    EXPECT_EQ(utf8("乙"),
+              tempConverter->Convert(std::string_view(utf8("鼠标"))));
     fs::current_path(originalCwd);
   } catch (...) {
     fs::current_path(originalCwd);
@@ -423,7 +429,8 @@ TEST_F(ConfigTest, RelativeParentDictionaryPathStillWorks) {
   try {
     const ConverterPtr tempConverter =
         config.NewFromFile(PathString(configDir / "config.json"));
-    EXPECT_EQ(utf8("滑鼠"), tempConverter->Convert(utf8("鼠标")));
+    EXPECT_EQ(utf8("滑鼠"),
+              tempConverter->Convert(std::string_view(utf8("鼠标"))));
   } catch (...) {
     fs::remove_all(tempDir);
     throw;
@@ -449,7 +456,8 @@ TEST_F(ConfigTest, MultipleSearchPathsUseFirstMatch) {
             {PathString(firstDir), PathString(secondDir)}));
     const ConverterPtr tempConverter =
         config.NewFromFile(PathString(configDir / "config.json"), provider);
-    EXPECT_EQ(utf8("第一"), tempConverter->Convert(utf8("鼠标")));
+    EXPECT_EQ(utf8("第一"),
+              tempConverter->Convert(std::string_view(utf8("鼠标"))));
   } catch (...) {
     fs::remove_all(tempDir);
     throw;
@@ -518,7 +526,8 @@ TEST_F(ConfigTest, PluginLikeResourcePathSupplementsMainPath) {
             {PathString(mainDir), PathString(pluginDir)}));
     const ConverterPtr tempConverter =
         config.NewFromFile(PathString(configDir / "config.json"), provider);
-    EXPECT_EQ(utf8("伺服器"), tempConverter->Convert(utf8("服务器")));
+    EXPECT_EQ(utf8("伺服器"),
+              tempConverter->Convert(std::string_view(utf8("服务器"))));
   } catch (...) {
     fs::remove_all(tempDir);
     throw;
@@ -540,7 +549,7 @@ TEST_F(ConfigTest, InlineDictBasicConversion) {
 
   const ConverterPtr inlineConverter = config.NewFromString(json, "");
   EXPECT_EQ(utf8("我想吃冰炫風"),
-            inlineConverter->Convert(utf8("我想吃麦旋风")));
+            inlineConverter->Convert(std::string_view(utf8("我想吃麦旋风"))));
 }
 
 TEST_F(ConfigTest, InlineDictInGroupTakesPriorityOverFollowingFileDict) {
@@ -569,7 +578,8 @@ TEST_F(ConfigTest, InlineDictInGroupTakesPriorityOverFollowingFileDict) {
 
   const ConverterPtr inlineConverter =
       config.NewFromString(json, {CONFIG_TEST_DIR_PATH + "/"});
-  EXPECT_EQ(utf8("自訂覆寫"), inlineConverter->Convert(utf8("燕燕于飞")));
+  EXPECT_EQ(utf8("自訂覆寫"),
+            inlineConverter->Convert(std::string_view(utf8("燕燕于飞"))));
 }
 
 TEST_F(ConfigTest, InlineDictOutputStillProcessedByLaterChainStep) {
@@ -607,7 +617,7 @@ TEST_F(ConfigTest, InlineDictOutputStillProcessedByLaterChainStep) {
                   "}\n");
 
   const ConverterPtr inlineConverter = config.NewFromString(json, "");
-  EXPECT_EQ("C", inlineConverter->Convert("A"));
+  EXPECT_EQ("C", inlineConverter->Convert(std::string_view("A")));
 }
 
 TEST_F(ConfigTest, InlineSegmentationDictUsesLongestMatch) {
@@ -639,7 +649,7 @@ TEST_F(ConfigTest, InlineSegmentationDictUsesLongestMatch) {
                   "}\n");
 
   const ConverterPtr inlineConverter = config.NewFromString(json, "");
-  EXPECT_EQ("XD", inlineConverter->Convert("ABCD"));
+  EXPECT_EQ("XD", inlineConverter->Convert(std::string_view("ABCD")));
 }
 
 TEST_F(ConfigTest, InlineDictPreservesExactStringSemantics) {
@@ -656,8 +666,8 @@ TEST_F(ConfigTest, InlineDictPreservesExactStringSemantics) {
       "    }");
 
   const ConverterPtr inlineConverter = config.NewFromString(json, "");
-  EXPECT_EQ("A", inlineConverter->Convert("A"));
-  EXPECT_EQ("B", inlineConverter->Convert(" A "));
+  EXPECT_EQ("A", inlineConverter->Convert(std::string_view("A")));
+  EXPECT_EQ("B", inlineConverter->Convert(std::string_view(" A ")));
 }
 
 TEST_F(ConfigTest, InlineDictValidationErrors) {
@@ -826,7 +836,8 @@ TEST_F(ConfigTest, InlineDictSupportsJsoncCommentsAndTrailingComma) {
                   "}\n");
 
   const ConverterPtr inlineConverter = config.NewFromString(json, "");
-  EXPECT_EQ(utf8("冰炫風"), inlineConverter->Convert(utf8("麦旋风")));
+  EXPECT_EQ(utf8("冰炫風"),
+            inlineConverter->Convert(std::string_view(utf8("麦旋风"))));
 }
 
 TEST_F(ConfigTest, InlineSegmentationAndConversionWorksWithOcd2GroupDicts) {
@@ -873,8 +884,10 @@ TEST_F(ConfigTest, InlineSegmentationAndConversionWorksWithOcd2GroupDicts) {
                   "}\n");
 
   const ConverterPtr inlineConverter = config.NewFromString(json, {ocd2Dir});
-  EXPECT_EQ(utf8("臺灣"), inlineConverter->Convert(utf8("台湾")));
-  EXPECT_EQ(utf8("台灣"), inlineConverter->Convert(utf8("台灣")));
+  EXPECT_EQ(utf8("臺灣"),
+            inlineConverter->Convert(std::string_view(utf8("台湾"))));
+  EXPECT_EQ(utf8("台灣"),
+            inlineConverter->Convert(std::string_view(utf8("台灣"))));
 }
 
 #if defined(_MSC_VER)
@@ -904,7 +917,7 @@ TEST_F(ConfigTest, LoadConfigFromUnicodePath) {
   try {
     const ConverterPtr unicodeConverter =
         config.NewFromFile(tempDir.u8string() + "/config_test.json");
-    EXPECT_EQ(expected, unicodeConverter->Convert(input));
+    EXPECT_EQ(expected, unicodeConverter->Convert(std::string_view(input)));
   } catch (...) {
     fs::remove_all(tempDir);
     throw;

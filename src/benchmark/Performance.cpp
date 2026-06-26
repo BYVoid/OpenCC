@@ -538,7 +538,7 @@ SimpleConverter* Initialize(const BenchmarkConfig& config) {
   return new SimpleConverter(config.path);
 }
 
-void Convert(const SimpleConverter* converter, const std::string& text) {
+void Convert(const SimpleConverter* converter, std::string_view text) {
   converter->Convert(text);
 }
 

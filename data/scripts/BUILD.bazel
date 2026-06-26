@@ -32,6 +32,11 @@ py_binary(
 )
 
 py_binary(
+    name = "minify_json_to_inc",
+    srcs = ["minify_json_to_inc.py"],
+)
+
+py_binary(
     name = "generate_st_phrases_from_regional_phrases",
     srcs = ["generate_st_phrases_from_regional_phrases.py"],
     imports = ["."],

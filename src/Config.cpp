@@ -27,6 +27,8 @@
 #endif
 
 #include <rapidjson/document.h>
+#include <rapidjson/schema.h>
+#include <rapidjson/stringbuffer.h>
 
 #include "Config.hpp"
 #include "ConversionChain.hpp"
@@ -45,6 +47,10 @@
 #endif
 
 typedef rapidjson::GenericValue<rapidjson::UTF8<char>> JSONValue;
+
+static const char kConfigSchemaJson[] =
+#include "opencc_config_schema.inc"
+;
 
 namespace opencc {
 
@@ -820,6 +826,29 @@ Config::NewFromString(const std::string& json,
   }
   if (!doc.IsObject()) {
     throw InvalidFormat("Root of configuration must be an object");
+  }
+
+  // Schema validation: warn on violations but continue parsing.
+  {
+    rapidjson::Document schemaDoc;
+    schemaDoc.Parse(kConfigSchemaJson);
+    if (!schemaDoc.HasParseError() && schemaDoc.IsObject()) {
+      rapidjson::SchemaDocument schema(schemaDoc);
+      rapidjson::SchemaValidator validator(schema);
+      if (!doc.Accept(validator)) {
+        rapidjson::StringBuffer docPath;
+        validator.GetInvalidDocumentPointer().Stringify(docPath);
+        rapidjson::StringBuffer schemaPath;
+        validator.GetInvalidSchemaPointer().Stringify(schemaPath);
+        fprintf(stderr,
+                "warning: config does not conform to schema: "
+                "document path \"%s\", schema path \"%s\", keyword \"%s\"\n",
+                docPath.GetString(), schemaPath.GetString(),
+                validator.GetInvalidSchemaKeyword()
+                    ? validator.GetInvalidSchemaKeyword()
+                    : "");
+      }
+    }
   }
 
   // Optional: name

@@ -1,3 +1,4 @@
+load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 load("@rules_python//python:py_library.bzl", "py_library")
@@ -10,6 +11,7 @@ filegroup(
         "**/*.cpp",
         "**/*.h",
         "**/*.hpp",
+        "**/*.inc",
     ]),
 )
 
@@ -90,12 +92,32 @@ cc_library(
     defines = ["Opencc_BUILT_AS_STATIC"],
 )
 
+genrule(
+    name = "config_schema_inc",
+    srcs = ["//data/config:config_schema"],
+    outs = ["generated/opencc_config_schema.inc"],
+    cmd = "$(location //data/scripts:minify_json_to_inc) $< $@",
+    tools = ["//data/scripts:minify_json_to_inc"],
+)
+
+cc_library(
+    name = "config_schema_inc_lib",
+    hdrs = ["opencc_config_schema.inc"],
+)
+
+diff_test(
+    name = "config_schema_inc_sync_test",
+    file1 = ":config_schema_inc",
+    file2 = "opencc_config_schema.inc",
+)
+
 cc_library(
     name = "config_lib",
     srcs = ["Config.cpp"],
     hdrs = ["Config.hpp"],
     deps = [
         ":common_lib",
+        ":config_schema_inc_lib",
         ":conversion_chain_lib",
         ":converter_lib",
         ":darts_dict_lib",

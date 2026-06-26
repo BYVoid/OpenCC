@@ -1,0 +1,23 @@
+{
+  "name": "Configuration Test",
+  "segmentation": {
+    "type": "mmseg",
+    "dict": {
+      "type": "text",
+      "file": "config_test_phrases.txt"
+    }
+  },
+  "conversion_chain": [{
+    "dict": {
+      "type": "group",
+      "match_policy": "short_circuit",
+      "dicts": [{
+        "type": "text",
+        "file": "config_test_phrases.txt"
+      }, {
+        "type": "text",
+        "file": "config_test_characters.txt"
+      }]
+    }
+  }]
+}

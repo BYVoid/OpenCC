@@ -48,6 +48,8 @@ TEST(ConfigSchemaValidationTest, BundledConfigsMatchSchema) {
   std::unique_ptr<Runfiles> runfiles(Runfiles::CreateForTest());
   ASSERT_NE(nullptr, runfiles);
 
+  // OPENCC_CONFIG_SCHEMA_TEST_FILE must be a workspace-relative path,
+  // e.g. "data/config/s2t.json" or "test/config_test/config_test.json".
   const std::string configFile = OPENCC_CONFIG_SCHEMA_TEST_FILE;
   const std::string schemaPath =
       runfiles->Rlocation("_main/data/config/opencc_config.schema.json");
@@ -60,8 +62,7 @@ TEST(ConfigSchemaValidationTest, BundledConfigsMatchSchema) {
   ASSERT_TRUE(schemaDoc.IsObject());
   rapidjson::SchemaDocument schema(schemaDoc);
 
-  const std::string configPath =
-      runfiles->Rlocation("_main/data/config/" + configFile);
+  const std::string configPath = runfiles->Rlocation("_main/" + configFile);
   const std::string configJson = ReadFile(configPath);
   rapidjson::Document configDoc;
   configDoc.Parse(configJson.c_str());

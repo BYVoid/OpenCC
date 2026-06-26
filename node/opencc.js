@@ -42,22 +42,17 @@ function requireOptionalPackage(packageName) {
 }
 
 function resolveBindingPath() {
-  // The addon ships either as a local build (build/Release, also used by the
-  // node-gyp source build and the Bazel sandbox), as a prebuildify prebuild
-  // under prebuilds/<platform>-<arch>/, or via an @opencc/opencc-<platform>-<arch>
-  // scoped package. OpenCC ships a single N-API build per platform (no
-  // musl/abi variants), so a direct filesystem lookup replaces node-gyp-build.
-  const candidates = [path.join(packageRoot, 'build', 'Release', 'opencc.node')];
-  const prebuildDir = path.join(
-    packageRoot, 'prebuilds', `${process.platform}-${process.arch}`
-  );
-  if (fs.existsSync(prebuildDir)) {
-    for (const entry of fs.readdirSync(prebuildDir)) {
-      if (entry.endsWith('.node')) {
-        candidates.push(path.join(prebuildDir, entry));
-      }
-    }
-  }
+  // The addon is always named opencc.node and ships either as a local build
+  // (build/Release, also used by the node-gyp source build and the Bazel
+  // sandbox), as a prebuild under prebuilds/<platform>-<arch>/, or via an
+  // @opencc/opencc-<platform>-<arch> scoped package. A direct filesystem lookup
+  // replaces node-gyp-build (OpenCC ships a single N-API build per platform).
+  const candidates = [
+    path.join(packageRoot, 'build', 'Release', 'opencc.node'),
+    path.join(
+      packageRoot, 'prebuilds', `${process.platform}-${process.arch}`, 'opencc.node'
+    ),
+  ];
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) {
       return candidate;

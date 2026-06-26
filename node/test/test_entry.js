@@ -1,8 +1,8 @@
 // Entry point for the Bazel js_test (//node/test:node_test): run node/test.js
 // with Node's built-in test runner (node:test) against the self-contained
-// sandbox assembled next to this file. There is no third-party test framework,
-// so the only npm dependency the test pulls in is node-gyp-build (used by
-// node/opencc.js to locate the addon).
+// sandbox assembled next to this file. The test has no npm dependencies at all:
+// node:test ships with Node, and node/opencc.js locates the addon with a plain
+// filesystem lookup (no node-gyp-build).
 //
 // The sandbox mirrors an npm-install layout (node/*.js + build/Release/<addon> +
 // assets + test/testcases + scripts), so node/opencc.js resolves the addon and

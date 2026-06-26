@@ -6,9 +6,9 @@ startup --windows_enable_symlinks
 # Automatically apply platform-specific config sections (e.g. build:windows)
 common --enable_platform_specific_config
 
-# Materialize a real runfiles tree on Windows so the Node js_test can resolve
-# its node_modules (node-gyp-build); otherwise Bazel uses a runfiles manifest
-# and node_modules is not a real directory.
+# Materialize a real runfiles tree on Windows so the Node js_test can reach its
+# staged sandbox directory (node/test/sandbox) by ordinary file paths; otherwise
+# Bazel uses a runfiles manifest and the sandbox is not a real directory tree.
 build:windows --enable_runfiles
 
 # Enable C++17 for MSVC on Windows

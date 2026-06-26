@@ -1,6 +1,14 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+
 package(default_visibility = ["//visibility:public"])
 
 filegroup(
     name = "testcases",
+    srcs = ["testcases.json"],
+)
+
+# js_library wrapper so the Node.js js_test (//:node_test) can read the cases.
+js_library(
+    name = "testcases_js",
     srcs = ["testcases.json"],
 )

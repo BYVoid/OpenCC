@@ -136,7 +136,7 @@ jobs:
           MSYS_NO_PATHCONV: 1
         run: |
           set +e
-          bazel test --show_timestamps --test_output=all --nocache_test_results //src/... //data/... //test/... //python/... //plugins/...
+          bazel test --show_timestamps --test_output=all --nocache_test_results --skip_incompatible_explicit_targets //src/... //data/... //test/... //python/... //plugins/... //node/test:node_test
           status=$?
           bash scripts/collect_bazel_testlogs.sh bazel-testlogs-artifact
           if [ "$status" -ne 0 ]; then

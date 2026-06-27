@@ -234,11 +234,10 @@ TEST_F(ConfigTest, Convert) {
   EXPECT_EQ(expected, converted);
 }
 
-TEST_F(ConfigTest, ConvertBuffer) {
-  char output[1024];
-  const size_t length = converter->Convert(input.c_str(), output);
-  EXPECT_EQ(expected.length(), length);
-  EXPECT_EQ(expected, output);
+TEST_F(ConfigTest, ConvertLength) {
+  const std::string result = converter->Convert(std::string_view(input));
+  EXPECT_EQ(expected.length(), result.length());
+  EXPECT_EQ(expected, result);
 }
 
 TEST_F(ConfigTest, NonexistingPath) {

@@ -38,13 +38,7 @@ public:
       : name(_name), segmentation(_segmentation),
         conversionChain(_conversionChain) {}
 
-  std::string Convert(const char* text) const;
-
-  std::string Convert(const std::string& text) const;
-
   std::string Convert(std::string_view text) const;
-
-  size_t Convert(const char* input, char* output) const;
 
   ConversionInspectionResult Inspect(const std::string& text) const;
 
@@ -65,11 +59,24 @@ public:
   explicit ConverterStream(ConverterPtr _converter, size_t _maxKeepChars = 16)
       : converter(_converter), maxKeepChars(_maxKeepChars) {}
 
-  std::string ConvertChunk(const char* input, size_t length);
+  /**
+   * Appends @p input to pending, then emits everything up to the last
+   * @c maxKeepChars code points (extended if an incomplete IDS is detected).
+   * The kept tail remains in pending so that a phrase or IDS spanning two
+   * consecutive calls is not split across separate Convert() invocations.
+   */
+  std::string ConvertChunk(std::string_view input);
+
+  /**
+   * Appends @p input to pending and flushes everything at once.
+   * @note Not equivalent to ConvertChunk(@p input) + Finish(): ConvertChunk
+   *   applies the keepStart window and issues two Convert() calls, which
+   *   breaks phrase or IDS matches that span the boundary.
+   *   Use this overload for the final chunk when no more data is coming.
+   */
+  std::string Finish(std::string_view input);
 
   std::string Finish();
-
-  std::string Finish(const char* input, size_t length);
 
 private:
   ConverterPtr converter;

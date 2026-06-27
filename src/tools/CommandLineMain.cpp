@@ -300,30 +300,31 @@ std::string SerializeSegmentationResultJson(
   rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
   writer.StartObject();
   writer.Key("input");
-  writer.String(result.input.c_str());
+  writer.String(result.input.c_str(), result.input.size());
   writer.Key("segments");
   writer.StartArray();
   for (const auto& seg : result.segments) {
-    writer.String(seg.c_str());
+    writer.String(seg.c_str(), seg.size());
   }
   writer.EndArray();
   writer.EndObject();
   return buffer.GetString();
 }
 
-// Serializes the full inspection result as a JSON object with "input",
-// "segments", "stages", and "output" fields. Used with --inspect mode.
-std::string SerializeInspectionResultJson(
-    const ConversionInspectionResult& result) {
-  rapidjson::StringBuffer buffer;
-  rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+// Writes a ConversionInspectionResult as a JSON object into writer.
+// Handles both SingleStageConverter results (segments + stages) and
+// PipelineConverter results (pipelineStages), and is called recursively
+// for nested pipeline stages.
+template <typename Writer>
+void WriteInspectionResultJson(Writer& writer,
+                               const ConversionInspectionResult& result) {
   writer.StartObject();
   writer.Key("input");
-  writer.String(result.input.c_str());
+  writer.String(result.input.c_str(), result.input.size());
   writer.Key("segments");
   writer.StartArray();
   for (const auto& seg : result.segments) {
-    writer.String(seg.c_str());
+    writer.String(seg.c_str(), seg.size());
   }
   writer.EndArray();
   writer.Key("stages");
@@ -335,15 +336,30 @@ std::string SerializeInspectionResultJson(
     writer.Key("segments");
     writer.StartArray();
     for (const auto& seg : stage.segments) {
-      writer.String(seg.c_str());
+      writer.String(seg.c_str(), seg.size());
     }
     writer.EndArray();
     writer.EndObject();
   }
   writer.EndArray();
+  writer.Key("pipelineStages");
+  writer.StartArray();
+  for (const auto& ps : result.pipelineStages) {
+    WriteInspectionResultJson(writer, ps);
+  }
+  writer.EndArray();
   writer.Key("output");
-  writer.String(result.output.c_str());
+  writer.String(result.output.c_str(), result.output.size());
   writer.EndObject();
+}
+
+// Serializes the full inspection result as a JSON object. Used with
+// --inspect mode. Handles both single-stage and pipeline converters.
+std::string SerializeInspectionResultJson(
+    const ConversionInspectionResult& result) {
+  rapidjson::StringBuffer buffer;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+  WriteInspectionResultJson(writer, result);
   return buffer.GetString();
 }
 

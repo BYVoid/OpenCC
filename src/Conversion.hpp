@@ -60,6 +60,13 @@ public:
   /**
    * Converts @p phrase and appends the result to @p output.
    * Preferred in hot paths (e.g. ConversionChain) to avoid extra allocations.
+   * @param phrase UTF-8 text; need not be null-terminated.
+   * @param output Destination buffer; content is appended, not replaced.
+   */
+  void AppendConverted(std::string_view phrase, std::string* output) const;
+
+  /**
+   * Converts @p phrase and appends the result to @p output.
    * @param phrase Null-terminated UTF-8 text.
    * @param output Destination buffer; content is appended, not replaced.
    */

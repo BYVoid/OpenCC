@@ -33,15 +33,41 @@ struct ConversionInspectionStage {
 };
 
 /**
- * Full inspection result for a single input text.
- * Contains the original input, initial segments after segmentation,
- * per-stage conversion results, and the final output.
+ * Full inspection result returned by Converter::Inspect().
+ *
+ * The fields that are populated depend on the concrete Converter type:
+ *
+ * - @b SingleStageConverter fills @c segments (initial segmentation),
+ *   @c stages (per-Conversion trace through the ConversionChain), and
+ *   @c output.  @c pipelineStages is empty.
+ *
+ * - @b PipelineConverter fills @c pipelineStages (one entry per child
+ *   Converter, each with its own fully populated result) and @c output.
+ *   @c segments and @c stages are empty at the pipeline level.
+ *
+ * In both cases @c input and @c output are always populated.
+ *
  * @ingroup opencc_cpp_api
  */
 struct ConversionInspectionResult {
+  /** The original input text passed to Inspect(). */
   std::string input;
+
+  /** Initial segmentation produced by this converter's Segmentation.
+   *  Non-empty only for SingleStageConverter. */
   std::vector<std::string> segments;
+
+  /** Per-dictionary-stage trace through this converter's ConversionChain.
+   *  Non-empty only for SingleStageConverter. */
   std::vector<ConversionInspectionStage> stages;
+
+  /** Per-child-converter inspection results for a PipelineConverter.
+   *  Each entry is the full result of the corresponding pipeline stage;
+   *  the structure is naturally recursive for nested pipelines.
+   *  Empty for SingleStageConverter. */
+  std::vector<ConversionInspectionResult> pipelineStages;
+
+  /** The final converted output of this converter. Always populated. */
   std::string output;
 };
 

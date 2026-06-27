@@ -43,8 +43,8 @@ SegmentsPtr SegmentText(const std::shared_ptr<PrefixMatch>& prefixMatch,
   const char* textEnd = text.data() + text.length();
   for (const char* pstr = text.data(); pstr < textEnd;) {
     size_t remainingLength = textEnd - pstr;
-    const PrefixMatch::Match matched =
-        prefixMatch->MatchPrefix(pstr, remainingLength);
+    const PrefixMatchView matched =
+        prefixMatch->MatchPrefixView(pstr, remainingLength);
     size_t matchedLength;
     if (!matched.matched) {
       matchedLength =
@@ -61,7 +61,7 @@ SegmentsPtr SegmentText(const std::shared_ptr<PrefixMatch>& prefixMatch,
     } else {
       clearBuffer();
       matchedLength = matched.keyLength;
-      segments->AddSegment(*matched.key);
+      segments->AddSegment(matched.key);
       segStart = pstr + matchedLength;
     }
     pstr += matchedLength;

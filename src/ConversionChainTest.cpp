@@ -167,13 +167,46 @@ TEST_F(PipelineConverterTest, GetSegmentationEmptyPipelineReturnsNullptr) {
   EXPECT_EQ(nullptr, pipeline.GetSegmentation());
 }
 
-TEST_F(PipelineConverterTest, InspectReturnsInputOutputWithNoStageDetail) {
+TEST_F(PipelineConverterTest, InspectPopulatesPipelineStages) {
   PipelineConverter pipeline({stage1, stage2});
   const ConversionInspectionResult result = pipeline.Inspect(utf8("钅"));
+
+  // Pipeline-level fields
   EXPECT_EQ(utf8("钅"), result.input);
   EXPECT_EQ(utf8("金"), result.output);
+  // segments/stages are SingleStageConverter concepts; empty at pipeline level
   EXPECT_TRUE(result.segments.empty());
   EXPECT_TRUE(result.stages.empty());
+
+  // Each child stage is fully inspected
+  ASSERT_EQ(2u, result.pipelineStages.size());
+
+  // Stage 1: 钅 → 釒
+  EXPECT_EQ(utf8("钅"), result.pipelineStages[0].input);
+  EXPECT_EQ(utf8("釒"), result.pipelineStages[0].output);
+  EXPECT_FALSE(result.pipelineStages[0].segments.empty());
+  EXPECT_FALSE(result.pipelineStages[0].stages.empty());
+  EXPECT_TRUE(result.pipelineStages[0].pipelineStages.empty());
+
+  // Stage 2: 釒 → 金, and its input must equal stage 1's output
+  EXPECT_EQ(result.pipelineStages[0].output, result.pipelineStages[1].input);
+  EXPECT_EQ(utf8("金"), result.pipelineStages[1].output);
+  EXPECT_FALSE(result.pipelineStages[1].stages.empty());
+  EXPECT_TRUE(result.pipelineStages[1].pipelineStages.empty());
+}
+
+TEST_F(PipelineConverterTest, InspectEmptyPipelineReturnsTrivialResult) {
+  PipelineConverter pipeline({});
+  const ConversionInspectionResult result = pipeline.Inspect(utf8("钅"));
+  EXPECT_EQ(utf8("钅"), result.input);
+  EXPECT_EQ(utf8("钅"), result.output);
+  EXPECT_TRUE(result.pipelineStages.empty());
+}
+
+TEST_F(PipelineConverterTest, InspectOutputMatchesConvert) {
+  PipelineConverter pipeline({stage1, stage2});
+  const ConversionInspectionResult result = pipeline.Inspect(utf8("钅"));
+  EXPECT_EQ(pipeline.Convert(utf8("钅")), result.output);
 }
 
 } // namespace opencc

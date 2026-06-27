@@ -17,6 +17,7 @@
  */
 
 #include <list>
+#include <string_view>
 
 #include "ConversionChain.hpp"
 #include "Segments.hpp"
@@ -38,6 +39,35 @@ void ConversionChain::AppendConvertedSegment(const char* segment,
                                              std::string* output) const {
   if (conversions.empty()) {
     output->append(segment);
+    return;
+  }
+
+  auto conversion = conversions.begin();
+  auto lastConversion = conversions.end();
+  --lastConversion;
+  if (conversion == lastConversion) {
+    (*conversion)->AppendConverted(segment, output);
+    return;
+  }
+
+  std::string converted;
+  (*conversion)->AppendConverted(segment, &converted);
+  ++conversion;
+  for (; conversion != lastConversion; ++conversion) {
+    std::string next;
+    (*conversion)->AppendConverted(converted.c_str(), &next);
+    converted.swap(next);
+  }
+  (*lastConversion)->AppendConverted(converted.c_str(), output);
+}
+
+void ConversionChain::AppendConvertedSegment(std::string_view segment,
+                                             std::string* output) const {
+  if (segment.empty()) {
+    return;
+  }
+  if (conversions.empty()) {
+    output->append(segment.data(), segment.size());
     return;
   }
 

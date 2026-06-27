@@ -40,10 +40,17 @@ public:
   Match MatchPrefix(const char* word, size_t len) const;
 
   /**
-   * Like MatchPrefix but returns non-owning string_view fields.
-   * key is valid for the lifetime of the caller's input buffer.
-   * value is valid for the lifetime of the underlying dictionary (fast-path)
-   * or the lifetime of this PrefixMatch (table-path).
+   * Like MatchPrefix but returns non-owning string_view fields without
+   * copying key or value into thread-local storage.
+   *
+   * Lifetime of the returned views:
+   *  - @b key: points into the caller's input buffer (fast-path singleDict,
+   *    where both MarisaDict and DartsDict return a slice of @p word) or into
+   *    PrefixMatch-owned table storage (table-path LeafMatcher).  Callers
+   *    must not assume one or the other; copy if the key needs to outlive the
+   *    current input position.
+   *  - @b value: valid for the lifetime of the underlying dictionary
+   *    (fast-path) or the lifetime of this PrefixMatch's tables (table-path).
    */
   PrefixMatchView MatchPrefixView(const char* word, size_t len) const;
 

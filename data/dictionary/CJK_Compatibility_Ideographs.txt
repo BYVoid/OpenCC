@@ -3,17 +3,23 @@
 # Format: key	value(s) (values separated by spaces)
 # License: Apache-2.0 (see LICENSE)
 # Source: https://www.unicode.org/Public/UCD/latest/ucd/UnicodeData.txt (accessed 2026-06-07)
-# Used in configs: none by default
+# Used in configs: all built-in configs (hk2s, hk2sp, hk2t, jp2t, s2hk, s2hkp,
+#   s2t, s2tw, s2twp, t2hk, t2jp, t2s, t2tw, tw2s, tw2sp, tw2t) via the
+#   normalization field, which runs this dictionary as a pre-pass before
+#   segmentation and conversion.
+# Compatible OpenCC implementations are encouraged to apply the same
+#   normalization pre-pass so that CJK Compatibility Ideograph input is handled
+#   consistently across implementations.
 #
 # Notes:
-# - This file is currently not used as an OpenCC conversion dictionary. It is a
-#   reference table for tests and audits, including checks that prevent regular
-#   dictionaries from accidentally adding incorrect compatibility ideograph
-#   mappings.
 # - This file maps CJK Compatibility Ideographs to their UnicodeData
 #   decomposition targets, normalizing compatibility forms to standard
-#   CJK unified ideographs. It includes both the BMP block and the
-#   CJK Compatibility Ideographs Supplement block.
+#   CJK unified ideographs before the main conversion chain runs.
+# - It is also used as a reference table for tests and audits, including
+#   checks that prevent regular dictionaries from accidentally adding
+#   incorrect compatibility ideograph mappings.
+# - Includes both the BMP block (U+F900–U+FAFF) and the CJK Compatibility
+#   Ideographs Supplement block (U+2F800–U+2FA1F).
 # - The following CJK Compatibility Ideographs have no decomposition
 #   mapping in UnicodeData.txt and are therefore not listed as entries:
 #   﨎 U+FA0E CJK COMPATIBILITY IDEOGRAPH-FA0E

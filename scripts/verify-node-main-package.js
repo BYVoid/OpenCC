@@ -16,6 +16,7 @@ const requiredFiles = [
   'node/opencc.d.mts',
   'prebuilds/assets/s2t.json',
   'prebuilds/assets/s2twp.json',
+  'prebuilds/assets/CJK_Compatibility_Ideographs.ocd2',
   'prebuilds/assets/STCharacters.ocd2',
   'prebuilds/assets/STPhrases.ocd2',
   'prebuilds/assets/STPhrases_GeneratedFromRegionalPhrases.ocd2',

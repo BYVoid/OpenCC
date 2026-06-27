@@ -46,8 +46,15 @@ public:
 
 class OPENCC_EXPORT ConverterStream {
 public:
-  explicit ConverterStream(ConverterPtr _converter, size_t _maxKeepChars = 16)
-      : converter(_converter), maxKeepChars(_maxKeepChars) {}
+  /**
+   * @param converter   The converter applied to each flushed chunk.
+   * @param maxKeepChars  Number of Unicode code points (not bytes) to retain
+   *   at the end of the pending buffer after each ConvertChunk() call, so
+   *   that a phrase or IDS straddling two consecutive chunks is not split
+   *   across separate Convert() invocations.  Defaults to 16 code points.
+   */
+  explicit ConverterStream(ConverterPtr converter, size_t maxKeepChars = 16)
+      : converter(converter), maxKeepChars(maxKeepChars) {}
 
   /**
    * Appends @p input to pending, then emits everything up to the last

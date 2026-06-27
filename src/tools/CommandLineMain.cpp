@@ -300,11 +300,11 @@ std::string SerializeSegmentationResultJson(
   rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
   writer.StartObject();
   writer.Key("input");
-  writer.String(result.input.c_str());
+  writer.String(result.input.c_str(), result.input.size());
   writer.Key("segments");
   writer.StartArray();
   for (const auto& seg : result.segments) {
-    writer.String(seg.c_str());
+    writer.String(seg.c_str(), seg.size());
   }
   writer.EndArray();
   writer.EndObject();
@@ -320,11 +320,11 @@ void WriteInspectionResultJson(Writer& writer,
                                const ConversionInspectionResult& result) {
   writer.StartObject();
   writer.Key("input");
-  writer.String(result.input.c_str());
+  writer.String(result.input.c_str(), result.input.size());
   writer.Key("segments");
   writer.StartArray();
   for (const auto& seg : result.segments) {
-    writer.String(seg.c_str());
+    writer.String(seg.c_str(), seg.size());
   }
   writer.EndArray();
   writer.Key("stages");
@@ -336,7 +336,7 @@ void WriteInspectionResultJson(Writer& writer,
     writer.Key("segments");
     writer.StartArray();
     for (const auto& seg : stage.segments) {
-      writer.String(seg.c_str());
+      writer.String(seg.c_str(), seg.size());
     }
     writer.EndArray();
     writer.EndObject();
@@ -349,7 +349,7 @@ void WriteInspectionResultJson(Writer& writer,
   }
   writer.EndArray();
   writer.Key("output");
-  writer.String(result.output.c_str());
+  writer.String(result.output.c_str(), result.output.size());
   writer.EndObject();
 }
 

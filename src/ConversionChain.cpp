@@ -63,6 +63,9 @@ void ConversionChain::AppendConvertedSegment(const char* segment,
 
 void ConversionChain::AppendConvertedSegment(std::string_view segment,
                                              std::string* output) const {
+  if (segment.empty()) {
+    return;
+  }
   if (conversions.empty()) {
     output->append(segment.data(), segment.size());
     return;

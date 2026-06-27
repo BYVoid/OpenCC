@@ -216,10 +216,10 @@ public:
       std::string output;
       if (info[0].IsBuffer()) {
         Napi::Buffer<char> input = info[0].As<Napi::Buffer<char>>();
-        output = stream_->ConvertChunk(input.Data(), input.Length());
+        output = stream_->ConvertChunk({input.Data(), input.Length()});
       } else {
         const std::string input = ToUtf8String(info[0]);
-        output = stream_->ConvertChunk(input.data(), input.size());
+        output = stream_->ConvertChunk(input);
       }
       return Napi::String::New(env, output);
     } catch (opencc::Exception& e) {
@@ -239,12 +239,11 @@ public:
       if (info.Length() >= 1 && info[0].IsBuffer()) {
         Napi::Buffer<char> input = info[0].As<Napi::Buffer<char>>();
         return Napi::String::New(
-            env, stream_->Finish(input.Data(), input.Length()));
+            env, stream_->Finish({input.Data(), input.Length()}));
       }
       if (info.Length() >= 1) {
         const std::string input = ToUtf8String(info[0]);
-        return Napi::String::New(env,
-                                 stream_->Finish(input.data(), input.size()));
+        return Napi::String::New(env, stream_->Finish(input));
       }
       return Napi::String::New(env, stream_->Finish());
     } catch (opencc::Exception& e) {

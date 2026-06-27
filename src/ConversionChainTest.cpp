@@ -76,8 +76,8 @@ TEST_F(ConversionChainTest, StreamKeepsIncompleteIdeographicDescriptionSequence)
   const std::string firstChunk = utf8("prefix⿰钅");
   const std::string secondChunk = utf8("只只");
   std::string output;
-  output += stream.ConvertChunk(firstChunk.c_str(), firstChunk.length());
-  output += stream.Finish(secondChunk.c_str(), secondChunk.length());
+  output += stream.ConvertChunk(firstChunk);
+  output += stream.Finish(secondChunk);
 
   EXPECT_EQ(utf8("prefix⿰钅只隻"), output);
 }
@@ -110,8 +110,8 @@ TEST_F(ConversionChainTest,
 
   const std::string secondChunk = utf8("只只");
   std::string output;
-  output += stream.ConvertChunk(nestedPrefix.c_str(), nestedPrefix.length());
-  output += stream.Finish(secondChunk.c_str(), secondChunk.length());
+  output += stream.ConvertChunk(nestedPrefix);
+  output += stream.Finish(secondChunk);
 
   EXPECT_EQ(expected, output);
 }

@@ -16,8 +16,6 @@
  * limitations under the License.
  */
 
-#include <cstring>
-
 #include "ConversionChain.hpp"
 #include "ConversionInspection.hpp"
 #include "Converter.hpp"
@@ -25,14 +23,6 @@
 #include "UTF8Util.hpp"
 
 using namespace opencc;
-
-std::string Converter::Convert(const char* text) const {
-  return Convert(std::string_view(text));
-}
-
-std::string Converter::Convert(const std::string& text) const {
-  return Convert(std::string_view(text));
-}
 
 std::string Converter::Convert(std::string_view text) const {
   std::string converted;
@@ -48,12 +38,6 @@ std::string Converter::Convert(std::string_view text) const {
     conversionChain->AppendConvertedSegment(segment, &converted);
   }
   return converted;
-}
-
-size_t Converter::Convert(const char* input, char* output) const {
-  const std::string converted = Convert(std::string_view(input));
-  strcpy(output, converted.c_str());
-  return converted.length();
 }
 
 ConversionInspectionResult Converter::Inspect(const std::string& text) const {
@@ -89,9 +73,9 @@ ConversionInspectionResult Converter::Inspect(const std::string& text) const {
   return result;
 }
 
-std::string ConverterStream::ConvertChunk(const char* input, size_t length) {
-  if (length > 0) {
-    pending.append(input, length);
+std::string ConverterStream::ConvertChunk(std::string_view input) {
+  if (!input.empty()) {
+    pending.append(input);
   }
   if (pending.empty()) {
     return std::string();
@@ -142,6 +126,13 @@ std::string ConverterStream::ConvertChunk(const char* input, size_t length) {
   return output;
 }
 
+std::string ConverterStream::Finish(std::string_view input) {
+  if (!input.empty()) {
+    pending.append(input);
+  }
+  return Finish();
+}
+
 std::string ConverterStream::Finish() {
   const std::string output =
       pending.empty() ? std::string()
@@ -150,9 +141,3 @@ std::string ConverterStream::Finish() {
   return output;
 }
 
-std::string ConverterStream::Finish(const char* input, size_t length) {
-  if (length > 0) {
-    pending.append(input, length);
-  }
-  return Finish();
-}

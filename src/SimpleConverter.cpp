@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <cstring>
+
 #include "Config.hpp"
 #include "Converter.hpp"
 #include "UTF8Util.hpp"
@@ -152,7 +154,9 @@ std::string SimpleConverter::Convert(const char* input, size_t length) const {
 size_t SimpleConverter::Convert(const char* input, char* output) const {
   try {
     const InternalData* data = (InternalData*)internalData;
-    return data->converter->Convert(input, output);
+    const std::string converted = data->converter->Convert(input);
+    strcpy(output, converted.c_str());
+    return converted.length();
   } catch (Exception& ex) {
     throw std::runtime_error(ex.what());
   }

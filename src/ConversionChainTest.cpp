@@ -116,4 +116,62 @@ TEST_F(ConversionChainTest,
   EXPECT_EQ(expected, output);
 }
 
+class PipelineConverterTest : public TextDictTestBase {
+protected:
+  // stage1: 钅 → 釒   stage2: 釒 → 金
+  void SetUp() override {
+    LexiconPtr lex1(new Lexicon);
+    lex1->Add(DictEntryFactory::New(utf8("钅"), utf8("釒")));
+    lex1->Sort();
+    DictPtr dict1(new TextDict(lex1));
+    stage1 = ConverterPtr(new SingleStageConverter(
+        SegmentationPtr(new MaxMatchSegmentation(dict1)),
+        ConversionChainPtr(
+            new ConversionChain({ConversionPtr(new Conversion(dict1))}))));
+    seg1 = stage1->GetSegmentation();
+
+    LexiconPtr lex2(new Lexicon);
+    lex2->Add(DictEntryFactory::New(utf8("釒"), utf8("金")));
+    lex2->Sort();
+    DictPtr dict2(new TextDict(lex2));
+    stage2 = ConverterPtr(new SingleStageConverter(
+        SegmentationPtr(new MaxMatchSegmentation(dict2)),
+        ConversionChainPtr(
+            new ConversionChain({ConversionPtr(new Conversion(dict2))}))));
+    seg2 = stage2->GetSegmentation();
+  }
+
+  ConverterPtr stage1, stage2;
+  SegmentationPtr seg1, seg2;
+};
+
+TEST_F(PipelineConverterTest, ConvertChainsStagesInOrder) {
+  PipelineConverter pipeline({stage1, stage2});
+  EXPECT_EQ(utf8("金"), pipeline.Convert(utf8("钅")));
+}
+
+TEST_F(PipelineConverterTest, ConvertEmptyPipelineIsIdentity) {
+  PipelineConverter pipeline({});
+  EXPECT_EQ(utf8("钅"), pipeline.Convert(utf8("钅")));
+}
+
+TEST_F(PipelineConverterTest, GetSegmentationReturnsLastStage) {
+  PipelineConverter pipeline({stage1, stage2});
+  EXPECT_EQ(seg2, pipeline.GetSegmentation());
+}
+
+TEST_F(PipelineConverterTest, GetSegmentationEmptyPipelineReturnsNullptr) {
+  PipelineConverter pipeline({});
+  EXPECT_EQ(nullptr, pipeline.GetSegmentation());
+}
+
+TEST_F(PipelineConverterTest, InspectReturnsInputOutputWithNoStageDetail) {
+  PipelineConverter pipeline({stage1, stage2});
+  const ConversionInspectionResult result = pipeline.Inspect(utf8("钅"));
+  EXPECT_EQ(utf8("钅"), result.input);
+  EXPECT_EQ(utf8("金"), result.output);
+  EXPECT_TRUE(result.segments.empty());
+  EXPECT_TRUE(result.stages.empty());
+}
+
 } // namespace opencc

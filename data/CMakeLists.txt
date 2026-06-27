@@ -10,6 +10,7 @@ set(DICT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 set(
   DICTS_RAW
+  CJK_Compatibility_Ideographs
   STCharacters
   STPhrases
   TSCharacters
@@ -71,6 +72,7 @@ set(
   DICT_STPhrases_GeneratedFromRegionalPhrases_GENERATING_INPUT
   ${DICT_DIR}/HKPhrases.txt
   ${DICT_DIR}/TWPhrases.txt
+  ${DICT_GENERATED_DIR}/CJK_Compatibility_Ideographs.ocd2
   ${DICT_GENERATED_DIR}/TSCharacters.ocd2
   ${DICT_GENERATED_DIR}/TSCharactersExt.ocd2
   ${DICT_GENERATED_DIR}/TSPhrases.ocd2

@@ -1,5 +1,8 @@
 {
   "name": "New Japanese Kanji (Shinjitai) to Old Japanese Kanji (Kyūjitai)",
+  "normalization": [
+    { "dict": { "type": "ocd2", "file": "CJK_Compatibility_Ideographs.ocd2" } }
+  ],
   "segmentation": {
     "type": "mmseg",
     "dict": { "type": "ocd2", "file": "JPShinjitaiPhrases.ocd2" }

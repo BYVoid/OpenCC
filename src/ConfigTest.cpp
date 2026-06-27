@@ -966,4 +966,39 @@ TEST_F(ConfigTest, LoadConfigFromUnicodePath) {
 }
 #endif
 
+// ── Normalization tests ──────────────────────────────────────────────────────
+
+TEST_F(ConfigTest, NormalizationRunsBeforeSegmentationAndConversion) {
+  // normalization: 甲 → 乙   main conversion: 乙 → 丙
+  // Without normalization the main dict would not match 甲.
+  const std::string config = R"({
+    "name": "Normalization Test",
+    "normalization": [{"dict": {"type": "inline", "entries": {"甲": "乙"}}}],
+    "conversion_chain": [{"dict": {"type": "inline", "entries": {"乙": "丙"}}}]
+  })";
+  Config c;
+  const ConverterPtr conv = c.NewFromString(config, CONFIG_TEST_DIR_PATH);
+  EXPECT_EQ(utf8("丙"), conv->Convert(utf8("甲")));
+}
+
+TEST_F(ConfigTest, AbsentNormalizationPreservesOriginalBehavior) {
+  const std::string config = R"({
+    "name": "No Normalization Test",
+    "conversion_chain": [{"dict": {"type": "inline", "entries": {"甲": "丙"}}}]
+  })";
+  Config c;
+  const ConverterPtr conv = c.NewFromString(config, CONFIG_TEST_DIR_PATH);
+  EXPECT_EQ(utf8("丙"), conv->Convert(utf8("甲")));
+}
+
+TEST_F(ConfigTest, NormalizationMissingFileDictThrows) {
+  const std::string config = R"({
+    "name": "Bad Normalization",
+    "normalization": [{"dict": {"type": "ocd2", "file": "nonexistent.ocd2"}}],
+    "conversion_chain": [{"dict": {"type": "inline", "entries": {"甲": "丙"}}}]
+  })";
+  Config c;
+  EXPECT_THROW(c.NewFromString(config, CONFIG_TEST_DIR_PATH), Exception);
+}
+
 } // namespace opencc

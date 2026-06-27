@@ -127,6 +127,7 @@ cc_library(
         ":exception_lib",
         ":marisa_dict_lib",
         ":max_match_segmentation_lib",
+        ":pipeline_converter_lib",
         ":plugin_segmentation_lib",
         ":resource_provider_lib",
         ":single_stage_converter_lib",

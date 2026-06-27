@@ -33,6 +33,7 @@
 #include "Config.hpp"
 #include "ConversionChain.hpp"
 #include "Converter.hpp"
+#include "PipelineConverter.hpp"
 #include "SingleStageConverter.hpp"
 #include "DictGroup.hpp"
 #include "Exception.hpp"
@@ -898,7 +899,17 @@ Config::NewFromString(const std::string& json,
   // Required: conversion_chain
   ConversionChainPtr chain = impl->ParseConversionChain(
       impl->GetArrayProperty(doc, "conversion_chain"));
-  return ConverterPtr(new SingleStageConverter(segmentation, chain));
+  ConverterPtr mainConverter(new SingleStageConverter(segmentation, chain));
+
+  // Optional: normalization — a conversion chain applied before segmentation
+  if (doc.HasMember("normalization")) {
+    ConversionChainPtr normChain = impl->ParseConversionChain(
+        impl->GetArrayProperty(doc, "normalization"));
+    ConverterPtr normConverter(new SingleStageConverter(nullptr, normChain));
+    return ConverterPtr(
+        new PipelineConverter({std::move(normConverter), std::move(mainConverter)}));
+  }
+  return mainConverter;
 }
 
 }; // namespace opencc

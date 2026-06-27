@@ -22,19 +22,32 @@
 
 namespace opencc {
 /**
- * Single-stage converter: one segmentation pass followed by one conversion
- * chain.
+ * A @c Converter that performs one segmentation pass followed by one
+ * @c ConversionChain.
+ *
+ * This is the standard converter produced by loading a single JSON config
+ * file.  It:
+ *  1. Segments the input using the supplied @c Segmentation (or treats the
+ *     entire input as one segment when @p segmentation is @c nullptr).
+ *  2. Passes each segment through the @c ConversionChain, which applies one
+ *     or more dictionaries in order.
+ *
  * @ingroup opencc_cpp_api
  */
 class OPENCC_EXPORT SingleStageConverter : public Converter {
 public:
+  /**
+   * @param segmentation  Segmentation strategy to use, or @c nullptr to skip
+   *   segmentation and treat the whole input as a single segment.
+   * @param conversionChain  Ordered dictionary chain applied to each segment.
+   */
   SingleStageConverter(SegmentationPtr segmentation,
                        ConversionChainPtr conversionChain)
       : segmentation(segmentation), conversionChain(conversionChain) {}
 
   std::string Convert(std::string_view text) const override;
 
-  ConversionInspectionResult Inspect(const std::string& text) const override;
+  ConversionInspectionResult Inspect(std::string_view text) const override;
 
   SegmentationPtr GetSegmentation() const override { return segmentation; }
 

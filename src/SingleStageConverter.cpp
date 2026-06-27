@@ -41,7 +41,7 @@ std::string SingleStageConverter::Convert(std::string_view text) const {
 }
 
 ConversionInspectionResult
-SingleStageConverter::Inspect(const std::string& text) const {
+SingleStageConverter::Inspect(std::string_view text) const {
   ConversionInspectionResult result;
   result.input = text;
 

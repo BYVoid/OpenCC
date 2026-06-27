@@ -21,9 +21,9 @@
 using namespace opencc;
 
 SegmentsPtr Segmentation::Segment(const char* text) const {
-  return Segment(std::string(text));
+  return Segment(std::string_view(text));
 }
 
-SegmentsPtr Segmentation::Segment(std::string_view text) const {
-  return Segment(std::string(text));
+SegmentsPtr Segmentation::Segment(const std::string& str) const {
+  return Segment(std::string_view(str));
 }

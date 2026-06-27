@@ -75,10 +75,6 @@ SegmentsPtr SegmentText(const std::shared_ptr<PrefixMatch>& prefixMatch,
 MaxMatchSegmentation::MaxMatchSegmentation(const DictPtr _dict)
     : dict(_dict), prefixMatch(new PrefixMatch(_dict)) {}
 
-SegmentsPtr MaxMatchSegmentation::Segment(const std::string& text) const {
-  return SegmentText(prefixMatch, text);
-}
-
 SegmentsPtr MaxMatchSegmentation::Segment(std::string_view text) const {
   return SegmentText(prefixMatch, text);
 }

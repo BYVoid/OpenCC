@@ -25,23 +25,38 @@
 
 namespace opencc {
 /**
- * Pipeline converter: passes text through a sequence of converters in order.
+ * A @c Converter that passes text through a sequence of @c Converter stages
+ * in order, feeding the output of each stage as input to the next.
+ *
+ * This enables multi-step conversion schemes where different segmentation
+ * strategies or dictionary sets are needed at each step.  For example, the
+ * @c s2twp config first converts Simplified to Traditional (stage 1) and then
+ * applies Taiwan-specific phrase substitution (stage 2).
+ *
+ * @note @c GetConversionChain() always returns @c nullptr because a pipeline
+ * has no single chain.  @c GetSegmentation() returns the last stage's
+ * segmentation as a best-effort representative.
+ *
  * @ingroup opencc_cpp_api
  */
 class OPENCC_EXPORT PipelineConverter : public Converter {
 public:
+  /** @param stages Ordered list of converters to apply in sequence. */
   explicit PipelineConverter(std::vector<ConverterPtr> stages)
       : stages(std::move(stages)) {}
 
   std::string Convert(std::string_view text) const override;
 
-  /** Returns an object with input/output filled and no stage detail. */
-  ConversionInspectionResult Inspect(const std::string& text) const override;
+  /**
+   * Returns an inspection result with @c input and @c output populated.
+   * Per-stage segment detail is not available at the pipeline level.
+   */
+  ConversionInspectionResult Inspect(std::string_view text) const override;
 
-  /** Returns the last stage's segmentation, or nullptr for an empty pipeline. */
+  /** Returns the last stage's segmentation, or @c nullptr for an empty pipeline. */
   SegmentationPtr GetSegmentation() const override;
 
-  /** Returns nullptr; a pipeline has no single conversion chain. */
+  /** Always returns @c nullptr; a pipeline has no single conversion chain. */
   ConversionChainPtr GetConversionChain() const override { return nullptr; }
 
 private:

@@ -173,7 +173,7 @@ size_t SimpleConverter::Convert(const char* input, size_t length,
 }
 
 ConversionInspectionResult
-SimpleConverter::Inspect(const std::string& input) const {
+SimpleConverter::Inspect(std::string_view input) const {
   try {
     const InternalData* data = (InternalData*)internalData;
     return data->converter->Inspect(input);

@@ -9,7 +9,10 @@ package(default_visibility = ["//visibility:public"])
 opencc_resources_zip(
     name = "opencc_resources_zip",
     configs = ["//data/config:config"],
-    dicts = ["//data/dictionary:text_dictionaries"],
+    dicts = [
+        "//data/dictionary:text_dictionaries",
+        "//data/dictionary:CJK_Compatibility_Ideographs.txt",
+    ],
     out = "opencc-resources.zip",
 )
 

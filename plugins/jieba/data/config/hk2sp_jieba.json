@@ -1,5 +1,13 @@
 {
   "name": "Traditional Chinese (Hong Kong variant) to Simplified Chinese (with phrases, Jieba Segmentation - Experimental)",
+  "normalization": [
+    {
+      "dict": {
+        "type": "ocd2",
+        "file": "CJK_Compatibility_Ideographs.ocd2"
+      }
+    }
+  ],
   "segmentation": {
     "type": "jieba",
     "resources": {
@@ -13,9 +21,18 @@
         "type": "group",
         "match_policy": "short_circuit",
         "dicts": [
-          { "type": "ocd2", "file": "HKPhrasesRev.ocd2" },
-          { "type": "ocd2", "file": "HKVariantsRevPhrases.ocd2" },
-          { "type": "ocd2", "file": "HKVariantsRev.ocd2" }
+          {
+            "type": "ocd2",
+            "file": "HKPhrasesRev.ocd2"
+          },
+          {
+            "type": "ocd2",
+            "file": "HKVariantsRevPhrases.ocd2"
+          },
+          {
+            "type": "ocd2",
+            "file": "HKVariantsRev.ocd2"
+          }
         ]
       }
     },
@@ -24,13 +41,19 @@
         "type": "group",
         "match_policy": "short_circuit",
         "dicts": [
-          { "type": "ocd2", "file": "TSPhrases.ocd2" },
+          {
+            "type": "ocd2",
+            "file": "TSPhrases.ocd2"
+          },
           {
             "type": "ocd2",
             "file": "TSCharactersExt.ocd2",
             "may_output_tofu": true
           },
-          { "type": "ocd2", "file": "TSCharacters.ocd2" }
+          {
+            "type": "ocd2",
+            "file": "TSCharacters.ocd2"
+          }
         ]
       }
     }

@@ -1,5 +1,8 @@
 {
   "name": "Traditional Chinese (Taiwan Standard) to Traditional Chinese (OpenCC Standard)",
+  "normalization": [
+    { "dict": { "type": "ocd2", "file": "CJK_Compatibility_Ideographs.ocd2" } }
+  ],
   "segmentation": {
     "type": "mmseg",
     "dict": { "type": "ocd2", "file": "TWVariantsRevPhrases.ocd2" }

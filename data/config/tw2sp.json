@@ -1,5 +1,8 @@
 {
   "name": "Traditional Chinese (Taiwan Standard) to Simplified Chinese (Mainland China Phrases)",
+  "normalization": [
+    { "dict": { "type": "ocd2", "file": "CJK_Compatibility_Ideographs.ocd2" } }
+  ],
   "segmentation": {
     "type": "mmseg",
     "dict": { "type": "ocd2", "file": "TSPhrases.ocd2" }

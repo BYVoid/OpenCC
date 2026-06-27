@@ -7,6 +7,11 @@
   "additionalProperties": false,
   "properties": {
     "name": { "type": "string" },
+    "normalization": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/conversion" }
+    },
     "segmentation": { "$ref": "#/definitions/segmentation" },
     "conversion_chain": {
       "type": "array",

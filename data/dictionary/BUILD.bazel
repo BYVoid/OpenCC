@@ -27,7 +27,9 @@ genrule(
 
 TEXT_DICTS = glob(
     ["*.txt"],
-    exclude = ["CJK_Compatibility_Ideographs.txt"],
+    exclude = [
+        "CJK_Compatibility_Ideographs.txt",
+    ],
 ) + [
     "STPhrases_GeneratedFromRegionalPhrases.txt",
     "TSCharactersExt.txt",
@@ -66,6 +68,7 @@ genrule(
     srcs = [
         "HKPhrases.txt",
         "TWPhrases.txt",
+        "CJK_Compatibility_Ideographs.ocd2",
         "TSCharacters.ocd2",
         "TSCharactersExt.ocd2",
         "TSPhrases.ocd2",
@@ -90,9 +93,23 @@ filegroup(
     srcs = TEXT_DICTS,
 )
 
+genrule(
+    name = "generate_bin_CJK_Compatibility_Ideographs",
+    srcs = ["CJK_Compatibility_Ideographs.txt"],
+    outs = ["CJK_Compatibility_Ideographs.ocd2"],
+    cmd = "$(location //src/tools:dict_converter) " +
+          "--input $(location CJK_Compatibility_Ideographs.txt) " +
+          "--output $(OUTS) " +
+          "--from text " +
+          "--to ocd2",
+    tools = ["//src/tools:dict_converter"],
+)
+
 filegroup(
     name = "binary_dictionaries",
-    srcs = [txt.replace(".txt", ".ocd2") for txt in TEXT_DICTS],
+    srcs = [txt.replace(".txt", ".ocd2") for txt in TEXT_DICTS] + [
+        "CJK_Compatibility_Ideographs.ocd2",
+    ],
 )
 
 [

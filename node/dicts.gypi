@@ -70,12 +70,21 @@
       "outputs": ["<(output_prefix)TSPhrases.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
+      "action_name": "CJK_Compatibility_Ideographs",
+      "variables": {
+        "input": "<(input_prefix)CJK_Compatibility_Ideographs.txt",
+      },
+      "inputs": ["<(input)"],
+      "outputs": ["<(output_prefix)CJK_Compatibility_Ideographs.ocd2"],
+      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
+    }, {
       "action_name": "STPhrases_GeneratedFromRegionalPhrases.txt",
       "inputs": [
         "<(dict_generate_st_phrases)",
         "<(input_prefix)HKPhrases.txt",
         "<(input_prefix)TWPhrases.txt",
         "<(module_root_dir)/data/config/t2s.json",
+        "<(output_prefix)CJK_Compatibility_Ideographs.ocd2",
         "<(output_prefix)TSCharacters.ocd2",
         "<(output_prefix)TSCharactersExt.ocd2",
         "<(output_prefix)TSPhrases.ocd2",

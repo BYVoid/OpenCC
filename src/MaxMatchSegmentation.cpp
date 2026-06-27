@@ -36,7 +36,7 @@ SegmentsPtr SegmentText(const std::shared_ptr<PrefixMatch>& prefixMatch,
   size_t segLength = 0;
   auto clearBuffer = [&segments, &segStart, &segLength]() {
     if (segLength > 0) {
-      segments->AddSegment(UTF8Util::FromSubstr(segStart, segLength));
+      segments->AddSegment(std::string_view(segStart, segLength));
       segLength = 0;
     }
   };

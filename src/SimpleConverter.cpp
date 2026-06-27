@@ -147,7 +147,7 @@ std::string SimpleConverter::Convert(const char* input, size_t length) const {
   if (length == static_cast<size_t>(-1)) {
     return Convert(std::string_view(input));
   } else {
-    return Convert(UTF8Util::FromSubstr(input, length));
+    return Convert(std::string_view(input, length));
   }
 }
 

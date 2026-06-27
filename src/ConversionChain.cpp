@@ -55,10 +55,10 @@ void ConversionChain::AppendConvertedSegment(const char* segment,
   ++conversion;
   for (; conversion != lastConversion; ++conversion) {
     std::string next;
-    (*conversion)->AppendConverted(converted.c_str(), &next);
+    (*conversion)->AppendConverted(converted, &next);
     converted.swap(next);
   }
-  (*lastConversion)->AppendConverted(converted.c_str(), output);
+  (*lastConversion)->AppendConverted(converted, output);
 }
 
 void ConversionChain::AppendConvertedSegment(std::string_view segment,
@@ -84,10 +84,10 @@ void ConversionChain::AppendConvertedSegment(std::string_view segment,
   ++conversion;
   for (; conversion != lastConversion; ++conversion) {
     std::string next;
-    (*conversion)->AppendConverted(converted.c_str(), &next);
+    (*conversion)->AppendConverted(std::string_view(converted), &next);
     converted.swap(next);
   }
-  (*lastConversion)->AppendConverted(converted.c_str(), output);
+  (*lastConversion)->AppendConverted(std::string_view(converted), output);
 }
 
 std::vector<SegmentsPtr>

@@ -21,9 +21,13 @@
 using namespace opencc;
 
 std::string PipelineConverter::Convert(std::string_view text) const {
-  std::string result(text);
-  for (const ConverterPtr& stage : stages) {
-    result = stage->Convert(result);
+  if (stages.empty()) {
+    return std::string(text);
+  }
+  auto it = stages.begin();
+  std::string result = (*it)->Convert(text);
+  for (++it; it != stages.end(); ++it) {
+    result = (*it)->Convert(result);
   }
   return result;
 }

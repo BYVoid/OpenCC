@@ -110,3 +110,26 @@ DictGroupPtr DictGroup::NewFromDict(const Dict& dict) {
   TextDictPtr newDict = TextDict::NewFromDict(dict);
   return DictGroupPtr(new DictGroup(std::list<DictPtr>{newDict}));
 }
+
+UnionDictGroup::UnionDictGroup(const std::list<DictPtr>& _dicts)
+    : DictGroup(_dicts, DictGroupMatchPolicy::Union) {}
+
+Optional<const DictEntry*> UnionDictGroup::MatchPrefix(const char* word,
+                                                       size_t len) const {
+  Optional<const DictEntry*> best = Optional<const DictEntry*>::Null();
+  const std::list<DictPtr>* items = GetDictGroupItems();
+  if (items == nullptr) {
+    return best;
+  }
+  for (const DictPtr& dict : *items) {
+    const Optional<const DictEntry*>& prefix = dict->MatchPrefix(word, len);
+    if (prefix.IsNull()) {
+      continue;
+    }
+    if (best.IsNull() ||
+        prefix.Get()->KeyLength() > best.Get()->KeyLength()) {
+      best = prefix;
+    }
+  }
+  return best;
+}

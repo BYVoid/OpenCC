@@ -328,6 +328,9 @@ public:
     if (matchPolicy == "short_circuit") {
       return DictGroupMatchPolicy::ShortCircuit;
     }
+    if (matchPolicy == "union") {
+      return DictGroupMatchPolicy::Union;
+    }
     throw InvalidFormat("Unknown dictionary group match_policy: " +
                         matchPolicy);
   }
@@ -528,7 +531,13 @@ public:
       if (dicts.empty()) {
         return DictPtr();
       }
-      return DictGroupPtr(new DictGroup(dicts, matchPolicy));
+      switch (matchPolicy) {
+      case DictGroupMatchPolicy::ShortCircuit:
+        return DictGroupPtr(new DictGroup(dicts, matchPolicy));
+      case DictGroupMatchPolicy::Union:
+        return DictGroupPtr(new UnionDictGroup(dicts));
+      }
+      throw InvalidFormat("Unsupported dictionary group match_policy");
     } else {
       std::string fileName = GetStringProperty(doc, "file");
       DictPtr dict = LoadDictFromFile(type, fileName);

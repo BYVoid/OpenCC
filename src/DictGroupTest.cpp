@@ -46,6 +46,34 @@ TEST_F(DictGroupTest, ExplicitMatchPolicy) {
   EXPECT_EQ(DictGroupMatchPolicy::ShortCircuit, dictGroup->GetMatchPolicy());
 }
 
+TEST_F(DictGroupTest, UnionMatchPolicy) {
+  const DictPtr phrasesDict = CreateDictForPhrases();
+  const DictPtr charactersDict = CreateDictForCharacters();
+  const DictGroupPtr dictGroup(
+      new UnionDictGroup(std::list<DictPtr>{phrasesDict, charactersDict}));
+  EXPECT_EQ(DictGroupMatchPolicy::Union, dictGroup->GetMatchPolicy());
+}
+
+TEST_F(DictGroupTest, UnionMatchPrefixPrefersLaterLongerMatch) {
+  LexiconPtr firstLexicon(new Lexicon);
+  firstLexicon->Add(DictEntryFactory::New(utf8("意大利"), utf8("義大利")));
+  firstLexicon->Sort();
+  DictPtr firstDict(new TextDict(firstLexicon));
+
+  LexiconPtr secondLexicon(new Lexicon);
+  secondLexicon->Add(DictEntryFactory::New(utf8("意大利面"), utf8("義大利麵")));
+  secondLexicon->Sort();
+  DictPtr secondDict(new TextDict(secondLexicon));
+
+  const DictGroupPtr dictGroup(
+      new UnionDictGroup(std::list<DictPtr>{firstDict, secondDict}));
+  const std::string query = utf8("意大利面");
+  const auto& entry = dictGroup->MatchPrefix(query.c_str(), query.length());
+  EXPECT_FALSE(entry.IsNull());
+  EXPECT_EQ(utf8("意大利面"), entry.Get()->Key());
+  EXPECT_EQ(utf8("義大利麵"), entry.Get()->GetDefault());
+}
+
 TEST_F(DictGroupTest, SimpleGroupTest) {
   const DictGroupPtr& dictGroup = CreateDictGroupForConversion();
   {

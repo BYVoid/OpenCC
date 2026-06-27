@@ -87,7 +87,7 @@
       "additionalProperties": false,
       "properties": {
         "type": { "enum": ["group"] },
-        "match_policy": { "enum": ["short_circuit"] },
+        "match_policy": { "enum": ["short_circuit", "union"] },
         "dicts": {
           "type": "array",
           "minItems": 1,

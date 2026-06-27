@@ -146,12 +146,12 @@ TEST_F(PrefixMatchTest, MatchPrefixViewTablePathReturnsViews) {
 
 TEST_F(PrefixMatchTest, ShortCircuitGroupPrefersEarlierShorterMatch) {
   LexiconPtr firstLexicon(new Lexicon);
-  firstLexicon->Add(DictEntryFactory::New(utf8("意"), "first"));
+  firstLexicon->Add(DictEntryFactory::New(utf8("意大利"), utf8("義大利")));
   firstLexicon->Sort();
   DictPtr firstDict(new TextDict(firstLexicon));
 
   LexiconPtr secondLexicon(new Lexicon);
-  secondLexicon->Add(DictEntryFactory::New(utf8("意大利面"), "second"));
+  secondLexicon->Add(DictEntryFactory::New(utf8("意大利面"), utf8("義大利麵")));
   secondLexicon->Sort();
   DictPtr secondDict(new TextDict(secondLexicon));
 
@@ -164,8 +164,61 @@ TEST_F(PrefixMatchTest, ShortCircuitGroupPrefersEarlierShorterMatch) {
   PrefixMatch::Match m = pm.MatchPrefix(query.c_str(), query.length());
 
   EXPECT_TRUE(m.matched);
-  EXPECT_EQ(utf8("意"), *m.key);
-  EXPECT_EQ("first", *m.value);
+  EXPECT_EQ(utf8("意大利"), *m.key);
+  EXPECT_EQ(utf8("義大利"), *m.value);
+}
+
+TEST_F(PrefixMatchTest, UnionGroupPrefersLaterLongerMatch) {
+  LexiconPtr firstLexicon(new Lexicon);
+  firstLexicon->Add(DictEntryFactory::New(utf8("意大利"), utf8("義大利")));
+  firstLexicon->Sort();
+  DictPtr firstDict(new TextDict(firstLexicon));
+
+  LexiconPtr secondLexicon(new Lexicon);
+  secondLexicon->Add(DictEntryFactory::New(utf8("意大利面"), utf8("義大利麵")));
+  secondLexicon->Sort();
+  DictPtr secondDict(new TextDict(secondLexicon));
+
+  DictPtr dictGroup(
+      new UnionDictGroup(std::list<DictPtr>{firstDict, secondDict}));
+  PrefixMatch pm(dictGroup);
+
+  const std::string query = utf8("意大利面");
+  PrefixMatch::Match m = pm.MatchPrefix(query.c_str(), query.length());
+
+  EXPECT_TRUE(m.matched);
+  EXPECT_EQ(utf8("意大利面"), *m.key);
+  EXPECT_EQ(utf8("義大利麵"), *m.value);
+}
+
+TEST_F(PrefixMatchTest, UnionGroupPreservesNestedShortCircuitBoundary) {
+  LexiconPtr firstLexicon(new Lexicon);
+  firstLexicon->Add(DictEntryFactory::New(utf8("意"), "nested-first"));
+  firstLexicon->Sort();
+  DictPtr firstDict(new TextDict(firstLexicon));
+
+  LexiconPtr hiddenLexicon(new Lexicon);
+  hiddenLexicon->Add(DictEntryFactory::New(utf8("意大利面"), "hidden"));
+  hiddenLexicon->Sort();
+  DictPtr hiddenDict(new TextDict(hiddenLexicon));
+
+  LexiconPtr rootLexicon(new Lexicon);
+  rootLexicon->Add(DictEntryFactory::New(utf8("意大利"), "root-second"));
+  rootLexicon->Sort();
+  DictPtr rootDict(new TextDict(rootLexicon));
+
+  DictPtr nestedGroup(
+      new DictGroup(std::list<DictPtr>{firstDict, hiddenDict}));
+  DictPtr rootGroup(
+      new UnionDictGroup(std::list<DictPtr>{nestedGroup, rootDict}));
+  PrefixMatch pm(rootGroup);
+
+  const std::string query = utf8("意大利面");
+  PrefixMatch::Match m = pm.MatchPrefix(query.c_str(), query.length());
+
+  EXPECT_TRUE(m.matched);
+  EXPECT_EQ(utf8("意大利"), *m.key);
+  EXPECT_EQ("root-second", *m.value);
 }
 
 } // namespace opencc

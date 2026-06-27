@@ -897,7 +897,7 @@ Config::NewFromString(const std::string& json,
   // Required: conversion_chain
   ConversionChainPtr chain = impl->ParseConversionChain(
       impl->GetArrayProperty(doc, "conversion_chain"));
-  return ConverterPtr(new Converter(name, segmentation, chain));
+  return ConverterPtr(new SingleStageConverter(segmentation, chain));
 }
 
 }; // namespace opencc

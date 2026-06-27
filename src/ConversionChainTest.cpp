@@ -70,7 +70,7 @@ TEST_F(ConversionChainTest, StreamKeepsIncompleteIdeographicDescriptionSequence)
   ConversionPtr componentConversion(new Conversion(componentDict));
   ConversionChainPtr chain(
       new ConversionChain(std::list<ConversionPtr>{componentConversion}));
-  ConverterPtr converter(new Converter("test", segmentation, chain));
+  ConverterPtr converter(new SingleStageConverter(segmentation, chain));
   ConverterStream stream(converter, 1);
 
   const std::string firstChunk = utf8("prefix⿰钅");
@@ -93,7 +93,7 @@ TEST_F(ConversionChainTest,
   ConversionPtr componentConversion(new Conversion(componentDict));
   ConversionChainPtr chain(
       new ConversionChain(std::list<ConversionPtr>{componentConversion}));
-  ConverterPtr converter(new Converter("test", segmentation, chain));
+  ConverterPtr converter(new SingleStageConverter(segmentation, chain));
   ConverterStream stream(converter, 16);
 
   std::string nestedPrefix = utf8("prefix");

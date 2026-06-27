@@ -317,6 +317,21 @@ public:
     return doc[name].GetBool();
   }
 
+  DictGroupMatchPolicy GetOptionalDictGroupMatchPolicy(const JSONValue& doc) {
+    if (!doc.HasMember("match_policy")) {
+      return DictGroupMatchPolicy::ShortCircuit;
+    }
+    if (!doc["match_policy"].IsString()) {
+      throw InvalidFormat("Property must be a std::string: match_policy");
+    }
+    const std::string matchPolicy = doc["match_policy"].GetString();
+    if (matchPolicy == "short_circuit") {
+      return DictGroupMatchPolicy::ShortCircuit;
+    }
+    throw InvalidFormat("Unknown dictionary group match_policy: " +
+                        matchPolicy);
+  }
+
   template <typename DICT>
   DictPtr LoadDictWithResourceProvider(const std::string& cachePrefix,
                                        const std::string& fileName) {
@@ -496,6 +511,8 @@ public:
     }
 
     if (type == "group") {
+      const DictGroupMatchPolicy matchPolicy =
+          GetOptionalDictGroupMatchPolicy(doc);
       std::list<DictPtr> dicts;
       const JSONValue& docs = GetArrayProperty(doc, "dicts");
       for (rapidjson::SizeType i = 0; i < docs.Size(); i++) {
@@ -511,7 +528,7 @@ public:
       if (dicts.empty()) {
         return DictPtr();
       }
-      return DictGroupPtr(new DictGroup(dicts));
+      return DictGroupPtr(new DictGroup(dicts, matchPolicy));
     } else {
       std::string fileName = GetStringProperty(doc, "file");
       DictPtr dict = LoadDictFromFile(type, fileName);

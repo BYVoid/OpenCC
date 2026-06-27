@@ -27,6 +27,19 @@
 namespace opencc {
 
 /**
+ * Defines how a dictionary group resolves matches across child dictionaries.
+ */
+enum class DictGroupMatchPolicy {
+  /**
+   * Preserve legacy DictGroup behavior: query child dictionaries in order and
+   * return the first dictionary that has a match. For prefix lookup, this means
+   * a shorter prefix from an earlier dictionary can win over a longer prefix
+   * from a later dictionary.
+   */
+  ShortCircuit,
+};
+
+/**
  * Result of a PrefixMatch fast-path lookup.
  * key and value are non-owning views; see PrefixMatch::MatchPrefixView()
  * for lifetime details.
@@ -110,6 +123,15 @@ public:
    */
   virtual const std::list<DictPtr>* GetDictGroupItems() const {
     return nullptr;
+  }
+
+  /**
+   * Returns the match policy when this dictionary is a group. Non-group
+   * dictionaries return ShortCircuit because the value is ignored unless
+   * GetDictGroupItems() returns children.
+   */
+  virtual DictGroupMatchPolicy GetMatchPolicy() const {
+    return DictGroupMatchPolicy::ShortCircuit;
   }
 
   /**

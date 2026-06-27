@@ -39,8 +39,7 @@ namespace opencc {
 struct ConfigLoadOptions;
 
 /**
- * A high level converter
- * This interface does not require C++11 to compile.
+ * A high-level converter.
  * @ingroup opencc_simple_api
  */
 class OPENCC_EXPORT SimpleConverter {

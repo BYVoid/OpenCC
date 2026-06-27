@@ -27,12 +27,16 @@ Conversion::Conversion(DictPtr _dict)
     : dict(_dict), prefixMatch(new PrefixMatch(_dict)) {}
 
 std::string Conversion::Convert(std::string_view phrase) const {
+  if (phrase.empty()) {
+    return std::string();
+  }
   std::string buffer;
   const size_t phraseLength = phrase.size();
   buffer.reserve(phraseLength + phraseLength / 5);
 
-  const char* phraseEnd = phrase.data() + phraseLength;
-  for (const char* pstr = phrase.data(); pstr < phraseEnd;) {
+  const char* phraseData = phrase.data();
+  const char* phraseEnd = phraseData + phraseLength;
+  for (const char* pstr = phraseData; pstr < phraseEnd;) {
     size_t remainingLength = phraseEnd - pstr;
     const PrefixMatch::Match matched =
         prefixMatch->MatchPrefix(pstr, remainingLength);

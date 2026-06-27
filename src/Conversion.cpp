@@ -38,8 +38,8 @@ std::string Conversion::Convert(std::string_view phrase) const {
   const char* phraseEnd = phraseData + phraseLength;
   for (const char* pstr = phraseData; pstr < phraseEnd;) {
     size_t remainingLength = phraseEnd - pstr;
-    const PrefixMatch::Match matched =
-        prefixMatch->MatchPrefix(pstr, remainingLength);
+    const PrefixMatchView matched =
+        prefixMatch->MatchPrefixView(pstr, remainingLength);
     size_t matchedLength;
     if (!matched.matched) {
       matchedLength =
@@ -57,7 +57,7 @@ std::string Conversion::Convert(std::string_view phrase) const {
       if (matchedLength > remainingLength) {
         matchedLength = remainingLength;
       }
-      buffer.append(*matched.value);
+      buffer.append(matched.value.data(), matched.value.size());
     }
     pstr += matchedLength;
   }
@@ -79,8 +79,8 @@ void Conversion::AppendConverted(const char* phrase, std::string* output) const 
 
   for (const char* pstr = phrase; *pstr != '\0';) {
     size_t remainingLength = phraseEnd - pstr;
-    const PrefixMatch::Match matched =
-        prefixMatch->MatchPrefix(pstr, remainingLength);
+    const PrefixMatchView matched =
+        prefixMatch->MatchPrefixView(pstr, remainingLength);
     size_t matchedLength;
     if (!matched.matched) {
       matchedLength =
@@ -101,7 +101,7 @@ void Conversion::AppendConverted(const char* phrase, std::string* output) const 
       if (matchedLength > remainingLength) {
         matchedLength = remainingLength;
       }
-      output->append(*matched.value);
+      output->append(matched.value.data(), matched.value.size());
     }
     pstr += matchedLength;
   }

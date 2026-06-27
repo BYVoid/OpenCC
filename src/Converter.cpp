@@ -73,6 +73,26 @@ ConversionInspectionResult SingleStageConverter::Inspect(const std::string& text
   return result;
 }
 
+std::string PipelineConverter::Convert(std::string_view text) const {
+  std::string result(text);
+  for (const ConverterPtr& stage : stages) {
+    result = stage->Convert(result);
+  }
+  return result;
+}
+
+ConversionInspectionResult
+PipelineConverter::Inspect(const std::string& text) const {
+  ConversionInspectionResult result;
+  result.input = text;
+  result.output = Convert(text);
+  return result;
+}
+
+SegmentationPtr PipelineConverter::GetSegmentation() const {
+  return stages.empty() ? nullptr : stages.back()->GetSegmentation();
+}
+
 std::string ConverterStream::ConvertChunk(std::string_view input) {
   if (!input.empty()) {
     pending.append(input);

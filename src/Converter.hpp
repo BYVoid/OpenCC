@@ -21,6 +21,8 @@
 #include <cstddef>
 #include <string>
 #include <string_view>
+#include <utility>
+#include <vector>
 
 #include "Common.hpp"
 #include "ConversionInspection.hpp"
@@ -68,6 +70,30 @@ public:
 private:
   const SegmentationPtr segmentation;
   const ConversionChainPtr conversionChain;
+};
+
+/**
+ * Pipeline converter: passes text through a sequence of converters in order.
+ * @ingroup opencc_cpp_api
+ */
+class OPENCC_EXPORT PipelineConverter : public Converter {
+public:
+  explicit PipelineConverter(std::vector<ConverterPtr> stages)
+      : stages(std::move(stages)) {}
+
+  std::string Convert(std::string_view text) const override;
+
+  /** Returns an object with input/output filled and no stage detail. */
+  ConversionInspectionResult Inspect(const std::string& text) const override;
+
+  /** Returns the last stage's segmentation, or nullptr for an empty pipeline. */
+  SegmentationPtr GetSegmentation() const override;
+
+  /** Returns nullptr; a pipeline has no single conversion chain. */
+  ConversionChainPtr GetConversionChain() const override { return nullptr; }
+
+private:
+  const std::vector<ConverterPtr> stages;
 };
 
 class OPENCC_EXPORT ConverterStream {

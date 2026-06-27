@@ -107,46 +107,6 @@
       "outputs": ["<(output_prefix)STPhrases_GeneratedFromRegionalPhrases.ocd2"],
       "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
     }, {
-      "action_name": "STPhrases_WithGeneratedFromRegionalPhrases.txt",
-      "inputs": [
-        "<(dict_generate_st_phrases)",
-        "<(input_prefix)HKPhrases.txt",
-        "<(input_prefix)TWPhrases.txt",
-        "<(input_prefix)STPhrases.txt",
-        "<(module_root_dir)/data/config/t2s.json",
-        "<(output_prefix)TSCharacters.ocd2",
-        "<(output_prefix)TSCharactersExt.ocd2",
-        "<(output_prefix)TSPhrases.ocd2",
-        "<(output_prefix)opencc.node"
-      ],
-      "outputs": ["<(output_prefix)STPhrases_WithGeneratedFromRegionalPhrases.txt"],
-      "action": [
-        "<(python_cmd)",
-        "<(dict_generate_st_phrases)",
-        "--input",
-        "<(input_prefix)HKPhrases.txt",
-        "--input",
-        "<(input_prefix)TWPhrases.txt",
-        "--append-to",
-        "<(input_prefix)STPhrases.txt",
-        "--output",
-        "<@(_outputs)",
-        "--node-binding",
-        "<(output_prefix)opencc.node",
-        "--config",
-        "<(module_root_dir)/data/config/t2s.json",
-        "--dict-dir",
-        "<(PRODUCT_DIR)"
-      ]
-    }, {
-      "action_name": "STPhrases_WithGeneratedFromRegionalPhrases",
-      "variables": {
-        "input": "<(output_prefix)STPhrases_WithGeneratedFromRegionalPhrases.txt",
-      },
-      "inputs": ["<(input)"],
-      "outputs": ["<(output_prefix)STPhrases_WithGeneratedFromRegionalPhrases.ocd2"],
-      "action": ["node", "<(cmd)", "<(input)", "<@(_outputs)"]
-    }, {
       "action_name": "TWVariantsPhrases",
       "variables": {
         "input": "<(input_prefix)TWVariantsPhrases.txt",

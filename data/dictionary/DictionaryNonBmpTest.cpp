@@ -38,7 +38,6 @@ constexpr NonBmpException kAllowedNonBmpCharacters[] = {
     {"STPhrases", "\xF0\xA3\xB2\x98"}, // U+23C98, 𣲘
     {"TSPhrases", "\xF0\xAB\xAB\x87"}, // U+2BAC7, 𫫇
     {"STPhrases_GeneratedFromRegionalPhrases", "\xF0\xAB\xAB\x87"}, // U+2BAC7, 𫫇
-    {"STPhrases_WithGeneratedFromRegionalPhrases", "\xF0\xAB\xAB\x87"}, // U+2BAC7, 𫫇
 };
 
 uint32_t DecodeUtf8CodePoint(const char* str, size_t length) {
@@ -72,9 +71,6 @@ bool IsAllowedNonBmpCharacter(const std::string& dictionary,
     if (dictionary == exception.dictionary && character == exception.character) {
       return true;
     }
-  }
-  if (dictionary == "STPhrases_WithGeneratedFromRegionalPhrases") {
-    return IsAllowedNonBmpCharacter("STPhrases", character);
   }
   return false;
 }

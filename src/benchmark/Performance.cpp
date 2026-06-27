@@ -44,12 +44,25 @@
 #include "SimpleConverter.hpp"
 #include "TestUtilsUTF8.hpp"
 
+#ifdef BAZEL
+#include "tools/cpp/runfiles/runfiles.h"
+using BazelRunfiles = bazel::tools::cpp::runfiles::Runfiles;
+static const char* g_argv0 = nullptr;
+static std::unique_ptr<BazelRunfiles> g_runfiles;
+#endif
+
 namespace opencc {
 
 namespace {
 
 using JSONDocument = rapidjson::Document;
 using JSONValue = rapidjson::Value;
+
+// Returns the value of environment variable `name`, or nullptr if unset/empty.
+const char* GetEnv(const char* name) noexcept {
+  const char* val = std::getenv(name);
+  return (val != nullptr && *val != '\0') ? val : nullptr;
+}
 
 struct BenchmarkConfig {
   std::string name;
@@ -107,7 +120,14 @@ std::string GetBaseNameWithoutExtension(const std::string& path) {
 }
 
 std::string BenchmarkTempDirectory() {
+  if (const char* e = GetEnv("OPENCC_BENCHMARK_TEMP_DIR")) {
+    return std::string(e) + "/";
+  }
+#ifdef PROJECT_BINARY_DIR
   return std::string(PROJECT_BINARY_DIR) + "/src/benchmark/";
+#else
+  return std::string("/tmp/opencc_benchmark/");
+#endif
 }
 
 bool IsAbsolutePath(const std::string& path) {
@@ -151,23 +171,59 @@ std::string ResolveConfigPath(const std::string& config_name) {
            ".json";
   }
 #endif
+  if (const char* e = GetEnv("OPENCC_BENCHMARK_DATA_DIR")) {
+    return std::string(e) + "/" + config_name + ".json";
+  }
+#ifdef BAZEL
+  if (g_runfiles) {
+    for (const char* prefix : {"_main", "opencc~"}) {
+      const std::string path = g_runfiles->Rlocation(
+          std::string(prefix) + "/data/config/" + config_name + ".json");
+      if (IsRegularFile(path)) return path;
+    }
+  }
+  return config_name + ".json";
+#elif defined(PROJECT_SOURCE_DIR)
   return std::string(PROJECT_SOURCE_DIR) + "/data/config/" + config_name + ".json";
+#else
+  return config_name + ".json";
+#endif
 }
 
 std::string ResolveTextDictionaryPath(const std::string& dict_file_name) {
   const std::string text_file_name =
       ReplaceSuffix(dict_file_name, ".ocd2", ".txt");
-  const std::string source_path =
-      std::string(PROJECT_SOURCE_DIR) + "/data/dictionary/" + text_file_name;
-  if (IsRegularFile(source_path)) {
-    return source_path;
+
+  if (const char* e = GetEnv("OPENCC_BENCHMARK_TEXT_DIR")) {
+    const std::string path = std::string(e) + "/" + text_file_name;
+    if (IsRegularFile(path)) return path;
+    throw FileNotFound(text_file_name);
   }
 
-  const std::string generated_path =
-      std::string(PROJECT_BINARY_DIR) + "/data/" + text_file_name;
-  if (IsRegularFile(generated_path)) {
-    return generated_path;
+#ifdef BAZEL
+  if (g_runfiles) {
+    for (const char* prefix : {"_main", "opencc~"}) {
+      const std::string path = g_runfiles->Rlocation(
+          std::string(prefix) + "/data/dictionary/" + text_file_name);
+      if (IsRegularFile(path)) return path;
+    }
   }
+#else
+#ifdef PROJECT_SOURCE_DIR
+  {
+    const std::string source_path =
+        std::string(PROJECT_SOURCE_DIR) + "/data/dictionary/" + text_file_name;
+    if (IsRegularFile(source_path)) return source_path;
+  }
+#endif
+#ifdef PROJECT_BINARY_DIR
+  {
+    const std::string generated_path =
+        std::string(PROJECT_BINARY_DIR) + "/data/" + text_file_name;
+    if (IsRegularFile(generated_path)) return generated_path;
+  }
+#endif
+#endif
 
   throw FileNotFound(text_file_name);
 }
@@ -431,9 +487,9 @@ std::vector<BenchmarkConfig> BuildBenchmarkConfigs(
           GetTemporaryTextConfigRegistry().Create(source_path, "text",
                                                  "benchmark-text"),
       });
-    } catch (const FileNotFound&) {
-      // Some legacy benchmark configs only ship precompiled ocd2 artifacts.
-      // Skip the text-json variant when there is no source text dictionary.
+    } catch (const Exception&) {
+      // Skip the text-json variant when the config can't be read or text
+      // dictionaries are unavailable (e.g., Bazel build before runfiles init).
     }
   }
   return configs;
@@ -458,15 +514,51 @@ bool IsJiebaConfig(const BenchmarkConfig& config) {
 #endif
 
 std::string OpenccBinaryPath() {
+  if (const char* e = GetEnv("OPENCC_BENCHMARK_OPENCC_PATH")) return e;
+#ifdef BAZEL
+  if (g_runfiles) {
+    for (const char* prefix : {"_main", "opencc~"}) {
+      const std::string path =
+          g_runfiles->Rlocation(std::string(prefix) + "/src/tools/command_line");
+      if (IsRegularFile(path)) return path;
+    }
+  }
+#endif
+#ifdef OPENCC_BENCHMARK_OPENCC_PATH
   return OPENCC_BENCHMARK_OPENCC_PATH;
+#else
+  return "opencc";
+#endif
 }
 
 std::string SourceConfigDirectory() {
+  if (const char* e = GetEnv("OPENCC_BENCHMARK_DATA_DIR")) return e;
+#ifdef BAZEL
+  if (g_runfiles) {
+    const std::string path = g_runfiles->Rlocation("_main/data/config");
+    if (!path.empty()) return path;
+  }
+#endif
+#ifdef PROJECT_SOURCE_DIR
   return std::string(PROJECT_SOURCE_DIR) + "/data/config";
+#else
+  return ".";
+#endif
 }
 
 std::string BuildDataDirectory() {
+  if (const char* e = GetEnv("OPENCC_BENCHMARK_DATA_DIR")) return e;
+#ifdef BAZEL
+  if (g_runfiles) {
+    const std::string path = g_runfiles->Rlocation("_main/data/dictionary");
+    if (!path.empty()) return path;
+  }
+#endif
+#ifdef PROJECT_BINARY_DIR
   return std::string(PROJECT_BINARY_DIR) + "/data";
+#else
+  return ".";
+#endif
 }
 
 struct MeasuredResult {
@@ -534,8 +626,19 @@ void RunCommandLineConversion(const BenchmarkConfig& config,
 }
 
 SimpleConverter* Initialize(const BenchmarkConfig& config) {
-  chdir(PROJECT_BINARY_DIR "/data");
+  if (const char* e = GetEnv("OPENCC_BENCHMARK_DATA_DIR")) {
+    chdir(e);
+  }
+#ifdef PROJECT_BINARY_DIR
+  else {
+    chdir(PROJECT_BINARY_DIR "/data");
+  }
+#endif
+#ifdef BAZEL
+  return new SimpleConverter(config.path, std::vector<std::string>{}, g_argv0);
+#else
   return new SimpleConverter(config.path);
+#endif
 }
 
 void Convert(const SimpleConverter* converter, std::string_view text) {
@@ -595,9 +698,12 @@ std::string FormatCounterValue(const benchmark::BenchmarkReporter::Run& run,
 
 std::string BenchmarkGroupName(const benchmark::BenchmarkReporter::Run& run) {
   const std::string name = run.benchmark_name();
-  const std::string::size_type slash_pos = name.find('/');
+  const std::string::size_type colons_pos = name.find("::");
+  const std::string bare_name =
+      colons_pos != std::string::npos ? name.substr(colons_pos + 2) : name;
+  const std::string::size_type slash_pos = bare_name.find('/');
   const std::string prefix =
-      slash_pos == std::string::npos ? name : name.substr(0, slash_pos);
+      slash_pos == std::string::npos ? bare_name : bare_name.substr(0, slash_pos);
   if (prefix == "BM_Initialization") {
     return "Initialization";
   }
@@ -755,8 +861,23 @@ void SetCommandLineCounters(benchmark::State& state, size_t total_input_bytes,
 }
 
 std::string ReadText(const std::string& filename) {
-  const std::string benchmark_data_dir = PROJECT_SOURCE_DIR "/test/benchmark/";
-  const std::string data_path = benchmark_data_dir + filename;
+  std::string data_path;
+  if (const char* e = GetEnv("OPENCC_BENCHMARK_TEST_DATA_DIR")) {
+    data_path = std::string(e) + "/" + filename;
+  } else {
+#ifdef BAZEL
+    if (g_runfiles) {
+      data_path = g_runfiles->Rlocation("_main/test/benchmark/" + filename);
+    }
+    if (data_path.empty() || !IsRegularFile(data_path)) {
+      data_path = filename;
+    }
+#elif defined(PROJECT_SOURCE_DIR)
+    data_path = std::string(PROJECT_SOURCE_DIR) + "/test/benchmark/" + filename;
+#else
+    data_path = filename;
+#endif
+  }
   std::ifstream stream(data_path.c_str());
   return std::string((std::istreambuf_iterator<char>(stream)),
                      std::istreambuf_iterator<char>());
@@ -873,7 +994,7 @@ bool RegisterBenchmarks() {
       BuildBenchmarkConfigs(InitializationConfigs());
   for (const BenchmarkConfig& config : initialization_configs) {
     benchmark::RegisterBenchmark(
-        ("BM_Initialization/" + config.name).c_str(),
+        ("Performance::BM_Initialization/" + config.name).c_str(),
         [config](benchmark::State& state) { BM_Initialization(state, config); })
         ->Unit(benchmark::kMicrosecond);
   }
@@ -882,7 +1003,7 @@ bool RegisterBenchmarks() {
       BuildBenchmarkConfigs(ConversionConfigs());
   for (const BenchmarkConfig& config : conversion_configs) {
     benchmark::RegisterBenchmark(
-        ("BM_ConvertLongText/" + config.name).c_str(),
+        ("Performance::BM_ConvertLongText/" + config.name).c_str(),
         [config](benchmark::State& state) { BM_ConvertLongText(state, config); })
         ->Unit(benchmark::kMillisecond);
   }
@@ -890,7 +1011,7 @@ bool RegisterBenchmarks() {
   for (const BenchmarkConfig& config : conversion_configs) {
     for (const int iteration : {100, 1000, 10000, 100000}) {
       benchmark::RegisterBenchmark(
-          ("BM_Convert/" + config.name + "/" + std::to_string(iteration))
+          ("Performance::BM_Convert/" + config.name + "/" + std::to_string(iteration))
               .c_str(),
           [config, iteration](benchmark::State& state) {
             BM_Convert(state, config, iteration);
@@ -901,7 +1022,7 @@ bool RegisterBenchmarks() {
 
   for (const BenchmarkConfig& config : conversion_configs) {
     benchmark::RegisterBenchmark(
-        ("BM_CommandLineLongText/" + config.name).c_str(),
+        ("Performance::BM_CommandLineLongText/" + config.name).c_str(),
         [config](benchmark::State& state) {
           BM_CommandLineLongText(state, config);
         })
@@ -912,7 +1033,7 @@ bool RegisterBenchmarks() {
   for (const BenchmarkConfig& config : conversion_configs) {
     for (const int iteration : {100, 1000, 10000, 100000}) {
       benchmark::RegisterBenchmark(
-          ("BM_CommandLine/" + config.name + "/" + std::to_string(iteration))
+          ("Performance::BM_CommandLine/" + config.name + "/" + std::to_string(iteration))
               .c_str(),
           [config, iteration](benchmark::State& state) {
             BM_CommandLine(state, config, iteration);
@@ -924,13 +1045,23 @@ bool RegisterBenchmarks() {
   return true;
 }
 
-const bool kBenchmarksRegistered = RegisterBenchmarks();
-
 } // namespace
+
+void DoRegisterBenchmarks() {
+  RegisterBenchmarks();
+}
 
 } // namespace opencc
 
 int main(int argc, char** argv) {
+#ifdef BAZEL
+  g_argv0 = argc > 0 ? argv[0] : nullptr;
+  {
+    std::string err;
+    g_runfiles.reset(BazelRunfiles::Create(g_argv0 != nullptr ? g_argv0 : "", &err));
+  }
+#endif
+  opencc::DoRegisterBenchmarks();
   ::benchmark::Initialize(&argc, argv);
   if (::benchmark::ReportUnrecognizedArguments(argc, argv)) {
     return 1;

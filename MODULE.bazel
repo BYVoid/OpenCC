@@ -8,6 +8,7 @@ module(
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.22.5")
 bazel_dep(name = "aspect_rules_js", version = "3.2.2")
+bazel_dep(name = "codspeed_google_benchmark_compat", version = "2.1.0", dev_dependency = True)
 bazel_dep(name = "darts-clone", version = "0.32")
 bazel_dep(name = "googletest", version = "1.17.0.bcr.2", dev_dependency = True)
 bazel_dep(name = "marisa-trie", version = "0.3.1.bcr.2")

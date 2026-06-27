@@ -21,8 +21,6 @@
 #include <cstddef>
 #include <string>
 #include <string_view>
-#include <utility>
-#include <vector>
 
 #include "Common.hpp"
 #include "ConversionInspection.hpp"
@@ -46,60 +44,17 @@ public:
   virtual ConversionChainPtr GetConversionChain() const = 0;
 };
 
-/**
- * Single-stage converter: one segmentation pass followed by one conversion
- * chain.
- * @ingroup opencc_cpp_api
- */
-class OPENCC_EXPORT SingleStageConverter : public Converter {
-public:
-  SingleStageConverter(SegmentationPtr segmentation,
-                       ConversionChainPtr conversionChain)
-      : segmentation(segmentation), conversionChain(conversionChain) {}
-
-  std::string Convert(std::string_view text) const override;
-
-  ConversionInspectionResult Inspect(const std::string& text) const override;
-
-  SegmentationPtr GetSegmentation() const override { return segmentation; }
-
-  ConversionChainPtr GetConversionChain() const override {
-    return conversionChain;
-  }
-
-private:
-  const SegmentationPtr segmentation;
-  const ConversionChainPtr conversionChain;
-};
-
-/**
- * Pipeline converter: passes text through a sequence of converters in order.
- * @ingroup opencc_cpp_api
- */
-class OPENCC_EXPORT PipelineConverter : public Converter {
-public:
-  explicit PipelineConverter(std::vector<ConverterPtr> stages)
-      : stages(std::move(stages)) {}
-
-  std::string Convert(std::string_view text) const override;
-
-  /** Returns an object with input/output filled and no stage detail. */
-  ConversionInspectionResult Inspect(const std::string& text) const override;
-
-  /** Returns the last stage's segmentation, or nullptr for an empty pipeline. */
-  SegmentationPtr GetSegmentation() const override;
-
-  /** Returns nullptr; a pipeline has no single conversion chain. */
-  ConversionChainPtr GetConversionChain() const override { return nullptr; }
-
-private:
-  const std::vector<ConverterPtr> stages;
-};
-
 class OPENCC_EXPORT ConverterStream {
 public:
-  explicit ConverterStream(ConverterPtr _converter, size_t _maxKeepChars = 16)
-      : converter(_converter), maxKeepChars(_maxKeepChars) {}
+  /**
+   * @param converter   The converter applied to each flushed chunk.
+   * @param maxKeepChars  Number of Unicode code points (not bytes) to retain
+   *   at the end of the pending buffer after each ConvertChunk() call, so
+   *   that a phrase or IDS straddling two consecutive chunks is not split
+   *   across separate Convert() invocations.  Defaults to 16 code points.
+   */
+  explicit ConverterStream(ConverterPtr converter, size_t maxKeepChars = 16)
+      : converter(converter), maxKeepChars(maxKeepChars) {}
 
   /**
    * Appends @p input to pending, then emits everything up to the last

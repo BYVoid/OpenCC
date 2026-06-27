@@ -76,8 +76,10 @@ sources=(
   src/Lexicon.cpp
   src/MarisaDict.cpp
   src/MaxMatchSegmentation.cpp
-  src/PluginSegmentation.cpp
   src/PhraseExtract.cpp
+  src/PipelineConverter.cpp
+  src/PluginSegmentation.cpp
+  src/SingleStageConverter.cpp
   src/PrefixMatch.cpp
   src/ResourceProvider.cpp
   src/Segmentation.cpp

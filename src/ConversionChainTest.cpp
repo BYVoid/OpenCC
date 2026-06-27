@@ -20,6 +20,8 @@
 #include "Converter.hpp"
 #include "DictGroupTestBase.hpp"
 #include "MaxMatchSegmentation.hpp"
+#include "PipelineConverter.hpp"
+#include "SingleStageConverter.hpp"
 
 namespace opencc {
 

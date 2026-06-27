@@ -33,8 +33,10 @@ set(
   MarisaDict.hpp
   MaxMatchSegmentation.hpp
   Optional.hpp
-  PluginSegmentation.hpp
   PhraseExtract.hpp
+  PipelineConverter.hpp
+  PluginSegmentation.hpp
+  SingleStageConverter.hpp
   PrefixMatch.hpp
   ResourceProvider.hpp
   Segmentation.hpp
@@ -62,9 +64,11 @@ set(
   Lexicon.cpp
   MarisaDict.cpp
   MaxMatchSegmentation.cpp
-  PluginSegmentation.cpp
   PhraseExtract.cpp
+  PipelineConverter.cpp
+  PluginSegmentation.cpp
   PrefixMatch.cpp
+  SingleStageConverter.cpp
   ResourceProvider.cpp
   SerializableDict.cpp
   SerializedValues.cpp

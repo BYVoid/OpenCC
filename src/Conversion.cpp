@@ -26,10 +26,42 @@ using namespace opencc;
 Conversion::Conversion(DictPtr _dict)
     : dict(_dict), prefixMatch(new PrefixMatch(_dict)) {}
 
-std::string Conversion::Convert(const char* phrase) const {
+std::string Conversion::Convert(std::string_view phrase) const {
   std::string buffer;
-  AppendConverted(phrase, &buffer);
+  const size_t phraseLength = phrase.size();
+  buffer.reserve(phraseLength + phraseLength / 5);
+
+  const char* phraseEnd = phrase.data() + phraseLength;
+  for (const char* pstr = phrase.data(); pstr < phraseEnd;) {
+    size_t remainingLength = phraseEnd - pstr;
+    const PrefixMatch::Match matched =
+        prefixMatch->MatchPrefix(pstr, remainingLength);
+    size_t matchedLength;
+    if (!matched.matched) {
+      matchedLength =
+          UTF8Util::NextIdeographicDescriptionSequenceLength(pstr,
+                                                             remainingLength);
+      if (matchedLength == 0) {
+        matchedLength = UTF8Util::NextCharLength(pstr);
+      }
+      if (matchedLength > remainingLength) {
+        matchedLength = remainingLength;
+      }
+      buffer.append(pstr, matchedLength);
+    } else {
+      matchedLength = matched.keyLength;
+      if (matchedLength > remainingLength) {
+        matchedLength = remainingLength;
+      }
+      buffer.append(*matched.value);
+    }
+    pstr += matchedLength;
+  }
   return buffer;
+}
+
+std::string Conversion::Convert(const char* phrase) const {
+  return Convert(std::string_view(phrase));
 }
 
 void Conversion::AppendConverted(const char* phrase, std::string* output) const {
@@ -69,10 +101,6 @@ void Conversion::AppendConverted(const char* phrase, std::string* output) const 
     }
     pstr += matchedLength;
   }
-}
-
-std::string Conversion::Convert(const std::string& phrase) const {
-  return Convert(phrase.c_str());
 }
 
 SegmentsPtr Conversion::Convert(const SegmentsPtr& input) const {

@@ -175,7 +175,7 @@ public:
    * output string.
    * @param input Text to be inspected.
    */
-  ConversionInspectionResult Inspect(const std::string& input) const;
+  ConversionInspectionResult Inspect(std::string_view input) const;
 
 private:
   const void* internalData;

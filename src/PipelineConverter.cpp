@@ -29,7 +29,7 @@ std::string PipelineConverter::Convert(std::string_view text) const {
 }
 
 ConversionInspectionResult
-PipelineConverter::Inspect(const std::string& text) const {
+PipelineConverter::Inspect(std::string_view text) const {
   ConversionInspectionResult result;
   result.input = text;
   result.output = Convert(text);

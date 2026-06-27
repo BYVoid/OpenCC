@@ -247,11 +247,11 @@ std::string TakeErrorMessage(const opencc_segmentation_plugin_v2* descriptor,
   throw Exception(fallbackPrefix + " '" + pluginType + "': " + message);
 }
 
-SegmentsPtr BuildSegmentsFromLengths(const std::string& text,
+SegmentsPtr BuildSegmentsFromLengths(std::string_view text,
                                      const opencc_segment_length_array_t& lengths) {
   SegmentsPtr segments(new Segments);
-  const char* bytes = text.c_str();
-  const size_t inputSize = std::strlen(bytes);
+  const char* bytes = text.data();
+  const size_t inputSize = text.size();
   size_t byteOffset = 0;
 
   for (size_t i = 0; i < lengths.segment_count; i++) {
@@ -297,7 +297,8 @@ public:
     }
   }
 
-  SegmentsPtr Segment(const std::string& text) const override {
+  SegmentsPtr Segment(std::string_view text) const override {
+    const std::string owned(text);
     opencc_segment_length_array_t segmentLengths = {};
     segmentLengths.struct_size = sizeof(segmentLengths);
     opencc_error_t error = {};
@@ -305,7 +306,7 @@ public:
     opencc_segmentation_segment_args_t args = {};
     args.struct_size = sizeof(args);
     args.handle = handle_;
-    args.utf8_text = text.c_str();
+    args.utf8_text = owned.c_str();
     args.segment_lengths = &segmentLengths;
     args.error = &error;
     const int status = plugin_->descriptor->segment(&args);

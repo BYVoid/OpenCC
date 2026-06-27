@@ -35,9 +35,7 @@ public:
 
   virtual ~MaxMatchSegmentation() {}
 
-  virtual SegmentsPtr Segment(const std::string& text) const;
-
-  SegmentsPtr Segment(std::string_view text) const;
+  SegmentsPtr Segment(std::string_view text) const override;
 
   const DictPtr GetDict() const { return dict; }
 

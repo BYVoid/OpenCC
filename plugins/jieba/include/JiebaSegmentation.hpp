@@ -39,9 +39,7 @@ public:
 
   ~JiebaSegmentation() override;
 
-  SegmentsPtr Segment(const std::string& text) const override;
-
-  SegmentsPtr Segment(std::string_view text) const;
+  SegmentsPtr Segment(std::string_view text) const override;
 
 private:
   std::unique_ptr<cppjieba::Jieba> jieba_;

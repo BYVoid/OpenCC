@@ -20,6 +20,7 @@
 
 #include <cstring>
 #include <iterator>
+#include <string_view>
 
 #include "Common.hpp"
 
@@ -52,6 +53,11 @@ public:
   void AddSegment(const std::string& str) {
     indexes.push_back(std::make_pair(managed.size(), true));
     managed.push_back(str);
+  }
+
+  void AddSegment(std::string_view sv) {
+    indexes.push_back(std::make_pair(managed.size(), true));
+    managed.emplace_back(sv);
   }
 
   class iterator {

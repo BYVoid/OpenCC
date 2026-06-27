@@ -28,19 +28,47 @@
 
 namespace opencc {
 /**
- * Abstract base for all converters.
+ * Abstract base for full-text converters.
+ *
+ * A @c Converter accepts a complete UTF-8 string and returns the converted
+ * result.  Internally it coordinates @c Segmentation (splitting text into
+ * words) and a @c ConversionChain (applying one or more dictionaries to each
+ * segment).  Two concrete implementations are provided:
+ *
+ *  - @c SingleStageConverter — one segmentation pass + one @c ConversionChain.
+ *  - @c PipelineConverter — passes text through a sequence of @c Converter
+ *    stages in order, each with its own segmentation and chain.
+ *
  * @ingroup opencc_cpp_api
  */
 class OPENCC_EXPORT Converter {
 public:
   virtual ~Converter() = default;
 
+  /**
+   * Converts @p text and returns the result.
+   * @param text UTF-8 input; need not be null-terminated.
+   */
   virtual std::string Convert(std::string_view text) const = 0;
 
-  virtual ConversionInspectionResult Inspect(const std::string& text) const = 0;
+  /**
+   * Converts @p text and returns a detailed inspection result that includes
+   * the initial segmentation, per-stage intermediate segments, and final
+   * output.  Intended for debugging and tooling rather than production
+   * conversion.
+   */
+  virtual ConversionInspectionResult Inspect(std::string_view text) const = 0;
 
+  /**
+   * Returns the segmentation used by this converter, or @c nullptr if the
+   * converter has no single segmentation (e.g. @c PipelineConverter).
+   */
   virtual SegmentationPtr GetSegmentation() const = 0;
 
+  /**
+   * Returns the conversion chain used by this converter, or @c nullptr if the
+   * converter has no single chain (e.g. @c PipelineConverter).
+   */
   virtual ConversionChainPtr GetConversionChain() const = 0;
 };
 

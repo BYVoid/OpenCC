@@ -582,6 +582,46 @@ TEST_F(ConfigTest, InlineDictInGroupTakesPriorityOverFollowingFileDict) {
             inlineConverter->Convert(std::string_view(utf8("燕燕于飞"))));
 }
 
+TEST_F(ConfigTest, UnionDictGroupPrefersLaterLongerMatch) {
+  const std::string json =
+      std::string("{\n"
+                  "  \"name\": \"Union Group Test\",\n"
+                  "  \"segmentation\": {\n"
+                  "    \"type\": \"mmseg\",\n"
+                  "    \"dict\": {\n"
+                  "      \"type\": \"inline\",\n"
+                  "      \"entries\": {\n"
+                  "        \"意大利面\": \"意大利面\"\n"
+                  "      }\n"
+                  "    }\n"
+                  "  },\n"
+                  "  \"conversion_chain\": [{\n"
+                  "    \"dict\": {\n"
+                  "      \"type\": \"group\",\n"
+                  "      \"match_policy\": \"union\",\n"
+                  "      \"dicts\": [\n"
+                  "        {\n"
+                  "          \"type\": \"inline\",\n"
+                  "          \"entries\": {\n"
+                  "            \"意大利\": \"義大利\"\n"
+                  "          }\n"
+                  "        },\n"
+                  "        {\n"
+                  "          \"type\": \"inline\",\n"
+                  "          \"entries\": {\n"
+                  "            \"意大利面\": \"義大利麵\"\n"
+                  "          }\n"
+                  "        }\n"
+                  "      ]\n"
+                  "    }\n"
+                  "  }]\n"
+                  "}\n");
+
+  const ConverterPtr inlineConverter = config.NewFromString(json, "");
+  EXPECT_EQ(utf8("義大利麵"),
+            inlineConverter->Convert(std::string_view(utf8("意大利面"))));
+}
+
 TEST_F(ConfigTest, InlineDictOutputStillProcessedByLaterChainStep) {
   const std::string json =
       std::string("{\n"

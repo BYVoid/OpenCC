@@ -37,6 +37,11 @@ enum class DictGroupMatchPolicy {
    * from a later dictionary.
    */
   ShortCircuit,
+  /**
+   * Treat child dictionaries as a union for prefix lookup: the longest prefix
+   * across all children wins, with dictionary order breaking ties.
+   */
+  Union,
 };
 
 /**

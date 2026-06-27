@@ -311,12 +311,13 @@ std::string SerializeSegmentationResultJson(
   return buffer.GetString();
 }
 
-// Serializes the full inspection result as a JSON object with "input",
-// "segments", "stages", and "output" fields. Used with --inspect mode.
-std::string SerializeInspectionResultJson(
-    const ConversionInspectionResult& result) {
-  rapidjson::StringBuffer buffer;
-  rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+// Writes a ConversionInspectionResult as a JSON object into writer.
+// Handles both SingleStageConverter results (segments + stages) and
+// PipelineConverter results (pipelineStages), and is called recursively
+// for nested pipeline stages.
+template <typename Writer>
+void WriteInspectionResultJson(Writer& writer,
+                               const ConversionInspectionResult& result) {
   writer.StartObject();
   writer.Key("input");
   writer.String(result.input.c_str());
@@ -341,9 +342,24 @@ std::string SerializeInspectionResultJson(
     writer.EndObject();
   }
   writer.EndArray();
+  writer.Key("pipelineStages");
+  writer.StartArray();
+  for (const auto& ps : result.pipelineStages) {
+    WriteInspectionResultJson(writer, ps);
+  }
+  writer.EndArray();
   writer.Key("output");
   writer.String(result.output.c_str());
   writer.EndObject();
+}
+
+// Serializes the full inspection result as a JSON object. Used with
+// --inspect mode. Handles both single-stage and pipeline converters.
+std::string SerializeInspectionResultJson(
+    const ConversionInspectionResult& result) {
+  rapidjson::StringBuffer buffer;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+  WriteInspectionResultJson(writer, result);
   return buffer.GetString();
 }
 

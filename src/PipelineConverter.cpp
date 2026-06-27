@@ -32,7 +32,16 @@ ConversionInspectionResult
 PipelineConverter::Inspect(std::string_view text) const {
   ConversionInspectionResult result;
   result.input = text;
-  result.output = Convert(text);
+
+  std::string current(text);
+  result.pipelineStages.reserve(stages.size());
+  for (const ConverterPtr& stage : stages) {
+    ConversionInspectionResult stageResult = stage->Inspect(current);
+    current = stageResult.output;
+    result.pipelineStages.push_back(std::move(stageResult));
+  }
+
+  result.output = current;
   return result;
 }
 

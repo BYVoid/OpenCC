@@ -37,6 +37,7 @@ cc_library(
         ":lexicon_lib",
         ":marisa_dict_lib",
         ":max_match_segmentation_lib",
+        ":pipeline_converter_lib",
         ":plugin_segmentation_lib",
         ":phrase_extract_lib",
         ":resource_provider_lib",
@@ -45,6 +46,7 @@ cc_library(
         ":serializable_dict_lib",
         ":serialized_values_lib",
         ":simple_converter_lib",
+        ":single_stage_converter_lib",
         ":utf8_string_slice_lib",
         ":utf8_util_lib",
     ],
@@ -127,6 +129,7 @@ cc_library(
         ":max_match_segmentation_lib",
         ":plugin_segmentation_lib",
         ":resource_provider_lib",
+        ":single_stage_converter_lib",
         ":text_dict_lib",
         ":utf8_util_lib",
         ":win_util_lib",
@@ -216,6 +219,8 @@ cc_test(
         ":converter_lib",
         ":dict_group_test_base_lib",
         ":max_match_segmentation_lib",
+        ":pipeline_converter_lib",
+        ":single_stage_converter_lib",
         "@googletest//:gtest_main",
     ],
 )
@@ -248,10 +253,30 @@ cc_library(
     ],
     deps = [
         ":common_lib",
-        ":conversion_chain_lib",
         ":segmentation_lib",
-        ":segments_lib",
         ":utf8_util_lib",
+    ],
+)
+
+cc_library(
+    name = "single_stage_converter_lib",
+    srcs = ["SingleStageConverter.cpp"],
+    hdrs = ["SingleStageConverter.hpp"],
+    deps = [
+        ":conversion_chain_lib",
+        ":conversion_inspection_lib",
+        ":converter_lib",
+        ":segments_lib",
+    ],
+)
+
+cc_library(
+    name = "pipeline_converter_lib",
+    srcs = ["PipelineConverter.cpp"],
+    hdrs = ["PipelineConverter.hpp"],
+    deps = [
+        ":conversion_inspection_lib",
+        ":converter_lib",
     ],
 )
 

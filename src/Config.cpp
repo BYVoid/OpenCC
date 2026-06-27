@@ -33,6 +33,7 @@
 #include "Config.hpp"
 #include "ConversionChain.hpp"
 #include "Converter.hpp"
+#include "SingleStageConverter.hpp"
 #include "DictGroup.hpp"
 #include "Exception.hpp"
 #include "Lexicon.hpp"

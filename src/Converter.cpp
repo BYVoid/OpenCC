@@ -16,82 +16,10 @@
  * limitations under the License.
  */
 
-#include "ConversionChain.hpp"
-#include "ConversionInspection.hpp"
 #include "Converter.hpp"
-#include "Segments.hpp"
 #include "UTF8Util.hpp"
 
 using namespace opencc;
-
-std::string SingleStageConverter::Convert(std::string_view text) const {
-  std::string converted;
-  converted.reserve(text.length() + text.length() / 5);
-  if (segmentation == nullptr) {
-    // AppendConvertedSegment requires null-termination; copy once for this path
-    const std::string owned(text);
-    conversionChain->AppendConvertedSegment(owned.c_str(), &converted);
-    return converted;
-  }
-  const SegmentsPtr& segments = segmentation->Segment(text);
-  for (const char* segment : *segments) {
-    conversionChain->AppendConvertedSegment(segment, &converted);
-  }
-  return converted;
-}
-
-ConversionInspectionResult SingleStageConverter::Inspect(const std::string& text) const {
-  ConversionInspectionResult result;
-  result.input = text;
-
-  SegmentsPtr initialSegments;
-  if (segmentation == nullptr) {
-    initialSegments.reset(new Segments);
-    initialSegments->AddSegment(text);
-  } else {
-    initialSegments = segmentation->Segment(text);
-  }
-  result.segments = initialSegments->ToVector();
-
-  const std::vector<SegmentsPtr> trace =
-      conversionChain->ConvertWithTrace(initialSegments);
-
-  result.stages.reserve(trace.size());
-  for (size_t i = 0; i < trace.size(); i++) {
-    ConversionInspectionStage stage;
-    stage.index = i + 1;
-    stage.segments = trace[i]->ToVector();
-    result.stages.push_back(std::move(stage));
-  }
-
-  if (!trace.empty()) {
-    result.output = trace.back()->ToString();
-  } else {
-    result.output = initialSegments->ToString();
-  }
-
-  return result;
-}
-
-std::string PipelineConverter::Convert(std::string_view text) const {
-  std::string result(text);
-  for (const ConverterPtr& stage : stages) {
-    result = stage->Convert(result);
-  }
-  return result;
-}
-
-ConversionInspectionResult
-PipelineConverter::Inspect(const std::string& text) const {
-  ConversionInspectionResult result;
-  result.input = text;
-  result.output = Convert(text);
-  return result;
-}
-
-SegmentationPtr PipelineConverter::GetSegmentation() const {
-  return stages.empty() ? nullptr : stages.back()->GetSegmentation();
-}
 
 std::string ConverterStream::ConvertChunk(std::string_view input) {
   if (!input.empty()) {

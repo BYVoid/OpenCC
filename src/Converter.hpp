@@ -28,28 +28,44 @@
 
 namespace opencc {
 /**
- * Controller of segmentation and conversion
+ * Abstract base for all converters.
  * @ingroup opencc_cpp_api
  */
 class OPENCC_EXPORT Converter {
 public:
-  Converter(const std::string& _name, SegmentationPtr _segmentation,
-            ConversionChainPtr _conversionChain)
-      : name(_name), segmentation(_segmentation),
-        conversionChain(_conversionChain) {}
+  virtual ~Converter() = default;
 
-  std::string Convert(std::string_view text) const;
+  virtual std::string Convert(std::string_view text) const = 0;
 
-  ConversionInspectionResult Inspect(const std::string& text) const;
+  virtual ConversionInspectionResult Inspect(const std::string& text) const = 0;
 
-  const SegmentationPtr GetSegmentation() const { return segmentation; }
+  virtual SegmentationPtr GetSegmentation() const = 0;
 
-  const ConversionChainPtr GetConversionChain() const {
+  virtual ConversionChainPtr GetConversionChain() const = 0;
+};
+
+/**
+ * Single-stage converter: one segmentation pass followed by one conversion
+ * chain.
+ * @ingroup opencc_cpp_api
+ */
+class OPENCC_EXPORT SingleStageConverter : public Converter {
+public:
+  SingleStageConverter(SegmentationPtr segmentation,
+                       ConversionChainPtr conversionChain)
+      : segmentation(segmentation), conversionChain(conversionChain) {}
+
+  std::string Convert(std::string_view text) const override;
+
+  ConversionInspectionResult Inspect(const std::string& text) const override;
+
+  SegmentationPtr GetSegmentation() const override { return segmentation; }
+
+  ConversionChainPtr GetConversionChain() const override {
     return conversionChain;
   }
 
 private:
-  const std::string name;
   const SegmentationPtr segmentation;
   const ConversionChainPtr conversionChain;
 };

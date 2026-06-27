@@ -24,7 +24,7 @@
 
 using namespace opencc;
 
-std::string Converter::Convert(std::string_view text) const {
+std::string SingleStageConverter::Convert(std::string_view text) const {
   std::string converted;
   converted.reserve(text.length() + text.length() / 5);
   if (segmentation == nullptr) {
@@ -40,7 +40,7 @@ std::string Converter::Convert(std::string_view text) const {
   return converted;
 }
 
-ConversionInspectionResult Converter::Inspect(const std::string& text) const {
+ConversionInspectionResult SingleStageConverter::Inspect(const std::string& text) const {
   ConversionInspectionResult result;
   result.input = text;
 

@@ -28,9 +28,7 @@ std::string SingleStageConverter::Convert(std::string_view text) const {
   std::string converted;
   converted.reserve(text.length() + text.length() / 5);
   if (segmentation == nullptr) {
-    // AppendConvertedSegment requires null-termination; copy once for this path
-    const std::string owned(text);
-    conversionChain->AppendConvertedSegment(owned.c_str(), &converted);
+    conversionChain->AppendConvertedSegment(text, &converted);
     return converted;
   }
   const SegmentsPtr& segments = segmentation->Segment(text);

@@ -26,13 +26,13 @@ using namespace opencc;
 Conversion::Conversion(DictPtr _dict)
     : dict(_dict), prefixMatch(new PrefixMatch(_dict)) {}
 
-std::string Conversion::Convert(std::string_view phrase) const {
+void Conversion::AppendConverted(std::string_view phrase,
+                                  std::string* output) const {
   if (phrase.empty()) {
-    return std::string();
+    return;
   }
-  std::string buffer;
   const size_t phraseLength = phrase.size();
-  buffer.reserve(phraseLength + phraseLength / 5);
+  output->reserve(output->size() + phraseLength + phraseLength / 5);
 
   const char* phraseData = phrase.data();
   const char* phraseEnd = phraseData + phraseLength;
@@ -51,16 +51,24 @@ std::string Conversion::Convert(std::string_view phrase) const {
       if (matchedLength > remainingLength) {
         matchedLength = remainingLength;
       }
-      buffer.append(pstr, matchedLength);
+      output->append(pstr, matchedLength);
     } else {
       matchedLength = matched.keyLength;
       if (matchedLength > remainingLength) {
         matchedLength = remainingLength;
       }
-      buffer.append(matched.value.data(), matched.value.size());
+      output->append(matched.value.data(), matched.value.size());
     }
     pstr += matchedLength;
   }
+}
+
+std::string Conversion::Convert(std::string_view phrase) const {
+  if (phrase.empty()) {
+    return std::string();
+  }
+  std::string buffer;
+  AppendConverted(phrase, &buffer);
   return buffer;
 }
 
@@ -69,42 +77,7 @@ std::string Conversion::Convert(const char* phrase) const {
 }
 
 void Conversion::AppendConverted(const char* phrase, std::string* output) const {
-  // Calculate string end to prevent reading beyond null terminator
-  const char* phraseEnd = phrase;
-  while (*phraseEnd != '\0') {
-    phraseEnd++;
-  }
-  const size_t phraseLength = phraseEnd - phrase;
-  output->reserve(output->size() + phraseLength + phraseLength / 5);
-
-  for (const char* pstr = phrase; *pstr != '\0';) {
-    size_t remainingLength = phraseEnd - pstr;
-    const PrefixMatchView matched =
-        prefixMatch->MatchPrefixView(pstr, remainingLength);
-    size_t matchedLength;
-    if (!matched.matched) {
-      matchedLength =
-          UTF8Util::NextIdeographicDescriptionSequenceLength(pstr,
-                                                             remainingLength);
-      if (matchedLength == 0) {
-        matchedLength = UTF8Util::NextCharLength(pstr);
-      }
-      // Ensure we don't read beyond the null terminator
-      if (matchedLength > remainingLength) {
-        matchedLength = remainingLength;
-      }
-      output->append(pstr, matchedLength);
-    } else {
-      matchedLength = matched.keyLength;
-      // Defensive: ensure dictionary key length does not exceed remaining input
-      // (MatchPrefix should already guarantee this, but defense in depth)
-      if (matchedLength > remainingLength) {
-        matchedLength = remainingLength;
-      }
-      output->append(matched.value.data(), matched.value.size());
-    }
-    pstr += matchedLength;
-  }
+  AppendConverted(std::string_view(phrase), output);
 }
 
 SegmentsPtr Conversion::Convert(const SegmentsPtr& input) const {

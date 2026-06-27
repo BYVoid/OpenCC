@@ -57,6 +57,15 @@ public:
   void AppendConvertedSegment(const char* segment, std::string* output) const;
 
   /**
+   * Like @c AppendConvertedSegment(const char*, std::string*) but accepts the
+   * segment as a @c string_view, avoiding a copy when the caller already has a
+   * non-null-terminated view (e.g. @c SingleStageConverter with no
+   * segmentation).
+   */
+  void AppendConvertedSegment(std::string_view segment,
+                              std::string* output) const;
+
+  /**
    * Converts @p input through the chain and records every intermediate
    * @c Segments after each conversion stage.
    * @return One entry per conversion in the chain, in order.

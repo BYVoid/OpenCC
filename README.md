@@ -215,18 +215,26 @@ These modes are useful for diagnosing conversion issues:
 Rules:
 - `--segmentation` and `--inspect` are mutually exclusive.
 
+### Official / Recommended Ports
+
+The following ports are maintained within the OpenCC ecosystem and are generally up to date with current configuration and dictionary data.
+
+* Data package: [opencc-data](https://www.npmjs.com/package/opencc-data)
+* Pure JavaScript: [opencc-js](https://www.npmjs.com/package/opencc-js)
+    * See [notes about different OpenCC NPM packages](#links-%E7%9B%B8%E9%97%9C%E9%8F%88%E6%8E%A5) below.
+* WebAssembly: [opencc-wasm](https://www.npmjs.com/package/opencc-wasm) ([website](https://opencc.js.org/))
+* Pure Python: [opencc-py](https://pypi.org/project/opencc-py/) (pre-release)
+
 ### Other Ports (Unofficial)
+
+These ports are community-maintained and may not always track upstream updates.
 
 * Swift (iOS): [SwiftyOpenCC](https://github.com/XQS6LB3A/SwiftyOpenCC)
 * iOSOpenCC (pod): [iOSOpenCC](https://github.com/swiftdo/OpenCC)
 * Java: [opencc4j](https://github.com/houbb/opencc4j)
 * Android: [android-opencc](https://github.com/qichuan/android-opencc)
 * PHP: [opencc4php](https://github.com/nauxliu/opencc4php)
-* Pure JavaScript: [opencc-js](https://github.com/nk2028/opencc-js)
-    * See [notes about different OpenCC NPM packages](#links-%E7%9B%B8%E9%97%9C%E9%8F%88%E6%8E%A5) below.
-* WebAssembly:
-    * [opencc-wasm](https://www.npmjs.com/package/opencc-wasm) ([website](https://opencc.js.org/))
-    * [wasm-opencc](https://github.com/oyyd/wasm-opencc)
+* WebAssembly: [wasm-opencc](https://github.com/oyyd/wasm-opencc)
 * Browser Extension: [opencc-extension](https://github.com/tnychn/opencc-extension)
 * Go (Pure): [OpenCC for Go](https://github.com/longbridge/opencc)
 * Dart (native-assets): [opencc-dart](https://github.com/lindeer/opencc-dart)

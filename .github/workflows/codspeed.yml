@@ -58,3 +58,4 @@ jobs:
           run: >-
             OPENCC_BENCHMARK_TEMP_DIR=/tmp/opencc_bench_temp
             bazel-bin/src/benchmark/performance
+            '--benchmark_filter=BM_ConvertLongText.*ocd2'

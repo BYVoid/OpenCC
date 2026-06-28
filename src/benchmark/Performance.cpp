@@ -466,6 +466,17 @@ std::vector<std::string> InitializationConfigs() {
   return configs;
 }
 
+std::vector<std::string> LongTextConversionConfigs() {
+  std::vector<std::string> configs = {
+      "hk2s", "hk2t", "jp2t", "s2hk", "s2t", "s2tw", "s2twp",
+      "t2hk", "t2jp", "t2s",  "t2tw", "tw2s", "tw2sp", "tw2t",
+  };
+#ifdef OPENCC_BENCHMARK_JIEBA_CONFIG_DIR
+  configs.push_back("s2twp_jieba");
+#endif
+  return configs;
+}
+
 std::vector<std::string> ConversionConfigs() {
   std::vector<std::string> configs = {"s2t", "s2twp"};
 #ifdef OPENCC_BENCHMARK_JIEBA_CONFIG_DIR
@@ -999,15 +1010,17 @@ bool RegisterBenchmarks() {
         ->Unit(benchmark::kMicrosecond);
   }
 
-  const std::vector<BenchmarkConfig> conversion_configs =
-      BuildBenchmarkConfigs(ConversionConfigs());
-  for (const BenchmarkConfig& config : conversion_configs) {
+  const std::vector<BenchmarkConfig> long_text_configs =
+      BuildBenchmarkConfigs(LongTextConversionConfigs());
+  for (const BenchmarkConfig& config : long_text_configs) {
     benchmark::RegisterBenchmark(
         ("Performance::BM_ConvertLongText/" + config.name).c_str(),
         [config](benchmark::State& state) { BM_ConvertLongText(state, config); })
         ->Unit(benchmark::kMillisecond);
   }
 
+  const std::vector<BenchmarkConfig> conversion_configs =
+      BuildBenchmarkConfigs(ConversionConfigs());
   for (const BenchmarkConfig& config : conversion_configs) {
     for (const int iteration : {100, 1000, 10000, 100000}) {
       benchmark::RegisterBenchmark(

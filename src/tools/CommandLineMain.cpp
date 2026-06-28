@@ -694,6 +694,12 @@ int CommandLineMain(std::vector<std::string> args) {
     }
     measurement.loadMs +=
         DurationToMilliseconds(std::chrono::steady_clock::now() - loadStart);
+    if (outputMode == OutputMode::Segmentation &&
+        converter->GetSegmentation() == nullptr) {
+      std::cerr << "error: this configuration has no segmentation step; "
+                   "--segmentation is not supported.\n";
+      return 1;
+    }
     bool lineByLine = inputFileName.IsNull();
     measurement.lineByLine = lineByLine;
     measurement.outputMode = outputMode;

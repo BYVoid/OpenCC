@@ -3,17 +3,6 @@
   "normalization": [
     { "dict": { "type": "ocd2", "file": "CJK_Compatibility_Ideographs.ocd2" } }
   ],
-  "segmentation": {
-    "type": "mmseg",
-    "dict": {
-      "type": "group",
-      "match_policy": "short_circuit",
-      "dicts": [
-        { "type": "ocd2", "file": "TWVariantsPhrases.ocd2" },
-        { "type": "ocd2", "file": "TWVariants.ocd2" }
-      ]
-    }
-  },
   "conversion_chain": [
     {
       "dict": {

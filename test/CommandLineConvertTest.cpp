@@ -767,7 +767,7 @@ TEST_F(CommandLineConvertTest, WritesMeasuredResultJson) {
 }
 
 TEST_F(CommandLineConvertTest, SegmentationOutputIsJson) {
-  const std::string config = "s2t";
+  const std::string config = "s2twp";
   const std::string inputFile = InputFile("segmentation_test");
   const std::string outputFile = OutputFile("segmentation_test");
 
@@ -855,6 +855,20 @@ TEST_F(CommandLineConvertTest, SegmentationAndInspectAreMutuallyExclusive) {
   EXPECT_NE(0, exitCode);
 }
 
+TEST_F(CommandLineConvertTest, SegmentationFailsWhenConfigHasNoSegmentation) {
+  // s2t has no segmentation step; --segmentation should exit non-zero.
+  const std::string config = "s2t";
+  const std::string inputFile = InputFile("seg_no_seg_test");
+  const std::string outputFile = OutputFile("seg_no_seg_test");
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "开放中文转换\n";
+  }
+  EXPECT_NE(0, system(TestCommandWithFlags(config, inputFile, outputFile,
+                                           "--segmentation").c_str()));
+}
+
 TEST_F(CommandLineConvertTest, MeasuredResultIncludesOutputMode) {
   const std::string config = "s2t";
   const std::string inputFile = InputFile("inspect_measured_test");
@@ -891,7 +905,7 @@ TEST_F(CommandLineConvertTest, MeasuredResultIncludesOutputMode) {
 // tokens; none of those tokens should already be Traditional Chinese unless
 // the conversion chain ran.
 TEST_F(CommandLineConvertTest, SegmentationDoesNotRunConversionChain) {
-  const std::string config = "s2t";
+  const std::string config = "s2twp";
   const std::string inputFile = InputFile("seg_no_convert_test");
   const std::string outputFile = OutputFile("seg_no_convert_test");
 
@@ -935,7 +949,7 @@ TEST_F(CommandLineConvertTest, SegmentationDoesNotRunConversionChain) {
 // Verify that a multi-line input in --segmentation mode produces exactly one
 // JSON object per input line with no spurious extra record at EOF.
 TEST_F(CommandLineConvertTest, SegmentationNoSpuriousEofRecord) {
-  const std::string config = "s2t";
+  const std::string config = "s2twp";
   const std::string inputFile = InputFile("seg_eof_test");
   const std::string outputFile = OutputFile("seg_eof_test");
 

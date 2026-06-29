@@ -1026,6 +1026,7 @@
 損	损
 搖	摇
 搗	捣
+搧	扇
 搵	揾
 搶	抢
 # @tofu-risk: not covered by PingFang/Source Han baseline: 𢫬 U+22AEC
@@ -3550,7 +3551,7 @@
 阪	阪 坂
 陘	陉
 陝	陕
-陞	陞 升
+陞	升 陞
 陣	阵
 陰	阴
 陳	陈
@@ -4425,6 +4426,7 @@
 𠠎	𠠎 𠚳
 # @tofu-risk: not covered by PingFang/Source Han baseline: 𪠡 U+2A821
 𠬙	𠬙 𪠡
+𠼤	𫪄
 # @tofu-risk: not covered by PingFang/Source Han baseline: 𪠺 U+2A83A
 𠽃	𠽃 𪠺
 # @tofu-risk: not covered by PingFang/Source Han baseline: 𪜎 U+2A70E

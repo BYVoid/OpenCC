@@ -477,6 +477,31 @@ describe('Optional opencc-jieba package integration', function () {
     assert.equal(result.stdout, '雲端計算');
   });
 
+  it('resolves normalization dict paths in jieba configs', function (t) {
+    const installRoot = createLocalInstalledShape();
+    if (!installRoot) {
+      t.skip();
+      return;
+    }
+
+    // U+F900 is a CJK Compatibility Ideograph; normalization maps it to U+8C48.
+    // If normalization dict paths are not resolved correctly the converter fails
+    // to load entirely, so a successful conversion also proves path resolution.
+    const script = [
+      "const OpenCC = require('opencc');",
+      "const converter = new OpenCC('s2twp_jieba');",
+      "const result = converter.convertSync('豈');",
+      "process.stdout.write(result.codePointAt(0).toString(16));",
+    ].join('');
+    const result = childProcess.spawnSync(process.execPath, ['-e', script], {
+      cwd: installRoot,
+      env: { ...process.env },
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.stdout, '8c48');
+  });
+
   it('loads jieba configs by mode name in the npm CLI', function (t) {
     const installRoot = createLocalInstalledShape();
     if (!installRoot) {

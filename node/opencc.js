@@ -192,7 +192,12 @@ function patchConfigPaths(config, jieba, mainAssetsDir) {
       }
     }
   }
-  // Absolutify conversion_chain dict file paths
+  // Absolutify normalization and conversion_chain dict file paths
+  if (Array.isArray(config.normalization)) {
+    for (const step of config.normalization) {
+      patchDictPaths(step.dict, mainAssetsDir);
+    }
+  }
   if (Array.isArray(config.conversion_chain)) {
     for (const step of config.conversion_chain) {
       patchDictPaths(step.dict, mainAssetsDir);

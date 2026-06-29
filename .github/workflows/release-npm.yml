@@ -59,10 +59,8 @@ jobs:
           const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
           const version = requestedVersion || pkg.version;
           pkg.version = version;
-          for (const name of Object.keys(pkg.optionalDependencies || {})) {
-            if (name.startsWith('@opencc/opencc-jieba-')) {
-              pkg.optionalDependencies[name] = version;
-            }
+          if (pkg.peerDependencies && pkg.peerDependencies.opencc) {
+            pkg.peerDependencies.opencc = `>=${version}`;
           }
           fs.writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
           NODE
@@ -197,11 +195,6 @@ jobs:
           const pkg = JSON.parse(fs.readFileSync(file, 'utf8'));
           const version = requestedVersion || pkg.version;
           pkg.version = version;
-          for (const name of Object.keys(pkg.optionalDependencies || {})) {
-            if (name.startsWith('@opencc/opencc-')) {
-              pkg.optionalDependencies[name] = version;
-            }
-          }
           fs.writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
           NODE
 

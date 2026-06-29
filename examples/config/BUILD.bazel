@@ -1,7 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-# Schema validation for example configs that include match_policy.
-# The original examples without match_policy are kept for backward-compatibility.
 [
     cc_test(
         name = "config_schema_validation_" + config[:-5],
@@ -22,15 +20,15 @@ package(default_visibility = ["//visibility:public"])
         ],
     )
     for config in [
-        "s2twp_quote_marks_with_policy.json",
-        "s2twp_taiwan_word_with_policy.json",
+        "s2twp_quote_marks.json",
+        "s2twp_taiwan_word.json",
     ]
 ]
 
 test_suite(
     name = "examples_schema_validation_test",
     tests = [
-        ":config_schema_validation_s2twp_quote_marks_with_policy",
-        ":config_schema_validation_s2twp_taiwan_word_with_policy",
+        ":config_schema_validation_s2twp_quote_marks",
+        ":config_schema_validation_s2twp_taiwan_word",
     ],
 )

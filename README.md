@@ -7,6 +7,8 @@
 [![Python CI](https://github.com/BYVoid/OpenCC/actions/workflows/python.yml/badge.svg)](https://github.com/BYVoid/OpenCC/actions/workflows/python.yml)
 [![AppVeyor](https://img.shields.io/appveyor/ci/Carbo/OpenCC.svg)](https://ci.appveyor.com/project/Carbo/OpenCC)
 
+[![GitHub downloads](https://img.shields.io/github/downloads/BYVoid/OpenCC/total)](https://github.com/BYVoid/OpenCC/releases)
+[![WinGet](https://img.shields.io/winget/v/BYVoid.OpenCC)](https://winstall.app/apps/BYVoid.OpenCC)
 [![npm package badge](https://img.shields.io/npm/v/opencc)](https://www.npmjs.com/package/opencc)
 [![PyPI version](https://img.shields.io/pypi/v/opencc.svg)](https://pypi.org/project/opencc/)
 [![Debian package](https://img.shields.io/debian/v/opencc/unstable)](https://packages.debian.org/search?keywords=opencc)

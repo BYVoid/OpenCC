@@ -387,17 +387,16 @@ jobs:
 
       - name: Regenerate lock files
         run: |
-          npm install --package-lock-only
-          cd plugins/jieba/node && npm install --package-lock-only
+          npm install --package-lock-only --ignore-scripts
 
       - name: Open PR if lock files changed
         id: pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git add package.json package-lock.json plugins/jieba/node/package.json plugins/jieba/node/package-lock.json
+          git add package.json package-lock.json plugins/jieba/node/package.json
           if git diff --staged --quiet; then
-            echo "Lock files already up to date; skipping PR."
+            echo "Package metadata and lock file already up to date; skipping PR."
             exit 0
           fi
           version="$(node -p "require('./package.json').version")"
@@ -408,8 +407,8 @@ jobs:
           git commit -m "Update lock files for $version binary package hashes"
           git push origin "$branch"
           url=$(gh pr create \
-            --title "Update lock files for $version binary package hashes" \
-            --body "Updates \`package-lock.json\` and \`plugins/jieba/node/package-lock.json\` with integrity hashes for the newly published binary packages.
+            --title "Update package metadata and lock file for $version binary package hashes" \
+            --body "Updates package metadata and \`package-lock.json\` with integrity hashes for the newly published binary packages.
 
           **Next steps**: merge this PR, then create the release tag pointing to the merge commit and publish the GitHub Release. The \`release: published\` event will trigger the main package publishing workflow." \
             --base "${{ github.ref_name }}" \

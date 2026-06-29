@@ -23,6 +23,7 @@ on:
 jobs:
   publish-jieba:
     name: Publish opencc-jieba
+    needs: publish-opencc
     runs-on: macos-15
     permissions:
       contents: read
@@ -161,7 +162,6 @@ jobs:
 
   publish-opencc:
     name: Publish opencc
-    needs: publish-jieba
     runs-on: macos-15
     permissions:
       contents: read

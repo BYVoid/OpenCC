@@ -372,6 +372,20 @@
       }
     },
     {
+      "id": "case_053",
+      "input": "楊聯陞",
+      "expected": {
+        "t2s": "杨联陞"
+      }
+    },
+    {
+      "id": "case_054",
+      "input": "步步高陞",
+      "expected": {
+        "t2s": "步步高升"
+      }
+    },
+    {
       "id": "BYVoid_OpenCC_Issue_475_s2twp",
       "input": "仙童半导体厂 人工智能借用",
       "expected": {

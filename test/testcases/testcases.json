@@ -1586,6 +1586,13 @@
       "expected": {
         "t2s": "并州"
       }
+    },
+    {
+      "id": "s2twp_2char_twphrases_segmentation_xin_pian",
+      "input": "芯片面积",
+      "expected": {
+        "s2twp": "晶片面積"
+      }
     }
   ]
 }

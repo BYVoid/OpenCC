@@ -40417,6 +40417,11 @@
 芭蕉布	芭蕉布
 芭蕾舞团	芭蕾舞團
 芯慧同用	芯慧同用
+# generate_st_phrases_from_regional_phrases.py skips TWPhrases keys with
+# len < 3 to avoid splitting longer Simplified words; that threshold may be
+# revisited (BYVoid/OpenCC#542). Until then, add individual 2-character keys
+# here to anchor mmseg segmentation.
+芯片	芯片
 芯片厂	芯片廠
 花个	花個
 花了	花了

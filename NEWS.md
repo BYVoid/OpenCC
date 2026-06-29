@@ -1,5 +1,34 @@
 # Change History of OpenCC
 
+## Version 1.3.2
+
+2026年6月29日
+
+* **詞庫更新**：
+    * 地區詞新增：20 種基本胺基酸及常見醫學／藥物臺灣名詞（[#1289](https://github.com/BYVoid/OpenCC/pull/1289), [#1299](https://github.com/BYVoid/OpenCC/pull/1299)）、`Fortune 500` 公司譯名（[#1270](https://github.com/BYVoid/OpenCC/pull/1270)）、香港專有名詞（[#1256](https://github.com/BYVoid/OpenCC/pull/1256), [#1267](https://github.com/BYVoid/OpenCC/pull/1267)）、美國州名／領地譯名（[#1269](https://github.com/BYVoid/OpenCC/pull/1269)）；持續修正多組因分詞界限導致的轉換失敗（[#1214](https://github.com/BYVoid/OpenCC/pull/1214), [#1296](https://github.com/BYVoid/OpenCC/pull/1296), [#1318](https://github.com/BYVoid/OpenCC/pull/1318)）。
+    * 字符映射修正：「后 / 後」「松 / 鬆」「虱目魚」（[commit](https://github.com/BYVoid/OpenCC/commit/ab3fea0a80b85feb7fba1164e8d56e0ab2cd4002)）、「欲」「丰 / 豐」「划 / 劃」「游 / 遊」「托 / 託」（[#1213](https://github.com/BYVoid/OpenCC/pull/1213)）、各式果乾詞條（葡萄乾、芒果乾等）、「冻干 / 凍乾」「榴莲 / 榴槤」（[#1233](https://github.com/BYVoid/OpenCC/pull/1233)）、「皂」「並」（[#788](https://github.com/BYVoid/OpenCC/pull/788)）、「內」「潘岳白髮」「采椽不斲」（[#1232](https://github.com/BYVoid/OpenCC/pull/1232)）、「毀」「凌」「仇」（[#1243](https://github.com/BYVoid/OpenCC/pull/1243)）、「焕 / 煥」「冢」（[#1244](https://github.com/BYVoid/OpenCC/pull/1244)）、「丁當」相關詞組（[#1036](https://github.com/BYVoid/OpenCC/pull/1036)）、「想象 / 想像」（[#1035](https://github.com/BYVoid/OpenCC/pull/1035)）、「周济 / 周濟」（[#1251](https://github.com/BYVoid/OpenCC/pull/1251)）、「坏 / 坯」（[#1250](https://github.com/BYVoid/OpenCC/pull/1250)）、「沈 / 沉」（[#1293](https://github.com/BYVoid/OpenCC/pull/1293)）、「甦」（[#1310](https://github.com/BYVoid/OpenCC/pull/1310)）、「里」（[#1295](https://github.com/BYVoid/OpenCC/pull/1295)）、「麪 / 麵 / 面」（[#1297](https://github.com/BYVoid/OpenCC/pull/1297)）、「硷」（[#461](https://github.com/BYVoid/OpenCC/pull/461)）、「鏟 / 剷 / 铲」（[#1319](https://github.com/BYVoid/OpenCC/pull/1319)）、「幷 / 并」（[#1335](https://github.com/BYVoid/OpenCC/issues/1335)）、「市場行銷 / 市場營銷」（[#1327](https://github.com/BYVoid/OpenCC/pull/1327)）、「妝髮」（[#1326](https://github.com/BYVoid/OpenCC/pull/1326)）、「去干擾」（[#1325](https://github.com/BYVoid/OpenCC/pull/1325)）、「乾闥婆」（[#1307](https://github.com/BYVoid/OpenCC/pull/1307)）；調整「内卷 / 內捲」（[#1203](https://github.com/BYVoid/OpenCC/pull/1203)）、「信道 / 通道」（[#508](https://github.com/BYVoid/OpenCC/pull/508)）、「調色板 / 調色盤」（[#1288](https://github.com/BYVoid/OpenCC/pull/1288)）等單向轉換策略。
+    * 新增 `HKVariantsPhrases` 與 `TWVariantsPhrases` 詞典，補充字級映射無法覆蓋的詞組例外（[#1247](https://github.com/BYVoid/OpenCC/pull/1247)）；新增 `s2hkp`、`hk2sp` 轉換模式（[#506](https://github.com/BYVoid/OpenCC/pull/506)）。
+    * 日文字體：重構 `jp2t` / `t2jp` 詞典與配置（[#1302](https://github.com/BYVoid/OpenCC/pull/1302), [#1303](https://github.com/BYVoid/OpenCC/pull/1303)），與日本官方字表對齊（[#1315](https://github.com/BYVoid/OpenCC/pull/1315)），修正多組歷史性錯誤對照，補充 `予 -> 預/豫`、`弁 -> 辯/辨/瓣`、`連 -> 聯`、`值`、`姬` 等詞語對應（[#1265](https://github.com/BYVoid/OpenCC/pull/1265)）。
+* **轉換行為調整**：
+    * 繁轉簡模式預設不再輸出大部分現代平台無法顯示的「類推簡化字」（取消 894 餘組轉換）；如需舊行為，可通過 `--include-tofu-risk-dictionaries` 啟用（[#1234](https://github.com/BYVoid/OpenCC/pull/1234)）。
+    * 所有內建配置均新增 CJK 相容表意文字正規化前處理（[#1358](https://github.com/BYVoid/OpenCC/pull/1358)）：Unicode U+F900–U+FAFF 區塊的字元在轉換前先映射至標準碼位，確保各移植實作行為一致。
+    * 命令列工具改善：串流輸入處理（[#1226](https://github.com/BYVoid/OpenCC/pull/1226)）、保留未映射位元組與表意描述序列（[#1292](https://github.com/BYVoid/OpenCC/pull/1292)）、對異體選擇符發出警告、Windows UTF-8 路徑支援（[#1220](https://github.com/BYVoid/OpenCC/pull/1220)）。
+* **配置文件新功能**（供自定義配置的使用者）：
+    * 配置文件全面支援 JSONC（[#1280](https://github.com/BYVoid/OpenCC/pull/1280), [#1301](https://github.com/BYVoid/OpenCC/pull/1301)）；違反 schema 時會發出警告（[#1351](https://github.com/BYVoid/OpenCC/pull/1351)）。
+    * 新增 inline dictionary：可在配置文件內直接嵌入詞條，無需另建 `.ocd2` 文件（[#1284](https://github.com/BYVoid/OpenCC/pull/1284)）；提供 `compile_to_inline_config.py` 工具將現有配置打包為自含格式（[#1300](https://github.com/BYVoid/OpenCC/pull/1300)）。詳見 [README.md 的「內聯字典」章節](https://github.com/BYVoid/OpenCC/blob/master/README.md#內聯字典inline-dictionary)。
+    * 詞典組新增 `match_policy` 欄位：`short_circuit`（短路，原有行為）或 `union`（最長前綴合并，取所有子詞典中最長的命中結果）（[#1352](https://github.com/BYVoid/OpenCC/pull/1352), [#1353](https://github.com/BYVoid/OpenCC/pull/1353)）。
+    * 新增 `normalization` 欄位，可在分詞與轉換前插入正規化步驟（[#1358](https://github.com/BYVoid/OpenCC/pull/1358)）。
+    * 從本版本起發佈純 `json + txt` 詞典資源包，供其他工具鏈互操作（[#1312](https://github.com/BYVoid/OpenCC/pull/1312), [#1321](https://github.com/BYVoid/OpenCC/pull/1321), [#1322](https://github.com/BYVoid/OpenCC/pull/1322)）。
+* **效能提升**：
+    * 前綴匹配流程優化，典型長文本提升 40%-60%（[#1287](https://github.com/BYVoid/OpenCC/pull/1287)）；新增單詞典 fast-path（[#1331](https://github.com/BYVoid/OpenCC/pull/1331), [#1332](https://github.com/BYVoid/OpenCC/pull/1332)）；記憶體載入 `ocd2` 支援延遲重建 lexicon（[#1328](https://github.com/BYVoid/OpenCC/pull/1328)）；消除轉換熱路徑中的多餘字串拷貝（[#1345](https://github.com/BYVoid/OpenCC/pull/1345), [#1359](https://github.com/BYVoid/OpenCC/pull/1359)）。
+    * 移除 `s2t`、`t2s`、`t2hk`、`t2tw`、`hk2t`、`jp2t`、`tw2t` 七種配置中冗餘的 mmseg 步驟（對這些單階段配置，mmseg 與轉換本身等價），消除一次額外輸入掃描（[#1362](https://github.com/BYVoid/OpenCC/pull/1362)）。
+* **C++ API**：
+    * `SimpleConverter`、`Segmentation`、`Conversion` 等主要介面新增 `std::string_view` 重載（[#1345](https://github.com/BYVoid/OpenCC/pull/1345), [#1359](https://github.com/BYVoid/OpenCC/pull/1359)）。
+    * 修復 `Dict` 析構相關 ABI 未定義行為（[#1278](https://github.com/BYVoid/OpenCC/pull/1278)）、MARISA `FlatVector` 初始化問題（修正後 32-bit 與 64-bit 系統生成的 `.ocd2` 內容一致，[commit](https://github.com/BYVoid/OpenCC/commit/c3e07074e282b80083ed7734be51caecf9e7804f)）；更新 marisa-trie 至 0.3.1.bcr.2。
+* **Python / Node.js**：
+    * Python 套件 [OpenCC](https://pypi.org/project/OpenCC/) 新增 CLI 入口（`pip install` 後即可直接使用 `opencc` 指令）（[#1337](https://github.com/BYVoid/OpenCC/pull/1337)）。
+    * npm 預編譯原生模組拆分為 scoped packages，安裝體積更小（[#1261](https://github.com/BYVoid/OpenCC/pull/1261), [#1263](https://github.com/BYVoid/OpenCC/pull/1263)）；更新 `cppjieba`（[#1320](https://github.com/BYVoid/OpenCC/pull/1320)）。
+
 ## Version 1.3.1
 
 2026年5月9日

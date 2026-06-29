@@ -41,6 +41,7 @@ Segmentation placement:
   "type": "mmseg",
   "dict": {
     "type": "group",
+    "match_policy": "short_circuit",
     "dicts": [
       {
         "type": "inline",
@@ -53,3 +54,8 @@ Segmentation placement:
   }
 }
 ```
+
+`match_policy: short_circuit` (the default when the field is absent) stops at
+the first dictionary in the group that has a match for the current prefix. Use
+it when your inline dict should take priority and you do not want later
+dictionaries to override it.

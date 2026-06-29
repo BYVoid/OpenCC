@@ -36,6 +36,7 @@ bazel-bin/src/tools/command_line \
   "type": "mmseg",
   "dict": {
     "type": "group",
+    "match_policy": "short_circuit",
     "dicts": [
       {
         "type": "inline",
@@ -48,3 +49,7 @@ bazel-bin/src/tools/command_line \
   }
 }
 ```
+
+`match_policy: short_circuit`（省略時的預設行為）會在詞典組中找到第一個命中當前前綴的
+詞典後短路停止，不再繼續查找後續詞典。當 inline dict 應優先生效、且不希望後面的詞典
+覆寫其結果時，使用此策略。

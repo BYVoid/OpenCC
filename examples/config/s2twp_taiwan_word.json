@@ -4,6 +4,7 @@
     "type": "mmseg",
     "dict": {
       "type": "group",
+      "match_policy": "short_circuit",
       "dicts": [
         {
           "type": "inline",
@@ -20,6 +21,7 @@
     {
       "dict": {
         "type": "group",
+        "match_policy": "short_circuit",
         "dicts": [
           { "type": "ocd2", "file": "STPhrases.ocd2" },
           { "type": "ocd2", "file": "STCharacters.ocd2" }
@@ -29,6 +31,7 @@
     {
       "dict": {
         "type": "group",
+        "match_policy": "short_circuit",
         "dicts": [
           {
             "type": "inline",

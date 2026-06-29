@@ -16,7 +16,7 @@ bazel_dep(name = "platforms", version = "1.1.0")
 bazel_dep(name = "pybind11_bazel", version = "3.0.1")
 bazel_dep(name = "rapidjson", version = "1.1.0.bcr.20250205")
 bazel_dep(name = "rules_cc", version = "0.2.20")
-bazel_dep(name = "rules_node_addon", version = "1.0.1")
+bazel_dep(name = "rules_node_addon", version = "1.0.2")
 bazel_dep(name = "rules_nodejs", version = "6.7.4")
 bazel_dep(name = "rules_python", version = "2.0.3")
 bazel_dep(name = "rules_zig", version = "0.14.0")
@@ -28,14 +28,6 @@ single_version_override(
     patches = ["//patches:rules-python-write-unstamped-build-data.patch"],
     patch_strip = 1,
     version = "2.0.3",
-)
-
-# rules_node_addon is not in the Bazel Central Registry; fetch the release tarball.
-archive_override(
-    module_name = "rules_node_addon",
-    integrity = "sha256-l7HlY7g3HFRGtgLfey08jNsCkHHK0K+5M1YYr3AVyhY=",
-    strip_prefix = "rules_node_addon-1.0.1",
-    urls = ["https://github.com/BYVoid/rules_node_addon/archive/refs/tags/v1.0.1.tar.gz"],
 )
 
 # Windows x64 node.lib import library for Zig/MinGW addon linking. node-addon-api

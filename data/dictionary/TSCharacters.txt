@@ -2247,6 +2247,7 @@
 興	兴
 舉	举
 舊	旧
+舖	铺
 舘	馆
 艙	舱
 # @tofu-risk: not covered by PingFang/Source Han baseline: 𫇛 U+2B1DB

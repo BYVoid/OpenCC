@@ -36,7 +36,7 @@ typedef int value_type;
 
 // The main structure of Darts-clone is an array of <DoubleArrayUnit>s, and the
 // unit type is actually a wrapper of <id_type>.
-typedef unsigned int id_type;
+typedef size_t id_type;
 
 // <progress_func_type> is the type of callback functions for reporting the
 // progress of building a dictionary. See also build() of <DoubleArray>.

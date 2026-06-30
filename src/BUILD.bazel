@@ -134,7 +134,7 @@ cc_library(
         ":text_dict_lib",
         ":utf8_util_lib",
         ":win_util_lib",
-        "//deps/rapidjson-1.1.0:rapidjson",
+        "@rapidjson//:rapidjson",
     ],
 )
 

@@ -267,10 +267,52 @@ private:
   const DictGroupMatchPolicy matchPolicy;
 };
 
+// Returns true if dict is a leaf dict, or if the entire subtree rooted at dict
+// consists only of union groups and leaf dicts (no short_circuit anywhere).
+// Union is associative, so such a tree is semantically equivalent to a single
+// flat union of all its leaf dicts: the longest match across all leaves wins,
+// which is exactly what a single LeafMatcher trie computes.
+bool CanFlattenAsUnion(const DictPtr& dict) {
+  const std::list<DictPtr>* items = dict->GetDictGroupItems();
+  if (items == nullptr) {
+    return true;
+  }
+  if (dict->GetMatchPolicy() != DictGroupMatchPolicy::Union) {
+    return false;
+  }
+  for (const DictPtr& child : *items) {
+    if (!CanFlattenAsUnion(child)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+void CollectAllLeafDicts(const DictPtr& dict, LeafMatcher* out) {
+  const std::list<DictPtr>* items = dict->GetDictGroupItems();
+  if (items == nullptr) {
+    out->AddDict(dict);
+    return;
+  }
+  for (const DictPtr& child : *items) {
+    CollectAllLeafDicts(child, out);
+  }
+}
+
 std::unique_ptr<PrefixMatch::Tables::Matcher> BuildMatcher(
     const DictPtr& dict) {
   const std::list<DictPtr>* dictGroupItems = dict->GetDictGroupItems();
   if (dictGroupItems != nullptr) {
+    // If the entire subtree is a pure union of leaf dicts, merge all entries
+    // into a single LeafMatcher. One trie traversal finds the longest match
+    // across all dicts, which equals union semantics, and eliminates the
+    // overhead of GroupMatcher dispatch and multiple traversals.
+    if (CanFlattenAsUnion(dict)) {
+      std::unique_ptr<LeafMatcher> leaf(new LeafMatcher);
+      CollectAllLeafDicts(dict, leaf.get());
+      return std::move(leaf);
+    }
+
     std::unique_ptr<GroupMatcher> group(
         new GroupMatcher(dict->GetMatchPolicy()));
     for (const DictPtr& child : *dictGroupItems) {

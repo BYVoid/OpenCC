@@ -562,6 +562,7 @@ TEST_F(ConfigTest, InlineDictInGroupTakesPriorityOverFollowingFileDict) {
                   "  \"conversion_chain\": [{\n"
                   "    \"dict\": {\n"
                   "      \"type\": \"group\",\n"
+                  "      \"match_policy\": \"short_circuit\",\n"
                   "      \"dicts\": [\n"
                   "        {\n"
                   "          \"type\": \"inline\",\n"
@@ -579,6 +580,40 @@ TEST_F(ConfigTest, InlineDictInGroupTakesPriorityOverFollowingFileDict) {
       config.NewFromString(json, {CONFIG_TEST_DIR_PATH + "/"});
   EXPECT_EQ(utf8("自訂覆寫"),
             inlineConverter->Convert(std::string_view(utf8("燕燕于飞"))));
+}
+
+TEST_F(ConfigTest, GroupDictWithoutMatchPolicyDefaultsToShortCircuit) {
+  const std::string json =
+      std::string("{\n"
+                  "  \"name\": \"Legacy Group Policy Test\",\n"
+                  "  \"segmentation\": {\n"
+                  "    \"type\": \"mmseg\",\n"
+                  "    \"dict\": {\"type\": \"text\", \"file\": \"config_test_phrases.txt\"}\n"
+                  "  },\n"
+                  "  \"conversion_chain\": [{\n"
+                  "    \"dict\": {\n"
+                  "      \"type\": \"group\",\n"
+                  "      \"dicts\": [\n"
+                  "        {\n"
+                  "          \"type\": \"inline\",\n"
+                  "          \"entries\": {\n"
+                  "            \"燕燕于飞\": \"自訂覆寫\"\n"
+                  "          }\n"
+                  "        },\n"
+                  "        {\"type\": \"text\", \"file\": \"config_test_phrases.txt\"}\n"
+                  "      ]\n"
+                  "    }\n"
+                  "  }]\n"
+                  "}\n");
+
+  testing::internal::CaptureStderr();
+  const ConverterPtr legacyConverter =
+      config.NewFromString(json, {CONFIG_TEST_DIR_PATH + "/"});
+  const std::string warning = testing::internal::GetCapturedStderr();
+  EXPECT_NE(std::string::npos,
+            warning.find("warning: config does not conform to schema"));
+  EXPECT_EQ(utf8("自訂覆寫"),
+            legacyConverter->Convert(std::string_view(utf8("燕燕于飞"))));
 }
 
 TEST_F(ConfigTest, UnionDictGroupPrefersLaterLongerMatch) {
@@ -712,10 +747,15 @@ TEST_F(ConfigTest, InlineDictPreservesExactStringSemantics) {
 TEST_F(ConfigTest, InlineDictValidationErrors) {
   const auto ExpectInvalidFormat = [this](const std::string& json,
                                           const std::string& expectedMessage) {
+    testing::internal::CaptureStderr();
     try {
       const ConverterPtr _ = config.NewFromString(json, "");
+      (void)testing::internal::GetCapturedStderr();
       FAIL() << "Expected InvalidFormat";
     } catch (const InvalidFormat& e) {
+      const std::string warning = testing::internal::GetCapturedStderr();
+      EXPECT_NE(std::string::npos,
+                warning.find("warning: config does not conform to schema"));
       EXPECT_NE(std::string::npos,
                 std::string(e.what()).find(expectedMessage));
     }
@@ -892,6 +932,7 @@ TEST_F(ConfigTest, InlineSegmentationAndConversionWorksWithOcd2GroupDicts) {
                   "    \"type\": \"mmseg\",\n"
                   "    \"dict\": {\n"
                   "      \"type\": \"group\",\n"
+                  "      \"match_policy\": \"short_circuit\",\n"
                   "      \"dicts\": [\n"
                   "        {\n"
                   "          \"type\": \"inline\",\n"
@@ -907,6 +948,7 @@ TEST_F(ConfigTest, InlineSegmentationAndConversionWorksWithOcd2GroupDicts) {
                   "    {\n"
                   "      \"dict\": {\n"
                   "        \"type\": \"group\",\n"
+                  "        \"match_policy\": \"short_circuit\",\n"
                   "        \"dicts\": [\n"
                   "          {\n"
                   "            \"type\": \"inline\",\n"

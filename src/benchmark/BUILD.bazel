@@ -1,0 +1,26 @@
+load("@rules_cc//cc:defs.bzl", "cc_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+cc_binary(
+    name = "performance",
+    testonly = True,
+    srcs = ["Performance.cpp"],
+    includes = [".."],
+    deps = [
+        "@codspeed_google_benchmark_compat//:benchmark",
+        "//deps/rapidjson-1.1.0:rapidjson",
+        "//src:exception_lib",
+        "//src:simple_converter_lib",
+        "//src:test_utils_utf8_lib",
+        "@bazel_tools//tools/cpp/runfiles",
+    ],
+    data = [
+        "//data/config:config",
+        "//data/dictionary:CJK_Compatibility_Ideographs.txt",
+        "//data/dictionary:binary_dictionaries",
+        "//data/dictionary:text_dictionaries",
+        "//src/tools:command_line",
+        "//test/benchmark:benchmark_data",
+    ],
+)

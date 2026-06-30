@@ -100,7 +100,7 @@ set(UNITTESTS
 if (ENABLE_DARTS)
   set(OPENCC_ENABLE_DARTS 1)
   if(NOT USE_SYSTEM_DARTS)
-    include_directories(SYSTEM ../deps/darts-clone-0.32)
+    include_directories(SYSTEM ../deps/darts-clone-0.32h/include)
   endif()
   set(
     LIBOPENCC_HEADERS

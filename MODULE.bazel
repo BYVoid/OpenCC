@@ -30,6 +30,11 @@ single_version_override(
     version = "2.0.3",
 )
 
+local_path_override(
+    module_name = "darts-clone",
+    path = "deps/darts-clone-0.32h",
+)
+
 # Windows x64 node.lib import library for Zig/MinGW addon linking. node-addon-api
 # comes from BCR (above) and the Node C headers come from the rules_nodejs Node
 # toolchain (below); this import library is available from neither.

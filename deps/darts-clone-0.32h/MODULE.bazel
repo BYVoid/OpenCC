@@ -1,0 +1,7 @@
+"""Darts-clone is a clone of Darts (Double-ARray Trie System)."""
+
+module(
+    name = "darts-clone",
+    version = "0.32h",
+    compatibility_level = 0,
+)

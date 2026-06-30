@@ -116,7 +116,7 @@ set +e
   -Ideps/marisa-0.3.1/include \
   -Ideps/marisa-0.3.1/lib \
   -Ideps/tclap-1.2.5 \
-  -Ideps/darts-clone-0.32 \
+  -Ideps/darts-clone-0.32h/include \
   "${sources[@]}" \
   -lshell32 \
   -Wl,--strip-all \

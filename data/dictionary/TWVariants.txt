@@ -7,7 +7,6 @@
 # Also used to generate TWVariantsRev.txt. See data/scripts/reverse.py for
 # the reverse dictionary generation algorithm.
 
-·	．
 僞	偽
 啓	啟
 喫	吃

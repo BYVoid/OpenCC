@@ -1,7 +1,10 @@
 name: Build and upload python package to PyPI
 
 on:
-  workflow_dispatch
+  push:
+    tags:
+      - "ver.*"
+  workflow_dispatch:
 
 jobs:
   release-pypi:

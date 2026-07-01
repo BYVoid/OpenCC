@@ -714,13 +714,13 @@
       }
     },
     {
-      "id": "BYVoid_OpenCC_Issue_914",
+      "id": "BYVoid_OpenCC_Issue_1366",
       "input": "别强 彆強",
       "expected": {
-        "s2t": "别强 彆強",
-        "s2tw": "别强 彆強",
-        "s2twp": "别强 彆強",
-        "s2hk": "别强 彆強",
+        "s2t": "別強 彆強",
+        "s2tw": "別強 彆強",
+        "s2twp": "別強 彆強",
+        "s2hk": "別強 彆強",
         "t2s": "别强 别强",
         "tw2s": "别强 别强",
         "hk2s": "别强 别强"

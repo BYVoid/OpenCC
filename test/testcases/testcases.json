@@ -714,7 +714,7 @@
       }
     },
     {
-      "id": "BYVoid_OpenCC_Issue_1366",
+      "id": "BYVoid_OpenCC_Issue_914",
       "input": "别强 彆強",
       "expected": {
         "s2t": "別強 彆強",

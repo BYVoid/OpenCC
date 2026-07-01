@@ -8157,7 +8157,7 @@
 别开蹊径	別開蹊徑
 别异	別異
 别弹	別彈
-# BYVoid/OpenCC/issues/1366 「别强」應轉為「別強」，避免同形映射
+# BYVoid/OpenCC/issues/914 「别强调」應轉為「別強調」；BYVoid/OpenCC/issues/1366 補充「别强」詞條應轉為「別強」
 别强	別強 彆強
 别当	別當
 别得	別得

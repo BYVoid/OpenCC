@@ -30,7 +30,6 @@
 
 #include "Export.hpp"
 #include "Optional.hpp"
-#include "opencc_config.h"
 
 // Forward decalarations and alias
 namespace opencc {
@@ -62,12 +61,10 @@ typedef std::shared_ptr<Segments> SegmentsPtr;
 typedef std::shared_ptr<SerializableDict> SerializableDictPtr;
 typedef std::shared_ptr<TextDict> TextDictPtr;
 
-#ifdef OPENCC_ENABLE_DARTS
 class BinaryDict;
 class DartsDict;
 typedef std::shared_ptr<BinaryDict> BinaryDictPtr;
 typedef std::shared_ptr<DartsDict> DartsDictPtr;
-#endif
 
 } // namespace opencc
 

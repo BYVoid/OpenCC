@@ -25,9 +25,7 @@
 #include "WinUtil.hpp"
 #endif
 
-#ifdef ENABLE_DARTS
 #include "DartsDict.hpp"
-#endif
 
 using namespace opencc;
 
@@ -47,9 +45,7 @@ DictPtr LoadDictionary(const std::string& format,
     fclose(fp);
     return dict;
   } else if (format == "ocd") {
-#ifdef ENABLE_DARTS
     return SerializableDict::NewFromFile<DartsDict>(inputFileName);
-#endif
   } else if (format == "ocd2") {
     return SerializableDict::NewFromFile<MarisaDict>(inputFileName);
   }
@@ -62,9 +58,7 @@ SerializableDictPtr ConvertDict(const std::string& format, const DictPtr dict) {
   if (format == "text") {
     return TextDict::NewFromDict(*dict.get());
   } else if (format == "ocd") {
-#ifdef ENABLE_DARTS
     return DartsDict::NewFromDict(*dict.get());
-#endif
   } else if (format == "ocd2") {
     return MarisaDict::NewFromDict(*dict.get());
   }

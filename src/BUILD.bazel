@@ -89,7 +89,6 @@ cc_library(
         "Common.hpp",
         "Export.hpp",
         "Optional.hpp",
-        "opencc_config.h",
     ],
     defines = ["Opencc_BUILT_AS_STATIC"],
 )

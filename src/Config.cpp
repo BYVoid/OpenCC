@@ -44,9 +44,7 @@
 #include "TextDict.hpp"
 #include "UTF8Util.hpp"
 
-#ifdef ENABLE_DARTS
 #include "DartsDict.hpp"
-#endif
 
 typedef rapidjson::GenericValue<rapidjson::UTF8<char>> JSONValue;
 
@@ -413,6 +411,39 @@ public:
     }
   }
 
+  DictPtr LoadOcdDictWithResourceProvider(const std::string& fileName) {
+    if (resourceProvider == nullptr) {
+      throw FileNotFound(fileName);
+    }
+    const std::shared_ptr<const ResourceProvider::Resource> resource =
+        resourceProvider->GetResource(fileName);
+    std::string cacheKey = "ocd\n" + resource->CacheKey();
+    {
+      std::lock_guard<std::mutex> lock(DictCacheMutex());
+      PruneExpiredDictCache();
+      const auto cached = DictCache().find(cacheKey);
+      if (cached != DictCache().end()) {
+        DictPtr dict = cached->second.lock();
+        if (dict != nullptr) {
+          return dict;
+        }
+      }
+    }
+    DictPtr dict =
+        DartsDict::NewFromBuffer(resource->Data(), resource->Size());
+    {
+      std::lock_guard<std::mutex> lock(DictCacheMutex());
+      PruneExpiredDictCache();
+      std::weak_ptr<Dict>& cached = DictCache()[cacheKey];
+      DictPtr cachedDict = cached.lock();
+      if (cachedDict == nullptr) {
+        cached = dict;
+        return dict;
+      }
+      return cachedDict;
+    }
+  }
+
   DictPtr LoadOcd2DictWithResourceProvider(const std::string& fileName) {
     if (resourceProvider == nullptr) {
       throw FileNotFound(fileName);
@@ -452,11 +483,16 @@ public:
     if (type == "text") {
       return LoadTextMarisaDictWithResourceProvider(fileName);
     }
-#ifdef ENABLE_DARTS
     if (type == "ocd") {
+      if (resourceProvider != nullptr) {
+        try {
+          return LoadOcdDictWithResourceProvider(fileName);
+        } catch (const FileNotFound&) {
+          // Fallback to loading from resolved file path
+        }
+      }
       return LoadDictWithResourceProvider<DartsDict>("ocd", fileName);
     }
-#endif
     if (type == "ocd2") {
       if (resourceProvider != nullptr) {
         try {

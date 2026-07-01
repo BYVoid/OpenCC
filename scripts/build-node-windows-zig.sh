@@ -31,6 +31,7 @@ sources=(
   src/Conversion.cpp
   src/ConversionChain.cpp
   src/Converter.cpp
+  src/DartsDict.cpp
   src/Dict.cpp
   src/DictConverter.cpp
   src/DictEntry.cpp
@@ -77,6 +78,7 @@ set +e
   -Ideps/rapidjson-1.1.0 \
   -Ideps/marisa-0.3.1/include \
   -Ideps/marisa-0.3.1/lib \
+  -Ideps/darts-clone-0.32h/include \
   -I"$node_include_dir" \
   -I"$napi_include_dir" \
   "${sources[@]}" \

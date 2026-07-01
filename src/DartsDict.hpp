@@ -53,6 +53,7 @@ public:
   static DartsDictPtr NewFromDict(const Dict& thatDict);
 
   static DartsDictPtr NewFromFile(FILE* fp);
+  static DartsDictPtr NewFromBuffer(const char* data, size_t size);
 
 private:
   DartsDict();

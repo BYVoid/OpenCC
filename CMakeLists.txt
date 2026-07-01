@@ -49,10 +49,8 @@ option(BUILD_SHARED_LIBS "Build opencc as shared library" ${_OPENCC_DEFAULT_BUIL
 option(OPENCC_ENABLE_INSTALL "Generate install targets" ${_OPENCC_DEFAULT_ENABLE_INSTALL})
 option(ENABLE_GTEST "Build all tests." OFF)
 option(ENABLE_BENCHMARK "Build benchmark tests." OFF)
-option(ENABLE_DARTS "Build DartsDict (ocd format)." ON)
 option(BUILD_OPENCC_JIEBA_PLUGIN "Build Jieba segmentation as a loadable plugin." OFF)
 option(BUILD_PYTHON "Build python library" OFF)
-option(USE_SYSTEM_DARTS "Use system version of Darts" OFF)
 option(USE_SYSTEM_GOOGLE_BENCHMARK "Use system version of Google Benchmark" OFF)
 option(USE_SYSTEM_GTEST "Use system version of GoogleTest" OFF)
 option(USE_SYSTEM_MARISA "Use system version of Marisa" OFF)
@@ -256,12 +254,6 @@ if (ENABLE_BENCHMARK)
   add_definitions(
     -DPROJECT_BINARY_DIR="${PROJECT_BINARY_DIR}"
     -DPROJECT_SOURCE_DIR="${PROJECT_SOURCE_DIR}"
-  )
-endif()
-
-if (ENABLE_DARTS)
-  add_definitions(
-    -DENABLE_DARTS
   )
 endif()
 

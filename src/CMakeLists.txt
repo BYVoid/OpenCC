@@ -48,7 +48,6 @@ set(
   UTF8StringSlice.hpp
   UTF8Util.hpp
   opencc.h
-  "${PROJECT_BINARY_DIR}/src/opencc_config.h"
 )
 
 set(
@@ -97,34 +96,25 @@ set(UNITTESTS
   UTF8UtilTest
 )
 
-if (ENABLE_DARTS)
-  set(OPENCC_ENABLE_DARTS 1)
-  if(NOT USE_SYSTEM_DARTS)
-    include_directories(SYSTEM ../deps/darts-clone-0.32h/include)
-  endif()
-  set(
-    LIBOPENCC_HEADERS
-    ${LIBOPENCC_HEADERS}
-    BinaryDict.hpp
-    DartsDict.hpp
-  )
-  set(
-    LIBOPENCC_SOURCES
-    ${LIBOPENCC_SOURCES}
-    BinaryDict.cpp
-    DartsDict.cpp
-  )
-  set(
-    UNITTESTS
-    ${UNITTESTS}
-    BinaryDictTest
-    DartsDictTest
-  )
-endif()
-
-configure_file(
-  "${PROJECT_SOURCE_DIR}/src/opencc_config.h.in"
-  "${PROJECT_BINARY_DIR}/src/opencc_config.h")
+include_directories(SYSTEM ../deps/darts-clone-0.32h/include)
+set(
+  LIBOPENCC_HEADERS
+  ${LIBOPENCC_HEADERS}
+  BinaryDict.hpp
+  DartsDict.hpp
+)
+set(
+  LIBOPENCC_SOURCES
+  ${LIBOPENCC_SOURCES}
+  BinaryDict.cpp
+  DartsDict.cpp
+)
+set(
+  UNITTESTS
+  ${UNITTESTS}
+  BinaryDictTest
+  DartsDictTest
+)
 
 if (WIN32)
   set(RC_FILE_DESCRIPTION "Open Chinese Convert Library")

@@ -316,6 +316,84 @@ DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
   return dict;
 }
 
+DartsDictPtr DartsDict::NewFromBuffer(const char* data, size_t size) {
+  DartsDictPtr dict(new DartsDict());
+
+  size_t headerLen = strlen(OCDHEADER);
+  if (size < headerLen || memcmp(data, OCDHEADER, headerLen) != 0) {
+    throw InvalidFormat("Invalid OpenCC dictionary header");
+  }
+  size_t offset = headerLen;
+
+  if (size - offset < 8) {
+    throw InvalidFormat("Invalid OpenCC dictionary header (dartsSize)");
+  }
+  uint8_t probe[8];
+  memcpy(probe, data + offset, 8);
+  offset += 8;
+  bool is64bit =
+      (probe[4] == 0 && probe[5] == 0 && probe[6] == 0 && probe[7] == 0);
+
+  auto internal = dict->internal;
+
+  if (is64bit) {
+    uint64_t dartsSize64;
+    memcpy(&dartsSize64, probe, 8);
+    size_t dartsSize = static_cast<size_t>(dartsSize64);
+    if (dartsSize > size - offset) {
+      throw InvalidFormat(
+          "Invalid OpenCC dictionary (dartsSize exceeds file size)");
+    }
+    if (dartsSize % sizeof(LegacyUnit64) != 0) {
+      throw InvalidFormat("Invalid legacy OCD dictionary unit alignment");
+    }
+    void* buffer = malloc(dartsSize);
+    memcpy(buffer, data + offset, dartsSize);
+    offset += dartsSize;
+    internal->buffer = buffer;
+    internal->binary = BinaryDict::NewFromBuffer(data + offset, size - offset);
+    internal->legacyArray64 = static_cast<const LegacyUnit64*>(buffer);
+    dict->lexicon = internal->binary->GetLexicon();
+    dict->maxLength = internal->binary->KeyMaxLength();
+    size_t numUnits = dartsSize / sizeof(LegacyUnit64);
+    if (!ValidateLegacy64(internal->legacyArray64, numUnits,
+                          static_cast<int>(dict->lexicon->Length()))) {
+      throw InvalidFormat("Invalid legacy OCD dictionary darts data");
+    }
+    return dict;
+  }
+
+  // 32-bit: dartsSize is the first 4 bytes of probe; probe[4..7] belong to the
+  // darts array, so rewind 4 bytes before reading the array.
+  uint32_t dartsSize32;
+  memcpy(&dartsSize32, probe, 4);
+  size_t dartsSize = dartsSize32;
+  offset -= 4;
+  if (dartsSize > size - offset) {
+    throw InvalidFormat(
+        "Invalid OpenCC dictionary (dartsSize exceeds file size)");
+  }
+  Darts::DoubleArray* doubleArray = new Darts::DoubleArray();
+  if (dartsSize % doubleArray->unit_size() != 0) {
+    delete doubleArray;
+    throw InvalidFormat("Invalid OpenCC dictionary size of darts alignment");
+  }
+  void* buffer = malloc(dartsSize);
+  memcpy(buffer, data + offset, dartsSize);
+  offset += dartsSize;
+  doubleArray->set_array(buffer, dartsSize / doubleArray->unit_size());
+  internal->buffer = buffer;
+  internal->binary = BinaryDict::NewFromBuffer(data + offset, size - offset);
+  internal->doubleArray = doubleArray;
+  dict->lexicon = internal->binary->GetLexicon();
+  dict->maxLength = internal->binary->KeyMaxLength();
+  if (!doubleArray->validate(static_cast<Darts::DoubleArray::value_type>(
+          dict->lexicon->Length()))) {
+    throw InvalidFormat("Invalid OpenCC dictionary darts data");
+  }
+  return dict;
+}
+
 DartsDictPtr DartsDict::NewFromDict(const Dict& thatDict) {
   DartsDictPtr dict(new DartsDict());
 

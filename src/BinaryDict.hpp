@@ -35,6 +35,7 @@ public:
   virtual void SerializeToFile(FILE* fp) const;
 
   static BinaryDictPtr NewFromFile(FILE* fp);
+  static BinaryDictPtr NewFromBuffer(const char* data, size_t size);
 
   const LexiconPtr& GetLexicon() const { return lexicon; }
 

@@ -4,14 +4,17 @@
 
 2026年7月1日
 
+* **發佈重點**：本版本主要目的是將 C++ ABI / SOVERSION 從 1.3 提升至 1.4，避免舊版下游程式靜默載入 ABI 不相容的新 `libopencc`；另外修復一個 1.3.2 與 `librime` 不相容之行為。詞表相較 1.3.2 有少量改動。
 * **詞庫更新**：
     * 修正 `s2twp` 中 `芯片` 的分詞與轉換結果，避免區域詞被拆開後無法套用臺灣用語（[commit](https://github.com/BYVoid/OpenCC/commit/773a9e11d2e3b0c13f018f0effaab3ded8e0e033)）。
     * 修正「批覆 / 批复」、「陞 / 升」、「锺繇」、「魏徵」、「搧 / 扇」、「沈厚 / 沉厚」、「芝柏表」、U+20F24 相關詞條，以及若干含「陞」「钜」字的人名（[#1365](https://github.com/BYVoid/OpenCC/pull/1365)）。
     * 修正含「台」字的人名、「今周刊」、「爱丽舍 / 爱丽舍宫」、「舖 / 铺」等轉換；調整 `HKVariantsRevPhrases` 中的香港用字反向映射（[#1369](https://github.com/BYVoid/OpenCC/pull/1369)）。
+    * 新增「自干五 → 自乾五」；補充動詞用法「扇 → 搧」的詞組轉換（`呼扇`、`扇火`、`扇風`、`扇風耳朵`、`鋪眉搧眼`）並在字符映射中加入 `搧` 作為 `扇` 的候選（[#1371](https://github.com/BYVoid/OpenCC/pull/1371)）。
     * 修正 `别强` 預設轉換為 `別強`（[#1366](https://github.com/BYVoid/OpenCC/pull/1366), [#1378](https://github.com/BYVoid/OpenCC/pull/1378)）；移除 `STPhrases.txt` 中以全形句號「．」分隔、實際難以命中的人名詞條（[#1379](https://github.com/BYVoid/OpenCC/pull/1379)）。
 * **Darts / `.ocd` 字典格式**：
     * 升級 vendored `darts-clone` 至 v0.32h，並加強 malformed `.ocd` 驗證，避免讀取損壞字典時越界或接受不一致資料（[#1372](https://github.com/BYVoid/OpenCC/pull/1372)）。
     * 新寫出的 `.ocd` Darts unit 固定為 32-bit，同時自動偵測並讀取 legacy 64-bit `.ocd`，修復舊檔 prefix search 邊界問題（[#1373](https://github.com/BYVoid/OpenCC/pull/1373)）。
+    * 改善 `DartsDict` 讀取錯誤或 legacy `.ocd` 檔案時的記憶體所有權與例外安全，避免驗證失敗路徑洩漏或留下不完整狀態（[#1382](https://github.com/BYVoid/OpenCC/pull/1382)）。
     * Darts 支援改為常態啟用，移除 `ENABLE_DARTS` / `USE_SYSTEM_DARTS` 分支；內建 `opencc_dict` 的 `ocd` 轉換和 runtime `.ocd` 載入，`.ocd` 字典可從 filesystem 或 resource zip 載入（[#1374](https://github.com/BYVoid/OpenCC/pull/1374)）。
 * **效能提升**：
     * 純 `union` 詞典組中的單詞典前綴匹配新增 fast-path，減少不必要的群組遍歷（[#1367](https://github.com/BYVoid/OpenCC/pull/1367)）。
@@ -23,10 +26,12 @@
 * **Node.js / Python / 構建系統**：
     * 修復 `opencc-jieba` npm 套件中 normalization 相關資源路徑，並補充 Node.js 測試覆蓋（[commit](https://github.com/BYVoid/OpenCC/commit/6f431a2b1d83fdfed0aec5f53341bb93b3c3288c)）。
     * Bazel 依賴更新：`rules_node_addon` 切換至 BCR 1.0.2，`node_addon_api` 更新至 BCR 8.9.0；vendored RapidJSON 與 `1.1.0.bcr.20250205` 對齊（[#1368](https://github.com/BYVoid/OpenCC/pull/1368)）。
-    * Python 測試新增 Bazel pytest runner；Windows Zig 構建腳本更新以配合 vendored Darts 與 Node 原生模組構建（[#1375](https://github.com/BYVoid/OpenCC/pull/1375)）。
-* **測試與文檔**：
+    * Bazel BUILD 檔改用顯式規則載入並補充必要 `exports_files`，提升 Bazel 9/10 前向相容性（[#1381](https://github.com/BYVoid/OpenCC/pull/1381)）。
+    * 修復 native CLI 與 Node.js CLI 的內建設定檔說明清單遺漏 `s2hkp.json`、`hk2sp.json`；兩個設定在 v1.3.2（[#506](https://github.com/BYVoid/OpenCC/pull/506)）新增但未列於說明文字。
+* **測試**：
     * 補充 `s2twp` mixed-script 測試、Darts `.ocd` 32-bit / legacy 64-bit 讀取測試、resource zip 載入測試、normalization conversion-chain introspection 測試，以及多組詞庫回歸測試。
-    * README 新增 GitHub Downloads 與 WinGet 徽章（[commit](https://github.com/BYVoid/OpenCC/commit/6383259a2254dfaa5d77a855346d65d64a40abf5)）；清理配置 schema warning 測試（[commit](https://github.com/BYVoid/OpenCC/commit/7bb8af01585337a94d293ec591861f461450e4af)）。
+    * Windows Zig 構建腳本更新以配合 vendored Darts 與 Node 原生模組構建（[#1375](https://github.com/BYVoid/OpenCC/pull/1375)）。
+    * 清理配置 schema warning 測試（[commit](https://github.com/BYVoid/OpenCC/commit/7bb8af01585337a94d293ec591861f461450e4af)）。
 
 ## Version 1.3.2
 

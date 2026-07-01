@@ -376,7 +376,8 @@ DartsDictPtr DartsDict::NewFromBuffer(const char* data, size_t size) {
     return dict;
   }
 
-  // 32-bit:
+  // 32-bit: dartsSize is the first 4 bytes of probe; probe[4..7] belong to the
+  // darts array, so rewind 4 bytes before reading the array.
   uint32_t dartsSize32;
   memcpy(&dartsSize32, probe, 4);
   size_t dartsSize = dartsSize32;

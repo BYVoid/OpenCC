@@ -55,12 +55,15 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 
 ### Prebuilt binaries 預編譯二進位檔
 
-* Windows (x86_64): [OpenCC-1.3.2](https://github.com/BYVoid/OpenCC/releases/download/ver.1.3.2/OpenCC-1.3.2-windows-x64-portable.zip) ([SHA-256](https://github.com/BYVoid/OpenCC/releases/download/ver.1.3.2/OpenCC-1.3.2-windows-x64-portable.zip.sha256))
+OpenCC 1.4.0 主要更新是將 C++ ABI / SOVERSION 提升至 1.4，避免舊版
+`libopencc.so.1.3` 使用者靜默載入 ABI 不相容的新版本；下游 C++ 程式需重新鏈結。
+
+* Windows (x86_64): [OpenCC-1.4.0](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.0/OpenCC-1.4.0-windows-x64-portable.zip) ([SHA-256](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.0/OpenCC-1.4.0-windows-x64-portable.zip.sha256))
     * This Windows release is available from WinGet. For details, see [doc/windows-winget-release.md](doc/windows-winget-release.md).
     * Requires Microsoft Visual C++ Redistributable for Visual Studio 2015-2026. Download the latest version from [Microsoft](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-supported-redistributable-version).
 * Debian/Ubuntu (amd64):
-    * [opencc_1.3.2_amd64.deb](https://github.com/BYVoid/OpenCC/releases/download/ver.1.3.2/opencc_1.3.2_amd64.deb)
-    * [opencc-jieba_1.3.2_amd64.deb](https://github.com/BYVoid/OpenCC/releases/download/ver.1.3.2/opencc-jieba_1.3.2_amd64.deb)
+    * [opencc_1.4.0_amd64.deb](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.0/opencc_1.4.0_amd64.deb)
+    * [opencc-jieba_1.4.0_amd64.deb](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.0/opencc-jieba_1.4.0_amd64.deb)
 
 ## Usage 使用
 

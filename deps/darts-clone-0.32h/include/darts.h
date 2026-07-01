@@ -2,6 +2,7 @@
 #define DARTS_H_
 
 #include <cstdio>
+#include <cstring>
 #include <exception>
 #include <new>
 
@@ -173,6 +174,14 @@ class DoubleArrayImpl {
     array_ = static_cast<const unit_type *>(ptr);
     size_ = size;
   }
+  void copy_array(const void* ptr, std::size_t num_bytes) {
+    clear();
+    const std::size_t extra_padding = num_bytes % unit_size() == 0 ? 0 : 1;
+    size_ = num_bytes / unit_size() + extra_padding;
+    buf_ = new unit_type[size_];
+    std::memcpy(buf_, ptr, num_bytes);
+    array_ = buf_;
+  }
   // array() returns a pointer to the array of units.
   const void *array() const {
     return array_;
@@ -283,6 +292,24 @@ class DoubleArrayImpl {
       std::size_t max_num_results, std::size_t length = 0,
       std::size_t node_pos = 0) const;
 
+  // The 1st commonLongestPrefixSearch() earches for the longest key which
+  // matches a prefix of the given string, and if it exists, its value and
+  // length are set to `result'. Otherwise, the value and the length of
+  //`result' are set to -1 and 0 respectively. Note that if `length' is 0,
+  // `key' is handled as a zero-terminated string. `node_pos' works as well as
+  // in exactMatchSearch().
+  template <class U>
+  void commonLongestPrefixSearch(const key_type *key, U &result,
+      std::size_t length = 0, std::size_t node_pos = 0) const {
+    result = commonLongestPrefixSearch<U>(key, length, node_pos);
+  }
+  // The 2nd commonLongestPrefixSearch() returns a result instead of updating
+  // the 2nd argument. So, the following commonLongestPrefixSearch() has only
+  // 3 arguments.
+  template <class U>
+  inline U commonLongestPrefixSearch(const key_type *key,
+      std::size_t length = 0, std::size_t node_pos = 0) const;
+
   // In Darts-clone, a dictionary is a deterministic finite-state automaton
   // (DFA) and traverse() tests transitions on the DFA. The initial state is
   // `node_pos' and traverse() chooses transitions labeled key[key_pos],
@@ -296,6 +323,8 @@ class DoubleArrayImpl {
   // updates `node_pos' and `key_pos' after each transition.
   inline value_type traverse(const key_type *key, std::size_t &node_pos,
       std::size_t &key_pos, std::size_t length = 0) const;
+
+  bool validate(value_type max_value_limit = -1) const;
 
  private:
   typedef Details::uchar_type uchar_type;
@@ -346,24 +375,52 @@ int DoubleArrayImpl<A, B, T, C>::open(const char *file_name,
     size = std::ftell(file) - offset;
   }
 
+  size /= unit_size();
+  if (size < 256 || (size & 0xFF) != 0) {
+    std::fclose(file);
+    return -1;
+  }
+
   if (std::fseek(file, offset, SEEK_SET) != 0) {
     std::fclose(file);
     return -1;
   }
 
-  size /= unit_size();
+  unit_type units[256];
+  if (std::fread(units, unit_size(), 256, file) != 256) {
+    std::fclose(file);
+    return -1;
+  }
+
+  if (units[0].label() != '\0' || units[0].has_leaf() ||
+      units[0].offset() == 0 || units[0].offset() >= 512) {
+    std::fclose(file);
+    return -1;
+  }
+  for (id_type i = 1; i < 256; ++i) {
+    if (units[i].label() <= 0xFF && units[i].offset() >= size) {
+      std::fclose(file);
+      return -1;
+    }
+  }
+
   unit_type *buf;
   try {
     buf = new unit_type[size];
+    for (id_type i = 0; i < 256; ++i) {
+      buf[i] = units[i];
+    }
   } catch (const std::bad_alloc &) {
     std::fclose(file);
     DARTS_THROW("failed to open double-array: std::bad_alloc");
   }
 
-  if (std::fread(buf, unit_size(), size, file) != size) {
-    std::fclose(file);
-    delete[] buf;
-    return -1;
+  if (size > 256) {
+    if (std::fread(buf + 256, unit_size(), size - 256, file) != size - 256) {
+      std::fclose(file);
+      delete[] buf;
+      return -1;
+    }
   }
   std::fclose(file);
 
@@ -377,7 +434,7 @@ int DoubleArrayImpl<A, B, T, C>::open(const char *file_name,
 
 template <typename A, typename B, typename T, typename C>
 int DoubleArrayImpl<A, B, T, C>::save(const char *file_name,
-    const char *mode, std::size_t) const {
+    const char *mode, std::size_t offset) const {
   if (size() == 0) {
     return -1;
   }
@@ -394,12 +451,40 @@ int DoubleArrayImpl<A, B, T, C>::save(const char *file_name,
   }
 #endif
 
+  if (std::fseek(file, offset, SEEK_SET) != 0) {
+    std::fclose(file);
+    return -1;
+  }
+
   if (std::fwrite(array_, unit_size(), size(), file) != size()) {
     std::fclose(file);
     return -1;
   }
   std::fclose(file);
   return 0;
+}
+
+template <typename A, typename B, typename T, typename C>
+bool DoubleArrayImpl<A, B, T, C>::validate(value_type max_value_limit) const {
+  if (size_ == 0 || array_ == NULL) {
+    return false;
+  }
+  if (array_[0].label() != '\0' || array_[0].has_leaf() ||
+      array_[0].offset() == 0 || ((0 ^ array_[0].offset()) | 0xFF) >= size_) {
+    return false;
+  }
+  for (std::size_t i = 1; i < size_; ++i) {
+    if (array_[i].label() <= 0xFF) {
+      if (((i ^ array_[i].offset()) | 0xFF) >= size_) {
+        return false;
+      }
+    } else if (max_value_limit >= 0) {
+      if (array_[i].value() >= max_value_limit) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 template <typename A, typename B, typename T, typename C>
@@ -482,6 +567,49 @@ inline std::size_t DoubleArrayImpl<A, B, T, C>::commonPrefixSearch(
   }
 
   return num_results;
+}
+
+template <typename A, typename B, typename T, typename C>
+template <typename U>
+inline U DoubleArrayImpl<A, B, T, C>::commonLongestPrefixSearch(
+    const key_type *key, std::size_t length,
+    std::size_t node_pos) const {
+  U result;
+  set_result(&result, static_cast<value_type>(-1), 0);
+
+  unit_type unit = array_[node_pos];
+  node_pos ^= unit.offset();
+  if (length != 0) {
+    for (std::size_t i = 0; i < length; ++i) {
+      node_pos ^= static_cast<uchar_type>(key[i]);
+      unit = array_[node_pos];
+      if (unit.label() != static_cast<uchar_type>(key[i])) {
+        return result;
+      }
+
+      node_pos ^= unit.offset();
+      if (unit.has_leaf()) {
+        set_result(&result, static_cast<value_type>(
+            array_[node_pos].value()), i + 1);
+      }
+    }
+  } else {
+    for ( ; key[length] != '\0'; ++length) {
+      node_pos ^= static_cast<uchar_type>(key[length]);
+      unit = array_[node_pos];
+      if (unit.label() != static_cast<uchar_type>(key[length])) {
+        return result;
+      }
+
+      node_pos ^= unit.offset();
+      if (unit.has_leaf()) {
+        set_result(&result, static_cast<value_type>(
+            array_[node_pos].value()), length + 1);
+      }
+    }
+  }
+
+  return result;
 }
 
 template <typename A, typename B, typename T, typename C>
@@ -861,7 +989,7 @@ class Keyset {
   bool has_values() const {
     return values_ != NULL;
   }
-  value_type values(std::size_t id) const {
+  const value_type values(std::size_t id) const {
     if (has_values()) {
       return static_cast<value_type>(values_[id]);
     }

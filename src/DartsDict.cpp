@@ -145,12 +145,15 @@ DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
     throw InvalidFormat(
         "Invalid OpenCC dictionary (dartsSize exceeds file size)");
   }
+  if (dartsSize % doubleArray->unit_size() != 0) {
+    throw InvalidFormat("Invalid OpenCC dictionary size of darts alignment");
+  }
   buffer = malloc(dartsSize);
   bytesRead = fread(buffer, 1, dartsSize, fp);
   if (bytesRead != dartsSize) {
     throw InvalidFormat("Invalid OpenCC dictionary size of darts mismatch");
   }
-  doubleArray->set_array(buffer);
+  doubleArray->set_array(buffer, dartsSize / doubleArray->unit_size());
 
   auto internal = dict->internal;
   internal->buffer = buffer;
@@ -158,6 +161,10 @@ DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
   internal->doubleArray = doubleArray;
   dict->lexicon = internal->binary->GetLexicon();
   dict->maxLength = internal->binary->KeyMaxLength();
+  if (!doubleArray->validate(static_cast<Darts::DoubleArray::value_type>(
+          dict->lexicon->Length()))) {
+    throw InvalidFormat("Invalid OpenCC dictionary darts data");
+  }
   return dict;
 }
 

@@ -44,6 +44,8 @@
     "data/scripts/reverse.py",
     "deps/marisa-0.3.1/include",
     "deps/marisa-0.3.1/lib",
+    "deps/darts-clone-0.32h/COPYING.md",
+    "deps/darts-clone-0.32h/include",
     "deps/rapidjson-1.1.0/rapidjson",
     "node/cli.js",
     "node/configs.gypi",

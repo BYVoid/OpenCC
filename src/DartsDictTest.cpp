@@ -39,6 +39,40 @@ protected:
     return path;
   }
 
+  static void CorruptDartsRootUnit(const std::string& path) {
+    FILE* fp = fopen(path.c_str(), "r+b");
+    const char* header = "OPENCCDARTS1";
+    fseek(fp, static_cast<long>(strlen(header) + sizeof(size_t)), SEEK_SET);
+    size_t invalidRoot = 0;
+    fwrite(&invalidRoot, sizeof(size_t), 1, fp);
+    fclose(fp);
+  }
+
+  static void CorruptFirstDartsValue(const std::string& path) {
+    FILE* fp = fopen(path.c_str(), "r+b");
+    const char* header = "OPENCCDARTS1";
+    fseek(fp, static_cast<long>(strlen(header)), SEEK_SET);
+    size_t dartsSize = 0;
+    fread(&dartsSize, sizeof(size_t), 1, fp);
+    const long dartsOffset =
+        static_cast<long>(strlen(header) + sizeof(size_t));
+    const size_t numUnits = dartsSize / sizeof(size_t);
+    for (size_t i = 0; i < numUnits; i++) {
+      size_t unit = 0;
+      fseek(fp, dartsOffset + static_cast<long>(i * sizeof(size_t)), SEEK_SET);
+      fread(&unit, sizeof(size_t), 1, fp);
+      const size_t label = unit & ((1ULL << 31) | 0xFF);
+      if (label > 0xFF) {
+        const size_t invalidValue = (1ULL << 31) | ((1ULL << 31) - 1);
+        fseek(fp, dartsOffset + static_cast<long>(i * sizeof(size_t)),
+              SEEK_SET);
+        fwrite(&invalidValue, sizeof(size_t), 1, fp);
+        break;
+      }
+    }
+    fclose(fp);
+  }
+
   const DartsDictPtr dartsDict;
   const std::string fileName;
 };
@@ -82,6 +116,35 @@ TEST_F(DartsDictTest, ExactMatch) {
 // Test that dartsSize exceeding file size triggers InvalidFormat (#816).
 TEST_F(DartsDictTest, RejectsHugeDartsSize) {
   std::string path = WriteMalformedDartsFile(0x1300000000000000ULL);
+  EXPECT_THROW(SerializableDict::NewFromFile<DartsDict>(path), InvalidFormat);
+  std::remove(path.c_str());
+}
+
+TEST_F(DartsDictTest, RejectsMisalignedDartsSize) {
+  std::string path = WriteMalformedDartsFile(1);
+  FILE* fp = fopen(path.c_str(), "ab");
+  char padding = '\0';
+  fwrite(&padding, sizeof(char), 1, fp);
+  fclose(fp);
+
+  EXPECT_THROW(SerializableDict::NewFromFile<DartsDict>(path), InvalidFormat);
+  std::remove(path.c_str());
+}
+
+TEST_F(DartsDictTest, RejectsInvalidDartsRoot) {
+  const std::string path = "invalid_darts_root.ocd";
+  dartsDict->opencc::SerializableDict::SerializeToFile(path);
+  CorruptDartsRootUnit(path);
+
+  EXPECT_THROW(SerializableDict::NewFromFile<DartsDict>(path), InvalidFormat);
+  std::remove(path.c_str());
+}
+
+TEST_F(DartsDictTest, RejectsInvalidDartsValue) {
+  const std::string path = "invalid_darts_value.ocd";
+  dartsDict->opencc::SerializableDict::SerializeToFile(path);
+  CorruptFirstDartsValue(path);
+
   EXPECT_THROW(SerializableDict::NewFromFile<DartsDict>(path), InvalidFormat);
   std::remove(path.c_str());
 }

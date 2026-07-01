@@ -1,0 +1,6 @@
+cc_library(
+    name = "darts-clone",
+    hdrs = glob(["include/*.h"]),
+    strip_include_prefix = "include",
+    visibility = ["//visibility:public"],
+)

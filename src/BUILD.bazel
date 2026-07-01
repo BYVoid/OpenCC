@@ -1,9 +1,23 @@
 load("@aspect_bazel_lib//lib:diff_test.bzl", "diff_test")
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension")
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 load("@rules_python//python:py_library.bzl", "py_library")
 
 package(default_visibility = ["//visibility:public"])
+
+# Public C/C++ headers consumed by the root //:opencc_lib target. Bazel 10 no
+# longer lets source files inherit package default_visibility, so export them
+# explicitly for cross-package references.
+exports_files(
+    [
+        "ConversionInspection.hpp",
+        "Export.hpp",
+        "ResourceProvider.hpp",
+        "SimpleConverter.hpp",
+        "opencc.h",
+    ],
+    visibility = ["//visibility:public"],
+)
 
 filegroup(
     name = "all_files",

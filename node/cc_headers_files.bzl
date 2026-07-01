@@ -11,6 +11,8 @@ rules_nodejs only exposes the active Node toolchain's headers as a cc_library
 CcInfo.compilation_context.headers depset into DefaultInfo files.
 """
 
+load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
+
 def _cc_headers_files_impl(ctx):
     # All (transitive) headers the library exposes to its consumers.
     headers = ctx.attr.lib[CcInfo].compilation_context.headers

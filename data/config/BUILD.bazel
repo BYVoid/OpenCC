@@ -1,8 +1,17 @@
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
 package(default_visibility = ["//visibility:public"])
 
 CONFIGS = glob(
     ["*.json"],
     exclude = ["*.schema.json"],
+)
+
+# Bazel 10 no longer lets source files inherit package default_visibility, so
+# export the config JSONs explicitly (e.g. //data/dictionary references t2s.json).
+exports_files(
+    CONFIGS,
+    visibility = ["//visibility:public"],
 )
 
 filegroup(

@@ -236,6 +236,11 @@ DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
 
   // Detect 32-bit vs 64-bit unit size by reading 8 bytes and checking
   // whether bytes [4..7] are all zero.
+  //   - Old 64-bit build: dartsSize field is uint64_t (8 bytes); high 32 bits
+  //     are zero for any realistic file size → bytes [4..7] == 0.
+  //   - 32-bit build (new or old): dartsSize field is uint32_t (4 bytes);
+  //     bytes [4..7] are the first 4 bytes of the darts array (non-zero for
+  //     any valid array whose root unit has a non-zero offset).
   uint8_t probe[8];
   if (fread(probe, 1, 8, fp) != 8) {
     throw InvalidFormat("Invalid OpenCC dictionary header (dartsSize)");

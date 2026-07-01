@@ -1,7 +1,5 @@
 import json
 import os
-import pytest
-import sys
 import zipfile
 
 _this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -131,7 +129,3 @@ def test_custom_config_path_without_json_extension_is_preserved():
     assert opencc._normalize_config_name('./s2t') == './s2t'
     assert opencc._normalize_config_name('configs/s2t') == 'configs/s2t'
     assert opencc._normalize_config_name(r'configs\s2t') == r'configs\s2t'
-
-
-if __name__ == "__main__":
-    sys.exit(pytest.main([os.path.abspath(__file__)]))

@@ -218,7 +218,3 @@ def test_cli_custom_config_path_without_json_extension(tmp_path, monkeypatch):
     )
 
     assert output_path.read_text(encoding='utf-8') == '滑鼠'
-
-
-if __name__ == "__main__":
-    sys.exit(pytest.main([os.path.abspath(__file__)]))

@@ -60,3 +60,13 @@ cc_binary(
         "//src:phrase_extract_lib",
     ],
 )
+
+cc_binary(
+    name = "speed_benchmark",
+    srcs = ["SpeedBenchmark.cpp"],
+    deps = [
+        "//src:resource_provider_lib",
+        "//src:simple_converter_lib",
+        "//src:utf8_util_lib",
+    ],
+)

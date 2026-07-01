@@ -1,0 +1,106 @@
+name: Resource Package Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version or tag, for example 1.4.0 or ver.1.4.0"
+        required: false
+  push:
+    tags:
+      - "ver.*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-resource-package:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.version }}
+          GIT_REF_TYPE: ${{ github.ref_type }}
+          GIT_REF_NAME: ${{ github.ref_name }}
+        run: |
+          value="${INPUT_VERSION:-}"
+          if [ -z "$value" ] && [ "${GIT_REF_TYPE:-}" = "tag" ]; then
+            value="${GIT_REF_NAME}"
+          fi
+          if [ -z "$value" ]; then
+            value="$(bash scripts/compute-version.sh)"
+          fi
+          value="${value#ver.}"
+          if [[ "$value" != v* ]]; then
+            value="v${value}"
+          fi
+          echo "value=$value" >> "$GITHUB_OUTPUT"
+          echo "VERSION=$value" >> "$GITHUB_ENV"
+
+      - uses: bazel-contrib/setup-bazel@0.19.0
+        with:
+          bazelisk-cache: true
+          repository-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Configure BuildBuddy
+        shell: bash
+        env:
+          BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
+        run: |
+          if [ -n "${BUILDBUDDY_API_KEY}" ]; then
+            {
+              echo "build --config=buildbuddy"
+              echo "build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
+              echo "build --bes_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
+            } >> .bazelrc.user
+            echo "BuildBuddy enabled."
+          else
+            echo "BUILDBUDDY_API_KEY not set; skipping BuildBuddy config."
+          fi
+
+      - name: Build resource package
+        shell: bash
+        env:
+          MSYS_NO_PATHCONV: 1
+        run: |
+          bazel build \
+            --workspace_status_command=./scripts/bazel-workspace-status.sh \
+            //data:opencc_resources_zip
+
+      - name: Stage resource package
+        shell: bash
+        run: |
+          mkdir -p dist
+          cp bazel-bin/data/opencc-resources.zip "dist/opencc-${VERSION}-resources.zip"
+          unzip -l "dist/opencc-${VERSION}-resources.zip"
+
+      - name: Upload resource package artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: opencc-resources-${{ steps.version.outputs.value }}
+          path: dist/opencc-${{ steps.version.outputs.value }}-resources.zip
+          archive: false
+          if-no-files-found: error
+
+      - name: Upload assets to existing GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            "dist/opencc-${VERSION}-resources.zip" \
+            --clobber

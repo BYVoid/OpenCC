@@ -1,4 +1,13 @@
+load("@rules_cc//cc:defs.bzl", "cc_test")
+
 package(default_visibility = ["//visibility:public"])
+
+# Bazel 10 no longer lets source files inherit package default_visibility;
+# //data references this text dictionary directly for the resources zip.
+exports_files(
+    ["CJK_Compatibility_Ideographs.txt"],
+    visibility = ["//visibility:public"],
+)
 
 [
     genrule(

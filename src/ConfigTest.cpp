@@ -31,7 +31,9 @@
 
 #include "Config.hpp"
 #include "ConfigTestBase.hpp"
+#include "ConversionChain.hpp"
 #include "Converter.hpp"
+#include "Segments.hpp"
 #include "Exception.hpp"
 #include "ResourceProvider.hpp"
 #include "TestUtilsUTF8.hpp"
@@ -1041,6 +1043,27 @@ TEST_F(ConfigTest, NormalizationMissingFileDictThrows) {
   })";
   Config c;
   EXPECT_THROW(c.NewFromString(config, CONFIG_TEST_DIR_PATH), Exception);
+}
+
+TEST_F(ConfigTest, NormalizationGetConversionChainIsNonNull) {
+  // Regression: converters built from configs with a normalization field must
+  // expose a non-null GetConversionChain() so that downstream consumers such
+  // as librime do not crash on null-pointer dereference.
+  // The returned chain must represent the main conversion_chain (乙→丙), not
+  // the normalization chain (甲→乙).
+  const std::string config = R"({
+    "name": "Normalization Chain Test",
+    "normalization": [{"dict": {"type": "inline", "entries": {"甲": "乙"}}}],
+    "conversion_chain": [{"dict": {"type": "inline", "entries": {"乙": "丙"}}}]
+  })";
+  Config c;
+  const ConverterPtr conv = c.NewFromString(config, CONFIG_TEST_DIR_PATH);
+  const ConversionChainPtr chain = conv->GetConversionChain();
+  ASSERT_NE(nullptr, chain);
+  // Verify it is the main chain: 乙 → 丙 (not the normalization chain 甲 → 乙).
+  const SegmentsPtr result = chain->Convert(SegmentsPtr(new Segments{utf8("乙")}));
+  ASSERT_EQ(1u, result->Length());
+  EXPECT_EQ(utf8("丙"), result->At(0));
 }
 
 } // namespace opencc

@@ -33,11 +33,15 @@ namespace opencc {
  * A @c Converter accepts a complete UTF-8 string and returns the converted
  * result.  Internally it coordinates @c Segmentation (splitting text into
  * words) and a @c ConversionChain (applying one or more dictionaries to each
- * segment).  Two concrete implementations are provided:
+ * segment).  Concrete implementations:
  *
  *  - @c SingleStageConverter — one segmentation pass + one @c ConversionChain.
  *  - @c PipelineConverter — passes text through a sequence of @c Converter
  *    stages in order, each with its own segmentation and chain.
+ *
+ * Config-backed converters may additionally expose the main conversion chain
+ * via @c GetConversionChain() even when an internal normalization pre-pass is
+ * present.
  *
  * @ingroup opencc_cpp_api
  */

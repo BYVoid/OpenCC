@@ -114,7 +114,10 @@ diff_test(
 
 cc_library(
     name = "config_lib",
-    srcs = ["Config.cpp"],
+    srcs = [
+        "Config.cpp",
+        "ConfigBasedConverter.hpp",
+    ],
     hdrs = ["Config.hpp"],
     deps = [
         ":common_lib",

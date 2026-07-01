@@ -505,7 +505,7 @@
     "@@rules_nodejs+//nodejs:extensions.bzl%node": {
       "general": {
         "bzlTransitiveDigest": "oZFClfRhTTwsYzpxVPkOpOt/r0+OzEfEV37au0jFZ0s=",
-        "usagesDigest": "26/AhWXawwL87X6fnDZq1pZ3jGoIPbAz2cCEurFfnX0=",
+        "usagesDigest": "Pecih7GGwmge0Dva9CUHmVnXf//OWZ3rHZ2/hNwW6gI=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -839,7 +839,7 @@
     "@@rules_zig+//zig:extensions.bzl%zig": {
       "general": {
         "bzlTransitiveDigest": "qht7HoYLrnCwuA9ZvC8Gujf2OlFgEwB4AzP2G/sVU1Q=",
-        "usagesDigest": "PIEfbCiX039lF8J6ZqRLwtHSR9ay5pIW0WuHhZW9oXc=",
+        "usagesDigest": "m4C0GGdpuSuTIIp6KYwv0BmQM/A4dk1JBHcdSVsUSNI=",
         "recordedFileInputs": {
           "@@rules_zig+//zig/private/versions.json": "5d4313a411f05e581e74a08ff333a229289434dc15c6f4f1de1db09076d4aa81"
         },
@@ -1059,7 +1059,7 @@
     "@@toolchains_buildbuddy+//:extensions.bzl%buildbuddy": {
       "general": {
         "bzlTransitiveDigest": "YThiSErJv+jiCHJzZIEyk0yegQRS/x+T/ce309eGTvA=",
-        "usagesDigest": "YPaAq0mPxb4otHDx47pPkoFOyhKaBLU/gt3wcKGZY9o=",
+        "usagesDigest": "k3pYx2AqtJ/HxzMKYmrRp3WSsjQGJbeZWoQ5oyPNh48=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},

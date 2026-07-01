@@ -32,8 +32,8 @@
 
 #include "Config.hpp"
 #include "ConversionChain.hpp"
+#include "ConfigBasedConverter.hpp"
 #include "Converter.hpp"
-#include "PipelineConverter.hpp"
 #include "SingleStageConverter.hpp"
 #include "DictGroup.hpp"
 #include "Exception.hpp"
@@ -943,7 +943,7 @@ Config::NewFromString(const std::string& json,
         impl->GetArrayProperty(doc, "normalization"));
     ConverterPtr normConverter(new SingleStageConverter(nullptr, normChain));
     return ConverterPtr(
-        new PipelineConverter({std::move(normConverter), std::move(mainConverter)}));
+        new ConfigBasedConverter(std::move(normConverter), std::move(mainConverter)));
   }
   return mainConverter;
 }

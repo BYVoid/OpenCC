@@ -4,9 +4,29 @@
 
 2026年7月1日
 
-* **ABI 版本升級**：SOVERSION 從 1.3 升至 1.4，反映 1.3.2 引入的多項不相容 C++ API 變動（含 `normalization` 管線包裝器、`string_view` 重載、`std::unique_ptr` 析構修正等）。已鏈結舊版 `libopencc.so.1.3` 的程式需重新編譯。
-* **修復 normalization 管線導致的崩潰**：部分下游程式（如 librime）假設 `Converter::GetConversionChain()` 一定返回非空值；當配置啟用 `normalization` 前處理時，舊版 `PipelineConverter` 會返回 `nullptr`，造成空指標解引用崩潰。
-* **公開標頭清理**：`DictConverter.hpp`、`PhraseExtract.hpp`、`UTF8StringSlice.hpp` 不再安裝至 `include/opencc/`；它們是僅供 `opencc_dict` / `opencc_phrase_extract` 命令列工具使用的非公開介面。
+* **詞庫更新**：
+    * 修正 `s2twp` 中 `芯片` 的分詞與轉換結果，避免區域詞被拆開後無法套用臺灣用語（[commit](https://github.com/BYVoid/OpenCC/commit/773a9e11d2e3b0c13f018f0effaab3ded8e0e033)）。
+    * 修正「批覆 / 批复」、「陞 / 升」、「锺繇」、「魏徵」、「搧 / 扇」、「沈厚 / 沉厚」、「芝柏表」、U+20F24 相關詞條，以及若干含「陞」「钜」字的人名（[#1365](https://github.com/BYVoid/OpenCC/pull/1365)）。
+    * 修正含「台」字的人名、「今周刊」、「爱丽舍 / 爱丽舍宫」、「舖 / 铺」等轉換；調整 `HKVariantsRevPhrases` 中的香港用字反向映射（[#1369](https://github.com/BYVoid/OpenCC/pull/1369)）。
+    * 修正 `别强` 預設轉換為 `別強`（[#1366](https://github.com/BYVoid/OpenCC/pull/1366), [#1378](https://github.com/BYVoid/OpenCC/pull/1378)）；移除 `STPhrases.txt` 中以全形句號「．」分隔、實際難以命中的人名詞條（[#1379](https://github.com/BYVoid/OpenCC/pull/1379)）。
+* **Darts / `.ocd` 字典格式**：
+    * 升級 vendored `darts-clone` 至 v0.32h，並加強 malformed `.ocd` 驗證，避免讀取損壞字典時越界或接受不一致資料（[#1372](https://github.com/BYVoid/OpenCC/pull/1372)）。
+    * 新寫出的 `.ocd` Darts unit 固定為 32-bit，同時自動偵測並讀取 legacy 64-bit `.ocd`，修復舊檔 prefix search 邊界問題（[#1373](https://github.com/BYVoid/OpenCC/pull/1373)）。
+    * Darts 支援改為常態啟用，移除 `ENABLE_DARTS` / `USE_SYSTEM_DARTS` 分支；內建 `opencc_dict` 的 `ocd` 轉換和 runtime `.ocd` 載入，`.ocd` 字典可從 filesystem 或 resource zip 載入（[#1374](https://github.com/BYVoid/OpenCC/pull/1374)）。
+* **效能提升**：
+    * 純 `union` 詞典組中的單詞典前綴匹配新增 fast-path，減少不必要的群組遍歷（[#1367](https://github.com/BYVoid/OpenCC/pull/1367)）。
+    * 從 filesystem 或 resource zip 載入 `.txt` 格式詞典時，runtime 會直接構建 in-memory Darts 字典，提升初始化和長文本前綴匹配效能；新增 `SpeedBenchmark` Bazel 目標供後續基準測試使用（[#1376](https://github.com/BYVoid/OpenCC/pull/1376)）。
+* **C++ ABI / API**：
+    * SOVERSION 從 1.3 升至 1.4，避免已鏈結 `libopencc.so.1.3` 的舊 C++ 下游程式靜默載入 1.3.2 之後 ABI 不相容的 OpenCC；下游程式需重新鏈結（[#1377](https://github.com/BYVoid/OpenCC/pull/1377)）。
+    * 修復啟用 `normalization` 前處理時 `Converter::GetConversionChain()` 返回空指標的問題；現在配置載入器會保留主 `conversion_chain` 供 librime 等下游 introspection 使用，`PipelineConverter` 本身仍保留「無單一 conversion chain」語義（[#1380](https://github.com/BYVoid/OpenCC/pull/1380)）。
+    * 清理公開標頭安裝範圍：`DictConverter.hpp`、`PhraseExtract.hpp`、`UTF8StringSlice.hpp`、`BinaryDict.hpp`、`DartsDict.hpp` 不再安裝至 `include/opencc/`；`DictGroup.hpp`、`MaxMatchSegmentation.hpp`、`MarisaDict.hpp` 等配置可見或插件／字典支援標頭仍保留公開（[#1380](https://github.com/BYVoid/OpenCC/pull/1380)）。
+* **Node.js / Python / 構建系統**：
+    * 修復 `opencc-jieba` npm 套件中 normalization 相關資源路徑，並補充 Node.js 測試覆蓋（[commit](https://github.com/BYVoid/OpenCC/commit/6f431a2b1d83fdfed0aec5f53341bb93b3c3288c)）。
+    * Bazel 依賴更新：`rules_node_addon` 切換至 BCR 1.0.2，`node_addon_api` 更新至 BCR 8.9.0；vendored RapidJSON 與 `1.1.0.bcr.20250205` 對齊（[#1368](https://github.com/BYVoid/OpenCC/pull/1368)）。
+    * Python 測試新增 Bazel pytest runner；Windows Zig 構建腳本更新以配合 vendored Darts 與 Node 原生模組構建（[#1375](https://github.com/BYVoid/OpenCC/pull/1375)）。
+* **測試與文檔**：
+    * 補充 `s2twp` mixed-script 測試、Darts `.ocd` 32-bit / legacy 64-bit 讀取測試、resource zip 載入測試、normalization conversion-chain introspection 測試，以及多組詞庫回歸測試。
+    * README 新增 GitHub Downloads 與 WinGet 徽章（[commit](https://github.com/BYVoid/OpenCC/commit/6383259a2254dfaa5d77a855346d65d64a40abf5)）；清理配置 schema warning 測試（[commit](https://github.com/BYVoid/OpenCC/commit/7bb8af01585337a94d293ec591861f461450e4af)）。
 
 ## Version 1.3.2
 

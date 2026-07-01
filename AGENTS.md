@@ -33,6 +33,11 @@ This document compiles the Open Chinese Convert (OpenCC) project information to 
 - Tools `opencc_dict`, `opencc_phrase_extract` (`src/tools/`) help developers convert dictionary formats and extract phrases.
 - Node.js tests live in `node/test.js`; npm prebuild packaging uses `npm run prebuild` and related scripts in `scripts/`.
 
+### C++ ABI Versioning
+- When a change introduces an ABI-incompatible modification to the public C++ interface, bump `OPENCC_ABI_VERSION` in `CMakeLists.txt` so downstream libraries and applications relink instead of silently loading an incompatible `libopencc` shared library.
+- Treat installed headers under `include/opencc/`, exported virtual interfaces, class layout, constructor/destructor signatures, inline public methods, and public symbol signatures as part of the ABI review surface. If in doubt, assume downstream C++ users may have compiled against it.
+- Keep private implementation helpers out of the installed header set when possible. Moving an installed header or public type to private is itself a compatibility decision and should be reflected in the release notes.
+
 ### CLI Consistency Follow-up
 - There is ongoing work to align user-facing behavior across the native CLI, npm CLI, and Python CLI. Treat CLI behavior differences as intentional only when they are documented in `README.md` and covered by tests.
 - Known area to unify: `-c/--config` values that omit `.json`. Current target behavior is the npm CLI rule:

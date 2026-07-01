@@ -24,7 +24,6 @@ set(
   ConversionInspection.hpp
   Converter.hpp
   Dict.hpp
-  DictConverter.hpp
   DictEntry.hpp
   DictGroup.hpp
   Exception.hpp
@@ -33,21 +32,27 @@ set(
   MarisaDict.hpp
   MaxMatchSegmentation.hpp
   Optional.hpp
-  PhraseExtract.hpp
-  PipelineConverter.hpp
-  PluginSegmentation.hpp
-  SingleStageConverter.hpp
-  PrefixMatch.hpp
   ResourceProvider.hpp
   Segmentation.hpp
   Segments.hpp
   SerializableDict.hpp
-  SerializedValues.hpp
   SimpleConverter.hpp
   TextDict.hpp
-  UTF8StringSlice.hpp
   UTF8Util.hpp
   opencc.h
+)
+
+set(
+  LIBOPENCC_PRIVATE_HEADERS
+  ConfigBasedConverter.hpp
+  DictConverter.hpp
+  PhraseExtract.hpp
+  PipelineConverter.hpp
+  PluginSegmentation.hpp
+  PrefixMatch.hpp
+  SerializedValues.hpp
+  SingleStageConverter.hpp
+  UTF8StringSlice.hpp
 )
 
 set(
@@ -98,8 +103,8 @@ set(UNITTESTS
 
 include_directories(SYSTEM ../deps/darts-clone-0.32h/include)
 set(
-  LIBOPENCC_HEADERS
-  ${LIBOPENCC_HEADERS}
+  LIBOPENCC_PRIVATE_HEADERS
+  ${LIBOPENCC_PRIVATE_HEADERS}
   BinaryDict.hpp
   DartsDict.hpp
 )
@@ -129,10 +134,18 @@ if (WIN32)
   list(APPEND LIBOPENCC_SOURCES "${CMAKE_CURRENT_BINARY_DIR}/version_libopencc.rc")
 endif()
 
-add_library(libopencc ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
+add_library(libopencc
+  ${LIBOPENCC_SOURCES}
+  ${LIBOPENCC_HEADERS}
+  ${LIBOPENCC_PRIVATE_HEADERS}
+)
 add_library(OpenCC::OpenCC ALIAS libopencc)
 set_target_properties(libopencc PROPERTIES POSITION_INDEPENDENT_CODE ON)
-source_group(libopencc FILES ${LIBOPENCC_SOURCES} ${LIBOPENCC_HEADERS})
+source_group(libopencc FILES
+  ${LIBOPENCC_SOURCES}
+  ${LIBOPENCC_HEADERS}
+  ${LIBOPENCC_PRIVATE_HEADERS}
+)
 target_link_libraries(libopencc marisa)
 if (NOT BUILD_SHARED_LIBS)
   target_compile_definitions(libopencc PUBLIC Opencc_BUILT_AS_STATIC)

@@ -1,5 +1,13 @@
 # Change History of OpenCC
 
+## Version 1.4.0
+
+2026年7月1日
+
+* **ABI 版本升級**：SOVERSION 從 1.3 升至 1.4，反映 1.3.2 引入的多項不相容 C++ API 變動（含 `normalization` 管線包裝器、`string_view` 重載、`std::unique_ptr` 析構修正等）。已鏈結舊版 `libopencc.so.1.3` 的程式需重新編譯。
+* **修復 normalization 管線導致的崩潰**：部分下游程式（如 librime）假設 `Converter::GetConversionChain()` 一定返回非空值；當配置啟用 `normalization` 前處理時，舊版 `PipelineConverter` 會返回 `nullptr`，造成空指標解引用崩潰。
+* **公開標頭清理**：`DictConverter.hpp`、`PhraseExtract.hpp`、`UTF8StringSlice.hpp` 不再安裝至 `include/opencc/`；它們是僅供 `opencc_dict` / `opencc_phrase_extract` 命令列工具使用的非公開介面。
+
 ## Version 1.3.2
 
 2026年6月28日

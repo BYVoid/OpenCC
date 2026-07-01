@@ -72,6 +72,10 @@ public:
         << std::endl
         << "   hk2s.json   Traditional Chinese (Hong Kong variant) to Simplified Chinese"
         << std::endl
+        << "   s2hkp.json  Simplified Chinese to Traditional Chinese (Hong Kong variant, with Hong Kong Phrases)"
+        << std::endl
+        << "   hk2sp.json  Traditional Chinese (Hong Kong variant) to Simplified Chinese (Mainland China Phrases)"
+        << std::endl
         << "   s2twp.json  Simplified Chinese to Traditional Chinese (Taiwan Standard, with Taiwan Phrases)"
         << std::endl
         << "   tw2sp.json  Traditional Chinese (Taiwan Standard) to Simplified Chinese (Mainland China Phrases)"

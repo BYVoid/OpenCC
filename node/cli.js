@@ -12,6 +12,8 @@ const BUILT_IN_CONFIGS = [
   ['tw2s.json', 'Traditional Chinese (Taiwan Standard) to Simplified Chinese'],
   ['s2hk.json', 'Simplified Chinese to Traditional Chinese (Hong Kong variant)'],
   ['hk2s.json', 'Traditional Chinese (Hong Kong variant) to Simplified Chinese'],
+  ['s2hkp.json', 'Simplified Chinese to Traditional Chinese (Hong Kong variant) with Hong Kong idiom'],
+  ['hk2sp.json', 'Traditional Chinese (Hong Kong variant) to Simplified Chinese with Mainland Chinese idiom'],
   ['s2twp.json', 'Simplified Chinese to Traditional Chinese (Taiwan Standard) with Taiwanese idiom'],
   ['tw2sp.json', 'Traditional Chinese (Taiwan Standard) to Simplified Chinese with Mainland Chinese idiom'],
   ['tw2t.json', 'Traditional Chinese (Taiwan Standard) to Traditional Chinese (OpenCC Standard)'],

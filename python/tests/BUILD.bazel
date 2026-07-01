@@ -4,11 +4,16 @@ load("@rules_python//python:py_test.bzl", "py_test")
 py_test(
     name = "test_opencc",
     size = "small",
-    srcs = ["test_opencc.py"],
+    srcs = [
+        "pytest_runner.py",
+        "test_opencc.py",
+    ],
+    args = ["test_opencc.py"],
     data = [
         "//test/testcases",
     ],
     imports = [".."],
+    main = "pytest_runner.py",
     deps = [
         "//python/opencc",
         requirement("pytest"),
@@ -20,8 +25,13 @@ py_test(
 py_test(
     name = "test_cli",
     size = "small",
-    srcs = ["test_cli.py"],
+    srcs = [
+        "pytest_runner.py",
+        "test_cli.py",
+    ],
+    args = ["test_cli.py"],
     imports = [".."],
+    main = "pytest_runner.py",
     deps = [
         "//python/opencc",
         requirement("pytest"),

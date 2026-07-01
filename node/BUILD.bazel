@@ -74,6 +74,7 @@ genrule(
     name = "opencc_node_windows_zig",
     srcs = [
         "opencc.cc",
+        "//deps/darts-clone-0.32h:all_files",
         "//deps/marisa-0.3.1:all_files",
         "//deps/rapidjson-1.1.0:all_files",
         "//src:all_files",

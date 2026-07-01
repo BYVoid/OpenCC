@@ -9,6 +9,7 @@
         "../src/Conversion.cpp",
         "../src/ConversionChain.cpp",
         "../src/Converter.cpp",
+        "../src/DartsDict.cpp",
         "../src/Dict.cpp",
         "../src/DictConverter.cpp",
         "../src/DictEntry.cpp",
@@ -41,6 +42,7 @@
         "../node",
         "../src",
         "../deps/rapidjson-1.1.0",
+        "../deps/darts-clone-0.32h/include",
         "../deps/marisa-0.3.1/include",
         "../deps/marisa-0.3.1/lib",
         "<!@(node -p \"require('node-addon-api').include\")"

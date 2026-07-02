@@ -33,15 +33,15 @@ diff --git a/include/darts.h b/include/darts.h
    // array() returns a pointer to the array of units.
    const void *array() const {
      return array_;
-@@ -315,6 +324,8 @@
+@@ -314,6 +323,8 @@
+   // updates `node_pos' and `key_pos' after each transition.
    inline value_type traverse(const key_type *key, std::size_t &node_pos,
        std::size_t &key_pos, std::size_t length = 0) const;
-
-+  bool validate(value_type max_value_limit = -1) const;
 +
++  bool validate(value_type max_value_limit = -1) const;
+
   private:
    typedef Details::uchar_type uchar_type;
-   typedef Details::id_type id_type;
 @@ -451,6 +462,29 @@
    }
    std::fclose(file);
@@ -72,3 +72,71 @@ diff --git a/include/darts.h b/include/darts.h
  }
 
  template <typename A, typename B, typename T, typename C>
+@@ -910,7 +944,7 @@
+
+   num_ones_ = 0;
+   for (std::size_t i = 0; i < units_.size(); ++i) {
+-    ranks_[i] = num_ones_;
++    ranks_[i] = static_cast<id_type>(num_ones_);
+     num_ones_ += pop_count(units_[i]);
+   }
+ }
+@@ -1832,7 +1866,7 @@
+
+ inline id_type DoubleArrayBuilder::find_valid_offset(id_type id) const {
+   if (extras_head_ >= units_.size()) {
+-    return units_.size() | (id & LOWER_MASK);
++    return static_cast<id_type>(units_.size()) | (id & LOWER_MASK);
+   }
+
+   id_type unfixed_id = extras_head_;
+@@ -1844,7 +1878,7 @@
+     unfixed_id = extras(unfixed_id).next();
+   } while (unfixed_id != extras_head_);
+
+-  return units_.size() | (id & LOWER_MASK);
++  return static_cast<id_type>(units_.size()) | (id & LOWER_MASK);
+ }
+
+ inline bool DoubleArrayBuilder::is_valid_offset(id_type id,
+@@ -1875,7 +1909,7 @@
+   if (id == extras_head_) {
+     extras_head_ = extras(id).next();
+     if (extras_head_ == id) {
+-      extras_head_ = units_.size();
++      extras_head_ = static_cast<id_type>(units_.size());
+     }
+   }
+   extras(extras(id).prev()).set_next(extras(id).next());
+@@ -1884,8 +1918,8 @@
+ }
+
+ inline void DoubleArrayBuilder::expand_units() {
+-  id_type src_num_units = units_.size();
+-  id_type src_num_blocks = num_blocks();
++  id_type src_num_units = static_cast<id_type>(units_.size());
++  id_type src_num_blocks = static_cast<id_type>(num_blocks());
+
+   id_type dest_num_units = src_num_units + BLOCK_SIZE;
+   id_type dest_num_blocks = src_num_blocks + 1;
+@@ -1897,7 +1931,7 @@
+   units_.resize(dest_num_units);
+
+   if (dest_num_blocks > NUM_EXTRA_BLOCKS) {
+-    for (std::size_t id = src_num_units; id < dest_num_units; ++id) {
++    for (id_type id = src_num_units; id < dest_num_units; ++id) {
+       extras(id).set_is_used(false);
+       extras(id).set_is_fixed(false);
+     }
+@@ -1921,9 +1955,9 @@
+ inline void DoubleArrayBuilder::fix_all_blocks() {
+   id_type begin = 0;
+   if (num_blocks() > NUM_EXTRA_BLOCKS) {
+-    begin = num_blocks() - NUM_EXTRA_BLOCKS;
++    begin = static_cast<id_type>(num_blocks()) - NUM_EXTRA_BLOCKS;
+   }
+-  id_type end = num_blocks();
++  id_type end = static_cast<id_type>(num_blocks());
+
+   for (id_type block_id = begin; block_id != end; ++block_id) {
+     fix_block(block_id);

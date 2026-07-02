@@ -1,0 +1,23 @@
+From: Shengjing Zhu <zhsj@debian.org>
+Date: Sun, 28 Jul 2024 19:44:27 -0400
+Subject: Use system googletest
+
+Forwarded: not-needed
+Last-Update: 2024-07-28
+---
+ CMakeLists.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0fdb13f..0cda6ea 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -235,6 +235,8 @@ add_subdirectory(test)
+ if (ENABLE_GTEST)
+   if(NOT USE_SYSTEM_GTEST)
+     add_subdirectory(deps/googletest-1.15.0)
++  else()
++    add_subdirectory(/usr/src/googletest/googletest ${CMAKE_BINARY_DIR}/googletest-build EXCLUDE_FROM_ALL)
+   endif()
+   enable_testing()
+ endif()

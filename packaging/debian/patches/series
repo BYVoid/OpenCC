@@ -1,0 +1,5 @@
+0003-no-remote-images-when-reading-docs-on-disk.patch
+0004-Use-system-googletest.patch
+0005-Disable-build-in-setup.py.patch
+0009-setup.py-Handle-python-binding-instead-of-cmake.patch
+

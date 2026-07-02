@@ -1,0 +1,55 @@
+From: Boyuan Yang <byang@debian.org>
+Date: Tue, 13 Jan 2026 18:04:57 -0500
+Subject: setup.py: Handle python binding instead of cmake
+
+---
+ setup.py | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 5c46dbd..ac443db 100644
+--- a/setup.py
++++ b/setup.py
+@@ -9,6 +9,8 @@ import setuptools
+ import setuptools.command.build_ext
+ import wheel.bdist_wheel
+ 
++import pybind11
++
+ _this_dir = os.path.dirname(os.path.abspath(__file__))
+ _build_dir = os.path.join(_this_dir, 'build', 'python')
+ 
+@@ -112,10 +114,13 @@ class OpenCCExtension(setuptools.Extension, object):
+ 
+ class BuildExtCommand(setuptools.command.build_ext.build_ext, object):
+     def build_extension(self, ext):
+-        if self.inplace:
+-            output_path = os.path.join(_this_dir, 'python', 'opencc', 'clib')
+-        else:
+-            output_path = os.path.abspath(os.path.join(self.build_lib, 'opencc', 'clib'))
++        project_root = os.path.abspath(_this_dir)
++        build_dir = os.environ.get('OPENCC_BUILD_DIR', 'obj-x86_64-linux-gnu')
++        lib_path = os.path.join(project_root, build_dir, 'src')
++        ext.include_dirs.append(pybind11.get_include())
++        ext.include_dirs.append('src')
++        ext.library_dirs = [lib_path]
++        ext.runtime_library_dirs = [lib_path]
+         if isinstance(ext, OpenCCExtension):
+             build_libopencc(output_path)
+         else:
+@@ -179,7 +184,14 @@ setuptools.setup(
+ 
+     packages=packages,
+     package_dir={'opencc': 'python/opencc'},
+-    ext_modules=[OpenCCExtension('opencc.clib.opencc_clib', 'python')],
++    ext_modules=[
++        setuptools.Extension(
++            'opencc.clib.opencc_clib',
++            sources=['src/py_opencc.cpp'],
++            libraries=['opencc'],
++            language='c++'
++        )
++        ],
+     cmdclass={
+         'build_ext': BuildExtCommand,
+         'bdist_wheel': BDistWheelCommand,

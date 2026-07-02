@@ -427,6 +427,7 @@ Please update if your project is using OpenCC.
 * [alfred-chinese-converter](https://github.com/amowu/alfred-chinese-converter)
 * [GoldenDict](https://github.com/goldendict/goldendict)
 * [China Biographical Database Project (CBDB)](https://cbdb.hsites.harvard.edu/)
+* [OpenCC-Traditional Chinese to Traditional Chinese (The Chinese Government Standard)](https://github.com/TerryTian-tech/OpenCC-Traditional-Chinese-characters-according-to-Chinese-government-standards)
 
 ## License 許可協議
 

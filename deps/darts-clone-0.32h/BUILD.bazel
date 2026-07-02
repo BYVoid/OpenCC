@@ -1,11 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
-filegroup(
-    name = "all_files",
-    srcs = glob(["**"]),
-    visibility = ["//visibility:public"],
-)
-
 cc_library(
     name = "darts-clone",
     hdrs = glob(["include/*.h"]),

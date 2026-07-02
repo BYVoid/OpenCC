@@ -1,4 +1,4 @@
-"""Darts-clone is a clone of Darts (Double-ARray Trie System)."""
+"""Darts-clone is a clone of Darts (Double-ARray Trie System) which is a C++ header library for a static double-array trie structure."""
 
 module(
     name = "darts-clone",

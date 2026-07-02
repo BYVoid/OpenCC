@@ -1,3 +1,7 @@
+if(DEFINED PYTHON_EXECUTABLE AND NOT DEFINED Python3_EXECUTABLE)
+  set(Python3_EXECUTABLE "${PYTHON_EXECUTABLE}")
+endif()
+
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
 set(OPENCC_DICT_BIN opencc_dict)

@@ -75,6 +75,8 @@
     "https://bcr.bazel.build/modules/bazel_skylib/1.9.0/source.json": "7ad77c1e8c1b84222d9b3f3cae016a76639435744c19330b0b37c0a3c9da7dc0",
     "https://bcr.bazel.build/modules/buildozer/8.5.1/MODULE.bazel": "a35d9561b3fc5b18797c330793e99e3b834a473d5fbd3d7d7634aafc9bdb6f8f",
     "https://bcr.bazel.build/modules/buildozer/8.5.1/source.json": "e3386e6ff4529f2442800dee47ad28d3e6487f36a1f75ae39ae56c70f0cd2fbd",
+    "https://bcr.bazel.build/modules/darts-clone/0.32h/MODULE.bazel": "ba209b6cfb1a70f4fad4c9c0aa5204ae4b1dcc3c0bcc95a7bf93ec3df0546296",
+    "https://bcr.bazel.build/modules/darts-clone/0.32h/source.json": "49b56b7949dd1efe3c99b4d08a739683bba35299f1c103be0dd76b21b30a8913",
     "https://bcr.bazel.build/modules/gawk/5.3.2.bcr.1/MODULE.bazel": "cdf8cbe5ee750db04b78878c9633cc76e80dcf4416cbe982ac3a9222f80713c8",
     "https://bcr.bazel.build/modules/gawk/5.3.2.bcr.3/MODULE.bazel": "f1b7bb2dd53e8f2ef984b39485ec8a44e9076dda5c4b8efd2fb4c6a6e856a31d",
     "https://bcr.bazel.build/modules/gawk/5.3.2.bcr.3/source.json": "ebe931bfe362e4b41e59ee00a528db6074157ff2ced92eb9e970acab2e1089c9",
@@ -252,6 +254,24 @@
   },
   "selectedYankedVersions": {},
   "moduleExtensions": {
+    "//node:deps.bzl%node_deps": {
+      "general": {
+        "bzlTransitiveDigest": "WzrR1cSo+6UM9ltfJLYa5sdnpCU7lQ1Dpo1vc0XPWVM=",
+        "usagesDigest": "MjFCpVGEw42P09a/hETvnWn+qpOM2D6Z/Fh8bK8GhYE=",
+        "recordedInputs": [
+          "REPO_MAPPING:,bazel_tools bazel_tools"
+        ],
+        "generatedRepoSpecs": {
+          "node_win_x64_lib": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_file",
+            "attributes": {
+              "url": "https://nodejs.org/dist/v20.20.2/win-x64/node.lib",
+              "sha256": "c4a794e993d9304238523230885e9ec00ca052c73b9558471858eef14916d91f"
+            }
+          }
+        }
+      }
+    },
     "@@aspect_tools_telemetry+//:extension.bzl%telemetry": {
       "general": {
         "bzlTransitiveDigest": "cl5A2O84vDL6Tt+Qga8FCj1DUDGqn+e7ly5rZ+4xvcc=",
@@ -325,6 +345,24 @@
               "urls": [
                 "https://github.com/bazelbuild/rules_android/archive/v0.1.1.zip"
               ]
+            }
+          }
+        }
+      }
+    },
+    "@@rules_node_addon+//node_addon:windows.bzl%node_addon_windows": {
+      "general": {
+        "bzlTransitiveDigest": "mSDCSku6ucwsexmDIvrQtQ+UDGdJisPoQ9c0eScU5dA=",
+        "usagesDigest": "8m6U7FypO9pMDljalXdBD/Bt8SVdQapq+cH/dWp9OM4=",
+        "recordedInputs": [],
+        "generatedRepoSpecs": {
+          "windows_node_api": {
+            "repoRuleId": "@@rules_node_addon+//node_addon:windows.bzl%_node_api_repo",
+            "attributes": {
+              "headers_sha256": "87d1a7d80599ce330de0f0832f6b85c7d93c5be7b6a203725afa016405227988",
+              "node_version": "24.14.0",
+              "win_arm64_node_lib_sha256": "59f1c42e5962e9333bb1673c21125b7a7ce9a6908299aee8f7673803c2e24212",
+              "win_x64_node_lib_sha256": "35fcdd35d3d22e283c0e2e095cc43ef676301bb85f950c344a73d59231bd7e61"
             }
           }
         }

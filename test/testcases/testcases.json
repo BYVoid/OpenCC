@@ -1599,6 +1599,13 @@
       }
     },
     {
+      "id": "t2s_huai_and_pi_phrases",
+      "input": "破坏 身坏命终 一坏 製坏 坏布 麪坏兒",
+      "expected": {
+        "t2s": "破坏 身坏命终 一坯 制坯 坯布 面坯儿"
+      }
+    },
+    {
       "id": "BYVoid_OpenCC_Issue_941_chan_s2t",
       "input": "铲子 铲刀 铲车 铲土 铲土机 铲雪 铲雪车 铲冰 铲球 飞铲 踢铲 铲倒 铲射 铲抢 反铲 铲板 铲起 铲除",
       "expected": {

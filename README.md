@@ -427,6 +427,10 @@ Please update if your project is using OpenCC.
 * [alfred-chinese-converter](https://github.com/amowu/alfred-chinese-converter)
 * [GoldenDict](https://github.com/goldendict/goldendict)
 * [China Biographical Database Project (CBDB)](https://cbdb.hsites.harvard.edu/)
+* [OpenCC-Traditional Chinese to Traditional Chinese (The Chinese Government Standard)](https://github.com/TerryTian-tech/OpenCC-Traditional-Chinese-characters-according-to-Chinese-government-standards)
+   * 將混雜不同標準的繁體字形轉換為中國《通用規範漢字表》(2013) 中的繁體字形
+   * [展示說明頁面](https://terrytian-tech.github.io/OpenCC-Traditional-Chinese-characters-according-to-Chinese-government-standards/)
+   * [轉換方案設計說明](https://github.com/TerryTian-tech/OpenCC-Traditional-Chinese-characters-according-to-Chinese-government-standards/blob/main/doc/%E3%80%8A%E9%80%9A%E7%94%A8%E8%A7%84%E8%8C%83%E6%B1%89%E5%AD%97%E8%A1%A8%E3%80%8B%E8%A7%84%E8%8C%83%E7%B9%81%E4%BD%93%E8%BD%AC%E6%8D%A2%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1%E8%AF%B4%E6%98%8E.md)
 
 ## License 許可協議
 

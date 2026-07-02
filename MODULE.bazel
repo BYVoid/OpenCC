@@ -7,7 +7,7 @@ module(
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.22.5")
 bazel_dep(name = "aspect_rules_js", version = "3.2.2")
-bazel_dep(name = "darts-clone", version = "0.32")
+bazel_dep(name = "darts-clone", version = "0.32h")
 bazel_dep(name = "googletest", version = "1.17.0.bcr.2", dev_dependency = True)
 bazel_dep(name = "marisa-trie", version = "0.3.1.bcr.2")
 bazel_dep(name = "node_addon_api", version = "8.9.0")
@@ -30,9 +30,11 @@ single_version_override(
     version = "2.0.3",
 )
 
-local_path_override(
+single_version_override(
     module_name = "darts-clone",
-    path = "deps/darts-clone-0.32h",
+    patches = ["//patches:darts-clone-opencc.patch"],
+    patch_strip = 1,
+    version = "0.32h",
 )
 
 # Windows x64 node.lib import library for Zig/MinGW addon linking. node-addon-api

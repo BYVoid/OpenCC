@@ -634,7 +634,7 @@
 團	团
 # @tofu-risk: not covered by PingFang/Source Han baseline: 𪢮 U+2A8AE
 圞	圞 𪢮
-坏	坯
+坏	坏 坯
 垻	坝
 埡	垭
 埨	𫭢

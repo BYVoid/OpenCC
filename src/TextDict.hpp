@@ -50,6 +50,7 @@ public:
   static TextDictPtr NewFromDict(const Dict& dict);
 
   static TextDictPtr NewFromFile(FILE* fp);
+  static TextDictPtr NewFromFile(FILE* fp, char keyValueDelimiter);
 
   static TextDictPtr NewFromBuffer(const char* data, size_t size);
 

@@ -24,12 +24,13 @@ namespace opencc {
 
 namespace {
 
-DictEntry* ParseKeyValues(const char* buff, size_t lineNum) {
+DictEntry* ParseKeyValues(const char* buff, size_t lineNum,
+                          char keyValueDelimiter) {
   size_t length;
   if (buff == nullptr || UTF8Util::IsLineEndingOrFileEnding(*buff)) {
     return nullptr;
   }
-  const char* pbuff = UTF8Util::FindNextInline(buff, '\t');
+  const char* pbuff = UTF8Util::FindNextInline(buff, keyValueDelimiter);
   if (UTF8Util::IsLineEndingOrFileEnding(*pbuff)) {
     throw InvalidTextDictionary("Tabular not found " + std::string(buff),
                                 lineNum);
@@ -77,6 +78,10 @@ bool Lexicon::IsUnique(std::string* dupkey) {
 }
 
 LexiconPtr Lexicon::ParseLexiconFromFile(FILE* fp) {
+  return ParseLexiconFromFile(fp, '\t');
+}
+
+LexiconPtr Lexicon::ParseLexiconFromFile(FILE* fp, char keyValueDelimiter) {
   const int ENTRY_BUFF_SIZE = 4096;
   char buff[ENTRY_BUFF_SIZE];
   LexiconPtr lexicon(new Lexicon);
@@ -88,7 +93,7 @@ LexiconPtr Lexicon::ParseLexiconFromFile(FILE* fp) {
       lineNum++;
       continue;
     }
-    DictEntry* entry = ParseKeyValues(buff, lineNum);
+    DictEntry* entry = ParseKeyValues(buff, lineNum, keyValueDelimiter);
     if (entry != nullptr) {
       lexicon->Add(entry);
     }
@@ -119,7 +124,7 @@ LexiconPtr Lexicon::ParseLexiconFromBuffer(const char* data, size_t size) {
     }
     if (!line.empty() && line.front() != '#') {
       line.push_back('\n');
-      DictEntry* entry = ParseKeyValues(line.c_str(), lineNum);
+      DictEntry* entry = ParseKeyValues(line.c_str(), lineNum, '\t');
       if (entry != nullptr) {
         lexicon->Add(entry);
       }

@@ -75,13 +75,13 @@ genrule(
         "//plugins/jieba/deps/cppjieba:dict/user.dict.utf8",
     ],
     outs = ["jieba_dict/jieba_merged.ocd2"],
-    cmd = "$(location :cppjieba_dict) -i $(location //plugins/jieba/deps/cppjieba:dict/jieba.dict.utf8) -i $(location //plugins/jieba/deps/cppjieba:dict/user.dict.utf8) -o $@",
-    tools = [":cppjieba_dict"],
+    cmd = "$(location :opencc_jieba_dict_build_tool) -i $(location //plugins/jieba/deps/cppjieba:dict/jieba.dict.utf8) -i $(location //plugins/jieba/deps/cppjieba:dict/user.dict.utf8) -o $@",
+    tools = [":opencc_jieba_dict_build_tool"],
 )
 
 cc_binary(
-    name = "cppjieba_dict",
-    srcs = ["tools/cppjieba_dict.cpp"],
+    name = "opencc_jieba_dict_build_tool",
+    srcs = ["tools/JiebaDictBuildTool.cpp"],
     deps = [
         "//src:dict_lib",
         "//src:dict_entry_lib",

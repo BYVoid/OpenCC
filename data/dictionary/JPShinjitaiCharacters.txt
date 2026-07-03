@@ -12,6 +12,13 @@
 # kept with a self-mapping as the first candidate.
 # Reference: https://zh.wikipedia.org/wiki/%E6%96%B0%E5%AD%97%E4%BD%93#%E6%96%B0%E8%88%8A%E5%AD%97%E9%AB%94%E5%B0%8D%E7%85%A7%E8%A1%A8
 
+# Preserved for compatibility
+# 「塩」U+5869 是日文常用漢字，新字體，可用於人名。
+# 「鹽」U+9E7D 是舊字體，在日文中既非常用漢字也非人名用漢字，不可用於日本人命名。
+# 在留卡依照法務省正字告示可保留新字「塩」與舊字「鹽」。
+# 「䀋」U+400B 是「鹽」的俗字/異體字，不可用於人名或在留卡氏名，此處列出僅為相容。
+# Ref: https://dictionary.sanseido-publ.co.jp/column/%E7%AC%AC215%E5%9B%9E%E3%80%8C%E5%A1%A9%E3%80%8D%E3%81%A8%E3%80%8C%E4%80%8B%E3%80%8D%E3%81%A8%E3%80%8C%E9%B9%BD%E3%80%8D
+䀋	䀋 鹽
 万	萬
 与	與
 両	兩
@@ -30,6 +37,12 @@
 体	體
 余	餘
 併	倂
+# Preserved for compatibility
+# 「俠」U+4FE0 是人名用漢字（舊字體），可用於日本人命名。
+# 「侠」U+4FA0 是新字體，但既非常用漢字也非人名用漢字，不可用於日本人命名。
+# 此處列出新字體「侠」僅為相容性映射。
+# Ref: https://dictionary.sanseido-publ.co.jp/column/%E7%AC%AC139%E5%9B%9E%E3%80%8C%E4%BE%A0%E3%80%8D%E3%81%A8%E3%80%8C%E4%BF%A0%E3%80%8D
+侠	侠 俠
 価	價
 # Preserved for compatibility
 値	値 值
@@ -106,6 +119,7 @@
 塁	壘
 # Preserved for compatibility
 塡	塡 填
+# @reverse-prefer: 鹽 塩
 塩	鹽
 増	增
 壊	壞
@@ -118,6 +132,12 @@
 奥	奧
 # Preserved for compatibility
 奨	奬 獎
+# Preserved for compatibility
+# 「姉」U+59C9 是日文常用漢字（新字體），可用於人名。
+# 「姊」U+59CA 是舊字體，但在日文中既非常用漢字也非人名用漢字，不可用於日本人命名。
+# 依照入國管理局正字告示，在留外國人氏名可保留使用舊字「姊」，此處列出僅為相容。
+# Ref: https://dictionary.sanseido-publ.co.jp/column/%E7%AC%AC160%E5%9B%9E%E3%80%8C%E5%A7%89%E3%80%8D%E3%81%A8%E3%80%8C%E5%A7%8A%E3%80%8D
+姉	姉 姊
 # Preserved for compatibility
 姫	姫 姬
 嬢	孃
@@ -145,6 +165,12 @@
 帰	歸
 庁	廳
 広	廣
+# Preserved for compatibility
+# 「荘」U+8358 是常用漢字（新字體），可用於人名。
+# 「莊」U+838A 是人名用漢字（舊字體），可用於人名。
+# 「庄」U+5E84 是俗字（也是日文人名用漢字），可用於人名。此處為相容性映射而列出。
+# Ref: https://dictionary.sanseido-publ.co.jp/column/%E7%AC%AC122%E5%9B%9E%E3%80%8C%E5%BA%84%E3%80%8D%E3%81%A8%E3%80%8C%E8%8D%98%E3%80%8D%E3%81%A8%E3%80%8C%E8%8E%8A%E3%80%8D
+庄	庄 莊
 # Preserved for compatibility
 床	床 牀
 廃	廢
@@ -299,8 +325,16 @@
 瓶	甁
 # Preserved for compatibility
 産	産 產
+# @reverse-prefer: 畫 画
 画	畫
 畳	疊
+# Preserved for compatibility
+# 「画」U+753B 是常用漢字（新字體），可用於人名。
+# 「畫」U+756B 是「画」的舊字體，不可用於命名。
+# 「畵」U+7575 是另一種俗字字形（畫的第三字形），皆不可用於日本人命名。
+# 在留外國人氏名依入國管理局正字可使用新字「画」、俗字「畫」或舊字「畵」。
+# Ref: https://dictionary.sanseido-publ.co.jp/column/%E7%AC%AC212%E5%9B%9E%E3%80%8C%E7%94%BB%E3%80%8D%E3%81%A8%E3%80%8C%E7%95%AB%E3%80%8D%E3%81%A8%E3%80%8C%E7%95%B5%E3%80%8D
+畵	畵 畫
 痩	瘦
 痴	癡
 # Preserved for compatibility
@@ -372,6 +406,13 @@
 # Preserved for compatibility
 舎	舎 舍
 # Preserved for compatibility
+# 「舗」U+8217 是常用漢字（新字體），可用於人名。
+# 「鋪」U+92EA 是舊字體，不可用於人名。
+# 「舖」U+8216 是俗字，曾在昭和24年被回答可用於人名，但自昭和56年起不再允許用於人名。
+# Ref: https://dictionary.sanseido-publ.co.jp/column/%E7%AC%AC121%E5%9B%9E%E3%80%8C%E8%88%97%E3%80%8D%E3%81%A8%E3%80%8C%E8%88%96%E3%80%8D%E3%81%A8%E3%80%8C%E9%8B%AA%E3%80%8D
+舖	舖 鋪
+# Preserved for compatibility
+# @reverse-prefer: 鋪 舗
 舗	舗 鋪
 艶	艷
 芦	蘆
@@ -379,6 +420,7 @@
 茎	莖
 # Preserved for compatibility
 茘	茘 荔
+# @reverse-prefer: 莊 荘
 荘	莊
 # Preserved for compatibility
 莱	莱 萊
@@ -394,6 +436,11 @@
 蚕	蠶
 蛍	螢
 蛮	蠻
+# Preserved for compatibility
+# 「蟬」U+87EC 是人名用漢字（舊字體），可用於人名。
+# 「蝉」U+8749 是新字體，但既非常用漢字也非人名用漢字，不可用於日本人命名。此處列出僅為相容。
+# Ref: https://dictionary.sanseido-publ.co.jp/column/%E7%AC%AC138%E5%9B%9E%E3%80%8C%E8%9D%89%E3%80%8D%E3%81%A8%E3%80%8C%E8%9F%AC%E3%80%8D
+蝉	蝉 蟬
 蝋	蠟
 衛	衞
 装	裝
@@ -438,6 +485,12 @@
 鉄	鐵
 鉱	鑛
 銭	錢
+# Preserved for compatibility
+# 「鋭」U+92ED 是日文常用漢字（新字體），可用於人名。
+# 「銳」U+92B3 是舊字體，常用漢字表未收錄，不可用於日本人命名。
+# 在留外國人氏名依入國管理局正字可保留舊字「銳」，此處列出僅為相容。
+# Ref: https://dictionary.sanseido-publ.co.jp/column/%E7%AC%AC172%E5%9B%9E%E3%80%8C%E9%8B%AD%E3%80%8D%E3%81%A8%E3%80%8C%E9%8A%B3%E3%80%8D
+鋭	鋭 銳
 鋳	鑄
 錬	鍊
 録	錄
@@ -445,11 +498,17 @@
 関	關
 閲	閱
 # Preserved for compatibility
+# @reverse-prefer: 鬥 闘
 闘	鬭 鬥
 陥	陷
 険	險
 随	隨
 隠	隱
+# Preserved for compatibility
+# 「隣」U+96A3 是常用漢字（新字體），可用於人名。
+# 「鄰」U+9130 是舊字體，但既非常用漢字也非人名用漢字，不可用於日本人命名。此處列出僅為相容。
+# Ref: https://dictionary.sanseido-publ.co.jp/column/%E7%AC%AC178%E5%9B%9E%E3%80%8C%E9%9A%A3%E3%80%8D%E3%81%A8%E3%80%8C%E9%84%B0%E3%80%8D
+隣	隣 鄰
 雑	雜
 霊	靈
 静	靜
@@ -459,11 +518,24 @@
 顕	顯
 餅	餠
 駅	驛
+# @reverse-prefer: 驅 駆
 駆	驅
+# Preserved for compatibility
+# 「駆」U+99C6 是常用漢字（新字體），可用於人名。
+# 「驅」U+9A45 是舊字體，不可用於人名。
+# 「駈」U+99C8 是俗字，經審議已追加為日文人名用漢字，可用於人名。此處為相容性映射而列出。
+# Ref: https://dictionary.sanseido-publ.co.jp/column/%E7%AC%AC41%E5%9B%9E%E3%80%8C%E9%A7%86%E3%80%8D%E3%81%A8%E3%80%8C%E9%A9%85%E3%80%8D%E3%81%A8%E3%80%8C%E9%A7%88%E3%80%8D
+駈	駈 驅
 騒	騷
 験	驗
 髄	髓
 髪	髮
+# Preserved for compatibility
+# 「闘」U+95D8 是常用漢字（新字體），可用於人名。
+# 「鬪」U+9B2A 是舊字體，自昭和56年起不再允許用於日本人命名。
+# 「鬭」U+9B2D 是另一種舊字字形，一開始即不可用於命名。此處「鬪」列出僅為相容。
+# Ref: https://dictionary.sanseido-publ.co.jp/column/%E7%AC%AC8%E5%9B%9E%E3%80%8C%E9%97%98%E3%80%8D%E3%81%A8%E3%80%8C%E9%AC%AA%E3%80%8D%E3%81%A8%E3%80%8C%E9%AC%AD%E3%80%8D
+鬪	鬪 鬥
 鴎	鷗
 # Preserved for compatibility
 鶏	鷄 雞

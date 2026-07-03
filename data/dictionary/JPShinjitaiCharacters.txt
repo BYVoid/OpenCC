@@ -12,6 +12,8 @@
 # kept with a self-mapping as the first candidate.
 # Reference: https://zh.wikipedia.org/wiki/%E6%96%B0%E5%AD%97%E4%BD%93#%E6%96%B0%E8%88%8A%E5%AD%97%E9%AB%94%E5%B0%8D%E7%85%A7%E8%A1%A8
 
+# Preserved for compatibility
+䀋	䀋 鹽
 万	萬
 与	與
 両	兩
@@ -30,6 +32,8 @@
 体	體
 余	餘
 併	倂
+# Preserved for compatibility
+侠	侠 俠
 価	價
 # Preserved for compatibility
 値	値 值
@@ -106,6 +110,7 @@
 塁	壘
 # Preserved for compatibility
 塡	塡 填
+# @reverse-prefer: 鹽 塩
 塩	鹽
 増	增
 壊	壞
@@ -118,6 +123,8 @@
 奥	奧
 # Preserved for compatibility
 奨	奬 獎
+# Preserved for compatibility
+姉	姉 姊
 # Preserved for compatibility
 姫	姫 姬
 嬢	孃
@@ -145,6 +152,8 @@
 帰	歸
 庁	廳
 広	廣
+# Preserved for compatibility
+庄	庄 莊
 # Preserved for compatibility
 床	床 牀
 廃	廢
@@ -299,8 +308,11 @@
 瓶	甁
 # Preserved for compatibility
 産	産 產
+# @reverse-prefer: 畫 画
 画	畫
 畳	疊
+# Preserved for compatibility
+畵	畵 畫
 痩	瘦
 痴	癡
 # Preserved for compatibility
@@ -372,6 +384,9 @@
 # Preserved for compatibility
 舎	舎 舍
 # Preserved for compatibility
+舖	舖 鋪
+# Preserved for compatibility
+# @reverse-prefer: 鋪 舗
 舗	舗 鋪
 艶	艷
 芦	蘆
@@ -379,6 +394,7 @@
 茎	莖
 # Preserved for compatibility
 茘	茘 荔
+# @reverse-prefer: 莊 荘
 荘	莊
 # Preserved for compatibility
 莱	莱 萊
@@ -394,6 +410,8 @@
 蚕	蠶
 蛍	螢
 蛮	蠻
+# Preserved for compatibility
+蝉	蝉 蟬
 蝋	蠟
 衛	衞
 装	裝
@@ -438,6 +456,8 @@
 鉄	鐵
 鉱	鑛
 銭	錢
+# Preserved for compatibility
+鋭	鋭 銳
 鋳	鑄
 錬	鍊
 録	錄
@@ -445,11 +465,14 @@
 関	關
 閲	閱
 # Preserved for compatibility
+# @reverse-prefer: 鬥 闘
 闘	鬭 鬥
 陥	陷
 険	險
 随	隨
 隠	隱
+# Preserved for compatibility
+隣	隣 鄰
 雑	雜
 霊	靈
 静	靜
@@ -459,11 +482,16 @@
 顕	顯
 餅	餠
 駅	驛
+# @reverse-prefer: 驅 駆
 駆	驅
+# Preserved for compatibility
+駈	駈 驅
 騒	騷
 験	驗
 髄	髓
 髪	髮
+# Preserved for compatibility
+鬪	鬪 鬥
 鴎	鷗
 # Preserved for compatibility
 鶏	鷄 雞

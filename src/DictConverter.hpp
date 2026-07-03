@@ -29,4 +29,9 @@ OPENCC_EXPORT void ConvertDictionary(const std::string& inputFileName,
                                      const std::string& outputFileName,
                                      const std::string& formatFrom,
                                      const std::string& formatTo);
+
+OPENCC_EXPORT void ConvertDictionary(
+    const std::vector<std::string>& inputFileNames,
+    const std::string& outputFileName, const std::string& formatFrom,
+    const std::string& formatTo);
 } // namespace opencc

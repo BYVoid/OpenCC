@@ -86,8 +86,10 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     src/JiebaSegmentationPlugin.cpp
   )
   target_link_libraries(opencc_jieba PRIVATE OpenCC::OpenCC)
-  add_executable(cppjieba_dict tools/cppjieba_dict.cpp)
-  target_link_libraries(cppjieba_dict PRIVATE OpenCC::OpenCC)
+  find_program(OPENCC_DICT_EXECUTABLE opencc_dict
+    HINTS "${_opencc_install_prefix_hint}/bin" "${CMAKE_INSTALL_PREFIX}/bin"
+  )
+  set(JIEBA_MERGED_DICT_TOOL_DEPENDS "${OPENCC_DICT_EXECUTABLE}")
 else()
   add_library(opencc_jieba SHARED
     src/JiebaSegmentation.cpp
@@ -99,12 +101,8 @@ else()
     ${PROJECT_BINARY_DIR}/src
   )
   target_link_libraries(opencc_jieba PRIVATE libopencc)
-  add_executable(cppjieba_dict tools/cppjieba_dict.cpp)
-  target_include_directories(cppjieba_dict PRIVATE
-    ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_BINARY_DIR}/src
-  )
-  target_link_libraries(cppjieba_dict PRIVATE libopencc)
+  set(OPENCC_DICT_EXECUTABLE $<TARGET_FILE:opencc_dict>)
+  set(JIEBA_MERGED_DICT_TOOL_DEPENDS opencc_dict)
 endif()
 target_compile_definitions(opencc_jieba PRIVATE OPENCC_PLUGIN_BUILD)
 
@@ -155,7 +153,8 @@ if (WIN32 AND _opencc_target_arch AND _opencc_host_arch)
   endif()
 endif()
 
-if (WIN32 AND OPENCC_CAN_RUN_CPPJIEBA_DICT)
+if (WIN32 AND OPENCC_CAN_RUN_CPPJIEBA_DICT AND
+    NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
   if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     set(_opencc_runtime_target OpenCC::OpenCC)
   else()
@@ -163,29 +162,35 @@ if (WIN32 AND OPENCC_CAN_RUN_CPPJIEBA_DICT)
   endif()
 
   add_custom_target(
-    copy_opencc_to_cppjieba_dict
+    copy_opencc_to_jieba_opencc_dict
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $<TARGET_FILE:${_opencc_runtime_target}>
-            $<TARGET_FILE_DIR:cppjieba_dict>
-    DEPENDS cppjieba_dict
-    COMMENT "Copying OpenCC runtime to directory of cppjieba_dict"
+            $<TARGET_FILE_DIR:opencc_dict>
+    DEPENDS opencc_dict
+    COMMENT "Copying OpenCC runtime to directory of opencc_dict"
   )
-  set(JIEBA_MERGED_DICT_WIN32_DEPENDS copy_opencc_to_cppjieba_dict)
+  set(JIEBA_MERGED_DICT_WIN32_DEPENDS copy_opencc_to_jieba_opencc_dict)
 else()
   set(JIEBA_MERGED_DICT_WIN32_DEPENDS)
 endif()
 
 if (OPENCC_CAN_RUN_CPPJIEBA_DICT)
+  if (NOT OPENCC_DICT_EXECUTABLE)
+    message(FATAL_ERROR "Unable to find opencc_dict. Install OpenCC tools or set OPENCC_DICT_EXECUTABLE.")
+  endif()
+
   add_custom_command(
     OUTPUT "${JIEBA_MERGED_DICT}"
     COMMAND ${CMAKE_COMMAND} -E make_directory "${JIEBA_MERGED_DICT_DIR}"
-    COMMAND $<TARGET_FILE:cppjieba_dict>
+    COMMAND ${OPENCC_DICT_EXECUTABLE}
             -i "${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/jieba.dict.utf8"
             -i "${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/user.dict.utf8"
+            -f cppjieba_utf8
+            -t ocd2
             -o "${JIEBA_MERGED_DICT}"
     DEPENDS
       ${JIEBA_MERGED_DICT_WIN32_DEPENDS}
-      cppjieba_dict
+      ${JIEBA_MERGED_DICT_TOOL_DEPENDS}
       "${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/jieba.dict.utf8"
       "${CMAKE_CURRENT_SOURCE_DIR}/deps/cppjieba/dict/user.dict.utf8"
     VERBATIM
@@ -206,7 +211,6 @@ if (WIN32)
   endif()
   if (_opencc_target_type STREQUAL "STATIC_LIBRARY")
     target_compile_definitions(opencc_jieba PRIVATE Opencc_BUILT_AS_STATIC)
-    target_compile_definitions(cppjieba_dict PRIVATE Opencc_BUILT_AS_STATIC)
   endif()
 endif()
 
@@ -225,11 +229,6 @@ if (BUILD_OPENCC_JIEBA_PLUGIN AND OPENCC_ENABLE_INSTALL)
     LIBRARY DESTINATION ${DIR_PLUGIN}
     ARCHIVE DESTINATION ${DIR_PLUGIN}
     RUNTIME DESTINATION ${DIR_PLUGIN}
-  )
-
-  install(
-    TARGETS cppjieba_dict
-    RUNTIME DESTINATION bin
   )
 
   if (OPENCC_CAN_RUN_CPPJIEBA_DICT)

@@ -11,7 +11,7 @@ description: Open Chinese Convert is an open source library and toolchain for Tr
 <section class="hero">
   <div class="hero-copy">
     <div class="hero-badges" aria-label="Project status">
-      <span class="badge success">Stable 1.3.1 · 穩定版</span>
+      <span class="badge success">Stable 1.4.0 · 穩定版</span>
       <span class="badge neutral">C, C++, Node.js, Python</span>
       <span class="badge info">Open source · 開源</span>
     </div>
@@ -155,7 +155,7 @@ npm install -g opencc opencc-jieba</code></pre>
     <p>Read the generated API documentation, browse historical versions, or inspect the source on GitHub.<span class="zh-copy">查看自動生成的 API 文檔、歷史版本，或在 GitHub 檢視原始碼。</span></p>
   </div>
   <div class="link-list">
-    <a href="/1.3.1/">Latest API docs / 最新 API 文檔 <span>1.3.1</span></a>
+    <a href="/1.4.0/">Latest API docs / 最新 API 文檔 <span>1.4.0</span></a>
     <a href="/characters-easy-to-misuse/">Character disambiguation / 易混淆字辨析 <span>Table</span></a>
     <a href="/docs/">Historical docs / 歷史文檔 <span>All versions</span></a>
     <a href="https://github.com/BYVoid/OpenCC">Source code / 原始碼 <span>GitHub</span></a>

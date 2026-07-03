@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['package_20managers_20包管理器_0',['Package Managers 包管理器',['../index.html#autotoc_md32',1,'']]],
+  ['packaging_20for_20distro_20maintainers_1',['Packaging for Distro Maintainers',['../dir_38c8d24aef3972a7f87b834274e76e31.html#autotoc_md25',1,'']]],
+  ['party_20libraries_20第三方庫_2',['Third Party Libraries 第三方庫',['../index.html#autotoc_md61',1,'']]],
+  ['path_20handling_3',['Platform and Path Handling',['../dir_68267d1309a1af8e8297ef4c3efbcdba.html#autotoc_md13',1,'']]],
+  ['phraseextract_4',['PhraseExtract',['../classopencc_1_1_phrase_extract.html',1,'opencc::PhraseExtract'],['../class_phrase_extract.html',1,'PhraseExtract']]],
+  ['pipeline_5',['Main Pipeline',['../dir_68267d1309a1af8e8297ef4c3efbcdba.html#autotoc_md1',1,'']]],
+  ['pipelineconverter_6',['PipelineConverter',['../classopencc_1_1_pipeline_converter.html',1,'opencc::PipelineConverter'],['../classopencc_1_1_pipeline_converter.html#aa8136c27b5d3ec7b4a3d45b570580b92',1,'opencc::PipelineConverter::PipelineConverter()']]],
+  ['pipelinestages_7',['pipelineStages',['../structopencc_1_1_conversion_inspection_result.html#a39122b6d0b3f919d55f74711662863b0',1,'opencc::ConversionInspectionResult']]],
+  ['platform_20and_20path_20handling_8',['Platform and Path Handling',['../dir_68267d1309a1af8e8297ef4c3efbcdba.html#autotoc_md13',1,'']]],
+  ['plugin_9',['Adding A New Plugin',['../dir_38c8d24aef3972a7f87b834274e76e31.html#autotoc_md24',1,'']]],
+  ['plugin_20standalone_10',['2. Build The Plugin Standalone',['../dir_38c8d24aef3972a7f87b834274e76e31.html#autotoc_md27',1,'']]],
+  ['plugins_11',['Plugins',['../dir_38c8d24aef3972a7f87b834274e76e31.html#autotoc_md17',1,'OpenCC Plugins'],['../dir_68267d1309a1af8e8297ef4c3efbcdba.html#autotoc_md14',1,'Plugins']]],
+  ['plugins_20試驗性插件_12',['Experimental Plugins 試驗性插件',['../index.html#autotoc_md48',1,'']]],
+  ['ports_13',['Official / Recommended Ports',['../index.html#autotoc_md42',1,'']]],
+  ['ports_20unofficial_14',['Other Ports (Unofficial)',['../index.html#autotoc_md43',1,'']]],
+  ['prebuilt_20binaries_20預編譯二進位檔_15',['Prebuilt binaries 預編譯二進位檔',['../index.html#autotoc_md33',1,'']]],
+  ['prefixmatch_16',['PrefixMatch',['../classopencc_1_1_prefix_match.html',1,'opencc']]],
+  ['prefixmatchview_17',['PrefixMatchView',['../structopencc_1_1_prefix_match_view.html',1,'opencc']]],
+  ['prevchar_18',['PrevChar',['../classopencc_1_1_u_t_f8_util.html#afb0cbf03c32b544cc6b84406db18927c',1,'opencc::UTF8Util']]],
+  ['prevcharlength_19',['PrevCharLength',['../classopencc_1_1_u_t_f8_util.html#a153a270ce21d855c07a7d5eba397da5e',1,'opencc::UTF8Util']]],
+  ['projects_20using_20opencc_20使用_20opencc_20的項目_20',['Projects using OpenCC 使用 OpenCC 的項目',['../index.html#autotoc_md59',1,'']]],
+  ['public_20apis_21',['Public APIs',['../dir_68267d1309a1af8e8297ef4c3efbcdba.html#autotoc_md8',1,'']]],
+  ['python_22',['Python',['../index.html#autotoc_md37',1,'']]],
+  ['python_20extension_23',['Python Extension',['../dir_68267d1309a1af8e8297ef4c3efbcdba.html#autotoc_md11',1,'']]]
+];

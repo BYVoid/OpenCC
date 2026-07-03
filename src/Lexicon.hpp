@@ -63,6 +63,7 @@ public:
   }
 
   static LexiconPtr ParseLexiconFromFile(FILE* fp);
+  static LexiconPtr ParseLexiconFromFile(FILE* fp, char keyValueDelimiter);
   static LexiconPtr ParseLexiconFromBuffer(const char* data, size_t size);
 
 private:

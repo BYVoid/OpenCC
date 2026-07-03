@@ -47,7 +47,12 @@ TextDictPtr TextDict::NewFromSortedFile(FILE* fp) {
 }
 
 TextDictPtr TextDict::NewFromFile(FILE* fp) {
-  const LexiconPtr& lexicon = Lexicon::ParseLexiconFromFile(fp);
+  return NewFromFile(fp, '\t');
+}
+
+TextDictPtr TextDict::NewFromFile(FILE* fp, char keyValueDelimiter) {
+  const LexiconPtr& lexicon =
+      Lexicon::ParseLexiconFromFile(fp, keyValueDelimiter);
   lexicon->Sort();
   std::string dupkey;
   if (!lexicon->IsUnique(&dupkey)) {

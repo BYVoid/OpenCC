@@ -245,7 +245,7 @@ main() {
     -DOpenCC_DIR="$opencc_package_dir" \
     "${cmake_cross_args[@]}"
   if [ "$is_cross_build" = TRUE ]; then
-    cmake --build "$plugin_build_dir" --target opencc_jieba cppjieba_dict
+    cmake --build "$plugin_build_dir" --target opencc_jieba
   else
     cmake --build "$plugin_build_dir"
   fi

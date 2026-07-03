@@ -51,7 +51,8 @@ using opencc::Optional;
 using opencc::SerializableDict;
 
 void PrintUsage(std::ostream& os) {
-  os << "Usage: cppjieba_dict -i <dict> [-i <dict> ...] -o <output.ocd2>"
+  os << "Usage: opencc_jieba_dict_build_tool -i <dict> [-i <dict> ...] "
+        "-o <output.ocd2>"
      << std::endl
      << "  -i <dict>         Input dictionary file. The first -i is parsed as"
      << std::endl
@@ -85,20 +86,20 @@ bool IsCommentOrEmpty(const std::string& line) {
   return true;
 }
 
-std::vector<std::string> ParseBaseDictValues(const std::vector<std::string>& tokens,
-                                             size_t line_number) {
+std::vector<std::string>
+ParseBaseDictValues(const std::vector<std::string>& tokens, size_t lineNumber) {
   if (tokens.size() != 3) {
     throw std::runtime_error("invalid base dict line " +
-                             std::to_string(line_number));
+                             std::to_string(lineNumber));
   }
   return std::vector<std::string>{tokens[1], tokens[2], "base"};
 }
 
-std::vector<std::string> ParseUserDictValues(const std::vector<std::string>& tokens,
-                                             size_t line_number) {
+std::vector<std::string>
+ParseUserDictValues(const std::vector<std::string>& tokens, size_t lineNumber) {
   if (tokens.empty() || tokens.size() > 3) {
     throw std::runtime_error("invalid user dict line " +
-                             std::to_string(line_number));
+                             std::to_string(lineNumber));
   }
   if (tokens.size() == 1) {
     return std::vector<std::string>{"", "", "user_default"};
@@ -111,12 +112,12 @@ std::vector<std::string> ParseUserDictValues(const std::vector<std::string>& tok
 
 class LexiconDict : public Dict {
 public:
-  explicit LexiconDict(std::vector<std::unique_ptr<DictEntry> > entries)
-      : lexicon_(new Lexicon(std::move(entries))), max_length_(0) {
+  explicit LexiconDict(std::vector<std::unique_ptr<DictEntry>> entries)
+      : lexicon_(new Lexicon(std::move(entries))), maxLength_(0) {
     for (size_t i = 0; i < lexicon_->Length(); ++i) {
       const DictEntry* entry = lexicon_->At(i);
-      if (entry->KeyLength() > max_length_) {
-        max_length_ = entry->KeyLength();
+      if (entry->KeyLength() > maxLength_) {
+        maxLength_ = entry->KeyLength();
       }
     }
   }
@@ -134,18 +135,18 @@ public:
 
   Optional<const DictEntry*> MatchPrefix(const char* word,
                                          size_t len) const override {
-    const size_t capped_len = len < max_length_ ? len : max_length_;
+    const size_t cappedLen = len < maxLength_ ? len : maxLength_;
     const DictEntry* best = nullptr;
-    size_t best_length = 0;
+    size_t bestLength = 0;
     for (size_t i = 0; i < lexicon_->Length(); ++i) {
       const DictEntry* entry = lexicon_->At(i);
-      const size_t entry_length = entry->KeyLength();
-      if (entry_length > capped_len || entry_length <= best_length) {
+      const size_t entryLength = entry->KeyLength();
+      if (entryLength > cappedLen || entryLength <= bestLength) {
         continue;
       }
-      if (std::string(word, entry_length) == entry->Key()) {
+      if (std::string(word, entryLength) == entry->Key()) {
         best = entry;
-        best_length = entry_length;
+        bestLength = entryLength;
       }
     }
     if (best == nullptr) {
@@ -156,60 +157,60 @@ public:
 
   std::vector<const DictEntry*> MatchAllPrefixes(const char* word,
                                                  size_t len) const override {
-    const size_t capped_len = len < max_length_ ? len : max_length_;
+    const size_t cappedLen = len < maxLength_ ? len : maxLength_;
     std::vector<const DictEntry*> matches;
     for (size_t i = 0; i < lexicon_->Length(); ++i) {
       const DictEntry* entry = lexicon_->At(i);
-      const size_t entry_length = entry->KeyLength();
-      if (entry_length > capped_len) {
+      const size_t entryLength = entry->KeyLength();
+      if (entryLength > cappedLen) {
         continue;
       }
-      if (std::string(word, entry_length) == entry->Key()) {
+      if (std::string(word, entryLength) == entry->Key()) {
         matches.push_back(entry);
       }
     }
     return matches;
   }
 
-  size_t KeyMaxLength() const override { return max_length_; }
+  size_t KeyMaxLength() const override { return maxLength_; }
 
   LexiconPtr GetLexicon() const override { return lexicon_; }
 
 private:
   LexiconPtr lexicon_;
-  size_t max_length_;
+  size_t maxLength_;
 };
 
 void LoadBaseDict(const std::string& path,
-                  std::map<std::string, std::vector<std::string> >& entries) {
+                  std::map<std::string, std::vector<std::string>>& entries) {
   std::ifstream ifs(path.c_str());
   if (!ifs.is_open()) {
     throw std::runtime_error("failed to open base dict: " + path);
   }
 
   std::string line;
-  size_t line_number = 0;
+  size_t lineNumber = 0;
   while (std::getline(ifs, line)) {
-    ++line_number;
+    ++lineNumber;
     if (IsCommentOrEmpty(line)) {
       continue;
     }
     const std::vector<std::string> tokens = SplitWhitespace(line);
-    entries[tokens[0]] = ParseBaseDictValues(tokens, line_number);
+    entries[tokens[0]] = ParseBaseDictValues(tokens, lineNumber);
   }
 }
 
 void LoadUserDict(const std::string& path,
-                  std::map<std::string, std::vector<std::string> >& entries) {
+                  std::map<std::string, std::vector<std::string>>& entries) {
   std::ifstream ifs(path.c_str());
   if (!ifs.is_open()) {
     throw std::runtime_error("failed to open user dict: " + path);
   }
 
   std::string line;
-  size_t line_number = 0;
+  size_t lineNumber = 0;
   while (std::getline(ifs, line)) {
-    ++line_number;
+    ++lineNumber;
     if (IsCommentOrEmpty(line)) {
       continue;
     }
@@ -217,85 +218,87 @@ void LoadUserDict(const std::string& path,
     if (tokens.empty()) {
       continue;
     }
-    entries[tokens[0]] = ParseUserDictValues(tokens, line_number);
+    entries[tokens[0]] = ParseUserDictValues(tokens, lineNumber);
   }
 }
 
-void WriteOcd2(const std::map<std::string, std::vector<std::string> >& entries,
-               const std::string& output_path) {
-  std::vector<std::unique_ptr<DictEntry> > lexicon_entries;
-  lexicon_entries.reserve(entries.size());
-  for (std::map<std::string, std::vector<std::string> >::const_iterator it =
-           entries.begin();
-       it != entries.end(); ++it) {
-    lexicon_entries.push_back(
-        std::unique_ptr<DictEntry>(DictEntryFactory::New(it->first, it->second)));
+void WriteOcd2(const std::map<std::string, std::vector<std::string>>& entries,
+               const std::string& outputPath) {
+  std::vector<std::unique_ptr<DictEntry>> lexiconEntries;
+  lexiconEntries.reserve(entries.size());
+  for (const auto& entry : entries) {
+    lexiconEntries.push_back(std::unique_ptr<DictEntry>(
+        DictEntryFactory::New(entry.first, entry.second)));
   }
 
-  LexiconDict dict(std::move(lexicon_entries));
-  MarisaDictPtr marisa_dict = MarisaDict::NewFromDict(dict);
-  static_cast<const SerializableDict&>(*marisa_dict).SerializeToFile(output_path);
+  LexiconDict dict(std::move(lexiconEntries));
+  MarisaDictPtr marisaDict = MarisaDict::NewFromDict(dict);
+  static_cast<const SerializableDict&>(*marisaDict).SerializeToFile(outputPath);
 }
 
-}  // namespace
+} // namespace
 
 int main(int argc, char** argv) {
-  std::vector<std::string> input_paths;
-  std::string output_path;
+  std::vector<std::string> inputPaths;
+  std::string outputPath;
 
   for (int i = 1; i < argc; ++i) {
     const std::string arg = argv[i];
     if (arg == "-i") {
       if (i + 1 >= argc) {
-        std::cerr << "cppjieba_dict: missing value after -i" << std::endl;
+        std::cerr << "opencc_jieba_dict_build_tool: missing value after -i"
+                  << std::endl;
         PrintUsage(std::cerr);
         return 1;
       }
-      input_paths.push_back(argv[++i]);
+      inputPaths.push_back(argv[++i]);
       continue;
     }
     if (arg == "-o") {
       if (i + 1 >= argc) {
-        std::cerr << "cppjieba_dict: missing value after -o" << std::endl;
+        std::cerr << "opencc_jieba_dict_build_tool: missing value after -o"
+                  << std::endl;
         PrintUsage(std::cerr);
         return 1;
       }
-      if (!output_path.empty()) {
-        std::cerr << "cppjieba_dict: exactly one -o is required" << std::endl;
+      if (!outputPath.empty()) {
+        std::cerr << "opencc_jieba_dict_build_tool: exactly one -o is required"
+                  << std::endl;
         PrintUsage(std::cerr);
         return 1;
       }
-      output_path = argv[++i];
+      outputPath = argv[++i];
       continue;
     }
 
-    std::cerr << "cppjieba_dict: unknown argument: " << arg << std::endl;
+    std::cerr << "opencc_jieba_dict_build_tool: unknown argument: " << arg
+              << std::endl;
     PrintUsage(std::cerr);
     return 1;
   }
 
-  if (input_paths.empty()) {
-    std::cerr << "cppjieba_dict: at least one -i is required" << std::endl;
+  if (inputPaths.empty()) {
+    std::cerr << "opencc_jieba_dict_build_tool: at least one -i is required"
+              << std::endl;
     PrintUsage(std::cerr);
     return 1;
   }
-  if (output_path.empty()) {
-    std::cerr << "cppjieba_dict: exactly one -o is required" << std::endl;
+  if (outputPath.empty()) {
+    std::cerr << "opencc_jieba_dict_build_tool: exactly one -o is required"
+              << std::endl;
     PrintUsage(std::cerr);
     return 1;
   }
 
   try {
-    std::map<std::string, std::vector<std::string> > entries;
-    LoadBaseDict(input_paths.front(), entries);
-    for (size_t i = 1; i < input_paths.size(); ++i) {
-      LoadUserDict(input_paths[i], entries);
+    std::map<std::string, std::vector<std::string>> entries;
+    LoadBaseDict(inputPaths.front(), entries);
+    for (size_t i = 1; i < inputPaths.size(); ++i) {
+      LoadUserDict(inputPaths[i], entries);
     }
-    WriteOcd2(entries, output_path);
-    std::cout << "Wrote " << entries.size() << " entries to " << output_path
-              << std::endl;
+    WriteOcd2(entries, outputPath);
   } catch (const std::exception& e) {
-    std::cerr << "cppjieba_dict: " << e.what() << std::endl;
+    std::cerr << "opencc_jieba_dict_build_tool: " << e.what() << std::endl;
     return 1;
   }
 

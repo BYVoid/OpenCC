@@ -9,6 +9,7 @@ set(OPENCC_BIN opencc)
 set(DICT_REVERSE_BIN "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/reverse.py")
 set(DICT_EXTRACT_TOFU_RISK_BIN "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/extract_tofu_risk.py")
 set(DICT_GENERATE_ST_PHRASES_BIN "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_st_phrases_from_regional_phrases.py")
+set(CONFIG_CONVERT_DICT_FORMAT_BIN "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/convert_config_dict_format.py")
 set(DICT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dictionary)
 set(DICT_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -44,17 +45,6 @@ set(
 
 set(DICTS ${DICTS_RAW} ${DICTS_GENERATED})
 
-foreach(DICT ${DICTS})
-  set(DICT_TARGETS ${DICT_TARGETS} ${DICT}.ocd2)
-endforeach(DICT)
-
-add_custom_target(
-  Dictionaries
-  ALL
-  DEPENDS
-    ${DICT_TARGETS}
-)
-
 foreach(DICT ${DICTS_RAW})
   set(DICT_${DICT}_INPUT ${DICT_DIR}/${DICT}.txt)
 endforeach(DICT)
@@ -62,6 +52,30 @@ endforeach(DICT)
 foreach(DICT ${DICTS_GENERATED})
   set(DICT_${DICT}_INPUT ${DICT_GENERATED_DIR}/${DICT}.txt)
 endforeach(DICT)
+
+# In "text" format, the Dictionaries target depends on the .txt dictionaries
+# (copied into the build tree alongside the generated ones, so the build
+# tree stays self-contained and runnable like the ocd2 build tree) instead of
+# building/installing compiled .ocd2/.ocd dictionaries. STPhrases_GeneratedFrom
+# RegionalPhrases still needs a handful of .ocd2 dictionaries to bootstrap
+# itself (see below) regardless of this setting; those are built on demand
+# since they remain explicit command dependencies.
+if(OPENCC_DICT_FORMAT STREQUAL "text")
+  foreach(DICT ${DICTS})
+    set(DICT_TARGETS ${DICT_TARGETS} ${DICT}.txt)
+  endforeach(DICT)
+else()
+  foreach(DICT ${DICTS})
+    set(DICT_TARGETS ${DICT_TARGETS} ${DICT}.${OPENCC_DICT_FORMAT})
+  endforeach(DICT)
+endif()
+
+add_custom_target(
+  Dictionaries
+  ALL
+  DEPENDS
+    ${DICT_TARGETS}
+)
 
 set(
   DICT_TSCharactersExt_GENERATING_INPUT
@@ -153,6 +167,26 @@ foreach(DICT ${DICTS_GENERATED})
   )
 endforeach(DICT)
 
+if(OPENCC_DICT_FORMAT STREQUAL "text")
+  foreach(DICT ${DICTS_RAW})
+    add_custom_command(
+      OUTPUT
+        ${DICT}.txt
+      COMMENT
+        "Copying ${DICT}.txt"
+      COMMAND
+        ${CMAKE_COMMAND} -E copy ${DICT_${DICT}_INPUT} ${DICT_GENERATED_DIR}/${DICT}.txt
+      DEPENDS
+        ${DICT_${DICT}_INPUT}
+    )
+    set_directory_properties(
+      PROPERTIES
+        ADDITIONAL_MAKE_CLEAN_FILES
+          "${DICT_GENERATED_DIR}/${DICT}.txt"
+    )
+  endforeach(DICT)
+endif()
+
 foreach(DICT ${DICTS})
   add_custom_command(
     OUTPUT
@@ -171,10 +205,19 @@ foreach(DICT ${DICTS})
       ${DICT_${DICT}_INPUT}
   )
 
-  if(OPENCC_ENABLE_INSTALL)
+  if(OPENCC_ENABLE_INSTALL AND OPENCC_DICT_FORMAT STREQUAL "ocd2")
   install(
     FILES
       ${DICT_GENERATED_DIR}/${DICT}.ocd2
+    DESTINATION
+      ${DIR_SHARE_OPENCC}
+  )
+  endif()
+
+  if(OPENCC_ENABLE_INSTALL AND OPENCC_DICT_FORMAT STREQUAL "text")
+  install(
+    FILES
+      ${DICT_GENERATED_DIR}/${DICT}.txt
     DESTINATION
       ${DIR_SHARE_OPENCC}
   )
@@ -186,6 +229,42 @@ foreach(DICT ${DICTS})
         "${DICT_GENERATED_DIR}/${DICT}.ocd2"
   )
 endforeach(DICT)
+
+if(OPENCC_DICT_FORMAT STREQUAL "ocd")
+  foreach(DICT ${DICTS})
+    add_custom_command(
+      OUTPUT
+        ${DICT}.ocd
+      COMMENT
+        "Building ${DICT}.ocd"
+      COMMAND
+        ${OPENCC_DICT_BIN}
+          --input ${DICT_${DICT}_INPUT}
+          --output ${DICT}.ocd
+          --from text
+          --to ocd
+      DEPENDS
+        ${DICT_WIN32_DEPENDS}
+        ${OPENCC_DICT_BIN}
+        ${DICT_${DICT}_INPUT}
+    )
+
+    if(OPENCC_ENABLE_INSTALL)
+    install(
+      FILES
+        ${DICT_GENERATED_DIR}/${DICT}.ocd
+      DESTINATION
+        ${DIR_SHARE_OPENCC}
+    )
+    endif()
+
+    set_directory_properties(
+      PROPERTIES
+        ADDITIONAL_MAKE_CLEAN_FILES
+          "${DICT_GENERATED_DIR}/${DICT}.ocd"
+    )
+  endforeach(DICT)
+endif()
 
 set(CONFIG_FILES
   config/hk2s.json
@@ -206,11 +285,57 @@ set(CONFIG_FILES
   config/tw2t.json
 )
 
-if(OPENCC_ENABLE_INSTALL)
-install(
-  FILES
-    ${CONFIG_FILES}
-  DESTINATION
-    ${DIR_SHARE_OPENCC}
-)
+if(NOT OPENCC_DICT_FORMAT STREQUAL "ocd2")
+  set(CONFIG_CONVERTED_DIR ${CMAKE_CURRENT_BINARY_DIR}/config)
+  file(MAKE_DIRECTORY ${CONFIG_CONVERTED_DIR})
+
+  foreach(CONFIG_FILE ${CONFIG_FILES})
+    get_filename_component(CONFIG_FILE_NAME ${CONFIG_FILE} NAME)
+    add_custom_command(
+      OUTPUT
+        ${CONFIG_CONVERTED_DIR}/${CONFIG_FILE_NAME}
+      COMMENT
+        "Converting ${CONFIG_FILE_NAME} to reference ${OPENCC_DICT_FORMAT} dictionaries"
+      COMMAND
+        ${CONFIG_CONVERT_DICT_FORMAT_BIN}
+          ${CMAKE_CURRENT_SOURCE_DIR}/${CONFIG_FILE}
+          ${CONFIG_CONVERTED_DIR}/${CONFIG_FILE_NAME}
+          ${OPENCC_DICT_FORMAT}
+      DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/${CONFIG_FILE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/scripts/convert_config_dict_format.py
+    )
+    set(CONFIG_CONVERTED_FILES ${CONFIG_CONVERTED_FILES} ${CONFIG_CONVERTED_DIR}/${CONFIG_FILE_NAME})
+  endforeach(CONFIG_FILE)
+
+  add_custom_target(
+    ConvertedConfigs
+    ALL
+    DEPENDS
+      ${CONFIG_CONVERTED_FILES}
+  )
+
+  set_directory_properties(
+    PROPERTIES
+      ADDITIONAL_MAKE_CLEAN_FILES
+        "${CONFIG_CONVERTED_FILES}"
+  )
+
+  if(OPENCC_ENABLE_INSTALL)
+  install(
+    FILES
+      ${CONFIG_CONVERTED_FILES}
+    DESTINATION
+      ${DIR_SHARE_OPENCC}
+  )
+  endif()
+else()
+  if(OPENCC_ENABLE_INSTALL)
+  install(
+    FILES
+      ${CONFIG_FILES}
+    DESTINATION
+      ${DIR_SHARE_OPENCC}
+  )
+  endif()
 endif()

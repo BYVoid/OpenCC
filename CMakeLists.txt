@@ -51,6 +51,20 @@ option(ENABLE_GTEST "Build all tests." OFF)
 option(ENABLE_BENCHMARK "Build benchmark tests." OFF)
 option(BUILD_OPENCC_JIEBA_PLUGIN "Build Jieba segmentation as a loadable plugin." OFF)
 option(BUILD_PYTHON "Build python library" OFF)
+
+# Built-in dictionaries and configs can be produced as compiled ocd2
+# (marisa-trie, default) or legacy ocd (Darts) dictionaries, or as plain text
+# dictionaries with configs that reference them directly (slower to load,
+# but human-readable and easy to interoperate with other toolchains).
+set(OPENCC_DICT_FORMAT "ocd2" CACHE STRING "Format of built-in dictionaries and configs to generate/install: ocd2, ocd, or text")
+set_property(CACHE OPENCC_DICT_FORMAT PROPERTY STRINGS ocd2 ocd text)
+if(NOT OPENCC_DICT_FORMAT STREQUAL "ocd2" AND NOT OPENCC_DICT_FORMAT STREQUAL "ocd" AND NOT OPENCC_DICT_FORMAT STREQUAL "text")
+  message(FATAL_ERROR "OPENCC_DICT_FORMAT must be one of 'ocd2', 'ocd', or 'text', got '${OPENCC_DICT_FORMAT}'")
+endif()
+if(OPENCC_DICT_FORMAT STREQUAL "ocd" AND NOT ENABLE_DARTS)
+  message(FATAL_ERROR "OPENCC_DICT_FORMAT=ocd requires ENABLE_DARTS=ON (DartsDict support)")
+endif()
+option(USE_SYSTEM_DARTS "Use system version of Darts" OFF)
 option(USE_SYSTEM_GOOGLE_BENCHMARK "Use system version of Google Benchmark" OFF)
 option(USE_SYSTEM_GTEST "Use system version of GoogleTest" OFF)
 option(USE_SYSTEM_MARISA "Use system version of Marisa" OFF)

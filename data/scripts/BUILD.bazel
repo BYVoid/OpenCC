@@ -43,6 +43,11 @@ py_binary(
     deps = [":common"],
 )
 
+py_binary(
+    name = "convert_config_dict_format",
+    srcs = ["convert_config_dict_format.py"],
+)
+
 py_test(
     name = "common_test",
     size = "small",

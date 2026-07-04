@@ -1,30 +1,26 @@
-debian/patches on this branch is a plain copy of packaging/debian/patches
-(kept at the repository root so upstream maintainers can review the Debian
-delta without checking out this branch; see packaging/debian/README.md).
-If you edit one, edit the other and keep them identical — there is no
-symlink because dpkg-source's "3.0 (quilt)" format requires
-debian/patches to be real files.
+This debian/ directory lives under packaging/debian/debian/ in the
+repository so that all Debian packaging content stays together under
+packaging/debian/. To use it, overlay this directory onto a clean
+checkout of upstream BYVoid/OpenCC (e.g. `cp -r packaging/debian/debian
+<upstream-checkout>/debian`) and run `dpkg-buildpackage` from there.
 
 This debian/ directory is authored against upstream BYVoid/OpenCC's file
 layout at 1.4.0, and was validated by running `dpkg-buildpackage -us -uc
 -b` against a clean checkout of upstream `master` (all six binary
 packages build, `dh_missing --fail-missing` finds nothing unclaimed,
 `ctest` passes 19/19, and `lintian --pedantic` reports no errors). It
-intentionally does not account for any local additions in this fork's
-own checkout (e.g. the cngov dictionaries/configs) that do not exist
-upstream — building this debian/ directory directly against this fork's
-own tree will fail dh_missing on those fork-only files, and that is
-expected: this is packaging content meant for upstream, not a build
-recipe for this fork's own releases (see scripts/build-deb-packages.sh
-for that).
+authored strictly against the file layout present in the upstream source
+tree at 1.4.0 — building it against any checkout that contains files
+beyond what upstream ships will cause dh_missing to fail on those extra
+files.
 
 Known gaps in this recreation of the Debian packaging flow (not a full
 archive-ready upload):
 
-- This mirrors and rebases exactly the four patches that
-  packaging/debian/patches already tracked (0003, 0004, 0005, 0009) —
-  that is the complete set upstream currently mirrors from Debian's
-  series, not a partial one; see packaging/debian/README.md.
+- This mirrors and rebases exactly the four patches in debian/patches/
+  (0003, 0004, 0005, 0009) — that is the complete set upstream currently
+  mirrors from Debian's series, not a partial one; see
+  packaging/debian/README.md.
 - No orig tarball repack (Files-Excluded / "+ds1") is implemented.
   A real upload would strip deps/marisa-0.3.1, deps/rapidjson-1.1.0,
   deps/tclap-1.2.5, and deps/googletest-1.15.0 (all replaced by

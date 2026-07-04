@@ -37,11 +37,11 @@ Intent:
 
 This directory is not authoritative Debian packaging. Debian maintainers
 should continue to use the Debian Salsa repository and the Debian source
-package as the source of truth. A recreation of the Debian packaging flow
-(quilt patch application via `dpkg-buildpackage`, validated against a
-clean checkout of upstream `master`) lives in the top-level `debian/`
-directory alongside this mirror — see `debian/README.source` for how the
-two are kept in sync.
+package as the source of truth. A complete recreation of the Debian
+packaging flow (validated against a clean checkout of upstream `master`
+with `dpkg-buildpackage`) lives in `packaging/debian/debian/` — overlay
+that directory onto a clean upstream checkout to reproduce the build; see
+`packaging/debian/debian/README.source` for details and known gaps.
 
 Source package handling:
 

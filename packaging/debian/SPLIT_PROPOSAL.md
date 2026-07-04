@@ -35,8 +35,8 @@ public symbol that downstream C++ consumers may have compiled against.
 | `libopencc-doc` | all | doc | Doxygen HTML API docs |
 
 Rationale, matching what the install-rule inventory in CMake already
-implies (see the file-by-file mapping validated in this branch's
-`debian/*.install`):
+implies (see the file-by-file mapping validated in
+`packaging/debian/debian/*.install`):
 
 - `libopencc-data` is `Architecture: all` and `Multi-Arch: foreign`
   because dictionaries and JSON configs are architecture-independent;
@@ -88,7 +88,7 @@ forward, in order of preference:
    embedded-code-copy review during upload (`Files-Excluded` does not
    apply here since there is no external package to fall back to).
 
-## What this branch's `debian/rules` actually builds
+## What the `debian/rules` in this proposal actually builds
 
 `-DUSE_SYSTEM_MARISA=ON -DUSE_SYSTEM_RAPIDJSON=ON -DUSE_SYSTEM_TCLAP=ON
 -DUSE_SYSTEM_GTEST=ON -DBUILD_PYTHON=OFF -DBUILD_DOCUMENTATION=ON

@@ -1,0 +1,9 @@
+usr/lib/*/opencc/plugins
+usr/share/opencc/jieba_dict
+usr/share/opencc/hk2sp_jieba.json
+usr/share/opencc/s2hk_jieba.json
+usr/share/opencc/s2hkp_jieba.json
+usr/share/opencc/s2t_jieba.json
+usr/share/opencc/s2tw_jieba.json
+usr/share/opencc/s2twp_jieba.json
+usr/share/opencc/tw2sp_jieba.json

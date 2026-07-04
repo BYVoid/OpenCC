@@ -1,0 +1,29 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+%:
+	dh $@ --buildsystem=cmake+ninja
+
+override_dh_auto_configure:
+	dh_auto_configure --buildsystem=cmake+ninja -- \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DBUILD_SHARED_LIBS=ON \
+		-DOPENCC_ENABLE_INSTALL=ON \
+		-DUSE_SYSTEM_MARISA=ON \
+		-DUSE_SYSTEM_RAPIDJSON=ON \
+		-DUSE_SYSTEM_TCLAP=ON \
+		-DENABLE_GTEST=ON \
+		-DUSE_SYSTEM_GTEST=ON \
+		-DENABLE_BENCHMARK=OFF \
+		-DBUILD_PYTHON=OFF \
+		-DBUILD_DOCUMENTATION=ON \
+		-DBUILD_OPENCC_JIEBA_PLUGIN=ON
+
+override_dh_auto_test:
+	set -e; \
+	builddir=$$(find . -maxdepth 1 -type d -name 'obj-*'); \
+	cd "$$builddir" && ctest --output-on-failure
+
+override_dh_missing:
+	dh_missing --fail-missing

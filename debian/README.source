@@ -1,0 +1,47 @@
+debian/patches on this branch is a plain copy of packaging/debian/patches
+(kept at the repository root so upstream maintainers can review the Debian
+delta without checking out this branch; see packaging/debian/README.md).
+If you edit one, edit the other and keep them identical — there is no
+symlink because dpkg-source's "3.0 (quilt)" format requires
+debian/patches to be real files.
+
+This debian/ directory is authored against upstream BYVoid/OpenCC's file
+layout at 1.4.0, and was validated by running `dpkg-buildpackage -us -uc
+-b` against a clean checkout of upstream `master` (all six binary
+packages build, `dh_missing --fail-missing` finds nothing unclaimed,
+`ctest` passes 19/19, and `lintian --pedantic` reports no errors). It
+intentionally does not account for any local additions in this fork's
+own checkout (e.g. the cngov dictionaries/configs) that do not exist
+upstream — building this debian/ directory directly against this fork's
+own tree will fail dh_missing on those fork-only files, and that is
+expected: this is packaging content meant for upstream, not a build
+recipe for this fork's own releases (see scripts/build-deb-packages.sh
+for that).
+
+Known gaps in this recreation of the Debian packaging flow (not a full
+archive-ready upload):
+
+- This mirrors and rebases exactly the four patches that
+  packaging/debian/patches already tracked (0003, 0004, 0005, 0009) —
+  that is the complete set upstream currently mirrors from Debian's
+  series, not a partial one; see packaging/debian/README.md.
+- No orig tarball repack (Files-Excluded / "+ds1") is implemented.
+  A real upload would strip deps/marisa-0.3.1, deps/rapidjson-1.1.0,
+  deps/tclap-1.2.5, and deps/googletest-1.15.0 (all replaced by
+  USE_SYSTEM_* build options; see debian/rules) from the .orig tarball.
+  deps/darts-clone-0.32h and plugins/jieba/deps/cppjieba have no system
+  package to build against and would stay bundled either way. See the
+  per-directory comments in debian/copyright.
+- debian/libopencc-data.install and debian/opencc-jieba.install hardcode
+  the *.json config filenames rather than globbing, to keep the two
+  packages' shared usr/share/opencc/*.json directory unambiguous. Keep
+  this list in sync with the CONFIG_FILES list in data/CMakeLists.txt
+  and the json list in plugins/jieba/CMakeLists.txt when configs are
+  added or renamed.
+- No debian/libopencc1.4.symbols file yet: dh_makeshlibs generates a
+  shlibs file automatically, which is enough for ${shlibs:Depends}, but
+  a real upload should add a proper symbols file for finer-grained
+  dependency versioning.
+- Binary packages are recreated to validate the build end-to-end; they
+  are not built with reproducible/archive build flags (e.g. no
+  buildinfo/signing setup) and have not been uploaded anywhere.

@@ -1,0 +1,17 @@
+usr/share/opencc/*.ocd2
+usr/share/opencc/hk2s.json
+usr/share/opencc/hk2sp.json
+usr/share/opencc/hk2t.json
+usr/share/opencc/jp2t.json
+usr/share/opencc/s2hk.json
+usr/share/opencc/s2hkp.json
+usr/share/opencc/s2t.json
+usr/share/opencc/s2tw.json
+usr/share/opencc/s2twp.json
+usr/share/opencc/t2hk.json
+usr/share/opencc/t2jp.json
+usr/share/opencc/t2s.json
+usr/share/opencc/t2tw.json
+usr/share/opencc/tw2s.json
+usr/share/opencc/tw2sp.json
+usr/share/opencc/tw2t.json

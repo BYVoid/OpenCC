@@ -1,0 +1,107 @@
+Source: opencc
+Section: utils
+Priority: optional
+Maintainer: Carbo Kuo <byvoid@byvoid.com>
+Build-Depends:
+ debhelper-compat (= 13),
+ cmake,
+ ninja-build,
+ pkg-config,
+ doxygen,
+ libmarisa-dev,
+ rapidjson-dev,
+ libtclap-dev,
+ googletest,
+ libgtest-dev,
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+Homepage: https://github.com/BYVoid/OpenCC
+
+Package: opencc
+Architecture: any
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ libopencc1.4 (= ${binary:Version}),
+ libopencc-data (>= ${source:Version}),
+Description: Open Chinese Convert (OpenCC) command line tools
+ OpenCC converts between Traditional Chinese, Simplified Chinese, and
+ regional variants (Mainland/Hong Kong/Taiwan) and Japanese Shinjitai
+ forms. This package provides the opencc command line converter, the
+ opencc_dict dictionary format conversion tool, and the
+ opencc_phrase_extract phrase extraction tool.
+
+Package: libopencc1.4
+Architecture: any
+Multi-Arch: same
+Section: libs
+Pre-Depends: ${misc:Pre-Depends}
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+Description: Open Chinese Convert (OpenCC) conversion library - runtime
+ OpenCC converts between Traditional Chinese, Simplified Chinese, and
+ regional variants (Mainland/Hong Kong/Taiwan) and Japanese Shinjitai
+ forms.
+ .
+ This package contains the shared library needed to run programs
+ dynamically linked against libopencc, SOVERSION 1.4.
+
+Package: libopencc-dev
+Architecture: any
+Section: libdevel
+Depends:
+ libopencc1.4 (= ${binary:Version}),
+ libopencc-data (>= ${source:Version}),
+ ${misc:Depends},
+Description: Open Chinese Convert (OpenCC) conversion library - development files
+ OpenCC converts between Traditional Chinese, Simplified Chinese, and
+ regional variants (Mainland/Hong Kong/Taiwan) and Japanese Shinjitai
+ forms.
+ .
+ This package contains the headers, CMake package config, pkg-config
+ file, and unversioned shared library symlink needed to build software
+ using libopencc.
+
+Package: libopencc-data
+Architecture: all
+Multi-Arch: foreign
+Section: libs
+Depends:
+ ${misc:Depends},
+Description: Open Chinese Convert (OpenCC) conversion library - data files
+ OpenCC converts between Traditional Chinese, Simplified Chinese, and
+ regional variants (Mainland/Hong Kong/Taiwan) and Japanese Shinjitai
+ forms.
+ .
+ This package contains the architecture-independent dictionaries
+ (.ocd2) and conversion configuration files (.json) used by libopencc
+ and the opencc command line tools.
+
+Package: libopencc-doc
+Architecture: all
+Section: doc
+Depends:
+ ${misc:Depends},
+Description: Open Chinese Convert (OpenCC) conversion library - API documentation
+ OpenCC converts between Traditional Chinese, Simplified Chinese, and
+ regional variants (Mainland/Hong Kong/Taiwan) and Japanese Shinjitai
+ forms.
+ .
+ This package contains the Doxygen-generated HTML API documentation
+ for libopencc.
+
+Package: opencc-jieba
+Architecture: any
+Section: utils
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ opencc (= ${binary:Version}),
+ libopencc-data (>= ${source:Version}),
+Description: Jieba segmentation plugin for Open Chinese Convert (OpenCC)
+ This package provides the optional Jieba-based word segmentation
+ plugin for OpenCC (libopencc-jieba.so) and the merged Jieba dictionary
+ and *_jieba.json configuration files it requires. Install this package
+ to enable the s2twp_jieba-style configs that use word-segmentation-aware
+ regional phrase conversion.

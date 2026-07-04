@@ -1,0 +1,171 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: opencc
+Upstream-Contact: Carbo Kuo <byvoid@byvoid.com>
+Source: https://github.com/BYVoid/OpenCC
+
+Files: *
+Copyright: 2010-2026 Carbo Kuo <byvoid@byvoid.com> and OpenCC contributors
+License: Apache-2.0
+
+Files: deps/darts-clone-0.32h/*
+Copyright: 2008-2014, Susumu Yata
+License: BSD-2-clause
+Comment:
+ Bundled unconditionally: OpenCC's .ocd Darts loader has no build-time
+ "use system darts-clone" option (ENABLE_DARTS/USE_SYSTEM_DARTS were
+ removed; Darts support is always compiled in), and darts-clone is not
+ itself packaged in the Debian archive.
+
+Files: plugins/jieba/deps/cppjieba/*
+Copyright: 2013, Yanyi Wu and cppjieba contributors
+License: MIT
+Comment:
+ Bundled unconditionally by the optional opencc-jieba binary package:
+ cppjieba is a header-only segmentation library with no Debian archive
+ package to depend on instead.
+
+Files: deps/marisa-0.3.1/*
+Copyright: 2010-2025, Susumu Yata
+License: BSD-2-clause or LGPL-2.1-or-later
+Comment:
+ Not built or shipped by this packaging: debian/rules configures with
+ -DUSE_SYSTEM_MARISA=ON and links against the libmarisa-dev package
+ instead. A real Debian source upload would repackage the orig tarball
+ (Files-Excluded) to drop this directory entirely; see
+ debian/README.source.
+
+Files: deps/rapidjson-1.1.0/*
+Copyright: 2015 THL A29 Limited, a Tencent company, and Milo Yip
+License: MIT
+Comment:
+ Not built or shipped by this packaging: debian/rules configures with
+ -DUSE_SYSTEM_RAPIDJSON=ON and links against the rapidjson-dev package
+ instead. See debian/README.source.
+
+Files: deps/tclap-1.2.5/*
+Copyright: 2003 Michael E. Smoot,
+           2004 Michael E. Smoot and Daniel Aarno,
+           2017 Google Inc.
+License: MIT
+Comment:
+ Not built or shipped by this packaging: debian/rules configures with
+ -DUSE_SYSTEM_TCLAP=ON and links against the libtclap-dev package
+ instead. See debian/README.source.
+
+Files: deps/googletest-1.15.0/*
+Copyright: 2008, Google Inc.
+License: BSD-3-clause
+Comment:
+ Not built or shipped by this packaging: debian/rules configures with
+ -DUSE_SYSTEM_GTEST=ON and builds test binaries against the googletest
+ source package's /usr/src/googletest instead (see
+ debian/patches/0004-Use-system-googletest.patch). Test binaries are
+ not shipped in any binary package regardless.
+
+Files: deps/pybind11-2.13.1/*
+Copyright: 2016, Wenzel Jakob
+License: BSD-3-clause
+Comment:
+ Not built or shipped by this packaging: debian/rules configures with
+ -DBUILD_PYTHON=OFF. Python bindings are out of scope for this
+ packaging (see packaging/debian/SPLIT_PROPOSAL.md); Debian does not
+ currently ship a python3-opencc binary package either.
+
+Files: deps/google-benchmark/*
+Copyright: 2015, Google Inc.
+License: Apache-2.0
+Comment:
+ Not built or shipped by this packaging: debian/rules configures with
+ -DENABLE_BENCHMARK=OFF.
+
+License: Apache-2.0
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ .
+     http://www.apache.org/licenses/LICENSE-2.0
+ .
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ implied. See the License for the specific language governing
+ permissions and limitations under the License.
+ .
+ On Debian systems, the complete text of the Apache License, Version 2.0
+ can be found in "/usr/share/common-licenses/Apache-2.0".
+
+License: BSD-2-clause
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ .
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the
+    distribution.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+License: BSD-3-clause
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are
+ met:
+ .
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the
+    distribution.
+ 3. Neither the name of the copyright holder nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+License: LGPL-2.1-or-later
+ On Debian systems, the complete text of the GNU Lesser General Public
+ License version 2.1 can be found in
+ "/usr/share/common-licenses/LGPL-2.1".
+
+License: MIT
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the
+ "Software"), to deal in the Software without restriction, including
+ without limitation the rights to use, copy, modify, merge, publish,
+ distribute, sublicense, and/or sell copies of the Software, and to
+ permit persons to whom the Software is furnished to do so, subject to
+ the following conditions:
+ .
+ The above copyright notice and this permission notice shall be
+ included in all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

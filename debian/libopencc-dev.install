@@ -1,0 +1,4 @@
+usr/include/opencc
+usr/lib/*/libopencc.so
+usr/lib/*/pkgconfig/opencc.pc
+usr/lib/*/cmake/opencc

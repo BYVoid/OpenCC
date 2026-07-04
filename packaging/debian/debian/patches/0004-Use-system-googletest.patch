@@ -1,6 +1,6 @@
 From: Shengjing Zhu <zhsj@debian.org>
 Date: Sun, 28 Jul 2024 19:44:27 -0400
-Subject: Use system googletest
+Subject: Use system-installed googletest via CMake package discovery
 
 Rebased for opencc 1.4.0: the ENABLE_GTEST block gained a bundled-source
 existence check ahead of the USE_SYSTEM_GTEST branch since this patch
@@ -10,14 +10,14 @@ if/else/endif is touched here.
 Forwarded: not-needed
 Last-Update: 2026-07-04
 ---
---- a/CMakeLists.txt	2026-07-04 01:16:39.393915155 +0000
-+++ b/CMakeLists.txt	2026-07-04 01:17:02.043855674 +0000
-@@ -381,6 +381,8 @@
-   endif()
+--- OpenCC.orig/CMakeLists.txt
++++ OpenCC/CMakeLists.txt
+@@ -309,6 +309,8 @@ endif()
+ if (ENABLE_GTEST)
    if(NOT USE_SYSTEM_GTEST)
      add_subdirectory(deps/googletest-1.15.0)
 +  else()
-+    add_subdirectory(/usr/src/googletest/googletest ${CMAKE_BINARY_DIR}/googletest-build EXCLUDE_FROM_ALL)
++    find_package(GTest CONFIG REQUIRED)
    endif()
    enable_testing()
  endif()

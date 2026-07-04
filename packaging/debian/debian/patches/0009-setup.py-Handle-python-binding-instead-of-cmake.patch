@@ -4,9 +4,11 @@ Subject: setup.py: Handle python binding instead of cmake
 
 Last-Update: 2026-07-04
 ---
---- a/setup.py	2026-07-04 01:17:17.094201906 +0000
-+++ b/setup.py	2026-07-04 01:17:46.591858322 +0000
-@@ -9,6 +9,8 @@
+Index: OpenCC/setup.py
+===================================================================
+--- OpenCC.orig/setup.py
++++ OpenCC/setup.py
+@@ -9,6 +9,8 @@ import setuptools
  import setuptools.command.build_ext
  import wheel.bdist_wheel
  
@@ -15,7 +17,7 @@ Last-Update: 2026-07-04
  _this_dir = os.path.dirname(os.path.abspath(__file__))
  _build_dir = os.path.join(_this_dir, 'build', 'python')
  
-@@ -147,10 +149,13 @@
+@@ -147,10 +149,13 @@ class OpenCCExtension(setuptools.Extensi
  
  class BuildExtCommand(setuptools.command.build_ext.build_ext, object):
      def build_extension(self, ext):
@@ -33,7 +35,7 @@ Last-Update: 2026-07-04
          if isinstance(ext, OpenCCExtension):
              build_libopencc(output_path)
          else:
-@@ -214,7 +219,14 @@
+@@ -214,7 +219,14 @@ setuptools.setup(
  
      packages=packages,
      package_dir={'opencc': 'python/opencc'},

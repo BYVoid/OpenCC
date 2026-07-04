@@ -5,7 +5,7 @@ maintainers can review Debian packaging deltas before a release.
 
 Current baseline:
 
-- Rebased against: upstream `BYVoid/OpenCC` at `1.4.0`
+- Rebased against: upstream `BYVoid/OpenCC` at `ver.1.4.0`
 - Original Debian source package baseline: `opencc 1.3.1+ds1-3`
 - Patch index: `https://udd.debian.org/patches.cgi?src=opencc`
 - Debian packaging source of truth: `https://salsa.debian.org/debian/opencc`

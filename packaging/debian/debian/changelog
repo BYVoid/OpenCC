@@ -3,8 +3,9 @@ opencc (1.4.0-1) UNRELEASED; urgency=medium
   * Recreate the Debian packaging flow on top of the existing
     packaging/debian patch mirror, rebased for the 1.4.0 release and
     validated against a clean checkout of upstream BYVoid/OpenCC:
-    - Rebase 0003 (no remote images in README.md), 0004 (use system
-      googletest), 0005 (disable CMake build in setup.py), and 0009
+    - Rebase 0003 (no remote images in README.md), 0004 (Use
+      system-installed googletest instead of bundled version for Debian
+      builds), 0005 (disable CMake build in setup.py), and 0009
       (setup.py handles the python binding directly) — the complete set
       packaging/debian/patches already tracked — so all four apply
       cleanly with `patch -p1 --fuzz=0` against upstream 1.4.0 sources.
@@ -22,4 +23,4 @@ opencc (1.4.0-1) UNRELEASED; urgency=medium
       --fail-missing` finds nothing unclaimed, `ctest` passes 19/19, and
       `lintian --pedantic` reports no errors.
 
- -- Carbo Kuo <byvoid@byvoid.com>  Sat, 04 Jul 2026 01:25:10 +0000
+ -- Frank Lin <github@linshuang.info>  Sat, 04 Jul 2026 02:12:00 +0000

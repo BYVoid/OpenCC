@@ -1623,6 +1623,13 @@
       }
     },
     {
+      "id": "rao_variant",
+      "input": "江流宛轉遶芳甸",
+      "expected": {
+        "t2s": "江流宛转绕芳甸"
+      }
+    },
+    {
       "id": "hk_computer_phrases_s2hkp",
       "input": "鼠标 光标 硬盘",
       "expected": {

@@ -3022,6 +3022,7 @@
 # @tofu-risk: not covered by PingFang/Source Han baseline: 𫐷 U+2B437
 遱	遱 𫐷
 遲	迟
+遶	绕
 遷	迁
 選	选
 遺	遗

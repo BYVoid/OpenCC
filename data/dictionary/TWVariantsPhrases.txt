@@ -16,6 +16,14 @@
 #   mappings that should be maintained as bidirectional phrase pairs.
 
 喫茶小舖	喫茶小舖
+張棟樑	張棟樑
+林國樑	林國樑
+林杰樑	林杰樑
+楊士樑	楊士樑
 牛驥同一皁	牛驥同一皁
 牛驥同皁	牛驥同皁
 純喫茶	純喫茶
+羅興樑	羅興樑
+葉步樑	葉步樑
+蔣國樑	蔣國樑
+黃東樑	黃東樑

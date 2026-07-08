@@ -14,6 +14,10 @@
 [![Debian package](https://img.shields.io/debian/v/opencc/unstable)](https://packages.debian.org/search?keywords=opencc)
 [![latest packaged version(s)](https://repology.org/badge/latest-versions/opencc.svg)](https://repology.org/project/opencc/versions)
 
+本次 npm 版本 1.4.1-beta.0 發布為 1.4.0 的修復版本 (Patch Release)，主要目的是解決 Intel Mac opencc npm 套件使用者的安裝問題。原始碼與詞典內容與 1.4.0 版本**完全相同**，無任何功能變更或新增。
+
+npm 1.4.1-beta.0 is a packaging-only patch release of 1.4.0 that fixes installation on Intel Macs; source code and dictionaries are **identical** to 1.4.0.
+
 ## Introduction 介紹
 
 ![OpenCC](https://opencc.byvoid.com/img/opencc.png)
@@ -54,9 +58,6 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 * [More (Repology)](https://repology.org/project/opencc/versions)
 
 ### Prebuilt binaries 預編譯二進位檔
-
-OpenCC 1.4.0 主要更新是將 C++ ABI / SOVERSION 提升至 1.4，避免舊版
-`libopencc.so.1.3` 使用者靜默載入 ABI 不相容的新版本；下游 C++ 程式需重新鏈結。
 
 * Windows (x86_64): [OpenCC-1.4.0](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.0/OpenCC-1.4.0-windows-x64-portable.zip) ([SHA-256](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.0/OpenCC-1.4.0-windows-x64-portable.zip.sha256))
     * This Windows release is available from WinGet. For details, see [doc/windows-winget-release.md](doc/windows-winget-release.md).

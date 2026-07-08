@@ -77,12 +77,22 @@ TypeScript type declarations are included.
 Creates a converter. If `config` is omitted, OpenCC uses `s2t.json`.
 
 `config` can be one of the built-in configuration file names, such as
-`s2t.json`, or an absolute path to a custom OpenCC configuration file.
+`s2t.json`, an absolute path to a custom OpenCC configuration file, or an
+OpenCC configuration object.
 
 `options.includeTofuRiskDictionaries` controls whether dictionaries marked as
 possibly outputting tofu are loaded. Here, tofu means Chinese characters that
 cannot be displayed and may render as missing-glyph boxes. It defaults to
 `true` for JavaScript API compatibility.
+
+`options.configDirectory` sets the base directory used to resolve relative
+dictionary paths in inline configuration objects. It defaults to the package's
+bundled OpenCC assets directory.
+
+### `OpenCC.fromConfig(config, options?)`
+
+Creates a converter from an OpenCC configuration object. This is equivalent to
+passing the object to `new OpenCC(config, options)`.
 
 ### `converter.convertSync(input)`
 
@@ -187,6 +197,34 @@ console.log(converter.convertSync('汉字'));
 Relative config paths are resolved from the current working directory by the
 CLI. In the JavaScript API, relative config names are resolved from the package
 assets directory, so custom configs should be passed as absolute paths.
+
+You can also pass an OpenCC configuration object directly:
+
+```js
+import OpenCC from 'opencc';
+
+const converter = OpenCC.fromConfig({
+  name: 'Custom Inline Config',
+  segmentation: {
+    type: 'mmseg',
+    dict: { type: 'inline', entries: { '鼠标': '鼠标' } },
+  },
+  conversion_chain: [{
+    dict: { type: 'inline', entries: { '鼠标': '滑鼠' } },
+  }],
+});
+
+console.log(converter.convertSync('鼠标坏了'));
+```
+
+When an inline configuration references relative dictionary files, pass
+`configDirectory`:
+
+```js
+const converter = OpenCC.fromConfig(config, {
+  configDirectory: '/absolute/path/to/opencc-resources',
+});
+```
 
 Custom dictionaries can be generated with `OpenCC.generateDict()` or with the
 native `opencc_dict` tool from the full OpenCC distribution.

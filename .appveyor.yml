@@ -33,7 +33,7 @@ for:
     - ps: Install-Product node $env:nodejs_version $env:platform
     - npm -g i npm@latest
   build_script:
-    - appveyor-retry call npm install --build-from-source
+    - set npm_config_build_from_source=true&& appveyor-retry call npm install
   test_script:
     - npm test
   after_test:

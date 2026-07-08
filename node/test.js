@@ -79,6 +79,123 @@ describe('API compatibility', function () {
     assert.equal(opencc.convertSync('㑮'), '𫝈');
   });
 
+  it('supports inline configuration objects', function () {
+    const opencc = new OpenCC({
+      name: 'Inline Object Config',
+      segmentation: {
+        type: 'mmseg',
+        dict: {
+          type: 'inline',
+          entries: {
+            '鼠标': '鼠标',
+          },
+        },
+      },
+      conversion_chain: [{
+        dict: {
+          type: 'inline',
+          entries: {
+            '鼠标': '滑鼠',
+          },
+        },
+      }],
+    });
+
+    assert.equal(opencc.convertSync('鼠标坏了'), '滑鼠坏了');
+  });
+
+  it('uses bundled assets as the default inline configuration directory', function () {
+    const opencc = OpenCC.fromConfig({
+      name: 'Inline Object Config With Bundled Assets',
+      conversion_chain: [{
+        dict: { type: 'ocd2', file: 'STCharacters.ocd2' },
+      }],
+    });
+
+    assert.equal(opencc.convertSync('汉字'), '漢字');
+  });
+
+  it('supports inline configuration objects with relative dictionary files', function () {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'opencc-node-inline-config-'));
+    const dict = path.join(dir, 'phrases.txt');
+    fs.writeFileSync(dict, '鼠标\t滑鼠\n', 'utf8');
+
+    try {
+      const opencc = new OpenCC({
+        name: 'Inline Object Config With Files',
+        segmentation: {
+          type: 'mmseg',
+          dict: { type: 'text', file: 'phrases.txt' },
+        },
+        conversion_chain: [{
+          dict: { type: 'text', file: 'phrases.txt' },
+        }],
+      }, { configDirectory: dir });
+
+      assert.equal(opencc.convertSync('鼠标坏了'), '滑鼠坏了');
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it('supports OpenCC.fromConfig with group tofu-risk dictionary filtering', function () {
+    const config = {
+      name: 'Inline Object Config Tofu Risk',
+      conversion_chain: [
+        {
+          dict: {
+            type: 'group',
+            may_output_tofu: true,
+            match_policy: 'short_circuit',
+            dicts: [{
+              type: 'inline',
+              entries: {
+                'A': 'B',
+              },
+            }],
+          },
+        },
+        {
+          dict: {
+            type: 'inline',
+            entries: {
+              'A': 'C',
+            },
+          },
+        },
+      ],
+    };
+
+    const opencc = OpenCC.fromConfig(config, { includeTofuRiskDictionaries: false });
+    assert.equal(opencc.convertSync('A'), 'C');
+    assert.equal(config.conversion_chain.length, 2);
+  });
+
+  it('rejects inline tofu-risk dictionaries consistently with C++ config parsing', function () {
+    const result = childProcess.spawnSync(process.execPath, ['-e', `
+      const assert = require('assert');
+      const OpenCC = require('./node/opencc');
+      assert.throws(function () {
+        OpenCC.fromConfig({
+          name: 'Inline Object Config Invalid Tofu Risk',
+          conversion_chain: [{
+            dict: {
+              type: 'inline',
+              may_output_tofu: true,
+              entries: {
+                'A': 'B',
+              },
+            },
+          }],
+        }, { includeTofuRiskDictionaries: false });
+      }, /Inline dictionary does not support may_output_tofu/);
+    `], {
+      cwd: path.resolve(__dirname, '..'),
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, result.stderr);
+  });
+
   it('supports JSONC (JSON with comments and trailing commas) configuration files', function () {
     const tempConfigPath = path.join(os.tmpdir(), 'test_comment_config.json');
     fs.writeFileSync(tempConfigPath, `

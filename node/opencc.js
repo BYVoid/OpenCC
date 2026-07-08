@@ -143,6 +143,9 @@ function patchDictPaths(dict, baseDir) {
 
 function filterTofuRiskDicts(dict, includeTofuRiskDictionaries) {
   if (!dict) return null;
+  if (dict.type === 'inline') {
+    return dict;
+  }
   if (dict.may_output_tofu && !includeTofuRiskDictionaries) {
     return null;
   }
@@ -166,6 +169,34 @@ function filterTofuRiskConversionChain(config, includeTofuRiskDictionaries) {
       return step.dict ? step : null;
     })
     .filter(Boolean);
+}
+
+function isConfigObject(config) {
+  return config && typeof config === 'object' && !Array.isArray(config);
+}
+
+function cloneConfigObject(config) {
+  return JSON.parse(JSON.stringify(config));
+}
+
+function createFromConfigObject(config, options) {
+  if (!isConfigObject(config)) {
+    throw new TypeError('OpenCC config must be an object');
+  }
+  if (options.resourceZip) {
+    throw new TypeError('resourceZip is only supported with config file names');
+  }
+
+  const raw = cloneConfigObject(config);
+  const includeTofuRiskDictionaries =
+    options.includeTofuRiskDictionaries !== false;
+  filterTofuRiskConversionChain(raw, includeTofuRiskDictionaries);
+
+  const configDirectory = options.configDirectory || assetsPath;
+  return new binding.Opencc(
+    JSON.stringify(raw),
+    configDirectory + (/[\\/]$/.test(configDirectory) ? '' : path.sep)
+  );
 }
 
 /**
@@ -242,6 +273,12 @@ const OpenCC = module.exports = function (config, options) {
   if (!options) {
     options = {};
   }
+
+  if (isConfigObject(config)) {
+    this.handler = createFromConfigObject(config, options);
+    return;
+  }
+
   const includeTofuRiskDictionaries =
     options.includeTofuRiskDictionaries !== false;
 
@@ -314,6 +351,10 @@ OpenCC._assetsPath = assetsPath;
  * @ingroup node_api
  */
 OpenCC.version = binding.Opencc.version();
+
+OpenCC.fromConfig = function (config, options) {
+  return new OpenCC(config, options);
+};
 
 /**
  * Generates dictionary from another format.

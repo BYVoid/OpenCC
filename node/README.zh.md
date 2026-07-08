@@ -75,11 +75,19 @@ converter.convert('漢字', (err, text) => {
 建立轉換器。若省略 `config`，OpenCC 會使用 `s2t.json`。
 
 `config` 可以是內建配置檔名稱，例如 `s2t.json`，也可以是自訂
-OpenCC 配置檔的絕對路徑。
+OpenCC 配置檔的絕對路徑，或 OpenCC 配置物件。
 
 `options.includeTofuRiskDictionaries` 控制是否載入標記為可能輸出 tofu
 的字典。這裡的 tofu 指無法顯示的中文字，有時會被渲染為方塊，俗稱
 豆腐塊。為維持 JavaScript API 相容性，預設值為 `true`。
+
+`options.configDirectory` 設定 inline 配置物件中相對字典路徑的基準
+目錄。預設會使用套件內建的 OpenCC assets 目錄。
+
+### `OpenCC.fromConfig(config, options?)`
+
+從 OpenCC 配置物件建立轉換器。這等同於將該物件傳給
+`new OpenCC(config, options)`。
 
 ### `converter.convertSync(input)`
 
@@ -182,6 +190,33 @@ console.log(converter.convertSync('汉字'));
 
 CLI 的相對配置路徑會從目前工作目錄解析。在 JavaScript API 中，相對
 配置名稱會從套件 assets 目錄解析，因此自訂配置應使用絕對路徑傳入。
+
+也可以直接傳入 OpenCC 配置物件：
+
+```js
+import OpenCC from 'opencc';
+
+const converter = OpenCC.fromConfig({
+  name: 'Custom Inline Config',
+  segmentation: {
+    type: 'mmseg',
+    dict: { type: 'inline', entries: { '鼠标': '鼠标' } },
+  },
+  conversion_chain: [{
+    dict: { type: 'inline', entries: { '鼠标': '滑鼠' } },
+  }],
+});
+
+console.log(converter.convertSync('鼠标坏了'));
+```
+
+若 inline 配置引用相對字典檔，請傳入 `configDirectory`：
+
+```js
+const converter = OpenCC.fromConfig(config, {
+  configDirectory: '/absolute/path/to/opencc-resources',
+});
+```
 
 自訂字典可以透過 `OpenCC.generateDict()` 產生，也可以使用完整 OpenCC
 發行版中的原生 `opencc_dict` 工具。

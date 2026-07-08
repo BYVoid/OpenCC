@@ -25,7 +25,6 @@ const requiredFiles = [
 
 const expectedOptionalPackages = [
   '@opencc/opencc-darwin-arm64',
-  '@opencc/opencc-darwin-x64',
   '@opencc/opencc-linux-arm64',
   '@opencc/opencc-linux-x64',
   '@opencc/opencc-win32-x64',

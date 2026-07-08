@@ -1,6 +1,6 @@
 {
   "name": "opencc-jieba",
-  "version": "1.4.1",
+  "version": "1.4.0",
   "description": "Jieba segmentation plugin for OpenCC",
   "author": "Carbo Kuo and OpenCC contributors",
   "license": "Apache-2.0",
@@ -14,11 +14,10 @@
     "opencc": ">=1.4.0"
   },
   "optionalDependencies": {
-    "@opencc/opencc-jieba-darwin-arm64": "1.4.1",
-    "@opencc/opencc-jieba-darwin-x64": "1.4.1",
-    "@opencc/opencc-jieba-linux-arm64": "1.4.1",
-    "@opencc/opencc-jieba-linux-x64": "1.4.1",
-    "@opencc/opencc-jieba-win32-x64": "1.4.1"
+    "@opencc/opencc-jieba-darwin-arm64": "1.4.0",
+    "@opencc/opencc-jieba-linux-arm64": "1.4.0",
+    "@opencc/opencc-jieba-linux-x64": "1.4.0",
+    "@opencc/opencc-jieba-win32-x64": "1.4.0"
   },
   "files": [
     "index.js",

@@ -49,9 +49,10 @@ protected:
   }
 
   // Serialize dict as a legacy 64-bit OPENCCDARTS1 file by zero-extending
-  // each 32-bit unit to 64 bits and writing dartsSize as uint64_t.
-  // This reproduces files produced by old builds where id_type was size_t on
-  // 64-bit platforms.
+  // each 32-bit darts unit to 64 bits, writing dartsSize as uint64_t, and
+  // widening every BinaryDict integer field from the fixed 4-byte layout to
+  // 8 bytes. This reproduces files produced by old builds where id_type and
+  // size_t were 8 bytes on 64-bit platforms.
   static void SerializeAsLegacy64(const DartsDictPtr& dict,
                                   const std::string& path) {
     const std::string tmp = path + ".tmp";
@@ -65,7 +66,6 @@ protected:
     size_t numUnits = dartsSize32 / sizeof(uint32_t);
     std::vector<uint32_t> units32(numUnits);
     fread(units32.data(), sizeof(uint32_t), numUnits, src);
-    long binaryStart = ftell(src);
 
     FILE* dst = fopen(path.c_str(), "wb");
     const char* header = "OPENCCDARTS1";
@@ -78,12 +78,28 @@ protected:
       fwrite(&unit64, sizeof(uint64_t), 1, dst);
     }
 
-    // Copy BinaryDict section verbatim
-    fseek(src, binaryStart, SEEK_SET);
-    char buf[4096];
-    size_t n;
-    while ((n = fread(buf, 1, sizeof(buf), src)) > 0) {
-      fwrite(buf, 1, n, dst);
+    // Widen the BinaryDict section field by field.
+    const auto widenField = [src, dst]() -> uint64_t {
+      uint32_t field32 = 0;
+      fread(&field32, sizeof(field32), 1, src);
+      uint64_t field64 = field32;
+      fwrite(&field64, sizeof(field64), 1, dst);
+      return field64;
+    };
+    const auto copyBytes = [src, dst](uint64_t count) {
+      std::vector<char> buf(static_cast<size_t>(count));
+      fread(buf.data(), sizeof(char), buf.size(), src);
+      fwrite(buf.data(), sizeof(char), buf.size(), dst);
+    };
+    const uint64_t numItems = widenField();
+    copyBytes(widenField());  // keyTotalLength + key buffer
+    copyBytes(widenField());  // valueTotalLength + value buffer
+    for (uint64_t i = 0; i < numItems; i++) {
+      const uint64_t numValues = widenField();
+      widenField();  // keyOffset
+      for (uint64_t j = 0; j < numValues; j++) {
+        widenField();  // valueOffset
+      }
     }
     fclose(src);
     fclose(dst);

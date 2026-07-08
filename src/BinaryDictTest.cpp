@@ -27,23 +27,31 @@ protected:
       : binDict(new BinaryDict(textDict->GetLexicon())), fileName("dict.bin"){};
 
   // Write a crafted binary file for BinaryDict with controllable fields.
-  static std::string WriteMalformedBinaryDict(
-      size_t numItems, size_t keyTotalLength, const std::string& keyBuffer,
-      size_t valueTotalLength, const std::string& valueBuffer,
-      const std::vector<std::tuple<size_t, size_t, std::vector<size_t>>>&
+  // FIELD selects the integer field width: uint32_t for the fixed-width
+  // layout written by current builds, uint64_t for the legacy layout written
+  // by old 64-bit builds.
+  template <typename FIELD>
+  static std::string WriteCraftedBinaryDict(
+      uint64_t numItems, uint64_t keyTotalLength, const std::string& keyBuffer,
+      uint64_t valueTotalLength, const std::string& valueBuffer,
+      const std::vector<std::tuple<uint64_t, uint64_t, std::vector<uint64_t>>>&
           items) {
-    const std::string path = "malformed_binary_dict.bin";
+    const std::string path = "crafted_binary_dict.bin";
     FILE* fp = fopen(path.c_str(), "wb");
-    fwrite(&numItems, sizeof(size_t), 1, fp);
-    fwrite(&keyTotalLength, sizeof(size_t), 1, fp);
+    const auto writeField = [fp](uint64_t value) {
+      FIELD field = static_cast<FIELD>(value);
+      fwrite(&field, sizeof(field), 1, fp);
+    };
+    writeField(numItems);
+    writeField(keyTotalLength);
     fwrite(keyBuffer.data(), sizeof(char), keyBuffer.size(), fp);
-    fwrite(&valueTotalLength, sizeof(size_t), 1, fp);
+    writeField(valueTotalLength);
     fwrite(valueBuffer.data(), sizeof(char), valueBuffer.size(), fp);
     for (const auto& [numValues, keyOffset, valueOffsets] : items) {
-      fwrite(&numValues, sizeof(size_t), 1, fp);
-      fwrite(&keyOffset, sizeof(size_t), 1, fp);
-      for (size_t vo : valueOffsets) {
-        fwrite(&vo, sizeof(size_t), 1, fp);
+      writeField(numValues);
+      writeField(keyOffset);
+      for (uint64_t vo : valueOffsets) {
+        writeField(vo);
       }
     }
     fclose(fp);
@@ -75,10 +83,62 @@ TEST_F(BinaryDictTest, Deserialization) {
   TestDict(deserializedTextDict);
 }
 
+// The serialized layout must not depend on the word size of the platform:
+// all integer fields are fixed 4-byte, so the total file size is fully
+// determined by the lexicon content (#1412 follow-up).
+TEST_F(BinaryDictTest, SerializedLayoutIsWordSizeIndependent) {
+  binDict->opencc::SerializableDict::SerializeToFile(fileName);
+
+  FILE* fp = fopen(fileName.c_str(), "rb");
+  ASSERT_NE(fp, nullptr);
+  fseek(fp, 0L, SEEK_END);
+  const size_t fileSize = static_cast<size_t>(ftell(fp));
+  fseek(fp, 0L, SEEK_SET);
+  uint32_t numItems;
+  ASSERT_EQ(fread(&numItems, sizeof(numItems), 1, fp), 1U);
+  fclose(fp);
+
+  EXPECT_EQ(numItems, binDict->GetLexicon()->Length());
+
+  size_t expectedSize = 3 * sizeof(uint32_t);
+  for (const auto& entry : *binDict->GetLexicon()) {
+    expectedSize += entry->Key().length() + 1;   // key + NUL
+    expectedSize += 2 * sizeof(uint32_t);        // numValues + keyOffset
+    expectedSize += entry->NumValues() * sizeof(uint32_t); // value offsets
+    for (const std::string& value : entry->Values()) {
+      expectedSize += value.length() + 1;        // value + NUL
+    }
+  }
+  EXPECT_EQ(fileSize, expectedSize);
+}
+
+// An empty dictionary serializes to exactly 12 bytes and round-trips; this is
+// the only fixed-width file whose first 8 bytes are all zero, which the
+// legacy-layout detection must not mistake for a 64-bit file.
+TEST_F(BinaryDictTest, EmptyDictRoundTrip) {
+  const std::string path = "empty_binary_dict.bin";
+  const BinaryDictPtr emptyDict(new BinaryDict(LexiconPtr(new Lexicon)));
+  emptyDict->opencc::SerializableDict::SerializeToFile(path);
+
+  FILE* fp = fopen(path.c_str(), "rb");
+  ASSERT_NE(fp, nullptr);
+  fseek(fp, 0L, SEEK_END);
+  EXPECT_EQ(ftell(fp), static_cast<long>(3 * sizeof(uint32_t)));
+  fclose(fp);
+
+  const auto deserialized = SerializableDict::NewFromFile<BinaryDict>(path);
+  EXPECT_EQ(deserialized->GetLexicon()->Length(), 0U);
+  std::remove(path.c_str());
+}
+
 // Test that keyTotalLength exceeding file size triggers InvalidFormat (#815).
 TEST_F(BinaryDictTest, RejectsHugeKeyTotalLength) {
-  std::string path = WriteMalformedBinaryDict(
+  std::string path = WriteCraftedBinaryDict<uint64_t>(
       1, 0x7000000000ULL, "", 0, "", {});
+  EXPECT_THROW(SerializableDict::NewFromFile<BinaryDict>(path), InvalidFormat);
+  std::remove(path.c_str());
+
+  path = WriteCraftedBinaryDict<uint32_t>(1, 0x70000000ULL, "", 0, "", {});
   EXPECT_THROW(SerializableDict::NewFromFile<BinaryDict>(path), InvalidFormat);
   std::remove(path.c_str());
 }
@@ -86,8 +146,12 @@ TEST_F(BinaryDictTest, RejectsHugeKeyTotalLength) {
 // Test that valueTotalLength exceeding file size triggers InvalidFormat (#815).
 TEST_F(BinaryDictTest, RejectsHugeValueTotalLength) {
   std::string keyBuf = {'k', '\0'};
-  std::string path = WriteMalformedBinaryDict(
+  std::string path = WriteCraftedBinaryDict<uint64_t>(
       1, 2, keyBuf, 0x7000000000ULL, "", {});
+  EXPECT_THROW(SerializableDict::NewFromFile<BinaryDict>(path), InvalidFormat);
+  std::remove(path.c_str());
+
+  path = WriteCraftedBinaryDict<uint32_t>(1, 2, keyBuf, 0x70000000ULL, "", {});
   EXPECT_THROW(SerializableDict::NewFromFile<BinaryDict>(path), InvalidFormat);
   std::remove(path.c_str());
 }
@@ -96,7 +160,7 @@ TEST_F(BinaryDictTest, RejectsHugeValueTotalLength) {
 TEST_F(BinaryDictTest, RejectsKeyOffsetOutOfBounds) {
   std::string keyBuf = {'h', 'i', '\0'};
   std::string valBuf = {'v', '\0'};
-  std::string path = WriteMalformedBinaryDict(
+  std::string path = WriteCraftedBinaryDict<uint32_t>(
       1, 3, keyBuf, 2, valBuf, {{1, 100, {0}}});
   EXPECT_THROW(SerializableDict::NewFromFile<BinaryDict>(path), InvalidFormat);
   std::remove(path.c_str());
@@ -106,20 +170,33 @@ TEST_F(BinaryDictTest, RejectsKeyOffsetOutOfBounds) {
 TEST_F(BinaryDictTest, RejectsValueOffsetOutOfBounds) {
   std::string keyBuf = {'h', 'i', '\0'};
   std::string valBuf = {'v', '\0'};
-  std::string path = WriteMalformedBinaryDict(
+  std::string path = WriteCraftedBinaryDict<uint32_t>(
       1, 3, keyBuf, 2, valBuf, {{1, 0, {100}}});
   EXPECT_THROW(SerializableDict::NewFromFile<BinaryDict>(path), InvalidFormat);
   std::remove(path.c_str());
 }
 
-// Sanity check: a well-formed BinaryDict crafted file deserializes.
+// Sanity check: a well-formed fixed-width crafted file deserializes.
 TEST_F(BinaryDictTest, AcceptsWellFormedFile) {
   std::string keyBuf = {'h', 'i', '\0'};
   std::string valBuf = {'v', '\0'};
-  std::string path = WriteMalformedBinaryDict(
+  std::string path = WriteCraftedBinaryDict<uint32_t>(
       1, 3, keyBuf, 2, valBuf, {{1, 0, {0}}});
   const auto deserialized = SerializableDict::NewFromFile<BinaryDict>(path);
   EXPECT_EQ(deserialized->GetLexicon()->Length(), 1);
+  std::remove(path.c_str());
+}
+
+// Files written by old 64-bit builds use native 8-byte size_t fields and must
+// still load.
+TEST_F(BinaryDictTest, AcceptsLegacy64BitLayout) {
+  std::string keyBuf = {'h', 'i', '\0'};
+  std::string valBuf = {'v', '\0'};
+  std::string path = WriteCraftedBinaryDict<uint64_t>(
+      1, 3, keyBuf, 2, valBuf, {{1, 0, {0}}});
+  const auto deserialized = SerializableDict::NewFromFile<BinaryDict>(path);
+  ASSERT_EQ(deserialized->GetLexicon()->Length(), 1);
+  EXPECT_EQ(deserialized->GetLexicon()->At(0)->Key(), "hi");
   std::remove(path.c_str());
 }
 

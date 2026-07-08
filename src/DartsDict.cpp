@@ -234,13 +234,14 @@ DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
           ? static_cast<size_t>(fileEnd - currentOffset)
           : 0;
 
-  // Detect 32-bit vs 64-bit unit size by reading 8 bytes and checking
+  // Detect the dartsSize field width by reading 8 bytes and checking
   // whether bytes [4..7] are all zero.
   //   - Old 64-bit build: dartsSize field is uint64_t (8 bytes); high 32 bits
   //     are zero for any realistic file size → bytes [4..7] == 0.
-  //   - 32-bit build (new or old): dartsSize field is uint32_t (4 bytes);
-  //     bytes [4..7] are the first 4 bytes of the darts array (non-zero for
-  //     any valid array whose root unit has a non-zero offset).
+  //   - Current build (any word size) or old 32-bit build: dartsSize field is
+  //     uint32_t (4 bytes); bytes [4..7] are the first 4 bytes of the darts
+  //     array (non-zero for any valid array whose root unit has a non-zero
+  //     offset).
   uint8_t probe[8];
   if (fread(probe, 1, 8, fp) != 8) {
     throw InvalidFormat("Invalid OpenCC dictionary header (dartsSize)");
@@ -284,8 +285,8 @@ DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
     return dict;
   }
 
-  // 32-bit: dartsSize is the first 4 bytes of probe; remaining 4 bytes belong
-  // to the array, so seek back.
+  // Fixed-width layout: dartsSize is the first 4 bytes of probe; remaining 4
+  // bytes belong to the array, so seek back.
   fseek(fp, -4, SEEK_CUR);
   uint32_t dartsSize32;
   memcpy(&dartsSize32, probe, 4);
@@ -376,8 +377,8 @@ DartsDictPtr DartsDict::NewFromBuffer(const char* data, size_t size) {
     return dict;
   }
 
-  // 32-bit: dartsSize is the first 4 bytes of probe; probe[4..7] belong to the
-  // darts array, so rewind 4 bytes before reading the array.
+  // Fixed-width layout: dartsSize is the first 4 bytes of probe; probe[4..7]
+  // belong to the darts array, so rewind 4 bytes before reading the array.
   uint32_t dartsSize32;
   memcpy(&dartsSize32, probe, 4);
   size_t dartsSize = dartsSize32;

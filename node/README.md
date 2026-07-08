@@ -298,5 +298,14 @@ npm install
 npm test
 ```
 
+The `OpenCCConfig` TypeScript declarations in `opencc.d.ts`,
+`opencc.d.cts`, and `opencc.d.mts` are generated from
+`data/config/opencc_config.schema.json`. Regenerate them after changing the
+schema:
+
+```bash
+npm run generate:node-config-types
+```
+
 To build prebuilt native addons for publishing, see
 [`node/PUBLISHING.md`](./PUBLISHING.md).

@@ -1,4 +1,41 @@
-type OpenCCConfig = Record<string, unknown>;
+type OpenCCDict = OpenCCFileDict | OpenCCInlineDict | OpenCCGroupDict;
+type OpenCCSegmentation = OpenCCMmsegSegmentation | OpenCCPluginSegmentation;
+type OpenCCPluginSegmentation = {
+  type: string;
+  resources?: Record<string, string>;
+  [key: string]: string | Record<string, string> | undefined;
+};
+
+interface OpenCCConfig {
+  name: string;
+  normalization?: [OpenCCConversion, ...OpenCCConversion[]];
+  segmentation?: OpenCCSegmentation;
+  conversion_chain: [OpenCCConversion, ...OpenCCConversion[]];
+}
+interface OpenCCConversion {
+  dict: OpenCCDict;
+}
+interface OpenCCFileDict {
+  type: "text" | "ocd" | "ocd2";
+  file: string;
+  may_output_tofu?: boolean;
+}
+interface OpenCCInlineDict {
+  type: "inline";
+  entries: {
+    [k: string]: string;
+  };
+}
+interface OpenCCGroupDict {
+  type: "group";
+  match_policy: "short_circuit" | "union";
+  dicts: [OpenCCDict, ...OpenCCDict[]];
+  may_output_tofu?: boolean;
+}
+interface OpenCCMmsegSegmentation {
+  type: "mmseg";
+  dict: OpenCCDict;
+}
 
 interface OpenCCOptions {
   includeTofuRiskDictionaries?: boolean;

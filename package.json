@@ -25,6 +25,7 @@
   },
   "scripts": {
     "test": "node --test --test-reporter=spec node/test.js && node node/esm-test.mjs",
+    "generate:node-config-types": "node scripts/generate-node-opencc-config-types.js",
     "prebuild": "prebuildify --napi --strip --postinstall \"node scripts/prepare-node-prebuild-artifacts.js\"",
     "prepare:scoped-packages": "node scripts/prepare-node-scoped-packages.js",
     "prepack": "node scripts/verify-node-main-package.js",
@@ -63,6 +64,7 @@
     "prebuilds/assets/*.ocd2",
     "scripts/prepare-node-prebuild-artifacts.js",
     "scripts/install.js",
+    "scripts/generate-node-opencc-config-types.js",
     "scripts/prepare-node-scoped-packages.js",
     "scripts/verify-node-main-package.js",
     "scripts/verify-node-scoped-packages-published.js",
@@ -148,6 +150,7 @@
     "Traditional Chinese"
   ],
   "devDependencies": {
+    "json-schema-to-typescript": "^15.0.4",
     "prebuildify": "^6.0.1"
   },
   "dependencies": {

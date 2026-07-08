@@ -32,6 +32,9 @@ jobs:
           - target: darwin-arm64
             runner: macos-15
             library: libopencc-jieba.dylib
+          - target: darwin-x64
+            runner: macos-15-intel
+            library: libopencc-jieba.dylib
           - target: linux-arm64
             runner: ubuntu-24.04-arm
             library: libopencc-jieba.so
@@ -194,6 +197,8 @@ jobs:
         include:
           - target: darwin-arm64
             runner: macos-15
+          - target: darwin-x64
+            runner: macos-15-intel
           - target: linux-arm64
             runner: ubuntu-24.04-arm
           - target: linux-x64

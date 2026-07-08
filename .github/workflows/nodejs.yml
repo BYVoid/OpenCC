@@ -25,6 +25,8 @@ jobs:
         include:
           - os: macos-14
             node-version: 24
+          - os: macos-15-intel
+            node-version: 24
           - os: windows-2022
             node-version: 24
     steps:
@@ -66,3 +68,50 @@ jobs:
             node/build/**
             prebuilds/**
             **/npm-debug.log
+
+  # Install the packed npm tarball without prebuilt binaries, so the
+  # node-gyp source build path is exercised exactly as it runs on platforms
+  # without a scoped binary package (issue #1409).
+  pack-source-install:
+    name: Source build from npm tarball (${{ matrix.os }})
+    permissions:
+      contents: read
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, macos-15-intel]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Use Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - run: npm ci
+      - name: Build prebuild assets
+        run: npm run prebuild
+      - name: Pack npm tarball
+        shell: bash
+        run: |
+          mkdir -p dist/npm-artifacts
+          npm pack --pack-destination dist/npm-artifacts
+      - name: Install tarball from source and smoke test
+        shell: bash
+        run: |
+          tarball="$(ls "$PWD"/dist/npm-artifacts/opencc-*.tgz)"
+          install_dir="$(mktemp -d)"
+          cd "$install_dir"
+          npm init -y
+          npm install --omit=optional --foreground-scripts "$tarball"
+          test -f node_modules/opencc/build/Release/opencc.node
+          node -e '
+            const assert = require("assert");
+            const OpenCC = require("opencc");
+            const converter = new OpenCC("s2t.json");
+            const converted = converter.convertSync("汉字");
+            assert.strictEqual(converted, "漢字");
+            console.log("Source-built opencc converts 汉字 ->", converted);
+          '

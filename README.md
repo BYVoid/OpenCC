@@ -79,6 +79,9 @@ The npm package supports Node.js `>=20.17`. It uses bundled Node-API
 prebuilds when available and falls back to a local `node-gyp` build when the
 current platform does not have a matching prebuild.
 
+Bun and Deno can also use the npm package through their npm compatibility
+support.
+
 To install the npm CLI:
 
 ```sh
@@ -98,7 +101,20 @@ async function main() {
 }
 ```
 
-See [demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js) and [ts-demo.ts](https://github.com/BYVoid/OpenCC/blob/master/node/ts-demo.ts).
+Inline configurations can be passed with `OpenCC.fromConfig`:
+
+```ts
+import { OpenCC } from 'opencc';
+const converter = OpenCC.fromConfig({
+  name: 'Demo Inline Config',
+  conversion_chain: [{
+    dict: { type: 'inline', entries: { '鼠标': '滑鼠' } },
+  }],
+});
+console.log(converter.convertSync('鼠标'));  // 滑鼠
+```
+
+See [demo.js](https://github.com/BYVoid/OpenCC/blob/master/node/demo.js) and [demo.ts](https://github.com/BYVoid/OpenCC/blob/master/node/demo.ts).
 
 ### Python
 

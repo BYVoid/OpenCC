@@ -177,8 +177,13 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org/
 
+      - uses: bazel-contrib/setup-bazel@0.19.0
+        with:
+          bazelisk-cache: true
+          repository-cache: true
+
       - name: Install dependencies
-        run: npm ci --omit=optional
+        run: npm ci --omit=optional --ignore-scripts
 
       - name: Prepare package versions
         shell: bash
@@ -214,7 +219,7 @@ jobs:
 
       - name: Build opencc package assets
         if: steps.publish_check.outputs.published != 'true'
-        run: npm run prebuild
+        run: ./scripts/build-node-prebuild-bazel.sh darwin-arm64
 
       - name: Test
         if: steps.publish_check.outputs.published != 'true'

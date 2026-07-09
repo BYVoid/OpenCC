@@ -20,25 +20,23 @@
  * limitations under the License.
  */
 
-/**
- * @example node/demo.js
- * This is an example of how to use the Node.js API.
- */
+import { OpenCC, OpenCCConfig } from './opencc';
 
-// In your project you should replace './opencc' with 'opencc'
-const { OpenCC } = require('./opencc');
+declare const process: {
+  exitCode?: number;
+};
 
 const input = '汉字';
 
-async function main() {
+async function main(): Promise<void> {
   console.log('OpenCC version', OpenCC.version);
 
   const converter = new OpenCC('s2t.json');
 
   console.log('Sync API:', converter.convertSync(input));
 
-  const callbackResult = await new Promise((resolve, reject) => {
-    converter.convert(input, (err, converted) => {
+  const callbackResult = await new Promise<string>((resolve, reject) => {
+    converter.convert(input, (err: string | undefined, converted: string) => {
       if (err) {
         reject(new Error(err));
         return;
@@ -50,7 +48,7 @@ async function main() {
 
   console.log('Promise API:', await converter.convertPromise(input));
 
-  const config = {
+  const config: OpenCCConfig = {
     name: 'Demo Inline Config',
     conversion_chain: [
       {
@@ -69,7 +67,7 @@ async function main() {
   console.log('Inline config:', inlineConverter.convertSync('鼠标和软件'));
 }
 
-main().catch((err) => {
+main().catch((err: unknown) => {
   console.error(err);
   process.exitCode = 1;
 });

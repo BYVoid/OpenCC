@@ -1,28 +1,77 @@
 #!/usr/bin/env bash
 #
-# Build opencc.node via Bazel remote execution and copy to the prebuilds directory.
-# Usage: ./scripts/build-node-prebuild-bazel.sh
+# Build opencc.node with Bazel and copy it to the npm prebuilds directory.
+# Usage: ./scripts/build-node-prebuild-bazel.sh <target>
 
-set -e
+set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-echo "Building Linux x64 (node-linux-x64)..."
-bazel build --config=node-linux-x64 -c opt --remote_download_toplevel //node:opencc
-mkdir -p prebuilds/linux-x64
-cp -fL bazel-bin/node/opencc.node prebuilds/linux-x64/
-echo "Copied to prebuilds/linux-x64/opencc.node"
+# Git Bash/MSYS rewrites Bazel labels such as //node:opencc as paths on Windows.
+case "$(uname -s 2>/dev/null || true)" in
+  MINGW*|MSYS*|CYGWIN*)
+    export MSYS2_ARG_CONV_EXCL='*'
+    export MSYS_NO_PATHCONV=1
+    ;;
+esac
 
-echo ""
-echo "Building Linux arm64 (node-linux-arm64)..."
-bazel build --config=node-linux-arm64 -c opt --remote_download_toplevel //node:opencc
-mkdir -p prebuilds/linux-arm64
-cp -fL bazel-bin/node/opencc.node prebuilds/linux-arm64/
-echo "Copied to prebuilds/linux-arm64/opencc.node"
+usage() {
+  cat >&2 <<'EOF'
+Usage: ./scripts/build-node-prebuild-bazel.sh <target>
 
-# 资产文件仍然依赖于 prepare-node-prebuild-artifacts.js，
-# 但那是 npm run prebuild 的一部分。如果需要，也可以在这里复制。
-echo ""
-echo "Prebuild files collected successfully."
-ls -lh prebuilds/linux-x64/opencc.node prebuilds/linux-arm64/opencc.node
+Supported targets:
+  darwin-arm64
+  darwin-x64
+  linux-arm64
+  linux-x64
+  win32-x64
+EOF
+}
+
+if [[ $# -ne 1 ]]; then
+  usage
+  exit 2
+fi
+
+target="$1"
+case "$target" in
+  darwin-arm64|darwin-x64|linux-arm64|linux-x64|win32-x64)
+    ;;
+  *)
+    echo "Unsupported target: $target" >&2
+    usage
+    exit 2
+    ;;
+esac
+
+host_target="$(node -p "process.platform + '-' + process.arch")"
+
+if [[ "$target" == "win32-x64" && "$host_target" != "$target" ]]; then
+  echo "Building $target with Bazel + Zig cross-compile..."
+  bazel build -c opt //data/dictionary:binary_dictionaries
+  bazel build -c opt --config=node-windows-x64-zig //node:opencc_node_windows_zig
+  addon="bazel-bin/node/windows-x64/opencc.node"
+elif [[ "$target" == "$host_target" ]]; then
+  echo "Building $target with native Bazel toolchain..."
+  bazel build -c opt //data/dictionary:binary_dictionaries //node:opencc
+  addon="bazel-bin/node/opencc.node"
+else
+  cat >&2 <<EOF
+Target $target does not match host $host_target.
+Run this script on a matching runner, or use win32-x64 from macOS/Linux via the
+existing Bazel + Zig cross-compile path.
+EOF
+  exit 1
+fi
+
+echo "Preparing shared Node.js prebuild assets..."
+node scripts/prepare-node-prebuild-artifacts.js
+
+dest_dir="prebuilds/$target"
+dest="$dest_dir/opencc.node"
+mkdir -p "$dest_dir"
+cp -fL "$addon" "$dest"
+
+echo "Copied Bazel-built addon to $dest"
+ls -lh "$dest"

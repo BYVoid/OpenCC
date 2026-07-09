@@ -217,8 +217,13 @@ jobs:
           node-version: 24
           registry-url: https://registry.npmjs.org/
 
+      - uses: bazel-contrib/setup-bazel@0.19.0
+        with:
+          bazelisk-cache: true
+          repository-cache: true
+
       - name: Install dependencies
-        run: npm install --omit=optional
+        run: npm install --omit=optional --ignore-scripts
 
       - name: Prepare package versions
         shell: bash
@@ -260,7 +265,7 @@ jobs:
         if: steps.publish_check.outputs.published != 'true'
         shell: bash
         run: |
-          npm run prebuild
+          ./scripts/build-node-prebuild-bazel.sh "${{ matrix.target }}"
           test -f "prebuilds/${{ matrix.target }}/opencc.node"
 
       - name: Prepare scoped package

@@ -45,11 +45,12 @@ scoped package for its own platform.
 
 ## Build
 
-From the repository root:
+From the repository root, build the scoped binary for the current platform with
+Bazel:
 
 ```sh
-npm install
-npm run prebuild
+npm install --omit=optional --ignore-scripts
+./scripts/build-node-prebuild-bazel.sh "$(node -p 'process.platform + "-" + process.arch')"
 ```
 
 This creates:
@@ -60,9 +61,10 @@ prebuilds/assets/*.ocd2
 prebuilds/<current-platform>-<current-arch>/opencc.node
 ```
 
-The release workflow runs this command separately on macOS ARM64, Linux ARM64,
-Linux x64, and Windows x64 runners. It no longer depends on Bazel remote
-execution to cross-build npm binaries.
+The release workflow runs the Bazel build script separately on the runner for
+each scoped binary target. The main `opencc` package still keeps `binding.gyp`
+and source files so installs on platforms without a scoped binary package can
+fall back to `node-gyp-build`.
 
 ## Prepare scoped binary packages
 

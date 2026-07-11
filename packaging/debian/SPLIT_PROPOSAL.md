@@ -2,7 +2,7 @@
 
 This is a proposal from upstream, not a Debian upload. It was produced by
 overlaying the top-level `debian/` directory onto a clean checkout of
-upstream `BYVoid/OpenCC` at `master` (1.4.0) and actually running
+upstream `BYVoid/OpenCC` at `master` (1.4.1) and actually running
 `dpkg-buildpackage -us -uc -b` there, on Ubuntu 24.04 with debhelper
 13.14. All six binary packages built, `dh_missing --fail-missing` found
 nothing unclaimed, `ctest` passed 19/19, and `lintian --pedantic`

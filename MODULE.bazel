@@ -2,7 +2,7 @@
 
 module(
     name = "opencc",
-    version = "1.4.0",
+    version = "1.4.1",
 )
 
 bazel_dep(name = "aspect_bazel_lib", version = "2.22.5")

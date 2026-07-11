@@ -1,4 +1,3 @@
-usr/bin/cppjieba_dict
 usr/lib/*/opencc/plugins
 usr/share/opencc/jieba_dict
 usr/share/opencc/hk2sp_jieba.json

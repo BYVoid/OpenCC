@@ -69,11 +69,11 @@ release artifact for continuity:
 
 Depends: `opencc (= ${binary:Version})`, `libopencc-data (>= ${source:Version})`.
 
-`plugins/jieba/CMakeLists.txt` also builds `opencc_jieba_dict_build_tool`,
-the offline tool that merges the bundled Jieba dictionaries into
-`jieba_dict/jieba_merged.ocd2` at build time. Upstream does not
-`install()` this tool, so it is a build dependency only and is not
-shipped in `opencc-jieba` (or any package) here either.
+The merged Jieba dictionary (`jieba_dict/jieba_merged.ocd2`) is generated
+at build time by upstream's own `opencc_dict` tool
+(`--from cppjieba_utf8`), which is built in-tree during the package build
+and already shipped in the `opencc` binary package; no additional
+dictionary tool is built or shipped.
 
 Known blocker for a real Debian upload: `plugins/jieba/deps/cppjieba` is
 a header-only C++ library with **no existing Debian package** to build

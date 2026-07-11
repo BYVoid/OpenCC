@@ -23,6 +23,7 @@ const requiredFiles = [
 
 const expectedOptionalPackages = [
   '@opencc/opencc-jieba-darwin-arm64',
+  '@opencc/opencc-jieba-darwin-x64',
   '@opencc/opencc-jieba-linux-arm64',
   '@opencc/opencc-jieba-linux-x64',
   '@opencc/opencc-jieba-win32-x64',

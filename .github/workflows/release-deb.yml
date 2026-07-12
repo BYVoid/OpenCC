@@ -119,11 +119,19 @@ jobs:
             -l packaging/debian/debian/changelog -S version)
           echo "value=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Assemble zip with checksums
+      - name: Assemble per-architecture zips with checksums
         run: |
           cd dist
-          sha256sum ./*.deb > SHA256SUMS
-          zip "opencc-${{ steps.version.outputs.value }}-deb.zip" ./*.deb SHA256SUMS
+          version="${{ steps.version.outputs.value }}"
+          for arch in amd64 arm64; do
+            stage="deb-$arch-stage"
+            mkdir "$stage"
+            cp ./*_"$arch".deb "$stage"/
+            cp ./*_all.deb "$stage"/
+            (cd "$stage" && sha256sum ./*.deb > SHA256SUMS && \
+             zip "../opencc-$version-deb-$arch.zip" ./*.deb SHA256SUMS)
+            rm -r "$stage"
+          done
 
       - uses: actions/upload-artifact@v4
         with:
@@ -142,5 +150,5 @@ jobs:
             sleep 10
           done
           gh release upload "$tag" \
-            "dist/opencc-${{ steps.version.outputs.value }}-deb.zip" \
+            dist/opencc-*-deb-*.zip \
             --clobber

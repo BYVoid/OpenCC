@@ -43,50 +43,24 @@ jobs:
           path: dist/*.deb
 
   build-arm64:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
-      - name: Set up arm64 cross-compilation environment
+      - name: Install build dependencies
         run: |
-          sudo rm -f /etc/apt/sources.list
-          sudo find /etc/apt/sources.list.d -maxdepth 1 \
-            \( -name '*.list' -o -name '*.sources' \) -exec rm -f {} +
-          cat <<'EOF' | sudo tee /etc/apt/sources.list.d/opencc-cross.sources >/dev/null
-          Types: deb
-          URIs: http://archive.ubuntu.com/ubuntu
-          Suites: noble noble-updates noble-backports
-          Components: main restricted universe multiverse
-          Architectures: amd64
-          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-
-          Types: deb
-          URIs: http://security.ubuntu.com/ubuntu
-          Suites: noble-security
-          Components: main restricted universe multiverse
-          Architectures: amd64
-          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-
-          Types: deb
-          URIs: http://ports.ubuntu.com/ubuntu-ports
-          Suites: noble noble-updates noble-backports noble-security
-          Components: main restricted universe multiverse
-          Architectures: arm64
-          Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
-          EOF
-          sudo dpkg --add-architecture arm64
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            build-essential debhelper cmake ninja-build pkg-config \
-            crossbuild-essential-arm64 \
-            libmarisa-dev:arm64 rapidjson-dev libtclap-dev \
+            build-essential debhelper cmake ninja-build pkg-config doxygen \
+            libmarisa-dev rapidjson-dev libtclap-dev \
             googletest libgtest-dev
 
       - name: Build arm64 packages
         env:
           DIST_DIR: ${{ github.workspace }}/dist
           BUILD_MODE: any-only
-          TARGET_ARCH: arm64
         run: bash scripts/build-deb-packages.sh
 
       - uses: actions/upload-artifact@v4

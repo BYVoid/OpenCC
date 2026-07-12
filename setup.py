@@ -111,6 +111,7 @@ def build_libopencc(output_path):
         '-DBUILD_SHARED_LIBS:BOOL=OFF',
         '-DENABLE_GTEST:BOOL=OFF',
         '-DENABLE_BENCHMARK:BOOL=OFF',
+        '-DBUILD_OPENCC_JIEBA_PLUGIN:BOOL=OFF',
         '-DBUILD_PYTHON:BOOL=ON',
         '-DCMAKE_BUILD_TYPE=Release',
         '-DCMAKE_INSTALL_PREFIX={}'.format(output_path),

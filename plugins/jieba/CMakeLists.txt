@@ -159,18 +159,41 @@ if (OPENCC_CAN_RUN_CPPJIEBA_DICT)
         "opencc_dict not found. Building the merged Jieba dictionary requires "
         "the opencc_dict tool from OpenCC 1.4.1 or later.")
     endif()
+    # An opencc_dict installed to a non-default prefix carries no rpath, so
+    # help the dynamic linker find libopencc from the same installation.
+    get_filename_component(_opencc_dict_bindir
+                           "${OPENCC_DICT_EXECUTABLE}" DIRECTORY)
+    get_filename_component(_opencc_dict_prefix
+                           "${_opencc_dict_bindir}" DIRECTORY)
+    if (WIN32)
+      # The installed layout keeps opencc.dll next to opencc_dict.exe.
+      set(OPENCC_DICT_COMMAND "${OPENCC_DICT_EXECUTABLE}")
+    elseif (APPLE)
+      set(OPENCC_DICT_COMMAND ${CMAKE_COMMAND} -E env
+          "DYLD_LIBRARY_PATH=${_opencc_dict_prefix}/lib:$ENV{DYLD_LIBRARY_PATH}"
+          "${OPENCC_DICT_EXECUTABLE}")
+    else()
+      set(OPENCC_DICT_COMMAND ${CMAKE_COMMAND} -E env
+          "LD_LIBRARY_PATH=${_opencc_dict_prefix}/lib:$ENV{LD_LIBRARY_PATH}"
+          "${OPENCC_DICT_EXECUTABLE}")
+    endif()
     execute_process(
-      COMMAND "${OPENCC_DICT_EXECUTABLE}" --help
+      COMMAND ${OPENCC_DICT_COMMAND} --help
+      RESULT_VARIABLE _opencc_dict_help_result
       OUTPUT_VARIABLE _opencc_dict_help
       ERROR_VARIABLE _opencc_dict_help_err
     )
+    if (NOT _opencc_dict_help_result EQUAL 0)
+      message(FATAL_ERROR
+        "Failed to run ${OPENCC_DICT_EXECUTABLE} (exit status "
+        "${_opencc_dict_help_result}): ${_opencc_dict_help_err}")
+    endif()
     if (NOT "${_opencc_dict_help}${_opencc_dict_help_err}" MATCHES
         "cppjieba_utf8")
       message(FATAL_ERROR
         "${OPENCC_DICT_EXECUTABLE} does not support the cppjieba_utf8 input "
         "format. OpenCC 1.4.1 or later is required.")
     endif()
-    set(OPENCC_DICT_COMMAND "${OPENCC_DICT_EXECUTABLE}")
     set(OPENCC_DICT_TARGET_DEPENDS)
   else()
     set(OPENCC_DICT_COMMAND opencc_dict)

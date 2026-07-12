@@ -2,6 +2,11 @@ name: Debian Packages
 
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Existing release tag to upload the built packages to, for example ver.1.4.1. Leave empty to only build artifacts."
+        required: false
+        type: string
   push:
     tags:
       - "ver.*"
@@ -126,11 +131,11 @@ jobs:
           path: dist/opencc-*.zip
 
       - name: Upload to GitHub release
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') || inputs.release_tag != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          tag="${{ github.ref_name }}"
+          tag="${{ inputs.release_tag || github.ref_name }}"
           for i in $(seq 1 30); do
             gh release view "$tag" --json isDraft > /dev/null 2>&1 && break
             echo "Waiting for release $tag to be created ($i/30)..."

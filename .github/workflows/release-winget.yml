@@ -178,11 +178,18 @@ jobs:
             release/*.sha256
             release/winget-manifests/**
 
-      - name: Publish GitHub release
+      - name: Upload to GitHub release
         if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            release/*.zip
-            release/*.sha256
-          generate_release_notes: true
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ github.ref_name }}"
+          for i in $(seq 1 30); do
+            gh release view "$tag" --json isDraft > /dev/null 2>&1 && break
+            echo "Waiting for release $tag to be created ($i/30)..."
+            sleep 10
+          done
+          gh release upload "$tag" \
+            release/*.zip release/*.sha256 \
+            --clobber

@@ -1,0 +1,48 @@
+name: Release Draft
+
+# Creates a draft GitHub release as soon as a ver.* tag is pushed, with the
+# matching section of NEWS.md as the release notes. The other release
+# workflows upload their assets to this draft (gh release upload resolves
+# draft releases by tag name), so the release can be reviewed and published
+# manually after all assets have landed. Publishing the release triggers
+# release-npm. This workflow is the only place a release is created; asset
+# upload steps in other workflows wait for it instead of creating their own,
+# which would risk duplicate drafts for the same tag.
+
+on:
+  push:
+    tags:
+      - "ver.*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  create-draft:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Create draft release if none exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ github.ref_name }}"
+          if gh release view "$tag" --json isDraft > /dev/null 2>&1; then
+            echo "Release for $tag already exists; nothing to do."
+            exit 0
+          fi
+          version="${tag#ver.}"
+          awk -v header="## Version $version" '
+            $0 == header {flag=1; next}
+            /^## Version / {flag=0}
+            flag' NEWS.md | sed -e '/./,$!d' > notes.md
+          if ! [ -s notes.md ]; then
+            echo "OpenCC $version" > notes.md
+          fi
+          gh release create "$tag" --draft --verify-tag \
+            --title "$tag" --notes-file notes.md
+          echo "Created draft release for $tag."

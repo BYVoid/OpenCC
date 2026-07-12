@@ -22,7 +22,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            debhelper cmake ninja-build pkg-config doxygen \
+            build-essential debhelper cmake ninja-build pkg-config doxygen \
             libmarisa-dev rapidjson-dev libtclap-dev \
             googletest libgtest-dev
 
@@ -72,7 +72,7 @@ jobs:
           sudo dpkg --add-architecture arm64
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            debhelper cmake ninja-build pkg-config \
+            build-essential debhelper cmake ninja-build pkg-config \
             crossbuild-essential-arm64 \
             libmarisa-dev:arm64 rapidjson-dev libtclap-dev \
             googletest libgtest-dev

@@ -49,7 +49,16 @@ option(BUILD_SHARED_LIBS "Build opencc as shared library" ${_OPENCC_DEFAULT_BUIL
 option(OPENCC_ENABLE_INSTALL "Generate install targets" ${_OPENCC_DEFAULT_ENABLE_INSTALL})
 option(ENABLE_GTEST "Build all tests." OFF)
 option(ENABLE_BENCHMARK "Build benchmark tests." OFF)
-option(BUILD_OPENCC_JIEBA_PLUGIN "Build Jieba segmentation as a loadable plugin." OFF)
+# Top-level macOS builds enable the Jieba plugin by default so package
+# managers that build with default options (e.g. Homebrew) ship it. Other
+# platforms and subproject builds (FetchContent / add_subdirectory) keep it
+# opt-in.
+if (APPLE AND CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  set(OPENCC_JIEBA_PLUGIN_DEFAULT ON)
+else()
+  set(OPENCC_JIEBA_PLUGIN_DEFAULT OFF)
+endif()
+option(BUILD_OPENCC_JIEBA_PLUGIN "Build Jieba segmentation as a loadable plugin." ${OPENCC_JIEBA_PLUGIN_DEFAULT})
 option(BUILD_PYTHON "Build python library" OFF)
 
 # Built-in dictionaries and configs can be produced as compiled ocd2

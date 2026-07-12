@@ -28,6 +28,7 @@
     * Node 預編譯二進制（`@opencc/opencc-*` scoped 套件）改用 Bazel 構建發佈，`npm run prebuild`（prebuildify / node-gyp）不再是官方發佈二進制的構建方式；Bazel 不支援的平台從此不再提供官方預編譯二進制，在這些平台上 `npm install` 目前仍會退回 node-gyp 源碼編譯，但此 fallback（`binding.gyp`）已計劃在後續版本中移除，屆時 Node 構建將統一使用 Bazel（[#1416](https://github.com/BYVoid/OpenCC/pull/1416)）。
     * 重寫 Node demo 範例（[commit](https://github.com/BYVoid/OpenCC/commit/6b382c6489efe4874350ec33531b46b32e08c2d5)）。
 * **打包 / 構建系統**：
+    * macOS 頂層 CMake 構建現在預設啟用 jieba 插件（`BUILD_OPENCC_JIEBA_PLUGIN=ON`），Homebrew 等以預設選項構建的套件管理器將直接提供 `opencc-jieba` 插件與 `*_jieba.json` 配置；其他平台與以子項目方式（FetchContent / `add_subdirectory`）引入的構建維持預設關閉，Python wheel 構建亦顯式關閉。
     * 重建 Debian 打包流程：新增頂層 `debian/` 目錄使 `dpkg-buildpackage` 可端到端重現 Debian 構建，`packaging/debian/` 補丁鏡像與 ver.1.4.0 源碼對齊，並改進 deb 構建腳本與 workflow（[#1398](https://github.com/BYVoid/OpenCC/pull/1398), [#1385](https://github.com/BYVoid/OpenCC/pull/1385), [#1406](https://github.com/BYVoid/OpenCC/pull/1406)）。
     * Bazel 升級至 9.1.1（[#1384](https://github.com/BYVoid/OpenCC/pull/1384)）；`rules_node_addon` 更新至 BCR 1.0.3（[#1370](https://github.com/BYVoid/OpenCC/pull/1370)）。
     * MSVC `/W4` 改用 `add_compile_options` 設定，避免 `rc.exe` 資源編譯失敗（[#1393](https://github.com/BYVoid/OpenCC/pull/1393)）；CMake 恢復支援舊式 Python executable 選項（[#1389](https://github.com/BYVoid/OpenCC/pull/1389)）。

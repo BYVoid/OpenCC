@@ -52,8 +52,11 @@ option(ENABLE_BENCHMARK "Build benchmark tests." OFF)
 # Top-level macOS builds enable the Jieba plugin by default so package
 # managers that build with default options (e.g. Homebrew) ship it. Other
 # platforms and subproject builds (FetchContent / add_subdirectory) keep it
-# opt-in.
-if (APPLE AND CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+# opt-in. Trimmed source packages ship without plugins/, so only default to
+# ON when the plugin sources are actually present; an explicit
+# -DBUILD_OPENCC_JIEBA_PLUGIN=ON without them still fails loudly below.
+if (APPLE AND CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR
+    AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugins/CMakeLists.txt")
   set(OPENCC_JIEBA_PLUGIN_DEFAULT ON)
 else()
   set(OPENCC_JIEBA_PLUGIN_DEFAULT OFF)
@@ -97,19 +100,20 @@ set (OPENCC_ABI_VERSION 1.4)
 
 set(_OPENCC_SOURCE_PACKAGE_SUFFIX "")
 set(_OPENCC_SOURCE_PACKAGE_IGNORE_FILES "")
+# Trimmed source packages keep both supported build systems (CMake and
+# Bazel), so Bazel workspace files (BUILD.bazel, MODULE.bazel[.lock],
+# .bazelrc, .bazelversion, .bazelignore) are intentionally NOT ignored here.
+# Only .bazelrc.user is excluded (it is a local/CI override that may carry a
+# BuildBuddy API key); it is dropped via CPACK_SOURCE_IGNORE_FILES below.
 set(_OPENCC_TRIMMED_SOURCE_PACKAGE_IGNORE_FILES
   "/.appveyor.yml"
-  "/.bazel[^/]*"
   "/.agents/"
   "/.claude/"
   "/.npmignore"
   "/AGENTS.md"
-  "/BUILD.bazel"
   "/CLAUDE.md"
   "/CONTRIBUTING.md"
   "/DESIGN_PRINCIPLES.md"
-  "/MODULE.bazel"
-  "/MODULE.bazel.lock"
   "/MANIFEST.in"
   "/Makefile"
   "/OpenCC.egg-info/"
@@ -124,7 +128,6 @@ set(_OPENCC_TRIMMED_SOURCE_PACKAGE_IGNORE_FILES
   "/node/"
   "/package.json"
   "/package-lock.json"
-  "/patches/"
   "/pyproject.toml"
   "/python[^/]*/"
   "/release-pypi-[^/]*"
@@ -156,7 +159,7 @@ if(NOT CPACK_SOURCE_PACKAGE_FILE_NAME)
   )
 endif()
 set(CPACK_SOURCE_IGNORE_FILES
-  "/build[^/]*/;/test/dict.ocd;/test/dict.txt;/test/dict.bin;/dict.ocd;/.DS_Store;/.zig-[^/]*/;/dist[^/]*/;/other/;/opencc.xcodeproj/;/.git/;.gitignore;~$;.pyc;/bazel*;/node_modules;/.github;/.pytest_cache;/.vscode;/packaging/;${_OPENCC_SOURCE_PACKAGE_IGNORE_FILES};${CPACK_SOURCE_IGNORE_FILES}"
+  "/build[^/]*/;/test/dict.ocd;/test/dict.txt;/test/dict.bin;/dict.ocd;/.DS_Store;/.zig-[^/]*/;/dist[^/]*/;/other/;/opencc.xcodeproj/;/.git/;.gitignore;~$;.pyc;/bazel-[^/]*;/.bazelrc.user;/node_modules;/.github;/.pytest_cache;/.vscode;/packaging/;${_OPENCC_SOURCE_PACKAGE_IGNORE_FILES};${CPACK_SOURCE_IGNORE_FILES}"
 )
 include(CPack)
 

@@ -1,0 +1,85 @@
+name: Source Package Release
+
+# Builds the trimmed C++ source package (opencc profile: no Node.js, Python,
+# documentation, or packaging files) and attaches it to the release. The
+# trimmed package keeps both build systems working, so it is smoke-tested with
+# CMake and Bazel before upload. Like the other release workflows it uploads to
+# the draft created by release-draft.yml; publishing is manual.
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Existing release tag to upload the source package to, for example ver.1.4.1. Leave empty to only build the artifact."
+        required: false
+        type: string
+  push:
+    tags:
+      - "ver.*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-source-package:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake ninja-build build-essential
+
+      - uses: bazel-contrib/setup-bazel@0.19.0
+        with:
+          bazelisk-cache: true
+          repository-cache: true
+
+      - name: Build trimmed source package
+        run: |
+          cmake -S . -B build-src -DOPENCC_SOURCE_PACKAGE_PROFILE=opencc
+          (cd build-src && cpack --config CPackSourceConfig.cmake -G TGZ)
+          mkdir -p dist
+          mv build-src/opencc-*-opencc-src.tar.gz dist/
+          ls -l dist/
+
+      - name: Smoke-test the package (CMake and Bazel)
+        run: |
+          set -e
+          tarball=$(ls dist/opencc-*-opencc-src.tar.gz)
+          workdir=$(mktemp -d)
+          tar xzf "$tarball" -C "$workdir"
+          src=$(echo "$workdir"/opencc-*-opencc-src)
+          # CMake: configure and build the core library and CLI tools.
+          cmake -S "$src" -B "$src/build" -DCMAKE_BUILD_TYPE=Release
+          cmake --build "$src/build" --target opencc opencc_dict --parallel
+          # Bazel: load, analyze, and build the core targets. Catches a trimmed
+          # package that dropped a file the Bazel module or BUILD graph needs.
+          (cd "$src" && bazel build //src/tools:dict_converter //data/dictionary:binary_dictionaries)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: opencc-source-package
+          path: dist/opencc-*-opencc-src.tar.gz
+
+      - name: Upload to GitHub release
+        if: startsWith(github.ref, 'refs/tags/') || inputs.release_tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ inputs.release_tag || github.ref_name }}"
+          for i in $(seq 1 30); do
+            gh release view "$tag" --json isDraft > /dev/null 2>&1 && break
+            echo "Waiting for release $tag to be created ($i/30)..."
+            sleep 10
+          done
+          gh release upload "$tag" \
+            dist/opencc-*-opencc-src.tar.gz \
+            --clobber

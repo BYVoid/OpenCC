@@ -31,7 +31,7 @@ This document compiles the Open Chinese Convert (OpenCC) project information to 
 - The top-level build system supports CMake, Bazel, Node.js `binding.gyp`, Python `pyproject.toml`, with cross-platform CI integration.
 - `src/*Test.cpp`, `data/config/*Test.cpp`, `plugins/jieba/tests/`, `test/`, and `test/golden/` contain tests covering dictionary matching, conversion chains, configuration validation, plugin segmentation, CLI behavior, and golden conversion outputs.
 - Tools `opencc_dict`, `opencc_phrase_extract` (`src/tools/`) help developers convert dictionary formats and extract phrases.
-- Node.js tests live in `node/test.js`; npm prebuild packaging uses `npm run prebuild` and related scripts in `scripts/`.
+- Node.js tests live in `node/test.js`. Official npm prebuilt binaries are built with Bazel via `scripts/build-node-prebuild-bazel.sh` (see `node/PUBLISHING.md`); `npm run prebuild` (prebuildify/node-gyp) is no longer the release path, and the `binding.gyp` source fallback is planned for removal.
 
 ### C++ ABI Versioning
 - When a change introduces an ABI-incompatible modification to the public C++ interface, bump `OPENCC_ABI_VERSION` in `CMakeLists.txt` so downstream libraries and applications relink instead of silently loading an incompatible `libopencc` shared library.
@@ -52,10 +52,12 @@ This document compiles the Open Chinese Convert (OpenCC) project information to 
 - README lists third-party Swift, Java, Go, WebAssembly and other porting projects, showcasing ecosystem breadth.
 
 ## Optional Plugin and Release Packaging
-- `BUILD_OPENCC_JIEBA_PLUGIN=ON` enables the C++ jieba plugin in CMake builds; default builds do not require it.
+- `BUILD_OPENCC_JIEBA_PLUGIN` enables the C++ jieba plugin in CMake builds. Since 1.4.1 it defaults to ON for top-level macOS builds (so Homebrew ships the plugin); other platforms, subproject builds (FetchContent / `add_subdirectory`), and Python wheel builds keep it OFF.
+- The merged jieba dictionary (`jieba_dict/jieba_merged.ocd2`) is generated at build time by `opencc_dict --from cppjieba_utf8`; there is no separate dictionary helper tool. Standalone plugin builds locate an installed `opencc_dict` and require OpenCC >= 1.4.1.
 - `plugins/README.md` documents plugin loading, ABI expectations, and standalone plugin builds.
 - `scripts/release-windows-winget.ps1` is the Windows portable/WinGet release path and produces the CLI zip, checksum, and WinGet manifests.
 - npm release packaging is separate from the native CLI release: `opencc` and `opencc-jieba` are packed as npm `.tgz` artifacts and should be install-tested together when plugin-backed npm configs are changed.
+- Release flow (since 1.4.1) is draft-first: publish the `@opencc/*` scoped binary packages via the `release-npm-binaries` workflow_dispatch, then push a `ver.*` tag. The tag creates a draft GitHub release (`release-draft.yml`, notes taken from the matching NEWS.md section) and the deb/doc/resource/winget workflows upload assets to the draft; everything up to this point is reversible. Manually publishing the release then triggers `release-npm` (main npm packages) and `release-pypi` — the irreversible publishes.
 
 ## Common Customization Steps
 1. Edit or add dictionary entries in `data/dictionary/*.txt`.

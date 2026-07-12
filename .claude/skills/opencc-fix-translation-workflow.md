@@ -100,7 +100,10 @@ When committing, it is recommended to clearly separate or combine, but must incl
 - Dictionary text file changes (`.txt`)
 - Core test changes (`test/testcases/testcases.json`)
 
+Follow the project commit style: action-verb first line, no conventional-commit
+prefix (no `Fix:` / `feat:` etc.), and no `Co-Authored-By` trailers.
+
 ```bash
 git add data/dictionary/TWPhrases.txt test/testcases/testcases.json
-git commit -m "Fix(Dictionary): correct conversion for 'XYZ'"
+git commit -m "Correct s2twp conversion for 方程式"
 ```

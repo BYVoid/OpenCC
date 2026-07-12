@@ -43,6 +43,7 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 * [Fedora](https://packages.fedoraproject.org/pkgs/opencc/opencc/)
 * [Arch Linux](https://archlinux.org/packages/extra/x86_64/opencc/)
 * [macOS (Homebrew)](https://formulae.brew.sh/formula/opencc)
+    * 使用 `brew install opencc` 命令可安裝命令行工具；formula 更新至 1.4.1 後將包含 Jieba 分詞插件
 * [WinGet](https://github.com/microsoft/winget-pkgs/tree/master/manifests/b/BYVoid/OpenCC)
     * 使用 `winget install opencc` 命令可直接安裝 opencc.exe 應用程式，含 Jieba 分詞插件
 * [Bazel](https://registry.bazel.build/modules/opencc)
@@ -57,7 +58,7 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 
 OpenCC 1.4.1 修復 `opencc` npm 套件在無預編譯二進制平台上源碼編譯安裝失敗的
 問題，並包含一批詞庫修正；C++ ABI 與 1.4.0 相同（SOVERSION 1.4），自 1.4.0
-升級的下游 C++ 程式無需重新鏈結。
+升級的下游 C++ 程式無需重新連結。
 
 * Windows (x86_64): [OpenCC-1.4.1](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.1/OpenCC-1.4.1-windows-x64-portable.zip) ([SHA-256](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.1/OpenCC-1.4.1-windows-x64-portable.zip.sha256))
     * This Windows release is available from WinGet. For details, see [doc/windows-winget-release.md](doc/windows-winget-release.md).
@@ -358,7 +359,7 @@ OpenCC now supports external C++ segmentation plugins. The first plugin is
 注意：
 
 - 該插件機制目前仍為試驗性功能。
-- `jieba` 插件是可選組件，預設 OpenCC 構建、Python 套件和 Node.js 套件都不要求它。
+- `jieba` 插件是可選組件，Python 套件和 Node.js 套件都不要求它。自 1.4.1 起，macOS 上的頂層 CMake 構建（含 Homebrew）預設啓用該插件（`BUILD_OPENCC_JIEBA_PLUGIN=ON`）；其他平台與以子項目方式引入的構建預設仍為關閉。
 - `opencc-jieba` 額外依賴 `cppjieba` 及其配套詞典資源，這些依賴僅在構建或分發該插件時需要。
 - 在下一次正式發布版本之前，插件 ABI 仍可能發生變化，不應視為穩定介面。
 - 我們預計從下一次正式發布版本開始，將插件 ABI 視為穩定介面。
@@ -367,8 +368,10 @@ OpenCC now supports external C++ segmentation plugins. The first plugin is
 Notes:
 
 - The plugin mechanism is currently experimental.
-- The `jieba` plugin is optional and is not required for the default OpenCC
-  build, Python package, or Node.js package.
+- The `jieba` plugin is optional and is not required by the Python package or
+  the Node.js package. Since 1.4.1, top-level CMake builds on macOS (including
+  Homebrew) enable the plugin by default (`BUILD_OPENCC_JIEBA_PLUGIN=ON`);
+  other platforms and subproject builds keep it disabled by default.
 - `opencc-jieba` additionally depends on `cppjieba` and its dictionary
   resources. These dependencies are only needed when building or distributing
   the plugin itself.

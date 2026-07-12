@@ -4,7 +4,7 @@
 
 2026年7月12日
 
-* **發佈重點**：修復 `opencc` npm 套件在沒有預編譯二進制的平台（如 Intel Mac）上退回源碼編譯時，因源碼包缺少檔案而安裝失敗的問題，並新增 darwin-x64（Intel Mac）預編譯 npm 套件；另包含一批詞庫修正、`.ocd` 字典跨平台輸出修復與 Debian 打包流程重建。C++ ABI 與 1.4.0 相同（SOVERSION 1.4），下游程式無需重新鏈結。
+* **發佈重點**：修復 `opencc` npm 套件在沒有預編譯二進制的平台（如 Intel Mac）上退回源碼編譯時，因源碼包缺少檔案而安裝失敗的問題，並新增 darwin-x64（Intel Mac）預編譯 npm 套件；另包含一批詞庫修正、`.ocd` 字典跨平台輸出修復與 Debian 打包流程重建。C++ ABI 與 1.4.0 相同（SOVERSION 1.4），下游程式無需重新連結。
 * **詞庫更新**：
     * 修正「托 / 託」候選順序：`s2t` 中 `托` 預設保留不轉換（如 `托着`、`茶托`、人名音譯），並補充「託」委託義的詞組轉換（[#1405](https://github.com/BYVoid/OpenCC/pull/1405)）。
     * 依《通用規範漢字表》與《現代漢語詞典》修正「牴 → 抵」，以及「復 / 複 / 覆」相關轉換（[#758](https://github.com/BYVoid/OpenCC/pull/758)）。
@@ -57,7 +57,7 @@
     * 純 `union` 詞典組中的單詞典前綴匹配新增 fast-path，減少不必要的群組遍歷（[#1367](https://github.com/BYVoid/OpenCC/pull/1367)）。
     * 從 filesystem 或 resource zip 載入 `.txt` 格式詞典時，runtime 會直接構建 in-memory Darts 字典，提升初始化和長文本前綴匹配效能；新增 `SpeedBenchmark` Bazel 目標供後續基準測試使用（[#1376](https://github.com/BYVoid/OpenCC/pull/1376)）。
 * **C++ ABI / API**：
-    * SOVERSION 從 1.3 升至 1.4，避免已鏈結 `libopencc.so.1.3` 的舊 C++ 下游程式靜默載入 1.3.2 之後 ABI 不相容的 OpenCC；下游程式需重新鏈結（[#1377](https://github.com/BYVoid/OpenCC/pull/1377)）。
+    * SOVERSION 從 1.3 升至 1.4，避免已連結 `libopencc.so.1.3` 的舊 C++ 下游程式靜默載入 1.3.2 之後 ABI 不相容的 OpenCC；下游程式需重新連結（[#1377](https://github.com/BYVoid/OpenCC/pull/1377)）。
     * 修復啟用 `normalization` 前處理時 `Converter::GetConversionChain()` 返回空指標的問題；現在配置載入器會保留主 `conversion_chain` 供 librime 等下游 introspection 使用，`PipelineConverter` 本身仍保留「無單一 conversion chain」語義（[#1380](https://github.com/BYVoid/OpenCC/pull/1380)）。
     * 清理公開標頭安裝範圍：`DictConverter.hpp`、`PhraseExtract.hpp`、`UTF8StringSlice.hpp`、`BinaryDict.hpp`、`DartsDict.hpp` 不再安裝至 `include/opencc/`；`DictGroup.hpp`、`MaxMatchSegmentation.hpp`、`MarisaDict.hpp` 等配置可見或插件／字典支援標頭仍保留公開（[#1380](https://github.com/BYVoid/OpenCC/pull/1380)）。
 * **Node.js / Python / 構建系統**：

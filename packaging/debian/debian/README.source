@@ -5,12 +5,12 @@ checkout of upstream BYVoid/OpenCC (e.g. `cp -r packaging/debian/debian
 <upstream-checkout>/debian`) and run `dpkg-buildpackage` from there.
 
 This debian/ directory is authored against upstream BYVoid/OpenCC's file
-layout at 1.4.0, and was validated by running `dpkg-buildpackage -us -uc
+layout at 1.4.1, and was validated by running `dpkg-buildpackage -us -uc
 -b` against a clean checkout of upstream `master` (all six binary
 packages build, `dh_missing --fail-missing` finds nothing unclaimed,
 `ctest` passes 19/19, and `lintian --pedantic` reports no errors). It
 authored strictly against the file layout present in the upstream source
-tree at 1.4.0 — building it against any checkout that contains files
+tree at 1.4.1 — building it against any checkout that contains files
 beyond what upstream ships will cause dh_missing to fail on those extra
 files.
 

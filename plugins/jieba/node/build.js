@@ -97,6 +97,9 @@ run('cmake', [
   '-DBUILD_OPENCC_JIEBA_PLUGIN=ON',
   '-DENABLE_GTEST=OFF',
   '-DENABLE_BENCHMARK=OFF',
+  // Match the minimum macOS version of the Bazel-built opencc npm binaries;
+  // without this the plugin inherits the build host's OS version as minos.
+  ...(platform === 'darwin' ? ['-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0'] : []),
 ]);
 
 run('cmake', [

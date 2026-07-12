@@ -1,3 +1,18 @@
+opencc (1.4.1-1) UNRELEASED; urgency=medium
+
+  * Update packaging for the upstream 1.4.1 release:
+    - Rebase 0004 (use system-installed googletest) against 1.4.1; the
+      ENABLE_GTEST block gained a bundled-source existence check that
+      shifted the hunk context. 0003, 0005 and 0009 apply unchanged. All
+      four patches verified with `patch -p1 --fuzz=0` against upstream
+      1.4.1 sources.
+    - Drop usr/bin/cppjieba_dict from opencc-jieba.install: upstream now
+      generates the merged Jieba dictionary with the regular opencc_dict
+      tool (shipped in the opencc package) and no longer builds or
+      installs a separate dictionary helper.
+
+ -- Frank Lin <github@linshuang.info>  Sat, 11 Jul 2026 00:00:00 +0000
+
 opencc (1.4.0-1) UNRELEASED; urgency=medium
 
   * Recreate the Debian packaging flow on top of the existing

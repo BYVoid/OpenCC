@@ -9,7 +9,7 @@ It is not the authoritative Debian packaging source.
 
 This patch set is based on:
 
-- Upstream: BYVoid/OpenCC `ver.1.4.0`
+- Upstream: BYVoid/OpenCC `ver.1.4.1`
 - Debian source package: `opencc 1.3.1+ds1-3`
 - Debian packaging repository:
   https://salsa.debian.org/debian/opencc
@@ -29,9 +29,9 @@ This is the complete active set.
 
 Patch numbering reflects historical Debian quilt ordering and is not contiguous.
 
-## 3. Patch status against upstream 1.4.0
+## 3. Patch status against upstream 1.4.1
 
-All patches have been re-based against upstream `1.4.0` and verified to apply cleanly:
+All patches have been re-based against upstream `1.4.1` and verified to apply cleanly:
 
 - `patch -p1 --fuzz=0` compatibility
 - tested in clean upstream checkout

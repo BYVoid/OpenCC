@@ -64,7 +64,8 @@ prebuilds/<current-platform>-<current-arch>/opencc.node
 The release workflow runs the Bazel build script separately on the runner for
 each scoped binary target. The main `opencc` package still keeps `binding.gyp`
 and source files so installs on platforms without a scoped binary package can
-fall back to `node-gyp-build`.
+fall back to `node-gyp-build`. This fallback is planned for removal in a
+future release, after which all Node builds will use Bazel exclusively.
 
 ## Prepare scoped binary packages
 

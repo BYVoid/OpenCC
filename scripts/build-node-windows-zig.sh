@@ -69,7 +69,7 @@ set +e
   -w \
   -Wno-nullability-completeness \
   -DNDEBUG \
-  '-DOPENCC_VERSION="1.4.0"' \
+  '-DOPENCC_VERSION="1.4.1"' \
   -DNAPI_DISABLE_CPP_EXCEPTIONS \
   -DOpencc_BUILT_AS_STATIC \
   -I. \

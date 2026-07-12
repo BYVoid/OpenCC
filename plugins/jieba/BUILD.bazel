@@ -75,19 +75,8 @@ genrule(
         "//plugins/jieba/deps/cppjieba:dict/user.dict.utf8",
     ],
     outs = ["jieba_dict/jieba_merged.ocd2"],
-    cmd = "$(location :opencc_jieba_dict_build_tool) -i $(location //plugins/jieba/deps/cppjieba:dict/jieba.dict.utf8) -i $(location //plugins/jieba/deps/cppjieba:dict/user.dict.utf8) -o $@",
-    tools = [":opencc_jieba_dict_build_tool"],
-)
-
-cc_binary(
-    name = "opencc_jieba_dict_build_tool",
-    srcs = ["tools/JiebaDictBuildTool.cpp"],
-    deps = [
-        "//src:dict_lib",
-        "//src:dict_entry_lib",
-        "//src:lexicon_lib",
-        "//src:marisa_dict_lib",
-    ],
+    cmd = "$(location //src/tools:dict_converter) --from cppjieba_utf8 --to ocd2 --input $(location //plugins/jieba/deps/cppjieba:dict/jieba.dict.utf8) --input $(location //plugins/jieba/deps/cppjieba:dict/user.dict.utf8) --output $@",
+    tools = ["//src/tools:dict_converter"],
 )
 
 cc_test(

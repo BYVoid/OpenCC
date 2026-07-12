@@ -20,6 +20,7 @@
 * **Node.js**：
     * 修復 npm 源碼包缺少 `src/ConfigBasedConverter.hpp`、`src/PipelineConverter.cpp/.hpp`、`src/SingleStageConverter.cpp/.hpp`、`src/opencc_config_schema.inc` 六個編譯所需檔案，導致 `npm install` 源碼編譯失敗（[#1409](https://github.com/BYVoid/OpenCC/issues/1409), [#1411](https://github.com/BYVoid/OpenCC/pull/1411)）。
     * 新增 `@opencc/opencc-darwin-x64` 與 `@opencc/opencc-jieba-darwin-x64` 預編譯套件，Intel Mac 不再需要源碼編譯（[#1411](https://github.com/BYVoid/OpenCC/pull/1411)）。
+    * `opencc-jieba` 預編譯二進制的 macOS 最低版本從構建機的 15.0 降至 11.0，與 `opencc` 主套件的預編譯二進制一致。
     * `prepack` 驗證腳本新增 gyp 源碼與 `#include` 閉包檢查，確保源碼編譯所需的所有檔案都在 npm 包的 `files` 白名單內，防止同類問題再次發生。
     * CI 新增「從 `npm pack` 產出的 tarball 進行源碼編譯並安裝」的測試（ubuntu / macOS ARM / macOS Intel），覆蓋無預編譯二進制平台的實際安裝路徑。
     * JavaScript API 支援以 inline config 物件建立轉換器，保留原有字串配置行為；並覆蓋 bundled assets、自定義配置目錄與 tofu-risk 過濾的測試（[#1412](https://github.com/BYVoid/OpenCC/pull/1412)）。

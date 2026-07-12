@@ -1,9 +1,11 @@
 name: Build and upload python package to PyPI
 
+# PyPI uploads are irreversible (a version can be yanked but its file names
+# can never be reused), so this workflow runs only when the GitHub release is
+# published, not when the tag is pushed and the release is still a draft.
 on:
-  push:
-    tags:
-      - "ver.*"
+  release:
+    types: [published]
   workflow_dispatch:
 
 jobs:

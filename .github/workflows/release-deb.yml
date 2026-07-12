@@ -2,6 +2,11 @@ name: Debian Packages
 
 on:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Existing release tag to upload the built packages to, for example ver.1.4.1. Leave empty to only build artifacts."
+        required: false
+        type: string
   push:
     tags:
       - "ver.*"
@@ -22,7 +27,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            debhelper cmake ninja-build pkg-config doxygen \
+            build-essential debhelper cmake ninja-build pkg-config doxygen \
             libmarisa-dev rapidjson-dev libtclap-dev \
             googletest libgtest-dev
 
@@ -72,7 +77,7 @@ jobs:
           sudo dpkg --add-architecture arm64
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            debhelper cmake ninja-build pkg-config \
+            build-essential debhelper cmake ninja-build pkg-config \
             crossbuild-essential-arm64 \
             libmarisa-dev:arm64 rapidjson-dev libtclap-dev \
             googletest libgtest-dev
@@ -114,11 +119,19 @@ jobs:
             -l packaging/debian/debian/changelog -S version)
           echo "value=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Assemble zip with checksums
+      - name: Assemble per-architecture zips with checksums
         run: |
           cd dist
-          sha256sum ./*.deb > SHA256SUMS
-          zip "opencc-${{ steps.version.outputs.value }}-deb.zip" ./*.deb SHA256SUMS
+          version="${{ steps.version.outputs.value }}"
+          for arch in amd64 arm64; do
+            stage="deb-$arch-stage"
+            mkdir "$stage"
+            cp ./*_"$arch".deb "$stage"/
+            cp ./*_all.deb "$stage"/
+            (cd "$stage" && sha256sum ./*.deb > SHA256SUMS && \
+             zip "../opencc-$version-deb-$arch.zip" ./*.deb SHA256SUMS)
+            rm -r "$stage"
+          done
 
       - uses: actions/upload-artifact@v4
         with:
@@ -126,16 +139,16 @@ jobs:
           path: dist/opencc-*.zip
 
       - name: Upload to GitHub release
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') || inputs.release_tag != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          tag="${{ github.ref_name }}"
+          tag="${{ inputs.release_tag || github.ref_name }}"
           for i in $(seq 1 30); do
             gh release view "$tag" --json isDraft > /dev/null 2>&1 && break
             echo "Waiting for release $tag to be created ($i/30)..."
             sleep 10
           done
           gh release upload "$tag" \
-            "dist/opencc-${{ steps.version.outputs.value }}-deb.zip" \
+            dist/opencc-*-deb-*.zip \
             --clobber

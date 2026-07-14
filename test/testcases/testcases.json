@@ -460,6 +460,21 @@
       }
     },
     {
+      "id": "case_063_s2x",
+      "input": "赛后复盘 覆盘难照",
+      "expected": {
+        "s2t": "賽後復盤 覆盤難照",
+        "s2tw": "賽後復盤 覆盤難照"
+      }
+    },
+    {
+      "id": "case_064_t2x",
+      "input": "賽後復盤 覆盤難照",
+      "expected": {
+        "t2s": "赛后复盘 覆盘难照"
+      }
+    },
+    {
       "id": "BYVoid_OpenCC_Issue_475_s2twp",
       "input": "仙童半导体厂 人工智能借用",
       "expected": {

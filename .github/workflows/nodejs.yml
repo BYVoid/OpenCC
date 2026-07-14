@@ -11,6 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Build the addon and prebuild assets with Bazel (the same path the npm
+  # release uses), then run the Node.js tests against the prebuild layout.
   build-and-test:
     permissions:
       contents: read
@@ -27,12 +29,19 @@ jobs:
             node-version: 24
           - os: macos-15-intel
             node-version: 24
-          - os: windows-2022
+          - os: windows-2025-vs2026
             node-version: 24
     steps:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
+      - name: Best-effort Defender exclusions
+        if: runner.os == 'Windows'
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          Add-MpPreference -ExclusionPath "$env:GITHUB_WORKSPACE" `
+            -ExclusionProcess "bazel.exe","bazelisk.exe","python.exe","cl.exe","link.exe"
       - name: Compute version
         id: version
         shell: bash
@@ -45,17 +54,38 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm ci
-      - run: npm test
-      - name: Build Node.js prebuild
-        if: ${{ matrix.node-version == 24 }}
-        run: npm run prebuild
+      - uses: bazel-contrib/setup-bazel@0.19.0
+        with:
+          bazelisk-cache: true
+          repository-cache: true
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Configure BuildBuddy
+        if: (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && runner.os != 'Windows'
+        shell: bash
+        env:
+          BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
+        run: |
+          if [ -n "${BUILDBUDDY_API_KEY}" ]; then
+            {
+              echo "build --config=buildbuddy"
+              echo "build --remote_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
+              echo "build --bes_header=x-buildbuddy-api-key=${BUILDBUDDY_API_KEY}"
+            } >> .bazelrc.user
+            echo "BuildBuddy enabled."
+          else
+            echo "BUILDBUDDY_API_KEY not set; skipping BuildBuddy config."
+          fi
+      - run: npm ci --omit=optional
+      - name: Build Node.js prebuild with Bazel
+        shell: bash
+        run: ./scripts/build-node-prebuild-bazel.sh
       - name: Verify Node.js prebuild layout
-        if: ${{ matrix.node-version == 24 }}
         run: |
           node -e "const fs=require('fs'); const path=require('path'); const dirs=fs.readdirSync('prebuilds',{withFileTypes:true}).filter((entry)=>entry.isDirectory()).map((entry)=>entry.name); if(!dirs.includes('assets')) throw new Error('missing prebuilds/assets'); const platformDirs=dirs.filter((name)=>name!=='assets'); if(platformDirs.length!==1) throw new Error('expected one platform prebuild directory, found '+platformDirs.join(',')); const addon=path.join('prebuilds', platformDirs[0], 'opencc.node'); if(!fs.existsSync(addon)) throw new Error('missing '+addon); console.log('Verified '+addon+' with shared assets');"
-      - name: Test Node.js prebuild
-        if: ${{ matrix.node-version == 24 }}
+      - name: Test
         env:
           PREBUILDS_ONLY: 1
         run: npm test
@@ -65,7 +95,6 @@ jobs:
         with:
           name: opencc-${{ env.VERSION }}-nodejs-${{ matrix.os }}-node-${{ matrix.node-version }}
           path: |
-            node/build/**
             prebuilds/**
             **/npm-debug.log
 

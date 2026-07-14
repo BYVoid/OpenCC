@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 #
 # Build opencc.node with Bazel and copy it to the npm prebuilds directory.
-# Usage: ./scripts/build-node-prebuild-bazel.sh <target>
+# Usage: ./scripts/build-node-prebuild-bazel.sh [<target>]
+# With no argument, builds for the host platform.
 
 set -euo pipefail
 
@@ -18,7 +19,7 @@ esac
 
 usage() {
   cat >&2 <<'EOF'
-Usage: ./scripts/build-node-prebuild-bazel.sh <target>
+Usage: ./scripts/build-node-prebuild-bazel.sh [<target>]
 
 Supported targets:
   darwin-arm64
@@ -26,15 +27,22 @@ Supported targets:
   linux-arm64
   linux-x64
   win32-x64
+
+With no argument, builds for the host platform.
 EOF
 }
 
-if [[ $# -ne 1 ]]; then
+if [[ $# -gt 1 ]]; then
   usage
   exit 2
 fi
 
-target="$1"
+if [[ $# -eq 1 ]]; then
+  target="$1"
+else
+  target="$(node -p "process.platform + '-' + process.arch")"
+  echo "No target specified; defaulting to host target $target."
+fi
 case "$target" in
   darwin-arm64|darwin-x64|linux-arm64|linux-x64|win32-x64)
     ;;

@@ -192,17 +192,20 @@ ctest --test-dir build --output-on-failure
 
 ### Node.js 測試
 
-Node.js binding 與 npm CLI 修改請執行：
+Node.js binding 與 npm CLI 修改請執行（addon 以 Bazel 構建，源碼倉庫內
+`npm install` 不會再觸發 node-gyp 編譯）：
 
 ```bash
-npm install
+npm install --omit=optional
+./scripts/build-node-prebuild-bazel.sh
 npm test
 ```
 
-驗證 npm prebuild 佈局時：
+`build-node-prebuild-bazel.sh` 會產生 `prebuilds/<platform>-<arch>/opencc.node`
+與共用資源 `prebuilds/assets/`，與 npm 發佈使用的佈局一致。如需確保測試只使用
+prebuild 佈局（忽略本地 `build/Release`）：
 
 ```bash
-npm run prebuild
 PREBUILDS_ONLY=1 npm test
 ```
 

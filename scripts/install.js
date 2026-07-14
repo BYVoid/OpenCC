@@ -9,12 +9,20 @@ const scopedPackageName = `@opencc/opencc-${process.platform}-${process.arch}`;
 const isSourceCheckout = fs.existsSync(path.join(packageRoot, '.git'));
 
 // In a source checkout, the native addon is built with Bazel, not node-gyp
-// (see CONTRIBUTING.md). Skip the npm-install source build entirely.
-if (isSourceCheckout) {
+// (see CONTRIBUTING.md), so the npm-install source build is skipped unless
+// the standard npm escape hatch is set (`npm install --build-from-source`,
+// or the npm_config_build_from_source environment variable, as used by the
+// AppVeyor npm packaging job).
+const buildFromSource = !['', 'false', '0'].includes(
+  String(process.env.npm_config_build_from_source || '').toLowerCase()
+);
+if (isSourceCheckout && !buildFromSource) {
   console.log(
     'opencc: source checkout detected; skipping the node-gyp install build.\n' +
     'opencc: run ./scripts/build-node-prebuild-bazel.sh to build the addon ' +
-    'with Bazel before `npm test`.'
+    'with Bazel before `npm test`,\n' +
+    'opencc: or re-run with `npm install --build-from-source` for the ' +
+    'node-gyp build.'
   );
   process.exit(0);
 }

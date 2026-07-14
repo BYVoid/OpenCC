@@ -27,16 +27,22 @@ if (isSourceCheckout && !buildFromSource) {
   process.exit(0);
 }
 
-try {
-  const scopedPackage = require(require.resolve(scopedPackageName, {
-    paths: [packageRoot],
-  }));
-  if (scopedPackage && scopedPackage.binaryPath) {
-    process.exit(0);
-  }
-} catch (error) {
-  if (!error || error.code !== 'MODULE_NOT_FOUND') {
-    throw error;
+// An installed scoped binary package satisfies the install, but never in a
+// source checkout (its published addon and dictionaries would shadow the
+// checked-out sources) and never when build-from-source explicitly asks for
+// a local compile.
+if (!isSourceCheckout && !buildFromSource) {
+  try {
+    const scopedPackage = require(require.resolve(scopedPackageName, {
+      paths: [packageRoot],
+    }));
+    if (scopedPackage && scopedPackage.binaryPath) {
+      process.exit(0);
+    }
+  } catch (error) {
+    if (!error || error.code !== 'MODULE_NOT_FOUND') {
+      throw error;
+    }
   }
 }
 

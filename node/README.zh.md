@@ -11,9 +11,10 @@ npm install opencc
 
 本套件需要 Node.js `>=20.17`。
 
-OpenCC 會隨套件提供原生綁定。當有符合目前平台的預編譯二進位檔時，
-安裝時會自動使用；否則 npm 會從原始碼建置原生 addon，這需要可用的
-C++ 工具鏈，以及 `node-gyp` 支援的 Python。
+OpenCC 以預編譯二進位檔提供原生綁定。安裝時會自動選取符合目前平台的
+`@opencc/opencc-<platform>-<arch>` 套件，涵蓋 macOS（x64/arm64）、
+Linux（x64/arm64）與 Windows（x64）。沒有預編譯二進位套件的平台
+不支援 `npm install`。
 
 ## 基本用法
 

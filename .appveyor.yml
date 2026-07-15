@@ -13,8 +13,11 @@ init:
 
 environment:
   matrix:
-    # Build Node.js
+    # Build Node.js. The native addon is built with Bazel (there is no
+    # node-gyp source build anymore); use a VS2022 worker for the Bazel
+    # MSVC toolchain.
     - nodejs_version: stable
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
 
     # Build plain C++
     - nodejs_version: none
@@ -32,15 +35,16 @@ for:
   install:
     - ps: Install-Product node $env:nodejs_version $env:platform
     - npm -g i npm@latest
+    - appveyor-retry choco install bazelisk -y --no-progress
   build_script:
-    - set npm_config_build_from_source=true&& appveyor-retry call npm install
+    - appveyor-retry call npm install --omit=optional
+    - echo [opencc npm package] building opencc win32-x64 prebuild with Bazel
+    - bash scripts/build-node-prebuild-bazel.sh win32-x64
   test_script:
-    - npm test
+    - set PREBUILDS_ONLY=1&& npm test
   after_test:
     - chcp 65001
-    - echo [opencc npm package] building opencc win32-x64 prebuild
-    - if exist prebuilds rmdir /S /Q prebuilds
-    - npm run prebuild
+    - echo [opencc npm package] verifying opencc win32-x64 prebuild layout
     - if exist prebuilds\darwin-arm64 exit /B 1
     - if exist prebuilds\linux-x64 exit /B 1
     - if exist prebuilds\linux-arm64 exit /B 1

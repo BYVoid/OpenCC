@@ -192,9 +192,7 @@ ctest --test-dir build --output-on-failure
 
 ### Node.js 測試
 
-Node.js binding 與 npm CLI 修改請執行（addon 以 Bazel 構建，源碼倉庫內
-`npm install` 不會再觸發 node-gyp 編譯；如需舊的 node-gyp 構建，可用
-`npm install --build-from-source`）：
+Node.js binding 與 npm CLI 修改請執行（addon 以 Bazel 構建）：
 
 ```bash
 npm install --omit=optional

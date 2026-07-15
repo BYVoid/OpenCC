@@ -58,8 +58,8 @@ function prepareArtifacts(root = path.join(__dirname, '..')) {
 
   if (jsonCount === 0 || dictionaryCount === 0) {
     throw new Error(
-      'Could not prepare Node.js prebuild assets. Run `npm run prebuild` first, ' +
-      'or run `bazel build -c opt //data/dictionary:binary_dictionaries` before this script.'
+      'Could not prepare Node.js prebuild assets. Run ' +
+      '`bazel build -c opt //data/dictionary:binary_dictionaries` before this script.'
     );
   }
 }

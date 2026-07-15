@@ -1,5 +1,10 @@
 # Change History of OpenCC
 
+## Unreleased
+
+* **Node.js**：
+    * 移除 `binding.gyp` / node-gyp 源碼編譯 fallback：`opencc` npm 套件的原生 addon 現在只透過 `@opencc/opencc-<platform>-<arch>` 預編譯 scoped 套件安裝（涵蓋 macOS x64/arm64、Linux x64/arm64、Windows x64，均以 Bazel 構建）。沒有預編譯二進位套件的平台不再支援 `npm install`。npm tarball 隨之不再攜帶 C++ 源碼、`deps/` 與字典源檔，體積大幅縮小；`node-gyp`、`node-gyp-build`、`node-addon-api`、`prebuildify` 依賴與 `install` / `prebuild` npm scripts 一併移除。
+
 ## Version 1.4.1
 
 2026年7月12日

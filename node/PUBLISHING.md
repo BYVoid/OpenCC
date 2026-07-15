@@ -5,14 +5,14 @@ family.
 
 The current npm layout is split by platform:
 
-- `opencc` contains the JavaScript API, CLI, TypeScript declarations, source
-  fallback, and runtime dictionary/config assets.
+- `opencc` contains the JavaScript API, CLI, TypeScript declarations, and
+  runtime dictionary/config assets.
 - `@opencc/opencc-<platform>-<arch>` contains exactly one native
   `opencc.node` binary for one platform.
 
-The split-package layout is experimental. It keeps the main npm package smaller
-while preserving source-build fallback for platforms without a scoped binary
-package.
+The native addon comes exclusively from the scoped binary packages. There is
+no source-build fallback: platforms without a scoped binary package are not
+supported by `npm install`.
 
 ## Package names
 
@@ -34,8 +34,8 @@ binary refresh, publish all scoped packages at the same version as `opencc`.
 
 - npm account access to publish `opencc`.
 - npm organization access to publish public packages under `@opencc`.
-- Node.js, npm, Python, and a native C++ build toolchain for the target
-  platform.
+- Node.js, npm, Python, Bazel (bazelisk), and a native C++ build toolchain
+  for the target platform.
 - GitHub Actions or another set of machines covering each supported target
   platform.
 
@@ -64,11 +64,10 @@ prebuilds/assets/*.ocd2
 prebuilds/<current-platform>-<current-arch>/opencc.node
 ```
 
-The release workflow runs the Bazel build script separately on the runner for
-each scoped binary target. The main `opencc` package still keeps `binding.gyp`
-and source files so installs on platforms without a scoped binary package can
-fall back to `node-gyp-build`. This fallback is planned for removal in a
-future release, after which all Node builds will use Bazel exclusively.
+The release workflow (`release-npm-binaries`) runs the Bazel build script
+separately on the runner for each scoped binary target. All Node builds use
+Bazel exclusively; the former `binding.gyp`/node-gyp source-build fallback has
+been removed.
 
 ## Prepare scoped binary packages
 
@@ -105,8 +104,9 @@ Dry-run the main package:
 npm pack --dry-run
 ```
 
-The main package tarball should contain `node/`, `src/`, `data/`, source build
-files, and `prebuilds/assets/`, but not `prebuilds/<platform>/opencc.node`.
+The main package tarball should contain the JavaScript API and CLI under
+`node/`, the TypeScript declarations, and `prebuilds/assets/`, but no C++
+sources and not `prebuilds/<platform>/opencc.node`.
 
 Dry-run each scoped package:
 
@@ -167,15 +167,18 @@ node -e "const OpenCC = require('opencc'); const cc = new OpenCC('s2twp'); conso
 
 The install should pull exactly one matching `@opencc/opencc-<platform>-<arch>`
 optional package for the current machine. If no scoped binary package is
-available, the install script falls back to `node-gyp-build`.
+available, requiring `opencc` fails with an error explaining where the addon
+was looked up.
 
-## Future CI shape
+## CI shape
 
-The intended CI release flow is:
+The CI release flow is:
 
-1. Build each scoped binary package on its matching platform or runner.
-2. Upload scoped package artifacts.
-3. Publish all scoped binary packages with the chosen version and dist-tag.
-4. Publish the main `opencc` package after the scoped packages exist.
+1. `release-npm-binaries` (workflow_dispatch) builds each scoped binary
+   package on its matching platform or runner and publishes them.
+2. Pushing a `ver.*` tag creates the draft GitHub release.
+3. Publishing the release triggers `release-npm`, which packs and publishes
+   the main `opencc` package after verifying the scoped packages exist.
 
-Until that CI flow exists, the local flow above is the source of truth.
+The local flow above remains available for building and publishing a single
+platform by hand.

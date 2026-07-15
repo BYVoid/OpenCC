@@ -28,10 +28,10 @@ This document compiles the Open Chinese Convert (OpenCC) project information to 
 - The command-line tool `opencc_dict` supports `text ↔ ocd2` (and optionally `ocd`) conversion. When adding or adjusting dictionaries, first edit `.txt`, then run the tool to generate the target format.
 
 ## Development and Testing
-- The top-level build system supports CMake, Bazel, Node.js `binding.gyp`, Python `pyproject.toml`, with cross-platform CI integration.
+- The top-level build system supports CMake, Bazel, Python `pyproject.toml`, with cross-platform CI integration. The Node.js native addon is built with Bazel (`//node:opencc`).
 - `src/*Test.cpp`, `data/config/*Test.cpp`, `plugins/jieba/tests/`, `test/`, and `test/golden/` contain tests covering dictionary matching, conversion chains, configuration validation, plugin segmentation, CLI behavior, and golden conversion outputs.
 - Tools `opencc_dict`, `opencc_phrase_extract` (`src/tools/`) help developers convert dictionary formats and extract phrases.
-- Node.js tests live in `node/test.js`. Official npm prebuilt binaries are built with Bazel via `scripts/build-node-prebuild-bazel.sh` (see `node/PUBLISHING.md`); `npm run prebuild` (prebuildify/node-gyp) is no longer the release path, and the `binding.gyp` source fallback is planned for removal.
+- Node.js tests live in `node/test.js`. npm prebuilt binaries are built with Bazel via `scripts/build-node-prebuild-bazel.sh` (see `node/PUBLISHING.md`). The `binding.gyp`/node-gyp source-build fallback has been removed: the native addon is installed exclusively through `@opencc/opencc-<platform>-<arch>` scoped packages, and platforms without one are not supported by `npm install`.
 
 ### C++ ABI Versioning
 - When a change introduces an ABI-incompatible modification to the public C++ interface, bump `OPENCC_ABI_VERSION` in `CMakeLists.txt` so downstream libraries and applications relink instead of silently loading an incompatible `libopencc` shared library.

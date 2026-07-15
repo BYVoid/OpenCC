@@ -17,13 +17,13 @@ cc_library(
     hdrs = ["CommandLineMain.hpp"],
     deps = [
         ":platform_io_lib",
-        "//deps/rapidjson-1.1.0:rapidjson",
         "//src:cmd_line_output_lib",
         "//src:config_lib",
         "//src:conversion_inspection_lib",
         "//src:converter_lib",
         "//src:exception_lib",
         "//src:segments_lib",
+        "@rapidjson//:rapidjson",
     ],
 )
 

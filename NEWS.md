@@ -3,7 +3,7 @@
 ## Unreleased
 
 * **Node.js**：
-    * npm 套件的源碼編譯 fallback 從 node-gyp 改為 Bazel：原生 addon 優先透過 `@opencc/opencc-<platform>-<arch>` 預編譯 scoped 套件安裝（涵蓋 macOS x64/arm64、Linux x64/arm64、Windows x64，均以 Bazel 構建）；沒有預編譯二進位套件的平台，`npm install` 會以 Bazel 現場編譯 `//node:opencc`（`bazel` / `bazelisk` 取自 PATH，或經 `npx` 自動下載 bazelisk），字典一律隨包預編譯、安裝時無需生成。`binding.gyp` 與 `.gypi` 構建定義刪除，`node-gyp`、`node-gyp-build`、`node-addon-api`、`prebuildify` 依賴與 `prebuild` npm script 一併移除；tarball 不再攜帶 `deps/` 與字典源檔，改為攜帶 Bazel workspace 與 `src/` C++ 源碼。
+    * npm 套件的源碼編譯 fallback 從 node-gyp 改為 Bazel：原生 addon 優先透過 `@opencc/opencc-<platform>-<arch>` 預編譯 scoped 套件安裝（涵蓋 macOS x64/arm64、Linux x64/arm64、Windows x64，均以 Bazel 構建，字典隨包預編譯）；沒有預編譯二進位套件的平台，`npm install` 會以 Bazel 完整地從源碼構建——編譯 `//node:opencc` 並重新生成字典（`bazel` / `bazelisk` 取自 PATH，或經 `npx` 自動下載 bazelisk；字典生成腳本的 Python 由 Bazel hermetic 工具鏈提供）。`binding.gyp` 與 `.gypi` 構建定義刪除，`node-gyp`、`node-gyp-build`、`node-addon-api`、`prebuildify` 依賴與 `prebuild` npm script 一併移除；tarball 不再攜帶 `deps/`（C++ 三方依賴改由 Bazel Central Registry 提供），改為攜帶 Bazel workspace、`src/` C++ 源碼與 `data/` 字典源檔。
 
 ## Version 1.4.1
 

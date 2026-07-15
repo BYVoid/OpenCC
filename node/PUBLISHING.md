@@ -11,9 +11,11 @@ The current npm layout is split by platform:
   `opencc.node` binary for one platform.
 
 The native addon normally comes from the scoped binary packages. On platforms
-without one, `npm install` falls back to compiling the addon from source with
-Bazel (`scripts/install.js`); the tarball ships the Bazel workspace and C++
-sources for this, and the dictionary assets are always prebuilt.
+without one, `npm install` falls back to a full Bazel source build
+(`scripts/install.js`): it compiles the addon, regenerates the dictionaries,
+and refreshes `prebuilds/assets`. The tarball ships the Bazel workspace, the
+C++ sources, and the dictionary sources for this; prebuilt assets are still
+included for the scoped-package fast path.
 
 ## Package names
 
@@ -107,8 +109,8 @@ npm pack --dry-run
 
 The main package tarball should contain the JavaScript API and CLI under
 `node/`, the TypeScript declarations, `prebuilds/assets/`, and the Bazel
-workspace plus `src/` C++ sources for the install-time source build, but not
-`prebuilds/<platform>/opencc.node`.
+workspace plus the `src/` C++ sources and `data/` dictionary sources for the
+install-time source build, but not `prebuilds/<platform>/opencc.node`.
 
 Dry-run each scoped package:
 
@@ -169,8 +171,9 @@ node -e "const OpenCC = require('opencc'); const cc = new OpenCC('s2twp'); conso
 
 The install should pull exactly one matching `@opencc/opencc-<platform>-<arch>`
 optional package for the current machine. If no scoped binary package is
-available, the install script compiles the addon from source with Bazel and
-stages it under `prebuilds/<platform>-<arch>/`.
+available, the install script builds from source with Bazel: it compiles the
+addon, stages it under `prebuilds/<platform>-<arch>/`, and regenerates the
+dictionaries into `prebuilds/assets`.
 
 ## CI shape
 

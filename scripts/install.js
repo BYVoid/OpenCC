@@ -5,12 +5,14 @@
 // 1. In a source checkout, skip: developers build with Bazel explicitly
 //    (see CONTRIBUTING.md). `npm install --build-from-source` overrides.
 // 2. If the matching @opencc/opencc-<platform>-<arch> scoped binary package
-//    is installed, nothing to do.
-// 3. Otherwise compile the addon from source with Bazel and stage it under
-//    prebuilds/<platform>-<arch>/opencc.node. Only //node:opencc is built:
-//    the config/dictionary assets ship prebuilt in the npm tarball
-//    (prebuilds/assets), so the source build needs no Python and generates
-//    no dictionaries.
+//    is installed, nothing to do (the prebuilt config/dictionary assets ship
+//    in the tarball under prebuilds/assets).
+// 3. Otherwise build from source with Bazel, exactly like a full prebuild:
+//    compile //node:opencc, regenerate the dictionaries
+//    (//data/dictionary:binary_dictionaries), stage the addon under
+//    prebuilds/<platform>-<arch>/opencc.node, and refresh prebuilds/assets
+//    from the freshly generated dictionaries. Bazel fetches its own hermetic
+//    Python toolchain for the dictionary generation scripts.
 
 const childProcess = require('child_process');
 const fs = require('fs');
@@ -92,13 +94,20 @@ if (!bazel) {
 
 console.log(
   `opencc: no prebuilt binary for ${target}; building the native addon ` +
-  'from source with Bazel...'
+  'and dictionaries from source with Bazel...'
 );
 const build = childProcess.spawnSync(
   bazel.command,
   // --max_idle_secs is a startup option: let the Bazel server exit shortly
   // after the install instead of lingering as a daemon.
-  [...bazel.prefixArgs, '--max_idle_secs=10', 'build', '-c', 'opt', '//node:opencc'],
+  [
+    ...bazel.prefixArgs,
+    '--max_idle_secs=10',
+    'build',
+    '-c', 'opt',
+    '//data/dictionary:binary_dictionaries',
+    '//node:opencc',
+  ],
   { cwd: packageRoot, stdio: 'inherit', shell: runInShell }
 );
 if (build.error || build.status !== 0) {
@@ -119,4 +128,12 @@ fs.rmSync(dest, { force: true });
 fs.copyFileSync(builtAddon, dest);
 // Bazel outputs are read-only; make the staged copy writable for reinstalls.
 fs.chmodSync(dest, 0o755);
-console.log(`opencc: staged source-built addon at prebuilds/${target}/opencc.node`);
+
+// Replace the shipped prebuilds/assets with the freshly generated
+// dictionaries (plus the config JSONs from data/config).
+require('./prepare-node-prebuild-artifacts').prepareArtifacts(packageRoot);
+
+console.log(
+  `opencc: staged source-built addon at prebuilds/${target}/opencc.node ` +
+  'and regenerated prebuilds/assets'
+);

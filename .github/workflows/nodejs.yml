@@ -178,8 +178,8 @@ jobs:
 
   # Install the packed npm tarball without any scoped binary package, so the
   # Bazel source-build fallback in scripts/install.js is exercised exactly as
-  # it runs on platforms without a prebuilt binary (the addon is compiled
-  # from source; the dictionary assets ship prebuilt in the tarball).
+  # it runs on platforms without a prebuilt binary: the addon is compiled
+  # from source and the dictionaries are regenerated into prebuilds/assets.
   pack-source-install:
     name: Bazel source build from npm tarball (${{ matrix.os }})
     permissions:

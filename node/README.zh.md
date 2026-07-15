@@ -14,9 +14,10 @@ npm install opencc
 OpenCC 以預編譯二進位檔提供原生綁定。安裝時會自動選取符合目前平台的
 `@opencc/opencc-<platform>-<arch>` 套件，涵蓋 macOS（x64/arm64）、
 Linux（x64/arm64）與 Windows（x64）。沒有預編譯二進位套件的平台，
-`npm install` 會以 Bazel 從原始碼編譯 addon：需要可用的 C++ 工具鏈與
-網路；`bazel` 或 `bazelisk` 取自 PATH，找不到時會透過 `npx` 自動下載
-bazelisk。字典一律隨套件預編譯提供，源碼編譯只需編譯 addon 本身。
+`npm install` 會以 Bazel 從原始碼構建：編譯 addon 並重新生成字典。
+這需要可用的 C++ 工具鏈與網路；`bazel` 或 `bazelisk` 取自 PATH，
+找不到時會透過 `npx` 自動下載 bazelisk，字典生成腳本所需的 Python
+由 Bazel 自動下載 hermetic 工具鏈，無需系統安裝。
 
 ## 基本用法
 

@@ -45,6 +45,7 @@ set(
 set(
   LIBOPENCC_PRIVATE_HEADERS
   ConfigBasedConverter.hpp
+  ConversionCandidates.hpp
   DictConverter.hpp
   PhraseExtract.hpp
   PipelineConverter.hpp
@@ -59,6 +60,7 @@ set(
   LIBOPENCC_SOURCES
   Config.cpp
   Conversion.cpp
+  ConversionCandidates.cpp
   ConversionChain.cpp
   Converter.cpp
   Dict.cpp
@@ -85,6 +87,7 @@ set(
 
 set(UNITTESTS
   ConfigTest
+  ConversionCandidatesTest
   ConversionChainTest
   ConversionInspectionTest
   ConversionTest
@@ -150,6 +153,11 @@ target_link_libraries(libopencc marisa)
 if (NOT BUILD_SHARED_LIBS)
   target_compile_definitions(libopencc PUBLIC Opencc_BUILT_AS_STATIC)
 endif()
+# Experimental, not-yet-stable API (e.g. Converter::GetConversionCandidates).
+# PRIVATE so the guarded declarations compile into the library but never leak
+# into the installed headers' interface; consumers cannot see the API until it
+# is promoted at the next ABI bump. See src/ConversionCandidates.hpp.
+target_compile_definitions(libopencc PRIVATE OPENCC_ENABLE_UNSTABLE_API)
 # PluginSegmentation.cpp uses LoadLibrary on _WIN32 (MSVC and MinGW).
 # Only non-Windows targets may need libdl for dlopen.
 if (NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -245,6 +253,12 @@ if (ENABLE_GTEST)
       add_dependencies(${TESTCASE} copy_gtest_to_src copy_gtest_main_to_src)
     endif()
   endforeach()
+
+  # ConversionCandidatesTest exercises the experimental
+  # Converter::GetConversionCandidates member, so its own translation unit must
+  # see the guarded declaration. This mirrors the PRIVATE define on libopencc.
+  target_compile_definitions(ConversionCandidatesTest
+                             PRIVATE OPENCC_ENABLE_UNSTABLE_API)
 endif()
 
 # Benchmark

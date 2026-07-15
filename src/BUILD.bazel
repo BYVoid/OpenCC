@@ -40,6 +40,7 @@ cc_library(
         ":common_lib",
         ":config_lib",
         ":conversion_lib",
+        ":conversion_candidates_lib",
         ":conversion_chain_lib",
         ":converter_lib",
         ":darts_dict_lib",
@@ -272,6 +273,49 @@ cc_library(
         ":common_lib",
         ":segmentation_lib",
         ":utf8_util_lib",
+    ],
+)
+
+# Internal, unstable candidate-enumeration API. local_defines (non-propagating)
+# keeps OPENCC_ENABLE_UNSTABLE_API scoped to this library's own sources, so the
+# guarded Converter::GetConversionCandidates member is compiled here without
+# leaking the macro into dependents. ConversionCandidates.hpp is intentionally
+# absent from exports_files, so consumers cannot reach the API until the next
+# ABI bump.
+cc_library(
+    name = "conversion_candidates_lib",
+    srcs = ["ConversionCandidates.cpp"],
+    hdrs = ["ConversionCandidates.hpp"],
+    local_defines = ["OPENCC_ENABLE_UNSTABLE_API"],
+    deps = [
+        ":common_lib",
+        ":conversion_lib",
+        ":conversion_chain_lib",
+        ":converter_lib",
+        ":dict_lib",
+        ":dict_entry_lib",
+        ":utf8_util_lib",
+    ],
+)
+
+cc_test(
+    name = "conversion_candidates_test",
+    size = "small",
+    srcs = ["ConversionCandidatesTest.cpp"],
+    local_defines = ["OPENCC_ENABLE_UNSTABLE_API"],
+    deps = [
+        ":conversion_candidates_lib",
+        ":conversion_lib",
+        ":conversion_chain_lib",
+        ":converter_lib",
+        ":lexicon_lib",
+        ":max_match_segmentation_lib",
+        ":pipeline_converter_lib",
+        ":single_stage_converter_lib",
+        ":test_utils_lib",
+        ":test_utils_utf8_lib",
+        ":text_dict_lib",
+        "@googletest//:gtest_main",
     ],
 )
 

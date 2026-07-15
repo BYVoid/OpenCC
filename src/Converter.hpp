@@ -21,6 +21,7 @@
 #include <cstddef>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "Common.hpp"
 #include "ConversionInspection.hpp"
@@ -74,6 +75,25 @@ public:
    * converter has no single chain (e.g. @c PipelineConverter).
    */
   virtual ConversionChainPtr GetConversionChain() const = 0;
+
+#ifdef OPENCC_ENABLE_UNSTABLE_API
+  /**
+   * Enumerates every candidate form of a single @p word produced by this
+   * converter's conversion chain (e.g. @c s2t expands @c 里 to @c 里 and
+   * @c 裏).  Unlike Convert(), which segments the whole input and returns one
+   * string, this returns all branch values for a single word and is intended
+   * for input-method and tooling use.  Delegates to GetAllConversions(); see
+   * ConversionCandidates.hpp for exact semantics.
+   *
+   * @warning Experimental, unstable API guarded by @c OPENCC_ENABLE_UNSTABLE_API
+   *   and deliberately absent from released headers.  It is @b not part of the
+   *   @c OPENCC_ABI_VERSION contract.  This is currently a non-virtual member so
+   *   that enabling the macro does not alter the vtable; when the API is
+   *   promoted at the next ABI bump the guard is removed and this becomes a
+   *   @c virtual method.
+   */
+  std::vector<std::string> GetConversionCandidates(std::string_view word) const;
+#endif
 };
 
 class OPENCC_EXPORT ConverterStream {

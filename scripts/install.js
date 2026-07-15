@@ -13,6 +13,13 @@
 //    prebuilds/<platform>-<arch>/opencc.node, and refresh prebuilds/assets
 //    from the freshly generated dictionaries. Bazel fetches its own hermetic
 //    Python toolchain for the dictionary generation scripts.
+//
+//    The dictionary rebuild is NOT redundant with the shipped
+//    prebuilds/assets: .ocd2 files are endianness-dependent (both the
+//    marisa trie dump and SerializedValues use native-endian integers), and
+//    the shipped assets are little-endian. Platforms that reach this
+//    fallback include the big-endian ones (e.g. s390x), where the shipped
+//    dictionaries would not load.
 
 const childProcess = require('child_process');
 const fs = require('fs');

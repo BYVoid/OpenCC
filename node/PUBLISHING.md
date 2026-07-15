@@ -10,9 +10,10 @@ The current npm layout is split by platform:
 - `@opencc/opencc-<platform>-<arch>` contains exactly one native
   `opencc.node` binary for one platform.
 
-The native addon comes exclusively from the scoped binary packages. There is
-no source-build fallback: on platforms without a scoped binary package,
-`npm install` succeeds but requiring `opencc` fails at load time.
+The native addon normally comes from the scoped binary packages. On platforms
+without one, `npm install` falls back to compiling the addon from source with
+Bazel (`scripts/install.js`); the tarball ships the Bazel workspace and C++
+sources for this, and the dictionary assets are always prebuilt.
 
 ## Package names
 
@@ -66,8 +67,8 @@ prebuilds/<current-platform>-<current-arch>/opencc.node
 
 The release workflow (`release-npm-binaries`) runs the Bazel build script
 separately on the runner for each scoped binary target. All Node builds use
-Bazel exclusively; the former `binding.gyp`/node-gyp source-build fallback has
-been removed.
+Bazel exclusively — including the install-time source-build fallback, which
+replaced the former `binding.gyp`/node-gyp build.
 
 ## Prepare scoped binary packages
 
@@ -105,8 +106,9 @@ npm pack --dry-run
 ```
 
 The main package tarball should contain the JavaScript API and CLI under
-`node/`, the TypeScript declarations, and `prebuilds/assets/`, but no C++
-sources and not `prebuilds/<platform>/opencc.node`.
+`node/`, the TypeScript declarations, `prebuilds/assets/`, and the Bazel
+workspace plus `src/` C++ sources for the install-time source build, but not
+`prebuilds/<platform>/opencc.node`.
 
 Dry-run each scoped package:
 
@@ -167,8 +169,8 @@ node -e "const OpenCC = require('opencc'); const cc = new OpenCC('s2twp'); conso
 
 The install should pull exactly one matching `@opencc/opencc-<platform>-<arch>`
 optional package for the current machine. If no scoped binary package is
-available, requiring `opencc` fails with an error explaining where the addon
-was looked up.
+available, the install script compiles the addon from source with Bazel and
+stages it under `prebuilds/<platform>-<arch>/`.
 
 ## CI shape
 

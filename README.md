@@ -80,10 +80,11 @@ https://opencc.js.org/converter?config=s2t
 
 The npm package supports Node.js `>=20.17`. The native addon is installed
 through prebuilt `@opencc/opencc-<platform>-<arch>` packages covering macOS
-(x64/arm64), Linux (x64/arm64), and Windows (x64). Platforms without a
-prebuilt binary package are unsupported: `npm install` itself succeeds
-there, but loading `opencc` fails with an error listing the addon lookup
-locations.
+(x64/arm64), Linux (x64/arm64), and Windows (x64). On platforms without a
+prebuilt binary package, `npm install` compiles the addon from source with
+Bazel, which requires a C++ toolchain and network access; Bazel is found on
+PATH (`bazel` or `bazelisk`) or fetched automatically via `npx`.
+Dictionaries always ship prebuilt in the package.
 
 Bun and Deno can also use the npm package through their npm compatibility
 support.

@@ -100,9 +100,8 @@ jobs:
 
   # Pack the main npm tarball plus the Bazel-built scoped binary package for
   # the host platform, install both together, and smoke test — mirroring how
-  # a release install resolves the native addon. There is no source-build
-  # fallback anymore: on platforms without a scoped binary package, npm
-  # install succeeds but requiring opencc fails at load time.
+  # a release install resolves the native addon on platforms with a prebuilt
+  # binary.
   pack-install:
     name: Install packed npm tarballs (${{ matrix.os }})
     permissions:
@@ -175,4 +174,62 @@ jobs:
             const converted = converter.convertSync("汉字");
             assert.strictEqual(converted, "漢字");
             console.log("Packed opencc converts 汉字 ->", converted);
+          '
+
+  # Install the packed npm tarball without any scoped binary package, so the
+  # Bazel source-build fallback in scripts/install.js is exercised exactly as
+  # it runs on platforms without a prebuilt binary (the addon is compiled
+  # from source; the dictionary assets ship prebuilt in the tarball).
+  pack-source-install:
+    name: Bazel source build from npm tarball (${{ matrix.os }})
+    permissions:
+      contents: read
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, macos-15-intel]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Use Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+      - uses: bazel-contrib/setup-bazel@0.19.0
+        with:
+          bazelisk-cache: true
+          repository-cache: true
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: npm ci --omit=optional
+      - name: Build prebuild assets
+        shell: bash
+        run: ./scripts/build-node-prebuild-bazel.sh
+      - name: Pack npm tarball
+        shell: bash
+        run: |
+          mkdir -p dist/npm-artifacts
+          npm pack --pack-destination dist/npm-artifacts
+      - name: Install tarball from source and smoke test
+        shell: bash
+        run: |
+          tarball="$(ls "$PWD"/dist/npm-artifacts/opencc-[0-9]*.tgz)"
+          target="$(node -p "process.platform + '-' + process.arch")"
+          install_dir="$(mktemp -d)"
+          cd "$install_dir"
+          npm init -y
+          npm install --omit=optional --foreground-scripts "$tarball"
+          test -f "node_modules/opencc/prebuilds/${target}/opencc.node"
+          node -e '
+            const assert = require("assert");
+            const OpenCC = require("opencc");
+            const converter = new OpenCC("s2t.json");
+            const converted = converter.convertSync("汉字");
+            assert.strictEqual(converted, "漢字");
+            console.log("Source-built opencc converts 汉字 ->", converted);
           '

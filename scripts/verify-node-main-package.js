@@ -6,17 +6,33 @@ const path = require('path');
 const packageRoot = path.resolve(__dirname, '..');
 const packageJson = require(path.join(packageRoot, 'package.json'));
 
-// The npm tarball ships only the JavaScript API, CLI, typings, and the
-// prebuilt config/dictionary assets. The native addon comes exclusively from
-// the @opencc/opencc-<platform>-<arch> scoped packages (built with Bazel);
-// there is no source-build fallback.
+// The npm tarball ships the JavaScript API, CLI, typings, the prebuilt
+// config/dictionary assets, and the Bazel workspace needed to compile the
+// native addon (//node:opencc) from source when no
+// @opencc/opencc-<platform>-<arch> scoped binary package matches the
+// platform (see scripts/install.js). Dictionaries are never rebuilt at
+// install time; they ship in prebuilds/assets.
 const requiredFiles = [
+  '.bazelignore',
+  '.bazelrc',
+  '.bazelversion',
+  'MODULE.bazel',
+  'MODULE.bazel.lock',
+  'node/BUILD.bazel',
+  'node/cc_headers_files.bzl',
   'node/cli.js',
+  'node/deps.bzl',
+  'node/opencc.cc',
   'node/opencc.js',
   'node/opencc.mjs',
   'node/opencc.d.ts',
   'node/opencc.d.cts',
   'node/opencc.d.mts',
+  'patches/rules-python-write-unstamped-build-data.patch',
+  'scripts/install.js',
+  'src/BUILD.bazel',
+  'src/SimpleConverter.cpp',
+  'src/opencc_config_schema.inc',
   'prebuilds/assets/s2t.json',
   'prebuilds/assets/s2twp.json',
   'prebuilds/assets/CJK_Compatibility_Ideographs.ocd2',

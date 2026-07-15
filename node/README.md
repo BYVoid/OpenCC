@@ -14,9 +14,12 @@ The package requires Node.js `>=20.17`.
 
 OpenCC ships native bindings as prebuilt binaries. Installation automatically
 selects the matching `@opencc/opencc-<platform>-<arch>` package, covering
-macOS (x64/arm64), Linux (x64/arm64), and Windows (x64). Platforms without a
-prebuilt binary package are unsupported: `npm install` itself succeeds there,
-but loading `opencc` fails with an error listing the addon lookup locations.
+macOS (x64/arm64), Linux (x64/arm64), and Windows (x64). On platforms without
+a prebuilt binary package, `npm install` compiles the addon from source with
+Bazel: this requires a C++ toolchain and network access, and uses `bazel` or
+`bazelisk` from PATH (or fetches bazelisk automatically via `npx`).
+Dictionaries always ship prebuilt in the package, so the source build only
+compiles the addon itself.
 
 ## Basic Usage
 

@@ -28,22 +28,26 @@
     "generate:node-config-types": "node scripts/generate-node-opencc-config-types.js",
     "prepare:scoped-packages": "node scripts/prepare-node-scoped-packages.js",
     "prepack": "node scripts/verify-node-main-package.js",
-    "prepublishOnly": "node scripts/verify-node-scoped-packages-published.js"
+    "prepublishOnly": "node scripts/verify-node-scoped-packages-published.js",
+    "install": "node scripts/install.js"
   },
   "engines": {
     "node": ">=20.17"
   },
   "files": [
-    "node/cli.js",
-    "node/opencc.d.cts",
-    "node/opencc.d.mts",
-    "node/opencc.d.ts",
-    "node/opencc.js",
-    "node/opencc.mjs",
+    ".bazelignore",
+    ".bazelrc",
+    ".bazelversion",
+    "MODULE.bazel",
+    "MODULE.bazel.lock",
+    "node",
+    "patches",
     "prebuilds/assets/*.json",
     "prebuilds/assets/*.ocd2",
+    "scripts/install.js",
     "scripts/verify-node-main-package.js",
-    "scripts/verify-node-scoped-packages-published.js"
+    "scripts/verify-node-scoped-packages-published.js",
+    "src"
   ],
   "repository": {
     "type": "git",

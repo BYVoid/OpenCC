@@ -63,6 +63,14 @@ public:
     return mainConverter->GetConversionChain();
   }
 
+  /**
+   * Returns the normalization pre-pass converter. Used by GetAllConversions()
+   * to normalize a word before walking the main chain, mirroring Convert().
+   */
+  const ConverterPtr& GetNormalizationConverter() const {
+    return normConverter;
+  }
+
 private:
   const ConverterPtr normConverter;
   const ConverterPtr mainConverter;

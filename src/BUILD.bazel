@@ -127,15 +127,24 @@ diff_test(
     file2 = "opencc_config_schema.inc",
 )
 
+# Private header shared between Config.cpp (which builds the converter) and
+# conversion_candidates_lib (which unwraps the normalization pre-pass).
+cc_library(
+    name = "config_based_converter_lib",
+    hdrs = ["ConfigBasedConverter.hpp"],
+    visibility = ["//src:__pkg__"],
+    deps = [
+        ":converter_lib",
+    ],
+)
+
 cc_library(
     name = "config_lib",
-    srcs = [
-        "Config.cpp",
-        "ConfigBasedConverter.hpp",
-    ],
+    srcs = ["Config.cpp"],
     hdrs = ["Config.hpp"],
     deps = [
         ":common_lib",
+        ":config_based_converter_lib",
         ":config_schema_inc_lib",
         ":conversion_chain_lib",
         ":converter_lib",
@@ -276,25 +285,23 @@ cc_library(
     ],
 )
 
-# Internal, unstable candidate-enumeration API. local_defines (non-propagating)
-# keeps OPENCC_ENABLE_UNSTABLE_API scoped to this library's own sources, so the
-# guarded Converter::GetConversionCandidates member is compiled here without
-# leaking the macro into dependents. ConversionCandidates.hpp is intentionally
-# absent from exports_files, so consumers cannot reach the API until the next
-# ABI bump.
+# Internal, unstable candidate-enumeration API (GetAllConversions). The header
+# is not installed by the CMake build and the function is not part of the
+# OPENCC_ABI_VERSION contract; visibility is restricted to this package so no
+# other Bazel target can depend on it directly until the API is promoted.
 cc_library(
     name = "conversion_candidates_lib",
     srcs = ["ConversionCandidates.cpp"],
     hdrs = ["ConversionCandidates.hpp"],
-    local_defines = ["OPENCC_ENABLE_UNSTABLE_API"],
+    visibility = ["//src:__pkg__"],
     deps = [
         ":common_lib",
+        ":config_based_converter_lib",
         ":conversion_lib",
         ":conversion_chain_lib",
         ":converter_lib",
         ":dict_lib",
         ":dict_entry_lib",
-        ":utf8_util_lib",
     ],
 )
 
@@ -302,8 +309,8 @@ cc_test(
     name = "conversion_candidates_test",
     size = "small",
     srcs = ["ConversionCandidatesTest.cpp"],
-    local_defines = ["OPENCC_ENABLE_UNSTABLE_API"],
     deps = [
+        ":config_based_converter_lib",
         ":conversion_candidates_lib",
         ":conversion_lib",
         ":conversion_chain_lib",

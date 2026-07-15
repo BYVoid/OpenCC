@@ -21,13 +21,13 @@
 #include <unordered_set>
 
 #include "Common.hpp"
+#include "ConfigBasedConverter.hpp"
 #include "Conversion.hpp"
 #include "ConversionChain.hpp"
 #include "Converter.hpp"
 #include "Dict.hpp"
 #include "DictEntry.hpp"
 #include "Optional.hpp"
-#include "UTF8Util.hpp"
 
 namespace opencc {
 
@@ -36,6 +36,17 @@ std::vector<std::string> GetAllConversions(const Converter& converter,
   const ConversionChainPtr chain = converter.GetConversionChain();
   if (chain == nullptr) {
     return {};
+  }
+
+  // A config-based converter runs a normalization pre-pass (e.g. CJK
+  // Compatibility Ideographs) before its main chain, but GetConversionChain()
+  // exposes only the main chain. Mirror Convert() by normalizing first, so a
+  // word whose dictionary key appears only after normalization is still found.
+  std::string normalized;
+  if (const auto* configBased =
+          dynamic_cast<const ConfigBasedConverter*>(&converter)) {
+    normalized = configBased->GetNormalizationConverter()->Convert(word);
+    word = normalized;
   }
 
   std::vector<std::string> currentWords{std::string(word)};
@@ -53,26 +64,23 @@ std::vector<std::string> GetAllConversions(const Converter& converter,
         // No exact match: convert greedily by longest prefix so a partially
         // convertible word can still flow through the rest of the chain. Even
         // when the result is unchanged we keep it, because a later dictionary
-        // may still convert it.
-        std::string buffer;
-        for (const char* p = currentWord.c_str(); *p != '\0';) {
-          const Optional<const DictEntry*> prefix = dict->MatchPrefix(p);
-          size_t matchedLength;
-          if (prefix.IsNull()) {
-            matchedLength = UTF8Util::NextCharLength(p);
-            buffer.append(p, matchedLength);
-          } else {
-            matchedLength = prefix.Get()->KeyLength();
-            buffer.append(prefix.Get()->GetDefault());
-          }
-          p += matchedLength;
-        }
+        // may still convert it. Conversion::Convert also handles ideographic
+        // description sequences and truncated UTF-8 safely.
+        std::string buffer = conversion->Convert(currentWord);
         if (seen.insert(buffer).second) {
           nextWords.push_back(std::move(buffer));
         }
         continue;
       }
       matched = true;
+      if (item.Get()->NumValues() == 0) {
+        // A key-only entry converts the word to itself, matching Convert(),
+        // which falls back to the key via DictEntry::GetDefault().
+        if (seen.insert(currentWord).second) {
+          nextWords.push_back(currentWord);
+        }
+        continue;
+      }
       for (const std::string& value : item.Get()->Values()) {
         if (seen.insert(value).second) {
           nextWords.push_back(value);
@@ -88,12 +96,5 @@ std::vector<std::string> GetAllConversions(const Converter& converter,
   }
   return currentWords;
 }
-
-#ifdef OPENCC_ENABLE_UNSTABLE_API
-std::vector<std::string>
-Converter::GetConversionCandidates(std::string_view word) const {
-  return GetAllConversions(*this, word);
-}
-#endif
 
 } // namespace opencc

@@ -41,10 +41,15 @@ class Converter;
  * single word.
  *
  * Matching a word against a dictionary:
- *  - On an exact match, every value of the entry becomes a candidate.
- *  - Otherwise the word is converted greedily by longest-prefix, taking each
- *    matched prefix's default value, so a partially convertible word still
- *    flows through the remaining dictionaries in the chain.
+ *  - On an exact match, every value of the entry becomes a candidate; a
+ *    key-only entry (no values) yields the word itself, matching Convert().
+ *  - Otherwise the word is converted with Conversion::Convert (greedy
+ *    longest-prefix, each matched prefix's default value), so a partially
+ *    convertible word still flows through the remaining dictionaries in the
+ *    chain.
+ *
+ * A converter loaded from a config with a @c normalization step (e.g.
+ * @c s2t.json) normalizes @p word first, mirroring Converter::Convert().
  *
  * @param converter Source of the conversion chain.  A converter without a
  *   single chain (e.g. @c PipelineConverter, whose GetConversionChain()
@@ -54,10 +59,13 @@ class Converter;
  *   when no dictionary in the chain contains @p word, matching librime's
  *   convention of reporting "not found".
  *
- * @note Internal, unstable API.  This header is intentionally kept out of the
- *   installed public header set and is not part of the OPENCC_ABI_VERSION
- *   contract.  It backs the experimental Converter::GetConversionCandidates()
- *   member, which is compiled only when OPENCC_ENABLE_UNSTABLE_API is defined.
+ * @note Internal, unstable API with no compatibility guarantee.  This header
+ *   is not installed by CMake and the function is not part of the
+ *   OPENCC_ABI_VERSION contract; like other non-installed headers
+ *   (e.g. PhraseExtract.hpp) the symbol is still OPENCC_EXPORT so unit tests
+ *   can link against a shared libopencc on Windows, which means the symbol is
+ *   technically reachable by forward declaration — binding to it outside this
+ *   repository is unsupported and may break without an ABI bump.
  */
 OPENCC_EXPORT std::vector<std::string>
 GetAllConversions(const Converter& converter, std::string_view word);

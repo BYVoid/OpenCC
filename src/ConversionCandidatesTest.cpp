@@ -18,6 +18,7 @@
 
 #include "ConversionCandidates.hpp"
 
+#include "ConfigBasedConverter.hpp"
 #include "Conversion.hpp"
 #include "ConversionChain.hpp"
 #include "Converter.hpp"
@@ -62,7 +63,7 @@ TEST_F(ConversionCandidatesTest, SingleDictMultipleValues) {
   const ConverterPtr converter =
       MakeConverter({MakeDict({{utf8("里"), {utf8("里"), utf8("裏")}}})});
   const std::vector<std::string> candidates =
-      converter->GetConversionCandidates(utf8("里"));
+      GetAllConversions(*converter, utf8("里"));
   EXPECT_EQ((std::vector<std::string>{utf8("里"), utf8("裏")}), candidates);
 }
 
@@ -74,7 +75,7 @@ TEST_F(ConversionCandidatesTest, ChainedExpansionCarriesBranches) {
       MakeDict({{utf8("裏"), {utf8("裡")}}}),
   });
   const std::vector<std::string> candidates =
-      converter->GetConversionCandidates(utf8("里"));
+      GetAllConversions(*converter, utf8("里"));
   EXPECT_EQ((std::vector<std::string>{utf8("里"), utf8("裡")}), candidates);
 }
 
@@ -85,7 +86,7 @@ TEST_F(ConversionCandidatesTest, DuplicateCandidatesAreDeduped) {
       MakeDict({{utf8("麵"), {utf8("面")}}}),
   });
   const std::vector<std::string> candidates =
-      converter->GetConversionCandidates(utf8("面"));
+      GetAllConversions(*converter, utf8("面"));
   EXPECT_EQ((std::vector<std::string>{utf8("面")}), candidates);
 }
 
@@ -93,7 +94,7 @@ TEST_F(ConversionCandidatesTest, DuplicateCandidatesAreDeduped) {
 TEST_F(ConversionCandidatesTest, WordNotInAnyDictReturnsEmpty) {
   const ConverterPtr converter =
       MakeConverter({MakeDict({{utf8("里"), {utf8("裏")}}})});
-  EXPECT_TRUE(converter->GetConversionCandidates(utf8("国")).empty());
+  EXPECT_TRUE(GetAllConversions(*converter, utf8("国")).empty());
 }
 
 // Only a prefix (not the whole word) matches: no exact match means "not found",
@@ -101,7 +102,7 @@ TEST_F(ConversionCandidatesTest, WordNotInAnyDictReturnsEmpty) {
 TEST_F(ConversionCandidatesTest, PrefixOnlyMatchReturnsEmpty) {
   const ConverterPtr converter =
       MakeConverter({MakeDict({{utf8("里"), {utf8("裏")}}})});
-  EXPECT_TRUE(converter->GetConversionCandidates(utf8("里面")).empty());
+  EXPECT_TRUE(GetAllConversions(*converter, utf8("里面")).empty());
 }
 
 // An exact match on a longer word still carries an unconvertible tail through a
@@ -112,7 +113,7 @@ TEST_F(ConversionCandidatesTest, PartialConversionInLaterDict) {
       MakeDict({{utf8("裏"), {utf8("裡")}}}),
   });
   const std::vector<std::string> candidates =
-      converter->GetConversionCandidates(utf8("里面"));
+      GetAllConversions(*converter, utf8("里面"));
   // Stage 1: 里面 -> 裏面. Stage 2: 裏 -> 裡 (prefix), 面 copied -> 裡面.
   EXPECT_EQ((std::vector<std::string>{utf8("裡面")}), candidates);
 }
@@ -126,12 +127,53 @@ TEST_F(ConversionCandidatesTest, PipelineConverterYieldsEmpty) {
   EXPECT_TRUE(GetAllConversions(*pipeline, utf8("里")).empty());
 }
 
-// The free function and the member wrapper agree.
-TEST_F(ConversionCandidatesTest, MemberDelegatesToFreeFunction) {
+// A key-only entry (no values) converts the word to itself, matching
+// Convert(), instead of silently dropping the branch.
+TEST_F(ConversionCandidatesTest, KeyOnlyEntryPassesWordThrough) {
   const ConverterPtr converter =
+      MakeConverter({MakeDict({{utf8("通道"), {}}})});
+  const std::vector<std::string> candidates =
+      GetAllConversions(*converter, utf8("通道"));
+  EXPECT_EQ((std::vector<std::string>{utf8("通道")}), candidates);
+}
+
+// Input ending in a truncated UTF-8 sequence must not read out of bounds; the
+// longest-prefix fallback delegates to Conversion::Convert, which clamps.
+TEST_F(ConversionCandidatesTest, TruncatedUtf8InputIsSafe) {
+  const ConverterPtr converter =
+      MakeConverter({MakeDict({{utf8("里"), {utf8("裏")}}})});
+  // First two bytes of 里 (0xE9 0x87 0x8C): an incomplete 3-byte sequence.
+  EXPECT_TRUE(GetAllConversions(*converter, "\xE9\x87").empty());
+  // Truncated tail after a convertible prefix: no exact match anywhere.
+  EXPECT_TRUE(GetAllConversions(*converter, utf8("里") + "\xE9\x87").empty());
+}
+
+// An ideographic description sequence flowing through a later dictionary's
+// longest-prefix fallback stays atomic, matching Converter::Convert.
+TEST_F(ConversionCandidatesTest, IdsKeptAtomicInLaterDict) {
+  const ConverterPtr converter = MakeConverter({
+      MakeDict({{utf8("里字"), {utf8("⿱艹里")}}}),
+      MakeDict({{utf8("里"), {utf8("裏")}}}),
+  });
+  const std::vector<std::string> candidates =
+      GetAllConversions(*converter, utf8("里字"));
+  // Stage 2 must not convert the 里 inside the IDS ⿱艹里.
+  EXPECT_EQ((std::vector<std::string>{utf8("⿱艹里")}), candidates);
+}
+
+// A config-based converter's normalization pre-pass is applied before the main
+// chain, mirroring Convert(): a CJK Compatibility Ideograph key is normalized
+// first and then expanded by the main chain.
+TEST_F(ConversionCandidatesTest, NormalizationPrePassApplied) {
+  // \xEF\xA7\xA9 is U+F9E9, the compatibility ideograph for 里.
+  const ConverterPtr norm =
+      MakeConverter({MakeDict({{"\xEF\xA7\xA9", {utf8("里")}}})});
+  const ConverterPtr main =
       MakeConverter({MakeDict({{utf8("里"), {utf8("里"), utf8("裏")}}})});
-  EXPECT_EQ(GetAllConversions(*converter, utf8("里")),
-            converter->GetConversionCandidates(utf8("里")));
+  const ConverterPtr converter(new ConfigBasedConverter(norm, main));
+  const std::vector<std::string> candidates =
+      GetAllConversions(*converter, "\xEF\xA7\xA9");
+  EXPECT_EQ((std::vector<std::string>{utf8("里"), utf8("裏")}), candidates);
 }
 
 } // namespace opencc

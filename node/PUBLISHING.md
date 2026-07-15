@@ -50,8 +50,11 @@ Bazel:
 
 ```sh
 npm install --omit=optional --ignore-scripts
-./scripts/build-node-prebuild-bazel.sh "$(node -p 'process.platform + "-" + process.arch')"
+./scripts/build-node-prebuild-bazel.sh
 ```
+
+The script defaults to the host platform; pass an explicit target such as
+`win32-x64` for the Bazel + Zig cross-compile path.
 
 This creates:
 

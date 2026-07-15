@@ -74,8 +74,7 @@ benchmark:
 	(cd build/perf; ctest --verbose)
 
 node:
-	node-gyp configure
-	node-gyp build
+	./scripts/build-node-prebuild-bazel.sh
 
 node-test: node
 	npm test

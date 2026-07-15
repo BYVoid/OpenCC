@@ -47,12 +47,15 @@ function resolveBindingPath() {
   // sandbox), as a prebuild under prebuilds/<platform>-<arch>/, or via an
   // @opencc/opencc-<platform>-<arch> scoped package. A direct filesystem lookup
   // replaces node-gyp-build (OpenCC ships a single N-API build per platform).
-  const candidates = [
-    path.join(packageRoot, 'build', 'Release', 'opencc.node'),
-    path.join(
-      packageRoot, 'prebuilds', `${process.platform}-${process.arch}`, 'opencc.node'
-    ),
-  ];
+  // PREBUILDS_ONLY keeps its node-gyp-build meaning: skip the local
+  // build/Release directory so tests exercise the shipped prebuild layout.
+  const candidates = [];
+  if (!process.env.PREBUILDS_ONLY) {
+    candidates.push(path.join(packageRoot, 'build', 'Release', 'opencc.node'));
+  }
+  candidates.push(path.join(
+    packageRoot, 'prebuilds', `${process.platform}-${process.arch}`, 'opencc.node'
+  ));
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) {
       return candidate;

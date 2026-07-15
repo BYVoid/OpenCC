@@ -118,7 +118,6 @@ set(_OPENCC_TRIMMED_SOURCE_PACKAGE_IGNORE_FILES
   "/Makefile"
   "/OpenCC.egg-info/"
   "/PUBLICATIONS.md"
-  "/binding.gyp"
   "/build.cmd"
   "/data/icon/"
   "/deps/google-benchmark/"

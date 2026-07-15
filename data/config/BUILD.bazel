@@ -47,7 +47,7 @@ filegroup(
             "//src:simple_converter_lib",
             "@bazel_tools//tools/cpp/runfiles",
             "@googletest//:gtest_main",
-            "//deps/rapidjson-1.1.0:rapidjson",
+            "@rapidjson//:rapidjson",
         ],
     )
     for config in CONFIGS
@@ -77,7 +77,7 @@ test_suite(
         deps = [
             "@bazel_tools//tools/cpp/runfiles",
             "@googletest//:gtest_main",
-            "//deps/rapidjson-1.1.0:rapidjson",
+            "@rapidjson//:rapidjson",
         ],
     )
     for config in CONFIGS

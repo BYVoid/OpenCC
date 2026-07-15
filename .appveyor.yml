@@ -13,8 +13,11 @@ init:
 
 environment:
   matrix:
-    # Build Node.js
+    # Build Node.js. The native addon is built with Bazel (there is no
+    # node-gyp source build anymore); use a VS2022 worker for the Bazel
+    # MSVC toolchain.
     - nodejs_version: stable
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
 
     # Build plain C++
     - nodejs_version: none
@@ -32,15 +35,36 @@ for:
   install:
     - ps: Install-Product node $env:nodejs_version $env:platform
     - npm -g i npm@latest
+    # @bazel/bazelisk provides both `bazel` and `bazelisk` commands on the
+    # npm global bin directory, which is already on PATH (unlike choco shims
+    # installed mid-build).
+    - appveyor-retry npm -g i @bazel/bazelisk
+    - bazel --version
   build_script:
-    - set npm_config_build_from_source=true&& appveyor-retry call npm install
+    - appveyor-retry call npm install --omit=optional
+    # Only the addon itself is built with Bazel here. The Bazel dictionary
+    # genrules run rules_python py_binary tools whose venv bootstrap needs
+    # symlink support that AppVeyor workers lack, so dictionaries and configs
+    # come from the CMake install below (also used for the jieba plugin
+    # packaging), where data/scripts run on the system Python directly.
+    - echo [opencc npm package] building opencc win32-x64 addon with Bazel
+    - bazel build -c opt //node:opencc
+    - echo [opencc npm package] building dictionaries and jieba plugin with CMake
+    - cmake -A%platform% -S. -Bbuild-npm-jieba -DCMAKE_INSTALL_PREFIX:PATH=%CD%\build-npm-jieba-install -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_OPENCC_JIEBA_PLUGIN:BOOL=ON -DENABLE_GTEST:BOOL=OFF -DENABLE_BENCHMARK:BOOL=OFF
+    - cmake --build build-npm-jieba --config Release --target install
+    - ps: |
+        New-Item -ItemType Directory -Force prebuilds\assets | Out-Null
+        New-Item -ItemType Directory -Force prebuilds\win32-x64 | Out-Null
+        Copy-Item build-npm-jieba-install\share\opencc\*.ocd2 prebuilds\assets\
+        Get-ChildItem build-npm-jieba-install\share\opencc\*.json |
+          Where-Object { $_.Name -notlike '*jieba*' -and $_.Name -notlike '*.schema.json' } |
+          Copy-Item -Destination prebuilds\assets\
+        Copy-Item bazel-bin\node\opencc.node prebuilds\win32-x64\opencc.node
   test_script:
-    - npm test
+    - set PREBUILDS_ONLY=1&& npm test
   after_test:
     - chcp 65001
-    - echo [opencc npm package] building opencc win32-x64 prebuild
-    - if exist prebuilds rmdir /S /Q prebuilds
-    - npm run prebuild
+    - echo [opencc npm package] verifying opencc win32-x64 prebuild layout
     - if exist prebuilds\darwin-arm64 exit /B 1
     - if exist prebuilds\linux-x64 exit /B 1
     - if exist prebuilds\linux-arm64 exit /B 1
@@ -52,9 +76,7 @@ for:
     - echo [opencc npm package] packing opencc win32-x64 scoped binary package
     - npm pack dist\scoped-packages\@opencc\opencc-win32-x64
     - for %%F in (opencc-opencc-win32-x64-*.tgz) do set OPENCC_WIN32_TGZ=%%~fF
-    - echo [opencc npm package] building opencc-jieba win32-x64 package files
-    - cmake -A%platform% -S. -Bbuild-npm-jieba -DCMAKE_INSTALL_PREFIX:PATH=%CD%\build-npm-jieba-install -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS:BOOL=OFF -DBUILD_OPENCC_JIEBA_PLUGIN:BOOL=ON -DENABLE_GTEST:BOOL=OFF -DENABLE_BENCHMARK:BOOL=OFF
-    - cmake --build build-npm-jieba --config Release --target install
+    - echo [opencc npm package] assembling opencc-jieba win32-x64 package files
     - mkdir plugins\jieba\node\prebuilds\win32-x64
     - mkdir plugins\jieba\node\data
     - copy build-npm-jieba-install\share\opencc\*jieba.json plugins\jieba\node\data\

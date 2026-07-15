@@ -12,10 +12,14 @@ npm install opencc
 
 The package requires Node.js `>=20.17`.
 
-OpenCC ships native bindings. When a matching prebuilt binary is available,
-installation uses it automatically. Otherwise npm builds the native addon from
-source, which requires a working C++ toolchain and Python supported by
-`node-gyp`.
+OpenCC ships native bindings as prebuilt binaries. Installation automatically
+selects the matching `@opencc/opencc-<platform>-<arch>` package, covering
+macOS (x64/arm64), Linux (x64/arm64), and Windows (x64). On platforms without
+a prebuilt binary package, `npm install` builds from source with Bazel,
+compiling the addon and regenerating the dictionaries: this requires a C++
+toolchain and network access, and uses `bazel` or `bazelisk` from PATH (or
+fetches bazelisk automatically via `npx`); Bazel downloads its own hermetic
+Python toolchain for the dictionary generation scripts.
 
 ## Basic Usage
 

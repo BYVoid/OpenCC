@@ -7,8 +7,8 @@ package(default_visibility = ["//visibility:public"])
 # computes its package root from its own location and looks for the addon under
 # <packageRoot>/build/Release, so the addon, its JS API, the config/dictionary
 # assets, and the testcases are assembled into one tree here. The addon is
-# located by a plain filesystem lookup (no node-gyp-build), so the test needs no
-# npm packages at all.
+# located by a plain filesystem lookup, so the test needs no npm packages at
+# all.
 copy_to_directory(
     name = "node_test_release",
     srcs = [
@@ -34,7 +34,8 @@ js_library(
 
 # Run node/test.js with Node's built-in test runner against the Bazel-built
 # addon. node:test ships with the Node runtime and opencc.js locates the addon
-# without node-gyp-build, so the test has no npm dependencies (no pnpm-lock).
+# with a plain filesystem lookup, so the test has no npm dependencies (no
+# pnpm-lock).
 js_test(
     name = "node_test",
     size = "medium",

@@ -2,7 +2,7 @@
 // with Node's built-in test runner (node:test) against the self-contained
 // sandbox assembled next to this file. The test has no npm dependencies at all:
 // node:test ships with Node, and node/opencc.js locates the addon with a plain
-// filesystem lookup (no node-gyp-build).
+// filesystem lookup.
 //
 // The sandbox mirrors an npm-install layout (node/*.js + build/Release/<addon> +
 // assets + test/testcases + scripts), so node/opencc.js resolves the addon and

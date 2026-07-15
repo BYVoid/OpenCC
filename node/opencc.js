@@ -43,12 +43,11 @@ function requireOptionalPackage(packageName) {
 
 function resolveBindingPath() {
   // The addon is always named opencc.node and ships either as a local build
-  // (build/Release, also used by the node-gyp source build and the Bazel
-  // sandbox), as a prebuild under prebuilds/<platform>-<arch>/, or via an
-  // @opencc/opencc-<platform>-<arch> scoped package. A direct filesystem lookup
-  // replaces node-gyp-build (OpenCC ships a single N-API build per platform).
-  // PREBUILDS_ONLY keeps its node-gyp-build meaning: skip the local
-  // build/Release directory so tests exercise the shipped prebuild layout.
+  // (build/Release, used by the Bazel test sandbox and local development), as
+  // a prebuild under prebuilds/<platform>-<arch>/, or via an
+  // @opencc/opencc-<platform>-<arch> scoped package (OpenCC ships a single
+  // N-API build per platform). PREBUILDS_ONLY skips the local build/Release
+  // directory so tests exercise the shipped prebuild layout.
   const candidates = [];
   if (!process.env.PREBUILDS_ONLY) {
     candidates.push(path.join(packageRoot, 'build', 'Release', 'opencc.node'));
@@ -342,7 +341,7 @@ OpenCC._parseJSON = parseJSON;
 
 // Resolved native addon path and its adjacent assets (config/dictionary)
 // directory, exported so tooling/tests can locate them without re-deriving the
-// lookup (and without depending on node-gyp-build).
+// lookup.
 OpenCC._bindingPath = bindingPath;
 OpenCC._assetsPath = assetsPath;
 

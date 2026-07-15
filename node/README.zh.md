@@ -11,9 +11,13 @@ npm install opencc
 
 本套件需要 Node.js `>=20.17`。
 
-OpenCC 會隨套件提供原生綁定。當有符合目前平台的預編譯二進位檔時，
-安裝時會自動使用；否則 npm 會從原始碼建置原生 addon，這需要可用的
-C++ 工具鏈，以及 `node-gyp` 支援的 Python。
+OpenCC 以預編譯二進位檔提供原生綁定。安裝時會自動選取符合目前平台的
+`@opencc/opencc-<platform>-<arch>` 套件，涵蓋 macOS（x64/arm64）、
+Linux（x64/arm64）與 Windows（x64）。沒有預編譯二進位套件的平台，
+`npm install` 會以 Bazel 從原始碼構建：編譯 addon 並重新生成字典。
+這需要可用的 C++ 工具鏈與網路；`bazel` 或 `bazelisk` 取自 PATH，
+找不到時會透過 `npx` 自動下載 bazelisk，字典生成腳本所需的 Python
+由 Bazel 自動下載 hermetic 工具鏈，無需系統安裝。
 
 ## 基本用法
 

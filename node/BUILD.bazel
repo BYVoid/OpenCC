@@ -37,8 +37,7 @@ cc_header_pick(
 # Node C headers itself (the rules_nodejs toolchain on Unix; the windows_node_api
 # import library on Windows).
 #
-# node-gyp and Bazel both compile the same binding source. node-gyp lists the
-# OpenCC and marisa sources directly, while Bazel links against //src:opencc_lib.
+# The binding source is compiled here and linked against //src:opencc_lib.
 node_addon(
     name = "opencc",
     srcs = ["opencc.cc"],

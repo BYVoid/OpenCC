@@ -101,8 +101,8 @@ jobs:
   # Pack the main npm tarball plus the Bazel-built scoped binary package for
   # the host platform, install both together, and smoke test — mirroring how
   # a release install resolves the native addon. There is no source-build
-  # fallback anymore: platforms without a scoped binary package are not
-  # supported by npm install.
+  # fallback anymore: on platforms without a scoped binary package, npm
+  # install succeeds but requiring opencc fails at load time.
   pack-install:
     name: Install packed npm tarballs (${{ matrix.os }})
     permissions:

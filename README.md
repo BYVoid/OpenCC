@@ -81,7 +81,9 @@ https://opencc.js.org/converter?config=s2t
 The npm package supports Node.js `>=20.17`. The native addon is installed
 through prebuilt `@opencc/opencc-<platform>-<arch>` packages covering macOS
 (x64/arm64), Linux (x64/arm64), and Windows (x64). Platforms without a
-prebuilt binary package are not supported by `npm install`.
+prebuilt binary package are unsupported: `npm install` itself succeeds
+there, but loading `opencc` fails with an error listing the addon lookup
+locations.
 
 Bun and Deno can also use the npm package through their npm compatibility
 support.

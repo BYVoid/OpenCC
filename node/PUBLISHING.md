@@ -11,8 +11,8 @@ The current npm layout is split by platform:
   `opencc.node` binary for one platform.
 
 The native addon comes exclusively from the scoped binary packages. There is
-no source-build fallback: platforms without a scoped binary package are not
-supported by `npm install`.
+no source-build fallback: on platforms without a scoped binary package,
+`npm install` succeeds but requiring `opencc` fails at load time.
 
 ## Package names
 

@@ -23,6 +23,8 @@ const requiredFiles = [
   'prebuilds/assets/STCharacters.ocd2',
   'prebuilds/assets/STPhrases.ocd2',
   'prebuilds/assets/STPhrases_GeneratedFromRegionalPhrases.ocd2',
+  'prebuilds/assets/TWPhrases.ocd2',
+  'prebuilds/assets/TWVariants.ocd2',
   'prebuilds/assets/TWVariantsPhrases.ocd2',
 ];
 

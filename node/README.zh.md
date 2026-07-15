@@ -13,8 +13,9 @@ npm install opencc
 
 OpenCC 以預編譯二進位檔提供原生綁定。安裝時會自動選取符合目前平台的
 `@opencc/opencc-<platform>-<arch>` 套件，涵蓋 macOS（x64/arm64）、
-Linux（x64/arm64）與 Windows（x64）。沒有預編譯二進位套件的平台
-不支援 `npm install`。
+Linux（x64/arm64）與 Windows（x64）。沒有預編譯二進位套件的平台不受
+支援：`npm install` 本身仍會成功，但載入 `opencc` 或執行 CLI 時會因
+找不到原生 addon 而報錯。
 
 ## 基本用法
 

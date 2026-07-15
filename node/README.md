@@ -15,7 +15,8 @@ The package requires Node.js `>=20.17`.
 OpenCC ships native bindings as prebuilt binaries. Installation automatically
 selects the matching `@opencc/opencc-<platform>-<arch>` package, covering
 macOS (x64/arm64), Linux (x64/arm64), and Windows (x64). Platforms without a
-prebuilt binary package are not supported by `npm install`.
+prebuilt binary package are unsupported: `npm install` itself succeeds there,
+but loading `opencc` fails with an error listing the addon lookup locations.
 
 ## Basic Usage
 

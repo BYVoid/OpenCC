@@ -35,11 +35,17 @@ for:
   install:
     - ps: Install-Product node $env:nodejs_version $env:platform
     - npm -g i npm@latest
-    - appveyor-retry choco install bazelisk -y --no-progress
+    # @bazel/bazelisk provides both `bazel` and `bazelisk` commands on the
+    # npm global bin directory, which is already on PATH (unlike choco shims
+    # installed mid-build).
+    - appveyor-retry npm -g i @bazel/bazelisk
+    - bazel --version
   build_script:
     - appveyor-retry call npm install --omit=optional
     - echo [opencc npm package] building opencc win32-x64 prebuild with Bazel
-    - bash scripts/build-node-prebuild-bazel.sh win32-x64
+    # Use Git Bash explicitly: bare `bash` may resolve to the WSL launcher on
+    # AppVeyor Windows images.
+    - '"C:\Program Files\Git\bin\bash.exe" scripts/build-node-prebuild-bazel.sh win32-x64'
   test_script:
     - set PREBUILDS_ONLY=1&& npm test
   after_test:

@@ -40,8 +40,15 @@ for:
     # installed mid-build).
     - appveyor-retry npm -g i @bazel/bazelisk
     - bazel --version
+    # Enable unprivileged symlink creation (Developer Mode), like the GitHub
+    # Actions runner images do; Bazel and rules_python rely on it.
+    - reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" /t REG_DWORD /f /v AllowDevelopmentWithoutDevLicense /d 1
   build_script:
     - appveyor-retry call npm install --omit=optional
+    # Belt and suspenders for workers without symlink support: the legacy
+    # system_python bootstrap runs py_binary genrules (dictionary generation)
+    # without creating a venv via os.symlink.
+    - echo build --@rules_python//python/config_settings:bootstrap_impl=system_python> .bazelrc.user
     - echo [opencc npm package] building opencc win32-x64 prebuild with Bazel
     # Use Git Bash explicitly: bare `bash` may resolve to the WSL launcher on
     # AppVeyor Windows images.

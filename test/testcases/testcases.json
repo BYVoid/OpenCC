@@ -1825,6 +1825,74 @@
         "tw2sp": "干红",
         "hk2sp": "干红"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_907_gongda_yindu_s2twp",
+      "input": "攻打印度",
+      "expected": {
+        "s2twp": "攻打印度",
+        "s2t": "攻打印度",
+        "s2tw": "攻打印度",
+        "s2hk": "攻打印度"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_907_oudayin_s2twp",
+      "input": "殴打印",
+      "expected": {
+        "s2twp": "歐打印",
+        "s2t": "毆打印",
+        "s2tw": "毆打印",
+        "s2hk": "毆打印"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_907_oudayinyi_s2twp",
+      "input": "殴打印裔",
+      "expected": {
+        "s2twp": "歐打印裔",
+        "s2t": "毆打印裔",
+        "s2tw": "毆打印裔",
+        "s2hk": "毆打印裔"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_907_oudaiindu_s2twp",
+      "input": "殴打印度",
+      "expected": {
+        "s2twp": "歐打印度",
+        "s2t": "毆打印度",
+        "s2tw": "毆打印度",
+        "s2hk": "毆打印度"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_907_correct_ou_s2twp",
+      "input": "欧打印",
+      "expected": {
+        "s2twp": "歐打印",
+        "s2t": "歐打印",
+        "s2tw": "歐打印",
+        "s2hk": "歐打印"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_907_oudayin_tw2sp",
+      "input": "歐打印",
+      "expected": {
+        "tw2sp": "欧打印",
+        "t2s": "欧打印",
+        "tw2s": "欧打印",
+        "hk2s": "欧打印"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_907_print_control_s2twp",
+      "input": "打印打印机",
+      "expected": {
+        "s2twp": "列印印表機"
+      }
     }
   ]
 }
+

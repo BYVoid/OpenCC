@@ -1825,6 +1825,85 @@
         "tw2sp": "干红",
         "hk2sp": "干红"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_901_ganhong_wine",
+      "input": "乾紅葡萄酒",
+      "expected": {
+        "t2s": "干红葡萄酒",
+        "tw2s": "干红葡萄酒",
+        "hk2s": "干红葡萄酒",
+        "tw2sp": "干红葡萄酒",
+        "hk2sp": "干红葡萄酒"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_901_ganhong_flower",
+      "input": "乾紅花",
+      "expected": {
+        "t2s": "干红花",
+        "tw2s": "干红花",
+        "hk2s": "干红花",
+        "tw2sp": "干红花",
+        "hk2sp": "干红花"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_901_ganhong_jujube",
+      "input": "乾紅棗",
+      "expected": {
+        "t2s": "干红枣",
+        "tw2s": "干红枣",
+        "hk2s": "干红枣",
+        "tw2sp": "干红枣",
+        "hk2sp": "干红枣"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_901_huoxi_identity",
+      "input": "豁谿谿刻谿卡谿壑",
+      "expected": {
+        "t2s": "豁谿谿刻谿卡谿壑",
+        "tw2s": "豁谿谿刻谿卡谿壑",
+        "hk2s": "豁谿谿刻谿卡谿壑",
+        "tw2sp": "豁谿谿刻谿卡谿壑",
+        "hk2sp": "豁谿谿刻谿卡谿壑"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_901_lieyindu_tw2sp",
+      "input": "位列印度一列印度火車",
+      "expected": {
+        "tw2sp": "位列印度一列印度火车",
+        "t2s": "位列印度一列印度火车",
+        "tw2s": "位列印度一列印度火车"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_901_lieyinni_tw2sp",
+      "input": "位列印尼一列印尼火車",
+      "expected": {
+        "tw2sp": "位列印尼一列印尼火车",
+        "t2s": "位列印尼一列印尼火车",
+        "tw2s": "位列印尼一列印尼火车"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_901_lieyin_control_tw2sp",
+      "input": "列印",
+      "expected": {
+        "tw2sp": "打印"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_901_georgia_middot",
+      "input": "喬治亞·馬克",
+      "expected": {
+        "tw2sp": "乔治亚·马克",
+        "t2s": "乔治亚·马克",
+        "tw2s": "乔治亚·马克",
+        "hk2s": "乔治亚·马克"
+      }
     }
   ]
 }

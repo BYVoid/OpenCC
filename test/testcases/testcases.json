@@ -1895,6 +1895,20 @@
       "expected": {
         "tw2sp": "系统设置 偏好设置 游戏设定 人物设定 默认值 设置路障"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_gao_ji_s2twp",
+      "input": "高级餐厅 高级住宅 高级会员 高级中学 高级语言 高级选项 高端",
+      "expected": {
+        "s2twp": "高級餐廳 高級住宅 高級會員 高級中學 高階語言 進階選項 高階"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_gao_jie_tw2sp",
+      "input": "高階語言 高級中學",
+      "expected": {
+        "tw2sp": "高级语言 高级中学"
+      }
     }
   ]
 }

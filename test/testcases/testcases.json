@@ -1825,6 +1825,41 @@
         "tw2sp": "干红",
         "hk2sp": "干红"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1253_medical_and_classical_keep_xie",
+      "input": "排泄 泄瀉 泄柳 泄沓 泄泄沓沓",
+      "expected": {
+        "s2t": "排泄 泄瀉 泄柳 泄沓 泄泄沓沓",
+        "s2tw": "排泄 泄瀉 泄柳 泄沓 泄泄沓沓",
+        "s2twp": "排泄 泄瀉 泄柳 泄沓 泄泄沓沓",
+        "t2tw": "排泄 泄瀉 泄柳 泄沓 泄泄沓沓"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1253_common_tw_prefer_xie_variant",
+      "input": "发泄 泄漏 泄密 泄洪 泄欲 泄水坡度",
+      "expected": {
+        "s2t": "發泄 泄漏 泄密 泄洪 泄慾 泄水坡度",
+        "s2tw": "發洩 洩漏 洩密 洩洪 洩慾 洩水坡度",
+        "s2twp": "發洩 洩漏 洩密 洩洪 洩慾 洩水坡度"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1253_t2tw_common_still_converts",
+      "input": "發泄 泄漏 泄密 泄洪 泄慾 泄水坡度",
+      "expected": {
+        "t2tw": "發洩 洩漏 洩密 洩洪 洩慾 洩水坡度"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1253_simplified_medical_s2tw",
+      "input": "排泄系统 泄泻",
+      "expected": {
+        "s2t": "排泄系統 泄瀉",
+        "s2tw": "排泄系統 泄瀉",
+        "s2twp": "排泄系統 泄瀉"
+      }
     }
   ]
 }

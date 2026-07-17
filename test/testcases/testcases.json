@@ -1881,6 +1881,20 @@
       "expected": {
         "tw2sp": "住宅社区 社区服务 开源社区 玩家社群 社交媒体 社交网站 社区版"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_she_zhi_s2twp",
+      "input": "系统设置 偏好设置 高级设置 设置路障 设置机构 默认值",
+      "expected": {
+        "s2twp": "系統設定 偏好設定 進階設定 設置路障 設置機構 預設值"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_she_ding_tw2sp",
+      "input": "系統設定 偏好設定 遊戲設定 人物設定 預設值 設置路障",
+      "expected": {
+        "tw2sp": "系统设置 偏好设置 游戏设定 人物设定 默认值 设置路障"
+      }
     }
   ]
 }

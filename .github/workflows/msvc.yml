@@ -23,10 +23,6 @@ jobs:
             cmake_arch: x64
             package_suffix: x64
             can_run_binaries: true
-          - arch: amd64_x86
-            cmake_arch: Win32
-            package_suffix: x86
-            can_run_binaries: true
           - arch: amd64_arm64
             cmake_arch: ARM64
             package_suffix: arm64

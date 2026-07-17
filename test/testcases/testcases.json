@@ -1844,6 +1844,96 @@
         "tw2s": "雇员",
         "hk2s": "雇员"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_805_zhongwen_caifang",
+      "input": "接受BBC中文采访时称",
+      "expected": {
+        "s2t": "接受BBC中文採訪時稱",
+        "s2tw": "接受BBC中文採訪時稱",
+        "s2twp": "接受BBC中文採訪時稱",
+        "s2hk": "接受BBC中文採訪時稱"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_805_caifang_control",
+      "input": "接受BBC采访时称",
+      "expected": {
+        "s2t": "接受BBC採訪時稱",
+        "s2tw": "接受BBC採訪時稱",
+        "s2twp": "接受BBC採訪時稱",
+        "s2hk": "接受BBC採訪時稱"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_805_wencai_control",
+      "input": "文采",
+      "expected": {
+        "s2t": "文采",
+        "s2tw": "文采",
+        "s2twp": "文采",
+        "s2hk": "文采"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_805_zhongguo_zizhi",
+      "input": "而非中国自制的光刻机",
+      "expected": {
+        "s2t": "而非中國自製的光刻機",
+        "s2tw": "而非中國自製的光刻機",
+        "s2twp": "而非中國自製的光刻機",
+        "s2hk": "而非中國自製的光刻機"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_805_zizhi_lv",
+      "input": "中国自制率据估计约90%",
+      "expected": {
+        "s2t": "中國自製率據估計約90%",
+        "s2tw": "中國自製率據估計約90%",
+        "s2twp": "中國自製率據估計約90%",
+        "s2hk": "中國自製率據估計約90%"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_805_zizhi_control",
+      "input": "自制力 自制炸弹",
+      "expected": {
+        "s2t": "自制力 自製炸彈",
+        "s2tw": "自制力 自製炸彈",
+        "s2twp": "自制力 自製炸彈",
+        "s2hk": "自制力 自製炸彈"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_805_naimi_zhicheng",
+      "input": "七奈米制程",
+      "expected": {
+        "s2t": "七奈米製程",
+        "s2tw": "七奈米製程",
+        "s2twp": "七奈米製程",
+        "s2hk": "七奈米製程"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_805_zhicheng_control",
+      "input": "挑战更精微的制程",
+      "expected": {
+        "s2t": "挑戰更精微的製程",
+        "s2tw": "挑戰更精微的製程",
+        "s2twp": "挑戰更精微的製程",
+        "s2hk": "挑戰更精微的製程"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_805_mizhi_control",
+      "input": "米制",
+      "expected": {
+        "s2t": "米制",
+        "s2tw": "米制",
+        "s2twp": "米制",
+        "s2hk": "米制"
+      }
     }
   ]
 }

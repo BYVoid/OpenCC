@@ -389,7 +389,7 @@
       "id": "case_055_s2t",
       "input": "自干五 扇风 扇风耳朵 呼扇 扇火 扇火止沸 铺眉扇眼",
       "expected": {
-        "s2t": "自乾五 搧風 扇風耳朵 呼搧 搧火 扇火止沸 鋪眉搧眼",
+        "s2t": "自乾五 搧風 扇風耳朵 呼搧 搧火 扇火止沸 鋪眉搧眼"
       }
     },
     {
@@ -1824,6 +1824,38 @@
         "hk2s": "干红",
         "tw2sp": "干红",
         "hk2sp": "干红"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_963_authorship_phrases",
+      "input": "原著 編著 譯著 專著 遺著 所著 著有 土著 拙著",
+      "expected": {
+        "tw2s": "原著 编著 译著 专著 遗著 所著 著有 土著 拙著",
+        "tw2sp": "原著 编著 译著 专著 遗著 所著 著有 土著 拙著"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_963_byline_ideographic_space",
+      "input": "高爾基　著 魯迅　著",
+      "expected": {
+        "tw2s": "高尔基　著 鲁迅　著",
+        "tw2sp": "高尔基　著 鲁迅　著"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_963_byline_colon",
+      "input": "高爾基著：母親",
+      "expected": {
+        "tw2s": "高尔基著：母亲",
+        "tw2sp": "高尔基著：母亲"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_963_aspect_control",
+      "input": "睡著了 看著 著急 著手 衣著 沿著",
+      "expected": {
+        "tw2s": "睡着了 看着 着急 着手 衣着 沿着",
+        "tw2sp": "睡着了 看着 着急 着手 衣着 沿着"
       }
     }
   ]

@@ -1825,6 +1825,36 @@
         "tw2sp": "干红",
         "hk2sp": "干红"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1304_shi_zhiyou",
+      "input": "这是只有一种可能",
+      "expected": {
+        "s2t": "這是只有一種可能",
+        "s2tw": "這是只有一種可能",
+        "s2twp": "這是只有一種可能",
+        "s2hk": "這是只有一種可能"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1304_shi_zhi_measure",
+      "input": "是只猫 是一只鸟",
+      "expected": {
+        "s2t": "是隻貓 是一隻鳥",
+        "s2tw": "是隻貓 是一隻鳥",
+        "s2twp": "是隻貓 是一隻鳥",
+        "s2hk": "是隻貓 是一隻鳥"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1304_shi_zhi_siblings",
+      "input": "是只要 是只能 是只好 是只得 是只怕",
+      "expected": {
+        "s2t": "是只要 是只能 是只好 是只得 是只怕",
+        "s2tw": "是只要 是只能 是只好 是只得 是只怕",
+        "s2twp": "是只要 是只能 是只好 是只得 是只怕",
+        "s2hk": "是只要 是只能 是只好 是只得 是只怕"
+      }
     }
   ]
 }

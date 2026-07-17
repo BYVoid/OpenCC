@@ -1825,6 +1825,36 @@
         "tw2sp": "干红",
         "hk2sp": "干红"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_586_qiantou_fasheng",
+      "input": "前头发生",
+      "expected": {
+        "s2t": "前頭發生",
+        "s2tw": "前頭發生",
+        "s2twp": "前頭發生",
+        "s2hk": "前頭發生"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_586_qiantoufa_control",
+      "input": "前头发 剪头发 头发",
+      "expected": {
+        "s2t": "前頭髮 剪頭髮 頭髮",
+        "s2tw": "前頭髮 剪頭髮 頭髮",
+        "s2twp": "前頭髮 剪頭髮 頭髮",
+        "s2hk": "前頭髮 剪頭髮 頭髮"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_586_fa_control",
+      "input": "喉头发干 不断发生",
+      "expected": {
+        "s2t": "喉頭發乾 不斷發生",
+        "s2tw": "喉頭發乾 不斷發生",
+        "s2twp": "喉頭發乾 不斷發生",
+        "s2hk": "喉頭發乾 不斷發生"
+      }
     }
   ]
 }

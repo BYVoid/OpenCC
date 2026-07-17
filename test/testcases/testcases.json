@@ -1909,6 +1909,20 @@
       "expected": {
         "tw2sp": "高级语言 高级中学"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_yun_xing_s2twp",
+      "input": "执行判决 执行任务 执行命令 系统运行 列车运行",
+      "expected": {
+        "s2twp": "執行判決 執行任務 執行命令 系統運行 列車運行"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_zhi_xing_tw2sp",
+      "input": "執行判決 執行任務 系統運行 列車運行 執行檔",
+      "expected": {
+        "tw2sp": "执行判决 执行任务 系统运行 列车运行 可执行文件"
+      }
     }
   ]
 }

@@ -1839,6 +1839,20 @@
       "expected": {
         "tw2sp": "法律程序 行政程序 诉讼程序 应用程序 驱动程序 小程序 线程 程序员"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_wen_jian_s2twp",
+      "input": "政府文件 机密文件 文件系统 文件夹 文件名",
+      "expected": {
+        "s2twp": "政府文件 機密文件 檔案系統 資料夾 檔名"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_dang_an_tw2sp",
+      "input": "歷史檔案 人事檔案 檔案系統 檔名 資料夾 公文文件",
+      "expected": {
+        "tw2sp": "历史档案 人事档案 文件系统 文件名 文件夹 公文文件"
+      }
     }
   ]
 }

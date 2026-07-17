@@ -1844,6 +1844,26 @@
         "tw2s": "雇员",
         "hk2s": "雇员"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_905_di_variant",
+      "input": "花蔕 並蔕蓮 煙蔕",
+      "expected": {
+        "t2s": "花蒂 并蒂莲 烟蒂",
+        "tw2s": "花蒂 并蒂莲 烟蒂",
+        "hk2s": "花蒂 并蒂莲 烟蒂",
+        "tw2sp": "花蒂 并蒂莲 烟蒂",
+        "hk2sp": "花蒂 并蒂莲 烟蒂"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_905_xi_default_溪_first",
+      "input": "蘭谿 松谿",
+      "expected": {
+        "t2s": "兰溪 松溪",
+        "tw2s": "兰溪 松溪",
+        "hk2s": "兰溪 松溪"
+      }
     }
   ]
 }

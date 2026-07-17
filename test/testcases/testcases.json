@@ -1923,6 +1923,20 @@
       "expected": {
         "tw2sp": "执行判决 执行任务 系统运行 列车运行 可执行文件"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_zhi_chi_s2twp",
+      "input": "支持候选人 财政支持 技术支持 支持者 支持率",
+      "expected": {
+        "s2twp": "支持候選人 財政支持 技術支援 支持者 支持率"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_zhi_yuan_tw2sp",
+      "input": "支持候選人 技術支援 後勤支援",
+      "expected": {
+        "tw2sp": "支持候选人 技术支持 后勤支持"
+      }
     }
   ]
 }

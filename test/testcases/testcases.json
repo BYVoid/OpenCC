@@ -1825,6 +1825,25 @@
         "tw2sp": "干红",
         "hk2sp": "干红"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_587_wanfa_hair",
+      "input": "挽发 绾发 挽髻 发髻",
+      "expected": {
+        "s2t": "挽髮 綰髮 挽髻 髮髻",
+        "s2tw": "挽髮 綰髮 挽髻 髮髻",
+        "s2twp": "挽髮 綰髮 挽髻 髮髻",
+        "s2hk": "挽髮 綰髮 挽髻 髮髻"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_587_wanfa_hair_t2s",
+      "input": "挽髮",
+      "expected": {
+        "t2s": "挽发",
+        "tw2s": "挽发",
+        "hk2s": "挽发"
+      }
     }
   ]
 }

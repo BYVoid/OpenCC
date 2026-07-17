@@ -1825,6 +1825,25 @@
         "tw2sp": "干红",
         "hk2sp": "干红"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_906_gu_default_and_phrases",
+      "input": "雇、雇佣、雇员、雇主、解雇、聘雇、劳雇关系",
+      "expected": {
+        "s2t": "僱、僱傭、僱員、僱主、解僱、聘僱、勞僱關係",
+        "s2tw": "僱、僱傭、僱員、僱主、解僱、聘僱、勞僱關係",
+        "s2twp": "僱、僱傭、僱員、僱主、解僱、聘僱、勞僱關係",
+        "s2hk": "僱、僱傭、僱員、僱主、解僱、聘僱、勞僱關係"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_906_gu_roundtrip_employee",
+      "input": "僱員",
+      "expected": {
+        "t2s": "雇员",
+        "tw2s": "雇员",
+        "hk2s": "雇员"
+      }
     }
   ]
 }

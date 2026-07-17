@@ -1825,6 +1825,32 @@
         "tw2sp": "干红",
         "hk2sp": "干红"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1252_plant_leng",
+      "input": "波棱菜 菠棱菜 波棱 菠棱",
+      "expected": {
+        "s2t": "波稜菜 菠稜菜 波稜 菠稜",
+        "s2tw": "波稜菜 菠稜菜 波稜 菠稜",
+        "s2twp": "波稜菜 菠稜菜 波稜 菠稜",
+        "s2hk": "波稜菜 菠稜菜 波稜 菠稜"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1252_dialect_leng",
+      "input": "棱登 焦棱 扑棱 刺棱 棱柱",
+      "expected": {
+        "s2t": "棱登 焦棱 撲棱 刺棱 棱柱",
+        "s2tw": "棱登 焦棱 撲棱 刺棱 稜柱",
+        "s2twp": "棱登 焦棱 撲棱 刺棱 稜柱"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1252_dialect_leng_t2tw",
+      "input": "棱登 焦棱 撲棱 刺棱 棱柱",
+      "expected": {
+        "t2tw": "棱登 焦棱 撲棱 刺棱 稜柱"
+      }
     }
   ]
 }

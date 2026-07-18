@@ -17,12 +17,26 @@ on:
         required: true
         type: boolean
         default: false
+      sign_windows_binaries:
+        description: Sign the win32-x64 binaries (opencc.node, opencc-jieba.dll) with SignPath before packaging
+        required: true
+        type: boolean
+        default: false
+      signpath_signing_policy_slug:
+        description: SignPath signing policy slug to use when signing is enabled
+        required: true
+        type: string
+        default: test-signing
+
+env:
+  SIGNPATH_PROJECT_SLUG: OpenCC
 
 jobs:
   publish-jieba-binaries:
     name: Publish opencc-jieba binary (${{ matrix.target }})
     runs-on: ${{ matrix.runner }}
     permissions:
+      actions: read
       contents: read
       id-token: write
     strategy:
@@ -107,6 +121,53 @@ jobs:
           npm run build -- "${{ matrix.target }}"
           test -f "prebuilds/${{ matrix.target }}/${{ matrix.library }}"
 
+      - name: Upload unsigned opencc-jieba.dll
+        if: ${{ matrix.target == 'win32-x64' && inputs.sign_windows_binaries && steps.publish_check.outputs.published != 'true' }}
+        id: upload-unsigned-jieba-dll
+        uses: actions/upload-artifact@v7
+        with:
+          name: unsigned-opencc-jieba-win32-x64
+          path: plugins/jieba/node/prebuilds/win32-x64/opencc-jieba.dll
+          archive: false
+          if-no-files-found: error
+
+      - name: Submit SignPath signing request (opencc-jieba.dll)
+        if: ${{ matrix.target == 'win32-x64' && inputs.sign_windows_binaries && steps.publish_check.outputs.published != 'true' }}
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ env.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ inputs.signpath_signing_policy_slug || 'test-signing' }}
+          artifact-configuration-slug: npm-opencc-jieba-win32-x64
+          github-artifact-id: ${{ steps.upload-unsigned-jieba-dll.outputs.artifact-id }}
+          wait-for-completion: true
+          skip-decompress: true
+          output-artifact-directory: signpath-signed/opencc-jieba
+
+      - name: Restore signed opencc-jieba.dll
+        if: ${{ matrix.target == 'win32-x64' && inputs.sign_windows_binaries && steps.publish_check.outputs.published != 'true' }}
+        shell: bash
+        run: |
+          signed="$(find signpath-signed/opencc-jieba -type f -name 'opencc-jieba.dll' | head -n 1)"
+          if [ -z "$signed" ]; then
+            echo "Signed opencc-jieba.dll not found under signpath-signed/opencc-jieba" >&2
+            find signpath-signed/opencc-jieba -type f >&2 || true
+            exit 1
+          fi
+          cp "$signed" plugins/jieba/node/prebuilds/win32-x64/opencc-jieba.dll
+
+      - name: Verify signed opencc-jieba.dll
+        if: ${{ matrix.target == 'win32-x64' && inputs.sign_windows_binaries && steps.publish_check.outputs.published != 'true' }}
+        shell: pwsh
+        run: |
+          $file = "plugins/jieba/node/prebuilds/win32-x64/opencc-jieba.dll"
+          $signature = Get-AuthenticodeSignature -FilePath $file
+          if ($signature.SignerCertificate -eq $null) {
+            throw "Missing Authenticode signature: $file"
+          }
+          Write-Host "$file signed by $($signature.SignerCertificate.Subject); status: $($signature.Status)"
+
       - name: Prepare scoped package
         if: steps.publish_check.outputs.published != 'true'
         shell: bash
@@ -189,6 +250,7 @@ jobs:
     name: Publish opencc binary (${{ matrix.target }})
     runs-on: ${{ matrix.runner }}
     permissions:
+      actions: read
       contents: read
       id-token: write
     strategy:
@@ -267,6 +329,53 @@ jobs:
         run: |
           ./scripts/build-node-prebuild-bazel.sh "${{ matrix.target }}"
           test -f "prebuilds/${{ matrix.target }}/opencc.node"
+
+      - name: Upload unsigned opencc.node
+        if: ${{ matrix.target == 'win32-x64' && inputs.sign_windows_binaries && steps.publish_check.outputs.published != 'true' }}
+        id: upload-unsigned-opencc-node
+        uses: actions/upload-artifact@v7
+        with:
+          name: unsigned-opencc-node-win32-x64
+          path: prebuilds/win32-x64/opencc.node
+          archive: false
+          if-no-files-found: error
+
+      - name: Submit SignPath signing request (opencc.node)
+        if: ${{ matrix.target == 'win32-x64' && inputs.sign_windows_binaries && steps.publish_check.outputs.published != 'true' }}
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ env.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ inputs.signpath_signing_policy_slug || 'test-signing' }}
+          artifact-configuration-slug: npm-opencc-node-win32-x64
+          github-artifact-id: ${{ steps.upload-unsigned-opencc-node.outputs.artifact-id }}
+          wait-for-completion: true
+          skip-decompress: true
+          output-artifact-directory: signpath-signed/opencc-node
+
+      - name: Restore signed opencc.node
+        if: ${{ matrix.target == 'win32-x64' && inputs.sign_windows_binaries && steps.publish_check.outputs.published != 'true' }}
+        shell: bash
+        run: |
+          signed="$(find signpath-signed/opencc-node -type f -name 'opencc.node' | head -n 1)"
+          if [ -z "$signed" ]; then
+            echo "Signed opencc.node not found under signpath-signed/opencc-node" >&2
+            find signpath-signed/opencc-node -type f >&2 || true
+            exit 1
+          fi
+          cp "$signed" prebuilds/win32-x64/opencc.node
+
+      - name: Verify signed opencc.node
+        if: ${{ matrix.target == 'win32-x64' && inputs.sign_windows_binaries && steps.publish_check.outputs.published != 'true' }}
+        shell: pwsh
+        run: |
+          $file = "prebuilds/win32-x64/opencc.node"
+          $signature = Get-AuthenticodeSignature -FilePath $file
+          if ($signature.SignerCertificate -eq $null) {
+            throw "Missing Authenticode signature: $file"
+          }
+          Write-Host "$file signed by $($signature.SignerCertificate.Subject); status: $($signature.Status)"
 
       - name: Prepare scoped package
         if: steps.publish_check.outputs.published != 'true'

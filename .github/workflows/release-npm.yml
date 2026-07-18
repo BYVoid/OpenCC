@@ -1,4 +1,5 @@
 name: Publish npm packages
+run-name: Publish npm packages${{ inputs.dry_run && ' (dry-run)' || '' }}
 
 on:
   release:

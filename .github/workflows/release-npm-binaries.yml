@@ -156,7 +156,11 @@ jobs:
             find signpath-signed/opencc-jieba -type f >&2 || true
             exit 1
           fi
-          cp "$signed" plugins/jieba/node/prebuilds/win32-x64/opencc-jieba.dll
+          dest="plugins/jieba/node/prebuilds/win32-x64/opencc-jieba.dll"
+          chmod u+w "$dest" 2>/dev/null || true
+          rm -f "$dest"
+          cp "$signed" "$dest"
+          chmod u+w "$dest"
 
       - name: Verify signed opencc-jieba.dll
         if: ${{ matrix.target == 'win32-x64' && inputs.sign_windows_binaries && steps.publish_check.outputs.published != 'true' }}
@@ -365,7 +369,11 @@ jobs:
             find signpath-signed/opencc-node -type f >&2 || true
             exit 1
           fi
-          cp "$signed" prebuilds/win32-x64/opencc.node
+          dest="prebuilds/win32-x64/opencc.node"
+          chmod u+w "$dest" 2>/dev/null || true
+          rm -f "$dest"
+          cp "$signed" "$dest"
+          chmod u+w "$dest"
 
       - name: Verify signed opencc.node
         if: ${{ matrix.target == 'win32-x64' && inputs.sign_windows_binaries && steps.publish_check.outputs.published != 'true' }}

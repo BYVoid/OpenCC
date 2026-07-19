@@ -16,9 +16,12 @@ on:
         type: boolean
         default: false
       signpath_signing_policy_slug:
-        description: "SignPath signing policy slug to use when signing is enabled"
+        description: "SignPath signing policy to use when signing is enabled"
         required: true
-        type: string
+        type: choice
+        options:
+          - release-signing
+          - test-signing
         default: release-signing
 
 concurrency:

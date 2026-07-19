@@ -24,10 +24,13 @@ on:
         type: boolean
         default: false
       signpath_signing_policy_slug:
-        description: SignPath signing policy slug to use when signing is enabled
+        description: SignPath signing policy to use when signing is enabled
         required: true
-        type: string
-        default: test-signing
+        type: choice
+        options:
+          - release-signing
+          - test-signing
+        default: release-signing
 
 env:
   SIGNPATH_PROJECT_SLUG: OpenCC
@@ -139,7 +142,7 @@ jobs:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
           organization-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
           project-slug: ${{ env.SIGNPATH_PROJECT_SLUG }}
-          signing-policy-slug: ${{ inputs.signpath_signing_policy_slug || 'test-signing' }}
+          signing-policy-slug: ${{ inputs.signpath_signing_policy_slug || 'release-signing' }}
           artifact-configuration-slug: npm-opencc-jieba-win32-x64
           github-artifact-id: ${{ steps.upload-unsigned-jieba-dll.outputs.artifact-id }}
           wait-for-completion: true
@@ -352,7 +355,7 @@ jobs:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
           organization-id: ${{ secrets.SIGNPATH_ORGANIZATION_ID }}
           project-slug: ${{ env.SIGNPATH_PROJECT_SLUG }}
-          signing-policy-slug: ${{ inputs.signpath_signing_policy_slug || 'test-signing' }}
+          signing-policy-slug: ${{ inputs.signpath_signing_policy_slug || 'release-signing' }}
           artifact-configuration-slug: npm-opencc-node-win32-x64
           github-artifact-id: ${{ steps.upload-unsigned-opencc-node.outputs.artifact-id }}
           wait-for-completion: true

@@ -18,8 +18,10 @@
 
 #include "ConversionAmbiguities.hpp"
 
+#include <cassert>
 #include <cstring>
 #include <unordered_map>
+#include <utility>
 
 #include "Common.hpp"
 #include "ConfigBasedConverter.hpp"
@@ -48,18 +50,14 @@ struct Run {
 // Replays Conversion::AppendConverted() for one dictionary over `in`, using
 // the DictEntry-returning MatchPrefix() so the candidate count is visible.
 // Appends the converted text to `out` and the alignment to `runs`.
-// Consecutive unambiguous runs are coalesced to keep the run list sparse.
+//
+// Runs must stay at match/character granularity: Compose() treats runs as
+// atomic and widens groups until boundaries align, so coalescing adjacent
+// unambiguous runs here would make a later-stage ambiguous match widen to
+// the whole coalesced range (in real chains such as s2tw, where stage one
+// rarely flags anything, that would stain an entire segment).
 void WalkStage(const DictPtr& dict, std::string_view in, std::string* out,
                std::vector<Run>* runs) {
-  auto pushRun = [runs](size_t srcLen, size_t dstLen, bool ambiguous) {
-    if (!ambiguous && !runs->empty() && !runs->back().ambiguous) {
-      runs->back().srcLen += srcLen;
-      runs->back().dstLen += dstLen;
-      return;
-    }
-    runs->push_back(Run{srcLen, dstLen, ambiguous});
-  };
-
   const char* pstr = in.data();
   const char* const end = pstr + in.size();
   while (pstr < end) {
@@ -75,7 +73,7 @@ void WalkStage(const DictPtr& dict, std::string_view in, std::string* out,
         charLen = remaining;
       }
       out->append(pstr, charLen);
-      pushRun(charLen, charLen, false);
+      runs->push_back(Run{charLen, charLen, false});
       pstr += charLen;
     } else {
       const DictEntry* entry = match.Get();
@@ -85,7 +83,7 @@ void WalkStage(const DictPtr& dict, std::string_view in, std::string* out,
       }
       const std::string_view value = entry->GetDefaultView();
       out->append(value.data(), value.size());
-      pushRun(keyLen, value.size(), entry->NumValues() > 1);
+      runs->push_back(Run{keyLen, value.size(), entry->NumValues() > 1});
       pstr += keyLen;
     }
   }
@@ -109,11 +107,15 @@ std::vector<Run> Compose(const std::vector<Run>& a, const std::vector<Run>& b) {
     ib++;
     while (aMid != bMid) {
       if (aMid < bMid) {
+        // The totals of a's dstLen and b's srcLen are equal (both measure
+        // the intermediate text), so the lagging side always has runs left.
+        assert(ia < a.size());
         srcLen += a[ia].srcLen;
         aMid += a[ia].dstLen;
         ambiguous = ambiguous || a[ia].ambiguous;
         ia++;
       } else {
+        assert(ib < b.size());
         bMid += b[ib].srcLen;
         dstLen += b[ib].dstLen;
         ambiguous = ambiguous || b[ib].ambiguous;
@@ -123,8 +125,8 @@ std::vector<Run> Compose(const std::vector<Run>& a, const std::vector<Run>& b) {
     out.push_back(Run{srcLen, dstLen, ambiguous});
   }
   // Trailing runs can only be zero-width on the shared middle coordinate
-  // (empty dictionary values / empty keys never occur in practice); fold them
-  // into the last group so both totals stay accounted for.
+  // (empty dictionary values / empty keys); fold them into the last group so
+  // both totals stay accounted for.
   for (; ia < a.size(); ia++) {
     if (out.empty()) {
       out.push_back(Run{0, 0, false});
@@ -150,8 +152,9 @@ AnnotatedConversion ConvertWithAmbiguities(const Converter& converter,
   const ConversionChainPtr chain = converter.GetConversionChain();
   if (chain == nullptr) {
     // No single conversion chain to walk (e.g. PipelineConverter); return the
-    // plain conversion with no ambiguity information.
+    // plain conversion and flag the result as unanalyzed.
     result.output = converter.Convert(text);
+    result.analyzed = false;
     return result;
   }
 
@@ -174,7 +177,17 @@ AnnotatedConversion ConvertWithAmbiguities(const Converter& converter,
   }
 
   std::unordered_map<std::string, size_t> sourceIndexes;
+  // Each segment is walked through the whole chain before moving to the
+  // next (segment-outer, stage-inner), while ConversionChain::Convert is
+  // stage-outer, segment-inner.  The two orders are equivalent only
+  // because every Conversion converts each segment independently and never
+  // matches across segment boundaries; if the chain ever gains cross-
+  // segment optimizations, this walk must be restructured to keep the
+  // byte-identical-output contract with Converter::Convert().
   for (const char* segment : *segments) {
+    // strlen() mirrors Convert(), which also consumes segments as
+    // NUL-terminated strings; input containing NUL bytes is truncated
+    // identically on both paths, so offsets stay aligned.
     const std::string_view segmentView(segment, std::strlen(segment));
 
     // Walk the segment through the chain, keeping the composed alignment
@@ -195,7 +208,6 @@ AnnotatedConversion ConvertWithAmbiguities(const Converter& converter,
       // Empty chain: the segment passes through unchanged.
       aligned.push_back(
           Run{segmentView.size(), segmentView.size(), false});
-      current.assign(segmentView);
     }
 
     size_t srcOffset = 0;
@@ -229,7 +241,7 @@ public:
 
 AmbiguityStream::AmbiguityStream(ConverterPtr converter, size_t maxKeepChars)
     : impl(new Impl) {
-  impl->converter = converter;
+  impl->converter = std::move(converter);
   impl->maxKeepChars = maxKeepChars;
 }
 

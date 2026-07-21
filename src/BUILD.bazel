@@ -322,6 +322,7 @@ cc_test(
         ":converter_lib",
         ":lexicon_lib",
         ":max_match_segmentation_lib",
+        ":pipeline_converter_lib",
         ":single_stage_converter_lib",
         ":test_utils_lib",
         ":test_utils_utf8_lib",

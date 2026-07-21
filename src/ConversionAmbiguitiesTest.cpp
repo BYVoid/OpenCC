@@ -23,6 +23,7 @@
 #include "Converter.hpp"
 #include "Lexicon.hpp"
 #include "MaxMatchSegmentation.hpp"
+#include "PipelineConverter.hpp"
 #include "SingleStageConverter.hpp"
 #include "TestUtils.hpp"
 #include "TestUtilsUTF8.hpp"
@@ -62,10 +63,10 @@ TEST_F(ConversionAmbiguitiesTest, SingleStageMultiValue) {
       ConvertWithAmbiguities(*converter, "aba");
   EXPECT_EQ("xyx", result.output);
   EXPECT_EQ(converter->Convert("aba"), result.output);
-  ASSERT_EQ(1, result.ambiguities.size());
-  EXPECT_EQ(1, result.ambiguities[0].outputOffset);
-  EXPECT_EQ(1, result.ambiguities[0].outputLength);
-  ASSERT_EQ(1, result.sources.size());
+  ASSERT_EQ(1u, result.ambiguities.size());
+  EXPECT_EQ(1u, result.ambiguities[0].outputOffset);
+  EXPECT_EQ(1u, result.ambiguities[0].outputLength);
+  ASSERT_EQ(1u, result.sources.size());
   EXPECT_EQ("b", result.sources[result.ambiguities[0].sourceIndex]);
 }
 
@@ -75,13 +76,13 @@ TEST_F(ConversionAmbiguitiesTest, SourcesAreDeduplicated) {
   const AnnotatedConversion result =
       ConvertWithAmbiguities(*converter, "bcb");
   EXPECT_EQ("ycy", result.output);
-  ASSERT_EQ(2, result.ambiguities.size());
-  EXPECT_EQ(0, result.ambiguities[0].outputOffset);
-  EXPECT_EQ(2, result.ambiguities[1].outputOffset);
-  ASSERT_EQ(1, result.sources.size());
+  ASSERT_EQ(2u, result.ambiguities.size());
+  EXPECT_EQ(0u, result.ambiguities[0].outputOffset);
+  EXPECT_EQ(2u, result.ambiguities[1].outputOffset);
+  ASSERT_EQ(1u, result.sources.size());
   EXPECT_EQ("b", result.sources[0]);
-  EXPECT_EQ(0, result.ambiguities[0].sourceIndex);
-  EXPECT_EQ(0, result.ambiguities[1].sourceIndex);
+  EXPECT_EQ(0u, result.ambiguities[0].sourceIndex);
+  EXPECT_EQ(0u, result.ambiguities[1].sourceIndex);
 }
 
 TEST_F(ConversionAmbiguitiesTest, AmbiguityInLaterStageMapsToInputSource) {
@@ -94,10 +95,34 @@ TEST_F(ConversionAmbiguitiesTest, AmbiguityInLaterStageMapsToInputSource) {
   const AnnotatedConversion result = ConvertWithAmbiguities(*converter, "ab");
   EXPECT_EQ("am", result.output);
   EXPECT_EQ(converter->Convert("ab"), result.output);
-  ASSERT_EQ(1, result.ambiguities.size());
-  EXPECT_EQ(1, result.ambiguities[0].outputOffset);
-  EXPECT_EQ(1, result.ambiguities[0].outputLength);
+  ASSERT_EQ(1u, result.ambiguities.size());
+  EXPECT_EQ(1u, result.ambiguities[0].outputOffset);
+  EXPECT_EQ(1u, result.ambiguities[0].outputLength);
   EXPECT_EQ("b", result.sources[result.ambiguities[0].sourceIndex]);
+}
+
+TEST_F(ConversionAmbiguitiesTest, LaterStageAmbiguityKeepsMatchPrecision) {
+  // Regression test for run coalescing: stage 1 matches nothing in the
+  // segment (its runs are all unambiguous), and stage 2 flags a single
+  // character in the middle.  The span must stay one character wide -- it
+  // must NOT widen to the whole segment.  This mirrors real multi-stage
+  // chains (e.g. s2tw), where stage one is a phrase pass that rarely
+  // flags anything and the variant pass flags individual characters
+  // inside long unsegmented runs.
+  std::list<ConversionPtr> conversions{
+      ConversionPtr(new Conversion(MakeDict({{"zz", {"zz"}}}))),
+      ConversionPtr(new Conversion(MakeDict({{"x", {"m", "n"}}})))};
+  const ConverterPtr converter(new SingleStageConverter(
+      SegmentationPtr(new MaxMatchSegmentation(MakeDict({}))),
+      ConversionChainPtr(new ConversionChain(conversions))));
+  const AnnotatedConversion result =
+      ConvertWithAmbiguities(*converter, "aaaxbbb");
+  EXPECT_EQ("aaambbb", result.output);
+  EXPECT_EQ(converter->Convert("aaaxbbb"), result.output);
+  ASSERT_EQ(1u, result.ambiguities.size());
+  EXPECT_EQ(3u, result.ambiguities[0].outputOffset);
+  EXPECT_EQ(1u, result.ambiguities[0].outputLength);
+  EXPECT_EQ("x", result.sources[result.ambiguities[0].sourceIndex]);
 }
 
 TEST_F(ConversionAmbiguitiesTest, StraddlingMatchCoarsensSpan) {
@@ -116,10 +141,25 @@ TEST_F(ConversionAmbiguitiesTest, StraddlingMatchCoarsensSpan) {
   const AnnotatedConversion result = ConvertWithAmbiguities(*converter, "ab");
   EXPECT_EQ("Q", result.output);
   EXPECT_EQ(converter->Convert("ab"), result.output);
-  ASSERT_EQ(1, result.ambiguities.size());
-  EXPECT_EQ(0, result.ambiguities[0].outputOffset);
-  EXPECT_EQ(1, result.ambiguities[0].outputLength);
+  ASSERT_EQ(1u, result.ambiguities.size());
+  EXPECT_EQ(0u, result.ambiguities[0].outputOffset);
+  EXPECT_EQ(1u, result.ambiguities[0].outputLength);
   EXPECT_EQ("ab", result.sources[result.ambiguities[0].sourceIndex]);
+}
+
+TEST_F(ConversionAmbiguitiesTest, PipelineConverterIsFlaggedUnanalyzed) {
+  // A converter without a single conversion chain still converts, but the
+  // result must be distinguishable from "converted with no ambiguities".
+  const ConverterPtr pipeline(new PipelineConverter(
+      {MakeConverter({MakeDict({{"b", {"y", "z"}}})})}));
+  const AnnotatedConversion result = ConvertWithAmbiguities(*pipeline, "b");
+  EXPECT_EQ("y", result.output);
+  EXPECT_FALSE(result.analyzed);
+  EXPECT_TRUE(result.ambiguities.empty());
+
+  const AnnotatedConversion analyzed = ConvertWithAmbiguities(
+      *MakeConverter({MakeDict({{"b", {"y", "z"}}})}), "b");
+  EXPECT_TRUE(analyzed.analyzed);
 }
 
 TEST_F(ConversionAmbiguitiesTest, UnmatchedTextHasNoAmbiguities) {
@@ -140,17 +180,23 @@ TEST_F(ConversionAmbiguitiesTest, PhraseEntryShadowsAmbiguousCharacter) {
   const AnnotatedConversion result = ConvertWithAmbiguities(*converter, "abcb");
   EXPECT_EQ("Wcy", result.output);
   EXPECT_EQ(converter->Convert("abcb"), result.output);
-  ASSERT_EQ(1, result.ambiguities.size());
-  EXPECT_EQ(2, result.ambiguities[0].outputOffset);
+  ASSERT_EQ(1u, result.ambiguities.size());
+  EXPECT_EQ(2u, result.ambiguities[0].outputOffset);
   EXPECT_EQ("b", result.sources[result.ambiguities[0].sourceIndex]);
 }
 
 TEST_F(ConversionAmbiguitiesTest, ChunkedStreamMatchesWholeInput) {
+  // Two stages with phrase (multi-character) entries, so the test also
+  // covers segmentation stability across flush-window boundaries.
   const ConverterPtr converter =
-      MakeConverter({MakeDict({{"a", {"x"}}, {"b", {"y", "z"}}, {"c", {"p", "q"}}})});
+      MakeConverter({MakeDict({{"ab", {"XY"}},
+                               {"b", {"y", "z"}},
+                               {"c", {"p", "q"}},
+                               {"de", {"UV", "WW"}}}),
+                     MakeDict({{"XY", {"J"}}, {"p", {"r", "s"}}})});
   std::string input;
   for (int i = 0; i < 100; i++) {
-    input += "abcab";
+    input += "abcabde";
   }
   const AnnotatedConversion whole = ConvertWithAmbiguities(*converter, input);
 
@@ -195,9 +241,9 @@ TEST_F(ConversionAmbiguitiesTest, Utf8OffsetsAreBytes) {
   const std::string input = utf8("文丑");
   const AnnotatedConversion result = ConvertWithAmbiguities(*converter, input);
   EXPECT_EQ(utf8("文醜"), result.output);
-  ASSERT_EQ(1, result.ambiguities.size());
-  EXPECT_EQ(3, result.ambiguities[0].outputOffset);
-  EXPECT_EQ(3, result.ambiguities[0].outputLength);
+  ASSERT_EQ(1u, result.ambiguities.size());
+  EXPECT_EQ(3u, result.ambiguities[0].outputOffset);
+  EXPECT_EQ(3u, result.ambiguities[0].outputLength);
   EXPECT_EQ(utf8("丑"), result.sources[result.ambiguities[0].sourceIndex]);
   EXPECT_EQ(utf8("醜"),
             result.output.substr(result.ambiguities[0].outputOffset,

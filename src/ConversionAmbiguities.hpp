@@ -24,11 +24,10 @@
 #include <vector>
 
 #include "Common.hpp"
+#include "Converter.hpp"
 #include "Export.hpp"
 
 namespace opencc {
-
-class Converter;
 
 /**
  * One span of the converted output whose source maps to more than one
@@ -67,6 +66,10 @@ struct AnnotatedConversion {
   std::string output;
   std::vector<std::string> sources;
   std::vector<AmbiguousSpan> ambiguities;
+  /** False when the converter could not be analyzed (no single conversion
+   *  chain, e.g. PipelineConverter): output is still the plain conversion
+   *  result, but empty ambiguities then means "unknown", not "none". */
+  bool analyzed = true;
 };
 
 /**
@@ -118,7 +121,8 @@ public:
     std::vector<std::string> newSources;
   };
 
-  explicit AmbiguityStream(ConverterPtr converter, size_t maxKeepChars = 16);
+  explicit AmbiguityStream(ConverterPtr converter,
+                           size_t maxKeepChars = kDefaultStreamKeepChars);
   ~AmbiguityStream();
 
   /** Appends @p input and flushes everything but the kept tail. */

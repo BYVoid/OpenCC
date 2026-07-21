@@ -362,53 +362,6 @@ void WriteInspectionResultJson(Writer& writer,
   writer.EndObject();
 }
 
-// Serializes an AnnotatedConversion as a JSON object. Used with
-// --ambiguities mode. "parts" splits the output into alternating literal
-// strings and {"t": defaultCandidate, "s": sourceIndex} objects for the
-// one-to-many spans, so consumers rebuild offsets in their own native
-// string-index unit; "sources" holds the deduplicated input slices to pass
-// to a candidate lookup.
-std::string SerializeAmbiguitiesJson(const std::string& input,
-                                     const AnnotatedConversion& result) {
-  rapidjson::StringBuffer buffer;
-  rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-  writer.StartObject();
-  writer.Key("input");
-  writer.String(input.c_str(), input.size());
-  writer.Key("text");
-  writer.String(result.output.c_str(), result.output.size());
-  writer.Key("sources");
-  writer.StartArray();
-  for (const auto& source : result.sources) {
-    writer.String(source.c_str(), source.size());
-  }
-  writer.EndArray();
-  writer.Key("parts");
-  writer.StartArray();
-  size_t consumed = 0;
-  for (const auto& span : result.ambiguities) {
-    if (span.outputOffset > consumed) {
-      writer.String(result.output.c_str() + consumed,
-                    span.outputOffset - consumed);
-    }
-    writer.StartObject();
-    writer.Key("t");
-    writer.String(result.output.c_str() + span.outputOffset,
-                  span.outputLength);
-    writer.Key("s");
-    writer.Uint64(span.sourceIndex);
-    writer.EndObject();
-    consumed = span.outputOffset + span.outputLength;
-  }
-  if (consumed < result.output.size()) {
-    writer.String(result.output.c_str() + consumed,
-                  result.output.size() - consumed);
-  }
-  writer.EndArray();
-  writer.EndObject();
-  return buffer.GetString();
-}
-
 // Serializes the full inspection result as a JSON object. Used with
 // --inspect mode. Handles both single-stage and pipeline converters.
 std::string SerializeInspectionResultJson(
@@ -435,10 +388,6 @@ std::string ConvertLineByMode(const std::string& line) {
   } else if (outputMode == OutputMode::Inspect) {
     const ConversionInspectionResult& result = converter->Inspect(line);
     output = SerializeInspectionResultJson(result);
-  } else if (outputMode == OutputMode::Ambiguities) {
-    const AnnotatedConversion& result =
-        ConvertWithAmbiguities(*converter, line);
-    output = SerializeAmbiguitiesJson(line, result);
   } else {
     output = converter->Convert(std::string_view(line));
   }
@@ -498,8 +447,10 @@ void WriteAmbiguityChunkRecords(const AmbiguityStream::Chunk& chunk,
   writeLiteral(chunk.output.size());
 }
 
-// Streaming --ambiguities over file input: bounded memory regardless of
-// line length or segmentation, emitting define-on-first-use records.
+// Streaming --ambiguities over any input stream (file or stdin): bounded
+// memory regardless of line length or segmentation, emitting
+// define-on-first-use records. This is the only --ambiguities output
+// format, so consumers see one schema no matter how the tool is invoked.
 void ConvertAmbiguitiesStream(FILE* fin, FILE* fout) {
   const int BUFFER_SIZE = 1024 * 1024;
   std::string buffer(BUFFER_SIZE, '\0');
@@ -647,9 +598,6 @@ void ConvertLineByLine() {
 void ConvertFileStreams(FILE* fin, FILE* fout) {
   try {
     if (outputMode == OutputMode::Ambiguities) {
-      // File input streams define-on-first-use records with bounded memory;
-      // lines (and unsegmented runs) can be arbitrarily long, so the
-      // per-line JSON envelope is reserved for interactive stdin.
       ConvertAmbiguitiesStream(fin, fout);
       return;
     }
@@ -749,7 +697,11 @@ void ConvertStdin() {
   PrintInteractiveStdinHint();
   SetBinaryMode(stdin);
   FILE* fout = GetOutputStream();
-  ConvertStream(stdin, fout);
+  if (outputMode == OutputMode::Ambiguities) {
+    ConvertAmbiguitiesStream(stdin, fout);
+  } else {
+    ConvertStream(stdin, fout);
+  }
   fclose(fout);
 }
 
@@ -799,8 +751,8 @@ int CommandLineMain(std::vector<std::string> args) {
         cmd, false);
     TCLAP::SwitchArg ambiguitiesArg(
         "", "ambiguities",
-        "Output converted text plus one-to-many (ambiguous) conversion spans "
-        "as JSON.",
+        "Convert while streaming JSONL records that mark one-to-many "
+        "(ambiguous) conversion spans.",
         cmd, false);
     TCLAP::SwitchArg includeTofuRiskDictionariesArg(
         "", "include-tofu-risk-dictionaries",
@@ -909,7 +861,8 @@ int CommandLineMain(std::vector<std::string> args) {
     bool lineByLine = inputFileName.IsNull();
     measurement.lineByLine = lineByLine;
     measurement.outputMode = outputMode;
-    if (lineByLine && outputMode == OutputMode::Convert) {
+    if (lineByLine && (outputMode == OutputMode::Convert ||
+                       outputMode == OutputMode::Ambiguities)) {
       ConvertStdin();
     } else if (lineByLine) {
       ConvertLineByLine();

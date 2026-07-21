@@ -526,6 +526,55 @@ TEST_F(CommandLineConvertTest, AmbiguitiesEmitsDefineOnFirstUseRecords) {
   EXPECT_EQ(GetFileContents(convertFile), reconstructed);
 }
 
+TEST_F(CommandLineConvertTest, AmbiguitiesCoversMultiStageChain) {
+  const std::string inputFile = InputFile("ambiguities_s2twp");
+  const std::string recordsFile = OutputFile("ambiguities_s2twp");
+  const std::string convertFile = OutputFile("ambiguities_s2twp_convert");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    // s2twp is a multi-stage chain: 下面 is one-to-many in stage one
+    // (STPhrases 下面 -> 下面 下麪) while 信号 becomes one-to-many in the
+    // regional stage (TWPhrases 信號 -> 訊號 信號), so its span must map
+    // back through the stage alignment to the Simplified input slice.
+    // 软件 converts unambiguously (軟件 -> 軟體) and must not be flagged.
+    ofs << "下面是软件的信号";
+  }
+
+  ASSERT_EQ(0, system(TestCommand("s2twp", inputFile, convertFile).c_str()));
+  ASSERT_EQ(0, system(TestCommandWithFlags("s2twp", inputFile, recordsFile,
+                                           "--ambiguities")
+                          .c_str()));
+
+  std::istringstream records(GetFileContents(recordsFile));
+  std::string line;
+  std::string reconstructed;
+  std::vector<std::string> defs;
+  std::vector<std::string> ambSources;
+  while (std::getline(records, line)) {
+    if (line.empty()) {
+      continue;
+    }
+    rapidjson::Document doc;
+    doc.Parse(line.c_str());
+    ASSERT_FALSE(doc.HasParseError()) << line;
+    if (doc.HasMember("def")) {
+      defs.push_back(doc["def"].GetString());
+    } else if (doc.HasMember("lit")) {
+      reconstructed += doc["lit"].GetString();
+    } else if (doc.HasMember("amb")) {
+      const size_t index = doc["amb"]["s"].GetUint64();
+      ASSERT_LT(index, defs.size()) << line;
+      ambSources.push_back(defs[index]);
+      reconstructed += doc["amb"]["t"].GetString();
+    }
+  }
+  EXPECT_EQ(GetFileContents(convertFile), reconstructed);
+  EXPECT_EQ((std::vector<std::string>{"下面", "信号"}), defs);
+  EXPECT_EQ((std::vector<std::string>{"下面", "信号"}), ambSources);
+}
+
 TEST_F(CommandLineConvertTest, StdinPreservesLineEndingsAndUnknownCharacters) {
   const std::string config = "s2t";
   const std::string inputFile = InputFile("stdin_line_endings");

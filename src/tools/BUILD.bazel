@@ -19,6 +19,7 @@ cc_library(
         ":platform_io_lib",
         "//src:cmd_line_output_lib",
         "//src:config_lib",
+        "//src:conversion_ambiguities_lib",
         "//src:conversion_inspection_lib",
         "//src:converter_lib",
         "//src:exception_lib",

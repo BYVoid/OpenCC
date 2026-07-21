@@ -35,6 +35,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "src/CmdLineOutput.hpp"
 #include "src/Config.hpp"
+#include "src/ConversionAmbiguities.hpp"
 #include "src/ConversionInspection.hpp"
 #include "src/Converter.hpp"
 #include "src/Exception.hpp"
@@ -51,6 +52,7 @@ enum class OutputMode {
   Convert,
   Segmentation,
   Inspect,
+  Ambiguities,
 };
 
 class OpenCCOutput : public CmdLineOutput {
@@ -199,6 +201,9 @@ void WriteMeasuredResult() {
     break;
   case OutputMode::Inspect:
     writer.String("inspect");
+    break;
+  case OutputMode::Ambiguities:
+    writer.String("ambiguities");
     break;
   default:
     writer.String("convert");
@@ -357,6 +362,53 @@ void WriteInspectionResultJson(Writer& writer,
   writer.EndObject();
 }
 
+// Serializes an AnnotatedConversion as a JSON object. Used with
+// --ambiguities mode. "parts" splits the output into alternating literal
+// strings and {"t": defaultCandidate, "s": sourceIndex} objects for the
+// one-to-many spans, so consumers rebuild offsets in their own native
+// string-index unit; "sources" holds the deduplicated input slices to pass
+// to a candidate lookup.
+std::string SerializeAmbiguitiesJson(const std::string& input,
+                                     const AnnotatedConversion& result) {
+  rapidjson::StringBuffer buffer;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+  writer.StartObject();
+  writer.Key("input");
+  writer.String(input.c_str(), input.size());
+  writer.Key("text");
+  writer.String(result.output.c_str(), result.output.size());
+  writer.Key("sources");
+  writer.StartArray();
+  for (const auto& source : result.sources) {
+    writer.String(source.c_str(), source.size());
+  }
+  writer.EndArray();
+  writer.Key("parts");
+  writer.StartArray();
+  size_t consumed = 0;
+  for (const auto& span : result.ambiguities) {
+    if (span.outputOffset > consumed) {
+      writer.String(result.output.c_str() + consumed,
+                    span.outputOffset - consumed);
+    }
+    writer.StartObject();
+    writer.Key("t");
+    writer.String(result.output.c_str() + span.outputOffset,
+                  span.outputLength);
+    writer.Key("s");
+    writer.Uint64(span.sourceIndex);
+    writer.EndObject();
+    consumed = span.outputOffset + span.outputLength;
+  }
+  if (consumed < result.output.size()) {
+    writer.String(result.output.c_str() + consumed,
+                  result.output.size() - consumed);
+  }
+  writer.EndArray();
+  writer.EndObject();
+  return buffer.GetString();
+}
+
 // Serializes the full inspection result as a JSON object. Used with
 // --inspect mode. Handles both single-stage and pipeline converters.
 std::string SerializeInspectionResultJson(
@@ -383,12 +435,139 @@ std::string ConvertLineByMode(const std::string& line) {
   } else if (outputMode == OutputMode::Inspect) {
     const ConversionInspectionResult& result = converter->Inspect(line);
     output = SerializeInspectionResultJson(result);
+  } else if (outputMode == OutputMode::Ambiguities) {
+    const AnnotatedConversion& result =
+        ConvertWithAmbiguities(*converter, line);
+    output = SerializeAmbiguitiesJson(line, result);
   } else {
     output = converter->Convert(std::string_view(line));
   }
   measurement.convertMs += DurationToMilliseconds(
       std::chrono::steady_clock::now() - convertStart);
   return output;
+}
+
+// Writes one define-on-first-use JSONL record. Record kinds:
+//   {"def":"<source>"}            defines the next global source index
+//   {"lit":"<text>"}              literal (unambiguous) output run
+//   {"amb":{"t":"<text>","s":N}}  ambiguous span; N is a global source index
+//   {"end":{...}}                 stream summary
+void WriteAmbiguityChunkRecords(const AmbiguityStream::Chunk& chunk,
+                                FILE* fout) {
+  rapidjson::StringBuffer buffer;
+  auto flushRecord = [&buffer, fout]() {
+    fputs(buffer.GetString(), fout);
+    fputc('\n', fout);
+    buffer.Clear();
+  };
+  for (const std::string& source : chunk.newSources) {
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    writer.StartObject();
+    writer.Key("def");
+    writer.String(source.c_str(), source.size());
+    writer.EndObject();
+    flushRecord();
+  }
+  size_t consumed = 0;
+  auto writeLiteral = [&](size_t until) {
+    if (until > consumed) {
+      rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+      writer.StartObject();
+      writer.Key("lit");
+      writer.String(chunk.output.c_str() + consumed, until - consumed);
+      writer.EndObject();
+      flushRecord();
+    }
+  };
+  for (const auto& span : chunk.ambiguities) {
+    writeLiteral(span.outputOffset);
+    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    writer.StartObject();
+    writer.Key("amb");
+    writer.StartObject();
+    writer.Key("t");
+    writer.String(chunk.output.c_str() + span.outputOffset,
+                  span.outputLength);
+    writer.Key("s");
+    writer.Uint64(span.sourceIndex);
+    writer.EndObject();
+    writer.EndObject();
+    flushRecord();
+    consumed = span.outputOffset + span.outputLength;
+  }
+  writeLiteral(chunk.output.size());
+}
+
+// Streaming --ambiguities over file input: bounded memory regardless of
+// line length or segmentation, emitting define-on-first-use records.
+void ConvertAmbiguitiesStream(FILE* fin, FILE* fout) {
+  const int BUFFER_SIZE = 1024 * 1024;
+  std::string buffer(BUFFER_SIZE, '\0');
+  AmbiguityStream stream(converter);
+  size_t outputBytes = 0;
+  size_t ambiguityCount = 0;
+
+  auto emitChunk = [&](const AmbiguityStream::Chunk& chunk) {
+    outputBytes += chunk.output.size();
+    ambiguityCount += chunk.ambiguities.size();
+    const auto writeStart = std::chrono::steady_clock::now();
+    WriteAmbiguityChunkRecords(chunk, fout);
+    if (!noFlush) {
+      fflush(fout);
+    }
+    measurement.writeMs += DurationToMilliseconds(
+        std::chrono::steady_clock::now() - writeStart);
+  };
+
+  bool finished = false;
+  while (!feof(fin)) {
+    size_t length = fread(&buffer[0], sizeof(char), buffer.size(), fin);
+    if (length == 0) {
+      break;
+    }
+    measurement.inputBytes += length;
+    WarnIfStreamChunkContainsVariationSelector(buffer.data(), length);
+
+    const auto convertStart = std::chrono::steady_clock::now();
+    const bool isFinalChunk = length < buffer.size() && feof(fin);
+    const AmbiguityStream::Chunk chunk =
+        isFinalChunk ? stream.Finish({buffer.data(), length})
+                     : stream.ConvertChunk({buffer.data(), length});
+    measurement.convertMs += DurationToMilliseconds(
+        std::chrono::steady_clock::now() - convertStart);
+    emitChunk(chunk);
+    if (isFinalChunk) {
+      finished = true;
+      break;
+    }
+  }
+  if (!finished) {
+    const auto convertStart = std::chrono::steady_clock::now();
+    const AmbiguityStream::Chunk chunk = stream.Finish();
+    measurement.convertMs += DurationToMilliseconds(
+        std::chrono::steady_clock::now() - convertStart);
+    emitChunk(chunk);
+  }
+  measurement.outputBytes += outputBytes;
+
+  rapidjson::StringBuffer endBuffer;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(endBuffer);
+  writer.StartObject();
+  writer.Key("end");
+  writer.StartObject();
+  writer.Key("output_bytes");
+  writer.Uint64(outputBytes);
+  writer.Key("ambiguities");
+  writer.Uint64(ambiguityCount);
+  writer.Key("sources");
+  writer.Uint64(stream.SourceCount());
+  writer.EndObject();
+  writer.EndObject();
+  fputs(endBuffer.GetString(), fout);
+  fputc('\n', fout);
+  if (!noFlush) {
+    fflush(fout);
+  }
 }
 
 void ConvertStream(FILE* fin, FILE* fout) {
@@ -467,10 +646,17 @@ void ConvertLineByLine() {
 
 void ConvertFileStreams(FILE* fin, FILE* fout) {
   try {
+    if (outputMode == OutputMode::Ambiguities) {
+      // File input streams define-on-first-use records with bounded memory;
+      // lines (and unsegmented runs) can be arbitrarily long, so the
+      // per-line JSON envelope is reserved for interactive stdin.
+      ConvertAmbiguitiesStream(fin, fout);
+      return;
+    }
     if (outputMode == OutputMode::Segmentation ||
         outputMode == OutputMode::Inspect) {
-      // Inspect/segmentation modes process line by line using std::getline to
-      // handle arbitrarily long lines.
+      // Inspect/segmentation modes process line by line using
+      // std::getline to handle arbitrarily long lines.
       bool isFirstLine = true;
       std::string line;
       while (ReadLine(fin, &line)) {
@@ -611,6 +797,11 @@ int CommandLineMain(std::vector<std::string> args) {
         "Output full inspection result (segmentation + per-stage conversion + "
         "final output) as JSON.",
         cmd, false);
+    TCLAP::SwitchArg ambiguitiesArg(
+        "", "ambiguities",
+        "Output converted text plus one-to-many (ambiguous) conversion spans "
+        "as JSON.",
+        cmd, false);
     TCLAP::SwitchArg includeTofuRiskDictionariesArg(
         "", "include-tofu-risk-dictionaries",
         "Include dictionaries marked as possibly outputting tofu, i.e. "
@@ -654,8 +845,11 @@ int CommandLineMain(std::vector<std::string> args) {
     cmd.parse(visibleArgs);
 
     // Validate mutual exclusion and dependencies
-    if (segmentationArg.getValue() && inspectArg.getValue()) {
-      std::cerr << "error: --segmentation and --inspect are mutually exclusive."
+    if (segmentationArg.getValue() + inspectArg.getValue() +
+            ambiguitiesArg.getValue() >
+        1) {
+      std::cerr << "error: --segmentation, --inspect and --ambiguities are "
+                   "mutually exclusive."
                 << std::endl;
       return 1;
     }
@@ -664,6 +858,8 @@ int CommandLineMain(std::vector<std::string> args) {
       outputMode = OutputMode::Segmentation;
     } else if (inspectArg.getValue()) {
       outputMode = OutputMode::Inspect;
+    } else if (ambiguitiesArg.getValue()) {
+      outputMode = OutputMode::Ambiguities;
     } else {
       outputMode = OutputMode::Convert;
     }
@@ -702,6 +898,12 @@ int CommandLineMain(std::vector<std::string> args) {
         converter->GetSegmentation() == nullptr) {
       std::cerr << "error: this configuration has no segmentation step; "
                    "--segmentation is not supported.\n";
+      return 1;
+    }
+    if (outputMode == OutputMode::Ambiguities &&
+        converter->GetConversionChain() == nullptr) {
+      std::cerr << "error: this configuration has no single conversion "
+                   "chain; --ambiguities is not supported.\n";
       return 1;
     }
     bool lineByLine = inputFileName.IsNull();

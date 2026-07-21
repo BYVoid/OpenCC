@@ -99,6 +99,17 @@ OPENCC_EXPORT AnnotatedConversion
 ConvertWithAmbiguities(const Converter& converter, std::string_view text);
 
 /**
+ * Default keep-tail window for AmbiguityStream, in Unicode code points.
+ * Must equal ConverterStream's default maxKeepChars (Converter.hpp) so the
+ * two wrappers flush on identical boundaries; the constant lives in this
+ * private header instead of the installed one to keep this feature free of
+ * installed-header changes.  ConversionAmbiguitiesTest pins the two
+ * defaults together behaviorally (identical per-chunk flush output), so a
+ * drift fails tests instead of silently desynchronizing the streams.
+ */
+inline constexpr size_t kAmbiguityStreamDefaultKeepChars = 16;
+
+/**
  * Streaming variant of ConvertWithAmbiguities() with bounded memory.
  *
  * Mirrors ConverterStream's windowing (a tail of @p maxKeepChars code
@@ -122,7 +133,7 @@ public:
   };
 
   explicit AmbiguityStream(ConverterPtr converter,
-                           size_t maxKeepChars = kDefaultStreamKeepChars);
+                           size_t maxKeepChars = kAmbiguityStreamDefaultKeepChars);
   ~AmbiguityStream();
 
   /** Appends @p input and flushes everything but the kept tail. */

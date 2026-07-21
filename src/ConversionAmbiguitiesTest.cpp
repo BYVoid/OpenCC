@@ -112,9 +112,15 @@ TEST_F(ConversionAmbiguitiesTest, LaterStageAmbiguityKeepsMatchPrecision) {
   std::list<ConversionPtr> conversions{
       ConversionPtr(new Conversion(MakeDict({{"zz", {"zz"}}}))),
       ConversionPtr(new Conversion(MakeDict({{"x", {"m", "n"}}})))};
+  const SegmentationPtr segmentation(
+      new MaxMatchSegmentation(MakeDict({})));
+  // The regression is only observable when the whole input is one segment
+  // (per-segment walks reset the run list); guard the precondition so a
+  // future segmentation change fails here instead of silently turning
+  // this into an empty test.
+  ASSERT_EQ(1u, segmentation->Segment("aaaxbbb")->Length());
   const ConverterPtr converter(new SingleStageConverter(
-      SegmentationPtr(new MaxMatchSegmentation(MakeDict({}))),
-      ConversionChainPtr(new ConversionChain(conversions))));
+      segmentation, ConversionChainPtr(new ConversionChain(conversions))));
   const AnnotatedConversion result =
       ConvertWithAmbiguities(*converter, "aaaxbbb");
   EXPECT_EQ("aaambbb", result.output);
@@ -233,6 +239,29 @@ TEST_F(ConversionAmbiguitiesTest, ChunkedStreamMatchesWholeInput) {
     EXPECT_EQ(whole.sources[whole.ambiguities[i].sourceIndex],
               streamedSources[streamedSpans[i].sourceIndex]);
   }
+}
+
+TEST_F(ConversionAmbiguitiesTest, DefaultWindowingMatchesConverterStream) {
+  // AmbiguityStream's default keep-tail window must equal
+  // ConverterStream's, or the two wrappers flush on different boundaries
+  // and stream/whole-input results diverge on long entries.  The constant
+  // lives in a private header and cannot reference the installed one, so
+  // pin the two defaults together behaviorally: identical chunked input
+  // must produce identical per-chunk flush output.
+  const ConverterPtr converter =
+      MakeConverter({MakeDict({{"ab", {"XY"}}, {"b", {"y", "z"}}})});
+  std::string input;
+  for (int i = 0; i < 100; i++) {
+    input += "abcab";
+  }
+  ConverterStream reference(converter);
+  AmbiguityStream stream(converter);
+  for (size_t pos = 0; pos < input.size(); pos += 7) {
+    const std::string_view chunk = std::string_view(input).substr(pos, 7);
+    EXPECT_EQ(reference.ConvertChunk(chunk),
+              stream.ConvertChunk(chunk).output);
+  }
+  EXPECT_EQ(reference.Finish(), stream.Finish().output);
 }
 
 TEST_F(ConversionAmbiguitiesTest, Utf8OffsetsAreBytes) {

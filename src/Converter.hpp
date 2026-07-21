@@ -76,15 +76,6 @@ public:
   virtual ConversionChainPtr GetConversionChain() const = 0;
 };
 
-/**
- * Default number of Unicode code points a streaming converter retains at
- * the end of its pending buffer after each flush, so that a phrase or IDS
- * straddling two consecutive chunks is not split across separate
- * conversions.  Shared by every streaming wrapper (e.g. ConverterStream
- * and the internal AmbiguityStream) so their windowing stays identical.
- */
-inline constexpr size_t kDefaultStreamKeepChars = 16;
-
 class OPENCC_EXPORT ConverterStream {
 public:
   /**
@@ -92,10 +83,9 @@ public:
    * @param maxKeepChars  Number of Unicode code points (not bytes) to retain
    *   at the end of the pending buffer after each ConvertChunk() call, so
    *   that a phrase or IDS straddling two consecutive chunks is not split
-   *   across separate Convert() invocations.
+   *   across separate Convert() invocations.  Defaults to 16 code points.
    */
-  explicit ConverterStream(ConverterPtr converter,
-                           size_t maxKeepChars = kDefaultStreamKeepChars)
+  explicit ConverterStream(ConverterPtr converter, size_t maxKeepChars = 16)
       : converter(converter), maxKeepChars(maxKeepChars) {}
 
   /**

@@ -285,6 +285,52 @@ cc_library(
     ],
 )
 
+# Internal, unstable ambiguity-annotation API (ConvertWithAmbiguities). The
+# header is not installed by the CMake build and the function is not part of
+# the OPENCC_ABI_VERSION contract; visibility is restricted to this package
+# and the CLI (which exposes it via --ambiguities).
+cc_library(
+    name = "conversion_ambiguities_lib",
+    srcs = ["ConversionAmbiguities.cpp"],
+    hdrs = ["ConversionAmbiguities.hpp"],
+    visibility = [
+        "//src:__pkg__",
+        "//src/tools:__pkg__",
+    ],
+    deps = [
+        ":common_lib",
+        ":config_based_converter_lib",
+        ":conversion_lib",
+        ":conversion_chain_lib",
+        ":converter_lib",
+        ":dict_lib",
+        ":dict_entry_lib",
+        ":segmentation_lib",
+        ":segments_lib",
+        ":utf8_util_lib",
+    ],
+)
+
+cc_test(
+    name = "conversion_ambiguities_test",
+    size = "small",
+    srcs = ["ConversionAmbiguitiesTest.cpp"],
+    deps = [
+        ":conversion_ambiguities_lib",
+        ":conversion_lib",
+        ":conversion_chain_lib",
+        ":converter_lib",
+        ":lexicon_lib",
+        ":max_match_segmentation_lib",
+        ":pipeline_converter_lib",
+        ":single_stage_converter_lib",
+        ":test_utils_lib",
+        ":test_utils_utf8_lib",
+        ":text_dict_lib",
+        "@googletest//:gtest_main",
+    ],
+)
+
 # Internal, unstable candidate-enumeration API (GetAllConversions). The header
 # is not installed by the CMake build and the function is not part of the
 # OPENCC_ABI_VERSION contract; visibility is restricted to this package so no

@@ -462,6 +462,119 @@ TEST_F(CommandLineConvertTest, ResourceOcd2ZipConvertsWithoutResourcePaths) {
 }
 #endif
 
+TEST_F(CommandLineConvertTest, AmbiguitiesEmitsDefineOnFirstUseRecords) {
+  const std::string inputFile = InputFile("ambiguities_records");
+  const std::string recordsFile = OutputFile("ambiguities_records");
+  const std::string convertFile = OutputFile("ambiguities_convert");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    // 文丑 (STPhrases 文丑 -> 文丑 文醜) appears twice so the second
+    // reference must reuse the first definition; 头发/干燥 are single-value
+    // phrase conversions and must not be flagged.
+    ofs << "文丑与文丑相争，头发干燥";
+  }
+
+  ASSERT_EQ(0, system(TestCommand("s2t", inputFile, convertFile).c_str()));
+  ASSERT_EQ(0, system(TestCommandWithFlags("s2t", inputFile, recordsFile,
+                                           "--ambiguities")
+                          .c_str()));
+
+  std::istringstream records(GetFileContents(recordsFile));
+  std::string line;
+  std::string reconstructed;
+  size_t defs = 0;
+  size_t ambs = 0;
+  bool sawEnd = false;
+  while (std::getline(records, line)) {
+    if (line.empty()) {
+      continue;
+    }
+    ASSERT_FALSE(sawEnd) << "record after end record: " << line;
+    rapidjson::Document doc;
+    doc.Parse(line.c_str());
+    ASSERT_FALSE(doc.HasParseError()) << line;
+    ASSERT_TRUE(doc.IsObject()) << line;
+    if (doc.HasMember("def")) {
+      ASSERT_TRUE(doc["def"].IsString());
+      defs++;
+    } else if (doc.HasMember("lit")) {
+      ASSERT_TRUE(doc["lit"].IsString());
+      reconstructed += doc["lit"].GetString();
+    } else if (doc.HasMember("amb")) {
+      ASSERT_TRUE(doc["amb"].IsObject());
+      // Define-on-first-use contract: every reference points at an
+      // already-defined source index.
+      ASSERT_LT(doc["amb"]["s"].GetUint64(), defs) << line;
+      reconstructed += doc["amb"]["t"].GetString();
+      ambs++;
+    } else if (doc.HasMember("end")) {
+      sawEnd = true;
+      EXPECT_EQ(reconstructed.size(),
+                doc["end"]["output_bytes"].GetUint64());
+      EXPECT_EQ(ambs, doc["end"]["ambiguities"].GetUint64());
+      EXPECT_EQ(defs, doc["end"]["sources"].GetUint64());
+    } else {
+      FAIL() << "unknown record: " << line;
+    }
+  }
+  EXPECT_TRUE(sawEnd);
+  EXPECT_EQ(2u, ambs);
+  EXPECT_EQ(1u, defs);
+  // Interleaved records reconstruct exactly the plain conversion output.
+  EXPECT_EQ(GetFileContents(convertFile), reconstructed);
+}
+
+TEST_F(CommandLineConvertTest, AmbiguitiesCoversMultiStageChain) {
+  const std::string inputFile = InputFile("ambiguities_s2twp");
+  const std::string recordsFile = OutputFile("ambiguities_s2twp");
+  const std::string convertFile = OutputFile("ambiguities_s2twp_convert");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    // s2twp is a multi-stage chain: 下面 is one-to-many in stage one
+    // (STPhrases 下面 -> 下面 下麪) while 信号 becomes one-to-many in the
+    // regional stage (TWPhrases 信號 -> 訊號 信號), so its span must map
+    // back through the stage alignment to the Simplified input slice.
+    // 软件 converts unambiguously (軟件 -> 軟體) and must not be flagged.
+    ofs << "下面是软件的信号";
+  }
+
+  ASSERT_EQ(0, system(TestCommand("s2twp", inputFile, convertFile).c_str()));
+  ASSERT_EQ(0, system(TestCommandWithFlags("s2twp", inputFile, recordsFile,
+                                           "--ambiguities")
+                          .c_str()));
+
+  std::istringstream records(GetFileContents(recordsFile));
+  std::string line;
+  std::string reconstructed;
+  std::vector<std::string> defs;
+  std::vector<std::string> ambSources;
+  while (std::getline(records, line)) {
+    if (line.empty()) {
+      continue;
+    }
+    rapidjson::Document doc;
+    doc.Parse(line.c_str());
+    ASSERT_FALSE(doc.HasParseError()) << line;
+    if (doc.HasMember("def")) {
+      defs.push_back(doc["def"].GetString());
+    } else if (doc.HasMember("lit")) {
+      reconstructed += doc["lit"].GetString();
+    } else if (doc.HasMember("amb")) {
+      const size_t index = doc["amb"]["s"].GetUint64();
+      ASSERT_LT(index, defs.size()) << line;
+      ambSources.push_back(defs[index]);
+      reconstructed += doc["amb"]["t"].GetString();
+    }
+  }
+  EXPECT_EQ(GetFileContents(convertFile), reconstructed);
+  EXPECT_EQ((std::vector<std::string>{"下面", "信号"}), defs);
+  EXPECT_EQ((std::vector<std::string>{"下面", "信号"}), ambSources);
+}
+
 TEST_F(CommandLineConvertTest, StdinPreservesLineEndingsAndUnknownCharacters) {
   const std::string config = "s2t";
   const std::string inputFile = InputFile("stdin_line_endings");

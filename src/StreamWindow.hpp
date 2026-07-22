@@ -19,12 +19,21 @@
 #pragma once
 
 #include <cstddef>
-#include <string>
+#include <string_view>
 
 #include "UTF8Util.hpp"
 
 namespace opencc {
 namespace internal {
+
+/**
+ * Default keep-tail window for streaming converters, in Unicode code
+ * points.  Must equal ConverterStream's default maxKeepChars
+ * (Converter.hpp, an installed header that cannot reference this private
+ * one); ConversionAmbiguitiesTest pins the two defaults together
+ * behaviorally, so a drift fails tests.
+ */
+inline constexpr size_t kDefaultStreamKeepChars = 16;
 
 /**
  * Returns the number of bytes at the front of @p pending that a streaming
@@ -40,7 +49,7 @@ namespace internal {
  * identical boundaries; a windowing fix applied here reaches every streaming
  * wrapper at once.  Private (non-installed) header.
  */
-inline size_t FlushableByteCount(const std::string& pending,
+inline size_t FlushableByteCount(std::string_view pending,
                                  size_t maxKeepChars) {
   if (pending.empty()) {
     return 0;

@@ -270,9 +270,11 @@ These modes are useful for diagnosing conversion issues:
 
 1. Use `--segmentation` to verify that the input is segmented as expected.
 2. Use `--inspect` to see which conversion stage produces an unexpected result.
+3. Use `--ambiguities` to locate one-to-many conversions and resolve each
+   deduplicated `def` source to its candidates.
 
 Rules:
-- `--segmentation` and `--inspect` are mutually exclusive.
+- `--segmentation`, `--inspect`, and `--ambiguities` are mutually exclusive.
 
 ### Official / Recommended Ports
 

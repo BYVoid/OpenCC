@@ -18,7 +18,6 @@
 
 #include "Converter.hpp"
 #include "StreamWindow.hpp"
-#include "UTF8Util.hpp"
 
 using namespace opencc;
 

@@ -55,10 +55,19 @@ struct Run {
 // GetMatchPolicy() -- which PrefixMatch honors by taking the longest match
 // across children -- but its inherited MatchPrefix() still short-circuits;
 // only the UnionDictGroup subclass overrides it.  Recursing on
-// GetDictGroupItems()/GetMatchPolicy() applies the same policy semantics as
-// PrefixMatch's matcher tables (union: longest across children, earlier
-// children win ties; short-circuit: first child with any match), keeping the
-// byte-identical-output contract even for directly constructed groups.
+// GetDictGroupItems()/GetMatchPolicy() applies the policy semantics
+// uniformly, which also fixes plain Union-policy DictGroups nested inside
+// other groups (where delegating to the parent's virtual MatchPrefix could
+// not).
+//
+// The recursion is verified equivalent to both overrides (and to
+// PrefixMatch's matcher tables): DictGroup::MatchPrefix returns the first
+// child with any match, and UnionDictGroup::MatchPrefix takes the longest
+// match across children with a strict > comparison so earlier children win
+// ties -- exactly the two branches below.  Neither override merges entry
+// values across children for prefix lookup, so NumValues() of the returned
+// entry is the correct candidate count.  ConversionAmbiguitiesTest pins the
+// longest-match and same-length-tie cases against Convert().
 Optional<const DictEntry*> MatchPrefixLikeConversion(const Dict& dict,
                                                      const char* word,
                                                      size_t len) {
@@ -167,11 +176,24 @@ std::vector<Run> Compose(const std::vector<Run>& a, const std::vector<Run>& b) {
     }
     out.push_back(Run{srcLen, dstLen, ambiguous});
   }
-  // Both sides measure the same intermediate text, so their totals match and
-  // the loops exhaust together: WalkStage never emits zero-width runs (every
-  // run consumes at least one input byte and appends its value verbatim).
-  assert(ia == a.size());
+  // Both sides measure the same intermediate text, so their totals match.
+  // Every b-side run consumes at least one intermediate byte (WalkStage
+  // advances by at least one byte per run), so b always exhausts with the
+  // main loop.  The a-side, however, can trail with zero-width runs: an
+  // a-side run's width on the middle coordinate is its dstLen, i.e. the
+  // dictionary value's length, and an empty-value entry (constructible by
+  // library users, e.g. StrSingleValueDictEntry("x", "")) matching at the
+  // end of a segment yields dstLen == 0.  Fold such trailing runs into the
+  // last group so the source side stays fully accounted for.
   assert(ib == b.size());
+  for (; ia < a.size(); ia++) {
+    assert(a[ia].dstLen == 0);
+    if (out.empty()) {
+      out.push_back(Run{0, 0, false});
+    }
+    out.back().srcLen += a[ia].srcLen;
+    out.back().ambiguous = out.back().ambiguous || a[ia].ambiguous;
+  }
   return out;
 }
 

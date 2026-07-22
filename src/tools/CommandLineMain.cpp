@@ -420,6 +420,12 @@ size_t WriteAmbiguityChunkRecords(const AmbiguityStream::Chunk& chunk,
                                   FILE* fout) {
   rapidjson::StringBuffer buffer;
   size_t bytesWritten = 0;
+  // fputs() is safe even when the converted text contains NUL bytes (the
+  // no-segmentation walk preserves them): rapidjson escapes control
+  // characters as backslash-u0000 escapes, so the serialized buffer
+  // never holds a raw NUL.  Keep that property in mind before switching
+  // the writer or the emission to anything that does not escape control
+  // characters.
   auto flushRecord = [&buffer, fout, &bytesWritten]() {
     fputs(buffer.GetString(), fout);
     fputc('\n', fout);
@@ -430,8 +436,9 @@ size_t WriteAmbiguityChunkRecords(const AmbiguityStream::Chunk& chunk,
                                  const char* data, size_t length) {
     if (!writer.String(data, length)) {
       throw Exception(
-          "Input contains invalid UTF-8; --ambiguities emits machine-"
-          "readable JSON and cannot represent it. Aborting record stream.");
+          "Converted output contains invalid UTF-8 (from the input or a "
+          "dictionary); --ambiguities emits machine-readable JSON and "
+          "cannot represent it. Aborting record stream.");
     }
   };
   for (const std::string& source : chunk.newSources) {

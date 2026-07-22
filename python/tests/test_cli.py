@@ -121,6 +121,15 @@ def test_cli_include_tofu_risk_dictionaries_flag(tmp_path, monkeypatch):
     assert output_path.read_text(encoding='utf-8') == '𫝈'
 
 
+def test_cli_rejects_native_only_modes(monkeypatch, capsys):
+    for flag in ('--inspect', '--segmentation', '--ambiguities'):
+        with pytest.raises(SystemExit) as exc_info:
+            _run_cli(monkeypatch, flag)
+        captured = capsys.readouterr()
+        assert exc_info.value.code == 1
+        assert 'native OpenCC CLI' in captured.err
+
+
 def test_cli_rejects_same_input_and_output_file(tmp_path, monkeypatch, capsys):
     input_path = tmp_path / 'same.txt'
     input_path.write_text('汉字', encoding='utf-8')

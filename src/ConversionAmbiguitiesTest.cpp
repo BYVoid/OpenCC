@@ -171,6 +171,43 @@ TEST_F(ConversionAmbiguitiesTest, UnionPolicyDictGroupMatchesConvert) {
   EXPECT_EQ(converter->Convert("ab"), result.output);
 }
 
+TEST_F(ConversionAmbiguitiesTest, UnionPolicyTieBreakMatchesConvert) {
+  // Two children share the same key with different values; PrefixMatch's
+  // union semantics let the earlier child win the tie, and the walk's
+  // recursion (strict > comparison) must agree with Convert().
+  const DictPtr group(new DictGroup(
+      std::list<DictPtr>{MakeDict({{"ab", {"first"}}}),
+                         MakeDict({{"ab", {"second"}}})},
+      DictGroupMatchPolicy::Union));
+  std::list<ConversionPtr> conversions{ConversionPtr(new Conversion(group))};
+  const ConverterPtr converter(new SingleStageConverter(
+      SegmentationPtr(new MaxMatchSegmentation(group)),
+      ConversionChainPtr(new ConversionChain(conversions))));
+  const AnnotatedConversion result = ConvertWithAmbiguities(*converter, "ab");
+  EXPECT_EQ(converter->Convert("ab"), result.output);
+  EXPECT_EQ("first", result.output);
+}
+
+TEST_F(ConversionAmbiguitiesTest, EmptyDictionaryValueDoesNotBreakCompose) {
+  // An empty-value entry matching at the end of a segment leaves a
+  // trailing zero-width run on the alignment's middle coordinate; Compose
+  // must fold it instead of asserting or reading out of bounds, and the
+  // output must still match Convert().
+  std::list<ConversionPtr> conversions{
+      ConversionPtr(
+          new Conversion(MakeDict({{"a", {"m", "n"}}, {"b", {""}}}))),
+      ConversionPtr(new Conversion(MakeDict({{"m", {"M"}}})))};
+  const ConverterPtr converter(new SingleStageConverter(
+      SegmentationPtr(new MaxMatchSegmentation(MakeDict({{"ab", {"ab"}}}))),
+      ConversionChainPtr(new ConversionChain(conversions))));
+  const AnnotatedConversion result = ConvertWithAmbiguities(*converter, "ab");
+  EXPECT_EQ(converter->Convert("ab"), result.output);
+  EXPECT_EQ("M", result.output);
+  ASSERT_EQ(1u, result.ambiguities.size());
+  // The trailing fold widens the span's source to cover the vanished tail.
+  EXPECT_EQ("ab", result.sources[result.ambiguities[0].sourceIndex]);
+}
+
 TEST_F(ConversionAmbiguitiesTest, NulBytePreservedWithoutSegmentation) {
   // Without a segmentation step, Convert() processes the whole text as one
   // string_view, preserving embedded NUL bytes; the walk must do the same

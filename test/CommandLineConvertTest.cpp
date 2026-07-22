@@ -575,6 +575,25 @@ TEST_F(CommandLineConvertTest, AmbiguitiesCoversMultiStageChain) {
   EXPECT_EQ((std::vector<std::string>{"下面", "信号"}), ambSources);
 }
 
+TEST_F(CommandLineConvertTest, AmbiguitiesInPlaceRewritesFile) {
+  // Regression: the --ambiguities branch used to early-return from
+  // ConvertFileStreams, skipping the fclose epilogue; --in-place then
+  // replaced the output file while both streams were still open (fails on
+  // Windows, risks unflushed data elsewhere).
+  const std::string file = OutputFile("ambiguities_inplace");
+  {
+    std::ofstream ofs(file, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "文丑";
+  }
+
+  ASSERT_EQ(0, RunCommand(
+                   TestCommand("s2t", file, file, "", "--ambiguities --in-place")));
+  const std::string contents = GetFileContents(file);
+  EXPECT_NE(std::string::npos, contents.find("{\"def\":\"文丑\"}")) << contents;
+  EXPECT_NE(std::string::npos, contents.find("\"end\"")) << contents;
+}
+
 TEST_F(CommandLineConvertTest, StdinPreservesLineEndingsAndUnknownCharacters) {
   const std::string config = "s2t";
   const std::string inputFile = InputFile("stdin_line_endings");

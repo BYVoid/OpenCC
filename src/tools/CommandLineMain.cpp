@@ -401,12 +401,16 @@ std::string ConvertLineByMode(const std::string& line) {
 //   {"lit":"<text>"}              literal (unambiguous) output run
 //   {"amb":{"t":"<text>","s":N}}  ambiguous span; N is a global source index
 //   {"end":{...}}                 stream summary
-void WriteAmbiguityChunkRecords(const AmbiguityStream::Chunk& chunk,
-                                FILE* fout) {
+// Returns the number of bytes written to fout, so callers can account for
+// the actual emitted size (record framing and JSON escaping included).
+size_t WriteAmbiguityChunkRecords(const AmbiguityStream::Chunk& chunk,
+                                  FILE* fout) {
   rapidjson::StringBuffer buffer;
-  auto flushRecord = [&buffer, fout]() {
+  size_t bytesWritten = 0;
+  auto flushRecord = [&buffer, fout, &bytesWritten]() {
     fputs(buffer.GetString(), fout);
     fputc('\n', fout);
+    bytesWritten += buffer.GetSize() + 1;
     buffer.Clear();
   };
   for (const std::string& source : chunk.newSources) {
@@ -445,6 +449,7 @@ void WriteAmbiguityChunkRecords(const AmbiguityStream::Chunk& chunk,
     consumed = span.outputOffset + span.outputLength;
   }
   writeLiteral(chunk.output.size());
+  return bytesWritten;
 }
 
 // Streaming --ambiguities over any input stream (file or stdin): bounded
@@ -455,14 +460,17 @@ void ConvertAmbiguitiesStream(FILE* fin, FILE* fout) {
   const int BUFFER_SIZE = 1024 * 1024;
   std::string buffer(BUFFER_SIZE, '\0');
   AmbiguityStream stream(converter);
-  size_t outputBytes = 0;
+  // convertedBytes counts the underlying converted text (reported in the
+  // end record); measurement.outputBytes gets the bytes actually written,
+  // consistent with every other output mode.
+  size_t convertedBytes = 0;
   size_t ambiguityCount = 0;
 
   auto emitChunk = [&](const AmbiguityStream::Chunk& chunk) {
-    outputBytes += chunk.output.size();
+    convertedBytes += chunk.output.size();
     ambiguityCount += chunk.ambiguities.size();
     const auto writeStart = std::chrono::steady_clock::now();
-    WriteAmbiguityChunkRecords(chunk, fout);
+    measurement.outputBytes += WriteAmbiguityChunkRecords(chunk, fout);
     if (!noFlush) {
       fflush(fout);
     }
@@ -471,9 +479,11 @@ void ConvertAmbiguitiesStream(FILE* fin, FILE* fout) {
   };
 
   bool finished = false;
+  bool readError = false;
   while (!feof(fin)) {
     size_t length = fread(&buffer[0], sizeof(char), buffer.size(), fin);
     if (length == 0) {
+      readError = ferror(fin) != 0;
       break;
     }
     measurement.inputBytes += length;
@@ -492,6 +502,13 @@ void ConvertAmbiguitiesStream(FILE* fin, FILE* fout) {
       break;
     }
   }
+  if (readError) {
+    // Do NOT emit the end record: it is the stream's integrity signal, and
+    // emitting it after a failed read would falsely mark a truncated stream
+    // as complete.  The missing end record plus the error exit tell the
+    // consumer the stream is incomplete.
+    throw Exception("Error reading input stream in --ambiguities mode.");
+  }
   if (!finished) {
     const auto convertStart = std::chrono::steady_clock::now();
     const AmbiguityStream::Chunk chunk = stream.Finish();
@@ -499,7 +516,6 @@ void ConvertAmbiguitiesStream(FILE* fin, FILE* fout) {
         std::chrono::steady_clock::now() - convertStart);
     emitChunk(chunk);
   }
-  measurement.outputBytes += outputBytes;
 
   rapidjson::StringBuffer endBuffer;
   rapidjson::Writer<rapidjson::StringBuffer> writer(endBuffer);
@@ -507,18 +523,22 @@ void ConvertAmbiguitiesStream(FILE* fin, FILE* fout) {
   writer.Key("end");
   writer.StartObject();
   writer.Key("output_bytes");
-  writer.Uint64(outputBytes);
+  writer.Uint64(convertedBytes);
   writer.Key("ambiguities");
   writer.Uint64(ambiguityCount);
   writer.Key("sources");
   writer.Uint64(stream.SourceCount());
   writer.EndObject();
   writer.EndObject();
+  const auto writeStart = std::chrono::steady_clock::now();
   fputs(endBuffer.GetString(), fout);
   fputc('\n', fout);
+  measurement.outputBytes += endBuffer.GetSize() + 1;
   if (!noFlush) {
     fflush(fout);
   }
+  measurement.writeMs += DurationToMilliseconds(
+      std::chrono::steady_clock::now() - writeStart);
 }
 
 void ConvertStream(FILE* fin, FILE* fout) {
@@ -598,11 +618,12 @@ void ConvertLineByLine() {
 void ConvertFileStreams(FILE* fin, FILE* fout) {
   try {
     if (outputMode == OutputMode::Ambiguities) {
+      // Falls through to the shared fclose epilogue below; an early return
+      // here would leak both streams and break --in-place, which replaces
+      // the output file after this function and requires it to be closed.
       ConvertAmbiguitiesStream(fin, fout);
-      return;
-    }
-    if (outputMode == OutputMode::Segmentation ||
-        outputMode == OutputMode::Inspect) {
+    } else if (outputMode == OutputMode::Segmentation ||
+               outputMode == OutputMode::Inspect) {
       // Inspect/segmentation modes process line by line using
       // std::getline to handle arbitrarily long lines.
       bool isFirstLine = true;

@@ -21,6 +21,7 @@
 #include "Conversion.hpp"
 #include "ConversionChain.hpp"
 #include "Converter.hpp"
+#include "DictGroup.hpp"
 #include "Lexicon.hpp"
 #include "MaxMatchSegmentation.hpp"
 #include "PipelineConverter.hpp"
@@ -151,6 +152,51 @@ TEST_F(ConversionAmbiguitiesTest, StraddlingMatchCoarsensSpan) {
   EXPECT_EQ(0u, result.ambiguities[0].outputOffset);
   EXPECT_EQ(1u, result.ambiguities[0].outputLength);
   EXPECT_EQ("ab", result.sources[result.ambiguities[0].sourceIndex]);
+}
+
+TEST_F(ConversionAmbiguitiesTest, UnionPolicyDictGroupMatchesConvert) {
+  // A DictGroup constructed directly with the Union policy reports Union
+  // via GetMatchPolicy() (honored by Convert()'s PrefixMatch tables), but
+  // its inherited MatchPrefix() short-circuits; the walk must apply the
+  // policy semantics itself or its output diverges from Convert().
+  const DictPtr group(new DictGroup(
+      std::list<DictPtr>{MakeDict({{"a", {"x"}}}), MakeDict({{"ab", {"y"}}})},
+      DictGroupMatchPolicy::Union));
+  std::list<ConversionPtr> conversions{ConversionPtr(new Conversion(group))};
+  const ConverterPtr converter(new SingleStageConverter(
+      SegmentationPtr(new MaxMatchSegmentation(group)),
+      ConversionChainPtr(new ConversionChain(conversions))));
+  ASSERT_EQ("y", converter->Convert("ab"));
+  const AnnotatedConversion result = ConvertWithAmbiguities(*converter, "ab");
+  EXPECT_EQ(converter->Convert("ab"), result.output);
+}
+
+TEST_F(ConversionAmbiguitiesTest, NulBytePreservedWithoutSegmentation) {
+  // Without a segmentation step, Convert() processes the whole text as one
+  // string_view, preserving embedded NUL bytes; the walk must do the same
+  // instead of truncating at the first NUL.
+  std::list<ConversionPtr> conversions{
+      ConversionPtr(new Conversion(MakeDict({{"b", {"y", "z"}}})))};
+  const ConverterPtr converter(new SingleStageConverter(
+      nullptr, ConversionChainPtr(new ConversionChain(conversions))));
+  const std::string input("a\0b", 3);
+  const std::string expected = converter->Convert(input);
+  ASSERT_EQ(std::string("a\0y", 3), expected);
+  const AnnotatedConversion result = ConvertWithAmbiguities(*converter, input);
+  EXPECT_EQ(expected, result.output);
+  ASSERT_EQ(1u, result.ambiguities.size());
+  EXPECT_EQ(2u, result.ambiguities[0].outputOffset);
+  EXPECT_EQ("b", result.sources[result.ambiguities[0].sourceIndex]);
+}
+
+TEST_F(ConversionAmbiguitiesTest, StreamChunkCarriesAnalyzedFlag) {
+  const ConverterPtr pipeline(new PipelineConverter(
+      {MakeConverter({MakeDict({{"b", {"y", "z"}}})})}));
+  AmbiguityStream unanalyzed(pipeline);
+  EXPECT_FALSE(unanalyzed.Finish("b").analyzed);
+
+  AmbiguityStream analyzed(MakeConverter({MakeDict({{"b", {"y", "z"}}})}));
+  EXPECT_TRUE(analyzed.Finish("b").analyzed);
 }
 
 TEST_F(ConversionAmbiguitiesTest, PipelineConverterIsFlaggedUnanalyzed) {

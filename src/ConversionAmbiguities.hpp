@@ -130,6 +130,10 @@ public:
     std::string output;
     std::vector<AmbiguousSpan> ambiguities;
     std::vector<std::string> newSources;
+    /** Mirrors AnnotatedConversion::analyzed: false when the underlying
+     *  converter could not be analyzed (no single conversion chain), in
+     *  which case empty ambiguities means "unknown", not "none". */
+    bool analyzed = true;
   };
 
   explicit AmbiguityStream(ConverterPtr converter,

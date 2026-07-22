@@ -57,6 +57,7 @@ Options:
 Unsupported in the npm CLI:
   --inspect            Use the native OpenCC CLI for inspection output.
   --segmentation       Use the native OpenCC CLI for segmentation output.
+  --ambiguities        Use the native OpenCC CLI for ambiguity records.
 
 Built-in Configurations:
 ${BUILT_IN_CONFIGS.map(([name, description]) => `  ${name.padEnd(11)} ${description}`).join('\n')}
@@ -123,7 +124,8 @@ function parseArgs(args) {
       options.output = readInlineOptionValue(arg, '--output');
     } else if (arg === '--include-tofu-risk-dictionaries') {
       options.includeTofuRiskDictionaries = true;
-    } else if (arg === '--inspect' || arg === '--segmentation') {
+    } else if (arg === '--inspect' || arg === '--segmentation' ||
+               arg === '--ambiguities') {
       throw new Error(`${arg} is not supported by the npm CLI. Use the native OpenCC CLI instead.`);
     } else if (arg === '--path' || arg.startsWith('--path=')) {
       throw new Error('--path is not supported by the npm CLI. Pass an explicit config file path instead.');

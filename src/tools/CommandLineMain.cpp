@@ -403,6 +403,19 @@ std::string ConvertLineByMode(const std::string& line) {
 //   {"end":{...}}                 stream summary
 // Returns the number of bytes written to fout, so callers can account for
 // the actual emitted size (record framing and JSON escaping included).
+//
+// Unlike plain conversion (byte-transparent) and --inspect (human-oriented),
+// this stream is a machine-readable contract, so the writer validates
+// encoding: length-based walking tolerates multi-byte lead bytes with
+// invalid continuation bytes, and without validation such input would flow
+// verbatim into the records and break every strict JSON consumer. A
+// validation failure aborts the stream loudly (no end record, error exit)
+// instead of emitting broken JSON.
+using ValidatingJsonWriter =
+    rapidjson::Writer<rapidjson::StringBuffer, rapidjson::UTF8<>,
+                      rapidjson::UTF8<>, rapidjson::CrtAllocator,
+                      rapidjson::kWriteValidateEncodingFlag>;
+
 size_t WriteAmbiguityChunkRecords(const AmbiguityStream::Chunk& chunk,
                                   FILE* fout) {
   rapidjson::StringBuffer buffer;
@@ -413,34 +426,43 @@ size_t WriteAmbiguityChunkRecords(const AmbiguityStream::Chunk& chunk,
     bytesWritten += buffer.GetSize() + 1;
     buffer.Clear();
   };
+  auto writeValidatedString = [](ValidatingJsonWriter& writer,
+                                 const char* data, size_t length) {
+    if (!writer.String(data, length)) {
+      throw Exception(
+          "Input contains invalid UTF-8; --ambiguities emits machine-"
+          "readable JSON and cannot represent it. Aborting record stream.");
+    }
+  };
   for (const std::string& source : chunk.newSources) {
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    ValidatingJsonWriter writer(buffer);
     writer.StartObject();
     writer.Key("def");
-    writer.String(source.c_str(), source.size());
+    writeValidatedString(writer, source.c_str(), source.size());
     writer.EndObject();
     flushRecord();
   }
   size_t consumed = 0;
   auto writeLiteral = [&](size_t until) {
     if (until > consumed) {
-      rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+      ValidatingJsonWriter writer(buffer);
       writer.StartObject();
       writer.Key("lit");
-      writer.String(chunk.output.c_str() + consumed, until - consumed);
+      writeValidatedString(writer, chunk.output.c_str() + consumed,
+                           until - consumed);
       writer.EndObject();
       flushRecord();
     }
   };
   for (const auto& span : chunk.ambiguities) {
     writeLiteral(span.outputOffset);
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+    ValidatingJsonWriter writer(buffer);
     writer.StartObject();
     writer.Key("amb");
     writer.StartObject();
     writer.Key("t");
-    writer.String(chunk.output.c_str() + span.outputOffset,
-                  span.outputLength);
+    writeValidatedString(writer, chunk.output.c_str() + span.outputOffset,
+                         span.outputLength);
     writer.Key("s");
     writer.Uint64(span.sourceIndex);
     writer.EndObject();

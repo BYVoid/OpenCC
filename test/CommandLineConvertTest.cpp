@@ -575,6 +575,27 @@ TEST_F(CommandLineConvertTest, AmbiguitiesCoversMultiStageChain) {
   EXPECT_EQ((std::vector<std::string>{"下面", "信号"}), ambSources);
 }
 
+TEST_F(CommandLineConvertTest, AmbiguitiesRejectsInvalidUtf8) {
+  // Length-based walking tolerates a multi-byte lead byte with invalid
+  // continuation bytes; the record writer validates encoding so such input
+  // aborts the stream (non-zero exit, no end record) instead of emitting
+  // JSON that strict consumers reject. Plain conversion stays
+  // byte-transparent and is unaffected.
+  const std::string inputFile = InputFile("ambiguities_invalid_utf8");
+  const std::string recordsFile = OutputFile("ambiguities_invalid_utf8");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "abc\xE4\x41\x41zzz";
+  }
+
+  ASSERT_NE(0, system(TestCommandWithFlags("s2t", inputFile, recordsFile,
+                                           "--ambiguities")
+                          .c_str()));
+  EXPECT_EQ(std::string::npos, GetFileContents(recordsFile).find("\"end\""));
+}
+
 TEST_F(CommandLineConvertTest, AmbiguitiesInPlaceRewritesFile) {
   // Regression: the --ambiguities branch used to early-return from
   // ConvertFileStreams, skipping the fclose epilogue; --in-place then

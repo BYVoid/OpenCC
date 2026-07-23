@@ -281,6 +281,19 @@ cc_library(
     deps = [
         ":common_lib",
         ":segmentation_lib",
+        ":stream_window_lib",
+        ":utf8_util_lib",
+    ],
+)
+
+# Shared streaming flush-window computation (private, non-installed header)
+# used by ConverterStream and AmbiguityStream so both flush on identical
+# boundaries.
+cc_library(
+    name = "stream_window_lib",
+    hdrs = ["StreamWindow.hpp"],
+    visibility = ["//src:__pkg__"],
+    deps = [
         ":utf8_util_lib",
     ],
 )
@@ -307,6 +320,7 @@ cc_library(
         ":dict_entry_lib",
         ":segmentation_lib",
         ":segments_lib",
+        ":stream_window_lib",
         ":utf8_util_lib",
     ],
 )
@@ -320,6 +334,7 @@ cc_test(
         ":conversion_lib",
         ":conversion_chain_lib",
         ":converter_lib",
+        ":dict_group_lib",
         ":lexicon_lib",
         ":max_match_segmentation_lib",
         ":pipeline_converter_lib",

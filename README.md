@@ -260,13 +260,21 @@ positions are implicit in record order, so consumers can rebuild offsets in
 their own string-index units. Single-value conversions (e.g. `头发` →
 `頭髮`) are not flagged.
 
+The record stream is a machine-readable contract: every emitted line is
+valid JSON, and the final `{"end"}` record only appears when the whole
+input was processed. Input containing invalid UTF-8 aborts the stream with
+an error (unlike plain conversion, which is byte-transparent), and a
+missing `{"end"}` record means the stream is incomplete.
+
 These modes are useful for diagnosing conversion issues:
 
 1. Use `--segmentation` to verify that the input is segmented as expected.
 2. Use `--inspect` to see which conversion stage produces an unexpected result.
+3. Use `--ambiguities` to locate one-to-many conversions and resolve each
+   deduplicated `def` source to its candidates.
 
 Rules:
-- `--segmentation` and `--inspect` are mutually exclusive.
+- `--segmentation`, `--inspect`, and `--ambiguities` are mutually exclusive.
 
 ### Official / Recommended Ports
 

@@ -434,6 +434,7 @@ describe('npm CLI', function () {
     assert.match(result.stdout, /Unsupported in the npm CLI:/);
     assert.match(result.stdout, /--inspect/);
     assert.match(result.stdout, /--segmentation/);
+    assert.match(result.stdout, /--ambiguities/);
   });
 
   it('prints version', function () {
@@ -456,6 +457,12 @@ describe('npm CLI', function () {
     });
     assert.notEqual(segmentation.status, 0);
     assert.match(segmentation.stderr, /not supported/);
+
+    const ambiguities = childProcess.spawnSync(process.execPath, [cli, '--ambiguities'], {
+      encoding: 'utf8',
+    });
+    assert.notEqual(ambiguities.status, 0);
+    assert.match(ambiguities.stderr, /not supported/);
   });
 
   it('rejects empty inline option values', function () {

@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <cstdlib>
@@ -484,8 +485,8 @@ TEST_F(CommandLineConvertTest, AmbiguitiesEmitsDefineOnFirstUseRecords) {
   std::istringstream records(GetFileContents(recordsFile));
   std::string line;
   std::string reconstructed;
-  size_t defs = 0;
-  size_t ambs = 0;
+  std::vector<std::string> defs;
+  std::vector<uint64_t> ambIndexes;
   bool sawEnd = false;
   while (std::getline(records, line)) {
     if (line.empty()) {
@@ -498,32 +499,42 @@ TEST_F(CommandLineConvertTest, AmbiguitiesEmitsDefineOnFirstUseRecords) {
     ASSERT_TRUE(doc.IsObject()) << line;
     if (doc.HasMember("def")) {
       ASSERT_TRUE(doc["def"].IsString());
-      defs++;
+      defs.push_back(doc["def"].GetString());
     } else if (doc.HasMember("lit")) {
       ASSERT_TRUE(doc["lit"].IsString());
       reconstructed += doc["lit"].GetString();
     } else if (doc.HasMember("amb")) {
       ASSERT_TRUE(doc["amb"].IsObject());
+      ASSERT_TRUE(doc["amb"].HasMember("t") && doc["amb"]["t"].IsString())
+          << line;
+      ASSERT_TRUE(doc["amb"].HasMember("s") && doc["amb"]["s"].IsUint64())
+          << line;
       // Define-on-first-use contract: every reference points at an
       // already-defined source index.
-      ASSERT_LT(doc["amb"]["s"].GetUint64(), defs) << line;
+      ASSERT_LT(doc["amb"]["s"].GetUint64(), defs.size()) << line;
       reconstructed += doc["amb"]["t"].GetString();
-      ambs++;
+      ambIndexes.push_back(doc["amb"]["s"].GetUint64());
     } else if (doc.HasMember("end")) {
       sawEnd = true;
       EXPECT_EQ(reconstructed.size(),
                 doc["end"]["output_bytes"].GetUint64());
-      EXPECT_EQ(ambs, doc["end"]["ambiguities"].GetUint64());
-      EXPECT_EQ(defs, doc["end"]["sources"].GetUint64());
+      EXPECT_EQ(ambIndexes.size(), doc["end"]["ambiguities"].GetUint64());
+      EXPECT_EQ(defs.size(), doc["end"]["sources"].GetUint64());
     } else {
       FAIL() << "unknown record: " << line;
     }
   }
   EXPECT_TRUE(sawEnd);
-  EXPECT_EQ(2u, ambs);
-  EXPECT_EQ(1u, defs);
   // Interleaved records reconstruct exactly the plain conversion output.
   EXPECT_EQ(GetFileContents(convertFile), reconstructed);
+  // 文丑 appears twice in the input: dedup means exactly one def, and both
+  // occurrences reference it.  Invariant-style, so unrelated dictionary
+  // updates cannot break this test.
+  ASSERT_EQ(1, std::count(defs.begin(), defs.end(), "文丑"));
+  const uint64_t wenchouIndex = static_cast<uint64_t>(
+      std::find(defs.begin(), defs.end(), "文丑") - defs.begin());
+  EXPECT_GE(std::count(ambIndexes.begin(), ambIndexes.end(), wenchouIndex),
+            2);
 }
 
 TEST_F(CommandLineConvertTest, AmbiguitiesCoversMultiStageChain) {
@@ -571,8 +582,87 @@ TEST_F(CommandLineConvertTest, AmbiguitiesCoversMultiStageChain) {
     }
   }
   EXPECT_EQ(GetFileContents(convertFile), reconstructed);
-  EXPECT_EQ((std::vector<std::string>{"下面", "信号"}), defs);
-  EXPECT_EQ((std::vector<std::string>{"下面", "信号"}), ambSources);
+  // Contains-style assertions so unrelated dictionary updates (new
+  // multi-value entries elsewhere in the sentence) cannot break the test.
+  EXPECT_NE(defs.end(), std::find(defs.begin(), defs.end(), "下面"));
+  EXPECT_NE(defs.end(), std::find(defs.begin(), defs.end(), "信号"));
+  EXPECT_NE(ambSources.end(),
+            std::find(ambSources.begin(), ambSources.end(), "下面"));
+  EXPECT_NE(ambSources.end(),
+            std::find(ambSources.begin(), ambSources.end(), "信号"));
+}
+
+TEST_F(CommandLineConvertTest, AmbiguitiesRejectsInvalidUtf8) {
+  // Length-based walking tolerates a multi-byte lead byte with invalid
+  // continuation bytes; the record writer validates encoding so such input
+  // aborts the stream (non-zero exit, no end record) instead of emitting
+  // JSON that strict consumers reject. Plain conversion stays
+  // byte-transparent and is unaffected.
+  const std::string inputFile = InputFile("ambiguities_invalid_utf8");
+  const std::string recordsFile = OutputFile("ambiguities_invalid_utf8");
+  const std::string convertFile = OutputFile("ambiguities_invalid_utf8_conv");
+
+  {
+    std::ofstream ofs(inputFile, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "abc\xE4\x41\x41zzz";
+  }
+
+  // The same input converts fine in byte-transparent convert mode, pinning
+  // the failure below to the record writer's encoding validation rather
+  // than some earlier stage.
+  ASSERT_EQ(0, RunCommand(TestCommand("s2t", inputFile, convertFile)));
+  ASSERT_NE(0, RunCommand(TestCommandWithFlags("s2t", inputFile, recordsFile,
+                                               "--ambiguities")));
+  EXPECT_EQ(std::string::npos, GetFileContents(recordsFile).find("\"end\""));
+}
+
+TEST_F(CommandLineConvertTest, AmbiguitiesInPlaceInvalidUtf8KeepsOriginal) {
+  // The record writer throws on invalid UTF-8; with --in-place the
+  // exception must abort before the temp-file replacement so the user's
+  // original file survives intact, and the temp file must be cleaned up.
+  // A dedicated directory makes the no-residue assertion exact.
+  const fs::path dir =
+      fs::u8path(OutputDirectory()) / fs::u8path("ambiguities_inplace_bad");
+  fs::create_directories(dir);
+  const fs::path file = dir / fs::u8path("input.txt");
+  const std::string original = "abc\xE4\x41\x41zzz";
+
+  {
+    std::ofstream ofs(file, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << original;
+  }
+
+  ASSERT_NE(0, RunCommand(TestCommand("s2t", file.u8string(),
+                                      file.u8string(), "",
+                                      "--ambiguities --in-place")));
+  EXPECT_EQ(original, GetFileContents(file));
+  size_t entries = 0;
+  for (const auto& entry : fs::directory_iterator(dir)) {
+    (void)entry;
+    entries++;
+  }
+  EXPECT_EQ(1u, entries) << "temporary file left behind";
+}
+
+TEST_F(CommandLineConvertTest, AmbiguitiesInPlaceRewritesFile) {
+  // Regression: the --ambiguities branch used to early-return from
+  // ConvertFileStreams, skipping the fclose epilogue; --in-place then
+  // replaced the output file while both streams were still open (fails on
+  // Windows, risks unflushed data elsewhere).
+  const std::string file = OutputFile("ambiguities_inplace");
+  {
+    std::ofstream ofs(file, std::ios::binary);
+    ASSERT_TRUE(ofs.is_open());
+    ofs << "文丑";
+  }
+
+  ASSERT_EQ(0, RunCommand(
+                   TestCommand("s2t", file, file, "", "--ambiguities --in-place")));
+  const std::string contents = GetFileContents(file);
+  EXPECT_NE(std::string::npos, contents.find("{\"def\":\"文丑\"}")) << contents;
+  EXPECT_NE(std::string::npos, contents.find("\"end\"")) << contents;
 }
 
 TEST_F(CommandLineConvertTest, StdinPreservesLineEndingsAndUnknownCharacters) {

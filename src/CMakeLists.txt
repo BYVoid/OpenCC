@@ -54,6 +54,7 @@ set(
   PrefixMatch.hpp
   SerializedValues.hpp
   SingleStageConverter.hpp
+  StreamWindow.hpp
   UTF8StringSlice.hpp
 )
 

@@ -20,6 +20,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <list>
 #include <unordered_map>
 #include <utility>
 
@@ -33,6 +34,7 @@
 #include "Optional.hpp"
 #include "Segmentation.hpp"
 #include "Segments.hpp"
+#include "StreamWindow.hpp"
 #include "UTF8Util.hpp"
 
 namespace opencc {
@@ -46,6 +48,55 @@ struct Run {
   size_t dstLen;
   bool ambiguous;
 };
+
+// Prefix match with PrefixMatch's group semantics, via the Dict interface.
+// The virtual Dict::MatchPrefix() cannot be called directly on groups: a
+// DictGroup constructed with DictGroupMatchPolicy::Union reports Union via
+// GetMatchPolicy() -- which PrefixMatch honors by taking the longest match
+// across children -- but its inherited MatchPrefix() still short-circuits;
+// only the UnionDictGroup subclass overrides it.  Recursing on
+// GetDictGroupItems()/GetMatchPolicy() applies the policy semantics
+// uniformly, which also fixes plain Union-policy DictGroups nested inside
+// other groups (where delegating to the parent's virtual MatchPrefix could
+// not).
+//
+// The recursion is verified equivalent to both overrides (and to
+// PrefixMatch's matcher tables): DictGroup::MatchPrefix returns the first
+// child with any match, and UnionDictGroup::MatchPrefix takes the longest
+// match across children with a strict > comparison so earlier children win
+// ties -- exactly the two branches below.  Neither override merges entry
+// values across children for prefix lookup, so NumValues() of the returned
+// entry is the correct candidate count.  ConversionAmbiguitiesTest pins the
+// longest-match and same-length-tie cases against Convert().
+Optional<const DictEntry*> MatchPrefixLikeConversion(const Dict& dict,
+                                                     const char* word,
+                                                     size_t len) {
+  const std::list<DictPtr>* items = dict.GetDictGroupItems();
+  if (items == nullptr) {
+    return dict.MatchPrefix(word, len);
+  }
+  if (dict.GetMatchPolicy() == DictGroupMatchPolicy::ShortCircuit) {
+    for (const DictPtr& child : *items) {
+      const Optional<const DictEntry*> match =
+          MatchPrefixLikeConversion(*child, word, len);
+      if (!match.IsNull()) {
+        return match;
+      }
+    }
+    return Optional<const DictEntry*>::Null();
+  }
+  Optional<const DictEntry*> best = Optional<const DictEntry*>::Null();
+  for (const DictPtr& child : *items) {
+    const Optional<const DictEntry*> match =
+        MatchPrefixLikeConversion(*child, word, len);
+    if (!match.IsNull() &&
+        (best.IsNull() ||
+         match.Get()->KeyLength() > best.Get()->KeyLength())) {
+      best = match;
+    }
+  }
+  return best;
+}
 
 // Replays Conversion::AppendConverted() for one dictionary over `in`, using
 // the DictEntry-returning MatchPrefix() so the candidate count is visible.
@@ -62,7 +113,8 @@ void WalkStage(const DictPtr& dict, std::string_view in, std::string* out,
   const char* const end = pstr + in.size();
   while (pstr < end) {
     const size_t remaining = static_cast<size_t>(end - pstr);
-    const Optional<const DictEntry*> match = dict->MatchPrefix(pstr, remaining);
+    const Optional<const DictEntry*> match =
+        MatchPrefixLikeConversion(*dict, pstr, remaining);
     if (match.IsNull()) {
       size_t charLen =
           UTF8Util::NextIdeographicDescriptionSequenceLength(pstr, remaining);
@@ -124,22 +176,23 @@ std::vector<Run> Compose(const std::vector<Run>& a, const std::vector<Run>& b) {
     }
     out.push_back(Run{srcLen, dstLen, ambiguous});
   }
-  // Trailing runs can only be zero-width on the shared middle coordinate
-  // (empty dictionary values / empty keys); fold them into the last group so
-  // both totals stay accounted for.
+  // Both sides measure the same intermediate text, so their totals match.
+  // Every b-side run consumes at least one intermediate byte (WalkStage
+  // advances by at least one byte per run), so b always exhausts with the
+  // main loop.  The a-side, however, can trail with zero-width runs: an
+  // a-side run's width on the middle coordinate is its dstLen, i.e. the
+  // dictionary value's length, and an empty-value entry (constructible by
+  // library users, e.g. StrSingleValueDictEntry("x", "")) matching at the
+  // end of a segment yields dstLen == 0.  Fold such trailing runs into the
+  // last group so the source side stays fully accounted for.
+  assert(ib == b.size());
   for (; ia < a.size(); ia++) {
+    assert(a[ia].dstLen == 0);
     if (out.empty()) {
       out.push_back(Run{0, 0, false});
     }
     out.back().srcLen += a[ia].srcLen;
     out.back().ambiguous = out.back().ambiguous || a[ia].ambiguous;
-  }
-  for (; ib < b.size(); ib++) {
-    if (out.empty()) {
-      out.push_back(Run{0, 0, false});
-    }
-    out.back().dstLen += b[ib].dstLen;
-    out.back().ambiguous = out.back().ambiguous || b[ib].ambiguous;
   }
   return out;
 }
@@ -167,15 +220,6 @@ AnnotatedConversion ConvertWithAmbiguities(const Converter& converter,
     text = normalized;
   }
 
-  SegmentsPtr segments;
-  const SegmentationPtr segmentation = converter.GetSegmentation();
-  if (segmentation == nullptr) {
-    segments.reset(new Segments);
-    segments->AddSegment(text);
-  } else {
-    segments = segmentation->Segment(text);
-  }
-
   std::unordered_map<std::string, size_t> sourceIndexes;
   // Each segment is walked through the whole chain before moving to the
   // next (segment-outer, stage-inner), while ConversionChain::Convert is
@@ -184,12 +228,7 @@ AnnotatedConversion ConvertWithAmbiguities(const Converter& converter,
   // matches across segment boundaries; if the chain ever gains cross-
   // segment optimizations, this walk must be restructured to keep the
   // byte-identical-output contract with Converter::Convert().
-  for (const char* segment : *segments) {
-    // strlen() mirrors Convert(), which also consumes segments as
-    // NUL-terminated strings; input containing NUL bytes is truncated
-    // identically on both paths, so offsets stay aligned.
-    const std::string_view segmentView(segment, std::strlen(segment));
-
+  auto walkSegment = [&](std::string_view segmentView) {
     // Walk the segment through the chain, keeping the composed alignment
     // between the original segment and the current stage's output.
     std::vector<Run> aligned;
@@ -227,6 +266,22 @@ AnnotatedConversion ConvertWithAmbiguities(const Converter& converter,
       dstOffset += run.dstLen;
     }
     result.output.append(current);
+  };
+
+  const SegmentationPtr segmentation = converter.GetSegmentation();
+  if (segmentation == nullptr) {
+    // Mirror SingleStageConverter::Convert's no-segmentation branch, which
+    // converts the whole text as a single string_view without building a
+    // Segments object -- embedded NUL bytes are preserved on both paths.
+    walkSegment(text);
+  } else {
+    const SegmentsPtr segments = segmentation->Segment(text);
+    for (const char* segment : *segments) {
+      // strlen() mirrors Convert()'s segmented path, which also consumes
+      // segments as NUL-terminated strings; input containing NUL bytes is
+      // truncated identically on both paths, so offsets stay aligned.
+      walkSegment(std::string_view(segment, std::strlen(segment)));
+    }
   }
   return result;
 }
@@ -258,6 +313,7 @@ AmbiguityStream::ConvertWindow(std::string_view window) {
   Chunk chunk;
   AnnotatedConversion result =
       ConvertWithAmbiguities(*impl->converter, window);
+  chunk.analyzed = result.analyzed;
   chunk.output = std::move(result.output);
   std::vector<size_t> globalIndex(result.sources.size());
   for (size_t i = 0; i < result.sources.size(); i++) {
@@ -275,60 +331,24 @@ AmbiguityStream::ConvertWindow(std::string_view window) {
   return chunk;
 }
 
-// Windowing below mirrors ConverterStream::ConvertChunk()/Finish() exactly;
-// the withheld tail guarantees no match (and hence no ambiguous span) ever
-// straddles a flush boundary.
+// Windowing below shares internal::FlushableByteCount with
+// ConverterStream::ConvertChunk, so both wrappers flush on identical
+// boundaries; the withheld tail guarantees no match (and hence no ambiguous
+// span) ever straddles a flush boundary.
 AmbiguityStream::Chunk AmbiguityStream::ConvertChunk(std::string_view input) {
   std::string& pending = impl->pending;
   if (!input.empty()) {
     pending.append(input);
   }
-  if (pending.empty()) {
+  const size_t flushable =
+      internal::FlushableByteCount(pending, impl->maxKeepChars);
+  if (flushable == 0) {
     return Chunk();
   }
 
-  const char* bufferBegin = pending.data();
-  const char* bufferEnd = bufferBegin + pending.size();
-  const char* completeEnd = bufferBegin;
-  while (completeEnd < bufferEnd) {
-    const size_t nextCharLen = UTF8Util::NextCharLength(completeEnd);
-    if (completeEnd + nextCharLen > bufferEnd) {
-      break;
-    }
-    completeEnd += nextCharLen;
-  }
-
-  const char* keepStart = completeEnd;
-  size_t charsKept = 0;
-  while (keepStart > bufferBegin && charsKept < impl->maxKeepChars) {
-    const size_t prevCharLen = UTF8Util::PrevCharLength(keepStart);
-    keepStart -= prevCharLen;
-    charsKept++;
-  }
-
-  const char* idsKeepStart = completeEnd;
-  const char* idsCandidate = completeEnd;
-  size_t idsCharsScanned = 0;
-  const size_t kMaxIDSCodePoints = 64;
-  while (idsCandidate > bufferBegin && idsCharsScanned < kMaxIDSCodePoints) {
-    idsCandidate -= UTF8Util::PrevCharLength(idsCandidate);
-    idsCharsScanned++;
-    if (UTF8Util::IsIncompleteIdeographicDescriptionSequencePrefix(
-            idsCandidate, completeEnd - idsCandidate)) {
-      idsKeepStart = idsCandidate;
-    }
-  }
-  if (idsKeepStart < keepStart) {
-    keepStart = idsKeepStart;
-  }
-
-  if (keepStart == bufferBegin) {
-    return Chunk();
-  }
-
-  Chunk chunk = ConvertWindow(std::string_view(
-      bufferBegin, static_cast<size_t>(keepStart - bufferBegin)));
-  pending.erase(0, static_cast<size_t>(keepStart - bufferBegin));
+  Chunk chunk =
+      ConvertWindow(std::string_view(pending.data(), flushable));
+  pending.erase(0, flushable);
   return chunk;
 }
 

@@ -48,7 +48,20 @@ def _build_parser():
     return parser
 
 
+_NATIVE_CLI_ONLY_FLAGS = ('--inspect', '--segmentation', '--ambiguities')
+
+
 def main():
+    for arg in sys.argv[1:]:
+        flag = arg.split('=', 1)[0]
+        if flag in _NATIVE_CLI_ONLY_FLAGS:
+            print(
+                f'opencc: error: {flag} is not supported by the Python CLI. '
+                'Use the native OpenCC CLI instead.',
+                file=sys.stderr,
+            )
+            sys.exit(1)
+
     parser = _build_parser()
     args = parser.parse_args()
 

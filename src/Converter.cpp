@@ -17,7 +17,7 @@
  */
 
 #include "Converter.hpp"
-#include "UTF8Util.hpp"
+#include "StreamWindow.hpp"
 
 using namespace opencc;
 
@@ -25,52 +25,15 @@ std::string ConverterStream::ConvertChunk(std::string_view input) {
   if (!input.empty()) {
     pending.append(input);
   }
-  if (pending.empty()) {
+  const size_t flushable =
+      internal::FlushableByteCount(pending, maxKeepChars);
+  if (flushable == 0) {
     return std::string();
   }
 
-  const char* bufferBegin = pending.data();
-  const char* bufferEnd = bufferBegin + pending.size();
-  const char* completeEnd = bufferBegin;
-  while (completeEnd < bufferEnd) {
-    const size_t nextCharLen = UTF8Util::NextCharLength(completeEnd);
-    if (completeEnd + nextCharLen > bufferEnd) {
-      break;
-    }
-    completeEnd += nextCharLen;
-  }
-
-  const char* keepStart = completeEnd;
-  size_t charsKept = 0;
-  while (keepStart > bufferBegin && charsKept < maxKeepChars) {
-    const size_t prevCharLen = UTF8Util::PrevCharLength(keepStart);
-    keepStart -= prevCharLen;
-    charsKept++;
-  }
-
-  const char* idsKeepStart = completeEnd;
-  const char* idsCandidate = completeEnd;
-  size_t idsCharsScanned = 0;
-  const size_t kMaxIDSCodePoints = 64;
-  while (idsCandidate > bufferBegin && idsCharsScanned < kMaxIDSCodePoints) {
-    idsCandidate -= UTF8Util::PrevCharLength(idsCandidate);
-    idsCharsScanned++;
-    if (UTF8Util::IsIncompleteIdeographicDescriptionSequencePrefix(
-            idsCandidate, completeEnd - idsCandidate)) {
-      idsKeepStart = idsCandidate;
-    }
-  }
-  if (idsKeepStart < keepStart) {
-    keepStart = idsKeepStart;
-  }
-
-  if (keepStart == bufferBegin) {
-    return std::string();
-  }
-
-  const std::string output = converter->Convert(std::string_view(
-      bufferBegin, static_cast<size_t>(keepStart - bufferBegin)));
-  pending.erase(0, static_cast<size_t>(keepStart - bufferBegin));
+  const std::string output =
+      converter->Convert(std::string_view(pending.data(), flushable));
+  pending.erase(0, flushable);
   return output;
 }
 

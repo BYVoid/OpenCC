@@ -620,8 +620,12 @@ TEST_F(CommandLineConvertTest, AmbiguitiesRejectsInvalidUtf8) {
 TEST_F(CommandLineConvertTest, AmbiguitiesInPlaceInvalidUtf8KeepsOriginal) {
   // The record writer throws on invalid UTF-8; with --in-place the
   // exception must abort before the temp-file replacement so the user's
-  // original file survives intact.
-  const std::string file = OutputFile("ambiguities_inplace_invalid");
+  // original file survives intact, and the temp file must be cleaned up.
+  // A dedicated directory makes the no-residue assertion exact.
+  const fs::path dir =
+      fs::u8path(OutputDirectory()) / fs::u8path("ambiguities_inplace_bad");
+  fs::create_directories(dir);
+  const fs::path file = dir / fs::u8path("input.txt");
   const std::string original = "abc\xE4\x41\x41zzz";
 
   {
@@ -630,9 +634,16 @@ TEST_F(CommandLineConvertTest, AmbiguitiesInPlaceInvalidUtf8KeepsOriginal) {
     ofs << original;
   }
 
-  ASSERT_NE(0, RunCommand(TestCommand("s2t", file, file, "",
+  ASSERT_NE(0, RunCommand(TestCommand("s2t", file.u8string(),
+                                      file.u8string(), "",
                                       "--ambiguities --in-place")));
   EXPECT_EQ(original, GetFileContents(file));
+  size_t entries = 0;
+  for (const auto& entry : fs::directory_iterator(dir)) {
+    (void)entry;
+    entries++;
+  }
+  EXPECT_EQ(1u, entries) << "temporary file left behind";
 }
 
 TEST_F(CommandLineConvertTest, AmbiguitiesInPlaceRewritesFile) {

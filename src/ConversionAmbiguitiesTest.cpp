@@ -188,6 +188,38 @@ TEST_F(ConversionAmbiguitiesTest, UnionPolicyTieBreakMatchesConvert) {
   EXPECT_EQ("first", result.output);
 }
 
+TEST_F(ConversionAmbiguitiesTest, UnionNumValuesComesFromWinningChild) {
+  // The flag must reflect NumValues() of exactly the entry the union
+  // picked (first child wins same-length ties), not values merged across
+  // children.  Uses the UnionDictGroup subclass directly so the override
+  // path is covered alongside the plain Union-policy DictGroup tests.
+  auto makeConverter = [](const DictPtr& first, const DictPtr& second) {
+    const DictPtr group(
+        new UnionDictGroup(std::list<DictPtr>{first, second}));
+    std::list<ConversionPtr> conversions{
+        ConversionPtr(new Conversion(group))};
+    return ConverterPtr(new SingleStageConverter(
+        SegmentationPtr(new MaxMatchSegmentation(group)),
+        ConversionChainPtr(new ConversionChain(conversions))));
+  };
+  const DictPtr multi = MakeDict({{"ab", {"x", "y"}}});
+  const DictPtr single = MakeDict({{"ab", {"z"}}});
+
+  // Multi-value child wins the tie: flagged, default is its first value.
+  const AnnotatedConversion flagged =
+      ConvertWithAmbiguities(*makeConverter(multi, single), "ab");
+  EXPECT_EQ("x", flagged.output);
+  ASSERT_EQ(1u, flagged.ambiguities.size());
+  EXPECT_EQ("ab", flagged.sources[flagged.ambiguities[0].sourceIndex]);
+
+  // Single-value child wins the tie: NOT flagged, even though another
+  // child holds a multi-value entry for the same key.
+  const AnnotatedConversion unflagged =
+      ConvertWithAmbiguities(*makeConverter(single, multi), "ab");
+  EXPECT_EQ("z", unflagged.output);
+  EXPECT_TRUE(unflagged.ambiguities.empty());
+}
+
 TEST_F(ConversionAmbiguitiesTest, EmptyDictionaryValueDoesNotBreakCompose) {
   // An empty-value entry matching at the end of a segment leaves a
   // trailing zero-width run on the alignment's middle coordinate; Compose

@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <functional>
 #include <list>
 #include <string_view>
 
@@ -123,17 +122,6 @@ public:
    * Returns all entries in the dictionary.
    */
   virtual LexiconPtr GetLexicon() const = 0;
-
-  /**
-   * Invokes cb once per key in the dictionary (order unspecified) with the
-   * key's bytes. Returns false when the keys cannot be enumerated cheaply,
-   * in which case cb may have been invoked for a subset of the keys. The
-   * default implementation walks GetLexicon(); subclasses whose GetLexicon()
-   * is expensive (e.g. MarisaDict, which reconstructs it from the trie)
-   * should override this with a direct enumeration.
-   */
-  virtual bool
-  EnumerateKeys(const std::function<void(const char*, size_t)>& cb) const;
 
   /**
    * Returns child dictionaries when this dictionary is a group.

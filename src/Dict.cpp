@@ -19,22 +19,8 @@
 #include <algorithm>
 
 #include "Dict.hpp"
-#include "Lexicon.hpp"
 
 using namespace opencc;
-
-bool Dict::EnumerateKeys(
-    const std::function<void(const char*, size_t)>& cb) const {
-  const LexiconPtr lexicon = GetLexicon();
-  if (lexicon == nullptr) {
-    return false;
-  }
-  for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
-    const std::string& key = entry->Key();
-    cb(key.data(), key.length());
-  }
-  return true;
-}
 
 Optional<const DictEntry*> Dict::MatchPrefix(const char* word,
                                              size_t wordLen) const {

@@ -322,57 +322,6 @@ TEST_F(PrefixMatchSkipTest, FourByteCharactersUseLeadByteFiltering) {
                                       otherFourByte.size()));
 }
 
-namespace {
-
-// A dictionary that cannot enumerate its keys, forcing the conservative
-// all-candidates fallback in the skip table builder.
-class UnenumerableDict : public Dict {
-public:
-  explicit UnenumerableDict(DictPtr _inner) : inner(std::move(_inner)) {}
-
-  Optional<const DictEntry*> Match(const char* word,
-                                   size_t len) const override {
-    return inner->Match(word, len);
-  }
-
-  size_t KeyMaxLength() const override { return inner->KeyMaxLength(); }
-
-  LexiconPtr GetLexicon() const override { return inner->GetLexicon(); }
-
-  bool EnumerateKeys(
-      const std::function<void(const char*, size_t)>&) const override {
-    return false;
-  }
-
-private:
-  const DictPtr inner;
-};
-
-} // namespace
-
-TEST_F(PrefixMatchSkipTest, EnumerationFailureDisablesSkipping) {
-  // The enumerable dict is first so the bitmap is partially built before the
-  // failure is discovered; the fallback must discard it and mark every byte
-  // a candidate, disabling skipping entirely.
-  LexiconPtr lexicon(new Lexicon);
-  lexicon->Add(DictEntryFactory::New(utf8("鼠标"), utf8("滑鼠")));
-  lexicon->Sort();
-  DictPtr unenumerable(
-      new UnenumerableDict(DictPtr(new TextDict(lexicon))));
-  DictPtr group(new DictGroup(std::list<DictPtr>{dict, unenumerable}));
-  PrefixMatch pm(group);
-
-  const std::string ascii = "abc";
-  const std::string punct = utf8("、。");
-  EXPECT_EQ(0u, pm.SkipUnmatchable(ascii.data(), ascii.size()));
-  EXPECT_EQ(0u, pm.SkipUnmatchable(punct.data(), punct.size()));
-  // Matching still works normally.
-  const std::string query = utf8("鼠标x");
-  PrefixMatch::Match m = pm.MatchPrefix(query.data(), query.size());
-  EXPECT_TRUE(m.matched);
-  EXPECT_EQ(utf8("滑鼠"), *m.value);
-}
-
 TEST_F(PrefixMatchSkipTest, CharLevelSkipsSameLeadByteNonCandidates) {
   // Table path uses character-granularity filtering: 天/地 share the lead
   // byte 0xE5 with the key 太后 but are not candidate first characters, so

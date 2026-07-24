@@ -19,6 +19,7 @@
 #pragma once
 
 #include <atomic>
+#include <functional>
 #include <mutex>
 
 #include "Common.hpp"
@@ -58,9 +59,11 @@ public:
   /**
    * Enumerates keys by walking the trie directly, so it does not trigger
    * lexicon reconstruction. Returns false when the trie is unavailable.
+   * Not part of the Dict interface (MarisaDict-specific, non-virtual) so
+   * adding it does not affect Dict's or MarisaDict's ABI; callers that need
+   * it across dictionary types dynamic_cast to MarisaDict.
    */
-  virtual bool EnumerateKeys(
-      const std::function<void(const char*, size_t)>& cb) const override;
+  bool EnumerateKeys(const std::function<void(const char*, size_t)>& cb) const;
 
   virtual void SerializeToFile(FILE* fp) const override;
 

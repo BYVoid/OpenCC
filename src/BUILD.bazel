@@ -442,7 +442,6 @@ cc_library(
     deps = [
         ":common_lib",
         ":dict_entry_lib",
-        ":lexicon_lib",
     ],
 )
 
@@ -584,6 +583,7 @@ cc_library(
         ":dict_group_lib",
         ":dict_lib",
         ":lexicon_lib",
+        ":marisa_dict_lib",
         ":utf8_util_lib",
     ],
 )

@@ -20,6 +20,7 @@
 #include "Dict.hpp"
 #include "DictGroup.hpp"
 #include "Lexicon.hpp"
+#include "MarisaDict.hpp"
 #include "UTF8Util.hpp"
 #include "Utf8SkipScan.hpp"
 
@@ -172,19 +173,55 @@ void MarkKeyFirstChar(internal::Utf8SkipTable* table, const char* key,
   // 4-byte (and longer legacy) first characters rely on lead-byte filtering.
 }
 
-// Builds the skip table for dict by enumerating every key. Each dictionary
-// supplies its cheapest enumeration (MarisaDict walks the trie without
-// reconstructing its lexicon; groups recurse into children). Falls back to
-// treating every byte as a candidate when enumeration is unavailable.
+// Recursively marks every key's first character into table: groups recurse
+// into children via GetDictGroupItems() (part of the Dict interface, so no
+// dynamic_cast needed); MarisaDict is special-cased with a dynamic_cast so
+// its keys can be walked directly from the trie without forcing lexicon
+// reconstruction; any other leaf dict enumerates through GetLexicon(), whose
+// contract (like LeafMatcher::AddDict's) assumes a non-null result. The
+// nullptr branch below is an untested defensive guard, kept for symmetry
+// with MarisaDict::EnumerateKeys() returning false when its trie is
+// unavailable; it cannot currently be exercised through PrefixMatch's public
+// API without a Dict subclass that violates the GetLexicon() contract
+// elsewhere too (BuildMatcher's LeafMatcher::AddDict dereferences it
+// unconditionally, so a real nullptr would already crash matcher
+// construction).
+void CollectSkipTable(const DictPtr& dict, internal::Utf8SkipTable* table) {
+  const std::list<DictPtr>* items = dict->GetDictGroupItems();
+  if (items != nullptr) {
+    for (const DictPtr& child : *items) {
+      CollectSkipTable(child, table);
+    }
+    return;
+  }
+  const MarisaDict* marisaDict = dynamic_cast<const MarisaDict*>(dict.get());
+  if (marisaDict != nullptr) {
+    const bool enumerated =
+        marisaDict->EnumerateKeys([table](const char* key, size_t len) {
+          MarkKeyFirstChar(table, key, len);
+        });
+    if (!enumerated) {
+      table->MarkAllCandidates();
+    }
+    return;
+  }
+  const LexiconPtr lexicon = dict->GetLexicon();
+  if (lexicon == nullptr) {
+    table->MarkAllCandidates();
+    return;
+  }
+  for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
+    const std::string& key = entry->Key();
+    MarkKeyFirstChar(table, key.data(), key.length());
+  }
+}
+
+// Builds the skip table for dict by enumerating every key at character
+// granularity; falls back to treating every byte as a candidate when any
+// leaf's keys are unavailable.
 void BuildSkipTable(const DictPtr& dict, internal::Utf8SkipTable* table) {
   table->EnableCharLevel();
-  const bool enumerated =
-      dict->EnumerateKeys([table](const char* key, size_t len) {
-        MarkKeyFirstChar(table, key, len);
-      });
-  if (!enumerated) {
-    table->MarkAllCandidates();
-  }
+  CollectSkipTable(dict, table);
   table->Finalize();
 }
 

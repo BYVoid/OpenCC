@@ -60,7 +60,7 @@ public:
    * starts no key (ideographic description operators excluded, so the
    * caller's IDS grouping is preserved). Callers may consume the returned
    * run without calling MatchPrefixView() at any position inside it. The
-   * scan is vectorized for ASCII runs. Returns 0 when the next character
+   * scan is word-at-a-time for ASCII runs. Returns 0 when the next character
    * requires a real lookup.
    */
   size_t SkipUnmatchable(const char* word, size_t len) const;
@@ -72,8 +72,8 @@ private:
 
   // Always non-null after construction. On the single-dictionary fast path
   // it carries only the skip table; on the table path it also owns the
-  // matcher. Kept opaque so this header stays free of the skip-scan and
-  // SIMD intrinsic headers.
+  // matcher. Kept opaque so this header stays free of the skip-scan header
+  // and of PrefixMatch layout changes when the skip table evolves.
   std::shared_ptr<const Tables> tables;
   DictPtr singleDict;
 };

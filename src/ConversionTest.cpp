@@ -92,7 +92,7 @@ TEST_F(ConversionTest, ConvertCString) {
 }
 
 TEST_F(ConversionTest, ConvertMixedAsciiAndChinese) {
-  // Long ASCII runs exercise the vectorized skip of unmatchable characters.
+  // Long ASCII runs exercise the bulk skip of unmatchable characters.
   const std::string asciiPrefix =
       "The quick brown fox jumps over the lazy dog 0123456789 ";
   const std::string asciiSuffix = " <html attr=\"value\">tail</html>";

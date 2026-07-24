@@ -280,8 +280,8 @@ protected:
   TextDictPtr dict;
 };
 
-TEST_F(PrefixMatchSkipTest, SkipsVectorizedAsciiRuns) {
-  // No ASCII key exists, so long ASCII runs take the vectorized scan.
+TEST_F(PrefixMatchSkipTest, SkipsLongAsciiRuns) {
+  // No ASCII key exists, so long ASCII runs take the word-at-a-time scan.
   PrefixMatch pm(dict);
   const std::string ascii(100, 'x');
   EXPECT_EQ(ascii.size(), pm.SkipUnmatchable(ascii.data(), ascii.size()));

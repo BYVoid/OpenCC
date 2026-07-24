@@ -55,6 +55,13 @@ public:
   virtual PrefixMatchView MatchPrefixValue(const char* word,
                                            size_t len) const override;
 
+  /**
+   * Enumerates keys by walking the trie directly, so it does not trigger
+   * lexicon reconstruction. Returns false when the trie is unavailable.
+   */
+  virtual bool EnumerateKeys(
+      const std::function<void(const char*, size_t)>& cb) const override;
+
   virtual void SerializeToFile(FILE* fp) const override;
 
   /**

@@ -56,6 +56,7 @@ set(
   SingleStageConverter.hpp
   StreamWindow.hpp
   UTF8StringSlice.hpp
+  Utf8SkipScan.hpp
 )
 
 set(

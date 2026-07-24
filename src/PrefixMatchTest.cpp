@@ -27,6 +27,7 @@
 #include "MarisaDict.hpp"
 #include "TestUtilsUTF8.hpp"
 #include "TextDictTestBase.hpp"
+#include "Utf8SkipScan.hpp"
 
 namespace opencc {
 
@@ -219,6 +220,187 @@ TEST_F(PrefixMatchTest, UnionGroupPreservesNestedShortCircuitBoundary) {
   EXPECT_TRUE(m.matched);
   EXPECT_EQ(utf8("意大利"), *m.key);
   EXPECT_EQ("root-second", *m.value);
+}
+
+TEST(Utf8SkipScanTest, AsciiRunLength) {
+  const std::string cjk = utf8("一");
+  // Cover all vector-width boundaries and unaligned starting offsets.
+  for (size_t asciiLength = 0; asciiLength < 70; asciiLength++) {
+    const std::string text = std::string(asciiLength, 'a') + cjk;
+    for (size_t offset = 0; offset <= asciiLength; offset++) {
+      EXPECT_EQ(asciiLength - offset,
+                internal::AsciiRunLength(text.data() + offset,
+                                         text.size() - offset));
+    }
+  }
+  const std::string pureAscii(100, 'x');
+  EXPECT_EQ(pureAscii.size(),
+            internal::AsciiRunLength(pureAscii.data(), pureAscii.size()));
+  EXPECT_EQ(0u, internal::AsciiRunLength(cjk.data(), cjk.size()));
+  EXPECT_EQ(0u, internal::AsciiRunLength("", 0));
+}
+
+TEST_F(PrefixMatchTest, SkipUnmatchableStopsAtAsciiCandidates) {
+  // textDict contains ASCII keys ("BYVoid", "zigzagzig"), so the scalar
+  // ASCII path must stop at candidate bytes 'B' and 'z'.
+  PrefixMatch pm(marisaDict);
+  const std::string query = "abc BYVoid";
+  EXPECT_EQ(4u, pm.SkipUnmatchable(query.data(), query.size()));
+  EXPECT_EQ(0u, pm.SkipUnmatchable(query.data() + 4, query.size() - 4));
+  const std::string zQuery = "zoo";
+  EXPECT_EQ(0u, pm.SkipUnmatchable(zQuery.data(), zQuery.size()));
+}
+
+TEST_F(PrefixMatchTest, SkipNeverCrossesAnyKeyFirstChar) {
+  // Invariant: for every dictionary key, the skip scan must not consume the
+  // position where that key starts, on both the fast path and the table
+  // path. A false skip here would silently corrupt conversion output.
+  PrefixMatch pmFast(marisaDict);
+  std::list<DictPtr> dictsMulti = {marisaDict, textDict};
+  DictPtr dictGroupMulti(new DictGroup(dictsMulti));
+  PrefixMatch pmTable(dictGroupMulti);
+  const LexiconPtr lexicon = textDict->GetLexicon();
+  for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
+    const std::string& key = entry->Key();
+    EXPECT_EQ(0u, pmFast.SkipUnmatchable(key.data(), key.length())) << key;
+    EXPECT_EQ(0u, pmTable.SkipUnmatchable(key.data(), key.length())) << key;
+  }
+}
+
+class PrefixMatchSkipTest : public ::testing::Test {
+protected:
+  PrefixMatchSkipTest() {
+    LexiconPtr lexicon(new Lexicon);
+    lexicon->Add(DictEntryFactory::New(utf8("太后"), utf8("太后")));
+    lexicon->Add(DictEntryFactory::New(utf8("里"), utf8("裏")));
+    lexicon->Sort();
+    dict = TextDictPtr(new TextDict(lexicon));
+  }
+
+  TextDictPtr dict;
+};
+
+TEST_F(PrefixMatchSkipTest, SkipsVectorizedAsciiRuns) {
+  // No ASCII key exists, so long ASCII runs take the vectorized scan.
+  PrefixMatch pm(dict);
+  const std::string ascii(100, 'x');
+  EXPECT_EQ(ascii.size(), pm.SkipUnmatchable(ascii.data(), ascii.size()));
+  const std::string mixed = ascii + utf8("太后");
+  EXPECT_EQ(ascii.size(), pm.SkipUnmatchable(mixed.data(), mixed.size()));
+}
+
+TEST_F(PrefixMatchSkipTest, SkipsNonCandidateCjkCharacters) {
+  // 、。「」 and kana share the lead byte 0xE3 which starts no key; they are
+  // skipped without a lookup. 太 (0xE5) is a candidate and stops the scan.
+  PrefixMatch pm(dict);
+  const std::string punct = utf8("、。「」あい");
+  EXPECT_EQ(punct.size(), pm.SkipUnmatchable(punct.data(), punct.size()));
+  const std::string mixed = punct + utf8("太后");
+  EXPECT_EQ(punct.size(), pm.SkipUnmatchable(mixed.data(), mixed.size()));
+  const std::string candidate = utf8("太x");
+  EXPECT_EQ(0u, pm.SkipUnmatchable(candidate.data(), candidate.size()));
+}
+
+TEST_F(PrefixMatchSkipTest, FourByteCharactersUseLeadByteFiltering) {
+  // No 4-byte key exists in dict, so lead byte 0xF0 is not a candidate and
+  // 4-byte characters are skipped whole.
+  PrefixMatch pm(dict);
+  const std::string emoji = utf8("🎉🚀x太后");
+  EXPECT_EQ(9u, pm.SkipUnmatchable(emoji.data(), emoji.size()));
+
+  // With a 4-byte key, its lead byte becomes a candidate; any 4-byte
+  // character sharing that lead byte conservatively stops the scan.
+  LexiconPtr lexicon(new Lexicon);
+  lexicon->Add(DictEntryFactory::New(utf8("𠀀"), "X"));
+  lexicon->Sort();
+  DictPtr extDict(new TextDict(lexicon));
+  PrefixMatch pmExt(extDict);
+  const std::string extB = utf8("𠀀");
+  const std::string otherFourByte = utf8("🎉");
+  EXPECT_EQ(0u, pmExt.SkipUnmatchable(extB.data(), extB.size()));
+  EXPECT_EQ(0u, pmExt.SkipUnmatchable(otherFourByte.data(),
+                                      otherFourByte.size()));
+}
+
+namespace {
+
+// A dictionary that cannot enumerate its keys, forcing the conservative
+// all-candidates fallback in the skip table builder.
+class UnenumerableDict : public Dict {
+public:
+  explicit UnenumerableDict(DictPtr _inner) : inner(std::move(_inner)) {}
+
+  Optional<const DictEntry*> Match(const char* word,
+                                   size_t len) const override {
+    return inner->Match(word, len);
+  }
+
+  size_t KeyMaxLength() const override { return inner->KeyMaxLength(); }
+
+  LexiconPtr GetLexicon() const override { return inner->GetLexicon(); }
+
+  bool EnumerateKeys(
+      const std::function<void(const char*, size_t)>&) const override {
+    return false;
+  }
+
+private:
+  const DictPtr inner;
+};
+
+} // namespace
+
+TEST_F(PrefixMatchSkipTest, EnumerationFailureDisablesSkipping) {
+  // The enumerable dict is first so the bitmap is partially built before the
+  // failure is discovered; the fallback must discard it and mark every byte
+  // a candidate, disabling skipping entirely.
+  LexiconPtr lexicon(new Lexicon);
+  lexicon->Add(DictEntryFactory::New(utf8("鼠标"), utf8("滑鼠")));
+  lexicon->Sort();
+  DictPtr unenumerable(
+      new UnenumerableDict(DictPtr(new TextDict(lexicon))));
+  DictPtr group(new DictGroup(std::list<DictPtr>{dict, unenumerable}));
+  PrefixMatch pm(group);
+
+  const std::string ascii = "abc";
+  const std::string punct = utf8("、。");
+  EXPECT_EQ(0u, pm.SkipUnmatchable(ascii.data(), ascii.size()));
+  EXPECT_EQ(0u, pm.SkipUnmatchable(punct.data(), punct.size()));
+  // Matching still works normally.
+  const std::string query = utf8("鼠标x");
+  PrefixMatch::Match m = pm.MatchPrefix(query.data(), query.size());
+  EXPECT_TRUE(m.matched);
+  EXPECT_EQ(utf8("滑鼠"), *m.value);
+}
+
+TEST_F(PrefixMatchSkipTest, StopsAtIdeographicDescriptionOperator) {
+  // No key starts with 0xE2, but IDS operators (U+2FF0..U+2FFF) must still
+  // reach the conversion loop so IDS grouping is preserved.
+  PrefixMatch pm(dict);
+  const std::string query = "abc" + utf8("⿰氵青");
+  EXPECT_EQ(3u, pm.SkipUnmatchable(query.data(), query.size()));
+  EXPECT_EQ(0u, pm.SkipUnmatchable(query.data() + 3, query.size() - 3));
+}
+
+TEST_F(PrefixMatchSkipTest, StopsAtInvalidOrTruncatedSequences) {
+  PrefixMatch pm(dict);
+  const std::string invalid = std::string("ab") + '\xFF';
+  EXPECT_EQ(2u, pm.SkipUnmatchable(invalid.data(), invalid.size()));
+  // Truncated 3-byte sequence: lead byte expects more bytes than remain.
+  const std::string truncated = std::string("ab") + '\xE3';
+  EXPECT_EQ(2u, pm.SkipUnmatchable(truncated.data(), truncated.size()));
+  EXPECT_EQ(0u, pm.SkipUnmatchable(invalid.data() + 2, 1));
+}
+
+TEST_F(PrefixMatchTest, SkipUnmatchableTablePath) {
+  // Multi-dict group exercises the table path; skip bytes are the union of
+  // all leaf dictionaries' key start bytes.
+  std::list<DictPtr> dictsMulti = {marisaDict, textDict};
+  DictPtr dictGroupMulti(new DictGroup(dictsMulti));
+  PrefixMatch pm(dictGroupMulti);
+  const std::string query = utf8("abc 清華");
+  EXPECT_EQ(4u, pm.SkipUnmatchable(query.data(), query.size()));
+  EXPECT_EQ(0u, pm.SkipUnmatchable(query.data() + 4, query.size() - 4));
 }
 
 } // namespace opencc

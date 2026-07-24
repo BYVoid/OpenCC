@@ -96,7 +96,7 @@ include(GitVersion)
 
 # C++ interface/layout changes after 1.3.1 require downstream C++ consumers
 # such as librime to relink instead of loading an ABI-incompatible libopencc.
-set (OPENCC_ABI_VERSION 1.4)
+set (OPENCC_ABI_VERSION 1.5)
 
 set(_OPENCC_SOURCE_PACKAGE_SUFFIX "")
 set(_OPENCC_SOURCE_PACKAGE_IGNORE_FILES "")

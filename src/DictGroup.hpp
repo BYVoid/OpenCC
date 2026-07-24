@@ -95,6 +95,13 @@ public:
   virtual LexiconPtr GetLexicon() const;
 
   /**
+   * Enumerates keys of all child dictionaries, letting each child use its
+   * cheapest enumeration (unlike GetLexicon(), which merges child lexicons).
+   */
+  virtual bool EnumerateKeys(
+      const std::function<void(const char*, size_t)>& cb) const override;
+
+  /**
    * Exposes child dictionaries to callers that need group-aware behavior.
    * PrefixMatch uses this to preserve nested group boundaries and dictionary
    * order.

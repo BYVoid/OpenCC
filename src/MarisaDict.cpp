@@ -258,6 +258,39 @@ void MarisaDict::SerializeToFile(FILE* fp) const {
       new SerializedValues(GetLexicon()));
   serialized_values->SerializeToFile(fp);
 }
+
+bool MarisaDict::EnumerateKeys(
+    const std::function<void(const char*, size_t)>& cb) const {
+  // Prefer the already-reconstructed lexicon (e.g. when a table-path
+  // PrefixMatch materialized it); fall back to walking the trie so lazy
+  // loading is never forced. Same convention as ReconstructLexicon():
+  // lexicon is written once before the release store of the flag, so the
+  // acquire load makes the plain read safe.
+  if (lexiconReconstructed.load(std::memory_order_acquire) &&
+      lexicon != nullptr) {
+    for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
+      const std::string& key = entry->Key();
+      cb(key.data(), key.length());
+    }
+    return true;
+  }
+  const marisa::Trie* trie = internal->marisa.get();
+  if (trie == nullptr) {
+    return false;
+  }
+  try {
+    marisa::Agent agent;
+    agent.set_query("");
+    while (trie->predictive_search(agent)) {
+      cb(agent.key().ptr(), agent.key().length());
+    }
+  } catch (const marisa::Exception&) {
+    // The trie has not been built or mapped yet.
+    return false;
+  }
+  return true;
+}
+
 PrefixMatchView MarisaDict::MatchPrefixValue(const char* word,
                                              size_t len) const {
   const marisa::Trie* trie = internal->marisa.get();

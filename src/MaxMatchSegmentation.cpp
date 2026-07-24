@@ -57,6 +57,11 @@ SegmentsPtr SegmentText(const std::shared_ptr<PrefixMatch>& prefixMatch,
       if (matchedLength > remainingLength) {
         matchedLength = remainingLength;
       }
+      // Extend the unmatched run over characters that cannot begin any
+      // dictionary key; each of them would fail the prefix lookup, so they
+      // are consumed with a single vectorized scan.
+      matchedLength += prefixMatch->SkipUnmatchable(
+          pstr + matchedLength, remainingLength - matchedLength);
       segLength += matchedLength;
     } else {
       clearBuffer();

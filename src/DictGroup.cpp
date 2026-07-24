@@ -93,6 +93,16 @@ std::vector<const DictEntry*> DictGroup::MatchAllPrefixes(const char* word,
   return matchedEntries;
 }
 
+bool DictGroup::EnumerateKeys(
+    const std::function<void(const char*, size_t)>& cb) const {
+  for (const auto& dict : dicts) {
+    if (!dict->EnumerateKeys(cb)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 LexiconPtr DictGroup::GetLexicon() const {
   LexiconPtr allLexicon(new Lexicon);
   for (const auto& dict : dicts) {

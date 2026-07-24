@@ -222,6 +222,7 @@ cc_test(
     deps = [
         ":conversion_lib",
         ":dict_group_test_base_lib",
+        ":marisa_dict_lib",
         "@googletest//:gtest_main",
     ],
 )
@@ -441,6 +442,7 @@ cc_library(
     deps = [
         ":common_lib",
         ":dict_entry_lib",
+        ":lexicon_lib",
     ],
 )
 
@@ -573,7 +575,10 @@ cc_library(
 cc_library(
     name = "prefix_match_lib",
     srcs = ["PrefixMatch.cpp"],
-    hdrs = ["PrefixMatch.hpp"],
+    hdrs = [
+        "PrefixMatch.hpp",
+        "Utf8SkipScan.hpp",
+    ],
     deps = [
         ":common_lib",
         ":dict_group_lib",

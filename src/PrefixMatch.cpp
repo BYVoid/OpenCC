@@ -21,6 +21,7 @@
 #include "DictGroup.hpp"
 #include "Lexicon.hpp"
 #include "UTF8Util.hpp"
+#include "Utf8SkipScan.hpp"
 
 #include <cstdint>
 #include <mutex>
@@ -54,6 +55,7 @@ class PrefixMatch::Tables {
 public:
   class Matcher;
   std::unique_ptr<Matcher> matcher;
+  internal::Utf8SkipTable skip;
 };
 
 namespace {
@@ -61,6 +63,9 @@ namespace {
 struct CacheEntry {
   std::vector<std::weak_ptr<const Dict>> dicts;
   std::weak_ptr<const PrefixMatch::Tables> tables;
+  // Fast-path Tables carry no matcher; never hand one to the table path
+  // (and vice versa), independently of the cache-key encoding.
+  bool fastPath = false;
 };
 
 bool SameOwner(const std::weak_ptr<const Dict>& cached,
@@ -121,6 +126,32 @@ void Unreachable() {
 #elif defined(__GNUC__) || defined(__clang__)
   __builtin_unreachable();
 #endif
+}
+
+// Marks a single key's first byte as a candidate in the skip table.
+void MarkKeyFirstChar(internal::Utf8SkipTable* table, const char* key,
+                      size_t len) {
+  if (len == 0) {
+    return;
+  }
+  // key may come straight from a trie enumeration buffer (e.g. marisa's
+  // Agent) and is NOT NUL-terminated; only the lead byte is read.
+  table->candidate[static_cast<unsigned char>(key[0])] = true;
+}
+
+// Builds the skip table for dict by enumerating every key. Each dictionary
+// supplies its cheapest enumeration (MarisaDict walks the trie without
+// reconstructing its lexicon; groups recurse into children). Falls back to
+// treating every byte as a candidate when enumeration is unavailable.
+void BuildSkipTable(const DictPtr& dict, internal::Utf8SkipTable* table) {
+  const bool enumerated =
+      dict->EnumerateKeys([table](const char* key, size_t len) {
+        MarkKeyFirstChar(table, key, len);
+      });
+  if (!enumerated) {
+    table->MarkAllCandidates();
+  }
+  table->Finalize();
 }
 
 } // namespace
@@ -338,18 +369,25 @@ PrefixMatch::PrefixMatch(const DictPtr& dict) {
     }
   }
 
-  if (actualDict && actualDict->SupportsFastPrefixMatch()) {
+  const bool fastPath = actualDict && actualDict->SupportsFastPrefixMatch();
+  if (fastPath) {
     singleDict = actualDict;
-    return;
   }
+  // On the fast path the Tables only carry the skip table (the dictionary
+  // answers prefix queries itself); the cache is shared with the table path,
+  // with a distinct key prefix because fast-path Tables hold no matcher.
+  const DictPtr& tableDict = fastPath ? actualDict : dict;
 
   static std::mutex cacheMutex;
   static std::unordered_map<std::string, std::vector<CacheEntry>> cache;
 
   std::string cacheKey;
-  AppendCacheKey(dict, &cacheKey);
+  if (fastPath) {
+    cacheKey.push_back('F');
+  }
+  AppendCacheKey(tableDict, &cacheKey);
   std::vector<std::weak_ptr<const Dict>> leafDicts;
-  CollectLeafDicts(dict, &leafDicts);
+  CollectLeafDicts(tableDict, &leafDicts);
 
   {
     std::lock_guard<std::mutex> lock(cacheMutex);
@@ -357,7 +395,7 @@ PrefixMatch::PrefixMatch(const DictPtr& dict) {
     const auto cached = cache.find(cacheKey);
     if (cached != cache.end()) {
       for (const CacheEntry& entry : cached->second) {
-        if (SameDicts(entry, leafDicts)) {
+        if (entry.fastPath == fastPath && SameDicts(entry, leafDicts)) {
           tables = entry.tables.lock();
           if (tables != nullptr) {
             return;
@@ -368,7 +406,10 @@ PrefixMatch::PrefixMatch(const DictPtr& dict) {
   }
 
   std::shared_ptr<Tables> built(new Tables);
-  built->matcher = BuildMatcher(dict);
+  if (!fastPath) {
+    built->matcher = BuildMatcher(tableDict);
+  }
+  BuildSkipTable(tableDict, &built->skip);
 
   std::lock_guard<std::mutex> lock(cacheMutex);
   PruneExpiredPrefixMatchCache(&cache);
@@ -377,7 +418,7 @@ PrefixMatch::PrefixMatch(const DictPtr& dict) {
        it != entries.end();) {
     if (HasExpiredDict(*it)) {
       it = entries.erase(it);
-    } else if (SameDicts(*it, leafDicts)) {
+    } else if (it->fastPath == fastPath && SameDicts(*it, leafDicts)) {
       tables = it->tables.lock();
       if (tables != nullptr) {
         return;
@@ -391,6 +432,7 @@ PrefixMatch::PrefixMatch(const DictPtr& dict) {
   CacheEntry entry;
   entry.dicts = std::move(leafDicts);
   entry.tables = tables;
+  entry.fastPath = fastPath;
   entries.push_back(std::move(entry));
 }
 
@@ -421,6 +463,10 @@ PrefixMatch::Match PrefixMatch::MatchPrefix(const char* word,
     return Match{true, candidate.keyLength, candidate.key, candidate.value};
   }
   return Match{false, 0, nullptr, nullptr};
+}
+
+size_t PrefixMatch::SkipUnmatchable(const char* word, size_t len) const {
+  return internal::SkipNonCandidateBytes(tables->skip, word, len);
 }
 
 PrefixMatchView PrefixMatch::MatchPrefixView(const char* word,

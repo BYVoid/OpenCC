@@ -51,6 +51,11 @@ void Conversion::AppendConverted(std::string_view phrase,
       if (matchedLength > remainingLength) {
         matchedLength = remainingLength;
       }
+      // Extend the unmatched run over characters that cannot begin any
+      // dictionary key; each of them would fail the prefix lookup, so they
+      // are consumed with a single bulk scan and one append.
+      matchedLength += prefixMatch->SkipUnmatchable(
+          pstr + matchedLength, remainingLength - matchedLength);
       output->append(pstr, matchedLength);
     } else {
       matchedLength = matched.keyLength;

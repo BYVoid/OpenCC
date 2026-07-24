@@ -112,6 +112,15 @@ public:
     return str - PrevCharLength(str);
   }
 
+  /**
+   * Code point bounds of the ideographic description operators recognized
+   * by IdeographicDescriptionOperatorArity(). Skip-scan tables iterate this
+   * range to keep IDS handling consistent with the conversion loop; when
+   * extending the switch below (e.g. with U+31EF), update these bounds too.
+   */
+  static const uint32_t kFirstIdeographicDescriptionOperator = 0x2FF0;
+  static const uint32_t kLastIdeographicDescriptionOperator = 0x2FFF;
+
   static size_t IdeographicDescriptionOperatorArity(uint32_t codePoint) {
     switch (codePoint) {
     case 0x2FF2:

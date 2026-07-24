@@ -20,7 +20,9 @@
 #include "Dict.hpp"
 #include "DictGroup.hpp"
 #include "Lexicon.hpp"
+#include "MarisaDict.hpp"
 #include "UTF8Util.hpp"
+#include "Utf8SkipScan.hpp"
 
 #include <cstdint>
 #include <mutex>
@@ -54,6 +56,7 @@ class PrefixMatch::Tables {
 public:
   class Matcher;
   std::unique_ptr<Matcher> matcher;
+  internal::Utf8SkipTable skip;
 };
 
 namespace {
@@ -61,6 +64,9 @@ namespace {
 struct CacheEntry {
   std::vector<std::weak_ptr<const Dict>> dicts;
   std::weak_ptr<const PrefixMatch::Tables> tables;
+  // Fast-path Tables carry no matcher; never hand one to the table path
+  // (and vice versa), independently of the cache-key encoding.
+  bool fastPath = false;
 };
 
 bool SameOwner(const std::weak_ptr<const Dict>& cached,
@@ -121,6 +127,102 @@ void Unreachable() {
 #elif defined(__GNUC__) || defined(__clang__)
   __builtin_unreachable();
 #endif
+}
+
+// Marks a single key's first character in the skip table: the lead byte
+// always, plus the exact first code point for 2- and 3-byte characters so
+// scanning can filter at character granularity. Uses the same decoder as the
+// scanner (internal::DecodeCodePoint23) so a key's first character always
+// maps to the bit the scanner will test. A key whose first character is
+// truncated or invalid cannot be represented as a code point; character
+// filtering is then disabled for the whole table and lead-byte filtering
+// (which stops at the marked lead) remains in effect.
+void MarkKeyFirstChar(internal::Utf8SkipTable* table, const char* key,
+                      size_t len) {
+  if (len == 0) {
+    return;
+  }
+  // key may come straight from a trie enumeration buffer (e.g. marisa's
+  // Agent) and is NOT NUL-terminated. NextCharLengthNoException() reads only
+  // the lead byte, and DecodeCodePoint23() reads at most charLength bytes,
+  // which is checked against len first — no read may pass key + len.
+  const unsigned char lead = static_cast<unsigned char>(key[0]);
+  table->candidate[lead] = true;
+  if (lead < 0x80) {
+    return;
+  }
+  const size_t charLength = UTF8Util::NextCharLengthNoException(key);
+  if (charLength == 0) {
+    // Invalid lead byte: the scanner stops at charLength == 0 before any
+    // candidate check, so the lead-byte mark alone is sufficient and
+    // character-level filtering can stay enabled.
+    return;
+  }
+  if (charLength > len) {
+    // Truncated first character: the key can still match its raw byte
+    // prefix, but the scanner would decode the code point using the text's
+    // following bytes and could skip such a position. This cannot be
+    // represented at character granularity, so fall back to lead-byte
+    // filtering (the marked lead stops the scan).
+    table->DisableCharLevel();
+    return;
+  }
+  if (charLength == 2 || charLength == 3) {
+    table->MarkCharCandidate(internal::DecodeCodePoint23(key, charLength));
+  }
+  // 4-byte (and longer legacy) first characters rely on lead-byte filtering.
+}
+
+// Recursively marks every key's first character into table: groups recurse
+// into children via GetDictGroupItems() (part of the Dict interface, so no
+// dynamic_cast needed); MarisaDict is special-cased with a dynamic_cast so
+// its keys can be walked directly from the trie without forcing lexicon
+// reconstruction; any other leaf dict enumerates through GetLexicon(), whose
+// contract (like LeafMatcher::AddDict's) assumes a non-null result. The
+// nullptr branch below is an untested defensive guard, kept for symmetry
+// with MarisaDict::EnumerateKeys() returning false when its trie is
+// unavailable; it cannot currently be exercised through PrefixMatch's public
+// API without a Dict subclass that violates the GetLexicon() contract
+// elsewhere too (BuildMatcher's LeafMatcher::AddDict dereferences it
+// unconditionally, so a real nullptr would already crash matcher
+// construction).
+void CollectSkipTable(const DictPtr& dict, internal::Utf8SkipTable* table) {
+  const std::list<DictPtr>* items = dict->GetDictGroupItems();
+  if (items != nullptr) {
+    for (const DictPtr& child : *items) {
+      CollectSkipTable(child, table);
+    }
+    return;
+  }
+  const MarisaDict* marisaDict = dynamic_cast<const MarisaDict*>(dict.get());
+  if (marisaDict != nullptr) {
+    const bool enumerated =
+        marisaDict->EnumerateKeys([table](const char* key, size_t len) {
+          MarkKeyFirstChar(table, key, len);
+        });
+    if (!enumerated) {
+      table->MarkAllCandidates();
+    }
+    return;
+  }
+  const LexiconPtr lexicon = dict->GetLexicon();
+  if (lexicon == nullptr) {
+    table->MarkAllCandidates();
+    return;
+  }
+  for (const std::unique_ptr<DictEntry>& entry : *lexicon) {
+    const std::string& key = entry->Key();
+    MarkKeyFirstChar(table, key.data(), key.length());
+  }
+}
+
+// Builds the skip table for dict by enumerating every key at character
+// granularity; falls back to treating every byte as a candidate when any
+// leaf's keys are unavailable.
+void BuildSkipTable(const DictPtr& dict, internal::Utf8SkipTable* table) {
+  table->EnableCharLevel();
+  CollectSkipTable(dict, table);
+  table->Finalize();
 }
 
 } // namespace
@@ -338,18 +440,25 @@ PrefixMatch::PrefixMatch(const DictPtr& dict) {
     }
   }
 
-  if (actualDict && actualDict->SupportsFastPrefixMatch()) {
+  const bool fastPath = actualDict && actualDict->SupportsFastPrefixMatch();
+  if (fastPath) {
     singleDict = actualDict;
-    return;
   }
+  // On the fast path the Tables only carry the skip table (the dictionary
+  // answers prefix queries itself); the cache is shared with the table path,
+  // with a distinct key prefix because fast-path Tables hold no matcher.
+  const DictPtr& tableDict = fastPath ? actualDict : dict;
 
   static std::mutex cacheMutex;
   static std::unordered_map<std::string, std::vector<CacheEntry>> cache;
 
   std::string cacheKey;
-  AppendCacheKey(dict, &cacheKey);
+  if (fastPath) {
+    cacheKey.push_back('F');
+  }
+  AppendCacheKey(tableDict, &cacheKey);
   std::vector<std::weak_ptr<const Dict>> leafDicts;
-  CollectLeafDicts(dict, &leafDicts);
+  CollectLeafDicts(tableDict, &leafDicts);
 
   {
     std::lock_guard<std::mutex> lock(cacheMutex);
@@ -357,7 +466,7 @@ PrefixMatch::PrefixMatch(const DictPtr& dict) {
     const auto cached = cache.find(cacheKey);
     if (cached != cache.end()) {
       for (const CacheEntry& entry : cached->second) {
-        if (SameDicts(entry, leafDicts)) {
+        if (entry.fastPath == fastPath && SameDicts(entry, leafDicts)) {
           tables = entry.tables.lock();
           if (tables != nullptr) {
             return;
@@ -368,7 +477,10 @@ PrefixMatch::PrefixMatch(const DictPtr& dict) {
   }
 
   std::shared_ptr<Tables> built(new Tables);
-  built->matcher = BuildMatcher(dict);
+  if (!fastPath) {
+    built->matcher = BuildMatcher(tableDict);
+  }
+  BuildSkipTable(tableDict, &built->skip);
 
   std::lock_guard<std::mutex> lock(cacheMutex);
   PruneExpiredPrefixMatchCache(&cache);
@@ -377,7 +489,7 @@ PrefixMatch::PrefixMatch(const DictPtr& dict) {
        it != entries.end();) {
     if (HasExpiredDict(*it)) {
       it = entries.erase(it);
-    } else if (SameDicts(*it, leafDicts)) {
+    } else if (it->fastPath == fastPath && SameDicts(*it, leafDicts)) {
       tables = it->tables.lock();
       if (tables != nullptr) {
         return;
@@ -391,6 +503,7 @@ PrefixMatch::PrefixMatch(const DictPtr& dict) {
   CacheEntry entry;
   entry.dicts = std::move(leafDicts);
   entry.tables = tables;
+  entry.fastPath = fastPath;
   entries.push_back(std::move(entry));
 }
 
@@ -421,6 +534,10 @@ PrefixMatch::Match PrefixMatch::MatchPrefix(const char* word,
     return Match{true, candidate.keyLength, candidate.key, candidate.value};
   }
   return Match{false, 0, nullptr, nullptr};
+}
+
+size_t PrefixMatch::SkipUnmatchable(const char* word, size_t len) const {
+  return internal::SkipNonCandidateBytes(tables->skip, word, len);
 }
 
 PrefixMatchView PrefixMatch::MatchPrefixView(const char* word,

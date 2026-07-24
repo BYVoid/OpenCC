@@ -43,6 +43,19 @@ TEST_F(MaxMatchSegmentationTest, Segment) {
   EXPECT_EQ(utf8("干燥"), std::string(segments->At(3)));
 }
 
+TEST_F(MaxMatchSegmentationTest, MixedAsciiAndChinese) {
+  // ASCII runs and non-candidate CJK punctuation are skipped in bulk but must
+  // still land in the same segments as the per-character path produced.
+  const auto& segments =
+      segmenter->Segment(utf8("Hello, world! 太后。头发 done"));
+  EXPECT_EQ(5, segments->Length());
+  EXPECT_EQ(utf8("Hello, world! "), std::string(segments->At(0)));
+  EXPECT_EQ(utf8("太后"), std::string(segments->At(1)));
+  EXPECT_EQ(utf8("。"), std::string(segments->At(2)));
+  EXPECT_EQ(utf8("头发"), std::string(segments->At(3)));
+  EXPECT_EQ(utf8(" done"), std::string(segments->At(4)));
+}
+
 TEST_F(MaxMatchSegmentationTest, EmptyString) {
   const auto& segments = segmenter->Segment("");
   EXPECT_EQ(0, segments->Length());

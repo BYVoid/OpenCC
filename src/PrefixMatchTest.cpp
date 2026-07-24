@@ -373,6 +373,54 @@ TEST_F(PrefixMatchSkipTest, EnumerationFailureDisablesSkipping) {
   EXPECT_EQ(utf8("滑鼠"), *m.value);
 }
 
+TEST_F(PrefixMatchSkipTest, CharLevelSkipsSameLeadByteNonCandidates) {
+  // Table path uses character-granularity filtering: 天/地 share the lead
+  // byte 0xE5 with the key 太后 but are not candidate first characters, so
+  // they are skipped; 太 itself stops the scan.
+  PrefixMatch pm(dict);
+  const std::string query = utf8("天地太后");
+  EXPECT_EQ(6u, pm.SkipUnmatchable(query.data(), query.size()));
+  // 黑 shares the lead byte 0xE9 with the key 里.
+  const std::string query2 = utf8("黑里");
+  EXPECT_EQ(3u, pm.SkipUnmatchable(query2.data(), query2.size()));
+}
+
+TEST_F(PrefixMatchSkipTest, CharLevelSkipsNonIdsPunctuationWithLead0xE2) {
+  // Em dash and curly quotes share the lead byte 0xE2 with the IDS
+  // operators but are not operators themselves; character-level filtering
+  // skips them while U+2FF0..U+2FFF still stop the scan.
+  PrefixMatch pm(dict);
+  const std::string dashes = utf8("——“”…");
+  EXPECT_EQ(dashes.size(), pm.SkipUnmatchable(dashes.data(), dashes.size()));
+  const std::string ids = utf8("—⿰氵青");
+  EXPECT_EQ(3u, pm.SkipUnmatchable(ids.data(), ids.size()));
+}
+
+TEST_F(PrefixMatchSkipTest, CharLevelSkipsTwoByteCharacters) {
+  PrefixMatch pm(dict);
+  const std::string query = utf8("Ünïcodé tail 太");
+  EXPECT_EQ(query.size() - 3, pm.SkipUnmatchable(query.data(), query.size()));
+}
+
+TEST_F(PrefixMatchSkipTest, AllIdsOperatorsStopTheScan) {
+  // Pins Finalize() to the arity table: every recognized IDS operator must
+  // stop the scan even though none of them begins a dictionary key, so the
+  // conversion loop's IDS grouping still sees them.
+  PrefixMatch pm(dict);
+  for (uint32_t cp = UTF8Util::kFirstIdeographicDescriptionOperator;
+       cp <= UTF8Util::kLastIdeographicDescriptionOperator; cp++) {
+    if (UTF8Util::IdeographicDescriptionOperatorArity(cp) == 0) {
+      continue;
+    }
+    const char encoded[3] = {
+        static_cast<char>(0xE0 | (cp >> 12)),
+        static_cast<char>(0x80 | ((cp >> 6) & 0x3F)),
+        static_cast<char>(0x80 | (cp & 0x3F)),
+    };
+    EXPECT_EQ(0u, pm.SkipUnmatchable(encoded, 3)) << "U+" << std::hex << cp;
+  }
+}
+
 TEST_F(PrefixMatchSkipTest, StopsAtIdeographicDescriptionOperator) {
   // No key starts with 0xE2, but IDS operators (U+2FF0..U+2FFF) must still
   // reach the conversion loop so IDS grouping is preserved.

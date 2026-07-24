@@ -128,15 +128,48 @@ void Unreachable() {
 #endif
 }
 
-// Marks a single key's first byte as a candidate in the skip table.
+// Marks a single key's first character in the skip table: the lead byte
+// always, plus the exact first code point for 2- and 3-byte characters so
+// scanning can filter at character granularity. Uses the same decoder as the
+// scanner (internal::DecodeCodePoint23) so a key's first character always
+// maps to the bit the scanner will test. A key whose first character is
+// truncated or invalid cannot be represented as a code point; character
+// filtering is then disabled for the whole table and lead-byte filtering
+// (which stops at the marked lead) remains in effect.
 void MarkKeyFirstChar(internal::Utf8SkipTable* table, const char* key,
                       size_t len) {
   if (len == 0) {
     return;
   }
   // key may come straight from a trie enumeration buffer (e.g. marisa's
-  // Agent) and is NOT NUL-terminated; only the lead byte is read.
-  table->candidate[static_cast<unsigned char>(key[0])] = true;
+  // Agent) and is NOT NUL-terminated. NextCharLengthNoException() reads only
+  // the lead byte, and DecodeCodePoint23() reads at most charLength bytes,
+  // which is checked against len first — no read may pass key + len.
+  const unsigned char lead = static_cast<unsigned char>(key[0]);
+  table->candidate[lead] = true;
+  if (lead < 0x80) {
+    return;
+  }
+  const size_t charLength = UTF8Util::NextCharLengthNoException(key);
+  if (charLength == 0) {
+    // Invalid lead byte: the scanner stops at charLength == 0 before any
+    // candidate check, so the lead-byte mark alone is sufficient and
+    // character-level filtering can stay enabled.
+    return;
+  }
+  if (charLength > len) {
+    // Truncated first character: the key can still match its raw byte
+    // prefix, but the scanner would decode the code point using the text's
+    // following bytes and could skip such a position. This cannot be
+    // represented at character granularity, so fall back to lead-byte
+    // filtering (the marked lead stops the scan).
+    table->DisableCharLevel();
+    return;
+  }
+  if (charLength == 2 || charLength == 3) {
+    table->MarkCharCandidate(internal::DecodeCodePoint23(key, charLength));
+  }
+  // 4-byte (and longer legacy) first characters rely on lead-byte filtering.
 }
 
 // Builds the skip table for dict by enumerating every key. Each dictionary
@@ -144,6 +177,7 @@ void MarkKeyFirstChar(internal::Utf8SkipTable* table, const char* key,
 // reconstructing its lexicon; groups recurse into children). Falls back to
 // treating every byte as a candidate when enumeration is unavailable.
 void BuildSkipTable(const DictPtr& dict, internal::Utf8SkipTable* table) {
+  table->EnableCharLevel();
   const bool enumerated =
       dict->EnumerateKeys([table](const char* key, size_t len) {
         MarkKeyFirstChar(table, key, len);

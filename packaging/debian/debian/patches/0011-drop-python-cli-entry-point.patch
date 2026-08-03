@@ -1,0 +1,31 @@
+From: Frank Lin <debian@linshuang.info>
+Date: Wed, 15 Jul 2026 06:42:22 +0000
+Subject: Drop the python console_scripts opencc entry point
+
+Since 1.4.x, setup.py registers a "opencc" console_scripts entry
+point (opencc.cli:main). debian/rules runs the pybuild install step
+after the cmake install step, so this Python wrapper script
+overwrites the compiled C++ /usr/bin/opencc CLI tool installed by
+the opencc binary package, and it lacks a corresponding python3
+dependency. Drop the entry point; the compiled CLI tool remains the
+one and only /usr/bin/opencc, and the python3-opencc bindings
+(import opencc) are unaffected.
+
+Forwarded: not-yet
+Last-Update: 2026-07-15
+Index: opencc/setup.py
+===================================================================
+--- opencc.orig/setup.py
++++ opencc/setup.py
+@@ -233,11 +233,6 @@ setuptools.setup(
+         'bdist_wheel': BDistWheelCommand,
+     },
+     setup_requires=setup_requires,
+-    entry_points={
+-        'console_scripts': [
+-            'opencc=opencc.cli:main',
+-        ],
+-    },
+ 
+     classifiers=[
+         'Development Status :: 5 - Production/Stable',

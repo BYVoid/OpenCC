@@ -1,30 +1,78 @@
 #!/usr/bin/make -f
+# -*- makefile -*-
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
 
-export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+# see FEATURE AREAS in dpkg-buildflags(1)
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all optimize=+lto
 
+include /usr/share/dpkg/architecture.mk
+
+# Used in the python3 binding (setup.py)
+export OPENCC_BUILD_DIR = obj-$(DEB_BUILD_GNU_TYPE)
+
+
+# Disable parallel build to circumvent some random build error
+# (needs further investigation)
 %:
-	dh $@ --buildsystem=cmake+ninja
+	dh $@ --buildsystem=cmake
+
+
+# Python build handled separately in pyproject.toml and setup.py
+BUILD_OPTIONS = \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DCMAKE_INSTALL_LIBDIR=/usr/lib/$(DEB_HOST_MULTIARCH)/ \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_OPENCC_JIEBA_PLUGIN=ON \
+    -DBUILD_PYTHON=OFF \
+    -DUSE_SYSTEM_DARTS=OFF \
+    -DUSE_SYSTEM_GTEST=ON \
+    -DUSE_SYSTEM_MARISA=ON \
+    -DUSE_SYSTEM_PYBIND11=ON \
+    -DUSE_SYSTEM_RAPIDJSON=ON \
+    -DUSE_SYSTEM_TCLAP=ON
+
+ifeq (,$(filter nodoc,$(DEB_BUILD_OPTIONS)))
+BUILD_OPTIONS += -DBUILD_DOCUMENTATION=ON
+else
+BUILD_OPTIONS += -DBUILD_DOCUMENTATION=OFF
+endif
+
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+BUILD_OPTIONS += -DENABLE_GTEST=ON
+else
+BUILD_OPTIONS += -DENABLE_GTEST=OFF
+endif
 
 override_dh_auto_configure:
-	dh_auto_configure --buildsystem=cmake+ninja -- \
-		-DCMAKE_BUILD_TYPE=Release \
-		-DBUILD_SHARED_LIBS=ON \
-		-DOPENCC_ENABLE_INSTALL=ON \
-		-DUSE_SYSTEM_MARISA=ON \
-		-DUSE_SYSTEM_RAPIDJSON=ON \
-		-DUSE_SYSTEM_TCLAP=ON \
-		-DENABLE_GTEST=ON \
-		-DUSE_SYSTEM_GTEST=ON \
-		-DENABLE_BENCHMARK=OFF \
-		-DBUILD_PYTHON=OFF \
-		-DBUILD_DOCUMENTATION=ON \
-		-DBUILD_OPENCC_JIEBA_PLUGIN=ON \
-		-DCMAKE_DISABLE_FIND_PACKAGE_Git=ON
+	dh_auto_configure -- $(BUILD_OPTIONS)
 
-override_dh_auto_test:
-	set -e; \
-	builddir=$$(find . -maxdepth 1 -type d -name 'obj-*'); \
-	cd "$$builddir" && ctest --output-on-failure
+execute_after_dh_auto_build:
+	dh_auto_build -O--buildsystem=pybuild -- -s pyproject
 
-override_dh_missing:
-	dh_missing --fail-missing
+execute_after_dh_auto_test:
+	# The testsuite needs the package to be installed
+	-dh_auto_test -O--buildsystem=pybuild -- -s pyproject
+
+execute_after_dh_auto_install:
+	dh_auto_install -O--buildsystem=pybuild -- -s pyproject
+	chrpath --delete debian/tmp/usr/lib/*/dist-packages/opencc/clib/*.so
+	for i in debian/tmp/usr/lib/*/dist-packages/opencc/clib/; do \
+		mkdir -p $$i/share/; \
+		ln -sf ../../../../../../share/opencc $$i/share/; \
+	done
+
+execute_after_dh_auto_clean:
+	find . -name *.pyc -delete
+
+execute_after_dh_installdocs-indep:
+ifeq (,$(findstring nodoc,$(DEB_BUILD_OPTIONS)))
+	dh_doxygen --indep
+endif
+
+override_dh_installdocs:
+	dh_installdocs -plibopencc-doc --doc-main-package=opencc
+	dh_installdocs --remaining-packages
+
+override_dh_installchangelogs:
+	dh_installchangelogs -k NEWS.md

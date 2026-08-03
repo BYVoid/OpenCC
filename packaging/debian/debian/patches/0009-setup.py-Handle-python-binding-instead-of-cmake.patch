@@ -2,12 +2,14 @@ From: Boyuan Yang <byang@debian.org>
 Date: Tue, 13 Jan 2026 18:04:57 -0500
 Subject: setup.py: Handle python binding instead of cmake
 
-Last-Update: 2026-07-04
 ---
-Index: OpenCC/setup.py
+ setup.py | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
+
+Index: opencc/setup.py
 ===================================================================
---- OpenCC.orig/setup.py
-+++ OpenCC/setup.py
+--- opencc.orig/setup.py
++++ opencc/setup.py
 @@ -9,6 +9,8 @@ import setuptools
  import setuptools.command.build_ext
  import wheel.bdist_wheel
@@ -17,7 +19,7 @@ Index: OpenCC/setup.py
  _this_dir = os.path.dirname(os.path.abspath(__file__))
  _build_dir = os.path.join(_this_dir, 'build', 'python')
  
-@@ -147,10 +149,13 @@ class OpenCCExtension(setuptools.Extensi
+@@ -148,10 +150,13 @@ class OpenCCExtension(setuptools.Extensi
  
  class BuildExtCommand(setuptools.command.build_ext.build_ext, object):
      def build_extension(self, ext):
@@ -35,7 +37,7 @@ Index: OpenCC/setup.py
          if isinstance(ext, OpenCCExtension):
              build_libopencc(output_path)
          else:
-@@ -214,7 +219,14 @@ setuptools.setup(
+@@ -215,7 +220,14 @@ setuptools.setup(
  
      packages=packages,
      package_dir={'opencc': 'python/opencc'},

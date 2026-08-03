@@ -1,0 +1,5 @@
+test/testcases/testcases.json test/testcases/
+test/config_test/config_test.json test/config_test/
+python/tests/test_opencc.py python/tests/
+pyproject.toml
+data/config data/

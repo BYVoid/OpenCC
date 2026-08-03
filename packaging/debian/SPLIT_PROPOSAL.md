@@ -1,5 +1,27 @@
 # Proposed Debian binary package split for opencc 1.4.x
 
+> **Status (2026-08): partially adopted by Debian.** This document is an
+> upstream proposal; adoption is entirely up to the Debian maintainers.
+> The Debian packaging now used as the baseline in
+> `packaging/debian/debian/` (source package `1.4.1+ds1-1~exp1`) has
+> since adopted the `libopencc1.3` → `libopencc1.4` rename with a proper
+> `.symbols` file, and additionally ships a `python3-opencc` binary
+> package built via pybuild. The proposed `opencc-jieba` package was not
+> adopted (the `cppjieba` bundling blocker below still stands). On
+> darts-clone, the claim below that "there is no `USE_SYSTEM_DARTS`
+> option" is outdated: upstream added that option, but the Debian
+> packaging must keep it `OFF` — `src/DartsDict.cpp` calls `validate()`,
+> which only exists in the vendored `deps/darts-clone-0.32h` header
+> (v0.32h plus sentencepiece hardening, added upstream in 1.4.0), and
+> Debian ships no darts-clone package (its `darts` package is a
+> different upstream). The `opencc-jieba` section below remains an
+> active upstream proposal for a future upload and is applied as a
+> delta in this directory (`debian/control` stanza, `debian/rules`
+> plugin flag, `debian/opencc-jieba.install`), together with moving the
+> `*.ocd2` dictionaries into `libopencc-data` as proposed in the table
+> below. `debian/README.source`, referenced below, was removed when the
+> baseline was resynced to the Debian packaging repository.
+
 This is a proposal from upstream, not a Debian upload. It was produced by
 overlaying the top-level `debian/` directory onto a clean checkout of
 upstream `BYVoid/OpenCC` at `master` (1.4.1) and actually running

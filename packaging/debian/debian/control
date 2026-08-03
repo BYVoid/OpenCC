@@ -1,107 +1,124 @@
 Source: opencc
-Section: utils
-Priority: optional
-Maintainer: Carbo Kuo <byvoid@byvoid.com>
-Build-Depends:
- debhelper-compat (= 13),
- cmake,
- ninja-build,
- pkg-config,
- doxygen,
- libmarisa-dev,
- rapidjson-dev,
- libtclap-dev,
- googletest,
- libgtest-dev,
-Standards-Version: 4.6.2
-Rules-Requires-Root: no
-Homepage: https://github.com/BYVoid/OpenCC
-
-Package: opencc
-Architecture: any
-Depends:
- ${shlibs:Depends},
- ${misc:Depends},
- libopencc1.4 (= ${binary:Version}),
- libopencc-data (>= ${source:Version}),
-Description: Open Chinese Convert (OpenCC) command line tools
- OpenCC converts between Traditional Chinese, Simplified Chinese, and
- regional variants (Mainland/Hong Kong/Taiwan) and Japanese Shinjitai
- forms. This package provides the opencc command line converter, the
- opencc_dict dictionary format conversion tool, and the
- opencc_phrase_extract phrase extraction tool.
-
-Package: libopencc1.4
-Architecture: any
-Multi-Arch: same
+Standards-Version: 4.7.4
+Maintainer: Debian Input Method Team <debian-input-method@lists.debian.org>
+Uploaders:
+ Debian Chinese Team <chinese-developers@lists.alioth.debian.org>,
+ Asias He <asias@debian.org>,
+ YunQiang Su <syq@debian.org>,
+ Osamu Aoki <osamu@debian.org>,
+ Aron Xu <aron@debian.org>,
+ xiao sheng wen <atzlinux@sina.com>,
+ Boyuan Yang <byang@debian.org>,
 Section: libs
-Pre-Depends: ${misc:Pre-Depends}
-Depends:
- ${shlibs:Depends},
- ${misc:Depends},
-Description: Open Chinese Convert (OpenCC) conversion library - runtime
- OpenCC converts between Traditional Chinese, Simplified Chinese, and
- regional variants (Mainland/Hong Kong/Taiwan) and Japanese Shinjitai
- forms.
- .
- This package contains the shared library needed to run programs
- dynamically linked against libopencc, SOVERSION 1.4.
-
-Package: libopencc-dev
-Architecture: any
-Section: libdevel
-Depends:
- libopencc1.4 (= ${binary:Version}),
- libopencc-data (>= ${source:Version}),
- ${misc:Depends},
-Description: Open Chinese Convert (OpenCC) conversion library - development files
- OpenCC converts between Traditional Chinese, Simplified Chinese, and
- regional variants (Mainland/Hong Kong/Taiwan) and Japanese Shinjitai
- forms.
- .
- This package contains the headers, CMake package config, pkg-config
- file, and unversioned shared library symlink needed to build software
- using libopencc.
+Testsuite: autopkgtest-pkg-pybuild
+Build-Depends:
+ chrpath,
+ cmake,
+ debhelper-compat (= 14),
+ dh-sequence-python3,
+ doxygen <!nodoc>,
+ googletest <!nocheck>,
+ libmarisa-dev (>> 0.3),
+ libtclap-dev,
+ opencc <cross>,
+ dh-sequence-pkgkde-symbolshelper,
+ pybind11-dev,
+ python3-all-dev,
+ rapidjson-dev,
+ pybuild-plugin-pyproject,
+ python3-pybind11,
+ python3-pytest <!nocheck>,
+ python3-setuptools,
+ python3-wheel,
+Vcs-Browser: https://salsa.debian.org/debian/opencc
+Vcs-Git: https://salsa.debian.org/debian/opencc.git
+Homepage: https://github.com/BYVoid/OpenCC
+Description: simplified-traditional Chinese conversion library
+ opencc is a library for converting character between traditional Chinese and
+ simplified Chinese.
 
 Package: libopencc-data
 Architecture: all
 Multi-Arch: foreign
-Section: libs
-Depends:
- ${misc:Depends},
-Description: Open Chinese Convert (OpenCC) conversion library - data files
- OpenCC converts between Traditional Chinese, Simplified Chinese, and
- regional variants (Mainland/Hong Kong/Taiwan) and Japanese Shinjitai
- forms.
+Breaks:
+ libopencc2-data (<< 1.1.1~),
+Replaces:
+ libopencc2-data (<< 1.1.1~),
+Description: ${source:Synopsis} - data files
+ ${source:Extended-Description}
  .
- This package contains the architecture-independent dictionaries
- (.ocd2) and conversion configuration files (.json) used by libopencc
- and the opencc command line tools.
+ This package includes the data files.
+
+Package: libopencc-dev
+Architecture: any
+Multi-Arch: same
+Section: libdevel
+Depends:
+ libopencc1.4 (= ${binary:Version}),
+Suggests:
+ libopencc-doc,
+Description: ${source:Synopsis} - development
+ ${source:Extended-Description}
+ .
+ This package includes the development support files.
 
 Package: libopencc-doc
 Architecture: all
+Multi-Arch: foreign
 Section: doc
-Depends:
- ${misc:Depends},
-Description: Open Chinese Convert (OpenCC) conversion library - API documentation
- OpenCC converts between Traditional Chinese, Simplified Chinese, and
- regional variants (Mainland/Hong Kong/Taiwan) and Japanese Shinjitai
- forms.
+Description: ${source:Synopsis} - document
+ ${source:Extended-Description}
  .
- This package contains the Doxygen-generated HTML API documentation
- for libopencc.
+ This package includes the library document files.
+
+Package: libopencc1.4
+Architecture: any
+Depends:
+ libopencc-data (= ${source:Version}),
+Breaks:
+ libopencc1.1,
+ libopencc1.2,
+ libopencc1.3,
+Replaces:
+ libopencc1.1,
+ libopencc1.2,
+ libopencc1.3,
+Description: ${source:Synopsis} - runtime
+ ${source:Extended-Description}
+ .
+ This package includes the shared library.
+
+Package: opencc
+Architecture: any
+Multi-Arch: foreign
+Section: utils
+Depends:
+ libopencc1.4 (= ${binary:Version}),
+Suggests:
+ libopencc-doc,
+Description: simplified-traditional Chinese conversion tool
+ ${source:Extended-Description}
+ .
+ This package includes the conversion tool.
 
 Package: opencc-jieba
 Architecture: any
+Multi-Arch: foreign
 Section: utils
 Depends:
- ${shlibs:Depends},
- ${misc:Depends},
  opencc (= ${binary:Version}),
- libopencc-data (>= ${source:Version}),
-Description: Jieba segmentation plugin for Open Chinese Convert (OpenCC)
- This package provides the optional Jieba-based word segmentation
- plugin for OpenCC (libopencc-jieba.so) and the merged Jieba dictionary
- and *_jieba.json configuration files it requires. Install this package
- to enable the s2twp_jieba-style configs that use word-segmentation-aware
+Description: ${source:Synopsis} - Jieba segmentation plugin
+ ${source:Extended-Description}
+ .
+ This package provides the optional Jieba-based word segmentation plugin
+ (libopencc-jieba.so) with the merged Jieba dictionary and the
+ *_jieba.json configurations that enable word-segmentation-aware
  regional phrase conversion.
+
+Package: python3-opencc
+Architecture: any
+Section: python
+Description: ${source:Synopsis} - Python 3.x
+ ${source:Extended-Description}
+ .
+ This package provides the Python 3.x module.

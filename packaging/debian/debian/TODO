@@ -1,0 +1,2 @@
+* We need to re-enable autopkgtest with updated opencc 1.2.0+ src.
+* We need to pack nodejs module provided by opencc when possible.

@@ -1,0 +1,2 @@
+# libopencc1.4 installs architecture dependent .ocd2 files
+dependency-is-not-multi-archified libopencc-dev depends on libopencc1.4 (multi-arch: no)

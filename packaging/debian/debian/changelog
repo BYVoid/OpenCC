@@ -1,41 +1,768 @@
-opencc (1.4.1-1) UNRELEASED; urgency=medium
+opencc (1.4.1+ds1-1~exp1) experimental; urgency=medium
 
-  * Update packaging for the upstream 1.4.1 release:
-    - Rebase 0004 (use system-installed googletest) against 1.4.1; the
-      ENABLE_GTEST block gained a bundled-source existence check that
-      shifted the hunk context. 0003, 0005 and 0009 apply unchanged. All
-      four patches verified with `patch -p1 --fuzz=0` against upstream
-      1.4.1 sources.
-    - Drop usr/bin/cppjieba_dict from opencc-jieba.install: upstream now
-      generates the merged Jieba dictionary with the regular opencc_dict
-      tool (shipped in the opencc package) and no longer builds or
-      installs a separate dictionary helper.
+  * debian/control: Bump debhelper compat to v14.
+  * debian/copyright: Updated.
+  * debian/docs: Rename to libopencc-dev.docs.
 
- -- Frank Lin <github@linshuang.info>  Sat, 11 Jul 2026 00:00:00 +0000
+  [ Frank Lin ]
+  * New upstream release.
+  * d/copyright: Stop excluding deps/darts-clone-*/*; upstream darts-
+    clone fork now provides validate()/copy_array() used by
+    src/DartsDict.cpp, which the separate system darts package (a
+    different upstream) does not have.
+  * d/rules: Disable USE_SYSTEM_DARTS accordingly; build against the
+    now-shipped bundled darts-clone fork.
+  * d/control: Drop no-longer-needed Build-Depends on darts.
+  * d/patches: Refresh 0003, 0004, 0005, 0009 for the new upstream
+    source tree.
+  * d/patches: Add 0010-fix-git-version-fallback.patch; upstream
+    cmake/GitVersion.cmake falls back to a hardcoded version when no
+    .git is present (always true for our source tarball), and the
+    fallback was left at 1.4.0 in the 1.4.1 release, causing opencc --
+    version to report the wrong version.
+  * d/patches: Add 0011-drop-python-cli-entry-point.patch; the pybuild
+    install step was overwriting the compiled C++ /usr/bin/opencc with a
+    python console_scripts wrapper lacking a python3 dependency.
+  * Rename libopencc1.3 to libopencc1.4: upstream bumped
+    OPENCC_ABI_VERSION to 1.4 (libopencc.so.1.4), so the binary package,
+    .install and .symbols files are renamed to match, with
+    Breaks/Replaces on libopencc1.3. The .symbols file is regenerated
+    against the built library.
+  * d/libopencc1.4.symbols: fix cross-architecture size_t/thunk mangling
+    caught by Salsa CI on i386, using native (regex)/(c++) dpkg-
+    gensymbols pattern tags.
 
-opencc (1.4.0-1) UNRELEASED; urgency=medium
+ -- Boyuan Yang <byang@debian.org>  Sun, 02 Aug 2026 14:53:16 -0400
 
-  * Recreate the Debian packaging flow on top of the existing
-    packaging/debian patch mirror, rebased for the 1.4.0 release and
-    validated against a clean checkout of upstream BYVoid/OpenCC:
-    - Rebase 0003 (no remote images in README.md), 0004 (Use
-      system-installed googletest instead of bundled version for Debian
-      builds), 0005 (disable CMake build in setup.py), and 0009
-      (setup.py handles the python binding directly) — the complete set
-      packaging/debian/patches already tracked — so all four apply
-      cleanly with `patch -p1 --fuzz=0` against upstream 1.4.0 sources.
-    - Split the binary packages the way Debian's existing opencc source
-      package already does (opencc, libopencc<soversion>, libopencc-dev,
-      libopencc-data, libopencc-doc), updated for the current
-      OPENCC_ABI_VERSION (1.4) SOVERSION, plus a new opencc-jieba binary
-      package for the Jieba segmentation plugin, which Debian does not
-      currently package. See packaging/debian/SPLIT_PROPOSAL.md.
-    - Build against system libmarisa, rapidjson, libtclap, and
-      googletest via the upstream USE_SYSTEM_* CMake options instead of
-      the vendored deps/ copies.
-    - Validated with `dpkg-buildpackage -us -uc -b` against upstream
-      `master`: all six binary packages build, `dh_missing
-      --fail-missing` finds nothing unclaimed, `ctest` passes 19/19, and
-      `lintian --pedantic` reports no errors.
+opencc (1.3.1+ds1-3) unstable; urgency=medium
 
- -- Frank Lin <github@linshuang.info>  Sat, 04 Jul 2026 02:12:00 +0000
+  * d/libopencc1.3.symbols: update use pkgkde-symbolshelper
+
+ -- xiao sheng wen <atzlinux@sina.com>  Sun, 14 Jun 2026 16:37:59 +0800
+
+opencc (1.3.1+ds1-2) unstable; urgency=medium
+
+  * d/libopencc1.3.symbols: use getbuildlog, pkgkde-symbolshelper update
+
+ -- xiao sheng wen <atzlinux@sina.com>  Sun, 14 Jun 2026 11:35:18 +0800
+
+opencc (1.3.1+ds1-1) unstable; urgency=medium
+
+  * New upstream version 1.3.1+ds1
+  * d/libopencc1.3.symbols: add symbols in 1.3.1
+
+ -- xiao sheng wen <atzlinux@sina.com>  Sat, 13 Jun 2026 14:18:09 +0800
+
+opencc (1.3.0+ds1-2) unstable; urgency=medium
+
+  * d/control: libopencc1.3 add Breaks Replaces libopencc1.2, Closes: #1134857
+
+ -- xiao sheng wen <atzlinux@sina.com>  Tue, 28 Apr 2026 11:07:38 +0800
+
+opencc (1.3.0+ds1-1) unstable; urgency=medium
+
+  * d/p/0003*.patch: don't fetch remote images
+    https://opencc.byvoid.com/img/opencc.png
+
+ -- xiao sheng wen <atzlinux@sina.com>  Sat, 25 Apr 2026 10:20:17 +0800
+
+opencc (1.3.0+ds1-1~exp1) unstable; urgency=medium
+
+  * New upstream version
+  * Standards-Version: 4.7.4 (routine-update)
+  * Reorder sequence of d/control fields by cme (routine-update)
+  * debputy lint --auto-fix (routine-update)
+  * d/clean: add clear OpenCC.egg-info/ build/ .pybuild/
+  * d/s/lintian-overrides: update to 1.3 version
+  * Rename package due to SONAME bump: libopencc1.2 => libopencc1.3
+  * d/p/0001*.patch, Dropped, applied upstream.
+  * update d/p/0003*.patch
+  * d/copyright: add plugins/jieba/deps/cppjieba/* License: MIT
+
+ -- xiao sheng wen <atzlinux@sina.com>  Fri, 24 Apr 2026 15:23:13 +0800
+
+opencc (1.2.0+ds1-1) unstable; urgency=medium
+
+  * Upload to unstable.
+
+ -- Boyuan Yang <byang@debian.org>  Sat, 21 Feb 2026 16:26:21 -0500
+
+opencc (1.2.0+ds1-1~exp2) experimental; urgency=medium
+
+  * debian/libopencc1.2.symbols: Refresh symbols.
+
+ -- Boyuan Yang <byang@debian.org>  Tue, 17 Feb 2026 10:17:27 -0500
+
+opencc (1.2.0+ds1-1~exp1) experimental; urgency=medium
+
+  * New upstream version 1.2.0. (CVE-2025-15536)
+  * Rename package due to SONAME bump: libopencc1.1 => libopencc1.2.
+  * debian/patches/backport: Dropped, merged upstream.
+  * debian/patches/0002-Force-build-with-c-17.patch: Dropped, applied
+    upstream.
+  * debian/patches: Refresh patches.
+  * debian/watch: Update to version 5.
+  * debian/tests/: Temporarily disable autopkgtest before we can draft
+    an updated version that matches opencc 1.2.0+.
+
+ -- Boyuan Yang <byang@debian.org>  Tue, 10 Feb 2026 17:29:25 -0500
+
+opencc (1.1.9+ds1-4) unstable; urgency=medium
+
+  * debian/control: Bump Standards-Version to 4.7.3.
+  * Build-dep on python3-all-dev instead of python3-dev. (Closes: #1125410)
+  * debian/rules: Enable DH_VERBOSE for better debugging.
+  * debian/pybuild.testfiles: Added to enable python binding post-build tests.
+  * debian/patches/backport/345c9a50ab07018f1b4439776bad78a0d40778ec.patch:
+    Add patch from upstream to fix out-of-bounds read issues when handling
+    truncated UTF-8 input.
+  * debian/patches/0009-setup.py-Handle-python-binding-instead-of-cmake.patch:
+    Add patch so that the python3 binding as well as pybind11 usage is handled
+    by setup.py, not CMakeLists.txt. This is required to build for all
+    supported python3 versions instead of just the default one.
+  * debian/rules: Adjust python-related building accordingly.
+
+ -- Boyuan Yang <byang@debian.org>  Tue, 13 Jan 2026 19:17:36 -0500
+
+opencc (1.1.9+ds1-3) unstable; urgency=medium
+
+  * debian/control: Bump Standards-Version to 4.7.2.
+  * Upload to unstable.
+
+ -- Boyuan Yang <byang@debian.org>  Sun, 28 Sep 2025 19:36:20 -0400
+
+opencc (1.1.9+ds1-3~exp1) experimental; urgency=medium
+
+  * Test rebuild against libmarisa 0.3.1.
+
+ -- Boyuan Yang <byang@debian.org>  Tue, 23 Sep 2025 20:07:44 -0400
+
+opencc (1.1.9+ds1-2) unstable; urgency=medium
+
+  * debian/patches/backport/0006-Fix-build-for-gcc-15-934.patch,
+    debian/patches/backport/0007-Fix-deprecated-declarations-in-C-17.patch:
+    Backport upstream patches to fix FTBFS with GCC 15. (Closes: #1097512)
+  * debian/patches/0002-Force-build-with-c-17.patch: Force building with
+    c++17 standard to fix FTBFS with the new googletest.
+
+ -- Boyuan Yang <byang@debian.org>  Tue, 09 Sep 2025 08:26:01 -0400
+
+opencc (1.1.9+ds1-1) unstable; urgency=medium
+
+  * Upload to unstable.
+
+ -- Boyuan Yang <byang@debian.org>  Wed, 14 Aug 2024 14:05:52 -0400
+
+opencc (1.1.9+ds1-1~exp1) experimental; urgency=medium
+
+  * New upstream release.
+  * debian/control: Add new build-test-dependency python3-pytest.
+  * debian/patches/0002: Dropped, merged upstream.
+  * debian/libopencc1.1.symbols: Update symbols.
+  * debian/rules: Allow python binding post-build test failure for now
+    before we find out the correct way to test the python package with
+    pytest.
+
+ -- Boyuan Yang <byang@debian.org>  Wed, 14 Aug 2024 12:32:59 -0400
+
+opencc (1.1.8+ds1-3) unstable; urgency=medium
+
+  * Upload to unstable. Closes: #1077816
+  * debian/control: Move main description to source package section.
+  * debian/control: Add new build-dependency pybuild-plugin-pyproject.
+  * debian/control: Use dh-sequence-python3.
+  * debian/rules: Use pyproject instead of distutils for pybuild.
+
+ -- Boyuan Yang <byang@debian.org>  Sat, 03 Aug 2024 19:07:26 -0400
+
+opencc (1.1.8+ds1-2) experimental; urgency=medium
+
+  * Team upload
+
+  [ Shengjing Zhu ]
+  * Disable build in setup.py
+
+  [ Felix Yan ]
+  * Enable python binding (Closes: #1077816)
+
+ -- Shengjing Zhu <zhsj@debian.org>  Sat, 03 Aug 2024 13:38:47 +0800
+
+opencc (1.1.8+ds1-1) unstable; urgency=medium
+
+  * Upload to unstable.
+  * debian/libopencc1.1.symbols: Reconfirm symbols.
+
+ -- Boyuan Yang <byang@debian.org>  Mon, 29 Jul 2024 12:07:48 -0400
+
+opencc (1.1.8+ds1-1~exp1) experimental; urgency=medium
+
+  * New upstream release.
+  * debian/copyright: Update information.
+  * debian/patches: Refresh patches.
+  * debian/control: Use dh-sequence-pkgkde-symbolshelper.
+
+ -- Boyuan Yang <byang@debian.org>  Sun, 28 Jul 2024 20:00:37 -0400
+
+opencc (1.1.7+ds1-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream version 1.1.7+ds1
+  * debian/libopencc-dev.install:
+    - Install CMake config modules
+
+ -- Gunnar Hjalmarsson <gunnarhj@debian.org>  Sat, 21 Oct 2023 21:22:49 +0200
+
+opencc (1.1.6+ds1-2) unstable; urgency=medium
+
+  [ Helmut Grohne ]
+  * Fix FTCBFS: Add B-D: opencc <cross> for opencc_dict. (Closes: #1051036)
+
+ -- Boyuan Yang <byang@debian.org>  Fri, 01 Sep 2023 12:00:26 -0400
+
+opencc (1.1.6+ds1-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream version 1.1.6+ds1
+  * Refresh patches:
+    - d/p/0001-use-cmake-install-libdir.patch
+    - d/p/0005-Use-system-googletest.patch
+
+ -- Gunnar Hjalmarsson <gunnarhj@debian.org>  Sat, 10 Dec 2022 13:10:03 +0100
+
+opencc (1.1.5+ds1-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream version 1.1.5+ds1
+
+ -- Gunnar Hjalmarsson <gunnarhj@debian.org>  Tue, 06 Dec 2022 13:40:36 +0100
+
+opencc (1.1.4+ds1-4) unstable; urgency=medium
+
+  * Team upload
+  * Work around uscan issue with GitHub releases page
+
+ -- Gunnar Hjalmarsson <gunnarhj@debian.org>  Tue, 08 Nov 2022 16:33:54 +0100
+
+opencc (1.1.4+ds1-3) unstable; urgency=medium
+
+  * Team upload
+  * debian/libopencc1.1.symbols:
+    - Update other archs for LTO using buildd logs (closes: #1015565)
+  * Build with GCC-12
+    - It builds fine now with GCC-12, so the symbols fix for LTO also
+      closes: #1013008.
+
+ -- Gunnar Hjalmarsson <gunnarhj@debian.org>  Mon, 25 Jul 2022 02:26:42 +0200
+
+opencc (1.1.4+ds1-2) unstable; urgency=medium
+
+  * Team upload
+  * Start fixing FTBFS with LTO enabled (see bug 1015565):
+    - debian/rules: Enable LTO
+    - Create symbols file for amd64 only
+  * Bump Standards-Version to 4.6.1
+  * debian/copyright: Bump copyright year to 2022
+
+ -- Gunnar Hjalmarsson <gunnarhj@debian.org>  Sat, 23 Jul 2022 19:05:33 +0200
+
+opencc (1.1.4+ds1-1) unstable; urgency=medium
+
+  [ xiao sheng wen ]
+  * update-debian-copyright to 2021 year.
+
+  [ Boyuan Yang ]
+  * New upstream version 1.1.4+ds1.
+  * debian/patches: Refresh patches.
+  * debian/libopencc1.1.symbols: Refresh symbols.
+
+ -- Boyuan Yang <byang@debian.org>  Sat, 04 Jun 2022 11:52:24 -0400
+
+opencc (1.1.3+ds1-5) unstable; urgency=medium
+
+  * Team upload
+  * debian/libopencc1.1.symbols:
+    - Refresh using buildd logs for all archs and pkgkde-symbolshelper
+      (Closes: #997412)
+
+ -- Gunnar Hjalmarsson <gunnarhj@debian.org>  Wed, 27 Oct 2021 09:39:59 +0200
+
+opencc (1.1.3+ds1-4) unstable; urgency=medium
+
+  * Team upload
+  * Re-build with GCC 11
+  * debian/libopencc1.1.symbols:
+    - amd64 tweak using buildd log from test rebuild
+
+ -- Gunnar Hjalmarsson <gunnarhj@debian.org>  Tue, 26 Oct 2021 23:03:58 +0200
+
+opencc (1.1.3+ds1-3) unstable; urgency=medium
+
+  * Refresh symbols again for all archs using buildd logs.
+
+ -- Boyuan Yang <byang@debian.org>  Mon, 20 Sep 2021 15:44:37 -0400
+
+opencc (1.1.3+ds1-2) unstable; urgency=medium
+
+  * Refresh symbols for all archs using buildd logs.
+
+ -- Boyuan Yang <byang@debian.org>  Sun, 19 Sep 2021 16:32:52 -0400
+
+opencc (1.1.3+ds1-1) unstable; urgency=medium
+
+  * New upstream release 1.1.3.
+  * Add myself into uploaders list.
+  * debian/patches: Refresh patches.
+    + 0002-use-system-libraries.patch: Dropped, upstream now provides
+      CMake options to use system libraries.
+    + Drop backported patches (0006, 0007), merged upstream.
+  * debian/control:
+    + Bump Standards-Version to 4.6.0.
+    + Add new build-dependency pybind11-dev.
+  * debian/rules: Refresh cmake build options.
+  * debian/libopencc1.1.symbols: Refresh symbols.
+
+ -- Boyuan Yang <byang@debian.org>  Sat, 18 Sep 2021 21:13:03 -0400
+
+opencc (1.1.1+git20200624+ds2-10) unstable; urgency=medium
+
+  * Team upload.
+  * Upload to unstable.
+  * Backport patch to fix performance regression again.
+    Add
+    + 0006-Fix-a-bug-in-the-calculation-of-DictGroup-keyMaxLeng.patch
+    + 0007-Fix-a-severe-performance-bug-in-Conversion-Convert-t.patch
+
+ -- Shengjing Zhu <zhsj@debian.org>  Sun, 07 Mar 2021 14:20:40 +0800
+
+opencc (1.1.1+git20200624+ds2-9) experimental; urgency=medium
+
+  * Team upload.
+  * Remove unused command from autopkgtest scripts
+  * Add build-essential to autopkgtest
+
+ -- Shengjing Zhu <zhsj@debian.org>  Sun, 07 Mar 2021 00:54:22 +0800
+
+opencc (1.1.1+git20200624+ds2-8) experimental; urgency=medium
+
+  * Team upload.
+  * Enable test when building
+  * Add autopkgtest
+
+ -- Shengjing Zhu <zhsj@debian.org>  Sat, 06 Mar 2021 17:57:00 +0800
+
+opencc (1.1.1+git20200624+ds2-7) unstable; urgency=high
+
+  * Team upload.
+  * Drop debian/patches/0005 for now due to regression reported.
+    See also https://github.com/fcitx/fcitx5/issues/238 .
+
+ -- Boyuan Yang <byang@debian.org>  Fri, 05 Mar 2021 09:37:48 -0500
+
+opencc (1.1.1+git20200624+ds2-6) unstable; urgency=high
+
+  * Team upload.
+  * debian/patches/0005: Add upstream patch to fix severe performance
+    regression in `Conversion::Convert` that caused O(N^2) complexity.
+  * debian/rules: Disable parallel build to workaround some random
+    build error for now.
+
+ -- Boyuan Yang <byang@debian.org>  Sun, 28 Feb 2021 19:48:01 -0500
+
+opencc (1.1.1+git20200624+ds2-5) unstable; urgency=medium
+
+  * Team upload.
+  * debian/rules: Rewrite to support <!nodoc> build profile.
+  * debian/rules: Enable dh_doxygen when building docs.
+  * Drop unnecessary build dependencies. (Closes: #981606)
+  * debian/control: Mark build-dependency doxygen as <!nodoc>.
+  * debian/control: Drop build-dependency on libjs-jquery. Let
+    doxygen handle it.
+  * debian/control: Drop build-dependency on graphviz. Doxyfile
+    did not enable HAVE_DOT.
+  * debian/control: Drop build-dependency on dartz. Currently opencc
+    uses its vendored copy.
+
+ -- Boyuan Yang <byang@debian.org>  Tue, 02 Feb 2021 11:58:39 -0500
+
+opencc (1.1.1+git20200624+ds2-4) unstable; urgency=medium
+
+  * Build-depends on pkg-kde-tools to handle symbols.
+  * debian/libopencc1.1.symbols: Refresh symbols using Debian
+    buildd logs.
+
+ -- Boyuan Yang <byang@debian.org>  Sun, 17 Jan 2021 17:52:00 -0500
+
+opencc (1.1.1+git20200624+ds2-3) unstable; urgency=medium
+
+  * Team upload.
+
+  [ Gunnar Hjalmarsson ]
+  * Replace shlibs file with symbols file
+  * debian/patches/no-remote-images-when-reading-docs-on-disk.patch:
+    - Fixes a privacy breach previously reported as Lintian warnings
+  * Bump Standards-Version to 4.5.1
+  * debian/source/lintian-overrides:
+    - Explain why libopencc1.1 is not multi-archified even if
+      libopencc-dev depends on it.
+
+  [ Boyuan Yang ]
+  * Mark package libopencc-dev as Multi-Arch: same
+
+ -- Boyuan Yang <byang@debian.org>  Sat, 16 Jan 2021 10:36:38 -0500
+
+opencc (1.1.1+git20200624+ds2-2) unstable; urgency=high
+
+  * Team upload.
+  * debian/control: Mark package libopencc-data Breaks+Replaces the
+    old libopencc2-data package. (Closes: #963187)
+
+ -- Boyuan Yang <byang@debian.org>  Sat, 04 Jul 2020 13:46:28 -0400
+
+opencc (1.1.1+git20200624+ds2-1) unstable; urgency=medium
+
+  * Team upload.
+  * Upload to unstable.
+
+ -- Boyuan Yang <byang@debian.org>  Sat, 04 Jul 2020 06:28:22 -0400
+
+opencc (1.1.1+git20200624+ds2-1~exp2) experimental; urgency=medium
+
+  * Team upload.
+  * Rebuild against marisa 0.2.6.
+
+ -- Boyuan Yang <byang@debian.org>  Fri, 03 Jul 2020 17:40:16 -0400
+
+opencc (1.1.1+git20200624+ds2-1~exp1) experimental; urgency=medium
+
+  * Team upload.
+
+  [ 肖盛文 ]
+  * add libopencc-doc.doc-base,to register opencc to doc-base
+  * d/control:
+     - add Section: doc for libopencc-doc
+     - add Depends: libjs-jquery for the libopencc-doc package
+
+  [ Boyuan Yang ]
+  * Import new upstream snapshot 2020-06-24 to fix some bugs.
+  * debian/patches: Refresh patches.
+
+ -- Boyuan Yang <byang@debian.org>  Thu, 25 Jun 2020 20:34:50 -0400
+
+opencc (1.1.1+ds1-1~exp1) experimental; urgency=medium
+
+  * Team upload.
+
+  [ 肖盛文 ]
+  * New upstream version 1.1.1
+  * change libopencc data pkgname from libopencc[num]-data to libopencc-data
+  * change libopencc pkgname from libopencc2 to libopencc1.1
+  * update debian/libopencc1.1.install for filename *.ocd2
+  * d/rules:
+     - delete override_dh_missing:
+     - use execute_after_dh_auto_clean:
+     - use execute_after_dh_auto_install:
+  * d/copyright:
+     - update dirname for new upstream version
+     - add xiao sheng wen <atzlinux@sina.com> for debian/*
+     - add Upstream-Contact
+  * d/control:
+     - add Rules-Requires-Root: no
+     - add New Uploaders: xiao sheng wen
+     - delete some Replaces: and Breaks:,
+       let the new version packages can co-exist with the old ones.
+  * add debian/upstream/metadata
+  * d/watch: use @PACKAGE@ @ANY_VERSION@@ARCHIVE_EXT@
+
+  [ Boyuan Yang ]
+  * ds: Do not include bundled gtest and libmarisa.
+  * debian/rules: Explicitly disable building bundled libmarisa.
+  * debian/libopencc1.1.shlibs: Reset version requirement.
+  * debian/control: Add new build-dependency libmarisa-dev.
+  * debian/patches: Refreshed.
+
+ -- Boyuan Yang <byang@debian.org>  Sat, 23 May 2020 15:51:01 -0400
+
+opencc (1.0.6-2) unstable; urgency=medium
+
+  * Team upload.
+  * debian/libopencc2.shlibs: Bump version requirement to 1.0.6.
+  * debian/control: Bump debhelper compat to v13.
+  * debian/rules: Drop as-needed linker flag.
+
+ -- Boyuan Yang <byang@debian.org>  Sat, 02 May 2020 10:46:44 -0400
+
+opencc (1.0.6-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream release 1.0.6.
+  * debian/control:
+    + Bump Standards-Version to 4.5.0.
+    + Add Debian Chinese Team into uploaders to show team's interest
+      in package co-maintenance.
+  * debian/patches: Refresh patches.
+
+ -- Boyuan Yang <byang@debian.org>  Mon, 13 Apr 2020 18:20:20 -0400
+
+opencc (1.0.5+git20190530-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream git snapshot (2019-05-30).
+    - opencc::ConvertDirectory is now exported.
+    - Various fixes and document updates.
+  * debian/control:
+    + Bump Standards-Version to 4.4.0.
+    + Bump debhelper copmat to v12.
+    + Add build-dependency graphviz for dot support for doxygen.
+  * debian/patches: Add patch 0004 to migrate from python2 to
+    python3. (Closes: #937195)
+
+ -- Boyuan Yang <byang@debian.org>  Fri, 30 Aug 2019 14:09:03 -0400
+
+opencc (1.0.5-2) unstable; urgency=medium
+
+  * Team upload.
+  * Rebuild against gcc 8.
+  * debian/control:
+    + Update uploaders email address and use the @debian.org one.
+    + Bump Standards-Version to 4.2.1 (no changes needed).
+  * debian/rules: Avoid explicit invocation to dpkg-architecture.
+
+ -- Boyuan Yang <byang@debian.org>  Thu, 20 Sep 2018 15:07:38 -0400
+
+opencc (1.0.5-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream Release.
+  * Remove libopencc2 M-A:same mark for now since ocd files exist.
+    (Closes: #874227)
+  * Remove LI Daobing from Uploaders list. (Closes: #841792)
+    Thank you for your previous work!
+  * Apply "wrap-and-sort -abst".
+  * d/patches: Refresh patches.
+  * d/changelog: Remove trailing spaces.
+  * d/control: Use debian-input-method maillist in Maintainer field.
+    Closes: #899625.
+  * d/control: Use Vcs URL on Salsa platform.
+  * d/control: Bump Standards-Version to 4.1.4.
+  * d/control: Bump debhelper compat to v11.
+  * d/rules: Use NEWS.md as upstream changelog.
+  * d/rules: Use "dh_missing --fail-missing".
+  * d/shlibs: Explicitly require the latest library version.
+
+ -- Boyuan Yang <073plan@gmail.com>  Thu, 21 Jun 2018 11:18:37 +0800
+
+opencc (1.0.4-5) unstable; urgency=medium
+
+  * Make ocd data files arch:any (Closes: #851733)
+
+ -- Aron Xu <aron@debian.org>  Fri, 20 Jan 2017 15:15:35 +0800
+
+opencc (1.0.4-4) unstable; urgency=medium
+
+  * Tighter Breaks/Conflicts version (Closes: #847145)
+
+ -- Aron Xu <aron@debian.org>  Mon, 19 Dec 2016 23:30:01 +0800
+
+opencc (1.0.4-3) unstable; urgency=medium
+
+  * Correct Breaks/Conflicts version (Closes: #846665)
+
+ -- Aron Xu <aron@debian.org>  Sun, 04 Dec 2016 16:39:48 +0800
+
+opencc (1.0.4-2) unstable; urgency=medium
+
+  [ Aron Xu ]
+  * Install data files to libopencc2-data, drop -dbg package
+    (Closes: #836395)
+
+  [ Boyuan Yang ]
+  * Add BSD-3-clause license in d/copyright
+
+ -- Aron Xu <aron@debian.org>  Sat, 03 Sep 2016 21:07:26 +0800
+
+opencc (1.0.4-1) unstable; urgency=medium
+
+  * Imported Upstream version 1.0.4
+  * Update d/watch to Github URL
+  * std-ver: 3.9.6 -> 3.9.8, no change
+  * Update VCS-Browser URL to use HTTPS
+
+ -- Aron Xu <aron@debian.org>  Mon, 08 Aug 2016 14:43:15 +0800
+
+opencc (1.0.3-1) experimental; urgency=medium
+
+  * New upstream release
+  * Add myself to Uploaders
+  * Drop symbols file, see README.Debian
+
+ -- Aron Xu <aron@debian.org>  Wed, 16 Dec 2015 00:34:21 +0800
+
+opencc (1.0.2-1) experimental; urgency=medium
+
+  * Team upload for new upstream release.
+  * SONAME transition: libopencc1 -> libopencc2
+  * Add libjs-jquery, libtclap-dev, darts, rapidjson-dev to B-D.
+  * Patches added/updated:
+    - lib-name-match-soversion.patch: rename library to match SONAME
+    - install-data-file-to-meet-need-of-multi-arch.patch: updated
+    - use-system-libraries.patch: do not use embeded libraries
+  * Use system version of jquery.js instead of embeded one.
+  * Removed python-opencc, upstream abandoned.
+  * Updated symbols file.
+  * Rewrite copyright file to machine-readable format.
+  * Allow parallel building.
+
+ -- Aron Xu <aron@debian.org>  Thu, 20 Nov 2014 17:09:31 +0800
+
+opencc (0.4.3-2) unstable; urgency=low
+
+  * Add the python-opencc package to support the Python binding.
+    Closes: #694993
+  * Bump standard version to 3.9.5.
+
+ -- Osamu Aoki <osamu@debian.org>  Sat, 02 Nov 2013 12:17:51 +0900
+
+opencc (0.4.3-1) experimental; urgency=low
+
+  * New upstream release.
+  * Update watch file.
+  * Clean up debian/control and wrap-and-sort.
+  * Update symbols file.
+
+ -- Osamu Aoki <osamu@debian.org>  Sun, 15 Sep 2013 00:13:31 +0900
+
+opencc (0.4.0-1) experimental; urgency=low
+
+  * New upstream release
+  * fix-new-test-cases.patch in upstream
+  * part of more_clear_man_c_option.patch is in upstream
+    the rest is in install-data-file-to-meet-need-of-multi-arch.path
+
+ -- Asias He <asias@debian.org>  Fri, 05 Apr 2013 10:52:29 +0800
+
+opencc (0.3.0-3) unstable; urgency=low
+
+  * Rebuild to
+    generate little endian mo file on any arch (Closes: #670016).
+  * add an - before include buildflags.mk
+
+ -- YunQiang Su <wzssyqa@gmail.com>  Sun, 10 Jun 2012 19:35:51 +0800
+
+opencc (0.3.0-2) unstable; urgency=low
+
+  * Multi-arch it.
+  * Add libopencc-dbg package.
+  * Bump standard version to 3.9.3.
+  * Add YunQiang Su to Uploaders.
+  * Enable CPPFLAGS hardening flags (Closes: #665322).
+  * Better explanation for the -c option arguments of opencc,
+    give the path of these files out. (Closes: #656201).
+
+ -- YunQiang Su <wzssyqa@gmail.com>  Thu, 29 Mar 2012 03:22:51 +0800
+
+opencc (0.3.0-1) unstable; urgency=low
+
+  * Team upload.
+
+  [ Kan-Ru Chen ]
+  * New upstream release
+  * debian/control:
+    - Remove autotools-dev and quilt from Build-Depends
+  * debian/rules:
+    - Support `nostrip' DEB_BUILD_OPTIONS
+    - Enable hardening flags.
+  * debian/docs: Install NEWS
+  * debian/copyright: Update update url
+  * debian/watch: Update upstream url
+  * debian/patches/fix-big-endian-build.diff: merged upstream
+  * debian/patches/fix-new-test-cases.patch: New patch.
+
+ -- Kan-Ru Chen <koster@debian.org>  Sat, 17 Dec 2011 16:41:49 +0800
+
+opencc (0.2.0-2) unstable; urgency=low
+
+  * Fix "Please fix FTBFS on mips, ppc, s390 and sparc" (Closes: #624562)
+  * debian/control: bump standards version to 3.9.2.
+  * Set DM-Upload-Allowed to yes
+
+ -- Asias He <asias.hejun@gmail.com>  Mon, 16 May 2011 20:46:03 +0800
+
+opencc (0.2.0-1) unstable; urgency=low
+
+  * New upstream release
+  * Move usr/share/locale to package opencc
+  * Add cmake to Build-Depends
+  * Change Homepage to http://code.google.com/p/opencc
+  * Set Vcs to git.debian.org
+
+ -- Asias He <asias.hejun@gmail.com>  Thu, 17 Mar 2011 21:36:41 +0800
+
+opencc (0.1.2-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/libopencc1.symbols: updated.
+
+ -- LI Daobing <lidaobing@debian.org>  Wed, 22 Sep 2010 20:40:54 +0800
+
+opencc (0.1.1-2) unstable; urgency=low
+
+  *debian/control: add Conflicts to libopencc0 (Closes: #596434)
+
+ -- Asias He <asias.hejun@gmail.com>  Sun, 12 Sep 2010 14:58:18 +0800
+
+opencc (0.1.1-1) unstable; urgency=low
+
+  [ Asias He ]
+  * New upstream release (closes: #591076).
+  * debian/control: bump standards version to 3.9.1.
+  * debian/watch: use googlecode.debian.net.
+
+  [ LI Daobing ]
+  * debian/clean: added.
+
+ -- LI Daobing <lidaobing@debian.org>  Wed, 11 Aug 2010 22:04:12 +0800
+
+opencc (0.1.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control:
+    - bump standards version to 3.9.1.
+    - libopencc0 -> libopecc1 (closes: #590473).
+    - libopencc1 replaces libopencc0.
+  * libopencc0 -> libopencc1:
+    - debian/libopencc0.install => debian/libopencc1.install
+    - debian/libopencc0.symbols => debian/libopencc1.symbols
+
+ -- LI Daobing <lidaobing@debian.org>  Thu, 29 Jul 2010 23:05:17 +0800
+
+opencc (0.0.5-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control: no longer build depends on python.
+  * debian/opencc.install: move .mo files to libopencc0.
+  * debian/libopencc0.install: install .mo files.
+  * debian/opencc_dict.1: deleted.
+  * debian/opencc.manpages: deleted.
+
+ -- LI Daobing <lidaobing@debian.org>  Wed, 21 Jul 2010 22:42:32 +0800
+
+opencc (0.0.4-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control: bump standards version to 3.9.0.
+
+ -- LI Daobing <lidaobing@debian.org>  Fri, 16 Jul 2010 23:52:08 +0800
+
+opencc (0.0.3-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/opencc.install: updated.
+  * debian/control: opencc depends on libopencc0 at the same version.
+
+ -- LI Daobing <lidaobing@debian.org>  Tue, 22 Jun 2010 19:08:33 +0800
+
+opencc (0.0.2-1) unstable; urgency=low
+
+  * Initial release (Closes: #585621)
+
+ -- LI Daobing <lidaobing@debian.org>  Sat, 19 Jun 2010 18:27:20 +0800

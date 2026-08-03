@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -ex
+
+cd "$(dirname "$0")"
+mkdir -p build
+cd build
+cmake ..
+make
+make test || true
+echo $AUTOPKGTEST_TMP
+cat ${AUTOPKGTEST_TMP}/../*/src/debian/tests/build/Testing/Temporary/LastTest.log
+cd ..
+rm -rf build

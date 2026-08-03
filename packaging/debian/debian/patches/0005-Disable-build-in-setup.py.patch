@@ -2,11 +2,15 @@ From: Shengjing Zhu <zhsj@debian.org>
 Date: Fri, 2 Aug 2024 17:11:08 +0800
 Subject: Disable build in setup.py
 
-Last-Update: 2026-07-04
 ---
---- a/setup.py	2026-07-04 01:16:39.397276721 +0000
-+++ b/setup.py	2026-07-04 01:17:17.094201906 +0000
-@@ -98,6 +98,7 @@
+ setup.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+Index: opencc/setup.py
+===================================================================
+--- opencc.orig/setup.py
++++ opencc/setup.py
+@@ -98,6 +98,7 @@ def get_long_description():
  
  
  def build_libopencc(output_path):

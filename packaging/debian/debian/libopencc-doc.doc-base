@@ -1,0 +1,10 @@
+Document: opencc
+Title: Open Chinese Convert
+Author: BYVoid
+Abstract: This document describes the OpenCC.
+ A project for conversion between Traditional and Simplified Chinese.
+Section: Text
+
+Format: HTML
+Index: /usr/share/doc/opencc/html/index.html
+Files: /usr/share/doc/opencc/html/*.html

@@ -3,21 +3,16 @@ Date: Sun, 28 Jul 2024 19:42:55 -0400
 Subject: Don't fetch remote images when reading docs on disk
 
 This fixes a privacy breach previously reported as Lintian warnings
-(privacy-breach-generic): README.md embeds remote CI-badge and logo
-images that get fetched when the file is rendered outside of GitHub,
-e.g. by tools that turn packaged docs into HTML.
-
-Rebased for opencc 1.4.0: README.md has grown more remote badges since
-this patch was first written, so all of them plus the logo image are
-dropped here.
 
 Forwarded: not-needed
 Reviewed-by: xiao sheng wen <atzlinux@debian.org>
-Last-Update: 2026-07-04
+Last-Update: 2026-04-25
 ---
---- a/README.md	2026-07-04 01:16:39.390649630 +0000
-+++ b/README.md	2026-07-04 01:16:50.939855014 +0000
-@@ -1,23 +1,7 @@
+Index: opencc/README.md
+===================================================================
+--- opencc.orig/README.md
++++ opencc/README.md
+@@ -1,22 +1,7 @@
  # Open Chinese Convert 開放中文轉換
  
 -[![CMake](https://github.com/BYVoid/OpenCC/actions/workflows/cmake.yml/badge.svg)](https://github.com/BYVoid/OpenCC/actions/workflows/cmake.yml)
@@ -37,7 +32,6 @@ Last-Update: 2026-07-04
  ## Introduction 介紹
  
 -![OpenCC](https://opencc.byvoid.com/img/opencc.png)
--
+ 
  Open Chinese Convert (OpenCC, 開放中文轉換) is an open source project for conversions between Traditional Chinese, Simplified Chinese and Japanese Kanji (Shinjitai). It supports character-level and phrase-level conversion, character variant handling, and regional vocabulary variants across Mainland China, Taiwan and Hong Kong. This is not a translation tool between Mandarin and Cantonese, etc.
  
- 中文簡繁轉換開源項目，支持詞彙級別的轉換、異體字轉換和地區習慣用詞轉換（中國大陸、台灣、香港）及日本新字體轉換。不提供普通話與粵語之間的轉換。

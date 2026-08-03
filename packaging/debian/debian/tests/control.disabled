@@ -1,0 +1,9 @@
+#Tests: integration
+#Depends:
+# build-essential,
+# cmake,
+# googletest,
+# pkgconf,
+# rapidjson-dev,
+# @,
+#Restrictions: allow-stderr,

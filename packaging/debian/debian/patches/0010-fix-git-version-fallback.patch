@@ -1,0 +1,26 @@
+From: xiao sheng wen <atzlinux@sina.com>
+Date: Wed, 15 Jul 2026 04:34:09 +0000
+Subject: Fix stale fallback version when building from a tarball without .git
+
+Upstream derives OPENCC_VERSION from `git describe` in
+cmake/GitVersion.cmake, falling back to hardcoded
+_OPENCC_FALLBACK_MAJOR/MINOR/REVISION when no .git directory is
+present (as is always the case for Debian source tarballs). The
+fallback was left at 1.4.0 in the 1.4.1 release, so builds from the
+released tarball report version 1.4.0 instead of 1.4.1.
+
+Forwarded: not-yet
+Last-Update: 2026-07-15
+Index: opencc/cmake/GitVersion.cmake
+===================================================================
+--- opencc.orig/cmake/GitVersion.cmake
++++ opencc/cmake/GitVersion.cmake
+@@ -14,7 +14,7 @@
+ 
+ set(_OPENCC_FALLBACK_MAJOR 1)
+ set(_OPENCC_FALLBACK_MINOR 4)
+-set(_OPENCC_FALLBACK_REVISION 0)
++set(_OPENCC_FALLBACK_REVISION 1)
+ 
+ find_package(Git QUIET)
+ 

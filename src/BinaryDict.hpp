@@ -18,10 +18,28 @@
 
 #pragma once
 
+#include <cstdint>
+#include <cstring>
+
 #include "Common.hpp"
 #include "SerializableDict.hpp"
 
 namespace opencc {
+// Returns true if the 8 bytes at `bytes` look like an 8-byte integer field
+// from the legacy 64-bit OCD layout rather than two fixed-width uint32_t
+// fields. Legacy files were written with native size_t fields in native byte
+// order, so the probe is loaded as a native uint64_t: a legacy field has
+// zero high 32 bits, while for a fixed-width file the high half is one of
+// the two uint32 fields (or the start of the darts array), non-zero for any
+// realistic dictionary. Works on both little- and big-endian hosts; legacy
+// files themselves remain readable only on hosts of the byte order that
+// wrote them.
+inline bool LooksLikeLegacy64Field(const void* bytes) {
+  uint64_t word;
+  std::memcpy(&word, bytes, sizeof(word));
+  return (word >> 32) == 0;
+}
+
 /**
  * Binary dictionary for faster deserialization
  * @ingroup opencc_cpp_api

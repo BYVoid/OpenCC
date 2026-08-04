@@ -234,20 +234,19 @@ DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
           ? static_cast<size_t>(fileEnd - currentOffset)
           : 0;
 
-  // Detect the dartsSize field width by reading 8 bytes and checking
-  // whether bytes [4..7] are all zero.
+  // Detect the dartsSize field width by reading 8 bytes.
   //   - Old 64-bit build: dartsSize field is uint64_t (8 bytes); high 32 bits
-  //     are zero for any realistic file size → bytes [4..7] == 0.
+  //     are zero for any realistic file size.
   //   - Current build (any word size) or old 32-bit build: dartsSize field is
-  //     uint32_t (4 bytes); bytes [4..7] are the first 4 bytes of the darts
-  //     array (non-zero for any valid array whose root unit has a non-zero
-  //     offset).
+  //     uint32_t (4 bytes); the other half of the probe is either the first
+  //     4 bytes of the darts array (non-zero for any valid array whose root
+  //     unit has a non-zero offset) or dartsSize itself, so the native
+  //     uint64_t load has non-zero high bits.
   uint8_t probe[8];
   if (fread(probe, 1, 8, fp) != 8) {
     throw InvalidFormat("Invalid OpenCC dictionary header (dartsSize)");
   }
-  bool is64bit =
-      (probe[4] == 0 && probe[5] == 0 && probe[6] == 0 && probe[7] == 0);
+  bool is64bit = LooksLikeLegacy64Field(probe);
 
   if (is64bit) {
     uint64_t dartsSize64;
@@ -340,8 +339,7 @@ DartsDictPtr DartsDict::NewFromBuffer(const char* data, size_t size) {
   uint8_t probe[8];
   memcpy(probe, data + offset, 8);
   offset += 8;
-  bool is64bit =
-      (probe[4] == 0 && probe[5] == 0 && probe[6] == 0 && probe[7] == 0);
+  bool is64bit = LooksLikeLegacy64Field(probe);
 
   if (is64bit) {
     uint64_t dartsSize64;

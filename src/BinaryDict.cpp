@@ -71,14 +71,12 @@ uint64_t ReadField(const char* data, size_t size, size_t* offset,
 //     non-zero whenever the dictionary has entries, and an empty dictionary
 //     is exactly 12 bytes long.
 //   - Legacy 64-bit layout: the first field is an 8-byte numItems whose high
-//     4 bytes are zero for any realistic dictionary.
+//     32 bits are zero for any realistic dictionary.
 size_t DetectFieldWidth(const char* data, size_t size) {
   if (size < 8) {
     return sizeof(uint32_t);
   }
-  const bool highBytesZero =
-      data[4] == 0 && data[5] == 0 && data[6] == 0 && data[7] == 0;
-  if (highBytesZero && size != 3 * sizeof(uint32_t)) {
+  if (LooksLikeLegacy64Field(data) && size != 3 * sizeof(uint32_t)) {
     return sizeof(uint64_t);
   }
   return sizeof(uint32_t);

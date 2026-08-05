@@ -17,20 +17,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # The packaging in packaging/debian/debian targets Debian
+  # unstable/experimental (debhelper compat 14, pybuild), which Ubuntu LTS
+  # runners cannot satisfy, so the build jobs run inside a debian:sid
+  # container on the matching runner architecture.
   build-amd64:
     runs-on: ubuntu-24.04
+    container: debian:sid
     steps:
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential fakeroot ca-certificates git \
+            chrpath cmake debhelper doxygen googletest \
+            libmarisa-dev rapidjson-dev libtclap-dev \
+            dh-python pkg-kde-tools \
+            pybind11-dev python3-all-dev python3-pybind11 \
+            pybuild-plugin-pyproject python3-pytest python3-setuptools \
+            python3-wheel
+
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-
-      - name: Install build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            build-essential debhelper cmake ninja-build pkg-config doxygen \
-            libmarisa-dev rapidjson-dev libtclap-dev \
-            googletest libgtest-dev
 
       - name: Build amd64 packages
         env:
@@ -45,18 +54,23 @@ jobs:
 
   build-arm64:
     runs-on: ubuntu-24.04-arm
+    container: debian:sid
     steps:
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential fakeroot ca-certificates git \
+            chrpath cmake debhelper doxygen googletest \
+            libmarisa-dev rapidjson-dev libtclap-dev \
+            dh-python pkg-kde-tools \
+            pybind11-dev python3-all-dev python3-pybind11 \
+            pybuild-plugin-pyproject python3-pytest python3-setuptools \
+            python3-wheel
+
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-
-      - name: Install build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            build-essential debhelper cmake ninja-build pkg-config doxygen \
-            libmarisa-dev rapidjson-dev libtclap-dev \
-            googletest libgtest-dev
 
       - name: Build arm64 packages
         env:

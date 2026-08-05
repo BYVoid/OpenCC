@@ -61,6 +61,8 @@
 人才輩出	人才輩出
 人才難得	人才難得
 人盡其才	人盡其才
+# intentionally kept for compatibility - https://github.com/BYVoid/OpenCC/issues/1469
+什么	什麼
 仙才	仙才
 伊核	伊核
 作育英才	作育英才
@@ -304,6 +306,8 @@
 增量參數	增量參數
 外才	外才
 外核	外核
+# intentionally kept for compatibility - https://github.com/BYVoid/OpenCC/issues/1469
+多么	多麼
 多事逞才	多事逞才
 多才	多才
 多才多藝	多才多藝
@@ -336,6 +340,8 @@
 女秀才	女秀才
 女貌郎才	女貌郎才
 奴才	奴才
+# intentionally kept for compatibility - https://github.com/BYVoid/OpenCC/issues/1469
+好么	好麼
 妙才	妙才
 學優才贍	學優才贍
 學淺才疏	學淺才疏
@@ -392,6 +398,8 @@
 志大才疏	志大才疏
 志大才短	志大才短
 志廣才疏	志廣才疏
+# intentionally kept for compatibility - https://github.com/BYVoid/OpenCC/issues/1469
+怎么	怎麼
 恃才傲物	恃才傲物
 恃才矜己	恃才矜己
 恃才自專	恃才自專
@@ -760,6 +768,8 @@
 瑣才	瑣才
 甄才品能	甄才品能
 甄選人才	甄選人才
+# intentionally kept for compatibility - https://github.com/BYVoid/OpenCC/issues/1469
+甚么	甚麼
 男才女貌	男才女貌
 畎畝下才	畎畝下才
 留針	留針
@@ -919,6 +929,8 @@
 補針	補針
 製麵	製麪
 西洋參	西洋參
+# intentionally kept for compatibility - https://github.com/BYVoid/OpenCC/issues/1469
+要么	要麼
 見縫插針	見縫插針
 討針線	討針線
 詠雪之才	詠雪之才
@@ -958,9 +970,13 @@
 辯才	辯才
 辯才天	辯才天
 辯才無礙	辯才無礙
+# intentionally kept for compatibility - https://github.com/BYVoid/OpenCC/issues/1469
+这么	这麼
 迴紋針	迴紋針
 退針	退針
 逆時針	逆時針
+# intentionally kept for compatibility - https://github.com/BYVoid/OpenCC/issues/1469
+這么	這麼
 通人達才	通人達才
 通才	通才
 通才教育	通才教育
@@ -977,6 +993,8 @@
 遺才	遺才
 避雷針	避雷針
 邊核	邊核
+# intentionally kept for compatibility - https://github.com/BYVoid/OpenCC/issues/1469
+那么	那麼
 郎才女姿	郎才女姿
 郎才女貌	郎才女貌
 鄧艾吃	鄧艾吃

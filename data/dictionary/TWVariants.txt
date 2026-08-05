@@ -47,4 +47,9 @@
 鍼	針
 鮎	鯰
 麪	麵
+# 么 as a secondary candidate backs the Simplified 么 phrase exceptions in
+# TWVariantsRevPhrases.txt (issue #1469); the generated TWVariantsRev.txt
+# then lists 么 -> 幺 麼 while 幺 stays the default via @reverse-prefer.
+# @reverse-prefer: 么 幺
+麼	麼 么
 齶	顎

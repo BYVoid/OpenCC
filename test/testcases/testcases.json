@@ -467,6 +467,14 @@
       }
     },
     {
+      "id": "BYVoid_OpenCC_Issue_1469_simplified_me_passthrough",
+      "input": "什么 怎么 这么 那么 多么 要么 好么 甚么 這么 老么",
+      "expected": {
+        "tw2s": "什么 怎么 这么 那么 多么 要么 好么 甚么 这么 老幺",
+        "tw2t": "什麼 怎麼 这麼 那麼 多麼 要麼 好麼 甚麼 這麼 老幺"
+      }
+    },
+    {
       "id": "case_063_s2x",
       "input": "赛后复盘 覆盘难照",
       "expected": {

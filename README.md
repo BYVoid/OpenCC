@@ -299,6 +299,7 @@ These ports are community-maintained and may not always track upstream updates.
 * Browser Extension: [opencc-extension](https://github.com/tnychn/opencc-extension)
 * Go (Pure): [OpenCC for Go](https://github.com/longbridge/opencc)
 * Dart (native-assets): [opencc-dart](https://github.com/lindeer/opencc-dart)
+* Rust: [opencc-rs](https://github.com/novel-rs/opencc-rs)
 
 ### Configurations 配置文件
 

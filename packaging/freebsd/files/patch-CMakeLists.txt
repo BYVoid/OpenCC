@@ -1,0 +1,11 @@
+--- CMakeLists.txt.orig	2026-07-12 14:54:12 UTC
++++ CMakeLists.txt
+@@ -263,7 +263,7 @@
+   FILES
+     ${CMAKE_CURRENT_BINARY_DIR}/opencc.pc
+   DESTINATION
+-    ${DIR_LIBRARY}/pkgconfig
++    ${CMAKE_INSTALL_PREFIX}/libdata/pkgconfig
+ )
+ endif()
+ 

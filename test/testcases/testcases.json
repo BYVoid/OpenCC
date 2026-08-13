@@ -1758,6 +1758,22 @@
       }
     },
     {
+      "id": "memory_module_s2twp_s2hkp",
+      "input": "安装内存条",
+      "expected": {
+        "s2twp": "安裝記憶體模組",
+        "s2hkp": "安裝記憶體模組"
+      }
+    },
+    {
+      "id": "memory_module_tw2sp_hk2sp",
+      "input": "安裝記憶體模組",
+      "expected": {
+        "tw2sp": "安装内存条",
+        "hk2sp": "安装内存条"
+      }
+    },
+    {
       "id": "BYVoid_OpenCC_Issue_175_yi_chu_phrase_exceptions_s2t",
       "input": "刚一出戏院 一出剧院 一出电影院 一出机场 一出来 风声一出 一出道 一出城 一出声 太阳一出",
       "expected": {

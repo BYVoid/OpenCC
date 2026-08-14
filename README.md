@@ -18,21 +18,29 @@
 
 ![OpenCC](https://opencc.byvoid.com/img/opencc.png)
 
-Open Chinese Convert (OpenCC, 開放中文轉換) is an open source project for high-quality conversion between Traditional Chinese, Simplified Chinese, Japanese Kanji (Shinjitai), character variants, and regional wording across Mainland China, Taiwan, and Hong Kong. It provides conversion dictionaries, a reusable library, command-line utilities, and dictionary generation tools. OpenCC performs orthographic conversion rather than language translation (for example, between Mandarin and Cantonese).
+Open Chinese Convert (OpenCC, 開放中文轉換) is an open source project for high-quality conversion between Traditional Chinese, Simplified Chinese, Japanese Shinjitai, and regional wording across Mainland China, Taiwan, and Hong Kong. It provides dictionaries, a reusable library, conversion tools, and dictionary generation tools.
 
-Open Chinese Convert（OpenCC，開放中文轉換） 是一個開源中文轉換項目，支援繁體中文、簡體中文、日本新字體（新字体）、異體字，以及中國大陸、臺灣、香港等地區習慣用詞之間的高品質轉換，並提供轉換詞典、可重用函式庫、命令列工具及詞典生成工具。OpenCC 提供的是文字轉換，而非語言翻譯（例如普通話與粵語之間的翻譯）。
+Open Chinese Convert（OpenCC，開放中文轉換） 是一個開源中文轉換項目，支持繁體中文、簡體中文、日文新字體，以及中國大陸、臺灣、香港等地區習慣用詞之間的高品質轉換，並提供詞典、可重用庫、轉換工具及詞典生成工具。
 
-Discussion (Telegram): https://t.me/open_chinese_convert
+Discussion (Telegram) 討論區（Telegram）: https://t.me/open_chinese_convert
 
 ### Features 特點
 
-* 嚴格區分「一簡對多繁」和「一簡對多異」。
-* 完全兼容異體字，可以實現動態替換。
-* 嚴格審校一簡對多繁詞條，原則爲「能分則不合」。
-* 支持中國大陸、台灣、香港異體字和地區習慣用詞轉換，如「裏」「裡」、「鼠標」「滑鼠」。
-* 詞庫和函數庫完全分離，可以自由修改、導入、擴展。
+* 基於詞庫的確定性轉換，不使用大語言模型，結果穩定可預期，可離線快速運行。
+  Deterministic, dictionary-based conversion without large language models (LLMs): results are stable and predictable, and conversion runs fast and fully offline.
+* 詞庫和函數庫可分離，允許自定義修改和擴展。
+  Dictionaries are decoupled from the library, allowing custom modification and extension.
+* 嚴格區分簡繁對應與異體字對應關係，嚴格審校一簡對多繁詞條，OpenCC標準的用字原則爲「能分則不合」。
+  Strictly distinguishes Simplified-Traditional mappings from character variant mappings, with rigorously reviewed one-to-many Simplified-to-Traditional entries; the OpenCC standard follows the character usage principle of "separate whenever distinguishable".
+* 支持中國大陸、臺灣、香港地區慣用異體字（如「裏」「裡」），以及習慣用詞轉換（如「鼠標」「滑鼠」）。
+  Supports conversion of preferred character variants (such as 「裏」/「裡」) and regional wording (such as 「鼠標」/「滑鼠」) for Mainland China, Taiwan, and Hong Kong.
+* 詞庫內容均以官話（普通話、國語）詞彙爲基準，不支持語言之間的翻譯，例如官話與粵語、閩南語或日語之間的翻譯。
+  Dictionaries are based on Mandarin (Putonghua / Guoyu) vocabulary; translation between languages, such as between Mandarin and Cantonese, Southern Min, or Japanese, is not supported.
+* 另外，有限支持日文新字體與舊字體之間的轉換。
+  In addition, conversion between Japanese Shinjitai (new character forms) and Kyujitai (old character forms) is supported to a limited extent.
 
-詳情參閱[OpenCC 設計思想](./DESIGN_PRINCIPLES.md)及[地區詞收錄標準](doc/regional-phrase-criteria.md)。
+詳情參閱 [OpenCC 設計思想](./DESIGN_PRINCIPLES.md)及[地區詞收錄標準](doc/regional-phrase-criteria.md)。
+For details, see [Design Principles](./DESIGN_PRINCIPLES.md) and [Regional Phrase Criteria](doc/regional-phrase-criteria.md).
 
 ## Installation 安裝
 
@@ -43,20 +51,20 @@ Discussion (Telegram): https://t.me/open_chinese_convert
 * [Fedora](https://packages.fedoraproject.org/pkgs/opencc/opencc/)
 * [Arch Linux](https://archlinux.org/packages/extra/x86_64/opencc/)
 * [macOS (Homebrew)](https://formulae.brew.sh/formula/opencc)
-    * 使用 `brew install opencc` 命令可安裝命令行工具；formula 更新至 1.4.1 後將包含 Jieba 分詞插件
+    * 使用 `brew install opencc`
 * [WinGet](https://github.com/microsoft/winget-pkgs/tree/master/manifests/b/BYVoid/OpenCC)
-    * 使用 `winget install opencc` 命令可直接安裝 opencc.exe 應用程式，含 Jieba 分詞插件
+    * 使用 `winget install opencc`
 * [Bazel](https://registry.bazel.build/modules/opencc)
 * [Node.js](https://npmjs.org/package/opencc)
     * 使用 `npm install -g opencc` 命令可安裝 OpenCC Node.js CLI
     * 使用 `npm install -g opencc opencc-jieba` 命令可同時安裝 OpenCC Node.js CLI 及 Jieba 分詞插件
 * [Python](https://pypi.org/project/OpenCC/)
     * 使用 `pip install opencc` 命令可安裝 Python API 及 Python CLI
-* [More (Repology)](https://repology.org/project/opencc/versions)
+* [Repology](https://repology.org/project/opencc/versions)
 
 ### Prebuilt binaries 預編譯二進位檔
 
-OpenCC 1.4.1 修復 `opencc` npm 套件在無預編譯二進制平台上源碼編譯安裝失敗的
+OpenCC 1.4.1 修復了 `opencc` npm 套件在無預編譯二進制平台上源碼編譯安裝失敗的
 問題，並包含一批詞庫修正；C++ ABI 與 1.4.0 相同（SOVERSION 1.4），自 1.4.0
 升級的下游 C++ 程式無需重新連結。
 

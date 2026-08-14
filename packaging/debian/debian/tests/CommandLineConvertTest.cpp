@@ -81,7 +81,8 @@ protected:
 #ifdef BAZEL
     return "";
 #else
-    return CMAKE_SOURCE_DIR "/data/config/";
+    // Use the configurations installed by libopencc-data.
+    return "/usr/share/opencc/";
 #endif
   }
 
@@ -96,9 +97,11 @@ protected:
   std::string TestCommand(const std::string& config,
                           const std::string& inputFile,
                           const std::string& outputFile) const {
-    std::string cmd = OpenccCommand() + " -i " + inputFile + " -o " +
-                      outputFile + " -c " + ConfigurationDirectory() + config +
-                      ".json";
+    // testcases.json is written against conversions with the tofu-risk
+    // dictionaries enabled, matching the upstream ConvertFromJson test.
+    std::string cmd = OpenccCommand() + " --include-tofu-risk-dictionaries" +
+                      " -i " + inputFile + " -o " + outputFile + " -c " +
+                      ConfigurationDirectory() + config + ".json";
 #ifdef BAZEL
     cmd += " --path " + runfiles_->Rlocation("_main/data/dictionary") + "/" +
            " --path " + runfiles_->Rlocation("_main/data/config") + "/";
@@ -134,7 +137,8 @@ CasesByConfig LoadCases(const std::string& jsonPath) {
   }
 
   rapidjson::Document doc;
-  doc.Parse(content.c_str());
+  doc.Parse<rapidjson::kParseCommentsFlag |
+            rapidjson::kParseTrailingCommasFlag>(content.c_str());
   if (doc.HasParseError() || !doc.IsObject() || !doc.HasMember("cases") ||
       !doc["cases"].IsArray()) {
     throw std::runtime_error("Invalid testcases.json format");
@@ -164,7 +168,10 @@ TEST_F(CommandLineConvertTest, ConvertFromJson) {
   const std::string casesPath =
       runfiles_->Rlocation("_main/test/testcases/testcases.json");
 #else
-  const std::string casesPath = CMAKE_SOURCE_DIR "/test/testcases/testcases.json";
+  // CMAKE_SOURCE_DIR is debian/tests; the testcases live in the top-level
+  // source tree, which autopkgtest provides as the working tree.
+  const std::string casesPath =
+      CMAKE_SOURCE_DIR "/../../test/testcases/testcases.json";
 #endif
   const CasesByConfig cases = LoadCases(casesPath);
 

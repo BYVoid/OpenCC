@@ -11,7 +11,7 @@ dependency. Drop the entry point; the compiled CLI tool remains the
 one and only /usr/bin/opencc, and the python3-opencc bindings
 (import opencc) are unaffected.
 
-Forwarded: not-yet
+Forwarded: no
 Last-Update: 2026-07-15
 Index: opencc/setup.py
 ===================================================================

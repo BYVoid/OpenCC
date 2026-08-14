@@ -1,0 +1,38 @@
+Embedded copy of cppjieba
+=========================
+
+The Jieba segmentation plugin (binary packages opencc-jieba and
+opencc-jieba-data, built from plugins/jieba) is compiled against the
+copy of cppjieba embedded at plugins/jieba/deps/cppjieba, rather than
+against a system-wide cppjieba. There is currently no cppjieba package
+in Debian; see also https://bugs.debian.org/1141451 for the upstream
+proposal that introduced these binary packages.
+
+Packaging cppjieba on its own would not be sufficient to drop the
+embedded copy. The embedded tree is not a pristine copy of upstream
+cppjieba: it carries a local fork adding a DictTrie::PrecomputedDict
+struct, a matching DictTrie constructor and Init() overload, and a
+corresponding cppjieba::Jieba constructor. That API lets the plugin hand
+cppjieba an already-parsed marisa-backed dictionary (the generated
+jieba_dict/jieba_merged.ocd2) instead of re-parsing several megabytes of
+text at every startup, and it is used unconditionally from
+plugins/jieba/src/JiebaSegmentation.cpp. None of it exists in upstream
+cppjieba, and it cannot be supplied from outside the library because it
+writes DictTrie members that are private.
+
+De-vendoring therefore needs, in order:
+
+ 1. DictTrie::PrecomputedDict (or an equivalent way of constructing a
+    DictTrie from an in-memory dictionary) accepted into upstream
+    cppjieba, https://github.com/yanyiwu/cppjieba
+ 2. a cppjieba source package in Debian, new enough to carry it
+ 3. a USE_SYSTEM_CPPJIEBA option in OpenCC, matching the existing
+    USE_SYSTEM_{DARTS,GTEST,MARISA,PYBIND11,RAPIDJSON,TCLAP} options;
+    plugins/jieba/CMakeLists.txt currently hardcodes the include path to
+    deps/cppjieba/include in two places
+
+Until then the embedded copy is built and shipped. It is covered by the
+"Files: plugins/jieba/deps/cppjieba/*" stanza in debian/copyright. Note
+that a security update to cppjieba would require rebuilding opencc.
+
+ -- Boyuan Yang <byang@debian.org>, Wed, 12 Aug 2026 11:04:33 -0400

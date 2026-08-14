@@ -1,0 +1,24 @@
+#!/bin/sh
+# Smoke-test the installed opencc CLI with the installed configurations.
+
+set -eu
+
+check() {
+    config="$1"
+    input="$2"
+    expected="$3"
+    actual="$(printf '%s\n' "$input" | opencc -c "$config")"
+    if [ "$actual" != "$expected" ]; then
+        echo "FAIL: $config: '$input' -> '$actual', expected '$expected'" >&2
+        exit 1
+    fi
+    echo "PASS: $config: '$input' -> '$actual'"
+}
+
+opencc --version
+
+check s2t.json '汉字转换' '漢字轉換'
+check t2s.json '漢字轉換' '汉字转换'
+check s2twp.json '为什么你要学习编程？因为软件开发的信道很宽。' \
+    '為什麼你要學習程式設計？因為軟體開發的通道很寬。'
+check s2hk.json '内地与香港' '內地與香港'

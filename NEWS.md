@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* **`.ocd` 字典格式**：
+    * 修復大端序平台（s390x、ppc64、sparc64、hppa）上 legacy 64-bit `.ocd` 佈局的偵測：原本以探測位元組 [4..7] 是否為零來判斷，該寫法僅在小端序主機成立，導致大端序平台將舊檔誤判為固定寬度格式並載入為空字典。三處判斷統一改用 `LooksLikeLegacy64Field()`，以原生 `uint64_t` 讀取探測值並檢查高 32 位，在兩種位元組序下皆正確（[#1471](https://github.com/BYVoid/OpenCC/issues/1471), [#1472](https://github.com/BYVoid/OpenCC/pull/1472)）。
 * **Node.js**：
     * npm 套件的源碼編譯 fallback 從 node-gyp 改為 Bazel：原生 addon 優先透過 `@opencc/opencc-<platform>-<arch>` 預編譯 scoped 套件安裝（涵蓋 macOS x64/arm64、Linux x64/arm64、Windows x64，均以 Bazel 構建，字典隨包預編譯）；沒有預編譯二進位套件的平台，`npm install` 會以 Bazel 完整地從源碼構建——編譯 `//node:opencc` 並重新生成字典（`bazel` / `bazelisk` 取自 PATH，或經 `npx` 自動下載 bazelisk；字典生成腳本的 Python 由 Bazel hermetic 工具鏈提供）。`binding.gyp` 與 `.gypi` 構建定義刪除，`node-gyp`、`node-gyp-build`、`node-addon-api`、`prebuildify` 依賴與 `prebuild` npm script 一併移除；tarball 不再攜帶 `deps/`（C++ 三方依賴改由 Bazel Central Registry 提供），改為攜帶 Bazel workspace、`src/` C++ 源碼與 `data/` 字典源檔。
 

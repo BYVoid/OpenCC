@@ -1,3 +1,108 @@
+opencc (1.4.1+ds1-7) unstable; urgency=medium
+
+  * Team upload.
+  * debian/tests/: Re-enable autopkgtest (debian/TODO item):
+    - debian/tests/control: Restore from control.disabled, with the
+      integration test plus new cli-smoke and jieba-plugin tests.
+    - debian/tests/CommandLineConvertTest.cpp: Parse testcases.json with
+      rapidjson comment/trailing-comma flags like the upstream test,
+      read the testcases from the top-level source tree, use the
+      installed configurations in /usr/share/opencc, and pass
+      --include-tofu-risk-dictionaries as the upstream test does (the
+      testcases are written against those conversions).
+    - debian/tests/CMakeLists.txt: Add the top-level source tree to the
+      include path for src/Common.hpp, and require C++17.
+    - debian/tests/integration: Build out-of-tree in AUTOPKGTEST_TMP and
+      stop masking test failures (previously "make test || true").
+    - debian/tests/cli-smoke: New quick checks of the installed CLI.
+    - debian/tests/jieba-plugin: New checks that the Jieba plugin loads
+      and the *_jieba.json configurations work.
+
+ -- Frank Lin <debian@linshuang.info>  Wed, 12 Aug 2026 12:30:00 -0700
+
+opencc (1.4.1+ds1-6) unstable; urgency=medium
+
+  * debian/patches/0009-setup.py-Handle-python-binding-instead-of-cmake.patch:
+    Stop setting ext.runtime_library_dirs. It baked the build directory
+    into the DT_RUNPATH of the python extension; deleting that entry with
+    chrpath afterwards still left the build path string behind in .dynstr
+    (lintian: file-references-package-build-path). Only -L is needed at
+    link time, and the installed extension finds libopencc.so.1.4 through
+    the regular linker search path.
+  * debian/rules: Drop the now unneeded chrpath call, and set
+    LD_LIBRARY_PATH for the pybuild test run so the freshly built
+    libopencc is still picked up without an RPATH.
+  * debian/control: Drop the chrpath build dependency accordingly.
+  * debian/control: Let opencc suggests opencc-jieba package, and let
+    opencc-jieba declare Enhances: opencc.
+
+ -- Boyuan Yang <byang@debian.org>  Wed, 12 Aug 2026 14:18:45 -0400
+
+opencc (1.4.1+ds1-5) unstable; urgency=medium
+
+  * debian/rules: Build with -DBUILD_OPENCC_JIEBA_PLUGIN=ON to enable the
+    Jieba word segmentation plugin, as proposed by upstream.
+    (Closes: #1141451)
+  * debian/control: Add new binary packages opencc-jieba (arch:any, the
+    plugin itself) and opencc-jieba-data (arch:all, the merged Jieba
+    dictionary and the *_jieba.json configurations). Upstream proposed a
+    single arch:any package, but the dictionary data is architecture-
+    independent and is split out for the same reason as the .ocd2 files
+    in 1.4.1+ds1-4.
+  * debian/opencc-jieba.install, debian/opencc-jieba-data.install:
+    New files.
+  * debian/libopencc-data.install: List the non-Jieba configurations
+    explicitly instead of globbing usr/share/opencc/*.json, which would
+    otherwise also match the *_jieba.json files.
+  * debian/README.source: New file, documenting why the embedded copy of
+    cppjieba cannot currently be replaced with a system library.
+  * debian/patches/0012-fix-legacy-dict-detection-on-big-endian.patch:
+    Add Applied-Upstream metatdata.
+
+ -- Boyuan Yang <byang@debian.org>  Wed, 12 Aug 2026 12:01:45 -0400
+
+opencc (1.4.1+ds1-4) unstable; urgency=medium
+
+  * debian/*.install: Move the architecture-independent .ocd2 files
+    from the libopencc arch:any package to libopencc-data arch:all package.
+
+ -- Boyuan Yang <byang@debian.org>  Wed, 12 Aug 2026 10:05:58 -0400
+
+opencc (1.4.1+ds1-3) unstable; urgency=medium
+
+  * debian/control: Bump version requirement for marisa in order to
+    fix the build reproducibility problem in ocd2 files.
+
+ -- Boyuan Yang <byang@debian.org>  Thu, 06 Aug 2026 10:43:10 -0400
+
+opencc (1.4.1+ds1-2) unstable; urgency=medium
+
+  * debian/libopencc1.4.symbols: Reconfirm symbols.
+
+ -- Boyuan Yang <byang@debian.org>  Wed, 05 Aug 2026 15:04:16 -0400
+
+opencc (1.4.1+ds1-1) unstable; urgency=medium
+
+  * Upload to unstable.
+
+ -- Boyuan Yang <byang@debian.org>  Wed, 05 Aug 2026 13:42:49 -0400
+
+opencc (1.4.1+ds1-1~exp3) experimental; urgency=medium
+
+  * d/patches: Replace 0012-fix-legacy-dict-detection-on-big-endian.patch
+    with the proposed upstream fix from
+    https://github.com/BYVoid/OpenCC/pull/1472 (upstream bug #1471).
+
+ -- Boyuan Yang <byang@debian.org>  Tue, 04 Aug 2026 16:18:35 -0400
+
+opencc (1.4.1+ds1-1~exp2) experimental; urgency=medium
+
+  * d/patches: Add 0012-fix-legacy-dict-detection-on-big-endian.patch to
+    fix the FTBFS on big-endian architectures (s390x, powerpc, ppc64,
+    sparc64, hppa).
+
+ -- Boyuan Yang <byang@debian.org>  Tue, 04 Aug 2026 13:36:34 -0400
+
 opencc (1.4.1+ds1-1~exp1) experimental; urgency=medium
 
   * debian/control: Bump debhelper compat to v14.

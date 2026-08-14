@@ -2,9 +2,18 @@ From: Boyuan Yang <byang@debian.org>
 Date: Tue, 13 Jan 2026 18:04:57 -0500
 Subject: setup.py: Handle python binding instead of cmake
 
+Link the extension against the libopencc.so built by the cmake pass in
+$OPENCC_BUILD_DIR/src.  Only -L (library_dirs) is set on purpose: adding
+runtime_library_dirs would bake the (build-time-only) build directory into
+DT_RUNPATH, and even deleting that entry afterwards leaves the build path
+behind in .dynstr (lintian: file-references-package-build-path).  The
+installed extension resolves libopencc.so.1.4 through the regular linker
+search path instead; debian/rules sets LD_LIBRARY_PATH for the test run.
+
+Forwarded: not-needed
 ---
- setup.py | 22 +++++++++++++++++-----
- 1 file changed, 17 insertions(+), 5 deletions(-)
+ setup.py | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
 
 Index: opencc/setup.py
 ===================================================================
@@ -19,7 +28,7 @@ Index: opencc/setup.py
  _this_dir = os.path.dirname(os.path.abspath(__file__))
  _build_dir = os.path.join(_this_dir, 'build', 'python')
  
-@@ -148,10 +150,13 @@ class OpenCCExtension(setuptools.Extensi
+@@ -148,10 +150,12 @@ class OpenCCExtension(setuptools.Extensi
  
  class BuildExtCommand(setuptools.command.build_ext.build_ext, object):
      def build_extension(self, ext):
@@ -33,7 +42,6 @@ Index: opencc/setup.py
 +        ext.include_dirs.append(pybind11.get_include())
 +        ext.include_dirs.append('src')
 +        ext.library_dirs = [lib_path]
-+        ext.runtime_library_dirs = [lib_path]
          if isinstance(ext, OpenCCExtension):
              build_libopencc(output_path)
          else:

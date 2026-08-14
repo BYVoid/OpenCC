@@ -4,3 +4,4 @@
 0009-setup.py-Handle-python-binding-instead-of-cmake.patch
 0010-fix-git-version-fallback.patch
 0011-drop-python-cli-entry-point.patch
+0012-fix-legacy-dict-detection-on-big-endian.patch

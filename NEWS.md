@@ -2,8 +2,35 @@
 
 ## Unreleased
 
+* **發佈重點**：轉換熱路徑大幅加速（純文字語料的整體轉換時間最多降至原本的 1/7），修復大端序平台載入 legacy `.ocd` 字典得到空字典的問題，並新增兩個實驗性 API（詞級候選查詢與一對多歧義標註，含 CLI `--ambiguities`）。詞庫方面修正了 `s2twp` 的數處貪婪匹配錯誤與 `tw2t`／`tw2s` 對簡體「么」的破壞性轉換，並補充臺灣／香港地區詞。C++ ABI 與 1.4.1 相同（SOVERSION 1.4），實驗性 API 皆位於未安裝的私有標頭或巨集開關之後，下游程式無需重新連結。
+* **詞庫更新**：
+    * 修復 `tw2t`／`tw2s`／`tw2sp` 會把已是簡體的「什么」轉成「什幺」的問題：生成的 `TWVariantsRev` 含 `么 -> 幺`（臺灣標準 `幺 -> 么` 的反向），在 `TWVariantsRevPhrases.txt` 補上「什么／怎么／这么／那么／多么／要么／好么／甚么」等例外映射至「麼」形，同時保留「老么 → 老幺」等真正的 yao1 詞（[#1469](https://github.com/BYVoid/OpenCC/issues/1469), [#1473](https://github.com/BYVoid/OpenCC/pull/1473)）。
+    * 修復 `s2twp` 因較短詞條先命中而拆錯詞的問題：補上「互联网络」「快闪存储器」「老挝人民民主共和国」的完整詞條，並將「老撾人民民主共和國」對應到臺灣官方譯名「寮人民民主共和國」（[#1467](https://github.com/BYVoid/OpenCC/issues/1467), [#1468](https://github.com/BYVoid/OpenCC/pull/1468)）。
+    * 「梁／樑」：新增臺灣地區用字映射與人名、地名保護詞條（[#1407](https://github.com/BYVoid/OpenCC/pull/1407)）；並將 `TWVariantsRevPhrases` 與 `STPhrases` 對齊，補上 41 條梁（棟梁義）的反向詞組映射，使 `tw2t` 能從上下文還原「橋樑」而不誤傷姓氏、地名（[#1424](https://github.com/BYVoid/OpenCC/pull/1424)）。
+    * 新增奧斯卡最佳導演與最佳影片製片人的臺灣／香港譯名詞條（取自中文維基百科 `NoteTA` 地區詞表並以 Wikidata 交叉核對，僅收錄真正存在音譯差異者，如 卡梅隆／卡麥隆／金馬倫）（[#1466](https://github.com/BYVoid/OpenCC/pull/1466)）。
+    * 新增地區詞「內存條 → 記憶體模組」（`s2twp`／`s2hkp`，含反向詞條）（[#1475](https://github.com/BYVoid/OpenCC/pull/1475)）、「数字人文 → 數位人文」（`s2twp`／`tw2sp`）（[#1465](https://github.com/BYVoid/OpenCC/pull/1465)）。
+    * `s2t`：「小丑」不再預設轉換為「小醜」（[#1423](https://github.com/BYVoid/OpenCC/pull/1423)）；「雇」改為 `STCharacters` 中「僱」以外的非預設候選（[#906](https://github.com/BYVoid/OpenCC/pull/906)）；新增「这周／那周／若干周／几周／周线 → 週」等指示與量化用法，並補上「周围／周边／周遭」的分詞保護詞條（[#1428](https://github.com/BYVoid/OpenCC/pull/1428)）；新增顯式詞條「复盘 → 復盤」，使其不再只依賴 `复` 的候選順序（[#1427](https://github.com/BYVoid/OpenCC/pull/1427)）。
+    * `t2s`：修正過度轉換「乾斷食 → 干断食」「乾紅 → 干红」（[#621](https://github.com/BYVoid/OpenCC/issues/621), [#1429](https://github.com/BYVoid/OpenCC/pull/1429)）。
+    * 修正「鑒」相關詞條與若干提稱語，如「郝铭鉴 → 郝銘鑒」（[#1421](https://github.com/BYVoid/OpenCC/pull/1421)）。
+* **效能**：
+    * 轉換熱路徑跳過不可能匹配的字元區段：`PrefixMatch` 在建構時建立 key 起始字元表並提供 `SkipUnmatchable()`，讓 `Conversion::AppendConverted` 與 `MaxMatchSegmentation` 一次消化整段不可能作為詞條開頭的字元（ASCII、標點、emoji 以及不作為任何 key 開頭的漢字），取代逐字元的 trie 查詢。過濾以精確碼位而非 UTF-8 首位元組進行（`0xE4..0xE9` 這些常見漢字首位元組幾乎都有 key，按首位元組只能跳過約 10%，按碼位則有 69–76% 的位置不匹配任何 key）。22 MB 繁體語料的整體 CLI 時間（含字典載入）：`t2s` 3.40s → 0.52s、`t2tw` 3.43s → 0.30s、`s2twp` 8.40s → 4.86s；4 MB 中英混合語料的 `t2s` 0.83s → 0.11s。啟動時間、最大 RSS 與缺頁次數不變，轉換輸出逐位元組不變（以對照逐字元參考實作的差分 fuzz 測試保證）（[#1464](https://github.com/BYVoid/OpenCC/pull/1464)）。
+* **實驗性 API / CLI**：
+    * 新增 librime 風格的詞級候選查詢 `Converter::GetConversionCandidates`，列舉單一詞經整條轉換鏈後的所有形式（如 `s2t` 的 `里` 展開為 `里`、`裏`）。該 API 以 `OPENCC_ENABLE_UNSTABLE_API` 巨集開關隔離，不進入已安裝標頭與 `OPENCC_ABI_VERSION` 契約；成員刻意設為非虛擬，開啟巨集不改變 `Converter` 的 vtable（[#1431](https://github.com/BYVoid/OpenCC/pull/1431)）。
+    * 新增一對多歧義標註與 CLI `--ambiguities` 模式：轉換結果與 `Converter::Convert` 完全一致，同時標出每一個字典匹配為一對多的輸出區段（如 `STPhrases` 的 `文丑 -> 文丑 文醜`、`TSCharacters` 的 `鍾 -> 钟 锺`），呼叫方可據此定位歧義位置並按需以 `GetAllConversions` 取得候選。檔案輸入輸出 JSONL 記錄且記憶體用量有界，互動式 stdin 則逐行輸出 JSON 封包。實作位於未安裝的私有標頭，不改變已安裝標頭與 ABI，轉換熱路徑不受影響（[#1461](https://github.com/BYVoid/OpenCC/pull/1461), [#1462](https://github.com/BYVoid/OpenCC/pull/1462)）。
+* **`.ocd` 字典格式**：
+    * 修復大端序平台（s390x、ppc64、sparc64、hppa）上 legacy 64-bit `.ocd` 佈局的偵測：原本以探測位元組 [4..7] 是否為零來判斷，該寫法僅在小端序主機成立，導致大端序平台將舊檔誤判為固定寬度格式並載入為空字典。三處判斷統一改用 `LooksLikeLegacy64Field()`，以原生 `uint64_t` 讀取探測值並檢查高 32 位，在兩種位元組序下皆正確（[#1471](https://github.com/BYVoid/OpenCC/issues/1471), [#1472](https://github.com/BYVoid/OpenCC/pull/1472)）。
 * **Node.js**：
-    * npm 套件的源碼編譯 fallback 從 node-gyp 改為 Bazel：原生 addon 優先透過 `@opencc/opencc-<platform>-<arch>` 預編譯 scoped 套件安裝（涵蓋 macOS x64/arm64、Linux x64/arm64、Windows x64，均以 Bazel 構建，字典隨包預編譯）；沒有預編譯二進位套件的平台，`npm install` 會以 Bazel 完整地從源碼構建——編譯 `//node:opencc` 並重新生成字典（`bazel` / `bazelisk` 取自 PATH，或經 `npx` 自動下載 bazelisk；字典生成腳本的 Python 由 Bazel hermetic 工具鏈提供）。`binding.gyp` 與 `.gypi` 構建定義刪除，`node-gyp`、`node-gyp-build`、`node-addon-api`、`prebuildify` 依賴與 `prebuild` npm script 一併移除；tarball 不再攜帶 `deps/`（C++ 三方依賴改由 Bazel Central Registry 提供），改為攜帶 Bazel workspace、`src/` C++ 源碼與 `data/` 字典源檔。
+    * npm 套件的源碼編譯 fallback 從 node-gyp 改為 Bazel：原生 addon 優先透過 `@opencc/opencc-<platform>-<arch>` 預編譯 scoped 套件安裝（涵蓋 macOS x64/arm64、Linux x64/arm64、Windows x64，均以 Bazel 構建，字典隨包預編譯）；沒有預編譯二進位套件的平台，`npm install` 會以 Bazel 完整地從源碼構建——編譯 `//node:opencc` 並重新生成字典（`bazel` / `bazelisk` 取自 PATH，或經 `npx` 自動下載 bazelisk；字典生成腳本的 Python 由 Bazel hermetic 工具鏈提供）。`binding.gyp` 與 `.gypi` 構建定義刪除，`node-gyp`、`node-gyp-build`、`node-addon-api`、`prebuildify` 依賴與 `prebuild` npm script 一併移除；tarball 不再攜帶 `deps/`（C++ 三方依賴改由 Bazel Central Registry 提供），改為攜帶 Bazel workspace、`src/` C++ 源碼與 `data/` 字典源檔（[#1426](https://github.com/BYVoid/OpenCC/pull/1426), [#1430](https://github.com/BYVoid/OpenCC/pull/1430)）。
+    * CI 測試任務、Makefile target 與源碼 checkout 的開發構建一併改用 Bazel，與 npm 發佈所用的構建路徑一致；Windows CI 任務移至 `windows-2025-vs2026`（[#1426](https://github.com/BYVoid/OpenCC/pull/1426)）。
+* **打包 / 構建系統**：
+    * `packaging/debian/` 同步至 Debian 的 `1.4.1+ds1-7`。Debian 已採納上游先前提出的兩項提案：jieba 插件打包（拆為 `opencc-jieba` 與 arch:all 的 `opencc-jieba-data` 兩個套件，內嵌 cppjieba 的理由記於 `debian/README.source`）與 `*.ocd2` 移入 `libopencc-data`；Debian 端亦重新啟用了 autopkgtest。`packaging/debian/SPLIT_PROPOSAL.md` 隨提案落地移除。
+    * Debian 套件構建改在 `debian:sid` 容器中進行（同步來的打包以 unstable 為目標，Ubuntu LTS runner 無法滿足），並在 `dpkg-buildpackage` 前套用 `debian/patches` quilt series（自動跳過已在樹中的補丁）；arm64 改用 `ubuntu-24.04-arm` runner 原生構建，取代先前的交叉構建（[#1420](https://github.com/BYVoid/OpenCC/pull/1420)）。
+    * 新增 `packaging/freebsd/`：FreeBSD ports tree `chinese/opencc` 條目的參考副本，供上游審閱與準備提交給 port maintainer 的改動。
+    * 新增精簡 C++ 源碼包發佈流程（`release-source.yml`）：以 `OPENCC_SOURCE_PACKAGE_PROFILE=opencc` 產生僅含 C++ 核心的 CPack 壓縮包（不含 Node.js、Python、文檔、packaging 與 plugins），並以 CMake 與 Bazel 雙路徑冒煙測試後上傳至 draft release；為此保留 Bazel workspace 檔案與頂層 `patches/`，僅排除可能含 API key 的 `.bazelrc.user`。
+    * 修正 `cmake/GitVersion.cmake` 的 fallback 版本號：1.4.1 發佈時仍停留在 1.4.0，導致從釋出的 tarball（無 git 資訊）構建時版本回報為 1.4.0。
+    * Windows 發佈簽章改用 SignPath 的 release-signing policy，並新增對 win32-x64 npm 二進位（`opencc.node`、`opencc-jieba.dll`）的 Authenticode 簽章（[#1458](https://github.com/BYVoid/OpenCC/pull/1458), [#1459](https://github.com/BYVoid/OpenCC/pull/1459)）。
+* **測試**：
+    * `PrefixMatchTest` 改用測試專屬的字典檔名，避免與 `MarisaDictTest` 在共享工作目錄下爭用同一個 `dict.ocd2`，該競爭會使並行 ctest（如 `dh_auto_test` 的 `ctest -j8`）偶發失敗。
 
 ## Version 1.4.1
 

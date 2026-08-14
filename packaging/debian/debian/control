@@ -12,13 +12,12 @@ Uploaders:
 Section: libs
 Testsuite: autopkgtest-pkg-pybuild
 Build-Depends:
- chrpath,
  cmake,
  debhelper-compat (= 14),
  dh-sequence-python3,
  doxygen <!nodoc>,
  googletest <!nocheck>,
- libmarisa-dev (>> 0.3),
+ libmarisa-dev (>= 0.3.1),
  libtclap-dev,
  opencc <cross>,
  dh-sequence-pkgkde-symbolshelper,
@@ -95,6 +94,7 @@ Section: utils
 Depends:
  libopencc1.4 (= ${binary:Version}),
 Suggests:
+ opencc-jieba,
  libopencc-doc,
 Description: simplified-traditional Chinese conversion tool
  ${source:Extended-Description}
@@ -103,17 +103,28 @@ Description: simplified-traditional Chinese conversion tool
 
 Package: opencc-jieba
 Architecture: any
-Multi-Arch: foreign
 Section: utils
 Depends:
  opencc (= ${binary:Version}),
+ opencc-jieba-data (= ${source:Version}),
+Enhances:
+ opencc,
 Description: ${source:Synopsis} - Jieba segmentation plugin
  ${source:Extended-Description}
  .
  This package provides the optional Jieba-based word segmentation plugin
- (libopencc-jieba.so) with the merged Jieba dictionary and the
- *_jieba.json configurations that enable word-segmentation-aware
- regional phrase conversion.
+ (libopencc-jieba.so) that enables word-segmentation-aware regional phrase
+ conversion.
+
+Package: opencc-jieba-data
+Architecture: all
+Multi-Arch: foreign
+Section: utils
+Description: ${source:Synopsis} - Jieba plugin data files
+ ${source:Extended-Description}
+ .
+ This package provides the merged Jieba dictionary and the *_jieba.json
+ configurations used by the Jieba-based word segmentation plugin.
 
 Package: python3-opencc
 Architecture: any

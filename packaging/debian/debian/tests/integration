@@ -1,14 +1,12 @@
 #!/bin/sh
+# Build the forked CommandLineConvertTest against the installed
+# libopencc-dev/opencc/libopencc-data packages and run it via ctest.
 
-set -ex
+set -eu
 
-cd "$(dirname "$0")"
-mkdir -p build
-cd build
-cmake ..
-make
-make test || true
-echo $AUTOPKGTEST_TMP
-cat ${AUTOPKGTEST_TMP}/../*/src/debian/tests/build/Testing/Temporary/LastTest.log
-cd ..
-rm -rf build
+srcdir="$(pwd)"
+builddir="${AUTOPKGTEST_TMP:-$(mktemp -d)}/integration-build"
+
+cmake -S "$srcdir/debian/tests" -B "$builddir"
+cmake --build "$builddir"
+ctest --test-dir "$builddir" --output-on-failure

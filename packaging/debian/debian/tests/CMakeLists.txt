@@ -3,6 +3,12 @@ project (opencc-integration CXX)
 include (CTest)
 enable_testing()
 set(CTEST_OUTPUT_ON_FAILURE ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# The test includes private headers (src/Common.hpp) from the top-level
+# source tree, which autopkgtest provides as the working tree.
+include_directories(${CMAKE_SOURCE_DIR}/../..)
 
 find_package(PkgConfig REQUIRED)
 find_program (OPENCC_TOOL opencc REQUIRED)

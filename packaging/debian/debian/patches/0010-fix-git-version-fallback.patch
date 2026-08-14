@@ -9,7 +9,7 @@ present (as is always the case for Debian source tarballs). The
 fallback was left at 1.4.0 in the 1.4.1 release, so builds from the
 released tarball report version 1.4.0 instead of 1.4.1.
 
-Forwarded: not-yet
+Forwarded: not-needed
 Last-Update: 2026-07-15
 Index: opencc/cmake/GitVersion.cmake
 ===================================================================

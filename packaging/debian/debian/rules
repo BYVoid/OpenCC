@@ -51,12 +51,14 @@ execute_after_dh_auto_build:
 	dh_auto_build -O--buildsystem=pybuild -- -s pyproject
 
 execute_after_dh_auto_test:
-	# The testsuite needs the package to be installed
-	-dh_auto_test -O--buildsystem=pybuild -- -s pyproject
+	# The testsuite needs the package to be installed.
+	# The python extension carries no RPATH on purpose (see patch 0009),
+	# so point it at the freshly built libopencc for the test run.
+	-LD_LIBRARY_PATH=$(CURDIR)/$(OPENCC_BUILD_DIR)/src$${LD_LIBRARY_PATH:+:$$LD_LIBRARY_PATH} \
+		dh_auto_test -O--buildsystem=pybuild -- -s pyproject
 
 execute_after_dh_auto_install:
 	dh_auto_install -O--buildsystem=pybuild -- -s pyproject
-	chrpath --delete debian/tmp/usr/lib/*/dist-packages/opencc/clib/*.so
 	for i in debian/tmp/usr/lib/*/dist-packages/opencc/clib/; do \
 		mkdir -p $$i/share/; \
 		ln -sf ../../../../../../share/opencc $$i/share/; \

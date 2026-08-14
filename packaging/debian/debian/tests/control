@@ -1,0 +1,17 @@
+Tests: cli-smoke
+Depends: opencc
+Restrictions: allow-stderr,
+
+Tests: integration
+Depends:
+ build-essential,
+ cmake,
+ googletest,
+ pkgconf,
+ rapidjson-dev,
+ @,
+Restrictions: allow-stderr,
+
+Tests: jieba-plugin
+Depends: opencc-jieba
+Restrictions: allow-stderr,

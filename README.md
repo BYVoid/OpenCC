@@ -71,6 +71,7 @@ OpenCC 1.4.2 大幅加速了轉換熱路徑（純文字語料的整體轉換時�
 
 * Windows (x86_64): [OpenCC-1.4.2](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.2/OpenCC-1.4.2-windows-x64-portable.zip) ([SHA-256](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.2/OpenCC-1.4.2-windows-x64-portable.zip.sha256))
     * This Windows release is available from WinGet. For details, see [doc/windows-winget-release.md](doc/windows-winget-release.md).
+    * The executables are Authenticode-signed; see [Code Signing 程式碼簽章](#code-signing-程式碼簽章).
     * Requires Microsoft Visual C++ Redistributable for Visual Studio 2015-2026. Download the latest version from [Microsoft](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-supported-redistributable-version).
 * Debian/Ubuntu:
     * [opencc-1.4.2-1-deb-amd64.zip](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.2/opencc-1.4.2-1-deb-amd64.zip)
@@ -513,6 +514,33 @@ Apache License 2.0
 * [cppjieba](https://github.com/yanyiwu/cppjieba) MIT License
   - Optional dependency used by the experimental `opencc-jieba` plugin.
   - 試驗性 `opencc-jieba` 插件使用的可選依賴。
+
+## Code Signing 程式碼簽章
+
+自 1.4.2 起，Windows 發佈的二進位檔（可攜式 CLI 壓縮包中的執行檔，以及 npm
+win32-x64 套件中的 `opencc.node` 與 `opencc-jieba.dll`）皆經過 Authenticode
+簽章。
+
+Since 1.4.2, the Windows binaries — the executables in the portable CLI zip
+and the `opencc.node` / `opencc-jieba.dll` shipped in the win32-x64 npm
+packages — are Authenticode-signed.
+
+This program uses free code signing provided by
+[SignPath.io](https://about.signpath.io/), and a free code signing
+certificate by the [SignPath Foundation](https://signpath.org/).
+
+本項目使用 [SignPath.io](https://about.signpath.io/) 免費提供的程式碼簽章服務，
+憑證由 [SignPath Foundation](https://signpath.org/) 免費提供。
+
+* **Code signing policy 簽章政策**：只有合併進 `master` 的提交會被簽章，簽章請求
+  由 [維護者](#contributors-貢獻者)在發佈流程中透過 GitHub Actions 發起
+  （見 [`release-winget.yml`](.github/workflows/release-winget.yml) 與
+  [`release-npm-binaries.yml`](.github/workflows/release-npm-binaries.yml)）。
+* **Privacy policy 隱私政策**：OpenCC 為離線的文字轉換程式庫與命令列工具，除非
+  使用者、安裝者或操作者明確要求，否則不會將任何資訊傳輸至其他網路系統。
+  This program will not transfer any information to other networked systems
+  unless specifically requested by the user or the person installing or
+  operating it.
 
 ## Change History 版本歷史
 

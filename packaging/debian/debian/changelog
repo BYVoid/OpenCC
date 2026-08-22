@@ -11,6 +11,38 @@ opencc (1.4.2-1) UNRELEASED; urgency=medium
 
  -- Frank Lin <github@linshuang.info>  Sat, 22 Aug 2026 00:00:00 +0000
 
+opencc (1.4.1+ds1-8) unstable; urgency=medium
+
+  * Do not ship the generated .ocd2 dictionaries in Architecture: all
+    packages. They are marisa-trie images written in host byte order and
+    are unusable on hosts of the opposite endianness, so every big-endian
+    architecture received the little-endian copies built on the arch:all
+    buildd. On s390x this made opencc fail at runtime with "Invalid OpenCC
+    Marisa dictionary: [...] size > avail_", which is what the s390x
+    autopkgtest has been catching since the tests were re-enabled in -7.
+    - debian/libopencc1.4.install, debian/libopencc-data.install: Move
+      usr/share/opencc/*.ocd2 back from libopencc-data (arch:all) to
+      libopencc1.4 (arch:any), reverting the move made in 1.4.1+ds1-4.
+      This also fixes the undeclared file conflict between libopencc-data
+      and libopencc1.4/libopencc1.1, as libopencc-data now only ships the
+      architecture-independent *.json configurations. (Closes: #1145010)
+    - debian/opencc-jieba.install, debian/opencc-jieba-data.install:
+      Likewise move usr/share/opencc/jieba_dict/jieba_merged.ocd2 from
+      opencc-jieba-data (arch:all) to opencc-jieba (arch:any). The
+      plain-text jieba_dict/*.utf8 sources stay in opencc-jieba-data.
+    - debian/control: Add the matching Breaks/Replaces against
+      libopencc-data (<< 1.4.1+ds1-8~) on libopencc1.4 and against
+      opencc-jieba-data (<< 1.4.1+ds1-8~) on opencc-jieba.
+    - debian/control: Adjust the binary package descriptions to say which
+      package now holds the dictionaries.
+    - debian/README.source: Document that the .ocd2 files are byte-order
+      dependent, must never be shipped arch:all, and that libopencc1.4
+      therefore cannot be marked Multi-Arch: same.
+    - debian/opencc-jieba.lintian-overrides: New file, overriding
+      arch-dep-package-has-big-usr-share for the same reason.
+
+ -- Boyuan Yang <byang@debian.org>  Fri, 21 Aug 2026 14:17:22 -0400
+
 opencc (1.4.1+ds1-7) unstable; urgency=medium
 
   * Team upload.

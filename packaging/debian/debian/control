@@ -43,10 +43,13 @@ Breaks:
  libopencc2-data (<< 1.1.1~),
 Replaces:
  libopencc2-data (<< 1.1.1~),
-Description: ${source:Synopsis} - data files
+Description: ${source:Synopsis} - configuration files
  ${source:Extended-Description}
  .
- This package includes the data files.
+ This package includes the architecture-independent conversion
+ configuration files (/usr/share/opencc/*.json). The binary conversion
+ dictionaries (*.ocd2) they refer to are shipped in libopencc1.4, as
+ their marisa-trie format is byte-order dependent.
 
 Package: libopencc-dev
 Architecture: any
@@ -75,17 +78,20 @@ Architecture: any
 Depends:
  libopencc-data (= ${source:Version}),
 Breaks:
+ libopencc-data (<< 1.4.1+ds1-8~),
  libopencc1.1,
  libopencc1.2,
  libopencc1.3,
 Replaces:
+ libopencc-data (<< 1.4.1+ds1-8~),
  libopencc1.1,
  libopencc1.2,
  libopencc1.3,
 Description: ${source:Synopsis} - runtime
  ${source:Extended-Description}
  .
- This package includes the shared library.
+ This package includes the shared library and the binary conversion
+ dictionaries (/usr/share/opencc/*.ocd2).
 
 Package: opencc
 Architecture: any
@@ -107,6 +113,10 @@ Section: utils
 Depends:
  opencc (= ${binary:Version}),
  opencc-jieba-data (= ${source:Version}),
+Breaks:
+ opencc-jieba-data (<< 1.4.1+ds1-8~),
+Replaces:
+ opencc-jieba-data (<< 1.4.1+ds1-8~),
 Enhances:
  opencc,
 Description: ${source:Synopsis} - Jieba segmentation plugin
@@ -114,7 +124,8 @@ Description: ${source:Synopsis} - Jieba segmentation plugin
  .
  This package provides the optional Jieba-based word segmentation plugin
  (libopencc-jieba.so) that enables word-segmentation-aware regional phrase
- conversion.
+ conversion, together with the merged binary Jieba dictionary
+ (/usr/share/opencc/jieba_dict/jieba_merged.ocd2).
 
 Package: opencc-jieba-data
 Architecture: all
@@ -123,8 +134,11 @@ Section: utils
 Description: ${source:Synopsis} - Jieba plugin data files
  ${source:Extended-Description}
  .
- This package provides the merged Jieba dictionary and the *_jieba.json
- configurations used by the Jieba-based word segmentation plugin.
+ This package provides the architecture-independent Jieba dictionary
+ sources and the *_jieba.json configurations used by the Jieba-based word
+ segmentation plugin. The merged binary dictionary (jieba_merged.ocd2) is
+ shipped in opencc-jieba, as its marisa-trie format is byte-order
+ dependent.
 
 Package: python3-opencc
 Architecture: any

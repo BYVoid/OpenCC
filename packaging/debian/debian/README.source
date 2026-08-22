@@ -35,4 +35,33 @@ Until then the embedded copy is built and shipped. It is covered by the
 "Files: plugins/jieba/deps/cppjieba/*" stanza in debian/copyright. Note
 that a security update to cppjieba would require rebuilding opencc.
 
- -- Boyuan Yang <byang@debian.org>, Wed, 12 Aug 2026 11:04:33 -0400
+
+The .ocd2 dictionaries are architecture-dependent
+=================================================
+
+The generated .ocd2 dictionaries (/usr/share/opencc/*.ocd2 and
+/usr/share/opencc/jieba_dict/jieba_merged.ocd2) are marisa-trie images
+that opencc mmaps and uses in place. The marisa-trie on-disk format is
+written in host byte order and is not portable: loading a little-endian
+image on a big-endian host fails with
+
+  Invalid OpenCC Marisa dictionary:
+  lib/marisa/grimoire/io/mapper.cc:99: std::runtime_error: size > avail_
+
+They must therefore never be shipped in an Architecture: all package.
+1.4.1+ds1-4 moved *.ocd2 into libopencc-data and 1.4.1+ds1-5 put
+jieba_merged.ocd2 into opencc-jieba-data; both are arch:all, so every
+architecture got the dictionaries built on the (little-endian) buildd
+that produced the arch:all binaries, and opencc was unusable on s390x
+(#1145010 / the s390x autopkgtest failure). 1.4.1+ds1-8 moved them back
+into the arch:any libopencc1.4 and opencc-jieba.
+
+For the same reason libopencc1.4 must not be marked Multi-Arch: same,
+even though the multiarch hinter on tracker.debian.org suggests it: the
+/usr/share/opencc/*.ocd2 files differ between architectures of different
+byte order, so two such instances are not co-installable. Only the
+.json configurations and the plain-text jieba dictionary sources are
+architecture-independent, and those stay in libopencc-data and
+opencc-jieba-data.
+
+ -- Boyuan Yang <byang@debian.org>, Fri, 21 Aug 2026 15:20:00 -0400

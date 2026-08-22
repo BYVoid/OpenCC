@@ -102,6 +102,48 @@ behavior because phrase priority and multi-stage conversion order matter.
 - `DictConverter.hpp`, `DictConverter.cpp`
   - Converts dictionary files between supported formats.
 
+### Binary Format Portability
+
+Neither binary dictionary format is portable across platforms, but they
+fail differently, and the constraints differ per format.
+
+| | Byte order | Word size (32/64-bit) |
+| --- | --- | --- |
+| `.ocd` | dependent | **independent** (since 1.4.1) |
+| `.ocd2` | dependent | dependent |
+
+- **`.ocd` is word-size independent.** The Darts double array uses
+  `id_type = unsigned int` (4 bytes on every supported platform), and
+  `DartsDict::SerializeToFile` writes the array length as an explicit
+  `uint32_t`. `BinaryDict` writes all of its integer fields as fixed-width
+  `uint32_t` as well. Files written by pre-1.4.1 64-bit builds used native
+  8-byte `size_t` fields; `BinaryDict::DetectFieldWidth()` still recognizes
+  that legacy layout, and `LooksLikeLegacy64Field()` performs the probe
+  through a native `uint64_t` read so the detection is correct on
+  big-endian hosts too.
+- **`.ocd2` is not.** The `SerializedValues` payload OpenCC writes uses
+  fixed-width `uint32_t` fields, but the marisa-trie image that precedes it
+  does not: `MARISA_WORD_SIZE` is derived from `UINTPTR_MAX`, and the
+  serialized `BitVector::Unit` / `FlatVector::Unit` are `uint64_t` on
+  64-bit builds and `uint32_t` on 32-bit builds. A 64-bit-built `.ocd2`
+  loaded by a 32-bit build is not reliably rejected either — marisa's
+  `Vector<T>::map` only checks `total_size % sizeof(T)`, and a multiple of
+  8 is always a multiple of 4 — so the mismatch can be read as silently
+  wrong data rather than an error.
+
+Forcing `MARISA_WORD_SIZE` to 32 would not make `.ocd2` portable, since
+byte order would still differ; it would not apply to `USE_SYSTEM_MARISA`
+builds (which distributions use), where the format would then depend on
+which marisa the build linked against; and it would narrow the rank/select
+word width in `MarisaDict`'s lookup hot path. Making `.ocd2` genuinely
+portable means normalizing the trie image on write and converting back on
+load, which gives up the in-place mmap that makes the format fast.
+
+The practical consequence is that generated `.ocd2` files must be built
+for the architecture that consumes them, and must never be shipped from an
+architecture-independent package — see `packaging/debian/README.md` for
+how this played out in Debian.
+
 ## Public APIs
 
 ### C++ API

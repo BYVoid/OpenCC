@@ -64,16 +64,17 @@ For details, see [Design Principles](./DESIGN_PRINCIPLES.md) and [Regional Phras
 
 ### Prebuilt binaries 預編譯二進位檔
 
-OpenCC 1.4.1 修復了 `opencc` npm 套件在無預編譯二進制平台上源碼編譯安裝失敗的
-問題，並包含一批詞庫修正；C++ ABI 與 1.4.0 相同（SOVERSION 1.4），自 1.4.0
-升級的下游 C++ 程式無需重新連結。
+OpenCC 1.4.2 大幅加速了轉換熱路徑（純文字語料的整體轉換時間最多降至原本的
+1/7），修復了大端序平台載入 legacy `.ocd` 字典得到空字典的問題，並包含一批詞庫
+修正；C++ ABI 與 1.4.1 相同（SOVERSION 1.4），自 1.4.0／1.4.1 升級的下游 C++
+程式無需重新連結。
 
-* Windows (x86_64): [OpenCC-1.4.1](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.1/OpenCC-1.4.1-windows-x64-portable.zip) ([SHA-256](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.1/OpenCC-1.4.1-windows-x64-portable.zip.sha256))
+* Windows (x86_64): [OpenCC-1.4.2](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.2/OpenCC-1.4.2-windows-x64-portable.zip) ([SHA-256](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.2/OpenCC-1.4.2-windows-x64-portable.zip.sha256))
     * This Windows release is available from WinGet. For details, see [doc/windows-winget-release.md](doc/windows-winget-release.md).
     * Requires Microsoft Visual C++ Redistributable for Visual Studio 2015-2026. Download the latest version from [Microsoft](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170#latest-supported-redistributable-version).
 * Debian/Ubuntu:
-    * [opencc-1.4.1-1-deb-amd64.zip](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.1/opencc-1.4.1-1-deb-amd64.zip)
-    * [opencc-1.4.1-1-deb-arm64.zip](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.1/opencc-1.4.1-1-deb-arm64.zip)
+    * [opencc-1.4.2-1-deb-amd64.zip](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.2/opencc-1.4.2-1-deb-amd64.zip)
+    * [opencc-1.4.2-1-deb-arm64.zip](https://github.com/BYVoid/OpenCC/releases/download/ver.1.4.2/opencc-1.4.2-1-deb-arm64.zip)
     * Each zip bundles the `opencc`, `opencc-jieba`, and `libopencc*` deb packages for one architecture, with a `SHA256SUMS` file.
 
 ## Usage 使用

@@ -46,7 +46,7 @@ node_addon(
         "//conditions:default": ["-std=c++20"],
     }),
     defines = [
-        'OPENCC_VERSION=\\"1.4.1\\"',
+        'OPENCC_VERSION=\\"1.4.2\\"',
         "NAPI_DISABLE_CPP_EXCEPTIONS",
         "Opencc_BUILT_AS_STATIC",
     ],

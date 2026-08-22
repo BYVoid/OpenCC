@@ -1,14 +1,17 @@
 # Change History of OpenCC
 
-## Unreleased
+## Version 1.4.2
 
-* **發佈重點**：轉換熱路徑大幅加速（純文字語料的整體轉換時間最多降至原本的 1/7），修復大端序平台載入 legacy `.ocd` 字典得到空字典的問題，並新增兩個實驗性 API（詞級候選查詢與一對多歧義標註，含 CLI `--ambiguities`）。詞庫方面修正了 `s2twp` 的數處貪婪匹配錯誤與 `tw2t`／`tw2s` 對簡體「么」的破壞性轉換，並補充臺灣／香港地區詞。C++ ABI 與 1.4.1 相同（SOVERSION 1.4），實驗性 API 皆位於未安裝的私有標頭或巨集開關之後，下游程式無需重新連結。
+2026年8月22日
+
+* **發佈重點**：轉換熱路徑大幅加速（純文字語料的整體轉換時間最多降至原本的 1/7），修復大端序平台載入 legacy `.ocd` 字典得到空字典的問題，並新增兩個實驗性 API（詞級候選查詢與一對多歧義標註，含 CLI `--ambiguities`）。詞庫方面修正了 `s2twp` 的數處貪婪匹配錯誤與 `tw2t`／`tw2s` 對簡體「么」的破壞性轉換，補充臺灣／香港地區詞，並修正古籍語境下 `s2t` 的一對多字用字。C++ ABI 與 1.4.1 相同（SOVERSION 1.4），實驗性 API 皆位於未安裝的私有標頭或巨集開關之後，下游程式無需重新連結。
 * **詞庫更新**：
     * 修復 `tw2t`／`tw2s`／`tw2sp` 會把已是簡體的「什么」轉成「什幺」的問題：生成的 `TWVariantsRev` 含 `么 -> 幺`（臺灣標準 `幺 -> 么` 的反向），在 `TWVariantsRevPhrases.txt` 補上「什么／怎么／这么／那么／多么／要么／好么／甚么」等例外映射至「麼」形，同時保留「老么 → 老幺」等真正的 yao1 詞（[#1469](https://github.com/BYVoid/OpenCC/issues/1469), [#1473](https://github.com/BYVoid/OpenCC/pull/1473)）。
     * 修復 `s2twp` 因較短詞條先命中而拆錯詞的問題：補上「互联网络」「快闪存储器」「老挝人民民主共和国」的完整詞條，並將「老撾人民民主共和國」對應到臺灣官方譯名「寮人民民主共和國」（[#1467](https://github.com/BYVoid/OpenCC/issues/1467), [#1468](https://github.com/BYVoid/OpenCC/pull/1468)）。
     * 「梁／樑」：新增臺灣地區用字映射與人名、地名保護詞條（[#1407](https://github.com/BYVoid/OpenCC/pull/1407)）；並將 `TWVariantsRevPhrases` 與 `STPhrases` 對齊，補上 41 條梁（棟梁義）的反向詞組映射，使 `tw2t` 能從上下文還原「橋樑」而不誤傷姓氏、地名（[#1424](https://github.com/BYVoid/OpenCC/pull/1424)）。
     * 新增奧斯卡最佳導演與最佳影片製片人的臺灣／香港譯名詞條（取自中文維基百科 `NoteTA` 地區詞表並以 Wikidata 交叉核對，僅收錄真正存在音譯差異者，如 卡梅隆／卡麥隆／金馬倫）（[#1466](https://github.com/BYVoid/OpenCC/pull/1466)）。
     * 新增地區詞「內存條 → 記憶體模組」（`s2twp`／`s2hkp`，含反向詞條）（[#1475](https://github.com/BYVoid/OpenCC/pull/1475)）、「数字人文 → 數位人文」（`s2twp`／`tw2sp`）（[#1465](https://github.com/BYVoid/OpenCC/pull/1465)）。
+    * `s2t`：修正古籍語境下一對多字的用字。`征`／`咸`／`斗`／`里`／`范`／`岳`／`冲`／`郁`／`谷` 在 `STPhrases` 沒有對應詞條時會退回 `STCharacters`，而那裏的候選次序是按現代用法排的，碰上文言文和書名就常常選錯。此次按義項補入詞條：征伐義（`征南`、`从征实录`）、年號與副詞義（`咸淳`、`少长咸集`）、星宿義（`斗姆`、`东斗星君`）、地名與音譯（`甫里`、`摩里支`）、姓氏義（`范文正`、`岳武穆`）、道教與梵語音譯（`道冲`、`郁迦罗越`）；`谷神` 改為保留「谷」（《老子》「谷神不死」），`谷神星` 則因鍵更長，仍映射為「穀神星」。這批問題是在清理殆知閣文獻時發現的，該批書名中 47 條誤轉修正了 46 條，現代語義的轉換一律不受影響（[#1479](https://github.com/BYVoid/OpenCC/pull/1479)）。
     * `s2t`：「小丑」不再預設轉換為「小醜」（[#1423](https://github.com/BYVoid/OpenCC/pull/1423)）；「雇」改為 `STCharacters` 中「僱」以外的非預設候選（[#906](https://github.com/BYVoid/OpenCC/pull/906)）；新增「这周／那周／若干周／几周／周线 → 週」等指示與量化用法，並補上「周围／周边／周遭」的分詞保護詞條（[#1428](https://github.com/BYVoid/OpenCC/pull/1428)）；新增顯式詞條「复盘 → 復盤」，使其不再只依賴 `复` 的候選順序（[#1427](https://github.com/BYVoid/OpenCC/pull/1427)）。
     * `t2s`：修正過度轉換「乾斷食 → 干断食」「乾紅 → 干红」（[#621](https://github.com/BYVoid/OpenCC/issues/621), [#1429](https://github.com/BYVoid/OpenCC/pull/1429)）。
     * 修正「鑒」相關詞條與若干提稱語，如「郝铭鉴 → 郝銘鑒」（[#1421](https://github.com/BYVoid/OpenCC/pull/1421)）。
@@ -27,7 +30,7 @@
     * Debian 套件構建改在 `debian:sid` 容器中進行（同步來的打包以 unstable 為目標，Ubuntu LTS runner 無法滿足），並在 `dpkg-buildpackage` 前套用 `debian/patches` quilt series（自動跳過已在樹中的補丁）；arm64 改用 `ubuntu-24.04-arm` runner 原生構建，取代先前的交叉構建（[#1420](https://github.com/BYVoid/OpenCC/pull/1420)）。
     * 新增 `packaging/freebsd/`：FreeBSD ports tree `chinese/opencc` 條目的參考副本，供上游審閱與準備提交給 port maintainer 的改動。
     * 新增精簡 C++ 源碼包發佈流程（`release-source.yml`）：以 `OPENCC_SOURCE_PACKAGE_PROFILE=opencc` 產生僅含 C++ 核心的 CPack 壓縮包（不含 Node.js、Python、文檔、packaging 與 plugins），並以 CMake 與 Bazel 雙路徑冒煙測試後上傳至 draft release；為此保留 Bazel workspace 檔案與頂層 `patches/`，僅排除可能含 API key 的 `.bazelrc.user`。
-    * 修正 `cmake/GitVersion.cmake` 的 fallback 版本號：1.4.1 發佈時仍停留在 1.4.0，導致從釋出的 tarball（無 git 資訊）構建時版本回報為 1.4.0。
+    * 修正 `cmake/GitVersion.cmake` 的 fallback 版本號：1.4.1 發佈時仍停留在 1.4.0，導致從釋出的 tarball（無 git 資訊）構建時版本回報為 1.4.0；本次發佈同步將其更新至 1.4.2，並讓 `scripts/compute-version.sh` 的 fallback 與之一致（先前停留在 1.2.1）。因此 Debian 打包的 `0010-fix-git-version-fallback.patch` 對 1.4.2 已無作用而移除，`0012-fix-legacy-dict-detection-on-big-endian.patch` 亦已包含於本次發佈。
     * Windows 發佈簽章改用 SignPath 的 release-signing policy，並新增對 win32-x64 npm 二進位（`opencc.node`、`opencc-jieba.dll`）的 Authenticode 簽章（[#1458](https://github.com/BYVoid/OpenCC/pull/1458), [#1459](https://github.com/BYVoid/OpenCC/pull/1459)）。
 * **測試**：
     * `PrefixMatchTest` 改用測試專屬的字典檔名，避免與 `MarisaDictTest` 在共享工作目錄下爭用同一個 `dict.ocd2`，該競爭會使並行 ctest（如 `dh_auto_test` 的 `ctest -j8`）偶發失敗。

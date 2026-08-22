@@ -1,3 +1,16 @@
+opencc (1.4.2-1) UNRELEASED; urgency=medium
+
+  * Update packaging for the upstream 1.4.2 release:
+    - Drop 0010-fix-git-version-fallback.patch: upstream 1.4.2 sets
+      _OPENCC_FALLBACK_REVISION to 2 in cmake/GitVersion.cmake, so builds
+      from the release tarball (which carries no .git) already report the
+      correct version and the patch no longer applies.
+    - 0012-fix-legacy-dict-detection-on-big-endian.patch is contained in
+      the 1.4.2 release and can be dropped as well.
+    - 0003, 0004, 0005, 0009 and 0011 apply unchanged against 1.4.2.
+
+ -- Frank Lin <github@linshuang.info>  Sat, 22 Aug 2026 00:00:00 +0000
+
 opencc (1.4.1+ds1-7) unstable; urgency=medium
 
   * Team upload.

@@ -1,6 +1,6 @@
 {
   "name": "opencc",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Conversion between Traditional and Simplified Chinese",
   "author": "Carbo Kuo <byvoid@byvoid.com>",
   "license": "Apache-2.0",
@@ -74,10 +74,10 @@
     "json-schema-to-typescript": "^15.0.4"
   },
   "optionalDependencies": {
-    "@opencc/opencc-darwin-arm64": "1.4.1",
-    "@opencc/opencc-darwin-x64": "1.4.1",
-    "@opencc/opencc-linux-arm64": "1.4.1",
-    "@opencc/opencc-linux-x64": "1.4.1",
-    "@opencc/opencc-win32-x64": "1.4.1"
+    "@opencc/opencc-darwin-arm64": "1.4.2",
+    "@opencc/opencc-darwin-x64": "1.4.2",
+    "@opencc/opencc-linux-arm64": "1.4.2",
+    "@opencc/opencc-linux-x64": "1.4.2",
+    "@opencc/opencc-win32-x64": "1.4.2"
   }
 }

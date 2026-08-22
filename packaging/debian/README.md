@@ -10,16 +10,20 @@ authoritative packaging is whatever Debian actually ships.
 To keep proposals reviewable as deltas, `debian/` here is periodically
 synced to the packaging Debian currently ships:
 
-- Upstream: BYVoid/OpenCC `ver.1.4.1`
+- Upstream: BYVoid/OpenCC `ver.1.4.2`
 - Debian source package: `opencc 1.4.1+ds1-7` (unstable)
 - Debian packaging repository:
   https://salsa.debian.org/debian/opencc
 - Patch reference index:
   https://udd.debian.org/patches.cgi?src=opencc
 
-As of this sync there are **no outstanding upstream deltas**: `debian/`
-is a verbatim copy of the Debian packaging repository. The two proposals
-previously carried here have been adopted, with implementation changes:
+As of this sync the only upstream deltas are release bookkeeping for
+1.4.2: a `1.4.2-1` `UNRELEASED` changelog entry (`release-deb.yml` stamps
+the built artifacts with `dpkg-parsechangelog`, which would otherwise
+still report `1.4.1+ds1-7`) and the removal of the now-inapplicable
+`0010-fix-git-version-fallback.patch`. Otherwise `debian/` is a verbatim
+copy of the Debian packaging repository. The two proposals previously
+carried here have been adopted, with implementation changes:
 
 - **Jieba plugin packaging** (Debian bug
   [#1141451](https://bugs.debian.org/1141451)): adopted in
@@ -42,13 +46,15 @@ Current quilt patch set (see `debian/patches/series`):
 - 0004-Use-system-googletest.patch
 - 0005-Disable-build-in-setup.py.patch
 - 0009-setup.py-Handle-python-binding-instead-of-cmake.patch
-- 0010-fix-git-version-fallback.patch
 - 0011-drop-python-cli-entry-point.patch
 - 0012-fix-legacy-dict-detection-on-big-endian.patch
 
 Patch numbering reflects historical Debian quilt ordering and is not
-contiguous. 0012 is `Applied-Upstream` (commit `8aeb5e69`) and can be
-dropped once Debian moves to a release containing it.
+contiguous. 0010 was dropped for the 1.4.2 release: upstream now sets
+`_OPENCC_FALLBACK_REVISION` to the release revision in
+`cmake/GitVersion.cmake`, so the patch no longer applies. 0012 is
+`Applied-Upstream` (commit `8aeb5e69`) and is contained in 1.4.2; it can
+be dropped once Debian moves to that release.
 
 ## 3. Binary packages (in this tree)
 
@@ -101,5 +107,5 @@ resolution can break it — see `debian/tests/README.md`.
 
 Copy the `debian/` directory from the salsa repository checkout over
 `packaging/debian/debian/`, re-apply any upstream proposal deltas that
-Debian has not adopted (currently none), and update the baseline section
-above.
+Debian has not adopted (currently only the release bookkeeping described
+in section 1), and update the baseline section above.

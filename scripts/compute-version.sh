@@ -16,7 +16,7 @@
 set -euo pipefail
 
 # Fallback version — must be kept in sync with cmake/GitVersion.cmake
-FALLBACK_VERSION="1.2.1"
+FALLBACK_VERSION="1.4.2"
 
 # Detect dirty working tree
 DIRTY=""

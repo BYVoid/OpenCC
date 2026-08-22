@@ -1,0 +1,4 @@
+# jieba_merged.ocd2 is a marisa-trie image written in host byte order and is
+# therefore architecture-dependent; it cannot be moved to the arch:all
+# opencc-jieba-data package. See debian/README.source.
+opencc-jieba: arch-dep-package-has-big-usr-share

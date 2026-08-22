@@ -1,2 +1,2 @@
-usr/share/opencc/jieba_dict/
+usr/share/opencc/jieba_dict/*.utf8
 usr/share/opencc/*_jieba.json

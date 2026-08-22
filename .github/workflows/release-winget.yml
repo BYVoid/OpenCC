@@ -11,7 +11,7 @@ on:
         description: "Release version or tag, for example 1.2.0, 1.2.1-rc1, 1.2.1-alpha1, or ver.1.2.0"
         required: false
       sign_windows_binaries:
-        description: "Sign Windows binaries with SignPath before packaging"
+        description: "Sign Windows binaries with SignPath before packaging (tag builds always sign)"
         required: true
         type: boolean
         default: false
@@ -84,7 +84,7 @@ jobs:
             -PrepareOnly
 
       - name: Create unsigned SignPath input
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_windows_binaries }}
+        if: ${{ inputs.sign_windows_binaries || startsWith(github.ref, 'refs/tags/') }}
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path release/signpath | Out-Null
@@ -94,7 +94,7 @@ jobs:
             -CompressionLevel Optimal
 
       - name: Upload unsigned SignPath input
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_windows_binaries }}
+        if: ${{ inputs.sign_windows_binaries || startsWith(github.ref, 'refs/tags/') }}
         id: upload-unsigned-signpath-input
         uses: actions/upload-artifact@v7
         with:
@@ -104,7 +104,7 @@ jobs:
           if-no-files-found: error
 
       - name: Submit SignPath signing request
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_windows_binaries }}
+        if: ${{ inputs.sign_windows_binaries || startsWith(github.ref, 'refs/tags/') }}
         uses: signpath/github-action-submit-signing-request@v2
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
@@ -114,11 +114,14 @@ jobs:
           artifact-configuration-slug: opencc-winget-portable-win32-x64
           github-artifact-id: ${{ steps.upload-unsigned-signpath-input.outputs.artifact-id }}
           wait-for-completion: true
+          # The release-signing policy requires a human approver; the action's
+          # 600s default is not enough to notice the request and approve it.
+          wait-for-completion-timeout-in-seconds: 1800
           skip-decompress: true
           output-artifact-directory: release/signpath-signed
 
       - name: Restore signed portable staging
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_windows_binaries }}
+        if: ${{ inputs.sign_windows_binaries || startsWith(github.ref, 'refs/tags/') }}
         shell: pwsh
         run: |
           $signedRoot = "release/signpath-signed"
@@ -142,7 +145,7 @@ jobs:
           }
 
       - name: Verify signed portable files
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.sign_windows_binaries }}
+        if: ${{ inputs.sign_windows_binaries || startsWith(github.ref, 'refs/tags/') }}
         shell: pwsh
         run: |
           $files = @(

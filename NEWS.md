@@ -31,7 +31,7 @@
     * 新增 `packaging/freebsd/`：FreeBSD ports tree `chinese/opencc` 條目的參考副本，供上游審閱與準備提交給 port maintainer 的改動。
     * 新增精簡 C++ 源碼包發佈流程（`release-source.yml`）：以 `OPENCC_SOURCE_PACKAGE_PROFILE=opencc` 產生僅含 C++ 核心的 CPack 壓縮包（不含 Node.js、Python、文檔、packaging 與 plugins），並以 CMake 與 Bazel 雙路徑冒煙測試後上傳至 draft release；為此保留 Bazel workspace 檔案與頂層 `patches/`，僅排除可能含 API key 的 `.bazelrc.user`。
     * 修正 `cmake/GitVersion.cmake` 的 fallback 版本號：1.4.1 發佈時仍停留在 1.4.0，導致從釋出的 tarball（無 git 資訊）構建時版本回報為 1.4.0；本次發佈同步將其更新至 1.4.2，並讓 `scripts/compute-version.sh` 的 fallback 與之一致（先前停留在 1.2.1）。因此 Debian 打包的 `0010-fix-git-version-fallback.patch` 對 1.4.2 已無作用而移除，`0012-fix-legacy-dict-detection-on-big-endian.patch` 亦已包含於本次發佈。
-    * Windows 發佈簽章改用 SignPath 的 release-signing policy，並新增對 win32-x64 npm 二進位（`opencc.node`、`opencc-jieba.dll`）的 Authenticode 簽章（[#1458](https://github.com/BYVoid/OpenCC/pull/1458), [#1459](https://github.com/BYVoid/OpenCC/pull/1459)）。
+    * Windows 發佈自本版起啟用程式碼簽章憑證：可攜式 CLI 壓縮包中的執行檔，以及 win32-x64 npm 二進位（`opencc.node`、`opencc-jieba.dll`）皆經 Authenticode 簽章，簽章服務由 [SignPath.io](https://about.signpath.io/) 免費提供、憑證由 [SignPath Foundation](https://signpath.org/) 免費提供，發佈流程改用其 release-signing policy；相關聲明與簽章／隱私政策見 README 的「Code Signing 程式碼簽章」一節（[#1458](https://github.com/BYVoid/OpenCC/pull/1458), [#1459](https://github.com/BYVoid/OpenCC/pull/1459)）。
 * **測試**：
     * `PrefixMatchTest` 改用測試專屬的字典檔名，避免與 `MarisaDictTest` 在共享工作目錄下爭用同一個 `dict.ocd2`，該競爭會使並行 ctest（如 `dh_auto_test` 的 `ctest -j8`）偶發失敗。
 

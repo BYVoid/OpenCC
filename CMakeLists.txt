@@ -83,8 +83,8 @@ option(USE_SYSTEM_MARISA "Use system version of Marisa" OFF)
 option(USE_SYSTEM_PYBIND11 "Use system version of pybind11" OFF)
 option(USE_SYSTEM_RAPIDJSON "Use system version of RapidJSON" OFF)
 option(USE_SYSTEM_TCLAP "Use system version of TCLAP" OFF)
-set(OPENCC_SOURCE_PACKAGE_PROFILE "full" CACHE STRING "Source package profile: full or opencc")
-set_property(CACHE OPENCC_SOURCE_PACKAGE_PROFILE PROPERTY STRINGS full opencc)
+set(OPENCC_SOURCE_PACKAGE_PROFILE "full" CACHE STRING "Source package profile: full, opencc or bazel")
+set_property(CACHE OPENCC_SOURCE_PACKAGE_PROFILE PROPERTY STRINGS full opencc bazel)
 
 ######## Package information
 set (PACKAGE_URL https://github.com/BYVoid/OpenCC)
@@ -105,6 +105,9 @@ set(_OPENCC_SOURCE_PACKAGE_IGNORE_FILES "")
 # .bazelrc, .bazelversion, .bazelignore) are intentionally NOT ignored here.
 # Only .bazelrc.user is excluded (it is a local/CI override that may carry a
 # BuildBuddy API key); it is dropped via CPACK_SOURCE_IGNORE_FILES below.
+#
+# Dropped by every trimmed profile: development metadata, documentation,
+# third-party extras, and release packaging entry points.
 set(_OPENCC_TRIMMED_SOURCE_PACKAGE_IGNORE_FILES
   "/.appveyor.yml"
   "/.agents/"
@@ -122,26 +125,44 @@ set(_OPENCC_TRIMMED_SOURCE_PACKAGE_IGNORE_FILES
   "/data/icon/"
   "/deps/google-benchmark/"
   "/deps/pybind11-2.13.1/"
+  # Third-party SWIG bindings (deps/marisa-*/bindings/python[3]/); the
+  # OpenCC python/ binding lives at the top level and is matched separately.
+  "/bindings/python[^/]*/"
   "/doc/"
   "/examples/"
-  "/node/"
   "/package.json"
   "/package-lock.json"
+  "/plugins/jieba/node/"
   "/pyproject.toml"
-  "/python[^/]*/"
+  "/python-[^/]*/"
   "/release-pypi-[^/]*"
-  "${PROJECT_SOURCE_DIR}/scripts/"
   "/setup.py"
   "/test.cmd"
 )
+# Node.js and Python binding sources and their build helper scripts. The
+# "opencc" profile drops them; the "bazel" profile keeps them so the //node
+# and //python Bazel targets stay buildable and testable from the package.
+set(_OPENCC_SOURCE_PACKAGE_BINDING_IGNORE_FILES
+  "/node/"
+  "/python/"
+  "${PROJECT_SOURCE_DIR}/scripts/"
+)
 if(OPENCC_SOURCE_PACKAGE_PROFILE STREQUAL "opencc")
+  # C++ core and Jieba plugin only. Buildable with CMake and Bazel.
   set(_OPENCC_SOURCE_PACKAGE_SUFFIX "-opencc-src")
   set(_OPENCC_SOURCE_PACKAGE_IGNORE_FILES
     ${_OPENCC_TRIMMED_SOURCE_PACKAGE_IGNORE_FILES}
-    "/plugins/jieba/node/"
+    ${_OPENCC_SOURCE_PACKAGE_BINDING_IGNORE_FILES}
+  )
+elseif(OPENCC_SOURCE_PACKAGE_PROFILE STREQUAL "bazel")
+  # C++ core, Jieba plugin, and the Node.js/Python binding sources: everything
+  # the Bazel build graph needs, without the npm/PyPI packaging entry points.
+  set(_OPENCC_SOURCE_PACKAGE_SUFFIX "-bazel-src")
+  set(_OPENCC_SOURCE_PACKAGE_IGNORE_FILES
+    ${_OPENCC_TRIMMED_SOURCE_PACKAGE_IGNORE_FILES}
   )
 elseif(NOT OPENCC_SOURCE_PACKAGE_PROFILE STREQUAL "full")
-  message(FATAL_ERROR "OPENCC_SOURCE_PACKAGE_PROFILE must be 'full' or 'opencc'.")
+  message(FATAL_ERROR "OPENCC_SOURCE_PACKAGE_PROFILE must be 'full', 'opencc' or 'bazel'.")
 endif()
 
 if(NOT CPACK_SOURCE_PACKAGE_FILE_NAME)

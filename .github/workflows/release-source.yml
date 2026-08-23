@@ -1,10 +1,11 @@
 name: Source Package Release
 run-name: Source Package Release${{ !(startsWith(github.ref, 'refs/tags/') || inputs.release_tag != '') && ' (build only)' || '' }}
 
-# Builds the trimmed C++ source package (opencc profile: includes the Jieba
-# segmentation plugin but excludes Node.js, Python, documentation, or packaging
-# files) and attaches it to the release. The trimmed package keeps both build
-# systems working, so it is smoke-tested with CMake and Bazel before upload.
+# Builds the trimmed source packages and attaches them to the release:
+#   opencc  C++ core and Jieba plugin only.
+#   bazel   C++ core, Jieba plugin, and the Node.js/Python binding sources.
+# Both keep the CMake and Bazel build systems working, so each is smoke-tested
+# with both before upload (see scripts/build-source-package.sh).
 # Like the other release workflows it uploads to the draft created by
 # release-draft.yml; publishing is manual.
 
@@ -28,6 +29,10 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [opencc, bazel]
     steps:
       - uses: actions/checkout@v5
         with:
@@ -44,42 +49,22 @@ jobs:
           bazelisk-cache: true
           repository-cache: true
 
+      - name: Set up Python
+        if: matrix.profile == 'bazel'
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
       - name: Build trimmed source package
-        run: |
-          cmake -S . -B build-src \
-            -DOPENCC_SOURCE_PACKAGE_PROFILE=opencc \
-            -DCPACK_SOURCE_ARCHIVE_TIMESTAMP=0
-          (cd build-src && cpack --config CPackSourceConfig.cmake -G TGZ)
-          # Repack for reproducibility: normalize ownership (root:root),
-          # timestamps (epoch 0), and file order (sorted).
-          cpack_tarball=$(ls build-src/opencc-*-opencc-src.tar.gz)
-          base=$(basename "$cpack_tarball" .tar.gz)
-          tmpdir=$(mktemp -d)
-          tar xzf "$cpack_tarball" -C "$tmpdir"
-          mkdir -p dist
-          tar cf - -C "$tmpdir" --sort=name --owner=root --group=root --mtime=@0 "$base" | gzip -9n > "dist/${base}.tar.gz"
-          tar cf - -C "$tmpdir" --sort=name --owner=root --group=root --mtime=@0 "$base" | xz -9 > "dist/${base}.tar.xz"
-          rm -rf "$tmpdir"
-          ls -l dist/
+        run: bash scripts/build-source-package.sh build ${{ matrix.profile }}
 
       - name: Smoke-test the package (CMake and Bazel)
-        run: |
-          set -e
-          tarball=$(ls dist/opencc-*-opencc-src.tar.gz)
-          workdir=$(mktemp -d)
-          tar xzf "$tarball" -C "$workdir"
-          src=$(echo "$workdir"/opencc-*-opencc-src)
-          # CMake: configure and build the core library, CLI tools, and Jieba plugin.
-          cmake -S "$src" -B "$src/build" -DCMAKE_BUILD_TYPE=Release -DBUILD_OPENCC_JIEBA_PLUGIN=ON
-          cmake --build "$src/build" --target opencc opencc_dict opencc-jieba --parallel
-          # Bazel: build the core and Jieba plugin targets. Catches a trimmed
-          # package that dropped a file the Bazel module or BUILD graph needs.
-          (cd "$src" && bazel build //src/tools:dict_converter //data/dictionary:binary_dictionaries //plugins/jieba:opencc-jieba)
+        run: bash scripts/build-source-package.sh smoke-test ${{ matrix.profile }}
 
       - uses: actions/upload-artifact@v4
         with:
-          name: opencc-source-package
-          path: dist/opencc-*-opencc-src.tar.*
+          name: opencc-source-package-${{ matrix.profile }}
+          path: dist/opencc-*-${{ matrix.profile }}-src.tar.*
 
       - name: Upload to GitHub release
         if: startsWith(github.ref, 'refs/tags/') || inputs.release_tag != ''
@@ -93,6 +78,6 @@ jobs:
             sleep 10
           done
           gh release upload "$tag" \
-            dist/opencc-*-opencc-src.tar.gz \
-            dist/opencc-*-opencc-src.tar.xz \
+            dist/opencc-*-${{ matrix.profile }}-src.tar.gz \
+            dist/opencc-*-${{ matrix.profile }}-src.tar.xz \
             --clobber

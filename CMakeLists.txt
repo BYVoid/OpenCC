@@ -52,9 +52,9 @@ option(ENABLE_BENCHMARK "Build benchmark tests." OFF)
 # Top-level macOS builds enable the Jieba plugin by default so package
 # managers that build with default options (e.g. Homebrew) ship it. Other
 # platforms and subproject builds (FetchContent / add_subdirectory) keep it
-# opt-in. Trimmed source packages ship without plugins/, so only default to
-# ON when the plugin sources are actually present; an explicit
-# -DBUILD_OPENCC_JIEBA_PLUGIN=ON without them still fails loudly below.
+# opt-in. Only default to ON when the plugin sources are actually present;
+# an explicit -DBUILD_OPENCC_JIEBA_PLUGIN=ON without them still fails
+# loudly below.
 if (APPLE AND CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR
     AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugins/CMakeLists.txt")
   set(OPENCC_JIEBA_PLUGIN_DEFAULT ON)
@@ -83,8 +83,8 @@ option(USE_SYSTEM_MARISA "Use system version of Marisa" OFF)
 option(USE_SYSTEM_PYBIND11 "Use system version of pybind11" OFF)
 option(USE_SYSTEM_RAPIDJSON "Use system version of RapidJSON" OFF)
 option(USE_SYSTEM_TCLAP "Use system version of TCLAP" OFF)
-set(OPENCC_SOURCE_PACKAGE_PROFILE "full" CACHE STRING "Source package profile: full, opencc, or opencc-jieba")
-set_property(CACHE OPENCC_SOURCE_PACKAGE_PROFILE PROPERTY STRINGS full opencc opencc-jieba)
+set(OPENCC_SOURCE_PACKAGE_PROFILE "full" CACHE STRING "Source package profile: full or opencc")
+set_property(CACHE OPENCC_SOURCE_PACKAGE_PROFILE PROPERTY STRINGS full opencc)
 
 ######## Package information
 set (PACKAGE_URL https://github.com/BYVoid/OpenCC)
@@ -138,18 +138,10 @@ if(OPENCC_SOURCE_PACKAGE_PROFILE STREQUAL "opencc")
   set(_OPENCC_SOURCE_PACKAGE_SUFFIX "-opencc-src")
   set(_OPENCC_SOURCE_PACKAGE_IGNORE_FILES
     ${_OPENCC_TRIMMED_SOURCE_PACKAGE_IGNORE_FILES}
-    "/plugins/"
-  )
-elseif(OPENCC_SOURCE_PACKAGE_PROFILE STREQUAL "opencc-jieba")
-  set(CPACK_SOURCE_PACKAGE_FILE_NAME
-    "opencc-jieba-${OPENCC_VERSION_MAJOR}.${OPENCC_VERSION_MINOR}.${OPENCC_VERSION_REVISION}-src"
-  )
-  set(_OPENCC_SOURCE_PACKAGE_IGNORE_FILES
-    ${_OPENCC_TRIMMED_SOURCE_PACKAGE_IGNORE_FILES}
     "/plugins/jieba/node/"
   )
 elseif(NOT OPENCC_SOURCE_PACKAGE_PROFILE STREQUAL "full")
-  message(FATAL_ERROR "OPENCC_SOURCE_PACKAGE_PROFILE must be 'full', 'opencc', or 'opencc-jieba'.")
+  message(FATAL_ERROR "OPENCC_SOURCE_PACKAGE_PROFILE must be 'full' or 'opencc'.")
 endif()
 
 if(NOT CPACK_SOURCE_PACKAGE_FILE_NAME)
@@ -158,7 +150,7 @@ if(NOT CPACK_SOURCE_PACKAGE_FILE_NAME)
   )
 endif()
 set(CPACK_SOURCE_IGNORE_FILES
-  "/build[^/]*/;/test/dict.ocd;/test/dict.txt;/test/dict.bin;/dict.ocd;/.DS_Store;/.zig-[^/]*/;/dist[^/]*/;/other/;/opencc.xcodeproj/;/.git/;.gitignore;~$;.pyc;/bazel-[^/]*;/.bazelrc.user;/node_modules;/.github;/.pytest_cache;/.vscode;/packaging/;${_OPENCC_SOURCE_PACKAGE_IGNORE_FILES};${CPACK_SOURCE_IGNORE_FILES}"
+  "/build[^/]*/;/test/dict.ocd;/test/dict.txt;/test/dict.bin;/dict.ocd;/.DS_Store;/.zig-[^/]*/;/dist[^/]*/;/other/;/opencc.xcodeproj/;/.git/;.gitattributes;.gitignore;.gitmodules;~$;.pyc;/bazel-[^/]*;/.bazelrc.user;/node_modules;/.github;/.pytest_cache;/.vscode;/packaging/;${_OPENCC_SOURCE_PACKAGE_IGNORE_FILES};${CPACK_SOURCE_IGNORE_FILES}"
 )
 include(CPack)
 

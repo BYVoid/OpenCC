@@ -1,11 +1,12 @@
 name: Source Package Release
 run-name: Source Package Release${{ !(startsWith(github.ref, 'refs/tags/') || inputs.release_tag != '') && ' (build only)' || '' }}
 
-# Builds the trimmed C++ source package (opencc profile: no Node.js, Python,
-# documentation, or packaging files) and attaches it to the release. The
-# trimmed package keeps both build systems working, so it is smoke-tested with
-# CMake and Bazel before upload. Like the other release workflows it uploads to
-# the draft created by release-draft.yml; publishing is manual.
+# Builds the trimmed C++ source package (opencc profile: includes the Jieba
+# segmentation plugin but excludes Node.js, Python, documentation, or packaging
+# files) and attaches it to the release. The trimmed package keeps both build
+# systems working, so it is smoke-tested with CMake and Bazel before upload.
+# Like the other release workflows it uploads to the draft created by
+# release-draft.yml; publishing is manual.
 
 on:
   workflow_dispatch:
@@ -45,10 +46,20 @@ jobs:
 
       - name: Build trimmed source package
         run: |
-          cmake -S . -B build-src -DOPENCC_SOURCE_PACKAGE_PROFILE=opencc
+          cmake -S . -B build-src \
+            -DOPENCC_SOURCE_PACKAGE_PROFILE=opencc \
+            -DCPACK_SOURCE_ARCHIVE_TIMESTAMP=0
           (cd build-src && cpack --config CPackSourceConfig.cmake -G TGZ)
+          # Repack for reproducibility: normalize ownership (root:root),
+          # timestamps (epoch 0), and file order (sorted).
+          cpack_tarball=$(ls build-src/opencc-*-opencc-src.tar.gz)
+          base=$(basename "$cpack_tarball" .tar.gz)
+          tmpdir=$(mktemp -d)
+          tar xzf "$cpack_tarball" -C "$tmpdir"
           mkdir -p dist
-          mv build-src/opencc-*-opencc-src.tar.gz dist/
+          tar cf - -C "$tmpdir" --sort=name --owner=root --group=root --mtime=@0 "$base" | gzip -9n > "dist/${base}.tar.gz"
+          tar cf - -C "$tmpdir" --sort=name --owner=root --group=root --mtime=@0 "$base" | xz -9 > "dist/${base}.tar.xz"
+          rm -rf "$tmpdir"
           ls -l dist/
 
       - name: Smoke-test the package (CMake and Bazel)
@@ -58,17 +69,17 @@ jobs:
           workdir=$(mktemp -d)
           tar xzf "$tarball" -C "$workdir"
           src=$(echo "$workdir"/opencc-*-opencc-src)
-          # CMake: configure and build the core library and CLI tools.
-          cmake -S "$src" -B "$src/build" -DCMAKE_BUILD_TYPE=Release
-          cmake --build "$src/build" --target opencc opencc_dict --parallel
-          # Bazel: load, analyze, and build the core targets. Catches a trimmed
+          # CMake: configure and build the core library, CLI tools, and Jieba plugin.
+          cmake -S "$src" -B "$src/build" -DCMAKE_BUILD_TYPE=Release -DBUILD_OPENCC_JIEBA_PLUGIN=ON
+          cmake --build "$src/build" --target opencc opencc_dict opencc-jieba --parallel
+          # Bazel: build the core and Jieba plugin targets. Catches a trimmed
           # package that dropped a file the Bazel module or BUILD graph needs.
-          (cd "$src" && bazel build //src/tools:dict_converter //data/dictionary:binary_dictionaries)
+          (cd "$src" && bazel build //src/tools:dict_converter //data/dictionary:binary_dictionaries //plugins/jieba:opencc-jieba)
 
       - uses: actions/upload-artifact@v4
         with:
           name: opencc-source-package
-          path: dist/opencc-*-opencc-src.tar.gz
+          path: dist/opencc-*-opencc-src.tar.*
 
       - name: Upload to GitHub release
         if: startsWith(github.ref, 'refs/tags/') || inputs.release_tag != ''
@@ -83,4 +94,5 @@ jobs:
           done
           gh release upload "$tag" \
             dist/opencc-*-opencc-src.tar.gz \
+            dist/opencc-*-opencc-src.tar.xz \
             --clobber

@@ -22,6 +22,7 @@
 #include <direct.h>
 #else
 #include <unistd.h>
+#include <stdlib.h>
 #endif
 
 namespace opencc {

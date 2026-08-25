@@ -30,13 +30,13 @@ class DartsDictTest : public TextDictTestBase {
 protected:
   DartsDictTest()
       : dartsDict(DartsDict::NewFromDict(*textDict.get())),
-        fileName("dict.ocd"){};
+        fileName(::testing::TempDir() + "/dict.ocd"){};
 
   // Write a crafted 32-bit-format OCD file with a controllable dartsSize.
   // A non-zero fakeFirstUnit is appended so probe[4..7] are not all zero,
   // ensuring the 32-bit detection path is taken even for malformed files.
   static std::string WriteMalformedDartsFile(uint32_t dartsSize) {
-    const std::string path = "malformed_darts.ocd";
+    const std::string path = ::testing::TempDir() + "/malformed_darts.ocd";
     FILE* fp = fopen(path.c_str(), "wb");
     const char* header = "OPENCCDARTS1";
     fwrite(header, sizeof(char), strlen(header), fp);

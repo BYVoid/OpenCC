@@ -26,7 +26,10 @@ namespace opencc {
 
 class LexiconAnnotationTest : public ::testing::Test {
 protected:
-  const std::string testFileName = "test_annotation_dict.txt";
+  LexiconAnnotationTest()
+      : testFileName(::testing::TempDir() + "/test_annotation_dict.txt") {}
+
+  const std::string testFileName;
 
   void TearDown() override { remove(testFileName.c_str()); }
 };
@@ -107,7 +110,7 @@ TEST_F(LexiconAnnotationTest, SerializeIgnoresComments) {
   fclose(readFp);
 
   // Serialize back
-  const std::string outputFileName = "test_annotation_dict_output.txt";
+  const std::string outputFileName = ::testing::TempDir() + "/test_annotation_dict_output.txt";
   FILE* outFp = fopen(outputFileName.c_str(), "w");
   dict->SerializeToFile(outFp);
   fclose(outFp);

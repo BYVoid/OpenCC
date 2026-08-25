@@ -27,11 +27,11 @@ namespace opencc {
 class MarisaDictTest : public TextDictTestBase {
 protected:
   MarisaDictTest()
-      : dict(MarisaDict::NewFromDict(*textDict)), fileName("dict.ocd2"){};
+      : dict(MarisaDict::NewFromDict(*textDict)), fileName(::testing::TempDir() + "/dict.ocd2"){};
 
   // Write a crafted OCD2 file with a valid header but corrupt trie data.
   static std::string WriteMalformedMarisaFile() {
-    const std::string path = "malformed_marisa.ocd2";
+    const std::string path = ::testing::TempDir() + "/malformed_marisa.ocd2";
     FILE* fp = fopen(path.c_str(), "wb");
     const char* header = "OPENCC_MARISA_0.2.5";
     fwrite(header, sizeof(char), strlen(header), fp);

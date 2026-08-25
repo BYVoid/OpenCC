@@ -28,7 +28,7 @@ class SerializedValuesTest : public TextDictTestBase {
 protected:
   SerializedValuesTest()
       : binDict(new SerializedValues(textDict->GetLexicon())),
-        fileName("dict.bin"){};
+        fileName(::testing::TempDir() + "/dict.bin"){};
 
   // Write a crafted binary file for testing malformed input handling.
   // Format: uint32 numItems, uint32 valueTotalLength, char[] valueBuffer,
@@ -38,7 +38,7 @@ protected:
                                         const std::string& valueBuffer,
                                         const std::vector<std::vector<uint16_t>>&
                                             itemValueBytes) {
-    const std::string path = "malformed_test.bin";
+    const std::string path = ::testing::TempDir() + "/malformed_test.bin";
     FILE* fp = fopen(path.c_str(), "wb");
     fwrite(&numItems, sizeof(uint32_t), 1, fp);
     fwrite(&valueTotalLength, sizeof(uint32_t), 1, fp);

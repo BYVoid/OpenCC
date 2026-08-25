@@ -35,7 +35,7 @@ class PrefixMatchTest : public TextDictTestBase {
 protected:
   PrefixMatchTest()
       : marisaDict(MarisaDict::NewFromDict(*textDict)),
-        fileName("prefix_match_dict.ocd2") {
+        fileName(::testing::TempDir() + "/prefix_match_dict.ocd2") {
     marisaDict->opencc::SerializableDict::SerializeToFile(fileName);
   }
 

@@ -24,7 +24,7 @@ namespace opencc {
 class BinaryDictTest : public TextDictTestBase {
 protected:
   BinaryDictTest()
-      : binDict(new BinaryDict(textDict->GetLexicon())), fileName("dict.bin"){};
+      : binDict(new BinaryDict(textDict->GetLexicon())), fileName(::testing::TempDir() + "/dict.bin"){};
 
   // Write a crafted binary file for BinaryDict with controllable fields.
   // FIELD selects the integer field width: uint32_t for the fixed-width
@@ -36,7 +36,7 @@ protected:
       uint64_t valueTotalLength, const std::string& valueBuffer,
       const std::vector<std::tuple<uint64_t, uint64_t, std::vector<uint64_t>>>&
           items) {
-    const std::string path = "crafted_binary_dict.bin";
+    const std::string path = ::testing::TempDir() + "/crafted_binary_dict.bin";
     FILE* fp = fopen(path.c_str(), "wb");
     const auto writeField = [fp](uint64_t value) {
       FIELD field = static_cast<FIELD>(value);

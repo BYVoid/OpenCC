@@ -23,7 +23,7 @@ namespace opencc {
 
 class TextDictTest : public TextDictTestBase {
 protected:
-  TextDictTest() : fileName("dict.txt"){};
+  TextDictTest() : fileName(::testing::TempDir() + "/dict.txt"){};
 
   const std::string fileName;
 };

@@ -1,8 +1,19 @@
 # Change History of OpenCC
 
+## Version 1.4.3
+
+尚未發佈
+
+* **發佈重點**：把 1.4.2 新增的詞級候選查詢與一對多歧義標註 API 由未安裝的私有標頭轉為正式公開 API，下游輸入法無需額外的建置設定即可使用。C++ ABI 與 1.4.2 相同（SOVERSION 1.4），純屬新增，既有下游程式無需重新連結。
+* **公開 API**：
+    * `ConversionCandidates.hpp`（`GetAllConversions`）與 `ConversionAmbiguities.hpp`（`ConvertWithAmbiguities`、`AmbiguityStream`）移入已安裝標頭集並納入相容性契約，文件中「內部、不穩定、不隨標頭安裝」的但書一併移除；Bazel 目標的 visibility 亦由 `//src:__pkg__` 放寬為公開。這兩個 API 的目標使用者本來就是輸入法引擎——librime 的 `Simplifier` 以 `GetAllConversions` 取代自行走訪 `Dict`／`DictEntry` 的實作，以 `ConvertWithAmbiguities` 實作隨機取字模式——而私有標頭不會被安裝，下游在對接系統安裝的 OpenCC 時根本引用不到。
+    * `StreamWindow.hpp` 隨之安裝，因為 `ConversionAmbiguities.hpp` 需要其中的 `kDefaultStreamKeepChars` 作為 `AmbiguityStream` 的預設引數。該標頭內容位於 `opencc::internal` 命名空間，仍屬實作細節，不提供相容性保證。
+
 ## Version 1.4.2
 
 2026年8月22日
+
+> **更正（2026年8月25日）**：下方「實驗性 API / CLI」第一條所記的 `Converter::GetConversionCandidates` 成員函式與 `OPENCC_ENABLE_UNSTABLE_API` 巨集開關並未實際發佈，那是 [#1431](https://github.com/BYVoid/OpenCC/pull/1431) 審查過程中的中途設計；「發佈重點」中「或巨集開關之後」一語亦同。1.4.2 實際提供的是自由函式 `opencc::GetAllConversions(converter, word)`，宣告於私有標頭 `ConversionCandidates.hpp`，沒有任何巨集開關，因此該標頭在 1.4.2 中無法從已安裝的 OpenCC 引用。此標頭自 1.4.3 起隨安裝提供。
 
 * **發佈重點**：轉換熱路徑大幅加速（純文字語料的整體轉換時間最多降至原本的 1/7），修復大端序平台載入 legacy `.ocd` 字典得到空字典的問題，並新增兩個實驗性 API（詞級候選查詢與一對多歧義標註，含 CLI `--ambiguities`）。詞庫方面修正了 `s2twp` 的數處貪婪匹配錯誤與 `tw2t`／`tw2s` 對簡體「么」的破壞性轉換，補充臺灣／香港地區詞，並修正古籍語境下 `s2t` 的一對多字用字。C++ ABI 與 1.4.1 相同（SOVERSION 1.4），實驗性 API 皆位於未安裝的私有標頭或巨集開關之後，下游程式無需重新連結。
 * **詞庫更新**：

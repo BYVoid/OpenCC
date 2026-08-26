@@ -1,8 +1,10 @@
-# SymbolsHelper-Confirmed: 1.4.1 armhf riscv64
+# SymbolsHelper-Confirmed: 1.4.2 arm64
 libopencc.so.1.4 libopencc1.4 #MINVER#
 * Build-Depends-Package: libopencc-dev
  (regex)"^_ZN6opencc10BinaryDict13NewFromBufferEPKc[mj]@Base$" 1.4.1
  (regex)"^_ZN6opencc10MarisaDict13NewFromBufferEPKc[mj]@Base$" 1.4.1
+ (regex)"^_ZN6opencc15AmbiguityStreamC1ESt10shared_ptrINS_9ConverterEE[mj]@Base$" 1.4.2
+ (regex)"^_ZN6opencc15AmbiguityStreamC2ESt10shared_ptrINS_9ConverterEE[mj]@Base$" 1.4.2
  (regex)"^_ZN6opencc16ResourceProvider8ResourceC1ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEPKc[mj]St10shared_ptrIKvES7_@Base$" 1.4.1
  (regex)"^_ZN6opencc16ResourceProvider8ResourceC2ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEPKc[mj]St10shared_ptrIKvES7_@Base$" 1.4.1
  (regex)"^_ZN6opencc16SerializedValues13NewFromBufferEPKc[mj]P[mj]@Base$" 1.3.1
@@ -11,11 +13,13 @@ libopencc.so.1.4 libopencc1.4 #MINVER#
  (regex)"^_ZN6opencc9DartsDict13NewFromBufferEPKc[mj]@Base$" 1.4.1
  (regex)"^_ZNK6opencc10BinaryDict15ConstructBufferERNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERSt6vectorI[mj]SaI[mj]EER[mj]S7_SB_SC_@Base$" 1.4.1
  (regex)"^_ZNK6opencc10MarisaDict11MatchPrefixEPKc[mj]@Base$" 1.4.1
+ (regex)"^_ZNK6opencc10MarisaDict13EnumerateKeysERKSt8functionIFvPKc[mj]EE@Base$" 1.4.2
  (regex)"^_ZNK6opencc10MarisaDict16MatchAllPrefixesEPKc[mj]@Base$" 1.4.1
  (regex)"^_ZNK6opencc10MarisaDict16MatchPrefixValueEPKc[mj]@Base$" 1.4.1
  (regex)"^_ZNK6opencc10MarisaDict5MatchEPKc[mj]@Base$" 1.4.1
  (regex)"^_ZNK6opencc11PrefixMatch11MatchPrefixEPKc[mj]@Base$" 1.3.1
  (regex)"^_ZNK6opencc11PrefixMatch15MatchPrefixViewEPKc[mj]@Base$" 1.4.1
+ (regex)"^_ZNK6opencc11PrefixMatch15SkipUnmatchableEPKc[mj]@Base$" 1.4.2
  (regex)"^_ZNK6opencc13PhraseExtract16CalculateEntropyERKSt13unordered_mapINS_19UTF8StringSliceBaseIhEE[mj]NS3_6HasherESt8equal_toIS3_ESaISt4pairIKS3_[mj]EEE@Base$" 1.4.1
  (regex)"^_ZNK6opencc14UnionDictGroup11MatchPrefixEPKc[mj]@Base$" 1.4.1
  (regex)"^_ZNK6opencc15SimpleConverter7ConvertB5cxx11EPKc[mj]@Base$" 1.4.1
@@ -105,6 +109,12 @@ libopencc.so.1.4 libopencc1.4 #MINVER#
  _ZN6opencc13PhraseExtractD2Ev@Base 1.2.0
  _ZN6opencc14UnionDictGroupC1ERKNSt7__cxx114listISt10shared_ptrINS_4DictEESaIS5_EEE@Base 1.4.1
  _ZN6opencc14UnionDictGroupC2ERKNSt7__cxx114listISt10shared_ptrINS_4DictEESaIS5_EEE@Base 1.4.1
+ _ZN6opencc15AmbiguityStream12ConvertChunkESt17basic_string_viewIcSt11char_traitsIcEE@Base 1.4.2
+ _ZN6opencc15AmbiguityStream13ConvertWindowESt17basic_string_viewIcSt11char_traitsIcEE@Base 1.4.2
+ _ZN6opencc15AmbiguityStream6FinishESt17basic_string_viewIcSt11char_traitsIcEE@Base 1.4.2
+ _ZN6opencc15AmbiguityStream6FinishEv@Base 1.4.2
+ _ZN6opencc15AmbiguityStreamD1Ev@Base 1.4.2
+ _ZN6opencc15AmbiguityStreamD2Ev@Base 1.4.2
  _ZN6opencc15ConversionChainC1ENSt7__cxx114listISt10shared_ptrINS_10ConversionEESaIS5_EEE@Base 1.2.0
  _ZN6opencc15ConversionChainC2ENSt7__cxx114listISt10shared_ptrINS_10ConversionEESaIS5_EEE@Base 1.2.0
  _ZN6opencc15ConverterStream12ConvertChunkB5cxx11ESt17basic_string_viewIcSt11char_traitsIcEE@Base 1.4.1
@@ -131,6 +141,7 @@ libopencc.so.1.4 libopencc1.4 #MINVER#
  _ZN6opencc16SerializedValues11NewFromFileEP8_IO_FILE@Base 1.2.0
  _ZN6opencc17ConvertDictionaryERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES7_S7_S7_@Base 1.2.0
  _ZN6opencc17ConvertDictionaryERKSt6vectorINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESaIS6_EERKS6_SC_SC_@Base 1.4.1
+ _ZN6opencc17GetAllConversionsB5cxx11ERKNS_9ConverterESt17basic_string_viewIcSt11char_traitsIcEE@Base 1.4.2
  _ZN6opencc19ZipResourceProvider8Internal5IndexEv@Base 1.4.1
  _ZN6opencc19ZipResourceProviderC1ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE@Base 1.4.1
  _ZN6opencc19ZipResourceProviderC2ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE@Base 1.4.1
@@ -139,6 +150,7 @@ libopencc.so.1.4 libopencc1.4 #MINVER#
  _ZN6opencc19ZipResourceProviderD2Ev@Base 1.4.1
  _ZN6opencc20MaxMatchSegmentationC1ESt10shared_ptrINS_4DictEE@Base 1.3.1
  _ZN6opencc20MaxMatchSegmentationC2ESt10shared_ptrINS_4DictEE@Base 1.3.1
+ _ZN6opencc22ConvertWithAmbiguitiesERKNS_9ConverterESt17basic_string_viewIcSt11char_traitsIcEE@Base 1.4.2
  _ZN6opencc24CreatePluginSegmentationERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKSt6vectorISt4pairIS5_S5_ESaISA_EE@Base 1.3.0
  _ZN6opencc24OpenSerializableFileUtf8ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEPKc@Base 1.4.1
  _ZN6opencc26FilesystemResourceProviderC1ESt6vectorINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESaIS7_EE@Base 1.4.1
@@ -213,6 +225,7 @@ libopencc.so.1.4 libopencc1.4 #MINVER#
  _ZNK6opencc13PhraseExtract7EntropyERKNS_19UTF8StringSliceBaseIhEE@Base 1.2.0
  _ZNK6opencc13PhraseExtract8CohesionERKNS_19UTF8StringSliceBaseIhEE@Base 1.2.0
  _ZNK6opencc13PhraseExtract9FrequencyERKNS_19UTF8StringSliceBaseIhEE@Base 1.2.0
+ _ZNK6opencc15AmbiguityStream11SourceCountEv@Base 1.4.2
  _ZNK6opencc15ConversionChain16ConvertWithTraceERKSt10shared_ptrINS_8SegmentsEE@Base 1.3.1
  _ZNK6opencc15ConversionChain22AppendConvertedSegmentEPKcPNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE@Base 1.3.1
  _ZNK6opencc15ConversionChain22AppendConvertedSegmentESt17basic_string_viewIcSt11char_traitsIcEEPNSt7__cxx1112basic_stringIcS3_SaIcEEE@Base 1.4.1
@@ -266,6 +279,7 @@ libopencc.so.1.4 libopencc1.4 #MINVER#
  _ZTIN6opencc17PipelineConverterE@Base 1.4.1
  _ZTIN6opencc19MultiValueDictEntryE@Base 1.2.0
  _ZTIN6opencc19ZipResourceProviderE@Base 1.4.1
+ _ZTIN6opencc20ConfigBasedConverterE@Base 1.4.2
  _ZTIN6opencc20MaxMatchSegmentationE@Base 1.2.0
  _ZTIN6opencc20SingleStageConverterE@Base 1.4.1
  _ZTIN6opencc20SingleValueDictEntryE@Base 1.2.0
@@ -286,9 +300,9 @@ libopencc.so.1.4 libopencc1.4 #MINVER#
  _ZTIN9rapidjson8internal19ISchemaStateFactoryINS0_6SchemaINS_21GenericSchemaDocumentINS_12GenericValueINS_4UTF8IcEENS_19MemoryPoolAllocatorINS_12CrtAllocatorEEEEES8_EEEEEE@Base 1.4.1
  _ZTIPFbRKN6opencc13PhraseExtractERKNS_19UTF8StringSliceBaseIhEEE@Base 1.2.0
  (arch=riscv64)_ZTISt11_Mutex_baseILN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTISt11_Mutex_baseILN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTISt11_Mutex_baseILN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTISt16_Sp_counted_baseILN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTISt16_Sp_counted_baseILN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTISt16_Sp_counted_baseILN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=armhf)_ZTISt19_Sp_make_shared_tag@Base 1.4.1
  _ZTS11LeafMatcher@Base 1.4.1
  _ZTS12GroupMatcher@Base 1.4.1
@@ -337,48 +351,48 @@ libopencc.so.1.4 libopencc1.4 #MINVER#
  _ZTSN9rapidjson8internal19ISchemaStateFactoryINS0_6SchemaINS_21GenericSchemaDocumentINS_12GenericValueINS_4UTF8IcEENS_19MemoryPoolAllocatorINS_12CrtAllocatorEEEEES8_EEEEEE@Base 1.4.1
  _ZTSPFbRKN6opencc13PhraseExtractERKNS_19UTF8StringSliceBaseIhEEE@Base 1.2.0
  (arch=riscv64)_ZTSSt11_Mutex_baseILN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt11_Mutex_baseILN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt11_Mutex_baseILN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc10BinaryDictELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc10BinaryDictELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc10BinaryDictELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc10ConversionELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc10ConversionELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc10ConversionELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc10MarisaDictELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc10MarisaDictELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc10MarisaDictELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc11PrefixMatch6TablesELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc11PrefixMatch6TablesELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc11PrefixMatch6TablesELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc11PrefixMatchELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc11PrefixMatchELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc11PrefixMatchELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc14UnionDictGroupELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc14UnionDictGroupELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc14UnionDictGroupELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc15ConversionChainELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc15ConversionChainELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc15ConversionChainELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc16SerializedValuesELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc16SerializedValuesELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc16SerializedValuesELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc20ConfigBasedConverterELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc20ConfigBasedConverterELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc20ConfigBasedConverterELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc20MaxMatchSegmentationELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc20MaxMatchSegmentationELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc20MaxMatchSegmentationELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc20SingleStageConverterELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc20SingleStageConverterELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc20SingleStageConverterELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc26FilesystemResourceProviderELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc26FilesystemResourceProviderELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc26FilesystemResourceProviderELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc7LexiconELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc7LexiconELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc7LexiconELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc8SegmentsELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc8SegmentsELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc8SegmentsELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc8TextDictELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc8TextDictELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc8TextDictELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc9DartsDictELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc9DartsDictELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc9DartsDictELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPN6opencc9DictGroupELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPN6opencc9DictGroupELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPN6opencc9DictGroupELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt15_Sp_counted_ptrIPNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt15_Sp_counted_ptrIPNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt15_Sp_counted_ptrIPNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  (arch=riscv64)_ZTSSt16_Sp_counted_baseILN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt16_Sp_counted_baseILN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt16_Sp_counted_baseILN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  _ZTSSt19_Sp_make_shared_tag@Base 1.4.1
  (arch=riscv64)_ZTSSt23_Sp_counted_ptr_inplaceIN6opencc16ResourceProvider8ResourceESaIvELN9__gnu_cxx12_Lock_policyE1EE@Base 1.4.1
- (arch=armhf)_ZTSSt23_Sp_counted_ptr_inplaceIN6opencc16ResourceProvider8ResourceESaIvELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.1
+ (arch=arm64 armhf i386)_ZTSSt23_Sp_counted_ptr_inplaceIN6opencc16ResourceProvider8ResourceESaIvELN9__gnu_cxx12_Lock_policyE2EE@Base 1.4.2
  _ZTVN6opencc10BinaryDictE@Base 1.2.0
  _ZTVN6opencc10MarisaDictE@Base 1.2.0
  _ZTVN6opencc13PhraseExtractE@Base 1.2.0

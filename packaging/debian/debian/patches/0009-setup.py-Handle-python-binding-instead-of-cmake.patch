@@ -45,7 +45,7 @@ Index: opencc/setup.py
          if isinstance(ext, OpenCCExtension):
              build_libopencc(output_path)
          else:
-@@ -215,7 +220,14 @@ setuptools.setup(
+@@ -215,7 +219,14 @@ setuptools.setup(
  
      packages=packages,
      package_dir={'opencc': 'python/opencc'},

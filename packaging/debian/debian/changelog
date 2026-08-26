@@ -1,15 +1,30 @@
-opencc (1.4.2-1) UNRELEASED; urgency=medium
+opencc (1.4.2+ds1-1) unstable; urgency=medium
 
-  * Update packaging for the upstream 1.4.2 release:
-    - Drop 0010-fix-git-version-fallback.patch: upstream 1.4.2 sets
-      _OPENCC_FALLBACK_REVISION to 2 in cmake/GitVersion.cmake, so builds
-      from the release tarball (which carries no .git) already report the
-      correct version and the patch no longer applies.
-    - 0012-fix-legacy-dict-detection-on-big-endian.patch is contained in
-      the 1.4.2 release and can be dropped as well.
-    - 0003, 0004, 0005, 0009 and 0011 apply unchanged against 1.4.2.
+  [ Frank Lin ]
+  * New upstream release.
+    - Fixes the legacy .ocd dictionary detection on big-endian architectures,
+      which was carried here as a patch since the previous upload.
+    - Speeds up the conversion hot path considerably and adds two
+      experimental interfaces (word-level candidate lookup and one-to-many
+      ambiguity annotation, exposed on the command line as
+      "opencc --ambiguities"). Both live in private, uninstalled headers;
+      the C++ ABI is unchanged (SOVERSION 1.4).
+  * debian/patches: Drop two patches that are no longer needed.
+    - 0010-fix-git-version-fallback.patch: upstream now sets the
+      cmake/GitVersion.cmake fallback version to the released version.
+    - 0012-fix-legacy-dict-detection-on-big-endian.patch: applied upstream.
+  * debian/patches: Refresh the remaining patches against the new source.
+  * debian/tests/jieba-plugin: Update the expected s2twp_jieba output for the
+    new upstream regional term 内存条 -> 記憶體模組 (was 記憶體條).
+  * debian/libopencc1.4.symbols: Add the symbols new in 1.4.2 (the
+    AmbiguityStream/GetAllConversions helpers behind the experimental API,
+    MarisaDict::EnumerateKeys and PrefixMatch::SkipUnmatchable). None of
+    them are part of the installed headers; the SONAME is unchanged. The
+    four new symbols whose mangling contains size_t are listed as (regex)
+    entries with [mj], like the existing ones, so that they also match on
+    32-bit architectures.
 
- -- Frank Lin <github@linshuang.info>  Sat, 22 Aug 2026 00:00:00 +0000
+ -- Boyuan Yang <byang@debian.org>  Tue, 25 Aug 2026 10:52:14 -0400
 
 opencc (1.4.1+ds1-8) unstable; urgency=medium
 

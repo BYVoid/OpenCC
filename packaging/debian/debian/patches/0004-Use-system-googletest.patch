@@ -12,7 +12,7 @@ Index: opencc/CMakeLists.txt
 ===================================================================
 --- opencc.orig/CMakeLists.txt
 +++ opencc/CMakeLists.txt
-@@ -404,6 +404,8 @@ if (ENABLE_GTEST)
+@@ -406,6 +406,8 @@ if (ENABLE_GTEST)
    endif()
    if(NOT USE_SYSTEM_GTEST)
      add_subdirectory(deps/googletest-1.15.0)

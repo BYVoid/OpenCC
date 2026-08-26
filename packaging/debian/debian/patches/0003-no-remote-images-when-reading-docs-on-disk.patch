@@ -33,5 +33,5 @@ Index: opencc/README.md
  
 -![OpenCC](https://opencc.byvoid.com/img/opencc.png)
  
- Open Chinese Convert (OpenCC, 開放中文轉換) is an open source project for conversions between Traditional Chinese, Simplified Chinese and Japanese Kanji (Shinjitai). It supports character-level and phrase-level conversion, character variant handling, and regional vocabulary variants across Mainland China, Taiwan and Hong Kong. This is not a translation tool between Mandarin and Cantonese, etc.
+ Open Chinese Convert (OpenCC, 開放中文轉換) is an open source project for high-quality conversion between Traditional Chinese, Simplified Chinese, Japanese Shinjitai, and regional wording across Mainland China, Taiwan, and Hong Kong. It provides dictionaries, a reusable library, conversion tools, and dictionary generation tools.
  

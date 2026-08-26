@@ -11,20 +11,21 @@ To keep proposals reviewable as deltas, `debian/` here is periodically
 synced to the packaging Debian currently ships:
 
 - Upstream: BYVoid/OpenCC `ver.1.4.2`
-- Debian source package: `opencc 1.4.1+ds1-8` (unstable)
-- Synced from packaging-repository commit `e4d7c5e8` (2026-08-21,
-  "Override arch-dep-package-has-big-usr-share for opencc-jieba")
+- Debian source package: `opencc 1.4.2+ds1-1` (unstable)
+- Synced from packaging-repository commit `a13950cd` (2026-08-25,
+  "Refresh changelog."), plus the uncommitted `debian/libopencc1.4.symbols`
+  work in that checkout that widens the `(arch=arm64 armhf)` tags to
+  `(arch=arm64 armhf i386)`
 - Debian packaging repository:
   https://salsa.debian.org/debian/opencc
 - Patch reference index:
   https://udd.debian.org/patches.cgi?src=opencc
 
-As of this sync the only upstream deltas are release bookkeeping for
-1.4.2: a `1.4.2-1` `UNRELEASED` changelog entry (`release-deb.yml` stamps
-the built artifacts with `dpkg-parsechangelog`, which would otherwise
-still report `1.4.1+ds1-8`) and the removal of the now-inapplicable
-`0010-fix-git-version-fallback.patch`. Otherwise `debian/` is a verbatim
-copy of the Debian packaging repository. The two proposals previously
+As of this sync `debian/` is a verbatim copy of the Debian packaging
+repository, with no upstream deltas: Debian has moved to 1.4.2, so the
+release bookkeeping previously carried here (a `1.4.2-1` `UNRELEASED`
+changelog entry and the removal of `0010-fix-git-version-fallback.patch`)
+is now part of the Debian packaging itself. The two proposals previously
 carried here have been adopted, with implementation changes — and one of
 them has since been partly reverted:
 
@@ -61,14 +62,14 @@ Current quilt patch set (see `debian/patches/series`):
 - 0005-Disable-build-in-setup.py.patch
 - 0009-setup.py-Handle-python-binding-instead-of-cmake.patch
 - 0011-drop-python-cli-entry-point.patch
-- 0012-fix-legacy-dict-detection-on-big-endian.patch
 
 Patch numbering reflects historical Debian quilt ordering and is not
-contiguous. 0010 was dropped for the 1.4.2 release: upstream now sets
-`_OPENCC_FALLBACK_REVISION` to the release revision in
-`cmake/GitVersion.cmake`, so the patch no longer applies. 0012 is
-`Applied-Upstream` (commit `8aeb5e69`) and is contained in 1.4.2; it can
-be dropped once Debian moves to that release.
+contiguous. Two patches were dropped in `1.4.2+ds1-1`: 0010, because
+upstream now sets `_OPENCC_FALLBACK_REVISION` to the release revision in
+`cmake/GitVersion.cmake`, so it no longer applies; and 0012
+(`fix-legacy-dict-detection-on-big-endian`), which was
+`Applied-Upstream` (commit `8aeb5e69`) and is contained in 1.4.2. The
+remaining patches were refreshed against the 1.4.2 source.
 
 ## 3. Binary packages (in this tree)
 
@@ -132,5 +133,8 @@ resolution can break it — see `debian/tests/README.md`.
 
 Copy the `debian/` directory from the salsa repository checkout over
 `packaging/debian/debian/`, re-apply any upstream proposal deltas that
-Debian has not adopted (currently only the release bookkeeping described
-in section 1), and update the baseline section above.
+Debian has not adopted (currently none — see section 1), and update the
+baseline section above. Note that `release-deb.yml` stamps the built
+artifacts with `dpkg-parsechangelog`, so when upstream releases ahead of
+Debian, `debian/changelog` here needs an `UNRELEASED` entry for the new
+upstream version until Debian catches up.

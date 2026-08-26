@@ -21,7 +21,7 @@ test -e /usr/lib/*/opencc/plugins/libopencc-jieba.so
 check s2twp_jieba.json '为什么你要学习编程？因为软件开发的信道很宽。' \
     '為什麼你要學習程式設計？因為軟體開發的通道很寬。'
 check s2twp_jieba.json '鼠标里面有内存条吗？还有硬盘和数据库。' \
-    '滑鼠裡面有記憶體條嗎？還有硬碟和資料庫。'
+    '滑鼠裡面有記憶體模組嗎？還有硬碟和資料庫。'
 check s2t_jieba.json '着重号用在这里。' '着重號用在這裏。'
 # Without segmentation, plain s2twp mangles 的士兵 into 計程車兵.
 check s2twp_jieba.json '城堡里的士兵' '城堡裡的士兵'

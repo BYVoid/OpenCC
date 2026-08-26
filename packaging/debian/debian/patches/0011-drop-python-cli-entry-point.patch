@@ -17,7 +17,7 @@ Index: opencc/setup.py
 ===================================================================
 --- opencc.orig/setup.py
 +++ opencc/setup.py
-@@ -233,11 +233,6 @@ setuptools.setup(
+@@ -232,11 +232,6 @@ setuptools.setup(
          'bdist_wheel': BDistWheelCommand,
      },
      setup_requires=setup_requires,

@@ -3,4 +3,3 @@
 0005-Disable-build-in-setup.py.patch
 0009-setup.py-Handle-python-binding-instead-of-cmake.patch
 0011-drop-python-cli-entry-point.patch
-0012-fix-legacy-dict-detection-on-big-endian.patch

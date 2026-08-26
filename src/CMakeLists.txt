@@ -20,6 +20,8 @@ set(
   Common.hpp
   Config.hpp
   Conversion.hpp
+  ConversionAmbiguities.hpp
+  ConversionCandidates.hpp
   ConversionChain.hpp
   ConversionInspection.hpp
   Converter.hpp
@@ -37,6 +39,7 @@ set(
   Segments.hpp
   SerializableDict.hpp
   SimpleConverter.hpp
+  StreamWindow.hpp
   TextDict.hpp
   UTF8Util.hpp
   opencc.h
@@ -45,8 +48,6 @@ set(
 set(
   LIBOPENCC_PRIVATE_HEADERS
   ConfigBasedConverter.hpp
-  ConversionAmbiguities.hpp
-  ConversionCandidates.hpp
   DictConverter.hpp
   PhraseExtract.hpp
   PipelineConverter.hpp
@@ -54,7 +55,6 @@ set(
   PrefixMatch.hpp
   SerializedValues.hpp
   SingleStageConverter.hpp
-  StreamWindow.hpp
   UTF8StringSlice.hpp
   Utf8SkipScan.hpp
 )

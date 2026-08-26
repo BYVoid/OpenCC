@@ -90,11 +90,7 @@ struct AnnotatedConversion {
  * whose GetConversionChain() returns nullptr) yields the plain conversion
  * result with no ambiguity information.
  *
- * @note Internal, unstable API with no compatibility guarantee.  This
- *   header is not installed by CMake and the function is not part of the
- *   OPENCC_ABI_VERSION contract; like ConversionCandidates.hpp the symbol
- *   is OPENCC_EXPORT only so unit tests can link against a shared
- *   libopencc on Windows.
+ * @ingroup opencc_cpp_api
  */
 OPENCC_EXPORT AnnotatedConversion
 ConvertWithAmbiguities(const Converter& converter, std::string_view text);
@@ -112,7 +108,7 @@ ConvertWithAmbiguities(const Converter& converter, std::string_view text);
  * index order), and span sourceIndex values are global stream-wide
  * indexes.  Offsets in Chunk::ambiguities are relative to Chunk::output.
  *
- * @note Internal, unstable API; see ConvertWithAmbiguities().
+ * @ingroup opencc_cpp_api
  */
 class OPENCC_EXPORT AmbiguityStream {
 public:

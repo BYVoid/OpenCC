@@ -59,13 +59,7 @@ class Converter;
  *   when no dictionary in the chain contains @p word, matching librime's
  *   convention of reporting "not found".
  *
- * @note Internal, unstable API with no compatibility guarantee.  This header
- *   is not installed by CMake and the function is not part of the
- *   OPENCC_ABI_VERSION contract; like other non-installed headers
- *   (e.g. PhraseExtract.hpp) the symbol is still OPENCC_EXPORT so unit tests
- *   can link against a shared libopencc on Windows, which means the symbol is
- *   technically reachable by forward declaration — binding to it outside this
- *   repository is unsupported and may break without an ABI bump.
+ * @ingroup opencc_cpp_api
  */
 OPENCC_EXPORT std::vector<std::string>
 GetAllConversions(const Converter& converter, std::string_view word);

@@ -29,9 +29,9 @@ namespace internal {
 /**
  * Default keep-tail window for streaming converters, in Unicode code
  * points.  Must equal ConverterStream's default maxKeepChars
- * (Converter.hpp, an installed header that cannot reference this private
- * one); ConversionAmbiguitiesTest pins the two defaults together
- * behaviorally, so a drift fails tests.
+ * (Converter.hpp, which spells the literal out rather than referencing
+ * opencc::internal); ConversionAmbiguitiesTest pins the two defaults
+ * together behaviorally, so a drift fails tests.
  */
 inline constexpr size_t kDefaultStreamKeepChars = 16;
 
@@ -47,7 +47,12 @@ inline constexpr size_t kDefaultStreamKeepChars = 16;
  *
  * Shared by ConverterStream and AmbiguityStream so that both always flush on
  * identical boundaries; a windowing fix applied here reaches every streaming
- * wrapper at once.  Private (non-installed) header.
+ * wrapper at once.
+ *
+ * This header is installed only because ConversionAmbiguities.hpp needs
+ * kDefaultStreamKeepChars for AmbiguityStream's default argument.  Everything
+ * in namespace opencc::internal is an implementation detail with no
+ * compatibility guarantee -- do not call it from outside OpenCC.
  */
 inline size_t FlushableByteCount(std::string_view pending,
                                  size_t maxKeepChars) {

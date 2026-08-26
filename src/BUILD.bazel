@@ -287,30 +287,27 @@ cc_library(
     ],
 )
 
-# Shared streaming flush-window computation (private, non-installed header)
-# used by ConverterStream and AmbiguityStream so both flush on identical
-# boundaries.
+# Shared streaming flush-window computation used by ConverterStream and
+# AmbiguityStream so both flush on identical boundaries. Installed alongside
+# the public headers only because ConversionAmbiguities.hpp needs
+# kDefaultStreamKeepChars; namespace opencc::internal carries no compatibility
+# guarantee.
 cc_library(
     name = "stream_window_lib",
     hdrs = ["StreamWindow.hpp"],
-    visibility = ["//src:__pkg__"],
+    visibility = ["//visibility:public"],
     deps = [
         ":utf8_util_lib",
     ],
 )
 
-# Internal, unstable ambiguity-annotation API (ConvertWithAmbiguities). The
-# header is not installed by the CMake build and the function is not part of
-# the OPENCC_ABI_VERSION contract; visibility is restricted to this package
-# and the CLI (which exposes it via --ambiguities).
+# Ambiguity-annotation API (ConvertWithAmbiguities), exposed by the CLI via
+# --ambiguities.
 cc_library(
     name = "conversion_ambiguities_lib",
     srcs = ["ConversionAmbiguities.cpp"],
     hdrs = ["ConversionAmbiguities.hpp"],
-    visibility = [
-        "//src:__pkg__",
-        "//src/tools:__pkg__",
-    ],
+    visibility = ["//visibility:public"],
     deps = [
         ":common_lib",
         ":config_based_converter_lib",
@@ -347,15 +344,13 @@ cc_test(
     ],
 )
 
-# Internal, unstable candidate-enumeration API (GetAllConversions). The header
-# is not installed by the CMake build and the function is not part of the
-# OPENCC_ABI_VERSION contract; visibility is restricted to this package so no
-# other Bazel target can depend on it directly until the API is promoted.
+# Word-level candidate-enumeration API (GetAllConversions), used by input
+# methods to offer every plausible conversion of a single word.
 cc_library(
     name = "conversion_candidates_lib",
     srcs = ["ConversionCandidates.cpp"],
     hdrs = ["ConversionCandidates.hpp"],
-    visibility = ["//src:__pkg__"],
+    visibility = ["//visibility:public"],
     deps = [
         ":common_lib",
         ":config_based_converter_lib",

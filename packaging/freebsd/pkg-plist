@@ -29,10 +29,9 @@ lib/cmake/opencc/OpenCCConfig.cmake
 lib/cmake/opencc/OpenCCConfigVersion.cmake
 lib/cmake/opencc/OpenCCTargets-%%CMAKE_BUILD_TYPE%%.cmake
 lib/cmake/opencc/OpenCCTargets.cmake
-lib/libmarisa.a
 lib/libopencc.so
 lib/libopencc.so.1.4
-lib/libopencc.so.1.4.1
+lib/libopencc.so.1.4.2
 libdata/pkgconfig/opencc.pc
 %%DATADIR%%/CJK_Compatibility_Ideographs.ocd2
 %%DATADIR%%/HKPhrases.ocd2

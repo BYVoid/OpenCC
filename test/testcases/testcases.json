@@ -2031,6 +2031,29 @@
         "s2tw": "獲益甚夥 為數甚夥 夥頤 合夥人 夥計",
         "s2hk": "獲益甚夥 為數甚夥 夥頤 合夥人 夥計"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1490_mi_secret_keeps_tw_standard_form",
+      "input": "秘书 秘书长 神秘 秘密",
+      "expected": {
+        "s2t": "祕書 祕書長 神祕 祕密",
+        "s2tw": "祕書 祕書長 神祕 祕密",
+        "s2twp": "祕書 祕書長 神祕 祕密"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1490_mi_secret_hk_keeps_bi_form",
+      "input": "秘书 秘书长 神秘 秘密",
+      "expected": {
+        "s2hk": "秘書 秘書長 神秘 秘密"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1490_mi_secret_t2tw_identity",
+      "input": "祕書 祕書長",
+      "expected": {
+        "t2tw": "祕書 祕書長"
+      }
     }
   ]
 }

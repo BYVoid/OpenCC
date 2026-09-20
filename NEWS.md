@@ -8,6 +8,10 @@
 * **公開 API**：
     * `ConversionCandidates.hpp`（`GetAllConversions`）與 `ConversionAmbiguities.hpp`（`ConvertWithAmbiguities`、`AmbiguityStream`）移入已安裝標頭集並納入相容性契約，文件中「內部、不穩定、不隨標頭安裝」的但書一併移除；Bazel 目標的 visibility 亦由 `//src:__pkg__` 放寬為公開。這兩個 API 的目標使用者本來就是輸入法引擎——librime 的 `Simplifier` 以 `GetAllConversions` 取代自行走訪 `Dict`／`DictEntry` 的實作，以 `ConvertWithAmbiguities` 實作隨機取字模式——而私有標頭不會被安裝，下游在對接系統安裝的 OpenCC 時根本引用不到。
     * `StreamWindow.hpp` 隨之安裝，因為 `ConversionAmbiguities.hpp` 需要其中的 `kDefaultStreamKeepChars` 作為 `AmbiguityStream` 的預設引數。該標頭內容位於 `opencc::internal` 命名空間，仍屬實作細節，不提供相容性保證。
+* **小篆對照（實驗性）**：
+    * 新增 Unicode 18.0 篆書區塊（Seal，U+3D000..U+3FC3F，共 11,328 字）與現代漢字的雙向對照。`SealCharacters.txt`（小篆 → 漢字）取自 UCD `SealSources.txt` 的 `kSEAL_MCJK` 屬性，反向詞典 `SealCharactersRev`（漢字 → 小篆）與 `TWVariantsRev` 等一樣於建置時生成。一個漢字對應多個小篆時（共 94 字），反向預設取碼位最小者（通常為《說文解字》正篆，重文在後），另有 4 字以 `@reverse-prefer` 改取版本來源（藤花榭本、陳昌治本、汲古閣本、段注本）更完整者。
+    * 新增 `SealVariants.txt`（現代標準字 → 《說文》隸定字，約 1,000 字，如 `年 → 秊`、`前 → 歬`、`小 → 𡭔`），銜接 `kSEAL_MCJK` 的隸定字形；`t2seal` 先經此表再查 `SealCharactersRev`，`seal2t` 則先查 `SealCharacters` 再以建置時生成的 `SealVariantsRev` 還原為標準字。此表由 shuowen.org 開放數據（Apache-2.0）的字頭序列與 `kSEAL_MCJK` 對齊，並輔以人工審閱的 Unihan 異體資料整理而成。另，《說文》「玉」（U+3D06D）的 `kSEAL_MCJK` 為「王」，與「王」（U+3D068）衝突，詞典中改對應「玉」。
+    * 新增配置 `t2seal.json`（繁體漢字 → 小篆）、`seal2t.json`（小篆 → 繁體漢字）與 `s2seal.json`（簡體 → 小篆，即 `s2t` 後接 `t2seal`），已加入 CLI 說明、npm CLI 內建配置表與測試案例；僅供探索性研究，顯示需搭配支援 Unicode 18.0 篆書區塊的字型。
 
 ## Version 1.4.2
 

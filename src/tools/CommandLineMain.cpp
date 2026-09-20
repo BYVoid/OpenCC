@@ -94,6 +94,12 @@ public:
         << std::endl
         << "   jp2t.json   New Japanese Kanji (Shinjitai) to Old Japanese Kanji (Kyūjitai)"
         << std::endl
+        << "   t2seal.json Traditional Chinese Characters to Small Seal Script (Unicode Seal block)"
+        << std::endl
+        << "   s2seal.json Simplified Chinese to Small Seal Script (Unicode Seal block)"
+        << std::endl
+        << "   seal2t.json Small Seal Script (Unicode Seal block) to Traditional Chinese Characters"
+        << std::endl
         << std::endl;
   }
 };

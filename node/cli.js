@@ -22,6 +22,9 @@ const BUILT_IN_CONFIGS = [
   ['t2hk.json', 'Traditional Chinese (OpenCC Standard) to Hong Kong variant'],
   ['t2jp.json', 'Old Japanese Kanji (Kyujitai) to New Japanese Kanji (Shinjitai)'],
   ['jp2t.json', 'New Japanese Kanji (Shinjitai) to Old Japanese Kanji (Kyujitai)'],
+  ['t2seal.json', 'Traditional Chinese Characters to Small Seal Script (Unicode Seal block)'],
+  ['s2seal.json', 'Simplified Chinese to Small Seal Script (Unicode Seal block)'],
+  ['seal2t.json', 'Small Seal Script (Unicode Seal block) to Traditional Chinese Characters'],
 ];
 const BUILT_IN_CONFIG_NAMES = new Set(BUILT_IN_CONFIGS.map(([name]) => name));
 const BUILT_IN_CONFIG_STEMS = new Set(

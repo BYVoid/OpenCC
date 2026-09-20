@@ -22,6 +22,8 @@ exports_files(
         "TWVariants",
         "HKVariants",
         "JPShinjitaiCharacters",
+        "SealCharacters",
+        "SealVariants",
     ]
 ]
 
@@ -45,8 +47,12 @@ TEXT_DICTS = glob(
     "TWVariantsRev.txt",
     "HKVariantsRev.txt",
     "JPShinjitaiCharactersRev.txt",
+    "SealCharactersRev.txt",
+    "SealVariantsRev.txt",
 ]
 
+# Character dictionaries are expected to contain non-BMP characters: the
+# Small Seal dictionaries live entirely in the Seal block (U+3D000..U+3FC3F).
 NON_BMP_TEXT_DICTS = [
     txt
     for txt in TEXT_DICTS
@@ -54,6 +60,10 @@ NON_BMP_TEXT_DICTS = [
         "STCharacters.txt",
         "TSCharacters.txt",
         "TSCharactersExt.txt",
+        "SealCharacters.txt",
+        "SealCharactersRev.txt",
+        "SealVariants.txt",
+        "SealVariantsRev.txt",
     ]
 ]
 

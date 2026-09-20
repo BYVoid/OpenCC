@@ -46,6 +46,10 @@ OpenCC 以 [Apache License 2.0](LICENSE) 釋出。提交 Pull Request、issue/co
   - `JPShinjitaiCharacters.txt` - 日文新舊字體對照（單字）
   - `JPShinjitaiPhrases.txt` - 日文新字體到舊字體（詞組，亦包含少量和製漢語詞匯轉換）
 
+- **小篆對照**（僅供探索性研究，不建議用於生產環境）
+  - `SealCharacters.txt` - Unicode 18.0 篆書區塊（U+3D000..U+3FC3F）小篆到現代漢字對照（單字）。內容取自 Unicode `SealSources.txt` 的 `kSEAL_MCJK` 屬性，應與之保持一致，修正請附 UCD 依據，例外須列於檔頭；反向的 `SealCharactersRev.txt` 於建置時生成，供 `t2seal` 使用
+  - `SealVariants.txt` - 現代標準字（含臺、港異體）到《說文》隸定字對照（單字），如 `年 → 秊`、`前 → 歬`，用來銜接 `kSEAL_MCJK` 的隸定字形。只收同字異形，不收本字、假借（如 `他 → 佗`）；反向的 `SealVariantsRev.txt` 於建置時生成，供 `seal2t` 使用
+
 ### 2. 詞典格式規範
 
 詞典檔案使用 **Tab 字元**（`\t`）分隔來源詞與目標詞，**請勿使用空格**。
@@ -300,7 +304,7 @@ python3 scripts/add_testcase.py \
 
 此腳本目前生成以下配置的結果：`s2t`、`s2tw`、`s2twp`、`s2hk`、`t2s`、
 `t2tw`、`t2hk`、`tw2s`、`tw2sp`、`tw2t`、`hk2s`、`hk2t`。若需要測試
-`jp2t`、`t2jp`，請手動在 `expected` 中加入對應結果。
+`jp2t`、`t2jp`、`t2seal`、`seal2t`、`s2seal`，請手動在 `expected` 中加入對應結果。
 
 ### 可用的轉換配置
 
@@ -324,6 +328,9 @@ python3 scripts/add_testcase.py \
 下列模式僅供探索性研究，不建議用於生產環境：
 - `jp2t` - 日文新字體到舊字體
 - `t2jp` - 日文舊字體到新字體
+- `t2seal` - 繁體漢字到小篆（Unicode 18.0 篆書區塊）
+- `s2seal` - 簡體到小篆（`s2t` 後接 `t2seal`）
+- `seal2t` - 小篆（Unicode 18.0 篆書區塊）到繁體漢字
 
 ### Golden 測試
 

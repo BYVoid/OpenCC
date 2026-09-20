@@ -2033,6 +2033,106 @@
       }
     },
     {
+      "id": "case_069_seal_roundtrip",
+      "input": "天地玄黃宇宙洪",
+      "expected": {
+        "t2seal": "𽀃𿡚𽭝𿤶𾒶𾓼𾿼"
+      }
+    },
+    {
+      "id": "case_070_seal_roundtrip",
+      "input": "𽀃𿡚𽭝𿤶𾒶𾓼𾿼",
+      "expected": {
+        "seal2t": "天地玄黃宇宙洪"
+      }
+    },
+    {
+      "id": "case_071_seal_untouched_characters",
+      "input": "你們好，OpenCC 說文解字。",
+      "expected": {
+        "t2seal": "你們𿒛，OpenCC 𽛛𾧆𽳮𿮵。",
+        "seal2t": "你們好，OpenCC 說文解字。"
+      }
+    },
+    {
+      "id": "case_072_seal_headword_before_variants",
+      "input": "民王",
+      "expected": {
+        "t2seal": "𿕍𽁨"
+      }
+    },
+    {
+      "id": "case_073_seal_variants_share_modern_form",
+      "input": "𿕍𿕎𿕏𽁨𽁭",
+      "expected": {
+        "seal2t": "民民民王玉"
+      }
+    },
+    {
+      "id": "case_074_seal_reverse_prefer",
+      "input": "叡",
+      "expected": {
+        "t2seal": "𽭹"
+      }
+    },
+    {
+      "id": "case_075_seal_reverse_prefer",
+      "input": "𽭹𽂊",
+      "expected": {
+        "seal2t": "叡叡"
+      }
+    },
+    {
+      "id": "case_076_seal_compatibility_ideograph_normalization",
+      "input": "樂",
+      "expected": {
+        "t2seal": "𾄨"
+      }
+    },
+    {
+      "id": "case_077_seal_variants_bridge_standard_characters",
+      "input": "小年生自前往得和",
+      "expected": {
+        "t2seal": "𽌠𾐡𾆦𽨋𽒰𽕷𽖕𽎿"
+      }
+    },
+    {
+      "id": "case_078_seal_variants_bridge_standard_characters",
+      "input": "𽌠𾐡𾆦𽨋𽒰𽕷𽖕𽎿",
+      "expected": {
+        "seal2t": "小年生自前往得和"
+      }
+    },
+    {
+      "id": "case_079_seal_jade_is_not_king",
+      "input": "王玉",
+      "expected": {
+        "t2seal": "𽁨𽁭"
+      }
+    },
+    {
+      "id": "case_080_seal_regional_variants_share_seal_form",
+      "input": "為爲裡裏群羣",
+      "expected": {
+        "t2seal": "𽡲𽡲𾟀𾟀𽪠𽪠"
+      }
+    },
+    {
+      "id": "case_081_seal_keeps_standard_transcription",
+      "input": "𽡲𾟀𽪠",
+      "expected": {
+        "seal2t": "爲裏羣"
+      }
+    },
+    {
+      "id": "case_082_s2seal_disambiguates_before_seal_conversion",
+      "input": "头发发展干燥从前 皇后在后面 年年有余",
+      "expected": {
+        "s2t": "頭髮發展乾燥從前 皇后在後面 年年有餘",
+        "s2seal": "𾤼𾧋𿗺𾡝𿮑𾵕𾞓𽒰 𽁬𾧼𿢐𽖐𾦧 𾐡𾐡𾎋𽻕"
+      }
+    },
+    {
       "id": "BYVoid_OpenCC_Issue_1490_mi_secret_keeps_tw_standard_form",
       "input": "秘书 秘书长 神秘 秘密",
       "expected": {

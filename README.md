@@ -336,6 +336,9 @@ These ports are community-maintained and may not always track upstream updates.
 
 * `t2jp.json` **Old Japanese Kanji (Kyūjitai)** to **New Japanese Kanji (Shinjitai)** / **日文舊字體** 到 **日文新字體**
 * `jp2t.json` **New Japanese Kanji (Shinjitai)** to **Old Japanese Kanji (Kyūjitai)** / **日文新字體** 到 **日文舊字體**，並將少量日文詞組轉換爲對應中文
+* `t2seal.json` **Traditional Chinese Characters** to **Small Seal Script (Unicode 18.0 Seal block)** / **繁體漢字** 到 **小篆（Unicode 18.0 篆書區塊 U+3D000..U+3FC3F）**，需搭配支援該區塊的字型顯示
+* `s2seal.json` **Simplified Chinese** to **Small Seal Script (Unicode 18.0 Seal block)** / **簡體** 到 **小篆**，相當於 `s2t` 後接 `t2seal`。反方向（小篆到簡體）請依序執行 `seal2t` 與 `t2s`：分詞只在輸入端進行一次，小篆輸入無法為 `t2s` 的詞組轉換分詞
+* `seal2t.json` **Small Seal Script (Unicode 18.0 Seal block)** to **Traditional Chinese Characters** / **小篆（Unicode 18.0 篆書區塊）** 到 **繁體漢字**，依 Unicode `SealSources.txt` 的 `kSEAL_MCJK` 屬性對應，並以 `SealVariants.txt` 銜接現代標準字與《說文》隸定字（如 `年`／`秊`）；《說文》未收之字（如 `你`、`們`）保持不變
 
 #### 指定配置文件
 

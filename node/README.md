@@ -186,6 +186,9 @@ advanced CLI features.
 | `hk2t.json` | Traditional Chinese (Hong Kong variant) to Traditional Chinese (OpenCC Standard) / 香港繁體到 OpenCC 標準繁體 |
 | `t2jp.json` | Traditional Chinese Characters (Kyūjitai) to New Japanese Kanji (Shinjitai) / OpenCC 標準繁體（日文舊字體）到日文新字體 |
 | `jp2t.json` | New Japanese Kanji (Shinjitai) to Traditional Chinese Characters (Kyūjitai) / 日文新字體到 OpenCC 標準繁體（日文舊字體） |
+| `t2seal.json` | Traditional Chinese Characters to Small Seal Script (Unicode 18.0 Seal block) / 繁體漢字到小篆（Unicode 18.0 篆書區塊） |
+| `s2seal.json` | Simplified Chinese to Small Seal Script (Unicode 18.0 Seal block) / 簡體到小篆（Unicode 18.0 篆書區塊） |
+| `seal2t.json` | Small Seal Script (Unicode 18.0 Seal block) to Traditional Chinese Characters / 小篆（Unicode 18.0 篆書區塊）到繁體漢字 |
 
 ## Custom Configurations
 

@@ -32,6 +32,8 @@ set(
   HKPhrasesRev
   JPShinjitaiCharacters
   JPShinjitaiPhrases
+  SealCharacters
+  SealVariants
 )
 
 set(
@@ -41,6 +43,8 @@ set(
   TWVariantsRev
   HKVariantsRev
   JPShinjitaiCharactersRev
+  SealCharactersRev
+  SealVariantsRev
 )
 
 set(DICTS ${DICTS_RAW} ${DICTS_GENERATED})
@@ -132,6 +136,24 @@ set(
 set(
   DICT_JPShinjitaiCharactersRev_GENERATING_COMMAND
   ${DICT_REVERSE_BIN} ${DICT_JPShinjitaiCharactersRev_GENERATING_INPUT} JPShinjitaiCharactersRev.txt
+)
+
+set(
+  DICT_SealCharactersRev_GENERATING_INPUT
+  ${DICT_DIR}/SealCharacters.txt
+)
+set(
+  DICT_SealCharactersRev_GENERATING_COMMAND
+  ${DICT_REVERSE_BIN} ${DICT_SealCharactersRev_GENERATING_INPUT} SealCharactersRev.txt
+)
+
+set(
+  DICT_SealVariantsRev_GENERATING_INPUT
+  ${DICT_DIR}/SealVariants.txt
+)
+set(
+  DICT_SealVariantsRev_GENERATING_COMMAND
+  ${DICT_REVERSE_BIN} ${DICT_SealVariantsRev_GENERATING_INPUT} SealVariantsRev.txt
 )
 
 add_custom_target(
@@ -273,12 +295,15 @@ set(CONFIG_FILES
   config/jp2t.json
   config/s2hk.json
   config/s2hkp.json
+  config/s2seal.json
   config/s2t.json
   config/s2tw.json
   config/s2twp.json
+  config/seal2t.json
   config/t2hk.json
   config/t2jp.json
   config/t2s.json
+  config/t2seal.json
   config/t2tw.json
   config/tw2s.json
   config/tw2sp.json

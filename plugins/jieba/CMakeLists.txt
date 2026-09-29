@@ -102,49 +102,67 @@ target_compile_definitions(opencc_jieba PRIVATE OPENCC_PLUGIN_BUILD)
 
 set(JIEBA_MERGED_DICT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/jieba_dict")
 set(JIEBA_MERGED_DICT "${JIEBA_MERGED_DICT_DIR}/jieba_merged.ocd2")
-set(OPENCC_CAN_RUN_CPPJIEBA_DICT TRUE)
 
-function(opencc_normalize_arch output_var input_value)
-  string(TOUPPER "${input_value}" _arch)
-  if (_arch STREQUAL "AMD64" OR _arch STREQUAL "X86_64")
-    set(_arch "X64")
-  elseif (_arch STREQUAL "AARCH64")
-    set(_arch "ARM64")
-  elseif (_arch MATCHES "^I[3-6]86$" OR _arch STREQUAL "X86" OR
-          _arch STREQUAL "WIN32")
-    set(_arch "X86")
-  endif()
-  set(${output_var} "${_arch}" PARENT_SCOPE)
-endfunction()
-
-function(opencc_can_run_target_on_host output_var host_arch target_arch)
-  set(_can_run FALSE)
-  if ("${host_arch}" STREQUAL "${target_arch}")
-    set(_can_run TRUE)
-  elseif ("${host_arch}" STREQUAL "X64" AND "${target_arch}" STREQUAL "X86")
-    set(_can_run TRUE)
-  endif()
-  set(${output_var} "${_can_run}" PARENT_SCOPE)
-endfunction()
-
-if (DEFINED CMAKE_VS_PLATFORM_NAME AND NOT CMAKE_VS_PLATFORM_NAME STREQUAL "")
-  set(_opencc_target_arch "${CMAKE_VS_PLATFORM_NAME}")
+# Whether the just-built (integrated mode) or installed (standalone mode)
+# opencc_dict can actually run on this host: dictionary generation executes
+# it at build time. The helper is shared with the top-level data build; a
+# standalone plugin build without the parent source tree falls back to an
+# inline copy kept in sync with cmake/OpenCCRunnability.cmake.
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/OpenCCRunnability.cmake")
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/OpenCCRunnability.cmake")
+  set(OPENCC_CAN_RUN_CPPJIEBA_DICT ${OPENCC_CAN_RUN_TARGET_TOOLS})
 else()
-  set(_opencc_target_arch "${CMAKE_SYSTEM_PROCESSOR}")
-endif()
-set(_opencc_host_arch "${CMAKE_HOST_SYSTEM_PROCESSOR}")
-opencc_normalize_arch(_opencc_target_arch "${_opencc_target_arch}")
-opencc_normalize_arch(_opencc_host_arch "${_opencc_host_arch}")
+  function(opencc_normalize_arch output_var input_value)
+    string(TOUPPER "${input_value}" _arch)
+    if (_arch STREQUAL "AMD64" OR _arch STREQUAL "X86_64")
+      set(_arch "X64")
+    elseif (_arch STREQUAL "AARCH64")
+      set(_arch "ARM64")
+    elseif (_arch MATCHES "^I[3-6]86$" OR _arch STREQUAL "X86" OR
+            _arch STREQUAL "WIN32")
+      set(_arch "X86")
+    endif()
+    set(${output_var} "${_arch}" PARENT_SCOPE)
+  endfunction()
 
-if (CMAKE_CROSSCOMPILING)
-  set(OPENCC_CAN_RUN_CPPJIEBA_DICT FALSE)
-endif()
-if (WIN32 AND _opencc_target_arch AND _opencc_host_arch)
-  opencc_can_run_target_on_host(_opencc_can_run_target "${_opencc_host_arch}"
-                                "${_opencc_target_arch}")
-  if (NOT _opencc_can_run_target)
+  function(opencc_can_run_target_on_host output_var host_arch target_arch)
+    set(_can_run FALSE)
+    if ("${host_arch}" STREQUAL "${target_arch}")
+      set(_can_run TRUE)
+    elseif ("${host_arch}" STREQUAL "X64" AND "${target_arch}" STREQUAL "X86")
+      set(_can_run TRUE)
+    endif()
+    set(${output_var} "${_can_run}" PARENT_SCOPE)
+  endfunction()
+
+  set(OPENCC_CAN_RUN_CPPJIEBA_DICT TRUE)
+  if (DEFINED CMAKE_VS_PLATFORM_NAME AND NOT CMAKE_VS_PLATFORM_NAME STREQUAL "")
+    set(_opencc_target_arch "${CMAKE_VS_PLATFORM_NAME}")
+  else()
+    set(_opencc_target_arch "${CMAKE_SYSTEM_PROCESSOR}")
+  endif()
+  set(_opencc_host_arch "${CMAKE_HOST_SYSTEM_PROCESSOR}")
+  opencc_normalize_arch(_opencc_target_arch "${_opencc_target_arch}")
+  opencc_normalize_arch(_opencc_host_arch "${_opencc_host_arch}")
+
+  if (CMAKE_CROSSCOMPILING)
     set(OPENCC_CAN_RUN_CPPJIEBA_DICT FALSE)
   endif()
+  if (WIN32 AND _opencc_target_arch AND _opencc_host_arch)
+    opencc_can_run_target_on_host(_opencc_can_run_target "${_opencc_host_arch}"
+                                  "${_opencc_target_arch}")
+    if (NOT _opencc_can_run_target)
+      set(OPENCC_CAN_RUN_CPPJIEBA_DICT FALSE)
+    endif()
+  endif()
+endif()
+
+if (OPENCC_CAN_RUN_CPPJIEBA_DICT AND
+    NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR AND
+    NOT BUILD_TOOLS)
+  message(FATAL_ERROR
+    "Building the merged Jieba dictionary requires the opencc_dict build "
+    "tool: set BUILD_TOOLS=ON or provide host tools.")
 endif()
 
 if (OPENCC_CAN_RUN_CPPJIEBA_DICT)

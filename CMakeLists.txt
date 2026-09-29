@@ -49,6 +49,68 @@ option(BUILD_SHARED_LIBS "Build opencc as shared library" ${_OPENCC_DEFAULT_BUIL
 option(OPENCC_ENABLE_INSTALL "Generate install targets" ${_OPENCC_DEFAULT_ENABLE_INSTALL})
 option(ENABLE_GTEST "Build all tests." OFF)
 option(ENABLE_BENCHMARK "Build benchmark tests." OFF)
+option(BUILD_TOOLS "Build OpenCC command-line tools" ON)
+
+# Host-built tool executables used to generate the dictionaries when the
+# host cannot execute the just-built target tools (cross compiling without
+# emulation). Dictionaries are architecture-independent data, so generating
+# them with host tools produces the same result as generating them on the
+# target.
+set(OPENCC_DICT_EXECUTABLE "" CACHE FILEPATH "Path to a host-built opencc_dict executable used to generate dictionaries when cross compiling")
+set(OPENCC_CLI_EXECUTABLE "" CACHE FILEPATH "Path to a host-built opencc CLI executable used to generate dictionaries when cross compiling")
+
+# Building the dictionaries executes the just-built target tools (opencc_dict
+# and the opencc CLI) at build time. When cross compiling to an architecture
+# the host cannot execute, default to skipping the data build instead of
+# failing mid-build. The default can be overridden explicitly, e.g. when the
+# host can emulate the target (Rosetta 2), or host tools can be provided via
+# OPENCC_DICT_EXECUTABLE/OPENCC_CLI_EXECUTABLE above to keep building data.
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/OpenCCRunnability.cmake")
+# Whether BUILD_DATA was provided explicitly (-D or a previous configure)
+# before option() normalizes it, so that the warning below only fires when
+# the default was flipped automatically rather than chosen by the user.
+get_property(_OPENCC_BUILD_DATA_PROVIDED CACHE BUILD_DATA PROPERTY TYPE SET)
+set(_OPENCC_BUILD_DATA_DEFAULT ON)
+set(_OPENCC_BUILD_DATA_AUTO_OFF OFF)
+if(NOT _OPENCC_BUILD_DATA_PROVIDED
+    AND CMAKE_CROSSCOMPILING AND NOT OPENCC_CAN_RUN_TARGET_TOOLS
+    AND NOT OPENCC_DICT_EXECUTABLE AND NOT OPENCC_CLI_EXECUTABLE)
+  set(_OPENCC_BUILD_DATA_DEFAULT OFF)
+  set(_OPENCC_BUILD_DATA_AUTO_OFF ON)
+endif()
+option(BUILD_DATA "Build OpenCC dictionary data" ${_OPENCC_BUILD_DATA_DEFAULT})
+if(_OPENCC_BUILD_DATA_AUTO_OFF)
+  message(WARNING
+    "Cross compiling for an architecture the host cannot execute: BUILD_DATA "
+    "defaulted to OFF, so no dictionaries will be built or installed. "
+    "Provide host-built tools via OPENCC_DICT_EXECUTABLE and "
+    "OPENCC_CLI_EXECUTABLE to build the dictionaries anyway, or set "
+    "BUILD_DATA=ON explicitly if the host can run the target binaries "
+    "(e.g. through Rosetta 2).")
+endif()
+if(OPENCC_DICT_EXECUTABLE OR OPENCC_CLI_EXECUTABLE)
+  if(NOT OPENCC_DICT_EXECUTABLE OR NOT OPENCC_CLI_EXECUTABLE)
+    message(FATAL_ERROR
+      "OPENCC_DICT_EXECUTABLE and OPENCC_CLI_EXECUTABLE must be provided "
+      "together: building the dictionaries runs both the opencc_dict tool "
+      "and the opencc CLI.")
+  endif()
+  foreach(_opencc_host_tool_var OPENCC_DICT_EXECUTABLE OPENCC_CLI_EXECUTABLE)
+    if(NOT EXISTS "${${_opencc_host_tool_var}}")
+      message(FATAL_ERROR
+        "${_opencc_host_tool_var} does not exist: ${${_opencc_host_tool_var}}")
+    endif()
+  endforeach()
+  set(OPENCC_USING_HOST_TOOLS ON)
+else()
+  set(OPENCC_USING_HOST_TOOLS OFF)
+endif()
+if(BUILD_DATA AND NOT BUILD_TOOLS AND NOT OPENCC_USING_HOST_TOOLS)
+  message(FATAL_ERROR
+    "BUILD_DATA requires BUILD_TOOLS, or host tools via OPENCC_DICT_EXECUTABLE "
+    "and OPENCC_CLI_EXECUTABLE.")
+endif()
+
 # Top-level macOS builds enable the Jieba plugin by default so package
 # managers that build with default options (e.g. Homebrew) ship it. Other
 # platforms and subproject builds (FetchContent / add_subdirectory) keep it
@@ -383,13 +445,20 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/doc/CMakeLists.txt")
 elseif(BUILD_DOCUMENTATION)
   message(FATAL_ERROR "BUILD_DOCUMENTATION requires the doc source directory.")
 endif()
-add_subdirectory(data)
+if(BUILD_DATA)
+  add_subdirectory(data)
+elseif(ENABLE_GTEST)
+  message(FATAL_ERROR "ENABLE_GTEST requires BUILD_DATA: the conversion tests run against the built dictionaries.")
+endif()
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugins/CMakeLists.txt")
   add_subdirectory(plugins)
 elseif(BUILD_OPENCC_JIEBA_PLUGIN)
   message(FATAL_ERROR "BUILD_OPENCC_JIEBA_PLUGIN requires the plugins source directory.")
 endif()
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")
+  if(ENABLE_GTEST AND NOT BUILD_TOOLS)
+    message(FATAL_ERROR "ENABLE_GTEST requires BUILD_TOOLS: the conversion tests execute the opencc CLI.")
+  endif()
   add_subdirectory(test)
 elseif(ENABLE_GTEST)
   message(FATAL_ERROR "ENABLE_GTEST requires the test source directory.")

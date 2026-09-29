@@ -4,8 +4,26 @@ endif()
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
-set(OPENCC_DICT_BIN opencc_dict)
-set(OPENCC_BIN opencc)
+if(OPENCC_USING_HOST_TOOLS)
+  # Host-built tools provided via OPENCC_DICT_EXECUTABLE/OPENCC_CLI_EXECUTABLE
+  # at the top level: they run on the host with their own libraries, so no
+  # build-tree copy dependency is needed on Windows.
+  set(OPENCC_DICT_BIN "${OPENCC_DICT_EXECUTABLE}")
+  set(OPENCC_BIN "${OPENCC_CLI_EXECUTABLE}")
+  set(OPENCC_CLI_COMMAND "${OPENCC_CLI_EXECUTABLE}")
+  set(DICT_WIN32_DEPENDS)
+else()
+  set(OPENCC_DICT_BIN opencc_dict)
+  set(OPENCC_BIN opencc)
+  # $<TARGET_FILE:...> generator expressions only resolve for targets; host
+  # tools above are plain paths.
+  set(OPENCC_CLI_COMMAND "$<TARGET_FILE:${OPENCC_BIN}>")
+  if(WIN32)
+    set(DICT_WIN32_DEPENDS copy_libopencc_to_dir_of_opencc_dict)
+  else()
+    set(DICT_WIN32_DEPENDS)
+  endif()
+endif()
 set(DICT_REVERSE_BIN "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/reverse.py")
 set(DICT_EXTRACT_TOFU_RISK_BIN "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/extract_tofu_risk.py")
 set(DICT_GENERATE_ST_PHRASES_BIN "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_st_phrases_from_regional_phrases.py")
@@ -106,7 +124,7 @@ set(
     --input ${DICT_DIR}/HKPhrases.txt
     --input ${DICT_DIR}/TWPhrases.txt
     --output STPhrases_GeneratedFromRegionalPhrases.txt
-    --opencc $<TARGET_FILE:${OPENCC_BIN}>
+    --opencc ${OPENCC_CLI_COMMAND}
     --config ${CMAKE_CURRENT_SOURCE_DIR}/config/t2s.json
     --dict-dir ${DICT_GENERATED_DIR}
 )
@@ -155,19 +173,6 @@ set(
   DICT_SealVariantsRev_GENERATING_COMMAND
   ${DICT_REVERSE_BIN} ${DICT_SealVariantsRev_GENERATING_INPUT} SealVariantsRev.txt
 )
-
-add_custom_target(
-  copy_libopencc_to_dir_of_opencc_dict
-  COMMENT
-    "Copying libopencc to directory of opencc_dict"
-  COMMAND
-    ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:libopencc>" "$<TARGET_FILE_DIR:${OPENCC_DICT_BIN}>"
-)
-if (WIN32)
-  set(DICT_WIN32_DEPENDS copy_libopencc_to_dir_of_opencc_dict)
-else()
-  set(DICT_WIN32_DEPENDS)
-endif()
 
 foreach(DICT ${DICTS_GENERATED})
   add_custom_command(

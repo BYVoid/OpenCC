@@ -263,7 +263,7 @@ endif()
 
 # Subdir
 
-if(BUILD_TOOLS)
+if(OPENCC_BUILD_TOOLS)
   add_subdirectory(tools)
 
   # opencc_dict in the build tree needs libopencc next to it to run on

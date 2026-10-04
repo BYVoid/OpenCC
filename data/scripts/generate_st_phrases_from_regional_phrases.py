@@ -17,7 +17,13 @@ def parse_args():
     parser.add_argument("--append-to")
     parser.add_argument("--output", required=True)
     backend = parser.add_mutually_exclusive_group(required=True)
-    backend.add_argument("--opencc")
+    # Repeated --opencc=<token> options build the converter command prefix:
+    # a cross-compiling emulator (CMAKE_CROSSCOMPILING_EMULATOR) or an env
+    # wrapper for a host-built opencc installed to a non-default prefix.
+    # The tokens may start with "-" (e.g. "cmake -E env ..."), so they are
+    # passed as separate --opencc=<token> options rather than one
+    # space-separated list, which the option parser would cut short.
+    backend.add_argument("--opencc", action="append")
     backend.add_argument("--node-binding")
     parser.add_argument("--config", required=True)
     parser.add_argument("--dict-dir", required=True)
@@ -28,10 +34,10 @@ def clean_path_arg(path):
     return path.replace('"', "")
 
 
-def convert_keys(opencc, config, dict_dir, keys):
+def convert_keys(opencc_command, config, dict_dir, keys):
     result = subprocess.run(
         [
-            opencc,
+            *opencc_command,
             "-c",
             config,
             "--path",
@@ -106,7 +112,7 @@ process.stdin.on('end', () => {
 def main():
     args = parse_args()
     if args.opencc:
-        args.opencc = clean_path_arg(args.opencc)
+        args.opencc = [clean_path_arg(part) for part in args.opencc]
     if args.node_binding:
         args.node_binding = clean_path_arg(args.node_binding)
     args.config = clean_path_arg(args.config)

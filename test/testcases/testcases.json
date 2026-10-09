@@ -2154,6 +2154,13 @@
       "expected": {
         "t2tw": "祕書 祕書長"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1505_hk_tv_names",
+      "input": "阳光卫视 凤凰卫视 凤凰台",
+      "expected": {
+        "s2hk": "陽光衛視 鳳凰衛視 鳳凰臺"
+      }
     }
   ]
 }

@@ -58,7 +58,7 @@ jobs:
             -DCMAKE_INSTALL_PREFIX:PATH="${{ github.workspace }}\dist\opencc-msvc-${{ matrix.package_suffix }}"
           cmake --build build-release --config Release --target install
 
-      - name: Build ARM64 compile-only targets
+      - name: Build ARM64 targets (data generation is skipped automatically)
         if: ${{ !matrix.can_run_binaries }}
         shell: pwsh
         run: |
@@ -66,7 +66,7 @@ jobs:
             -A "${{ matrix.cmake_arch }}" `
             -DCMAKE_BUILD_TYPE=Release `
             -DBUILD_OPENCC_JIEBA_PLUGIN=ON
-          cmake --build build-release --config Release --target libopencc opencc opencc_dict opencc_phrase_extract opencc_jieba
+          cmake --build build-release --config Release
 
       - name: Build and test debug
         if: ${{ matrix.can_run_binaries }}

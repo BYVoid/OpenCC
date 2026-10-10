@@ -102,53 +102,119 @@ target_compile_definitions(opencc_jieba PRIVATE OPENCC_PLUGIN_BUILD)
 
 set(JIEBA_MERGED_DICT_DIR "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/jieba_dict")
 set(JIEBA_MERGED_DICT "${JIEBA_MERGED_DICT_DIR}/jieba_merged.ocd2")
-set(OPENCC_CAN_RUN_CPPJIEBA_DICT TRUE)
 
-function(opencc_normalize_arch output_var input_value)
-  string(TOUPPER "${input_value}" _arch)
-  if (_arch STREQUAL "AMD64" OR _arch STREQUAL "X86_64")
-    set(_arch "X64")
-  elseif (_arch STREQUAL "AARCH64")
-    set(_arch "ARM64")
-  elseif (_arch MATCHES "^I[3-6]86$" OR _arch STREQUAL "X86" OR
-          _arch STREQUAL "WIN32")
-    set(_arch "X86")
-  endif()
-  set(${output_var} "${_arch}" PARENT_SCOPE)
-endfunction()
-
-function(opencc_can_run_target_on_host output_var host_arch target_arch)
-  set(_can_run FALSE)
-  if ("${host_arch}" STREQUAL "${target_arch}")
-    set(_can_run TRUE)
-  elseif ("${host_arch}" STREQUAL "X64" AND "${target_arch}" STREQUAL "X86")
-    set(_can_run TRUE)
-  endif()
-  set(${output_var} "${_can_run}" PARENT_SCOPE)
-endfunction()
-
-if (DEFINED CMAKE_VS_PLATFORM_NAME AND NOT CMAKE_VS_PLATFORM_NAME STREQUAL "")
-  set(_opencc_target_arch "${CMAKE_VS_PLATFORM_NAME}")
+# Whether the merged Jieba dictionary can be generated at build time: the
+# generation executes opencc_dict on the host. Integrated builds that were
+# given host tools (OPENCC_DICT_EXECUTABLE/OPENCC_CLI_EXECUTABLE at the top
+# level) can always run the host tool. Otherwise the helper shared with the
+# top-level data build decides whether the just-built (integrated mode) or
+# installed (standalone mode) opencc_dict can actually run on this host. A
+# standalone plugin build without the parent source tree falls back to an
+# inline copy kept in sync with cmake/OpenCCRunnability.cmake.
+set(_opencc_jieba_using_host_tools OFF)
+if (NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR AND OPENCC_USING_HOST_TOOLS)
+  set(_opencc_jieba_using_host_tools ON)
+  set(OPENCC_CAN_RUN_CPPJIEBA_DICT TRUE)
+elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/OpenCCRunnability.cmake")
+  include("${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/OpenCCRunnability.cmake")
+  set(OPENCC_CAN_RUN_CPPJIEBA_DICT ${OPENCC_CAN_RUN_TARGET_TOOLS})
 else()
-  set(_opencc_target_arch "${CMAKE_SYSTEM_PROCESSOR}")
-endif()
-set(_opencc_host_arch "${CMAKE_HOST_SYSTEM_PROCESSOR}")
-opencc_normalize_arch(_opencc_target_arch "${_opencc_target_arch}")
-opencc_normalize_arch(_opencc_host_arch "${_opencc_host_arch}")
+  function(opencc_normalize_arch output_var input_value)
+    string(TOUPPER "${input_value}" _arch)
+    if (_arch STREQUAL "AMD64" OR _arch STREQUAL "X86_64")
+      set(_arch "X64")
+    elseif (_arch STREQUAL "AARCH64")
+      set(_arch "ARM64")
+    elseif (_arch MATCHES "^I[3-6]86$" OR _arch STREQUAL "X86" OR
+            _arch STREQUAL "WIN32")
+      set(_arch "X86")
+    endif()
+    set(${output_var} "${_arch}" PARENT_SCOPE)
+  endfunction()
 
-if (CMAKE_CROSSCOMPILING)
-  set(OPENCC_CAN_RUN_CPPJIEBA_DICT FALSE)
-endif()
-if (WIN32 AND _opencc_target_arch AND _opencc_host_arch)
-  opencc_can_run_target_on_host(_opencc_can_run_target "${_opencc_host_arch}"
-                                "${_opencc_target_arch}")
-  if (NOT _opencc_can_run_target)
+  function(opencc_can_run_target_on_host output_var host_arch target_arch)
+    set(_can_run FALSE)
+    if ("${host_arch}" STREQUAL "${target_arch}")
+      set(_can_run TRUE)
+    elseif ("${host_arch}" STREQUAL "X64" AND "${target_arch}" STREQUAL "X86")
+      set(_can_run TRUE)
+    endif()
+    set(${output_var} "${_can_run}" PARENT_SCOPE)
+  endfunction()
+
+  function(opencc_host_tool_env output_var tool_path)
+    if (CMAKE_HOST_WIN32)
+      set(${output_var} "" PARENT_SCOPE)
+    else()
+      get_filename_component(_opencc_tool_bindir "${tool_path}" DIRECTORY)
+      get_filename_component(_opencc_tool_prefix
+                             "${_opencc_tool_bindir}" DIRECTORY)
+      if (CMAKE_HOST_APPLE)
+        set(_opencc_tool_libpath
+            "DYLD_LIBRARY_PATH=${_opencc_tool_prefix}/lib:$ENV{DYLD_LIBRARY_PATH}")
+      else()
+        set(_opencc_tool_libpath
+            "LD_LIBRARY_PATH=${_opencc_tool_prefix}/lib:$ENV{LD_LIBRARY_PATH}")
+      endif()
+      set(${output_var}
+          ${CMAKE_COMMAND} -E env "${_opencc_tool_libpath}" PARENT_SCOPE)
+    endif()
+  endfunction()
+
+  function(opencc_host_tool_command output_var tool_path)
+    opencc_host_tool_env(_opencc_tool_env "${tool_path}")
+    set(${output_var} ${_opencc_tool_env} "${tool_path}" PARENT_SCOPE)
+  endfunction()
+
+  set(OPENCC_CAN_RUN_CPPJIEBA_DICT TRUE)
+  if (DEFINED CMAKE_VS_PLATFORM_NAME AND NOT CMAKE_VS_PLATFORM_NAME STREQUAL "")
+    set(_opencc_target_arch "${CMAKE_VS_PLATFORM_NAME}")
+  else()
+    set(_opencc_target_arch "${CMAKE_SYSTEM_PROCESSOR}")
+  endif()
+  set(_opencc_host_arch "${CMAKE_HOST_SYSTEM_PROCESSOR}")
+  opencc_normalize_arch(_opencc_target_arch "${_opencc_target_arch}")
+  opencc_normalize_arch(_opencc_host_arch "${_opencc_host_arch}")
+
+  if (CMAKE_CROSSCOMPILING)
     set(OPENCC_CAN_RUN_CPPJIEBA_DICT FALSE)
   endif()
+  if (WIN32 AND _opencc_target_arch AND _opencc_host_arch)
+    opencc_can_run_target_on_host(_opencc_can_run_target "${_opencc_host_arch}"
+                                  "${_opencc_target_arch}")
+    # Downgrade on a mismatched architecture; upgrade on a runnable one only
+    # on a Windows host, where the comparison means WOW64 (cross builds from
+    # other hosts to Windows produce PE binaries the host cannot execute
+    # even when the architectures match).
+    if (NOT _opencc_can_run_target)
+      set(OPENCC_CAN_RUN_CPPJIEBA_DICT FALSE)
+    elseif (CMAKE_HOST_WIN32)
+      set(OPENCC_CAN_RUN_CPPJIEBA_DICT TRUE)
+    endif()
+  endif()
+  if (CMAKE_CROSSCOMPILING_EMULATOR)
+    set(OPENCC_CAN_RUN_CPPJIEBA_DICT TRUE)
+  endif()
+endif()
+
+if (OPENCC_CAN_RUN_CPPJIEBA_DICT AND
+    NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR AND
+    NOT OPENCC_BUILD_TOOLS AND
+    NOT _opencc_jieba_using_host_tools)
+  message(FATAL_ERROR
+    "Building the merged Jieba dictionary requires the opencc_dict build "
+    "tool: set OPENCC_BUILD_TOOLS=ON or provide host tools via "
+    "OPENCC_DICT_EXECUTABLE and OPENCC_CLI_EXECUTABLE.")
 endif()
 
 if (OPENCC_CAN_RUN_CPPJIEBA_DICT)
-  if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+  if (_opencc_jieba_using_host_tools)
+    # Integrated build with host tools: run the host opencc_dict instead of
+    # the just-built target tool, wrapped so its dynamic linker finds the
+    # libopencc it was built against (same helper as the data build).
+    opencc_host_tool_command(OPENCC_DICT_COMMAND "${OPENCC_DICT_EXECUTABLE}")
+    set(OPENCC_DICT_TARGET_DEPENDS)
+  elseif (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     # Standalone plugin build: use the opencc_dict installed alongside the
     # OpenCC package found by find_package. Merging the bundled Jieba
     # dictionaries requires the cppjieba_utf8 input format (OpenCC >= 1.4.1).
@@ -161,22 +227,7 @@ if (OPENCC_CAN_RUN_CPPJIEBA_DICT)
     endif()
     # An opencc_dict installed to a non-default prefix carries no rpath, so
     # help the dynamic linker find libopencc from the same installation.
-    get_filename_component(_opencc_dict_bindir
-                           "${OPENCC_DICT_EXECUTABLE}" DIRECTORY)
-    get_filename_component(_opencc_dict_prefix
-                           "${_opencc_dict_bindir}" DIRECTORY)
-    if (WIN32)
-      # The installed layout keeps opencc.dll next to opencc_dict.exe.
-      set(OPENCC_DICT_COMMAND "${OPENCC_DICT_EXECUTABLE}")
-    elseif (APPLE)
-      set(OPENCC_DICT_COMMAND ${CMAKE_COMMAND} -E env
-          "DYLD_LIBRARY_PATH=${_opencc_dict_prefix}/lib:$ENV{DYLD_LIBRARY_PATH}"
-          "${OPENCC_DICT_EXECUTABLE}")
-    else()
-      set(OPENCC_DICT_COMMAND ${CMAKE_COMMAND} -E env
-          "LD_LIBRARY_PATH=${_opencc_dict_prefix}/lib:$ENV{LD_LIBRARY_PATH}"
-          "${OPENCC_DICT_EXECUTABLE}")
-    endif()
+    opencc_host_tool_command(OPENCC_DICT_COMMAND "${OPENCC_DICT_EXECUTABLE}")
     execute_process(
       COMMAND ${OPENCC_DICT_COMMAND} --help
       RESULT_VARIABLE _opencc_dict_help_result
@@ -196,16 +247,26 @@ if (OPENCC_CAN_RUN_CPPJIEBA_DICT)
     endif()
     set(OPENCC_DICT_TARGET_DEPENDS)
   else()
-    set(OPENCC_DICT_COMMAND opencc_dict)
+    # Just-built target tool. CMAKE_CROSSCOMPILING_EMULATOR (e.g. qemu) runs
+    # it on the host; add_custom_command does not prepend it automatically,
+    # so the invocation wraps the tool explicitly (same as the data build).
+    if (CMAKE_CROSSCOMPILING_EMULATOR)
+      set(OPENCC_DICT_COMMAND
+          ${CMAKE_CROSSCOMPILING_EMULATOR} "$<TARGET_FILE:opencc_dict>")
+    else()
+      set(OPENCC_DICT_COMMAND opencc_dict)
+    endif()
     set(OPENCC_DICT_TARGET_DEPENDS opencc_dict)
   endif()
 endif()
 
 if (WIN32 AND OPENCC_CAN_RUN_CPPJIEBA_DICT AND
-    NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    NOT CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR AND
+    NOT _opencc_jieba_using_host_tools)
   # opencc_dict in the build tree needs libopencc next to it to run; data/
   # already defines this copy target for its own dictionary generation. An
-  # installed opencc_dict (standalone build) ships next to its runtime.
+  # installed opencc_dict (standalone build) ships next to its runtime, and
+  # host tools (integrated build) run with their own libraries.
   set(JIEBA_MERGED_DICT_WIN32_DEPENDS copy_libopencc_to_dir_of_opencc_dict)
 else()
   set(JIEBA_MERGED_DICT_WIN32_DEPENDS)
@@ -281,18 +342,25 @@ if (BUILD_OPENCC_JIEBA_PLUGIN AND OPENCC_ENABLE_INSTALL)
     endif()
   endif()
 
-  install(
-    FILES
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/config/hk2sp_jieba.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/config/s2hk_jieba.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/config/s2hkp_jieba.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/config/s2t_jieba.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/config/s2tw_jieba.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/config/s2twp_jieba.json
-      ${CMAKE_CURRENT_SOURCE_DIR}/data/config/tw2sp_jieba.json
-    DESTINATION
-      ${DIR_SHARE_OPENCC}
-  )
+  # The *_jieba.json configs reference both the merged Jieba dictionary and
+  # the dictionaries built by data/ (or the installation, in standalone
+  # builds); do not install configs pointing at dictionaries that are not
+  # built (cross compiling without host tools, OPENCC_BUILD_DATA=OFF).
+  if (OPENCC_CAN_RUN_CPPJIEBA_DICT AND
+      (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR OR OPENCC_BUILD_DATA))
+    install(
+      FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/data/config/hk2sp_jieba.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/data/config/s2hk_jieba.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/data/config/s2hkp_jieba.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/data/config/s2t_jieba.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/data/config/s2tw_jieba.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/data/config/s2twp_jieba.json
+        ${CMAKE_CURRENT_SOURCE_DIR}/data/config/tw2sp_jieba.json
+      DESTINATION
+        ${DIR_SHARE_OPENCC}
+    )
+  endif()
 
   install(
     FILES

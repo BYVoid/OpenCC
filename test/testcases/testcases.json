@@ -2161,6 +2161,20 @@
       "expected": {
         "s2hk": "陽光衛視 鳳凰衛視 鳳凰臺"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_zhichi_not_generic_s2twp",
+      "input": "支持候选人 支持政策 我支持你 财政支持 支持率 支持向量机 技术支持 客户支持 后勤支持 支持多平台",
+      "expected": {
+        "s2twp": "支持候選人 支持政策 我支持你 財政支持 支持率 支持向量機 技術支援 客戶支援 後勤支援 支援多平臺"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_zhichi_tw2sp",
+      "input": "支持候選人 技術支援 客戶支援 後勤支援 支援多平臺",
+      "expected": {
+        "tw2sp": "支持候选人 技术支持 客户支持 后勤支持 支持多平台"
+      }
     }
   ]
 }

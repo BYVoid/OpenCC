@@ -2161,6 +2161,20 @@
       "expected": {
         "s2hk": "陽光衛視 鳳凰衛視 鳳凰臺"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_gaoji_not_generic_s2twp",
+      "input": "高级中学 高级餐厅 高级住宅 高级会员 高级设置 高级选项 高级语言 高级搜索",
+      "expected": {
+        "s2twp": "高級中學 高級餐廳 高級住宅 高級會員 進階設定 進階選項 高階語言 進階搜尋"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_gaoji_tw2sp",
+      "input": "高級中學 高階語言 進階搜尋 進階設定",
+      "expected": {
+        "tw2sp": "高级中学 高级语言 高级搜索 高级设置"
+      }
     }
   ]
 }

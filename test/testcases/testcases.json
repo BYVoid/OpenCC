@@ -2163,6 +2163,20 @@
       }
     },
     {
+      "id": "BYVoid_OpenCC_Issue_1313_zhichi_not_generic_s2twp",
+      "input": "支持候选人 支持政策 我支持你 财政支持 支持率 支持向量机 技术支持 客户支持 后勤支持 支持多平台",
+      "expected": {
+        "s2twp": "支持候選人 支持政策 我支持你 財政支持 支持率 支持向量機 技術支援 客戶支援 後勤支援 支援多平臺"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_zhichi_tw2sp",
+      "input": "支持候選人 技術支援 客戶支援 後勤支援 支援多平臺",
+      "expected": {
+        "tw2sp": "支持候选人 技术支持 客户支持 后勤支持 支持多平台"
+      }
+    },
+    {
       "id": "BYVoid_OpenCC_Issue_1313_gaoji_not_generic_s2twp",
       "input": "高级中学 高级餐厅 高级住宅 高级会员 高级设置 高级选项 高级语言 高级搜索",
       "expected": {

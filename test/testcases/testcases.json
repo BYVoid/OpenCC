@@ -2177,6 +2177,20 @@
       }
     },
     {
+      "id": "BYVoid_OpenCC_Issue_1313_zhixing_not_generic_tw2sp",
+      "input": "強制執行 執行判決 執行任務 執行力 政策執行 執行委員會 執行長 執行緒 執行檔",
+      "expected": {
+        "tw2sp": "强制执行 执行判决 执行任务 执行力 政策执行 执行委员会 首席执行官 线程 可执行文件"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_zhixing_s2twp",
+      "input": "运行程序 首席执行官 可执行文件 线程",
+      "expected": {
+        "s2twp": "執行程式 執行長 執行檔 執行緒"
+      }
+    },
+    {
       "id": "BYVoid_OpenCC_Issue_1313_gaoji_not_generic_s2twp",
       "input": "高级中学 高级餐厅 高级住宅 高级会员 高级设置 高级选项 高级语言 高级搜索",
       "expected": {

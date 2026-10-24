@@ -2217,6 +2217,20 @@
       "expected": {
         "tw2sp": "社区大学 社区发展协会 开源社区 网络社区 在线社区"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_chengxu_not_generic_s2twp",
+      "input": "法律程序 申请程序 审批程序 应用程序 小程序 程序设计 程序代码 计算机程序 驱动程序 写程序",
+      "expected": {
+        "s2twp": "法律程序 申請程序 審批程序 應用程式 小程式 程式設計 程式碼 電腦程式 驅動程式 寫程式"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_chengxu_tw2sp",
+      "input": "法律程序 申請程序 應用程式 寫程式 電腦程式",
+      "expected": {
+        "tw2sp": "法律程序 申请程序 应用程序 写程序 计算机程序"
+      }
     }
   ]
 }

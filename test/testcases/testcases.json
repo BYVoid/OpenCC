@@ -2231,6 +2231,20 @@
       "expected": {
         "tw2sp": "法律程序 申请程序 应用程序 写程序 计算机程序"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_jincheng_not_generic_s2twp",
+      "input": "历史进程 和平进程 进程间通信 子进程 守护进程 后台进程 进程管理",
+      "expected": {
+        "s2twp": "歷史進程 和平進程 行程間通訊 子行程 常駐程式 背景處理程序 行程管理"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_xingcheng_tw2sp",
+      "input": "旅遊行程 行程表 行程間通訊 子行程 常駐程式",
+      "expected": {
+        "tw2sp": "旅游行程 行程表 进程间通信 子进程 守护进程"
+      }
     }
   ]
 }

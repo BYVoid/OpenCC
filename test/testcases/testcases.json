@@ -1713,6 +1713,16 @@
       }
     },
     {
+      "id": "BYVoid_OpenCC_Issue_1517_qian_fu",
+      "input": "乾符",
+      "expected": {
+        "t2s": "乾符",
+        "hk2s": "乾符",
+        "tw2s": "乾符",
+        "tw2sp": "乾符"
+      }
+    },
+    {
       "id": "t2s_huai_and_pi_phrases",
       "input": "破坏 身坏命终 一坏 製坏 坏布 麪坏兒",
       "expected": {

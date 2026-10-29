@@ -1,0 +1,54 @@
+TCLAP - Templatized Command Line Argument Parser
+
+This is a simple C++ library that facilitates parsing command line
+arguments in a type independent manner. It doesn't conform exactly
+to either the GNU or POSIX standards, although it is close. See
+docs/manual.html for descriptions of how things work or look at the
+simple examples in the examples dir.
+
+Versions and stability
+----------------------
+
+  1.2  For existing integrations that require the legacy 1.2 API or
+       behavior. Receives only critical bug fixes.
+  1.4  Recommended for projects requiring C++98 compatibility.
+       Maintenance version with no new feature development.
+  1.6  Recommended for projects using C++20 or later. Modernized
+       internals with an API mostly source compatible with 1.4.
+  2.0  A modern C++20 alternative under active development.
+       Not yet stable; expect API breakages.
+
+For stable integrations, choose 1.4 (C++98) or 1.6 (C++20).
+Choose the version that matches your project's C++ and API requirements.
+
+Quick start
+-----------
+
+This example uses the TCLAP 1.4 API. Add <tclap/CmdLine.h>, <iostream>
+and <string> to the includes and save as hello.cpp.
+
+    int main(int argc, char **argv) {
+        try {
+            TCLAP::CmdLine cmd("Print a greeting.", ' ', "1.0");
+            TCLAP::ValueArg<std::string> name(
+                "n", "name", "Name to greet", false, "world", "string", cmd);
+            cmd.parse(argc, argv);
+            std::cout << "Hello, " << name.getValue() << "!\n";
+        } catch (const TCLAP::ArgException &e) {
+            std::cerr << e.what() << '\n';
+            return 1;
+        }
+        return 0;
+    }
+
+With TCLAP headers on your include path, compile and run:
+
+    c++ -std=c++98 hello.cpp -o hello
+    ./hello
+    Hello, world!
+    ./hello --name Ada
+    Hello, Ada!
+
+Use -n Ada for the short form, or --help to see all options.
+
+Any and all feedback is welcome at https://sf.net/p/tclap/discussion/

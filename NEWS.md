@@ -14,6 +14,7 @@
     * 新增配置 `t2seal.json`（繁體漢字 → 小篆）、`seal2t.json`（小篆 → 繁體漢字）與 `s2seal.json`（簡體 → 小篆，即 `s2t` 後接 `t2seal`），已加入 CLI 說明、npm CLI 內建配置表與測試案例；僅供探索性研究，顯示需搭配支援 Unicode 18.0 篆書區塊的字型。
 * **詞庫更新**：
     * 以 cn-era 的 437 個歷代年號（漢武帝建元至清宣統）逐一驗證 `t2s`／`s2t`／`s2tw`／`s2hk` 的往返轉換，修正 `乾` 字年號被誤轉的問題：`t2s` 不再把「乾符／乾寧／乾祐／乾德／乾亨／乾封／乾明／乾定／乾統／乾興」轉成「干×」，`s2t` 也不再把簡體輸入的這些年號還原為「幹×」（[#1517](https://github.com/BYVoid/OpenCC/issues/1517), [#1518](https://github.com/BYVoid/OpenCC/pull/1518)）。「乾化」（後梁）在繁體中與「乾化」（gān huà，如「污泥乾化」）同形，故 `t2s` 只在「乾化元年～五年」「乾化年間」「後梁乾化」等語境下保留「乾」，單獨的「乾化」仍轉為「干化」；`s2t` 方向則新增「干化 → 乾化」。另補上「征和」（漢武帝）、「應曆」（遼穆宗；`应历元年～十九年`、`应历年间`、`辽应历`）、「聖曆」（武周；`圣历元年～三年`、`圣历年间`、`武周圣历`）的 `s2t` 詞條；後兩者刻意不收單獨的「应历／圣历」，以免「相应历史」「神圣历史」被拆錯。「升平」（晉穆帝）的 `s2t` 詞條改為「昇平 升平」，預設輸出不變，但多出「升平」候選，供 `GetAllConversions`／`--ambiguities` 等一對多查詢取用。
+* **依賴更新**：附帶的 `tclap` 由 1.2.5 更新到 1.4.0（header-only；上游改以 CMake 建置，附帶目錄改為 `deps/tclap-1.4.0/include`），Bazel 亦改用 BCR 上的 `tclap@1.4.0`。OpenCC 只使用 `CmdLine`／`ValueArg`／`SwitchArg`／`MultiArg`／`ValuesConstraint` 與 `StdOutput` 等穩定介面，程式碼無需修改；`USE_SYSTEM_TCLAP` 下仍可與系統的 1.2.x 相容。另，`USE_SYSTEM_TCLAP=ON` 時 CMake 現在會在 configure 階段尋找系統 TCLAP（先試 1.4 的 CMake package，再試 pkg-config，最後直接找標頭）並印出版本，且會試編 OpenCC 實際用到的 TCLAP 介面；找不到或介面不相容時立即以明確訊息報錯，而不是等到編譯 `src/tools` 時才出現模板錯誤。
 
 ## Version 1.4.2
 

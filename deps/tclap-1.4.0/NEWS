@@ -1,0 +1,88 @@
+TCLAP 1.4.0 - changes since 1.2.5
+================================
+
+This summary compares TCLAP 1.4.0 with the v1.2.5 tag, not with an earlier
+1.4 release candidate. TCLAP remains a header-only library supporting C++98.
+
+Arguments and constraints
+-------------------------
+
+* Argument groups replace the old XOR handler: OneOf requires exactly one
+  member, EitherOf permits at most one, and AnyOf groups arguments for display
+  without imposing a selection rule. CmdLine::xorAdd remains as a deprecated
+  convenience; new code should use OneOf. Exclusive members must be optional.
+* Argument aliases provide equivalent short flags and long names for one
+  argument, sharing its value, visitor, constraints and group membership.
+  Registration rejects conflicting spellings; detailed help lists aliases.
+* PredicateConstraint adapts owned functions and function objects to value
+  constraints. MakeConstraint and MakeRuleConstraint provide factories, with
+  fixed help text or text computed from the stored rule. Null function
+  pointers are rejected at construction.
+* Inclusive RangeConstraint and ready-made less-than/greater-than constraints
+  provide ordered bounds, reject unordered comparisons and generate error/help
+  text. Constraints can be passed as const objects; ValuesConstraint accepts
+  a const collection.
+* Arguments can be hidden from help while remaining available for parsing.
+
+Help, output and documentation
+------------------------------
+
+* Usage follows BSD-style conventions, with clearer required/optional and
+  exclusive groups, type placeholders, and positional arguments shown in
+  parsing order. Empty combined-switch summaries are omitted.
+* Improved wrapping, multiline descriptions and handling of long program names;
+  fixed crashes and buffer/length errors in help formatting. Displayed program
+  names omit directory paths and the executable suffix.
+* Built-in help, version and error messages support application-provided
+  translation, with a gettext integration example.
+* DocBook output supports argument groups, ordered positional operands and
+  aliases, escapes XML data, preserves type labels, and links correctly when
+  included from multiple translation units.
+* Updated manual, examples and installation guidance cover parser reuse,
+  borrowed object lifetimes, constraints, end-of-options handling and grouping.
+
+Parsing and robustness
+-----------------------
+
+* Delimiters, end-of-options state and optional positional registration checks
+  are scoped to each parser. Reset clears end-of-options state, and positional
+  ordering is checked at registration rather than object construction.
+* Failed argument/group registration rolls back parser state and bindings.
+  Duplicate detection uses declared names, flags and aliases rather than
+  descriptions or custom argument equality operators.
+* Explicitly empty attached values are passed to the value type: empty strings
+  are accepted, numeric extraction fails, and custom extractors decide their
+  own behavior. Positional arguments invoke their visitors when matched.
+* Fixed counted-switch reset and boolean conversion, positional equality, empty
+  argv-vector handling and exception diagnostic storage. Corrected required
+  argument bookkeeping without changing the argument's declared requirement.
+
+Compatibility notes
+--------------------
+
+* Stream-extracted (ValueLike) values reject embedded NUL bytes by default,
+  instead of silently truncating. Define TCLAP_ALLOW_NUL_TRUNCATION=1 before
+  including TCLAP to restore the old behavior; use one setting program-wide.
+  StringLike values, including std::string, retain their string semantics.
+* The deprecated mutable ValueArg::getValue() overload, ZshCompletionOutput
+  and XorHandler are removed. Legacy XOR customization helpers are replaced
+  by ArgGroup, and ignore-rest control now belongs to the parser.
+* Custom CmdLineInterface implementations and code depending on mutable
+  metadata accessors need adapting to the revised grouping/const interfaces.
+  Help text and some diagnostics differ from 1.2.5; update output comparisons.
+
+Build, installation and testing
+-------------------------------
+
+* CMake replaces Autotools and requires CMake 3.13 or later. Installed CMake
+  package discovery, pkg-config metadata and CPack packaging are provided;
+  examples, tests and documentation can be disabled independently.
+* Out-of-source builds, configurable installation destinations and paths with
+  spaces are supported. Release archives include generated API/manual docs,
+  examples, the test runner, unit tests and fuzz sources/seeds.
+* Tests use Python 3 and CTest, with an expanded public-API unit suite and
+  portable C++98 fuzz-seed regression tests. The runner executes the full suite
+  by default and supports selecting a subset. Optional Clang/libFuzzer builds
+  support sanitizer testing.
+* GitHub Actions covers Linux GCC/Clang, macOS Clang and Windows MSVC. Updated
+  documentation pages show these workflows and link maintained versions.

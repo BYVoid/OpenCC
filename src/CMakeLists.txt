@@ -10,7 +10,7 @@ if(NOT USE_SYSTEM_RAPIDJSON)
   include_directories(SYSTEM ../deps/rapidjson-1.1.0)
 endif()
 if(NOT USE_SYSTEM_TCLAP)
-  include_directories(SYSTEM ../deps/tclap-1.2.5)
+  include_directories(SYSTEM ../deps/tclap-1.4.0/include)
 endif()
 
 # Library

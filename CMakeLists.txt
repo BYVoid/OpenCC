@@ -465,7 +465,9 @@ if(USE_SYSTEM_TCLAP)
       "System TCLAP (version ${OPENCC_TCLAP_VERSION}) at ${TCLAP_INCLUDE_DIR} "
       "does not provide the API used by OpenCC (CmdLine, ValueArg, SwitchArg, "
       "MultiArg, UnlabeledMultiArg, ValuesConstraint and StdOutput as of "
-      "TCLAP 1.2.2 to 1.4.0). See CMakeFiles/CMakeConfigureLog.yaml (or "
+      "TCLAP 1.2.2 to 1.4.0). Note that TCLAP 1.6 and later require C++20 "
+      "while OpenCC is built as C++17, so they are not supported. See "
+      "CMakeFiles/CMakeConfigureLog.yaml (or "
       "CMakeFiles/CMakeError.log on CMake < 3.26) for the compiler output, or "
       "configure with -DUSE_SYSTEM_TCLAP=OFF to use the bundled copy.")
   endif()

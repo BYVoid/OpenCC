@@ -474,7 +474,9 @@ else()
   endif()
 endif()
 
-if(USE_SYSTEM_TCLAP)
+if(USE_SYSTEM_TCLAP AND OPENCC_BUILD_TOOLS)
+  # TCLAP is only used by the command line tools in src/tools, so a
+  # library-only build (OPENCC_BUILD_TOOLS=OFF) does not need it at all.
   # Locate the system TCLAP headers. TCLAP >= 1.4 installs a CMake package
   # (TCLAPConfig.cmake, target TCLAP::TCLAP); TCLAP 1.2.x only ships a
   # pkg-config file. Fall back to a plain header search so that a bare header

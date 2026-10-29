@@ -375,6 +375,103 @@ else()
   endif()
 endif()
 
+if(USE_SYSTEM_TCLAP)
+  # Locate the system TCLAP headers. TCLAP >= 1.4 installs a CMake package
+  # (TCLAPConfig.cmake, target TCLAP::TCLAP); TCLAP 1.2.x only ships a
+  # pkg-config file. Fall back to a plain header search so that a bare header
+  # install (e.g. a distro package without metadata) still works.
+  set(OPENCC_TCLAP_VERSION "unknown")
+  set(OPENCC_TCLAP_HINTS "")
+  find_package(TCLAP CONFIG QUIET)
+  if(TCLAP_FOUND AND TARGET TCLAP::TCLAP)
+    set(OPENCC_TCLAP_VERSION "${TCLAP_VERSION}")
+    get_target_property(OPENCC_TCLAP_HINTS TCLAP::TCLAP
+                        INTERFACE_INCLUDE_DIRECTORIES)
+  else()
+    find_package(PkgConfig QUIET)
+    if(PKG_CONFIG_FOUND)
+      pkg_check_modules(PC_TCLAP QUIET tclap)
+      if(PC_TCLAP_FOUND)
+        set(OPENCC_TCLAP_VERSION "${PC_TCLAP_VERSION}")
+        set(OPENCC_TCLAP_HINTS ${PC_TCLAP_INCLUDE_DIRS} ${PC_TCLAP_INCLUDEDIR})
+      endif()
+    endif()
+  endif()
+  find_path(TCLAP_INCLUDE_DIR tclap/CmdLine.h HINTS ${OPENCC_TCLAP_HINTS})
+  if(NOT TCLAP_INCLUDE_DIR)
+    message(FATAL_ERROR
+      "USE_SYSTEM_TCLAP is ON but tclap/CmdLine.h was not found. Install the "
+      "TCLAP headers (e.g. libtclap-dev) or configure with "
+      "-DUSE_SYSTEM_TCLAP=OFF to use the bundled copy.")
+  endif()
+  message(STATUS
+    "System TCLAP found: ${TCLAP_INCLUDE_DIR} (version ${OPENCC_TCLAP_VERSION})")
+
+  # Compile the subset of the TCLAP API that OpenCC's command line tools use,
+  # so that an incompatible system version fails at configure time with a
+  # clear message instead of deep inside src/tools.
+  include(CheckCXXSourceCompiles)
+  set(CMAKE_REQUIRED_INCLUDES "${TCLAP_INCLUDE_DIR}")
+  set(CMAKE_REQUIRED_QUIET ON)
+  check_cxx_source_compiles("
+    #include <iostream>
+    #include <string>
+    #include <vector>
+    #include <tclap/CmdLine.h>
+    class Output : public TCLAP::StdOutput {
+    public:
+      void usage(TCLAP::CmdLineInterface& cmd) override {
+        std::cout << cmd.getMessage() << cmd.getVersion();
+        _shortUsage(cmd, std::cout);
+        _longUsage(cmd, std::cout);
+      }
+      void version(TCLAP::CmdLineInterface& cmd) override {
+        std::cout << cmd.getVersion();
+      }
+    };
+    int main(int argc, const char* argv[]) {
+      try {
+        TCLAP::CmdLine cmd(\"message\", ' ', \"1.0\");
+        Output output;
+        cmd.setOutput(&output);
+        std::vector<std::string> values{\"a\", \"b\"};
+        TCLAP::ValuesConstraint<std::string> constraint(values);
+        TCLAP::ValueArg<std::string> valueArg(
+            \"c\", \"config\", \"desc\", false, \"default\", \"file\", cmd);
+        TCLAP::ValueArg<std::string> constrainedArg(
+            \"t\", \"to\", \"desc\", true, \"\", &constraint, cmd);
+        TCLAP::ValueArg<bool> boolArg(
+            \"\", \"noflush\", \"desc\", false, false, \"bool\", cmd);
+        TCLAP::SwitchArg switchArg(\"\", \"in-place\", \"desc\", cmd, false);
+        TCLAP::MultiArg<std::string> multiArg(
+            \"\", \"path\", \"desc\", false, \"file\", cmd);
+        TCLAP::UnlabeledMultiArg<std::string> fileNames(
+            \"fileName\", \"desc\", true, \"files\");
+        cmd.add(fileNames);
+        cmd.parse(argc, argv);
+        return valueArg.getValue().size() + constrainedArg.getValue().size() +
+               (boolArg.getValue() ? 1 : 0) + (switchArg.getValue() ? 1 : 0) +
+               multiArg.getValue().size() + fileNames.getValue().size();
+      } catch (TCLAP::ArgException& e) {
+        std::cerr << e.error() << e.argId();
+        return 1;
+      }
+    }
+  " OPENCC_SYSTEM_TCLAP_COMPATIBLE)
+  unset(CMAKE_REQUIRED_INCLUDES)
+  unset(CMAKE_REQUIRED_QUIET)
+  if(NOT OPENCC_SYSTEM_TCLAP_COMPATIBLE)
+    message(FATAL_ERROR
+      "System TCLAP (version ${OPENCC_TCLAP_VERSION}) at ${TCLAP_INCLUDE_DIR} "
+      "does not provide the API used by OpenCC (CmdLine, ValueArg, SwitchArg, "
+      "MultiArg, UnlabeledMultiArg, ValuesConstraint and StdOutput as of "
+      "TCLAP 1.2.2 to 1.4.0). See CMakeFiles/CMakeConfigureLog.yaml (or "
+      "CMakeFiles/CMakeError.log on CMake < 3.26) for the compiler output, or "
+      "configure with -DUSE_SYSTEM_TCLAP=OFF to use the bundled copy.")
+  endif()
+  include_directories(SYSTEM "${TCLAP_INCLUDE_DIR}")
+endif()
+
 ######## Subdirectories
 
 add_subdirectory(src)

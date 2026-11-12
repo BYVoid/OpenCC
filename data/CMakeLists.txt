@@ -4,8 +4,52 @@ endif()
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
-set(OPENCC_DICT_BIN opencc_dict)
-set(OPENCC_BIN opencc)
+if(OPENCC_USING_HOST_TOOLS)
+  # Host-built tools provided via OPENCC_DICT_EXECUTABLE/OPENCC_CLI_EXECUTABLE
+  # at the top level: they run on the host, wrapped so their dynamic linker
+  # finds the libopencc they were built against. No build-tree copy
+  # dependency is needed on Windows.
+  set(OPENCC_DICT_BIN "${OPENCC_DICT_EXECUTABLE}")
+  set(OPENCC_BIN "${OPENCC_CLI_EXECUTABLE}")
+  opencc_host_tool_command(OPENCC_DICT_COMMAND "${OPENCC_DICT_EXECUTABLE}")
+  # The ST phrase generator takes the converter as its --opencc argument;
+  # an env wrapper cannot be carried through an argument, so the generator
+  # invocation itself gets the env prefix below and the spawned CLI
+  # inherits it.
+  opencc_host_tool_env(DICT_GENERATOR_ENV "${OPENCC_CLI_EXECUTABLE}")
+  set(OPENCC_CLI_COMMAND "--opencc=${OPENCC_CLI_EXECUTABLE}")
+  set(DICT_WIN32_DEPENDS)
+else()
+  set(OPENCC_DICT_BIN opencc_dict)
+  set(OPENCC_BIN opencc)
+  set(DICT_GENERATOR_ENV)
+  # $<TARGET_FILE:...> generator expressions only resolve for targets; host
+  # tools above are plain paths. CMAKE_CROSSCOMPILING_EMULATOR (e.g. qemu)
+  # runs target binaries on the host; add_custom_command does not prepend it
+  # automatically, so the build-time invocations wrap the just-built tools
+  # explicitly — including the --opencc argument of the ST phrase generator.
+  if(CMAKE_CROSSCOMPILING_EMULATOR)
+    set(OPENCC_DICT_COMMAND
+        ${CMAKE_CROSSCOMPILING_EMULATOR} "$<TARGET_FILE:opencc_dict>")
+    # The generator script takes the converter as repeated --opencc=<token>
+    # options, so the emulator prefix (and the target path) each get their
+    # own option; a token may not be passed as a bare argument when it
+    # starts with "-".
+    set(OPENCC_CLI_COMMAND)
+    foreach(_OPENCC_CLI_TOKEN
+        ${CMAKE_CROSSCOMPILING_EMULATOR} "$<TARGET_FILE:opencc>")
+      list(APPEND OPENCC_CLI_COMMAND "--opencc=${_OPENCC_CLI_TOKEN}")
+    endforeach()
+  else()
+    set(OPENCC_DICT_COMMAND "$<TARGET_FILE:opencc_dict>")
+    set(OPENCC_CLI_COMMAND "--opencc=$<TARGET_FILE:opencc>")
+  endif()
+  if(WIN32)
+    set(DICT_WIN32_DEPENDS copy_libopencc_to_dir_of_opencc_dict)
+  else()
+    set(DICT_WIN32_DEPENDS)
+  endif()
+endif()
 set(DICT_REVERSE_BIN "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/reverse.py")
 set(DICT_EXTRACT_TOFU_RISK_BIN "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/extract_tofu_risk.py")
 set(DICT_GENERATE_ST_PHRASES_BIN "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_st_phrases_from_regional_phrases.py")
@@ -102,11 +146,12 @@ set(
 )
 set(
   DICT_STPhrases_GeneratedFromRegionalPhrases_GENERATING_COMMAND
+  ${DICT_GENERATOR_ENV}
   ${DICT_GENERATE_ST_PHRASES_BIN}
     --input ${DICT_DIR}/HKPhrases.txt
     --input ${DICT_DIR}/TWPhrases.txt
     --output STPhrases_GeneratedFromRegionalPhrases.txt
-    --opencc $<TARGET_FILE:${OPENCC_BIN}>
+    ${OPENCC_CLI_COMMAND}
     --config ${CMAKE_CURRENT_SOURCE_DIR}/config/t2s.json
     --dict-dir ${DICT_GENERATED_DIR}
 )
@@ -156,19 +201,6 @@ set(
   ${DICT_REVERSE_BIN} ${DICT_SealVariantsRev_GENERATING_INPUT} SealVariantsRev.txt
 )
 
-add_custom_target(
-  copy_libopencc_to_dir_of_opencc_dict
-  COMMENT
-    "Copying libopencc to directory of opencc_dict"
-  COMMAND
-    ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:libopencc>" "$<TARGET_FILE_DIR:${OPENCC_DICT_BIN}>"
-)
-if (WIN32)
-  set(DICT_WIN32_DEPENDS copy_libopencc_to_dir_of_opencc_dict)
-else()
-  set(DICT_WIN32_DEPENDS)
-endif()
-
 foreach(DICT ${DICTS_GENERATED})
   add_custom_command(
     OUTPUT
@@ -181,6 +213,7 @@ foreach(DICT ${DICTS_GENERATED})
       ${DICT_WIN32_DEPENDS}
       ${OPENCC_BIN}
       ${DICT_${DICT}_GENERATING_INPUT}
+    VERBATIM
   )
   set_directory_properties(
     PROPERTIES
@@ -216,7 +249,7 @@ foreach(DICT ${DICTS})
     COMMENT
       "Building ${DICT}.ocd2"
     COMMAND
-      ${OPENCC_DICT_BIN}
+      ${OPENCC_DICT_COMMAND}
         --input ${DICT_${DICT}_INPUT}
         --output ${DICT}.ocd2
         --from text
@@ -225,6 +258,7 @@ foreach(DICT ${DICTS})
       ${DICT_WIN32_DEPENDS}
       ${OPENCC_DICT_BIN}
       ${DICT_${DICT}_INPUT}
+    VERBATIM
   )
 
   if(OPENCC_ENABLE_INSTALL AND OPENCC_DICT_FORMAT STREQUAL "ocd2")
@@ -260,7 +294,7 @@ if(OPENCC_DICT_FORMAT STREQUAL "ocd")
       COMMENT
         "Building ${DICT}.ocd"
       COMMAND
-        ${OPENCC_DICT_BIN}
+        ${OPENCC_DICT_COMMAND}
           --input ${DICT_${DICT}_INPUT}
           --output ${DICT}.ocd
           --from text
@@ -269,6 +303,7 @@ if(OPENCC_DICT_FORMAT STREQUAL "ocd")
         ${DICT_WIN32_DEPENDS}
         ${OPENCC_DICT_BIN}
         ${DICT_${DICT}_INPUT}
+      VERBATIM
     )
 
     if(OPENCC_ENABLE_INSTALL)

@@ -20,7 +20,7 @@ bazel_dep(name = "rules_nodejs", version = "6.7.4")
 bazel_dep(name = "rules_python", version = "2.0.3")
 bazel_dep(name = "rules_shell", version = "0.8.0")
 bazel_dep(name = "rules_zig", version = "0.14.0")
-bazel_dep(name = "tclap", version = "1.2.5.bcr.1")
+bazel_dep(name = "tclap", version = "1.4.0")
 bazel_dep(name = "toolchains_buildbuddy", version = "0.0.4", dev_dependency = True)
 
 single_version_override(

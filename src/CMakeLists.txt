@@ -10,7 +10,7 @@ if(NOT USE_SYSTEM_RAPIDJSON)
   include_directories(SYSTEM ../deps/rapidjson-1.1.0)
 endif()
 if(NOT USE_SYSTEM_TCLAP)
-  include_directories(SYSTEM ../deps/tclap-1.2.5)
+  include_directories(SYSTEM ../deps/tclap-1.4.0/include)
 endif()
 
 # Library
@@ -263,4 +263,19 @@ endif()
 
 # Subdir
 
-add_subdirectory(tools)
+if(OPENCC_BUILD_TOOLS)
+  add_subdirectory(tools)
+
+  # opencc_dict in the build tree needs libopencc next to it to run on
+  # Windows; data/ and plugins/jieba/ use this copy target for their
+  # build-time tool execution.
+  if(WIN32)
+    add_custom_target(
+      copy_libopencc_to_dir_of_opencc_dict
+      COMMENT
+        "Copying libopencc to directory of opencc_dict"
+      COMMAND
+        ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:libopencc>" "$<TARGET_FILE_DIR:opencc_dict>"
+    )
+  endif()
+endif()

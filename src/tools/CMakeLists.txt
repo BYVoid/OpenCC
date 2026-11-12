@@ -63,5 +63,8 @@ if(OPENCC_ENABLE_INSTALL)
 install(
   TARGETS opencc opencc_dict opencc_phrase_extract
   RUNTIME DESTINATION bin
+  # Executables built for iOS are MACOSX_BUNDLE targets and install through
+  # the BUNDLE destination instead of RUNTIME.
+  BUNDLE DESTINATION bin
 )
 endif()

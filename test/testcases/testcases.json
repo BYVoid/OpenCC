@@ -785,7 +785,7 @@
       "id": "variants_tw_s2twp",
       "input": "社區 所罗门群岛 复选框 复选按钮",
       "expected": {
-        "s2twp": "社群 索羅門群島 核取方塊 核取按鈕",
+        "s2twp": "社區 索羅門群島 核取方塊 核取按鈕",
         "s2tw": "社區 所羅門群島 複選框 複選按鈕",
         "s2t": "社區 所羅門羣島 複選框 複選按鈕"
       }
@@ -1713,6 +1713,16 @@
       }
     },
     {
+      "id": "BYVoid_OpenCC_Issue_1517_qian_fu",
+      "input": "乾符",
+      "expected": {
+        "t2s": "乾符",
+        "hk2s": "乾符",
+        "tw2s": "乾符",
+        "tw2sp": "乾符"
+      }
+    },
+    {
       "id": "t2s_huai_and_pi_phrases",
       "input": "破坏 身坏命终 一坏 製坏 坏布 麪坏兒",
       "expected": {
@@ -2160,6 +2170,131 @@
       "input": "阳光卫视 凤凰卫视 凤凰台",
       "expected": {
         "s2hk": "陽光衛視 鳳凰衛視 鳳凰臺"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_zhichi_not_generic_s2twp",
+      "input": "支持候选人 支持政策 我支持你 财政支持 支持率 支持向量机 技术支持 客户支持 后勤支持 支持多平台",
+      "expected": {
+        "s2twp": "支持候選人 支持政策 我支持你 財政支持 支持率 支持向量機 技術支援 客戶支援 後勤支援 支援多平臺"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_zhichi_tw2sp",
+      "input": "支持候選人 技術支援 客戶支援 後勤支援 支援多平臺",
+      "expected": {
+        "tw2sp": "支持候选人 技术支持 客户支持 后勤支持 支持多平台"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_zhixing_not_generic_tw2sp",
+      "input": "強制執行 執行判決 執行任務 執行力 政策執行 執行委員會 執行長 執行緒 執行檔",
+      "expected": {
+        "tw2sp": "强制执行 执行判决 执行任务 执行力 政策执行 执行委员会 首席执行官 线程 可执行文件"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_zhixing_s2twp",
+      "input": "运行程序 首席执行官 可执行文件 线程 强制执行 执行判决 执行任务 执行力 政策执行 执行委员会",
+      "expected": {
+        "s2twp": "執行程式 執行長 執行檔 執行緒 強制執行 執行判決 執行任務 執行力 政策執行 執行委員會"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_gaoji_not_generic_s2twp",
+      "input": "高级中学 高级餐厅 高级住宅 高级会员 高级设置 高级选项 高级语言 高级搜索",
+      "expected": {
+        "s2twp": "高級中學 高級餐廳 高級住宅 高級會員 進階設定 進階選項 高階語言 進階搜尋"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_gaoji_tw2sp",
+      "input": "高級中學 高階語言 進階搜尋 進階設定",
+      "expected": {
+        "tw2sp": "高级中学 高级语言 高级搜索 高级设置"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_shequ_not_generic_s2twp",
+      "input": "社区医院 住宅社区 社区服务 社区大学 社区发展协会 开源社区 网络社区 在线社区",
+      "expected": {
+        "s2twp": "社區醫院 住宅社區 社區服務 社區大學 社區發展協會 開源社群 網路社群 線上社群"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_shequ_tw2sp",
+      "input": "社區大學 社區發展協會 開源社群 網路社群 線上社群",
+      "expected": {
+        "tw2sp": "社区大学 社区发展协会 开源社区 网络社区 在线社区"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_chengxu_not_generic_s2twp",
+      "input": "法律程序 申请程序 审批程序 应用程序 小程序 程序设计 程序代码 计算机程序 驱动程序 写程序",
+      "expected": {
+        "s2twp": "法律程序 申請程序 審批程序 應用程式 小程式 程式設計 程式碼 電腦程式 驅動程式 寫程式"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_chengxu_tw2sp",
+      "input": "法律程序 申請程序 應用程式 寫程式 電腦程式",
+      "expected": {
+        "tw2sp": "法律程序 申请程序 应用程序 写程序 计算机程序"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_jincheng_not_generic_s2twp",
+      "input": "历史进程 和平进程 进程间通信 子进程 守护进程 后台进程 进程管理",
+      "expected": {
+        "s2twp": "歷史進程 和平進程 行程間通訊 子行程 常駐程式 背景處理程序 行程管理"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1313_xingcheng_tw2sp",
+      "input": "旅遊行程 行程表 行程間通訊 子行程 常駐程式",
+      "expected": {
+        "tw2sp": "旅游行程 行程表 进程间通信 子进程 守护进程"
+      }
+    },
+    {
+      "id": "era_names_qian_t2s",
+      "input": "乾亨 乾化元年 乾化年間 後梁乾化 乾定 乾寧 乾封 乾德 乾明 乾祐 乾符 乾統 乾興 乾元 乾道 乾隆",
+      "expected": {
+        "t2s": "乾亨 乾化元年 乾化年间 后梁乾化 乾定 乾宁 乾封 乾德 乾明 乾祐 乾符 乾统 乾兴 乾元 乾道 乾隆",
+        "hk2s": "乾亨 乾化元年 乾化年间 后梁乾化 乾定 乾宁 乾封 乾德 乾明 乾祐 乾符 乾统 乾兴 乾元 乾道 乾隆",
+        "tw2s": "乾亨 乾化元年 乾化年间 后梁乾化 乾定 乾宁 乾封 乾德 乾明 乾祐 乾符 乾统 乾兴 乾元 乾道 乾隆"
+      }
+    },
+    {
+      "id": "era_names_qian_s2t",
+      "input": "乾亨 乾化 乾定 乾宁 乾封 乾德 乾明 乾祐 乾符 乾统 乾兴 乾元 乾道 乾隆",
+      "expected": {
+        "s2t": "乾亨 乾化 乾定 乾寧 乾封 乾德 乾明 乾祐 乾符 乾統 乾興 乾元 乾道 乾隆",
+        "s2hk": "乾亨 乾化 乾定 乾寧 乾封 乾德 乾明 乾祐 乾符 乾統 乾興 乾元 乾道 乾隆",
+        "s2tw": "乾亨 乾化 乾定 乾寧 乾封 乾德 乾明 乾祐 乾符 乾統 乾興 乾元 乾道 乾隆"
+      }
+    },
+    {
+      "id": "era_names_li_zheng_s2t",
+      "input": "征和 应历元年 应历十九年 辽应历 圣历元年 武周圣历 万历 永历 大历",
+      "expected": {
+        "s2t": "征和 應曆元年 應曆十九年 遼應曆 聖曆元年 武周聖曆 萬曆 永曆 大曆",
+        "s2hk": "征和 應曆元年 應曆十九年 遼應曆 聖曆元年 武周聖曆 萬曆 永曆 大曆",
+        "s2tw": "征和 應曆元年 應曆十九年 遼應曆 聖曆元年 武周聖曆 萬曆 永曆 大曆"
+      }
+    },
+    {
+      "id": "era_names_no_collateral_damage",
+      "input": "相应历史 神圣历史 污泥干化",
+      "expected": {
+        "s2t": "相應歷史 神聖歷史 污泥乾化"
+      }
+    },
+    {
+      "id": "era_names_drying_t2s",
+      "input": "污泥乾化",
+      "expected": {
+        "t2s": "污泥干化"
       }
     }
   ]

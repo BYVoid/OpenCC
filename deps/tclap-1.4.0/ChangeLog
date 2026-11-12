@@ -1,0 +1,15 @@
+# TCLAP 1.4
+
+The 1.4 release of TCLAP contains many small improvements, but the main
+changes are:
+
+* xor args are deprecated in favour of *ArgGroup*s, a more feature
+  rich and general purpose way to express constraints among args.
+* The help output and argument parsing now more closely resembles that
+  of the NetBSD style.
+* Arguments can be hidden from the help text.
+* Switched to cmake build system.
+
+Most programs written for 1.2 should still continue to compile out of
+the box, but there are some cases where minor API changes have been
+made.

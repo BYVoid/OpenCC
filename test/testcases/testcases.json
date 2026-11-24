@@ -2296,6 +2296,20 @@
       "expected": {
         "t2s": "污泥干化"
       }
+    },
+    {
+      "id": "haokunnan_not_haokun_s2tw",
+      "input": "好困难 好困 我好困难",
+      "expected": {
+        "s2tw": "好困難 好睏 我好困難"
+      }
+    },
+    {
+      "id": "haokunnan_tw2s",
+      "input": "好困難 好睏",
+      "expected": {
+        "tw2s": "好困难 好困"
+      }
     }
   ]
 }

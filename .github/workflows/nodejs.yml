@@ -23,9 +23,9 @@ jobs:
         # Supported Node.js versions on latest hosted runners
         os: [ubuntu-latest, macos-latest]
         node-version: [20, 22, 24, 25]
-        # LTS coverage on macOS 14 (ARM64)
+        # LTS coverage on macOS 15 (ARM64)
         include:
-          - os: macos-14
+          - os: macos-15
             node-version: 24
           - os: macos-15-intel
             node-version: 24

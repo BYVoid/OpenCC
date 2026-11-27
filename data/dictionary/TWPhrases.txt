@@ -731,6 +731,12 @@ U盤	隨身碟
 變量	變數
 貝利尼	貝里尼
 貝寧	貝南
+# BYVoid/OpenCC/issues/1530
+賬單	帳單
+# BYVoid/OpenCC/issues/1530
+賬戶	帳戶
+# BYVoid/OpenCC/issues/1530
+賬號	帳號
 賴希	萊許
 賴氨酸	離胺酸
 贊比亞	尚比亞

@@ -2329,6 +2329,39 @@
         "s2hk": "不能把這種術忽略掉。我們不能把這門術忽視掉。",
         "s2hkp": "不能把這種術忽略掉。我們不能把這門術忽視掉。"
       }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1252_plant_leng",
+      "input": "菠棱菜 波棱菜",
+      "expected": {
+        "s2t": "菠稜菜 波稜菜",
+        "s2tw": "菠稜菜 波稜菜",
+        "s2twp": "菠稜菜 波稜菜",
+        "s2hk": "菠稜菜 波稜菜"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1252_tw_keep_leng_s2x",
+      "input": "焦棱 扑棱 刺棱 棱登 棱角",
+      "expected": {
+        "s2tw": "焦棱 撲棱 刺棱 棱登 稜角",
+        "s2twp": "焦棱 撲棱 刺棱 棱登 稜角"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1252_tw_keep_leng_t2tw",
+      "input": "焦棱 撲棱 刺棱 棱登 棱角",
+      "expected": {
+        "t2tw": "焦棱 撲棱 刺棱 棱登 稜角"
+      }
+    },
+    {
+      "id": "BYVoid_OpenCC_Issue_1252_plant_leng_x2t",
+      "input": "菠稜菜 波稜菜",
+      "expected": {
+        "tw2t": "菠稜菜 波稜菜",
+        "hk2t": "菠稜菜 波稜菜"
+      }
     }
   ]
 }

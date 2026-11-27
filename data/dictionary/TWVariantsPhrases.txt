@@ -15,11 +15,15 @@
 # - Use TWPhrases.txt/TWPhrasesRev.txt for Taiwan regional vocabulary
 #   mappings that should be maintained as bidirectional phrase pairs.
 
+刺棱	刺棱
 喫茶小舖	喫茶小舖
 張棟樑	張棟樑
+撲棱	撲棱
 林國樑	林國樑
 林杰樑	林杰樑
+棱登	棱登
 楊士樑	楊士樑
+焦棱	焦棱
 牛驥同一皁	牛驥同一皁
 牛驥同皁	牛驥同皁
 純喫茶	純喫茶
